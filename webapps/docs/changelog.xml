@@ -152,6 +152,11 @@
         clarify when a user may wish to deploy additional instances of the
         Manager web application. (markt)
       </fix>
+      <fix>
+        <bug>64774</bug>: Review references to Tomcat 9 in the the documentation
+        web application and remove them or upadte them to refer to Tomact 10 as
+        appropriate. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

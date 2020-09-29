@@ -200,7 +200,7 @@
   <subsection name="org.apache.catalina.tribes.group.interceptors.EncryptInterceptor Attributes">
    <p>
      The EncryptInterceptor adds encryption to the channel messages carrying
-     session data between nodes. Added in Tomcat 9.0.13.
+     session data between nodes.
    </p>
    <p>
      If using the <code>TcpFailureDetector</code>, the <code>EncryptInterceptor</code>

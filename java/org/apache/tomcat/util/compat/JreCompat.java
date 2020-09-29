@@ -50,7 +50,7 @@ public class JreCompat {
     protected static final Method getApplicationProtocolMethod;
 
     static {
-        // This is Tomcat 9 with a minimum Java version of Java 8.
+        // This is Tomcat 10 with a minimum Java version of Java 8.
         // Look for the highest supported JVM first
         if (GraalCompat.isSupported()) {
             instance = new GraalCompat();
