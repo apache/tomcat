@@ -66,6 +66,13 @@
         Correct numerous spellings throughout the code base. Based on a pull
         request from John Bampton. (markt)
       </fix>
+      <fix>
+        <bug>64765</bug>: Ensure that the number of currently processing threads
+        is tracked correctly when a web application is undeployed, long running
+        requests are being processed and
+        <code>renewThreadsWhenStoppingContext</code> is enabled for the web
+        application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
