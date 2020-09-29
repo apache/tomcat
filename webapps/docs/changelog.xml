@@ -86,7 +86,7 @@
       </update>
       <fix>
         Throw <code>SQLException</code> instead of
-        <code>NullpointerException</code> when failing to connect to the
+        <code>NullPointerException</code> when failing to connect to the
         database. (kfujino)
       </fix>
       <fix>
@@ -150,7 +150,7 @@
   <subsection name="Web applications">
     <changelog>
       <add>
-        Configure the Manager and Host Manager applications to set
+        Configure the Manager and Host Manager web applications to set
         <code>SameSite=strict</code> for all cookies, including session cookies,
         created by the application. (markt)
       </add>
@@ -160,8 +160,8 @@
         Manager web application. (markt)
       </fix>
       <fix>
-        <bug>64774</bug>: Review references to Tomcat 9 in the the documentation
-        web application and remove them or upadte them to refer to Tomact 10 as
+        <bug>64774</bug>: Review references to Tomcat 9 in the documentation
+        web application and remove them or update them to refer to Tomcat 10 as
         appropriate. (markt)
       </fix>
     </changelog>
@@ -171,7 +171,7 @@
       <update>
         Update to Commons Daemon 1.2.3. This adds support to jsvc for
         <code>--enable-preview</code> and native memory tracking (Procrun
-        already supported these features), adds some addition debug logging and
+        already supported these features), adds some additional debug logging and
         adds a new feature to Procrun that outputs the command to (re-)configure
         the service with the current settings. (markt)
       </update>
