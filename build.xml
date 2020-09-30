@@ -1557,7 +1557,7 @@
            />
         <batchtest todir="${test.reports}" unless="test.entry">
           <!-- Include all by default -->
-          <fileset dir="test" includes="${test.name}">
+          <fileset dir="test" includes="${test.name}" excludes="${test.exclude}">
             <!-- Exclude helper classes -->
             <exclude name="**/Tester*.java" />
             <!-- Exclude the tests known to fail -->
@@ -1569,8 +1569,6 @@
             <exclude unless="java.7.home" name="org/apache/tomcat/websocket/**" />
             <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
             <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
-            <!-- Exclude a configurable list of tests -->
-            <exclude name="${test.exclude}" />
           </fileset>
         </batchtest>
       </junit>
