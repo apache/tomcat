@@ -225,7 +225,7 @@ hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
 hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
 hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest/${hamcrest.version}/hamcrest-${hamcrest.version}.jar
 
-# ----- EasyMock, version 3.2 or later -----
+# ----- EasyMock, version 3.6 or later -----
 easymock.version=3.6
 easymock.checksum.enabled=true
 easymock.checksum.algorithm=SHA-512
@@ -234,7 +234,7 @@ easymock.home=${base.path}/easymock-${easymock.version}
 easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
 easymock.loc=${base-maven.loc}/org/easymock/easymock/${easymock.version}/easymock-${easymock.version}.jar
 
-# ----- cglib, used by EasyMock, version 2.2 or later -----
+# ----- cglib, used by EasyMock, version 3.3 or later -----
 cglib.version=3.3.0
 cglib.checksum.enabled=true
 cglib.checksum.algorithm=SHA-512
@@ -243,7 +243,7 @@ cglib.home=${base.path}/cglib-${cglib.version}
 cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
 
-# ----- objenesis, used by EasyMock, version 1.2 or later -----
+# ----- objenesis, used by EasyMock, version 2.6 or later -----
 objenesis.version=2.6
 objenesis.checksum.enabled=true
 objenesis.checksum.algorithm=SHA-512

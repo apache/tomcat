@@ -20,9 +20,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,6 +33,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.security.SecurityManagerBaseTest;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.easymock.IExpectationSetters;
 import org.easymock.internal.LastControl;
 
@@ -46,24 +47,24 @@ public final class TestApplicationContextFacadeSecurityManager extends SecurityM
      */
     @Parameterized.Parameters(name = "{index}: method={0}")
     public static Collection<Method> publicApplicationContextFacadeMethods() {
-        return Arrays.stream(ApplicationContextFacade.class.getMethods())
-                .filter(method -> !Modifier.isStatic(method.getModifiers()))
-                .filter(method -> {
-                    try {
-                        Object.class.getMethod(method.getName(), method.getParameterTypes());
-                        return false;
-                    } catch (final NoSuchMethodException e) {
-                        return true;
-                    }
-                })
-                .collect(Collectors.toList());
+        List<Method> result = new ArrayList<>();
+        for (Method m : ApplicationContextFacade.class.getMethods()) {
+            if (!Modifier.isStatic(m.getModifiers())) {
+                try {
+                    Object.class.getMethod(m.getName(), m.getParameterTypes());
+                    // Skip;
+                } catch (final NoSuchMethodException e) {
+                    result.add(m);
+                }
+            }
+        }
+        return result;
     }
 
 
     private static Object[] getDefaultParams(final Method method) {
-        final int paramsCount = method.getParameterCount();
-        final Object[] params = new Object[paramsCount];
         final Class<?>[] paramTypes = method.getParameterTypes();
+        final Object[] params = new Object[paramTypes.length];
         for (int i = 0; i < params.length; i++) {
             params[i] = getDefaultValue(paramTypes[i]);
         }
@@ -118,13 +119,17 @@ public final class TestApplicationContextFacadeSecurityManager extends SecurityM
                     EasyMock.expect(expectedAppContextMethod.invoke(
                             mockAppContext, getDefaultParams(methodToTest)));
         }
-        expectationSetters
-                .andAnswer(() -> {
-                    Assert.assertEquals(
-                            expectedAppContextMethod,
-                            LastControl.getCurrentInvocation().getMethod());
-                    return getDefaultValue(expectedAppContextMethod.getReturnType());
-                }).once();
+        expectationSetters.andAnswer(new IAnswer<Object>() {
+            @Override
+            public Object answer() throws Throwable {
+                Assert.assertEquals(
+                        expectedAppContextMethod,
+                        LastControl.getCurrentInvocation().getMethod());
+                return getDefaultValue(expectedAppContextMethod.getReturnType());
+            }
+
+        }).once();
+
         EasyMock.replay(mockAppContext);
         EasyMock.verifyUnexpectedCalls(mockAppContext);
 
