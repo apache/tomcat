@@ -182,21 +182,23 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (localAddress.getAddress().getClass().isAssignableFrom(inetAddress.getClass())) {
-                        if (inetAddress.isLoopbackAddress()) {
-                            if (loopbackConnectAddress == null) {
-                                loopbackConnectAddress = inetAddress;
+                if (networkInterface.isUp()) {
+                    Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                    while (inetAddresses.hasMoreElements()) {
+                        InetAddress inetAddress = inetAddresses.nextElement();
+                        if (localAddress.getAddress().getClass().isAssignableFrom(inetAddress.getClass())) {
+                            if (inetAddress.isLoopbackAddress()) {
+                                if (loopbackConnectAddress == null) {
+                                    loopbackConnectAddress = inetAddress;
+                                }
+                            } else if (inetAddress.isLinkLocalAddress()) {
+                                if (linkLocalConnectAddress == null) {
+                                    linkLocalConnectAddress = inetAddress;
+                                }
+                            } else {
+                                // Use a non-link local, non-loop back address by default
+                                return new InetSocketAddress(inetAddress, localAddress.getPort());
                             }
-                        } else if (inetAddress.isLinkLocalAddress()) {
-                            if (linkLocalConnectAddress == null) {
-                                linkLocalConnectAddress = inetAddress;
-                            }
-                        } else {
-                            // Use a non-link local, non-loop back address by default
-                            return new InetSocketAddress(inetAddress, localAddress.getPort());
                         }
                     }
                 }
