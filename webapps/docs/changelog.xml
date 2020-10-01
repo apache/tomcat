@@ -142,9 +142,9 @@
         explicitly closed. (markt)
       </fix>
       <fix>
-        Avoid a <code>BufferOverflowException</code> if an HTTP/2 connection is
-        closed while the parser still has a partial HTTP/2 frame in the input
-        buffer. (markt)
+        <bug>64710</bug>: Avoid a <code>BufferOverflowException</code> if an
+        HTTP/2 connection is closed while the parser still has a partial HTTP/2
+        frame in the input buffer. (markt)
       </fix>
     </changelog>
   </subsection>
