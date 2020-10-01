@@ -25,6 +25,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.servlet.http.WebConnection;
 
@@ -43,8 +44,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     // Because of the compression used, headers need to be written to the
     // network in the same order they are generated.
     private final Object headerWriteLock = new Object();
-    private Throwable error = null;
-    private IOException applicationIOE = null;
+    private final AtomicReference<Throwable> error = new AtomicReference<>();
+    private final AtomicReference<IOException> applicationIOE = new AtomicReference<>();
 
     public Http2AsyncUpgradeHandler(Http2Protocol protocol, Adapter adapter,
             Request coyoteRequest) {
@@ -57,7 +58,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         }
         @Override
         public void failed(Throwable t, Void attachment) {
-            error = t;
+            error.set(t);
         }
     };
     private final CompletionHandler<Long, Void> applicationErrorCompletion = new CompletionHandler<Long, Void>() {
@@ -67,9 +68,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         @Override
         public void failed(Throwable t, Void attachment) {
             if (t instanceof IOException) {
-                applicationIOE = (IOException) t;
+                applicationIOE.set((IOException) t);
             }
-            error = t;
+            error.set(t);
         }
     };
 
@@ -109,12 +110,13 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
                 ByteBuffer.wrap(localSettings.getSettingsFrameForPending()),
                 ByteBuffer.wrap(createWindowUpdateForSettings()));
-        if (error != null) {
+        Throwable err = error.get();
+        if (err != null) {
             String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
             if (log.isDebugEnabled()) {
                 log.debug(msg);
             }
-            throw new ProtocolException(msg, error);
+            throw new ProtocolException(msg, err);
         }
     }
 
@@ -270,17 +272,17 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
 
     private void handleAsyncException() throws IOException {
-        if (applicationIOE != null) {
-            IOException ioe = applicationIOE;
-            applicationIOE = null;
+        IOException ioe = applicationIOE.getAndSet(null);
+        if (ioe != null) {
             handleAppInitiatedIOException(ioe);
-        } else if (error != null) {
-            Throwable error = this.error;
-            this.error = null;
-            if (error instanceof IOException) {
-                throw (IOException) error;
-            } else {
-                throw new IOException(error);
+        } else {
+            Throwable err = this.error.getAndSet(null);
+            if (err != null) {
+                if (err instanceof IOException) {
+                    throw (IOException) err;
+                } else {
+                    throw new IOException(err);
+                }
             }
         }
     }
