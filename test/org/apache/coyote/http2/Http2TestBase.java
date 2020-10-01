@@ -813,14 +813,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    void sendGoaway(int streamId, int lastStreamId, long errorCode, byte[] debug)
-            throws IOException {
+    byte[] buildGoaway(int streamId, int lastStreamId, long errorCode) {
         byte[] goawayFrame = new byte[17];
-        int len = 8;
-        if (debug != null) {
-            len += debug.length;
-        }
-        ByteUtil.setThreeBytes(goawayFrame, 0, len);
+        ByteUtil.setThreeBytes(goawayFrame, 0, 8);
         // Type
         goawayFrame[3] = FrameType.GOAWAY.getIdByte();
         // No flags
@@ -829,10 +824,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         // Last stream
         ByteUtil.set31Bits(goawayFrame, 9, lastStreamId);
         ByteUtil.setFourBytes(goawayFrame, 13, errorCode);
+        return goawayFrame;
+    }
+
+
+    void sendGoaway(int streamId, int lastStreamId, long errorCode) throws IOException {
+        byte[] goawayFrame = buildGoaway(streamId, lastStreamId, errorCode);
         os.write(goawayFrame);
-        if (debug != null && debug.length > 0) {
-            os.write(debug);
-        }
         os.flush();
     }
 
