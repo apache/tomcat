@@ -100,6 +100,11 @@
         <code>renewThreadsWhenStoppingContext</code> is enabled for the web
         application. (markt)
       </fix>
+      <add>
+        Improve the error messages when running under JPMS without the necessary
+        options to enable reflection required by the memory leak prevention /
+        detection code. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
