@@ -32,6 +32,7 @@ import org.junit.Ignore;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
+import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
@@ -44,7 +45,8 @@ public class EmbeddedTomcat {
             ".handlers = java.util.logging.ConsoleHandler\n" +
             "java.util.logging.ConsoleHandler.level = FINE\n" +
             "java.util.logging.ConsoleHandler.formatter = org.apache.juli.OneLineFormatter\n" +
-            "java.util.logging.ConsoleHandler.encoding = UTF-8\n";
+            "java.util.logging.ConsoleHandler.encoding = UTF-8\n" +
+            "org.apache.level = INFO";
         try {
             InputStream is = new ByteArrayInputStream(loggingConfig.getBytes(StandardCharsets.UTF_8));
             LogManager.getLogManager().readConfiguration(is);
@@ -79,7 +81,7 @@ public class EmbeddedTomcat {
     }
 
     private static class CounterServlet extends HttpServlet {
-
+        Log log = LogFactory.getLog(CounterServlet.class);
         private static final long serialVersionUID = 1L;
 
         private AtomicInteger callCount = new AtomicInteger(0);
@@ -87,9 +89,13 @@ public class EmbeddedTomcat {
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+            log.debug("Enter CounterServlet");
             req.getSession(true);
             resp.setContentType("text/plain");
             resp.getWriter().print("OK: " + req.getRequestURL() + "[" + callCount.incrementAndGet()+ "]");
+            resp.flushBuffer();
+            log.debug("Exit CounterServlet");
+
         }
     }
 }

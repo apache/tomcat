@@ -1162,8 +1162,11 @@ public class Tomcat {
                 if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
                     context.setConfigured(true);
 
-                    // Process annotations
-                    WebAnnotationSet.loadApplicationAnnotations(context);
+                    // Process annotations when not running in a Graal image
+                    // annotations require reflections and additional configuration
+                    if (!JreCompat.isGraalAvailable()) {
+                        WebAnnotationSet.loadApplicationAnnotations(context);
+                    }
 
                     // LoginConfig is required to process @ServletSecurity
                     // annotations

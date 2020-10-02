@@ -1,2 +1,9 @@
 [
+  {
+    "name": "org.apache.juli.OneLineFormatter",
+    "allPublicMethods": true,
+    "allDeclaredFields":true,
+    "allDeclaredMethods":true,
+    "allDeclaredConstructors":true
+  }
 ]
