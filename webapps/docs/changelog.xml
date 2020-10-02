@@ -161,6 +161,13 @@
         Fix running service.bat when called from <code>$CATALINA_HOME</code>.
         (markt)
       </fix>
+      <fix>
+        Complete the fix for <bug>63815</bug>. Users wishing to use system
+        properties that require quoting with <code>catalina.sh</code> and the
+        <code>debug</code> option must use a JRE that includes the fix for <a
+        href="https://bugs.openjdk.java.net/browse/JDK-8234808">JDK-8234808</a>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
