@@ -249,4 +249,17 @@ public class JreCompat {
     public boolean isExported(Class<?> type) {
         return true;
     }
+
+
+    /**
+     * What is the module of the given class?
+     *
+     * @param type  The class to test
+     *
+     * @return Always {@code true} for Java 8. {@code true} if the enclosing
+     *         package is exported for Java 9+
+     */
+    public String getModuleName(Class<?> type) {
+        return "NO_MODULE_JAVA_8";
+    }
 }
