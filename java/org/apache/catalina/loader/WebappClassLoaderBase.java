@@ -2795,7 +2795,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (jreCompat.isInstanceOfInaccessibleObjectException(t)) {
                 // Must be running on Java 9 without the necessary command line
                 // options.
-                log.warn(sm.getString("webappClassLoader.addExportsThreadLocal"));
+                String currentModule = JreCompat.getInstance().getModuleName(this.getClass());
+                log.warn(sm.getString("webappClassLoader.addExportsThreadLocal", currentModule));
             } else {
                 ExceptionUtils.handleThrowable(t);
                 log.warn(sm.getString(
@@ -3057,7 +3058,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (jreCompat.isInstanceOfInaccessibleObjectException(e)) {
                 // Must be running on Java 9 without the necessary command line
                 // options.
-                log.warn(sm.getString("webappClassLoader.addExportsRmi"));
+                String currentModule = JreCompat.getInstance().getModuleName(this.getClass());
+                log.warn(sm.getString("webappClassLoader.addExportsRmi", currentModule));
             } else {
                 // Re-throw all other exceptions
                 // Have to wrap this below Java 7
@@ -3090,6 +3092,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         } catch (ClassNotFoundException e) {
             log.warn(sm.getString(
                     "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
+        } catch (RuntimeException e) {
+            JreCompat jreCompat = JreCompat.getInstance();
+            if (jreCompat.isInstanceOfInaccessibleObjectException(e)) {
+                // Must be running on Java 9 without the necessary command line
+                // options.
+                String currentModule = JreCompat.getInstance().getModuleName(this.getClass());
+                log.warn(sm.getString("webappClassLoader.addExportsJavaIo", currentModule));
+                return;
+            } else {
+                // Re-throw all other exceptions
+                throw e;
+            }
         }
     }
 
