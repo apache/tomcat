@@ -78,6 +78,11 @@ public interface Registration {
      */
     public Map<String, String> getInitParameters();
 
+    /**
+     * Interface through which a Servlet or Filter registered via one of the
+     * addServlet or addFilter methods, respectively, on ServletContext may be
+     * further configured.
+     */
     public interface Dynamic extends Registration {
 
         /**
