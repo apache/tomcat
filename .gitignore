@@ -30,6 +30,7 @@ mvn.properties
 .project
 .settings
 .idea
+.vscode
 *.iml
 *.ipr
 *.iws
