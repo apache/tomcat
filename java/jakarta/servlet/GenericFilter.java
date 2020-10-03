@@ -19,6 +19,13 @@ package jakarta.servlet;
 import java.io.Serializable;
 import java.util.Enumeration;
 
+/**
+ * Provides a base class the implements the Filter and FilterConfig interfaces
+ * to reduce boilerplate when writing new filters.
+ *
+ * @see jakarta.servlet.Filter
+ * @see jakarta.servlet.FilterConfig
+ */
 public abstract class GenericFilter implements Filter, FilterConfig, Serializable {
 
     private static final long serialVersionUID = 1L;
