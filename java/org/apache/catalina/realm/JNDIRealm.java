@@ -1659,7 +1659,6 @@ public class JNDIRealm extends RealmBase {
         if (attrIds == null)
             attrIds = new String[0];
         constraints.setReturningAttributes(attrIds);
-System.out.println("getUserBySearch " + username);
 
         NamingEnumeration<SearchResult> results =
                 connection.context.search(userBase, filter, constraints);
