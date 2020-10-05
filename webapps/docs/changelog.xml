@@ -108,6 +108,11 @@
       <update>
         Add connection pooling to JNDI realm. (remm)
       </update>
+      <fix>
+        When estimating the size of a resource in the static resource cache,
+        include a specific allowance for the path to the resource. Based on a
+        pull request by blueSky1825821. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
