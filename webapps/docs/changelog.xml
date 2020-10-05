@@ -224,6 +224,9 @@
         href="https://bugs.openjdk.java.net/browse/JDK-8234808">JDK-8234808</a>.
         (markt)
       </fix>
+      <add>
+        Improvements to Chinese translations. Provided by leeyazhou. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
