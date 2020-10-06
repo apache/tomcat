@@ -46,7 +46,7 @@ public @interface Resource {
      * @return a String with the name of the resource
      */
     public String name() default "";
-    
+
     /**
      * Uses generics since Common Annotations 1.2.
      *
