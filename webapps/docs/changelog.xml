@@ -76,7 +76,7 @@
         JARs may be used with JPMS. (markt)
       </fix>
       <fix>
-        When performing an incremental build, ensure bdn does not create
+        When performing an incremental build, ensure bnd does not create
         unwanted JPMS dependencies between embedded JARs. (markt)
       </fix>
       <update>
