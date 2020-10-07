@@ -45,6 +45,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.60 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>55559</bug>: Add a new attribute, <code>localJndiResource</code>,
+        that allows a UserDatabaseRealm to obtain a UserDatabase instance from
+        the local (web application) JNDI context rather than the global JNDI
+        context. This option is only useful when the Realm is defined on the
+        Context. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.59 (markt)" rtext="release in progress">
   <subsection name="Catalina">
