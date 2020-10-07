@@ -329,6 +329,10 @@
           description="The global JNDI name of the UserDatabase resource to use"
                  type="java.lang.String"/>
 
+    <attribute   name="localJndiResource"
+          description="Configures if the UserDatabase JNDI definition is local to the webapp"
+                 type="boolean"/>
+
     <attribute   name="realmPath"
           description="The realm path"
                  type="java.lang.String"/>

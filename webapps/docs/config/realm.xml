@@ -647,6 +647,13 @@
         one of those roles.</p>
       </attribute>
 
+      <attribute name="localJndiResource" required="false">
+        <p>When the realm is nested inside a Context element, this allows the
+        realm to use a UserDatabase defined for the Context rather than a global
+        UserDatabase. If not specified, the default is <code>false</code>: use a
+        global UserDatabase.</p>
+      </attribute>
+
       <attribute name="resourceName" required="true">
         <p>The name of the global <code>UserDatabase</code> resource
         that this realm will use for user, password and role information.</p>
