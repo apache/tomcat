@@ -33,7 +33,7 @@ public class BackportEnglish extends BackportBase {
 
 
     public static void main(String... args) throws IOException {
-        // Exclude keys known to be different between 9.0.x and 8.5.x
+        // Exclude keys known to be different between 8.5.x and 7.0.x
         keysToExclude.add("java.org.apache.catalina.manager.zzz.htmlManagerServlet.deployPath");
         keysToExclude.add("java.org.apache.catalina.mbeans.zzz.jmxRemoteLifecycleListener.deprecated");
         keysToExclude.add("java.org.apache.catalina.session.zzz.managerBase.contextNull");
