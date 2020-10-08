@@ -56,6 +56,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>64794</bug>: Security exception reading system property on
+        JspRuntimeLibrary use. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.39 (markt)" rtext="release in progress">
   <subsection name="Catalina">
