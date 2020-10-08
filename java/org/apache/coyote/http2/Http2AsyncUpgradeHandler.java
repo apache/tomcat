@@ -229,14 +229,15 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
 
     @Override
-    void writeWindowUpdate(Stream stream, int increment, boolean applicationInitiated)
+    void writeWindowUpdate(AbstractNonZeroStream stream, int increment, boolean applicationInitiated)
             throws IOException {
         // Build window update frame for stream 0
         byte[] frame = new byte[13];
         ByteUtil.setThreeBytes(frame, 0,  4);
         frame[3] = FrameType.WINDOW_UPDATE.getIdByte();
         ByteUtil.set31Bits(frame, 9, increment);
-        if (stream.canWrite()) {
+        // No need to send update from closed stream
+        if  (stream instanceof Stream && ((Stream) stream).canWrite()) {
             // Change stream Id
             byte[] frame2 = new byte[13];
             ByteUtil.setThreeBytes(frame2, 0,  4);
