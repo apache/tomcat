@@ -59,6 +59,15 @@
       </update>
     </changelog>
   </subsection>
+  <subseciton name="Coyote">
+    <changelog>
+      <fix>
+        Refactor the HTTP/2 window update handling for padding in data frames to
+        ensure that the connection window is correctly updated after a data
+        frame with zero lngth padding is received. (markt)
+      </fix>
+    </changelog>
+  </subseciton>
 </section>
 <section name="Tomcat 8.5.59 (markt)" rtext="release in progress">
   <subsection name="Catalina">
