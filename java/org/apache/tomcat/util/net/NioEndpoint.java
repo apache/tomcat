@@ -134,7 +134,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     public boolean getUseInheritedChannel() { return useInheritedChannel; }
 
     /**
-     * Priority of the poller threads.
+     * Priority of the poller thread.
      */
     private int pollerThreadPriority = Thread.NORM_PRIORITY;
     public void setPollerThreadPriority(int pollerThreadPriority) { this.pollerThreadPriority = pollerThreadPriority; }
