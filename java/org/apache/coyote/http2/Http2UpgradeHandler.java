@@ -802,7 +802,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * Needs to know if this was application initiated since that affects the
      * error handling.
      */
-    void writeWindowUpdate(Stream stream, int increment, boolean applicationInitiated)
+    void writeWindowUpdate(AbstractNonZeroStream stream, int increment, boolean applicationInitiated)
             throws IOException {
         synchronized (socketWrapper) {
             // Build window update frame for stream 0
@@ -811,7 +811,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             frame[3] = FrameType.WINDOW_UPDATE.getIdByte();
             ByteUtil.set31Bits(frame, 9, increment);
             socketWrapper.write(true, frame, 0, frame.length);
-            if  (stream.canWrite()) {
+            // No need to send update from closed stream
+            if  (stream instanceof Stream && ((Stream) stream).canWrite()) {
                 // Change stream Id and re-use
                 ByteUtil.set31Bits(frame, 5, stream.getIdAsInt());
                 try {
@@ -1488,10 +1489,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     public void swallowedPadding(int streamId, int paddingLength) throws
             ConnectionException, IOException {
         AbstractNonZeroStream abstractNonZeroStream = getStreamMayBeClosed(streamId, true);
-        if (abstractNonZeroStream instanceof Stream) {
-            // +1 is for the payload byte used to define the padding length
-            writeWindowUpdate((Stream) abstractNonZeroStream, paddingLength + 1, false);
-        }
+        // +1 is for the payload byte used to define the padding length
+        writeWindowUpdate(abstractNonZeroStream, paddingLength + 1, false);
     }
 
 
