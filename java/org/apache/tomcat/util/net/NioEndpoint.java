@@ -1032,14 +1032,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             }
         }
 
-        protected void unreg(SelectionKey sk, NioSocketWrapper attachment, int readyOps) {
-            //this is a must, so that we don't have multiple threads messing with the socket
-            reg(sk,attachment,sk.interestOps()& (~readyOps));
+        protected void unreg(SelectionKey sk, NioSocketWrapper socketWrapper, int readyOps) {
+            // This is a must, so that we don't have multiple threads messing with the socket
+            reg(sk, socketWrapper, sk.interestOps() & (~readyOps));
         }
 
-        protected void reg(SelectionKey sk, NioSocketWrapper attachment, int intops) {
+        protected void reg(SelectionKey sk, NioSocketWrapper socketWrapper, int intops) {
             sk.interestOps(intops);
-            attachment.interestOps(intops);
+            socketWrapper.interestOps(intops);
         }
 
         protected void timeout(int keyCount, boolean hasEvents) {
@@ -1132,9 +1132,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             socketBufferHandler = channel.getBufHandler();
         }
 
-        public Poller getPoller() { return poller;}
+        public Poller getPoller() { return poller; }
         public void setPoller(Poller poller){this.poller = poller;}
-        public int interestOps() { return interestOps;}
+        public int interestOps() { return interestOps; }
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
         public CountDownLatch getReadLatch() { return readLatch; }
         public CountDownLatch getWriteLatch() { return writeLatch; }
@@ -1165,7 +1165,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public void awaitWriteLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(writeLatch,timeout,unit);}
 
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
-        public SendfileData getSendfileData() { return this.sendfileData;}
+        public SendfileData getSendfileData() { return this.sendfileData; }
 
         public void updateLastWrite() { lastWrite = System.currentTimeMillis(); }
         public long getLastWrite() { return lastWrite; }
@@ -1664,6 +1664,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     }
 
     // ----------------------------------------------- SendfileData Inner Class
+
     /**
      * SendfileData class.
      */
