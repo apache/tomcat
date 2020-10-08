@@ -146,6 +146,9 @@ public final class UDecoder {
                         throw EXCEPTION_SLASH;
                     }
                     case PASS_THROUGH: {
+                        buff[idx] = buff[j-2];
+                        buff[idx+1] = buff[j-1];
+                        buff[idx+2] = buff[j];
                         idx += 2;
                     }
                     }
