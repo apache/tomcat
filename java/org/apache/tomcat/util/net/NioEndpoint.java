@@ -938,8 +938,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             try {
                 for (SelectionKey key : selector.keys()) {
                     keycount++;
+                    NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
                     try {
-                        NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
                         if (socketWrapper == null) {
                             // We don't support any keys without attachments
                             cancelledKey(key, null);
@@ -987,7 +987,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             }
                         }
                     } catch (CancelledKeyException ckx) {
-                        cancelledKey(key, (NioSocketWrapper) key.attachment());
+                        cancelledKey(key, socketWrapper);
                     }
                 }
             } catch (ConcurrentModificationException cme) {
