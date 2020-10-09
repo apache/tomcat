@@ -150,7 +150,9 @@ public final class UDecoder {
                         throw EXCEPTION_SLASH;
                     }
                     case PASS_THROUGH: {
-                        idx += 2;
+                        buff[idx++] = buff[j-2];
+                        buff[idx++] = buff[j-1];
+                        buff[idx] = buff[j];
                     }
                     }
                 } else {
