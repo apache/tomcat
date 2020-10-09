@@ -495,7 +495,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getServerInfo() {
-        return "JspC/ApacheTomcat9";
+        return "JspC/ApacheTomcat10";
     }
 
 
