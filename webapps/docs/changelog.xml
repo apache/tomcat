@@ -85,6 +85,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix processing of URIs with %nn encoded solidus characters when
+        <code>encodedSolidusHandling</code> was set to <code>passthrough</code>
+        and the encoded solidus was preceeded by other %nn encoded characters.
+        Based on a pull request by willmeck. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
