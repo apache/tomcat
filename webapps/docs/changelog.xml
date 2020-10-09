@@ -66,6 +66,12 @@
         ensure that the connection window is correctly updated after a data
         frame with zero length padding is received. (markt)
       </fix>
+      <fix>
+        Fix processing of URIs with %nn encoded solidus characters when
+        <code>encodedSolidusHandling</code> was set to <code>passthrough</code>
+        and the encoded solidus was preceeded by other %nn encoded characters.
+        Based on a pull request by willmeck. (markt)
+      </fix>
     </changelog>
   </subseciton>
 </section>
