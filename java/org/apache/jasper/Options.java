@@ -256,4 +256,15 @@ public interface Options {
      *         the quoting rules in JSP.1.6 applied to the expression.
      */
     public boolean getQuoteAttributeEL();
+
+    /**
+     * Should the container include the time the file was generated in the
+     * comments at the start of a Java file generated from a JSP or tag.
+     * Defaults to {@code true}.
+     *
+     * @return {@code true} to include the timestamp, otherwise don't include it
+     */
+    public default boolean getGeneratedJavaAddTimestamp() {
+        return true;
+    }
 }

@@ -69,12 +69,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
     /**
-     * Name of MBean for the Global Request Processor.
-     */
-    protected ObjectName rgOname = null;
-
-
-    /**
      * Unique ID for this connector. Only used if the connector is configured
      * to use a random port as the port will change if stop(), start() is
      * called.
@@ -143,6 +137,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
     // ------------------------------- Properties managed by the ProtocolHandler
+
+    /**
+     * Name of MBean for the Global Request Processor.
+     */
+    protected ObjectName rgOname = null;
+    public ObjectName getGlobalRequestProcessorMBeanName() {
+        return rgOname;
+    }
 
     /**
      * The adapter provides the link between the ProtocolHandler and the
@@ -569,7 +571,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
         if (this.domain != null) {
-            rgOname = new ObjectName(domain + ":type=GlobalRequestProcessor,name=" + getName());
+            ObjectName rgOname = new ObjectName(domain + ":type=GlobalRequestProcessor,name=" + getName());
+            this.rgOname = rgOname;
             Registry.getRegistry(null, null).registerComponent(
                     getHandler().getGlobal(), rgOname, null);
         }
@@ -579,6 +582,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         endpoint.setDomain(domain);
 
         endpoint.init();
+
+        UpgradeProtocol[] upgradeProtocols = findUpgradeProtocols();
+        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
+            // Implementation note: Failure of one upgrade protocol fails the
+            // whole Connector
+            upgradeProtocol.init();
+        }
     }
 
 
@@ -692,6 +702,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             logPortOffset();
         }
 
+        UpgradeProtocol[] upgradeProtocols = findUpgradeProtocols();
+        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
+            try {
+                upgradeProtocol.destroy();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                getLog().error(sm.getString("abstractProtocol.upgradeProtocolDestroyError"), t);
+            }
+        }
+
         try {
             endpoint.destroy();
         } finally {
@@ -709,6 +729,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 }
             }
 
+            ObjectName rgOname = getGlobalRequestProcessorMBeanName();
             if (rgOname != null) {
                 Registry.getRegistry(null, null).unregisterComponent(rgOname);
             }

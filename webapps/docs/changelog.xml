@@ -56,8 +56,41 @@
       </fix>
     </changelog>
   </subsection>
+  <subseciton name="Coyote">
+    <changelog>
+      <fix>
+        Refactor the HTTP/2 window update handling for padding in data frames to
+        ensure that the connection window is correctly updated after a data
+        frame with zero length padding is received. (markt)
+      </fix>
+      <fix>
+        Fix processing of URIs with %nn encoded solidus characters when
+        <code>encodedSolidusHandling</code> was set to <code>passthrough</code>
+        and the encoded solidus was preceeded by other %nn encoded characters.
+        Based on a pull request by willmeck. (markt)
+      </fix>
+      <fix>
+        Implement a partial fix for <bug>63362</bug> that adds collection of
+        request statistics for HTTP/2 requests. (markt)
+      </fix>
+    </changelog>
+  </subseciton>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>64784</bug>: Don't include the time the Java file was generated as
+        a comment when generating Java files for JSPs and/or tags if the Java
+        file was created during pre-compilation. This is to aid repeatable
+        builds. (markt)
+      </fix>
+      <fix>
+        <bug>64794</bug>: Security exception reading system property on
+        JspRuntimeLibrary use. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
-<section name="Tomcat 9.0.39 (markt)" rtext="release in progress">
+<section name="Tomcat 9.0.39 (markt)" rtext="2020-10-09">
   <subsection name="Catalina">
     <changelog>
       <update>
