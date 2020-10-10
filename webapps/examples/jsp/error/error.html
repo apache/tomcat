@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -15,23 +16,27 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-
-<body bgcolor="white">
-
-<h1> This example uses <b>errorpage</b> directive </h1>
-<br>
-<h3> Select my favourite car.</h3>
-<form method=get action=err.jsp>
-<!-- <br> Make a guess: -->
-<SELECT NAME="name" SIZE=5>
-<OPTION VALUE="integra"> Acura Integra <BR>
-<OPTION VALUE="bmw328i"> BMW 328I <BR>
-<OPTION VALUE="z3"> BMW Z3 <BR>
-<OPTION VALUE="infiniti"> InfinitiQ3 <BR>
-<OPTION VALUE="audi"> Audi A8 <BR>
-</SELECT>
-<br> <INPUT TYPE=submit name=submit Value="Submit">
-</form>
-
+<head>
+    <title>Errorpage directive example</title>
+    <style>
+        body {background-color: white;}
+    </style>
+</head>
+<body>
+    <h1>This example uses <b>errorpage</b> directive</h1>
+    <br>
+    <h3>Select my favourite car.</h3>
+    <form method="GET" action="err.jsp">
+        <!-- <br> Make a guess: -->
+        <select name="name" size="5">
+            <option value="integra"> Acura Integra </option>
+            <option value="bmw328i"> BMW 328I </option>
+            <option value="z3"> BMW Z3 </option>
+            <option value="infiniti"> InfinitiQ3 </option>
+            <option value="audi"> Audi A8 </option>
+        </select>
+        <br>
+        <input type="submit" name="submit" value="Submit">
+    </form>
 </body>
 </html>

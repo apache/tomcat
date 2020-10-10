@@ -15,80 +15,78 @@
   limitations under the License.
 --%>
 <%@page contentType="text/html; charset=UTF-8" %>
-<HTML>
-<HEAD><TITLE>
-    Calendar: A JSP APPLICATION
-</TITLE></HEAD>
+<html lang="en">
+  <head>
+    <title>Calendar: A JSP APPLICATION</title>
+    <style>
+      body {background-color: white;}
+    </style>
+  </head>
+  <body>
 
+  <%@ page language="java" import="cal.*" %>
+  <jsp:useBean id="table" scope="session" class="cal.TableBean" />
 
-<BODY BGCOLOR="white">
-
-<%@ page language="java" import="cal.*" %>
-<jsp:useBean id="table" scope="session" class="cal.TableBean" />
-
-<%
+  <%
     table.processRequest(request);
     if (table.getProcessError() == false) {
-%>
+  %>
 
-<!-- HTML table goes here -->
-<CENTER>
-<TABLE WIDTH=60% BGCOLOR=yellow CELLPADDING=15>
-<TR>
-<TD ALIGN=CENTER> <A HREF=cal1.jsp?date=prev> prev </A>
-<TD ALIGN=CENTER> Calendar:<%= table.getDate() %></TD>
-<TD ALIGN=CENTER> <A HREF=cal1.jsp?date=next> next </A>
-</TR>
-</TABLE>
+  <!-- HTML table goes here -->
+  <center>
+    <table width="60%" bgcolor="yellow" cellpadding="15">
+      <tr>
+        <td align="center"> <a href="cal1.jsp?date=prev"> prev </a>
+        <td align="center"> Calendar:<%= table.getDate() %></td>
+        <td align="center"> <a href="cal1.jsp?date=next"> next </a>
+      </tr>
+    </table>
 
-<!-- the main table -->
-<TABLE WIDTH=60% BGCOLOR=lightblue BORDER=1 CELLPADDING=10>
-<TR>
-<TH> Time </TH>
-<TH> Appointment </TH>
-</TR>
-<FORM METHOD=POST ACTION=cal1.jsp>
-<%
-    for(int i=0; i<table.getEntries().getRows(); i++) {
-       cal.Entry entr = table.getEntries().getEntry(i);
-%>
-    <TR>
-    <TD>
-    <A HREF=cal2.jsp?time=<%= entr.getHour() %>>
-        <%= entr.getHour() %> </A>
-    </TD>
-    <TD BGCOLOR=<%= entr.getColor() %>>
-    <% out.print(util.HTMLFilter.filter(entr.getDescription())); %>
-    </TD>
-    </TR>
-<%
-    }
-%>
-</FORM>
-</TABLE>
-<BR>
+    <!-- the main table -->
+    <table width="60%" bgcolor="lightblue" border="1" cellpadding="10">
+      <tr>
+        <th> Time </th>
+        <th> Appointment </th>
+      </tr>
+      <form method="POST" action="cal1.jsp">
+      <%
+        for(int i=0; i<table.getEntries().getRows(); i++) {
+           cal.Entry entr = table.getEntries().getEntry(i);
+      %>
+        <tr>
+          <td>
+          <a href="cal2.jsp?time=<%= entr.getHour() %>">
+            <%= entr.getHour() %> </a>
+          </td>
+          <td bgcolor="<%= entr.getColor() %>">
+            <% out.print(util.HTMLFilter.filter(entr.getDescription())); %>
+          </td>
+        </tr>
+      <%
+        }
+      %>
+      </form>
+    </table>
+    <br>
 
-<!-- footer -->
-<TABLE WIDTH=60% BGCOLOR=yellow CELLPADDING=15>
-<TR>
-<TD ALIGN=CENTER>  <% out.print(util.HTMLFilter.filter(table.getName())); %> :
-             <% out.print(util.HTMLFilter.filter(table.getEmail())); %> </TD>
-</TR>
-</TABLE>
-</CENTER>
+    <!-- footer -->
+    <table width="60%" bgcolor="yellow" cellpadding="15">
+      <tr>
+        <td align="center">  <% out.print(util.HTMLFilter.filter(table.getName())); %> :
+          <% out.print(util.HTMLFilter.filter(table.getEmail())); %> </td>
+      </tr>
+    </table>
+  </center>
 
-<%
-    } else {
-%>
-<font size=5>
+  <%
+      } else {
+  %>
+  <font size="5">
     You must enter your name and email address correctly.
-</font>
-<%
-    }
-%>
+  </font>
+  <%
+      }
+  %>
 
-
-</BODY>
-</HTML>
-
-
+  </body>
+</html>

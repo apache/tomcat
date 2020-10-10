@@ -22,8 +22,7 @@
     cart.processRequest();
 %>
 
-
-<FONT size = 5 COLOR="#CC0000">
+<font size="5" color="#CC0000">
 <br> You have the following items in your cart:
 <ol>
 <%
@@ -36,7 +35,7 @@
 %>
 </ol>
 
-</FONT>
+</font>
 
 <hr>
 <%@ include file ="carts.html" %>

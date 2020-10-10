@@ -14,7 +14,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <title>Servlet 3.1 non-blocking IO examples: Byte counter</title>
   </head>
@@ -23,10 +24,10 @@
     <p>Select a file and/or enter some data using the form below and then submit
        it. The server will read the request body using non-blocking IO and then
        respond with the total length of the request body in bytes.</p>
-    <form method="POST" enctype="multipart/form-data" action="bytecounter" >
-      <p><textarea name="data" rows="5" cols="60" ></textarea></p>
-      <p><input name="source" type="file" /></p>
-      <p><input type="submit" value="Submit" /></p>
+    <form method="POST" enctype="multipart/form-data" action="bytecounter">
+      <p><textarea name="data" rows="5" cols="60"></textarea></p>
+      <p><input name="source" type="file"></p>
+      <p><input type="submit" value="Submit"></p>
     </form>
   </body>
 </html>

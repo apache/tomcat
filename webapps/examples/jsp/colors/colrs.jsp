@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
+<html lang="en">
 
 <jsp:useBean id="cb" scope="session" class="colors.ColorGameBean" />
 <jsp:setProperty name="cb" property="*" />
@@ -23,8 +23,8 @@
     cb.processRequest();
 %>
 
-<body bgcolor=<%= cb.getColor1() %>>
-<font size=6 color=<%= cb.getColor2() %>>
+<body bgcolor="<%= cb.getColor1() %>">
+<font size="6" color="<%= cb.getColor2() %>">
 <p>
 
 <% if (cb.getHint()==true) { %>
@@ -50,19 +50,13 @@
 
 <p>
 
-<form method=POST action=colrs.jsp>
-
-Color #1: <input type=text name= color1 size=16>
-
-<br>
-
-Color #2: <input type=text name= color2 size=16>
-
-<p>
-
-<input type=submit name=action value="Submit">
-<input type=submit name=action value="Hint">
-
+<form method="POST" action="colrs.jsp">
+  Color #1: <input type="text" name="color1" size="16">
+  <br>
+  Color #2: <input type="text" name="color2" size="16">
+  <p>
+  <input type="submit" name="action" value="Submit">
+  <input type="submit" name="action" value="Hint">
 </form>
 
 </font>

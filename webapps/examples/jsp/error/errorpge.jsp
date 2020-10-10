@@ -14,12 +14,16 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
-
-<body bgcolor="red">
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body {background-color: red;}
+  </style>
+</head>
+<body>
     <%@ page isErrorPage="true" %>
     <h1> The exception <%= exception.getMessage() %> tells me you
-         made a wrong choice.
+         made a wrong choice.</h1>
 </body>
 </html>

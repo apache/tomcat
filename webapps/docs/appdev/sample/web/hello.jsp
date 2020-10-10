@@ -16,20 +16,19 @@
 --%>
 <%@ page session="false" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Sample Application JSP Page</title>
+  <meta charset="UTF-8">
+  <title>Sample Application JSP Page</title>
 </head>
 <body>
 
 <div style="float: left; padding: 10px;">
-<img src="images/tomcat.gif" alt="" />
+  <img src="images/tomcat.gif" alt="tomcat">
 </div>
 <h1>Sample Application JSP Page</h1>
 This is the output of a JSP page that is part of the Hello, World
 application.
-
 
 <%= new String("Hello!") %>
 

@@ -14,10 +14,14 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<html>
-
-<body bgcolor="white">
-<font color="red">
-
-VM Memory usage &lt; 50%.
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      body {background-color: white; color: red;}
+    </style>
+  </head>
+  <body>
+    VM Memory usage &lt; 50%.
+  </body>
 </html>

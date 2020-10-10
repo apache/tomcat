@@ -63,7 +63,6 @@ Use cases:
  - servlet2 does a dispatch to servlet3 (asyncsupported=true)
  - servlet3 does a dispatch to servlet4 (asyncsupported=false)
 
-
 7. Stock ticker
    <a href="<%=response.encodeURL("/examples/async/stockticker")%>"> StockTicker </a>
 </pre>

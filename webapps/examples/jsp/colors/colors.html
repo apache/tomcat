@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -15,33 +16,33 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<head>
+    <title>Example using JSP and BEANs.</title>
+    <style>
+        body {background-color: white; color: red;}
+    </style>
+</head>
+<body>
+    <hr>
+    This web page is an example using JSP and BEANs.
+    <p>Guess my favorite two colors</p>
 
-<body bgcolor= white>
-<font size=6 color=red>
+    <p>If you fail to guess both of them - you get yellow on red.</p>
 
-<hr>
-This web page is an example using JSP and BEANs.
-<p>
-Guess my favorite two colors
+    <p>If you guess one of them right, either your foreground or
+        your background will change to the color that was guessed right.</p>
 
-<p> If you fail to guess both of them - you get yellow on red.
+    <p>Guess them both right and your browser foreground/background
+        will change to my two favorite colors to display this page.</p>
 
-<p> If you guess one of them right, either your foreground or
-    your background will change to the color that was guessed right.
-
-<p> Guess them both right and your browser foreground/background
-    will change to my two favorite colors to display this page.
-
-<hr>
-<form method=GET action=colrs.jsp>
-Color #1: <input type=text name= color1 size=16>
-<br>
-Color #2: <input type=text name= color2 size=16>
-<p>
-<input type=submit name=action value="Submit">
-<input type=submit name=action value="Hint">
-</form>
-
-</font>
+    <hr>
+    <form method="GET" action="colrs.jsp">
+        Color #1: <input type="text" name="color1" size="16">
+        <br>
+        Color #2: <input type="text" name="color2" size="16">
+        <p>
+        <input type="submit" name="action" value="Submit">
+        <input type="submit" name="action" value="Hint">
+    </form>
 </body>
 </html>

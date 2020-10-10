@@ -32,10 +32,9 @@
 <head>
   <title>Example JSP in XML format</title>
 </head>
-
 <body>
 This is the output of a simple JSP using XML format.
-<br />
+<br/>
 
 <div>Use a jsp:scriptlet to loop from 1 to 10: </div>
 <jsp:scriptlet>
@@ -59,7 +58,6 @@ This is the output of a simple JSP using XML format.
   Use a jsp:expression to write the date and time in the browser's locale:
   <jsp:expression>getDateTimeStr(request.getLocale())</jsp:expression>
 </div>
-
 
 <jsp:text>
   &lt;p&gt;This sentence is enclosed in a jsp:text element.&lt;/p&gt;
