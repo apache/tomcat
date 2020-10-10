@@ -78,6 +78,13 @@
       </fix>
     </changelog>
   </subseciton>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>64799</bug>: Added missing resources to host-manager web app. (isapir)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.59 (markt)" rtext="release in progress">
   <subsection name="Catalina">
