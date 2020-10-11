@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.util.Enumeration;
 
 /**
- * Provides a base class the implements the Filter and FilterConfig interfaces
+ * Provides a base class that implements the Filter and FilterConfig interfaces
  * to reduce boilerplate when writing new filters.
  *
  * @see jakarta.servlet.Filter
