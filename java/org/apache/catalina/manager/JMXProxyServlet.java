@@ -37,8 +37,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.mbeans.MBeanDumper;
-import org.apache.catalina.tribes.util.StringManager;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This servlet will dump JMX attributes in a simple format and implement proxy

@@ -83,6 +83,10 @@
         options to enable reflection required by the memory leak prevention /
         detection code. (markt)
       </add>
+      <fix>
+        <bug>64805</bug>: Correct imports used by <code>JMXPorxyServlet</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
