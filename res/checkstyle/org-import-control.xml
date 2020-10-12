@@ -44,9 +44,9 @@
     <allow pkg="jakarta.persistence"/>
     <allow pkg="jakarta.servlet"/>
     <allow pkg="jakarta.xml.ws"/>
+    <disallow pkg="org\.apache\.catalina\.ha.*" regex="true"/>
+    <disallow pkg="org\.apache\.catalina\.tribes.*" regex="true"/>
     <allow pkg="org.apache.catalina"/>
-    <disallow pkg="org.apache.catalina.ha"/>
-    <disallow pkg="org.apache.catalina.tribes"/>
     <allow pkg="org.apache.coyote"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.naming"/>
