@@ -18,7 +18,7 @@ package jakarta.servlet;
 
 /**
  * Provides the context for asynchronous request handling
- *  
+ *
  * @since Servlet 3.0
  */
 public interface AsyncContext {
@@ -120,21 +120,21 @@ public interface AsyncContext {
 
     /**
      * Starts a new thread to process the asynchronous request
-     * 
+     *
      * @param run a Runnable that the new thread will run
      */
     void start(Runnable run);
 
     /**
      * Adds an event listener that will be called for different AsyncEvents fire
-     * 
+     *
      * @param listener an AsyncListener that will be called with AsyncEvent objects
      */
     void addListener(AsyncListener listener);
 
     /**
      * Adds an event listener that will be called when different AsyncEvents fire
-     * 
+     *
      * @param listener an AsyncListener that will be called with AsyncEvent objects
      * @param request the ServletRequest that will be passed with the AsyncEvent
      * @param response the ServletResponse that will be passed with the AsyncEvent
@@ -143,9 +143,9 @@ public interface AsyncContext {
             ServletResponse response);
 
     /**
-     * Creates and returns an AsyncListener object 
-     * 
-     * @param <T> 
+     * Creates and returns an AsyncListener object
+     *
+     * @param <T>
      * @param clazz
      * @return the newly created AsyncListener object
      * @throws ServletException

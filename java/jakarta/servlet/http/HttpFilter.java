@@ -26,7 +26,7 @@ import jakarta.servlet.ServletResponse;
 
 /**
  * Provides a base class that implements the Filter interface and ensures
- * that the Request and Response are of type HttpServletRequest and 
+ * that the Request and Response are of type HttpServletRequest and
  * HttpServletResponse respectively.
  */
 public abstract class HttpFilter extends GenericFilter {
