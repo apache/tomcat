@@ -61,6 +61,11 @@
         <bug>64805</bug>: Correct imports used by <code>JMXPorxyServlet</code>.
         (markt)
       </fix>
+      <fix>
+        Fix JNDIRealm pooling problems retrying on another bad connection. Any
+        retries are made on a new connection, just like with the single
+        connection scenario. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subseciton name="Coyote">

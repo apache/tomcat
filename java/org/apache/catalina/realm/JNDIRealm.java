@@ -1311,7 +1311,7 @@ public class JNDIRealm extends RealmBase {
                 close(connection);
 
                 // open a new directory context.
-                connection = get();
+                connection = get(true);
 
                 // Try the authentication again.
                 principal = authenticate(connection, username, credentials);
@@ -2389,12 +2389,28 @@ public class JNDIRealm extends RealmBase {
      * @exception NamingException if a directory server error occurs
      */
     protected JNDIConnection get() throws NamingException {
+        return get(false);
+    }
+
+    /**
+     * Open (if necessary) and return a connection to the configured
+     * directory server for this Realm.
+     * @param create when pooling, this forces creation of a new connection,
+     *   for example after an error
+     * @return the connection
+     * @exception NamingException if a directory server error occurs
+     */
+    protected JNDIConnection get(boolean create) throws NamingException {
         JNDIConnection connection = null;
         // Use the pool if available, otherwise use the single connection
         if (connectionPool != null) {
-            connection = connectionPool.pop();
-            if (connection == null) {
+            if (create) {
                 connection = create();
+            } else {
+                connection = connectionPool.pop();
+                if (connection == null) {
+                    connection = create();
+                }
             }
         } else {
             singleConnectionLock.lock();
