@@ -63,9 +63,13 @@
         retries are made on a new connection, just like with the single
         connection scenario. (remm)
       </fix>
+      <add>
+        Add extended <code>ErrorReportValve</code> that returns response as
+        JSON instead of HTML. (kfujino)
+      </add>
     </changelog>
   </subsection>
-  <subseciton name="Coyote">
+  <subsection name="Coyote">
     <changelog>
       <fix>
         Refactor the HTTP/2 window update handling for padding in data frames to
@@ -83,7 +87,7 @@
         request statistics for HTTP/2 requests. (markt)
       </fix>
     </changelog>
-  </subseciton>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
