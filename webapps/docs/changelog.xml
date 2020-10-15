@@ -58,7 +58,7 @@
         Add connection pooling to JNDI realm. (remm)
       </update>
       <fix>
-        <bug>64805</bug>: Correct imports used by <code>JMXPorxyServlet</code>.
+        <bug>64805</bug>: Correct imports used by <code>JMXProxyServlet</code>.
         (markt)
       </fix>
       <fix>
