@@ -50,6 +50,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -1674,6 +1675,93 @@ public class TestHttp11Processor extends TomcatBaseTest {
             }
 
             out.print(" and request.getServerPort() is " + req.getServerPort());
+        }
+    }
+
+
+    @Test
+    public void testSlowUploadTimeoutWithLongerUploadTimeout() throws Exception {
+        doTestSlowUploadTimeout(true);
+    }
+
+
+    @Test
+    public void testSlowUploadTimeoutWithoutLongerUploadTimeout() throws Exception {
+        doTestSlowUploadTimeout(false);
+    }
+
+
+    private void doTestSlowUploadTimeout(boolean useLongerUploadTimeout) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+
+        int connectionTimeout = ((Integer) connector.getProperty("connectionTimeout")).intValue();
+
+        // These factors should make the differences large enough that the CI
+        // tests pass consistently. If not, may need to reduce connectionTimeout
+        // and increase delay and connectionUploadTimeout
+        int delay = connectionTimeout * 2;
+        int connectionUploadTimeout = connectionTimeout * 4;
+
+        if (useLongerUploadTimeout) {
+            connector.setProperty("connectionUploadTimeout", "" + connectionUploadTimeout);
+            connector.setProperty("disableUploadTimeout", "false");
+        }
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new SwallowBodyTesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request =
+                "POST /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 10" + SimpleHttpClient.CRLF +
+                 SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request, "XXXXXXXXXX"});
+        client.setRequestPause(delay);
+
+        client.connect();
+        client.processRequest();
+
+        if (useLongerUploadTimeout) {
+            // Expected response is a 200 response.
+            Assert.assertTrue(client.isResponse200());
+            Assert.assertEquals("OK", client.getResponseBody());
+        } else {
+            // Different failure modes with different connectors
+            Assert.assertFalse(client.isResponse200());
+        }
+    }
+
+
+    private static class SwallowBodyTesterServlet extends TesterServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        public SwallowBodyTesterServlet() {
+            super(true);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            // Swallow the body
+            byte[] buf = new byte[1024];
+            InputStream is = req.getInputStream();
+            while (is.read(buf) > 0) {
+                // Loop
+            }
+
+            // Standard response
+            doGet(req, resp);
         }
     }
 }
