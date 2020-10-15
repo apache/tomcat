@@ -1499,7 +1499,7 @@ public class DefaultServlet extends HttpServlet {
                 // If the timestamp of the entity the client got differs from
                 // the last modification date of the entity, the entire entity
                 // is returned.
-                if (Math.abs(lastModified  -headerValueTime) > 1000) {
+                if (Math.abs(lastModified - headerValueTime) > 1000) {
                     return FULL;
                 }
             }
