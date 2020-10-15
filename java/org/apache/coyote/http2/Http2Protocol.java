@@ -117,7 +117,7 @@ public class Http2Protocol implements UpgradeProtocol {
         String upgradeProtocol = getUpgradeProtocolName();
         UpgradeProcessorInternal processor = new UpgradeProcessorInternal(socketWrapper,
                 new UpgradeToken(getInternalUpgradeHandler(socketWrapper, adapter, null), null, null, upgradeProtocol),
-                http11Protocol.getUpgradeGroupInfo(upgradeProtocol));
+                null);
         return processor;
     }
 
