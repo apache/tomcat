@@ -145,10 +145,10 @@ public interface AsyncContext {
     /**
      * Creates and returns an AsyncListener object
      *
-     * @param <T>
-     * @param clazz
+     * @param <T> The type to create that extends AsyncListener
+     * @param clazz The class to instantiate to create the listener
      * @return the newly created AsyncListener object
-     * @throws ServletException
+     * @throws ServletException if the listener cannot be created
      */
     <T extends AsyncListener> T createListener(Class<T> clazz)
     throws ServletException;
