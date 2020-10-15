@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
@@ -37,10 +39,13 @@ import org.apache.coyote.Response;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
+import org.apache.coyote.http11.upgrade.UpgradeGroupInfo;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.coyote.http2.Http2Protocol;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.modeler.Util;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -73,6 +78,33 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         }
 
         super.init();
+
+        // Set the Http11Protocol (i.e. this) for any upgrade protocols once
+        // this has completed initialisation as the upgrade protocols may expect this
+        // to be initialised when the call is made
+        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
+            if (upgradeProtocol instanceof Http2Protocol) {
+                ((Http2Protocol) upgradeProtocol).setHttp11Protocol(this);
+            }
+        }
+    }
+
+
+    @Override
+    public void destroy() throws Exception {
+        // There may be upgrade protocols with their own MBeans. These need to
+        // be de-registered.
+        ObjectName rgOname = getGlobalRequestProcessorMBeanName();
+        if (rgOname != null) {
+            Registry registry = Registry.getRegistry(null, null);
+            ObjectName query = new ObjectName(rgOname.getCanonicalName() + ",Upgrade=*");
+            Set<ObjectInstance> upgrades = registry.getMBeanServer().queryMBeans(query, null);
+            for (ObjectInstance upgrade : upgrades) {
+                registry.unregisterComponent(upgrade.getObjectName());
+            }
+        }
+
+        super.destroy();
     }
 
 
@@ -535,10 +567,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 }
             }
         }
-
-        if (upgradeProtocol instanceof Http2Protocol) {
-            ((Http2Protocol) upgradeProtocol).setHttp11Protocol(this);
-        }
     }
     @Override
     public UpgradeProtocol getNegotiatedProtocol(String negotiatedName) {
@@ -547,6 +575,66 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     @Override
     public UpgradeProtocol getUpgradeProtocol(String upgradedName) {
         return httpUpgradeProtocols.get(upgradedName);
+    }
+
+
+    /**
+     * Map of upgrade protocol name to {@link UpgradeGroupInfo} instance.
+     * <p>
+     * HTTP upgrades via
+     * {@link javax.servlet.http.HttpServletRequest#upgrade(Class)} do not have
+     * to depend on an {@code UpgradeProtocol}. To enable basic statistics to be
+     * made available for these protocols, a map of protocol name to
+     * {@link UpgradeGroupInfo} instances is maintained here.
+     */
+    private final Map<String,UpgradeGroupInfo> upgradeProtocolGroupInfos = new ConcurrentHashMap<>();
+    public UpgradeGroupInfo getUpgradeGroupInfo(String upgradeProtocol) {
+        if (upgradeProtocol == null) {
+            return null;
+        }
+        UpgradeGroupInfo result = upgradeProtocolGroupInfos.get(upgradeProtocol);
+        if (result == null) {
+            // Protecting against multiple JMX registration, not modification
+            // of the Map.
+            synchronized (upgradeProtocolGroupInfos) {
+                result = upgradeProtocolGroupInfos.get(upgradeProtocol);
+                if (result == null) {
+                    result = new UpgradeGroupInfo();
+                    upgradeProtocolGroupInfos.put(upgradeProtocol, result);
+                    ObjectName oname = getONameForUpgrade(upgradeProtocol);
+                    if (oname != null) {
+                        try {
+                            Registry.getRegistry(null, null).registerComponent(result, oname, null);
+                        } catch (Exception e) {
+                            getLog().warn(sm.getString("abstractHttp11Protocol.upgradeJmxRegistrationFail"), e);
+                            result = null;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public ObjectName getONameForUpgrade(String upgradeProtocol) {
+        ObjectName oname = null;
+        ObjectName parentRgOname = getGlobalRequestProcessorMBeanName();
+        if (parentRgOname != null) {
+            StringBuilder name = new StringBuilder(parentRgOname.getCanonicalName());
+            name.append(",Upgrade=");
+            if (Util.objectNameValueNeedsQuote(upgradeProtocol)) {
+                name.append(ObjectName.quote(upgradeProtocol));
+            } else {
+                name.append(upgradeProtocol);
+            }
+            try {
+                oname = new ObjectName(name.toString());
+            } catch (Exception e) {
+                getLog().warn(sm.getString("abstractHttp11Protocol.upgradeJmxNameFail"), e);
+            }
+        }
+        return oname;
     }
 
 
@@ -1014,9 +1102,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
             UpgradeToken upgradeToken) {
         HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
         if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
-            return new UpgradeProcessorInternal(socket, upgradeToken);
+            return new UpgradeProcessorInternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.getProtocol()));
         } else {
-            return new UpgradeProcessorExternal(socket, upgradeToken);
+            return new UpgradeProcessorExternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.getProtocol()));
         }
     }
 }

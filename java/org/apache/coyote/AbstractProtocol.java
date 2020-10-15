@@ -35,7 +35,6 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
-import org.apache.coyote.http2.Http2Protocol;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -589,17 +588,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         endpoint.setDomain(domain);
 
         endpoint.init();
-
-        UpgradeProtocol[] upgradeProtocols = findUpgradeProtocols();
-        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
-            // Need to do this as we can't add methods to UpgradeProtocol
-            // without running the risk of breaking a custom upgrade protocol
-            if (upgradeProtocol instanceof Http2Protocol) {
-                // Implementation note: Failure of one upgrade protocol fails the
-                // whole Connector
-                ((Http2Protocol) upgradeProtocol).init();
-            }
-        }
     }
 
 
@@ -662,20 +650,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public void destroy() throws Exception {
         if(getLog().isInfoEnabled()) {
             getLog().info(sm.getString("abstractProtocolHandler.destroy", getName()));
-        }
-
-        UpgradeProtocol[] upgradeProtocols = findUpgradeProtocols();
-        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
-            try {
-                // Need to do this as we can't add methods to UpgradeProtocol
-                // without running the risk of breaking a custom upgrade protocol
-                if (upgradeProtocol instanceof Http2Protocol) {
-                    ((Http2Protocol) upgradeProtocol).destroy();
-                }
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                getLog().error(sm.getString("abstractProtocol.upgradeProtocolDestroyError"), t);
-            }
         }
 
         try {

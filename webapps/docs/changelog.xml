@@ -82,8 +82,8 @@
         Based on a pull request by willmeck. (markt)
       </fix>
       <fix>
-        Implement a partial fix for <bug>63362</bug> that adds collection of
-        request statistics for HTTP/2 requests. (markt)
+        <bug>63362</bug>: Add collection of statistics for HTTP/2, WebSocket and
+        connections upgraded via the HTTP upgrade mechanism. (markt)
       </fix>
     </changelog>
   </subseciton>

@@ -579,7 +579,7 @@ public class Http11Processor extends AbstractProcessor {
                         InternalHttpUpgradeHandler upgradeHandler =
                                 upgradeProtocol.getInternalUpgradeHandler(
                                         getAdapter(), cloneRequest(request));
-                        UpgradeToken upgradeToken = new UpgradeToken(upgradeHandler, null, null);
+                        UpgradeToken upgradeToken = new UpgradeToken(upgradeHandler, null, null, requestedProtocol);
                         action(ActionCode.UPGRADE, upgradeToken);
                         return SocketState.UPGRADING;
                     }

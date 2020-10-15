@@ -282,6 +282,10 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         public void setSslSupport(SSLSupport sslSupport) {
             // NO-OP
         }
-    }
 
+        @Override
+        public UpgradeInfo getUpgradeInfo() {
+            return null;
+        }
+    }
 }

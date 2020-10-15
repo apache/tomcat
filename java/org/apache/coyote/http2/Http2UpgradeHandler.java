@@ -42,6 +42,7 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
+import org.apache.coyote.http11.upgrade.UpgradeInfo;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.HpackEncoder.State;
 import org.apache.coyote.http2.Http2Parser.Input;
@@ -481,6 +482,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void destroy() {
         // NO-OP
+    }
+
+
+    @Override
+    public UpgradeInfo getUpgradeInfo() {
+        // Uses RequestInfo rather than UpgradeInfo
+        return null;
     }
 
 

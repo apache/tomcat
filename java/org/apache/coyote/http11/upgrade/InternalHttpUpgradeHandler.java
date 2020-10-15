@@ -39,4 +39,6 @@ public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
     void setSslSupport(SSLSupport sslSupport);
 
     void pause();
+
+    UpgradeInfo getUpgradeInfo();
 }
