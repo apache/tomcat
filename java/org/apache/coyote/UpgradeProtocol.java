@@ -109,6 +109,7 @@ public interface UpgradeProtocol {
         // NO-OP
     }
 
+
     /**
      * Configure the HTTP/1.1 protocol that this UpgradeProcotol is nested
      * under. Connections passed to this UpgradeProtocol via HTTP upgrade will
@@ -130,27 +131,5 @@ public interface UpgradeProtocol {
         if (protocol instanceof AbstractHttp11Protocol) {
             setHttp11Protocol((AbstractHttp11Protocol<?>) protocol);
         }
-    }
-
-
-    /**
-     * Initialise the upgrade protocol. Called once the parent HTTP/1.1 protocol
-     * has initialised.
-     *
-     * @throws Exception If initialisation fails
-     */
-    public default void init() throws Exception {
-        // NO-OP
-    }
-
-
-    /**
-     * Destroy the upgrade protocol. Called before the parent HTTP/1.1 protocol
-     * is destroyed.
-     *
-     * @throws Exception If the upgrade protocol is not destroyed cleanly
-     */
-    public default void destroy() throws Exception {
-        // NO-OP
     }
 }
