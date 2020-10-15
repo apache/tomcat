@@ -97,6 +97,10 @@
         and the encoded solidus was preceeded by other %nn encoded characters.
         Based on a pull request by willmeck. (markt)
       </fix>
+      <fix>
+        <bug>55160</bug>: Re-fix this bug after the original fix was reverted by
+        a separate fix to timeouts in 7.0.81. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

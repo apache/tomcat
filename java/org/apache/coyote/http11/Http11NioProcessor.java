@@ -251,7 +251,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     @Override
     protected void setSocketTimeout(int timeout) throws IOException {
-        socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(timeout);
+        socketWrapper.setTimeout(timeout);
     }
 
 
