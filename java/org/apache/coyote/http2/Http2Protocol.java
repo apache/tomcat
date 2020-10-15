@@ -344,8 +344,8 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     @Override
-    public void setHttp11Protocol(AbstractProtocol<?> http11Protocol) {
-        this.http11Protocol = (AbstractHttp11Protocol<?>) http11Protocol;
+    public void setHttp11Protocol(AbstractHttp11Protocol<?> http11Protocol) {
+        this.http11Protocol = http11Protocol;
 
         try {
             ObjectName oname = this.http11Protocol.getONameForUpgrade(getUpgradeProtocolName());
