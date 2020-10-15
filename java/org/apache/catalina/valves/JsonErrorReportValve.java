@@ -22,8 +22,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.tribes.util.ExceptionUtils;
 import org.apache.coyote.ActionCode;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -75,7 +75,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
         String description = null;
         description = smClient.getString("http." + statusCode + ".desc");
         if (description == null) {
-            if (message.isEmpty()) {
+            if (message == null || message.isEmpty()) {
                 return;
             } else {
                 description = smClient.getString("errorReportValve.noDescription");
