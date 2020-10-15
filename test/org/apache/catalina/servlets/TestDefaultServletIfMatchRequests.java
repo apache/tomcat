@@ -58,7 +58,7 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         resourceETagWeak = "W/" + resourceETagStrong;
 
         String otherETagStrong = "\"123456789\"";
-        String otherETagWeak = "\"123456789\"";
+        String otherETagWeak = "W/\"123456789\"";
 
         List<Object[]> parameterSets = new ArrayList<Object[]>();
 
