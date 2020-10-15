@@ -24,6 +24,11 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+/**
+ * Provides a base class that implements the Filter interface and ensures
+ * that the Request and Response are of type HttpServletRequest and
+ * HttpServletResponse respectively.
+ */
 public abstract class HttpFilter extends GenericFilter {
 
     private static final long serialVersionUID = 1L;
