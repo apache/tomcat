@@ -491,6 +491,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             mask = null;
         }
 
+        int payloadSize = mp.getPayload().remaining();
         headerBuffer.clear();
         writeHeader(headerBuffer, mp.isFin(), mp.getRsv(), mp.getOpCode(),
                 isMasked(), mp.getPayload(), mask, first);
@@ -508,6 +509,20 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             doWrite(mp.getEndHandler(), mp.getBlockingWriteTimeoutExpiry(),
                     headerBuffer, mp.getPayload());
         }
+
+        updateStats(payloadSize);
+    }
+
+
+    /**
+     * Hook for updating server side statistics. Called on every frame written
+     * (including when batching is enabled and the frames are buffered locally
+     * until the buffer is full or is flushed).
+     *
+     * @param payloadLength Size of message payload
+     */
+    protected void updateStats(long payloadLength) {
+        // NO-OP by default
     }
 
 

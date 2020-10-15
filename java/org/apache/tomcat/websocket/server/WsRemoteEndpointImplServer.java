@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import jakarta.websocket.SendHandler;
 import jakarta.websocket.SendResult;
 
+import org.apache.coyote.http11.upgrade.UpgradeInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -46,15 +47,17 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private final Log log = LogFactory.getLog(WsRemoteEndpointImplServer.class); // must not be static
 
     private final SocketWrapperBase<?> socketWrapper;
+    private final UpgradeInfo upgradeInfo;
     private final WsWriteTimeout wsWriteTimeout;
     private volatile SendHandler handler = null;
     private volatile ByteBuffer[] buffers = null;
 
     private volatile long timeoutExpiry = -1;
 
-    public WsRemoteEndpointImplServer(SocketWrapperBase<?> socketWrapper,
+    public WsRemoteEndpointImplServer(SocketWrapperBase<?> socketWrapper, UpgradeInfo upgradeInfo,
             WsServerContainer serverContainer) {
         this.socketWrapper = socketWrapper;
+        this.upgradeInfo = upgradeInfo;
         this.wsWriteTimeout = serverContainer.getTimeout();
     }
 
@@ -151,6 +154,13 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
             }
         }
+    }
+
+
+    @Override
+    protected void updateStats(long payloadLength) {
+        upgradeInfo.addMsgsSent(1);
+        upgradeInfo.addBytesSent(payloadLength);
     }
 
 

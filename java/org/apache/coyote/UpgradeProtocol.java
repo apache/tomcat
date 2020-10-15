@@ -107,26 +107,4 @@ public interface UpgradeProtocol {
     public default void setHttp11Protocol(AbstractProtocol<?> protocol) {
         // NO-OP
     }
-
-
-    /**
-     * Initialise the upgrade protocol. Called once the parent HTTP/1.1 protocol
-     * has initialised.
-     *
-     * @throws Exception If initialisation fails
-     */
-    public default void init() throws Exception {
-        // NO-OP
-    }
-
-
-    /**
-     * Destroy the upgrade protocol. Called before the parent HTTP/1.1 protocol
-     * is destroyed.
-     *
-     * @throws Exception If the upgrade protocol is not destroyed cleanly
-     */
-    public default void destroy() throws Exception {
-        // NO-OP
-    }
 }

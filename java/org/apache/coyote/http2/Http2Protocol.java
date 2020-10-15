@@ -33,10 +33,16 @@ import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SocketWrapperBase;
+import org.apache.tomcat.util.res.StringManager;
 
 public class Http2Protocol implements UpgradeProtocol {
+
+    private static final Log log = LogFactory.getLog(Http2Protocol.class);
+    private static final StringManager sm = StringManager.getManager(Http2Protocol.class);
 
     static final long DEFAULT_READ_TIMEOUT = 5000;
     static final long DEFAULT_WRITE_TIMEOUT = 5000;
@@ -86,7 +92,6 @@ public class Http2Protocol implements UpgradeProtocol {
     private AbstractHttp11Protocol<?> http11Protocol = null;
 
     private RequestGroupInfo global = new RequestGroupInfo();
-    private ObjectName rgOname = null;
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -109,8 +114,10 @@ public class Http2Protocol implements UpgradeProtocol {
 
     @Override
     public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter) {
+        String upgradeProtocol = getUpgradeProtocolName();
         UpgradeProcessorInternal processor = new UpgradeProcessorInternal(socketWrapper,
-                new UpgradeToken(getInternalUpgradeHandler(socketWrapper, adapter, null), null, null));
+                new UpgradeToken(getInternalUpgradeHandler(socketWrapper, adapter, null), null, null, upgradeProtocol),
+                http11Protocol.getUpgradeGroupInfo(upgradeProtocol));
         return processor;
     }
 
@@ -339,38 +346,26 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public void setHttp11Protocol(AbstractProtocol<?> http11Protocol) {
         this.http11Protocol = (AbstractHttp11Protocol<?>) http11Protocol;
+
+        try {
+            ObjectName oname = this.http11Protocol.getONameForUpgrade(getUpgradeProtocolName());
+            Registry.getRegistry(null, null).registerComponent(global, oname, null);
+        } catch (Exception e) {
+            log.warn(sm.getString("http2Protocol.jmxRegistration.fail"), e);
+        }
+    }
+
+
+    public String getUpgradeProtocolName() {
+        if (http11Protocol.isSSLEnabled()) {
+            return ALPN_NAME;
+        } else {
+            return HTTP_UPGRADE_NAME;
+        }
     }
 
 
     public RequestGroupInfo getGlobal() {
         return global;
-    }
-
-
-    @Override
-    public void init() throws Exception {
-        ObjectName parentRgOname = http11Protocol.getGlobalRequestProcessorMBeanName();
-        if (parentRgOname != null) {
-            StringBuilder name = new StringBuilder(parentRgOname.getCanonicalName());
-            name.append(",Upgrade=");
-            // Neither of these names need quoting
-            if (http11Protocol.isSSLEnabled()) {
-                name.append(ALPN_NAME);
-            } else {
-                name.append(HTTP_UPGRADE_NAME);
-            }
-            ObjectName rgOname = new ObjectName(name.toString());
-            this.rgOname = rgOname;
-            Registry.getRegistry(null, null).registerComponent(global, rgOname, null);
-        }
-    }
-
-
-    @Override
-    public void destroy() throws Exception {
-        ObjectName rgOname = this.rgOname;
-        if (rgOname != null) {
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
-        }
     }
 }

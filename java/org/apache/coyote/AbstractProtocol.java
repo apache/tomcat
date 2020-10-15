@@ -559,13 +559,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         endpoint.setDomain(domain);
 
         endpoint.init();
-
-        UpgradeProtocol[] upgradeProtocols = findUpgradeProtocols();
-        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
-            // Implementation note: Failure of one upgrade protocol fails the
-            // whole Connector
-            upgradeProtocol.init();
-        }
     }
 
 
@@ -677,16 +670,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         if(getLog().isInfoEnabled()) {
             getLog().info(sm.getString("abstractProtocolHandler.destroy", getName()));
             logPortOffset();
-        }
-
-        UpgradeProtocol[] upgradeProtocols = findUpgradeProtocols();
-        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
-            try {
-                upgradeProtocol.destroy();
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                getLog().error(sm.getString("abstractProtocol.upgradeProtocolDestroyError"), t);
-            }
         }
 
         try {

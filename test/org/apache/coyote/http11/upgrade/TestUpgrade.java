@@ -178,6 +178,7 @@ public class TestUpgrade extends TomcatBaseTest {
 
         uc.getWriter().write("GET / HTTP/1.1" + CRLF);
         uc.getWriter().write("Host: whatever" + CRLF);
+        uc.getWriter().write("Upgrade: test" + CRLF);
         uc.getWriter().write(CRLF);
         uc.getWriter().flush();
 
@@ -210,6 +211,9 @@ public class TestUpgrade extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
+            // In these tests only a single protocol is requested so it is safe
+            // to echo it to the response.
+            resp.setHeader("upgrade", req.getHeader("upgrade"));
             req.upgrade(upgradeHandlerClass);
         }
     }
