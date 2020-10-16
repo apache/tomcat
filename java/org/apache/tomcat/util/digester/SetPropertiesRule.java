@@ -95,8 +95,7 @@ public class SetPropertiesRule extends Rule {
                         "} Setting property '" + name + "' to '" +
                         value + "'");
             }
-            if (!digester.isFakeAttribute(top, name)
-                    && (excludes == null || (excludes != null && !excludes.containsKey(name)))) {
+            if (!digester.isFakeAttribute(top, name) && (excludes == null || !excludes.containsKey(name))) {
                 StringBuilder actualMethod = null;
                 if (code != null) {
                     actualMethod = new StringBuilder();
