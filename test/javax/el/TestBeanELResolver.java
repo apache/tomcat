@@ -21,6 +21,9 @@ import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,9 +60,9 @@ public class TestBeanELResolver {
         } catch (PropertyNotFoundException pnfe) {
             e = pnfe;
         }
-        Assert.assertTrue("Wrong exception type",
-                e instanceof PropertyNotFoundException);
+        assertThat("Wrong exception type", e, instanceOf(PropertyNotFoundException.class));
         String type = Bean.class.getName();
+        @SuppressWarnings("null") // Not possible due to test above
         String msg = e.getMessage();
         Assert.assertTrue("No reference to type [" + type +
                 "] where property cannot be found in [" + msg + "]",

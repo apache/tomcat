@@ -28,6 +28,9 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -86,7 +89,7 @@ public class TestJNDIRealm {
                 realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
 
         // THEN
-        Assert.assertTrue(principal instanceof GenericPrincipal);
+        assertThat(principal, instanceOf(GenericPrincipal.class));
         Assert.assertEquals(PASSWORD, ((GenericPrincipal)principal).getPassword());
     }
 
@@ -103,7 +106,7 @@ public class TestJNDIRealm {
                 realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
 
         // THEN
-        Assert.assertTrue(principal instanceof GenericPrincipal);
+        assertThat(principal, instanceOf(GenericPrincipal.class));
         Assert.assertEquals(ha1(), ((GenericPrincipal)principal).getPassword());
     }
 
