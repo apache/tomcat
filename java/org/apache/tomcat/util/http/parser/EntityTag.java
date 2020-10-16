@@ -30,7 +30,8 @@ public class EntityTag {
      * @param compareWeak  Use weak comparison e.g. match "etag" with W/"etag"
      * @param resourceETag Resource's ETag
      *
-     * @return true if ETag matched or {@code null} if the header is invalid
+     * @return {@code true} if ETag matches, {@code false} if ETag doesn't match
+     *         or {@code null} if the input is invalid
      *
      * @throws IOException If an I/O occurs during the parsing
      */
