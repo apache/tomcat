@@ -1909,6 +1909,15 @@
     <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
   </Match>
   <Match>
+    <!-- Return values are irrelevant as exceptions should be thrown -->
+    <Class name="org.apache.catalina.webresources.TestJarContents"/>
+    <Or>
+      <Method name="testStringOutOfBoundExceptions"/>
+      <Method name="testNullPointerExceptions"/>
+    </Or>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
     <!-- Use of hard-coded path is deliberate -->
     <Class name="org.apache.catalina.webresources.TestStandardRoot" />
     <Method name="&lt;clinit&gt;" />
@@ -2138,6 +2147,12 @@
       <Bug pattern="WA_NOT_IN_LOOP" />
       <Bug pattern="UW_UNCOND_WAIT " />
     </Or>
+  </Match>
+  <Match>
+    <!-- Array contents is not mutated -->
+    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
+    <Field name="data"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
     <!-- Return value of latch is intentionally ignored -->
