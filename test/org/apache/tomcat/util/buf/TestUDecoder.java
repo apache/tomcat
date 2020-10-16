@@ -25,25 +25,17 @@ import org.junit.Test;
 
 public class TestUDecoder {
 
-    @Test
-    public void testURLDecodeStringInvalid() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testURLDecodeStringInvalid01() {
         // %n rather than %nn should throw an IAE according to the Javadoc
-        Exception exception = null;
-        try {
-            UDecoder.URLDecode("%5xxxxx", StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            exception = e;
-        }
-        Assert.assertTrue(exception instanceof IllegalArgumentException);
+        UDecoder.URLDecode("%5xxxxx", StandardCharsets.UTF_8);
+    }
 
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testURLDecodeStringInvalid02() {
         // Edge case trying to trigger ArrayIndexOutOfBoundsException
-        exception = null;
-        try {
-            UDecoder.URLDecode("%5", StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            exception = e;
-        }
-        Assert.assertTrue(exception instanceof IllegalArgumentException);
+        UDecoder.URLDecode("%5", StandardCharsets.UTF_8);
     }
 
 
