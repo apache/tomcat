@@ -1306,7 +1306,7 @@ public class DefaultServlet extends HttpServlet {
     private static boolean validate(Ranges.Entry range, long length) {
         long start = getStart(range, length);
         long end = getEnd(range, length);
-        return (range != null) && (start >= 0) && (end >= 0) && (start <= end);
+        return (start >= 0) && (end >= 0) && (start <= end);
     }
 
     private static long getStart(Ranges.Entry range, long length) {
