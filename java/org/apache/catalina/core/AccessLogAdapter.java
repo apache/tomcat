@@ -60,5 +60,4 @@ public class AccessLogAdapter implements AccessLog {
         // not see a use case for that.
         return false;
     }
-
 }
