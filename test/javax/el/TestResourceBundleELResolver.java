@@ -52,7 +52,6 @@ public class TestResourceBundleELResolver {
 
         // Check that the method expression does return the keys
         Object result2 = me.invoke(context, null);
-        Assert.assertTrue(result2 instanceof Enumeration);
         @SuppressWarnings("unchecked")
         Enumeration<String> e = (Enumeration<String>) result2;
 

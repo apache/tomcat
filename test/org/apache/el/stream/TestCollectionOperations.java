@@ -123,8 +123,6 @@ public class TestCollectionOperations {
                 "beans.stream().filter(b->b.valLong > 1).map(b->[b.name, b.valLong]).toList()",
                 List.class);
 
-        Assert.assertTrue(result instanceof List);
-
         @SuppressWarnings("unchecked")
         List<List<Object>> list = (List<List<Object>>) result;
 
