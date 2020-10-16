@@ -165,22 +165,14 @@ public class TestBasicAuthParser {
     /*
      * Confirm the Basic parser rejects an invalid authentication method.
      */
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testAuthMethodBadMethod() throws Exception {
         final String METHOD = "BadMethod";
         final BasicAuthHeader AUTH_HEADER =
                 new BasicAuthHeader(METHOD, USER_NAME, PASSWORD);
         @SuppressWarnings("unused")
-        BasicAuthenticator.BasicCredentials credentials = null;
-        try {
-            credentials = new BasicAuthenticator.BasicCredentials(
-                AUTH_HEADER.getHeader(), StandardCharsets.UTF_8, true);
-            Assert.fail("IllegalArgumentException expected");
-        }
-        catch (Exception e) {
-            Assert.assertTrue(e instanceof IllegalArgumentException);
-            Assert.assertTrue(e.getMessage().contains("header method"));
-        }
+        BasicAuthenticator.BasicCredentials credentials =
+                new BasicAuthenticator.BasicCredentials(AUTH_HEADER.getHeader(), StandardCharsets.UTF_8, true);
     }
 
     /*
