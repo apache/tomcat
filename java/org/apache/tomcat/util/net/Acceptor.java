@@ -159,9 +159,11 @@ public class Acceptor<U> implements Runnable {
     public void stop() {
         stopCalled = true;
         try {
-            stopLatch.await(10, TimeUnit.SECONDS);
+            if (!stopLatch.await(10, TimeUnit.SECONDS)) {
+               log.warn(sm.getString("acceptor.stop.fail", getThreadName()));
+            }
         } catch (InterruptedException e) {
-            // Ignore
+            log.warn(sm.getString("acceptor.stop.interrupted", getThreadName()), e);
         }
     }
 
