@@ -164,7 +164,6 @@ public class TestMultipartConfig {
             Container parent = new StandardHost();
             parent.setParent(engine);
             super.context.setParent(parent);
-            context.getState().equals(LifecycleState.STARTING_PREP);
         }
         public Context getContext() {
             return super.context;
@@ -175,7 +174,7 @@ public class TestMultipartConfig {
         private volatile LifecycleState state;
 
         @Override
-        public LifecycleState getState() {
+        public synchronized LifecycleState getState() {
             return state;
         }
 
