@@ -571,7 +571,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 cancelledKey(key, socketWrapper);
                             }
                         } else {
-                            cancelledKey(key, attachment);
+                            cancelledKey(key, null);
                         }
                     }
                 }
