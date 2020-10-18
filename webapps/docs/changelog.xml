@@ -64,8 +64,9 @@
         connection scenario. (remm)
       </fix>
       <add>
-        Add extended <code>ErrorReportValve</code> that returns response as
-        JSON instead of HTML. (kfujino)
+        Add <code>JsonErrorReportValve</code> that extends the
+        <code>ErrorReportValve</code> that returns  response as JSON instead of
+        HTML. (kfujino)
       </add>
     </changelog>
   </subsection>
