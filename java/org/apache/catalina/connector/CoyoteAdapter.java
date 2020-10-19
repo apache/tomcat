@@ -1192,7 +1192,7 @@ public class CoyoteAdapter implements Adapter {
                 }
             } catch (IOException e) {
                 log.error("Invalid URI encoding; using HTTP default");
-                connector.setURIEncoding(null);
+                connector.setURIEncoding("ISO-8859-1");
             }
             if (conv != null) {
                 try {
