@@ -61,7 +61,8 @@
       <fix>
         Fix JNDIRealm pooling problems retrying on another bad connection. Any
         retries are made on a new connection, just like with the single
-        connection scenario. (remm)
+        connection scenario. Also remove all connections from the pool after
+        an error. (remm)
       </fix>
       <fix>
         Remove the entry for <code>org.apache.tomcat.util.descriptor.tld.LocalStrings</code>
