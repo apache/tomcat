@@ -63,6 +63,12 @@
         retries are made on a new connection, just like with the single
         connection scenario. (remm)
       </fix>
+      <fix>
+        Remove the entry for <code>org.apache.tomcat.util.descriptor.tld.LocalStrings</code>
+        from tomcat-embed-core's GraalVM tomcat-resource.json. It no more part of the jar
+        since <a href="https://github.com/apache/tomcat/commit/3815b4951eb3acd30a0b77aafa75fbdb928d5782">
+        Fix unwanted JPMS dependency of embed-core on embed-jasper</a>. (mgrigorov)
+      </fix>
       <add>
         Add <code>JsonErrorReportValve</code> that extends the
         <code>ErrorReportValve</code> that returns  response as JSON instead of
