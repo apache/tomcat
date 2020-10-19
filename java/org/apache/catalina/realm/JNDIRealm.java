@@ -1309,9 +1309,10 @@ public class JNDIRealm extends RealmBase {
 
                 // close the connection so we know it will be reopened.
                 close(connection);
+                closePooledConnections();
 
                 // open a new directory context.
-                connection = get(true);
+                connection = get();
 
                 // Try the authentication again.
                 principal = authenticate(connection, username, credentials);
@@ -2198,6 +2199,20 @@ public class JNDIRealm extends RealmBase {
 
     }
 
+    /**
+     * Close all pooled connections.
+     */
+    protected void closePooledConnections() {
+        if (connectionPool != null) {
+            // Close any pooled connections as they might be bad as well
+            synchronized (connectionPool) {
+                JNDIConnection connection = null;
+                while ((connection = connectionPool.pop()) != null) {
+                    close(connection);
+                }
+            }
+        }
+    }
 
     @Override
     @Deprecated
@@ -2218,8 +2233,36 @@ public class JNDIRealm extends RealmBase {
             return null;
         }
 
+        JNDIConnection connection = null;
+        User user = null;
         try {
-            User user = getUser(get(), username, null);
+
+            // Ensure that we have a directory context available
+            connection = get();
+
+            // Occasionally the directory context will timeout.  Try one more
+            // time before giving up.
+            try {
+                user = getUser(connection, username, null);
+            } catch (NullPointerException | NamingException e) {
+                // log the exception so we know it's there.
+                containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
+
+                // close the connection so we know it will be reopened.
+                close(connection);
+                closePooledConnections();
+
+                // open a new directory context.
+                connection = get();
+
+                // Try the authentication again.
+                user = getUser(connection, username, null);
+            }
+
+
+            // Release this context
+            release(connection);
+
             if (user == null) {
                 // User should be found...
                 return null;
@@ -2227,7 +2270,10 @@ public class JNDIRealm extends RealmBase {
                 // ... and have a password
                 return user.getPassword();
             }
+
         } catch (NamingException e) {
+            // Log the problem for posterity
+            containerLog.error(sm.getString("jndiRealm.exception"), e);
             return null;
         }
 
@@ -2285,6 +2331,7 @@ public class JNDIRealm extends RealmBase {
 
                 // close the connection so we know it will be reopened.
                 close(connection);
+                closePooledConnections();
 
                 // open a new directory context.
                 connection = get();
@@ -2389,28 +2436,12 @@ public class JNDIRealm extends RealmBase {
      * @exception NamingException if a directory server error occurs
      */
     protected JNDIConnection get() throws NamingException {
-        return get(false);
-    }
-
-    /**
-     * Open (if necessary) and return a connection to the configured
-     * directory server for this Realm.
-     * @param create when pooling, this forces creation of a new connection,
-     *   for example after an error
-     * @return the connection
-     * @exception NamingException if a directory server error occurs
-     */
-    protected JNDIConnection get(boolean create) throws NamingException {
         JNDIConnection connection = null;
         // Use the pool if available, otherwise use the single connection
         if (connectionPool != null) {
-            if (create) {
+            connection = connectionPool.pop();
+            if (connection == null) {
                 connection = create();
-            } else {
-                connection = connectionPool.pop();
-                if (connection == null) {
-                    connection = create();
-                }
             }
         } else {
             singleConnectionLock.lock();
@@ -2699,10 +2730,7 @@ public class JNDIRealm extends RealmBase {
             singleConnectionLock.lock();
             close(singleConnection);
         } else {
-            JNDIConnection connection = null;
-            while ((connection = connectionPool.pop()) != null) {
-                close(connection);
-            }
+            closePooledConnections();
             connectionPool = null;
         }
     }
