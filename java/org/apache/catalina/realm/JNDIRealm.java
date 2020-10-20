@@ -490,6 +490,14 @@ public class JNDIRealm extends RealmBase {
     protected int connectionPoolSize = 1;
 
 
+    /**
+     * Whether to use context ClassLoader or default ClassLoader.
+     * True means use context ClassLoader, and True is the default
+     * value.
+     */
+    protected boolean useContextClassLoader = true;
+
+
     // ------------------------------------------------------------- Properties
 
     public boolean getForceDnHexEscape() {
@@ -1244,6 +1252,26 @@ public class JNDIRealm extends RealmBase {
             throws ReflectiveOperationException {
         Class<?> clazz = Class.forName(className);
         return clazz.getConstructor().newInstance();
+    }
+
+    /**
+     * Sets whether to use the context or default ClassLoader.
+     * True means use context ClassLoader.
+     *
+     * @param useContext True means use context ClassLoader
+     */
+    public void setUseContextClassLoader(boolean useContext) {
+        useContextClassLoader = useContext;
+    }
+
+    /**
+     * Returns whether to use the context or default ClassLoader.
+     * True means to use the context ClassLoader.
+     *
+     * @return The value of useContextClassLoader
+     */
+    public boolean isUseContextClassLoader() {
+        return useContextClassLoader;
     }
 
     // ---------------------------------------------------------- Realm Methods
@@ -2486,7 +2514,12 @@ public class JNDIRealm extends RealmBase {
      * @throws NamingException if a directory server error occurs
      */
     protected void open(JNDIConnection connection) throws NamingException {
+        ClassLoader ocl = null;
         try {
+            if (!isUseContextClassLoader()) {
+                ocl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            }
             // Ensure that we have a directory context available
             connection.context = createDirContext(getDirectoryContextEnvironment());
         } catch (Exception e) {
@@ -2503,6 +2536,9 @@ public class JNDIRealm extends RealmBase {
             // reset it in case the connection times out.
             // the primary may come back.
             connectionAttempt = 0;
+            if (!isUseContextClassLoader()) {
+                Thread.currentThread().setContextClassLoader(ocl);
+            }
         }
     }
 
