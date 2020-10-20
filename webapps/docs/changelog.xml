@@ -75,6 +75,11 @@
         <code>ErrorReportValve</code> that returns  response as JSON instead of
         HTML. (kfujino)
       </add>
+      <fix>
+        JNDIRealm connections should only be created with the container
+        classloader as the thread context classloader, just like for the JAAS
+        realm. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
