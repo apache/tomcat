@@ -67,6 +67,11 @@
         connection scenario. Also remove all connections from the pool after
         an error. (remm)
       </fix>
+      <fix>
+        JNDIRealm connections should only be created with the container
+        classloader as the thread context classloader, just like for the JAAS
+        realm. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subseciton name="Coyote">

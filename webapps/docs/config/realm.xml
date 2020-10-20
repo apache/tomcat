@@ -508,6 +508,13 @@
            specified, the default value of <code>302</code> is used.</p>
       </attribute>
 
+      <attribute name="useContextClassLoader" required="false">
+        <p>Instructs JNDIRealm to use the context class loader when opening the
+        connection for the JNDI provider. The default value is
+        <code>true</code>. To load classes using the container's classloader,
+        specify <code>false</code>.</p>
+      </attribute>
+
       <attribute name="useDelegatedCredential" required="false">
         <p>When the JNDIRealm is used with the SPNEGO authenticator, delegated
         credentials for the user may be available. If such credentials are
