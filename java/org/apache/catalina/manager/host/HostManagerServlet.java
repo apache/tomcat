@@ -394,7 +394,7 @@ public class HostManagerServlet
                         "hostManagerServlet.configBaseCreateFail", name));
                 return;
             }
-            try (InputStream is = getServletContext().getResourceAsStream("/manager.xml")) {
+            try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/manager.xml")) {
                 Path dest = (new File(configBaseFile, "manager.xml")).toPath();
                 Files.copy(is, dest);
             } catch (IOException e) {

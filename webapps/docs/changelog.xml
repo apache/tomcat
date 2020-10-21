@@ -98,6 +98,10 @@
       <fix>
         <bug>64799</bug>: Added missing resources to host-manager web app. (isapir)
       </fix>
+      <fix>
+        <bug>64797</bug>: Align manager.xml template file in Host-Manager with
+        context.xml of real Manager web application. (isapir)
+      </fix>
     </changelog>
   </subsection>
 </section>
