@@ -27,9 +27,10 @@ mvn.properties
 .checkstyle
 .classpath
 .fbprefs
+.idea
 .project
 .settings
-.idea
+.vscode
 *.iml
 *.ipr
 *.iws
