@@ -41,6 +41,7 @@
 { "name":"org.apache.catalina.servlets.DefaultServlet", "allDeclaredFields":true, "allDeclaredMethods":true },
 { "name":"org.apache.catalina.valves.ErrorReportValve", "methods" : [{"name": "<init>","parameterTypes":[]}] },
 { "name":"org.apache.coyote.http11.Http11NioProtocol", "methods" : [{"name": "<init>","parameterTypes":[]}] },
+{ "name":"org.apache.coyote.http11.Http11Nio2Protocol", "methods" : [{"name": "<init>","parameterTypes":[]}] },
 { "name":"org.apache.coyote.http11.Http11AprProtocol", "allDeclaredConstructors" : true, "allPublicConstructors" : true, "allDeclaredMethods" : true, "allPublicMethods" : true},
 { "name":"org.apache.coyote.UpgradeProtocol" },
 { "name":"org.apache.coyote.Request", "methods":[{"name":"<init>","parameterTypes":[] }] },

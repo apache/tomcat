@@ -70,6 +70,10 @@
         since <a href="https://github.com/apache/tomcat/commit/3815b4951eb3acd30a0b77aafa75fbdb928d5782">
         Fix unwanted JPMS dependency of embed-core on embed-jasper</a>. (mgrigorov)
       </fix>
+      <fix>
+        Add org.apache.coyote.http11.Http11Nio2Protocol to the list of classes which could be instantiated
+        via reflection in GraalVM. (mgrigorov)
+      </fix>
       <add>
         Add <code>JsonErrorReportValve</code> that extends the
         <code>ErrorReportValve</code> that returns  response as JSON instead of
