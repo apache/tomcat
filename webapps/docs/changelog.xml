@@ -79,6 +79,10 @@
         <code>ErrorReportValve</code> that returns  response as JSON instead of
         HTML. (kfujino)
       </add>
+      <add>
+        Add GraalVM config for Tomcat JNI related classes. This makes it possible to use the APR
+        protocol in GraalVM native images. (mgrigorov)
+      </add>
       <fix>
         JNDIRealm connections should only be created with the container
         classloader as the thread context classloader, just like for the JAAS
