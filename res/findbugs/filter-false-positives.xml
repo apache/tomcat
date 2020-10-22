@@ -137,6 +137,12 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- Calling sleep while holding a lock is deliberate -->
+    <Class name="org.apache.catalina.core.StandardContext" />
+    <Method name="stopInternal" />
+    <Bug pattern="SWL_SLEEP_WITH_LOCK_HELD" />
+  </Match>
+  <Match>
     <!-- Have to trigger GC for leak detection to work. Clearly documented -->
     <Class name="org.apache.catalina.core.StandardHost" />
     <Method name="findReloadedContextMemoryLeaks" />
@@ -190,6 +196,17 @@
       <Method name="waitForSendAllSessions" />
     </Or>
     <Bug code="DE" />
+  </Match>
+  <Match>
+    <!-- Design choice to reduce need for syncs -->
+    <Class name="org.apache.catalina.ha.tcp.ReplicationValve" />
+    <Or>
+      <Field name="nrOfCrossContextSendRequests" />
+      <Field name="nrOfFilterRequests" />
+      <Field name="nrOfRequests" />
+      <Field name="nrOfSendRequests" />
+    </Or>
+    <Pattern code="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
     <!-- Field is only modified during Servlet load -->
@@ -340,6 +357,12 @@
     <Class name="org.apache.catalina.tribes.membership.McastServiceImpl$RecoveryThread"/>
     <Method name="run"/>
     <Bug code="NS"/>
+  </Match>
+  <Match>
+    <!-- lock is in clone so this is safe -->
+    <Class name="org.apache.catalina.tribes.membership.Membership" />
+    <Method name="clone" />
+    <Bug pattern="ML_SYNC_ON_FIELD_TO_GUARD_CHANGING_THAT_FIELD" />
   </Match>
   <Match>
     <!-- Intentional in case thread is waiting -->
@@ -501,9 +524,35 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Utility classes used to import/export l10n strings -->
+    <!-- This code does not need to be robust -->
+    <Class name="org.apache.tomcat.buildutil.translate.Import"/>
+  </Match>
+  <Match>
     <!-- Class has to implement clone since its superclass does but fakes it -->
     <Class name="org.apache.naming.resources.ResourceAttributes" />
     <Bug code="CN" />
+  </Match>
+  <Match>
+    <!-- instanceof is appropriate here -->
+    <Or>
+      <Class name="org.apache.tomcat.dbcp.dbcp.DelegatingCallableStatement"/>
+      <Class name="org.apache.tomcat.dbcp.dbcp.DelegatingPreparedStatement"/>
+    </Or>
+    <Method name="equals"/>
+    <Bug pattern="EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC"/>
+  </Match>
+  <Match>
+    <!-- Naked notify is by design (doesn't matter which thread is unblocked -->
+    <Or>
+      <Class name="org.apache.tomcat.dbcp.pool.impl.GenericKeyedObjectPool"/>
+      <Class name="org.apache.tomcat.dbcp.pool.impl.GenericObjectPool"/>
+    </Or>
+    <Or>
+      <Method name="allocate"/>
+      <Method name="close"/>
+    </Or>
+    <Bug pattern="NN_NAKED_NOTIFY"/>
   </Match>
   <Match>
     <!-- Return value is ignored but a null result will trigger an exception -->
@@ -642,6 +691,12 @@
     <Bug code="SF" />
   </Match>
   <Match>
+    <!-- Returns null by design -->
+    <Class name="org.apache.tomcat.util.http.parser.EntityTag" />
+     <Method name="compareEntityTag"/>
+    <Bug pattern="NP_BOOLEAN_RETURN_NULL" />
+  </Match>
+  <Match>
     <!-- Hiding of field in superclass is deliberate -->
     <Class name="org.apache.tomcat.util.modeler.NotificationInfo"/>
     <Field name="info" />
@@ -677,6 +732,15 @@
     <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketEventProcessor"/>
     <Method name="run"/>
     <Bug code="ML" />
+  </Match>
+  <Match>
+    <!-- Modifications to SocketLists are always protected by syncs -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketList"/>
+    <Or>
+      <Method name="add"/>
+      <Method name="remove"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_INCREMENT"/>
   </Match>
   <Match>
     <!-- Sync is there to protect referenced object not field -->
@@ -738,6 +802,12 @@
     <Class name="org.apache.catalina.core.TestApplicationSessionCookieConfig$CustomContext" />
     <Method name="getState"/>
     <Bug code="UG" />
+  </Match>
+  <Match>
+    <!-- Deliberate use of run() for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextStateChanges$AsyncServlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="RU_INVOKE_RUN"/>
   </Match>
   <Match>
     <Or>
@@ -841,6 +911,12 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Concrete Map type not affected -->
+    <Class name="org.apache.catalina.util.TestParameterMap" />
+    <Method name="testEntrySetImmutabilityAfterLocked" />
+    <Bug pattern="DMI_ENTRY_SETS_MAY_REUSE_ENTRY_OBJECTS" />
+  </Match>
+  <Match>
     <!-- Deliberate hack for the purposes of the test -->
     <Class name="org.apache.catalina.valves.TestStuckThreadDetectionValve$StickingServlet"/>
     <Field name="wasInterrupted"/>
@@ -853,6 +929,31 @@
       <Field name="formats"/>
     </Or>
     <Bug pattern="STCAL_STATIC_SIMPLE_DATE_FORMAT_INSTANCE" />
+  </Match>
+  <Match>
+    <!-- Exceptions are deliberately ignored -->
+    <Class name="org.apache.tomcat.dbcp.dbcp.AbstractConnectionPoolTest$TestThread"/>
+    <Method name="run"/>
+    <Bug pattern="DE_MIGHT_IGNORE"/>
+  </Match>
+  <Match>
+    <!-- Sleep with lock is deliberate -->
+    <Class name="org.apache.tomcat.dbcp.dbcp.TestBasicDataSource"/>
+    <Method name="testCreateDataSourceCleanupEvictor"/>
+    <Bug pattern="SWL_SLEEP_WITH_LOCK_HELD"/>
+  </Match>
+  <Match>
+    <!-- nulls are intentional in the tests -->
+    <Or>
+      <Class name="org.apache.tomcat.dbcp.dbcp.TesterConnection"/>
+      <Class name="org.apache.tomcat.dbcp.dbcp.TesterPreparedStatement"/>
+      <Class name="org.apache.tomcat.dbcp.dbcp.TesterStatement"/>
+    </Or>
+    <Or>
+      <Method name="executeQuery"/>
+      <Method name="prepareStatement"/>
+    </Or>
+    <Bug pattern="NP_NONNULL_RETURN_VIOLATION"/>
   </Match>
   <Match>
     <!-- Use of statics is unavoidable in all cases -->
@@ -913,6 +1014,9 @@
       <Method name="testBasicPrefix" />
       <Method name="testQuote2" />
       <Method name="testDuplicate01" />
+      <Method name="testSpecIssue194a" />
+      <Method name="testSpecIssue194b" />
+      <Method name="testSpecIssue194c" />
     </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
