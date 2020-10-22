@@ -2073,18 +2073,9 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-<<<<<<< HEAD
-     * Provides the entity tag (the ETag header) for the given resource
-     * attributes. Intended to be over-ridden by custom DefaultServlet
-     * implementations that wish to use an alternative format for the entity
-     * tag. Such custom implementations that generate strong entity tags may
-     * also want to change the default value of
-     * {@link #useWeakComparisonWithIfMatch}.
-=======
      * Provides the entity tag (the ETag header) for the given resource.
      * Intended to be over-ridden by custom DefaultServlet implementations that
      * wish to use an alternative format for the entity tag.
->>>>>>> bc379af8e3... Further ETag fixes
      *
      * @param resourceAttributes  The resource attributes for which an entity
      *                            tag is required.
