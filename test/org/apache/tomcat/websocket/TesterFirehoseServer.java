@@ -227,12 +227,10 @@ public class TesterFirehoseServer {
 
             // Ignore the latch result as the message count test below will tell us
             // if the right number of messages arrived
-            handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS,
-                    TimeUnit.MILLISECONDS);
+            Assert.assertTrue(handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS,
+                    TimeUnit.MILLISECONDS));
 
             Queue<String> messages = handler.getMessages();
-            Assert.assertEquals(
-                    TesterFirehoseServer.MESSAGE_COUNT, messages.size());
             for (String message : messages) {
                 Assert.assertEquals(TesterFirehoseServer.MESSAGE, message);
             }
