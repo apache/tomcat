@@ -86,7 +86,7 @@ public class FileHandler extends Handler {
     public static final int DEFAULT_MAX_DAYS = -1;
     public static final int DEFAULT_BUFFER_SIZE = -1;
 
-    private static ExecutorService DELETE_FILES_SERVICE;
+    private static volatile ExecutorService DELETE_FILES_SERVICE;
 
 
     // ------------------------------------------------------------ Constructor
