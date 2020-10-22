@@ -865,13 +865,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 // any active event.
                 while (iterator != null && iterator.hasNext()) {
                     SelectionKey sk = iterator.next();
+                    iterator.remove();
                     NioSocketWrapper socketWrapper = (NioSocketWrapper) sk.attachment();
                     // Attachment may be null if another thread has called
                     // cancelledKey()
-                    if (socketWrapper == null) {
-                        iterator.remove();
-                    } else {
-                        iterator.remove();
+                    if (socketWrapper != null) {
                         processKey(sk, socketWrapper);
                     }
                 }
