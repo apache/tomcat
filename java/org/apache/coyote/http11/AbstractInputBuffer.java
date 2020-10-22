@@ -290,6 +290,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      * Available bytes in the buffers (note that due to encoding, this may not
      * correspond).
      */
+    @Override
     public int available() {
         int result = (lastValid - pos);
         if ((result == 0) && (lastActiveFilter >= 0)) {
