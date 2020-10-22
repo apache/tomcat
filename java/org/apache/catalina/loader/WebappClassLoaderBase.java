@@ -1822,7 +1822,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      *
      * @exception ClassNotFoundException if the class was not found
      */
-    @SuppressWarnings("sync-override")
     @Override
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 
