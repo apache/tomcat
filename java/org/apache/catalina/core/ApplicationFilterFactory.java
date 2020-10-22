@@ -52,7 +52,7 @@ public final class ApplicationFilterFactory {
     public static final String DISPATCHER_REQUEST_PATH_ATTR =
             Globals.DISPATCHER_REQUEST_PATH_ATTR;
 
-    private static ApplicationFilterFactory factory = null;
+    private static volatile ApplicationFilterFactory factory = null;
 
 
     // ----------------------------------------------------------- Constructors
