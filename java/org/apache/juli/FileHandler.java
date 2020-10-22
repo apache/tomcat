@@ -99,9 +99,45 @@ public class FileHandler extends Handler {
     public static final int DEFAULT_MAX_DAYS = -1;
     public static final int DEFAULT_BUFFER_SIZE = -1;
 
+    private static volatile ExecutorService DELETE_FILES_SERVICE;
 
-    private static final ExecutorService DELETE_FILES_SERVICE =
-            Executors.newSingleThreadExecutor(new ThreadFactory() {
+    // ------------------------------------------------------------ Constructor
+
+
+    public FileHandler() {
+        this(null, null, null);
+    }
+
+
+    public FileHandler(String directory, String prefix, String suffix) {
+        this(directory, prefix, suffix, null);
+    }
+
+
+    public FileHandler(String directory, String prefix, String suffix, Integer maxDays) {
+        this(directory, prefix, suffix, maxDays, null, null);
+    }
+
+
+    public FileHandler(String directory, String prefix, String suffix, Integer maxDays,
+            Boolean rotatable, Integer bufferSize) {
+        this.directory = directory;
+        this.prefix = prefix;
+        this.suffix = suffix;
+        this.maxDays = maxDays;
+        this.rotatable = rotatable;
+        this.bufferSize = bufferSize;
+        initExecutor();
+        configure();
+        clean();
+    }
+
+    /**
+     * lazy set field `DELETE_FILES_SERVICE` to avoid class `ThreadPoolExecutor` loaded earlier than tomcat start.
+     */
+    private static synchronized void initExecutor(){
+        if (null == DELETE_FILES_SERVICE){
+            DELETE_FILES_SERVICE = Executors.newSingleThreadExecutor(new ThreadFactory() {
                 private static final String NAME_PREFIX = "FileHandlerLogFilesCleaner-";
                 private final boolean isSecurityEnabled;
                 private final ThreadGroup group;
@@ -149,37 +185,8 @@ public class FileHandler extends Handler {
                     }
                 }
             });
-
-    // ------------------------------------------------------------ Constructor
-
-
-    public FileHandler() {
-        this(null, null, null);
+        }
     }
-
-
-    public FileHandler(String directory, String prefix, String suffix) {
-        this(directory, prefix, suffix, null);
-    }
-
-
-    public FileHandler(String directory, String prefix, String suffix, Integer maxDays) {
-        this(directory, prefix, suffix, maxDays, null, null);
-    }
-
-
-    public FileHandler(String directory, String prefix, String suffix, Integer maxDays,
-            Boolean rotatable, Integer bufferSize) {
-        this.directory = directory;
-        this.prefix = prefix;
-        this.suffix = suffix;
-        this.maxDays = maxDays;
-        this.rotatable = rotatable;
-        this.bufferSize = bufferSize;
-        configure();
-        clean();
-    }
-
 
     // ----------------------------------------------------- Instance Variables
 
