@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="cookie-processor.html">
+
+  &project;
+
+  <properties>
+    <title>The Cookie Processor Component</title>
+  </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc />
+</section>
+
+<section name="Introduction">
+
+  <p>The <strong>CookieProcessor</strong> element represents the component that
+  parses received cookie headers into <code>javax.servlet.http.Cookie</code>
+  objects accessible through <code>HttpServletRequest.getCookies()</code> and
+  converts <code>javax.servlet.http.Cookie</code> objects added to the response
+  through <code>HttpServletResponse.addCookie()</code> to the HTTP headers
+  returned to the client.</p>
+
+  <p>A CookieProcessor element MAY be nested inside a
+  <a href="context.html">Context</a> component. If it is not included, a default
+  implementation will be created automatically.</p>
+
+</section>
+
+
+<section name="Attributes">
+
+  <subsection name="Common Attributes">
+
+    <p>All implementations of <strong>CookieProcessor</strong> support the
+    following attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="false">
+        <p>Java class name of the implementation to use. This class must
+        implement the <code>org.apache.tomcat.util.http.CookieProcessor</code>
+        interface. If not specified, the standard value (defined below) will be
+        used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+
+  <subsection name="Standard Implementation">
+
+    <p>The standard implementation of <strong>CookieProcessor</strong> is
+    <code>org.apache.tomcat.util.http.Rfc6265CookieProcessor</code>.</p>
+
+    <p>This cookie processor is based on RFC6265 with the following changes to
+    support better interoperability:</p>
+
+    <ul>
+      <li>Values 0x80 to 0xFF are permitted in cookie-octet to support the use
+      of UTF-8 in cookie values as used by HTML 5.</li>
+      <li>For cookies without a value, the '=' is not required after the name as
+      some browsers do not sent it.</li>
+    </ul>
+
+    <p>The RFC 6265 cookie processor is generally more lenient than the legacy
+    cookie parser. In particular:</p>
+
+    <ul>
+      <li>The '<code>=</code>' and '<code>/</code>' characters are always
+      permitted in a cookie value.</li>
+      <li>Name only cookies are always permitted.</li>
+      <li>The cookie header is always preserved.</li>
+    </ul>
+
+    <p>The <strong>RFC 6265 Cookie Processor</strong> supports the following
+    additional attributes.</p>
+
+    <attributes>
+
+      <attribute name="sameSiteCookies" required="false">
+        <p>Enables setting same-site cookie attribute.</p>
+
+        <p>If value is <code>unset</code> then the same-site cookie attribute
+        won't be set. This is the default value.</p>
+
+        <p>If value is <code>none</code> then the same-site cookie attribute
+        will be set and the cookie will always be sent in cross-site requests.</p>
+
+        <p>If value is <code>lax</code> then the browser only sends the cookie
+        in same-site requests and cross-site top level GET requests.</p>
+
+        <p>If value is <code>strict</code> then the browser prevents sending the
+        cookie in any cross-site request.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Legacy Cookie Processor - org.apache.tomcat.util.http.LegacyCookieProcessor">
+
+    <p>This is the legacy  cookie parser based on RFC6265, RFC2109 and RFC2616.
+    It implements a strict interpretation of the cookie specifications. Due to
+    various interoperability issues with browsers not all strict behaviours
+    are enabled by default and additional options are available to further
+    relax the behaviour of this cookie processor if required.</p>
+
+    <attributes>
+
+      <attribute name="allowEqualsInValue" required="false">
+        <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'
+        characters when parsing unquoted cookie values. If <code>false</code>,
+        cookie values containing '<code>=</code>' will be terminated when the
+        '<code>=</code>' is encountered and the remainder of the cookie value
+        will be dropped.</p>
+        <p>If not set the specification compliant default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="allowHttpSepsInV0" required="false">
+        <p>If this is <code>true</code> Tomcat will allow HTTP separators in
+        cookie names and values.</p>
+        <p>If not specified, the default specification compliant value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="allowNameOnly" required="false">
+        <p>If this is <code>true</code> Tomcat will allow name only cookies
+        (with or without trailing '<code>=</code>') when parsing cookie headers.
+        If <code>false</code>, name only cookies will be dropped.</p>
+        <p>If not set the specification compliant default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="alwaysAddExpires" required="false">
+        <p>If this is <code>true</code> Tomcat will always add an expires
+        parameter to a SetCookie header even for cookies with version greater
+        than zero. This is to work around a known IE6 and IE7 bug that causes I
+        to ignore the Max-Age parameter in a SetCookie header.</p>
+        <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set
+        to <code>true</code>, the default of this setting will be
+        <code>false</code>, else the default value will be <code>true</code>.
+        </p>
+      </attribute>
+
+      <attribute name="forwardSlashIsSeparator" required="false">
+        <p>If this is <code>true</code> Tomcat will treat the forward slash
+        character ('<code>/</code>') as an HTTP separator when processing cookie
+        headers. If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        is set to <code>true</code>, the default of this setting will be
+        <code>true</code>, else the default value will be <code>false</code>.
+        </p>
+      </attribute>
+
+      <attribute name="sameSiteCookies" required="false">
+        <p>Enables setting same-site cookie attribute.</p>
+
+        <p>If value is <code>unset</code> then the same-site cookie attribute
+        won't be set. This is the default value.</p>
+
+        <p>If value is <code>none</code> then the same-site cookie attribute
+        will be set and the cookie will always be sent in cross-site requests.</p>
+
+        <p>If value is <code>lax</code> then the browser only sends the cookie
+        in same-site requests and cross-site top level GET requests.</p>
+
+        <p>If value is <code>strict</code> then the browser prevents sending the
+        cookie in any cross-site request.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
+<section name="Nested Components">
+
+  <p>No element may be nested inside a <strong>CookieProcessor</strong>.</p>
+
+</section>
+
+
+<section name="Special Features">
+
+  <p>No special features are associated with a <strong>CookieProcessor</strong>
+  element.</p>
+
+</section>
+
+</body>
+
+</document>

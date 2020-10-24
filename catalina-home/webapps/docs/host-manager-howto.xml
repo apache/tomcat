@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="host-manager-howto.html">
+  &project;
+
+  <properties>
+        <title>Host Manager App -- Text Interface</title>
+  </properties>
+<body>
+
+<section name="Table of Contents">
+  <toc/>
+</section>
+
+<section name="Introduction">
+  <p>
+    The <strong>Tomcat Host Manager</strong> application enables you to create,
+    delete, and otherwise manage virtual hosts within Tomcat. This how-to guide
+    is best accompanied by the following pieces of documentation:
+  </p>
+  <ul>
+    <li>
+      <a href="virtual-hosting-howto.html">Virtual Hosting How-To</a> for more
+      information about virtual hosting.
+    </li>
+    <li>
+      <a href="config/host.html">The Host Container</a> for more information
+      about the underlying xml configuration of virtual hosts and description
+      of attributes.
+    </li>
+  </ul>
+
+  <p>
+    The <strong>Tomcat Host Manager</strong> application is a part of
+    Tomcat installation, by default available using the following
+    context: <code>/host-manager</code>. You can use the host manager in the
+    following ways:
+  </p>
+
+  <ul>
+    <li>
+      Utilizing the graphical user interface, accessible at:
+      <code>{server}:{port}/host-manager/html</code>.
+    </li>
+    <li>
+      Utilizing a set of minimal HTTP requests suitable for scripting.
+      You can access this mode at:
+      <code>{server}:{port}/host-manager/text</code>.
+    </li>
+  </ul>
+  <p>
+    Both ways enable you to add, remove, start, and stop virtual hosts. Changes
+    may be persisted by using the <code>persist</code> command. This document
+    focuses on the text interface. For further information about the graphical
+    interface, see
+    <a href="html-host-manager-howto.html">Host Manager App -- HTML Interface</a>.
+  </p>
+</section>
+
+<section name="Configuring Manager Application Access">
+  <p><em>The description below uses <code>$CATALINA_HOME</code> to refer the
+    base Tomcat directory. It is the directory in which you installed
+    Tomcat, for example <code>C:\tomcat8</code>, or
+    <code>/usr/share/tomcat8</code>.</em></p>
+
+  <p>
+    The Host Manager application requires a user with one of the following
+    roles:
+  </p>
+
+  <ul>
+    <li>
+      <code>admin-gui</code> - use this role for the graphical web interface.
+    </li>
+    <li>
+      <code>admin-script</code> - use this role for the scripting web interface.
+    </li>
+  </ul>
+
+  <p>
+    To enable access to the text interface of the Host Manager application,
+    either grant your Tomcat user the appropriate role, or create a new one with
+    the correct role. For example, open
+    <code>${CATALINA_BASE}/conf/tomcat-users.xml</code> and enter the following:
+  </p>
+  <source><![CDATA[<user username="test" password="chang3m3N#w" roles="admin-script"/>]]></source>
+  <p>
+    No further settings is needed. When you now access
+    <code>{server}:{port}/host-manager/text/${COMMAND}</code>,you are able to
+    log in with the created credentials. For example:
+    <source>$ curl -u ${USERNAME}:${PASSWORD} http://localhost:8080/host-manager/text/list
+OK - Listed hosts
+localhost:</source>
+  </p>
+  <p>
+    If you are using a different realm you will need to add the necessary role
+    to the appropriate user(s) using the standard user management tools for that
+    realm.
+  </p>
+</section>
+<section name="List of Commands">
+  <p>The following commands are supported:</p>
+  <ul>
+    <li>list</li>
+    <li>add</li>
+    <li>remove</li>
+    <li>start</li>
+    <li>stop</li>
+    <li>persist</li>
+  </ul>
+  <p>
+    In the following subsections, the username and password is assumed to be
+    <b>test:test</b>. For your environment, use credentials created in the
+    previous sections.
+  </p>
+  <subsection name="List command">
+    <p>
+      Use the <b>list</b> command to see the available virtual hosts on your
+      Tomcat instance.
+    </p>
+    <p><i>Example command</i>:</p>
+    <code>curl -u test:test http://localhost:8080/host-manager/text/list</code>
+    <p><i>Example response</i>:</p>
+    <source>OK - Listed hosts
+localhost:</source>
+  </subsection>
+  <subsection name="Add command">
+    <p>
+      Use the <b>add</b> command to add a new virtual host. Parameters used
+      for the <b>add</b> command:
+    </p>
+    <ul>
+      <li>String <b>name</b>: Name of the virtual host. <b>REQUIRED</b></li>
+      <li>String <b>aliases</b>: Aliases for your virtual host.</li>
+      <li>String <b>appBase</b>: Base path for the application that will be
+      served by this virtual host. Provide relative or absolute path.</li>
+      <li>Boolean <b>manager</b>: If true, the Manager app is added to the
+      virtual host. You can access it with the <i>/manager</i> context.</li>
+      <li>Boolean <b>autoDeploy</b>: If true, Tomcat automatically redeploys
+      applications placed in the appBase directory.</li>
+      <li>Boolean <b>deployOnStartup</b>: If true, Tomcat automatically deploys
+      applications placed in the appBase directory on startup.</li>
+      <li>Boolean <b>deployXML</b>: If true, the <i>/META-INF/context.xml</i>
+      file is read and used by Tomcat.</li>
+      <li>Boolean <b>copyXML</b>: If true, Tomcat copies <i>/META-INF/context.xml</i>
+      file and uses the original copy regardless of updates to the application's
+      <i>/META-INF/context.xml</i> file.</li>
+    </ul>
+    <p><i>Example command</i>:</p>
+    <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/add?name=www.awesomeserver.com&aliases=awesomeserver.com&appBase/mnt/appDir&deployOnStartup=true]]></source>
+    <p><i>Example response</i>:</p>
+    <source>add: Adding host [www.awesomeserver.com]</source>
+  </subsection>
+  <subsection name="Remove command">
+    <p>
+      Use the <b>remove</b> command to remove a virtual host. Parameters used
+      for the <b>remove</b> command:
+    </p>
+    <ul>
+      <li>String <b>name</b>: Name of the virtual host to be removed.
+      <b>REQUIRED</b></li>
+    </ul>
+    <p><i>Example command</i>:</p>
+    <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/remove?name=www.awesomeserver.com]]></source>
+    <p><i>Example response</i>:</p>
+    <source>remove: Removing host [www.awesomeserver.com]</source>
+  </subsection>
+  <subsection name="Start command">
+    <p>
+      Use the <b>start</b> command to start a virtual host. Parameters used
+      for the <b>start</b> command:
+    </p>
+    <ul>
+      <li>String <b>name</b>: Name of the virtual host to be started.
+      <b>REQUIRED</b></li>
+    </ul>
+    <p><i>Example command</i>:</p>
+    <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/start?name=www.awesomeserver.com]]></source>
+    <p><i>Example response</i>:</p>
+    <source>OK - Host www.awesomeserver.com started</source>
+  </subsection>
+  <subsection name="Stop command">
+    <p>
+      Use the <b>stop</b> command to stop a virtual host. Parameters used
+      for the <b>stop</b> command:
+    </p>
+    <ul>
+      <li>String <b>name</b>: Name of the virtual host to be stopped.
+      <b>REQUIRED</b></li>
+    </ul>
+    <p><i>Example command</i>:</p>
+    <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/stop?name=www.awesomeserver.com]]></source>
+    <p><i>Example response</i>:</p>
+    <source>OK - Host www.awesomeserver.com stopped</source>
+  </subsection>
+  <subsection name="Persist command">
+    <p>
+      Use the <b>persist</b> command to persist a virtual host into
+      <b>server.xml</b>. Parameters used for the <b>persist</b> command:
+    </p>
+    <ul>
+      <li>String <b>name</b>: Name of the virtual host to be persist.
+      <b>REQUIRED</b></li>
+    </ul>
+    <p>
+      This functionality is disabled by default. To enable this option, you must
+      configure the <code>StoreConfigLifecycleListener</code> listener first.
+      To do so, add the following listener to your <i>server.xml</i>:
+    </p>
+    <source><![CDATA[<Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>]]></source>
+    <p><i>Example command</i>:</p>
+    <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/persist?name=www.awesomeserver.com]]></source>
+    <p><i>Example response</i>:</p>
+    <source>OK - Configuration persisted</source>
+    <p><i>Example manual entry</i>:</p>
+    <source><![CDATA[<Host appBase="www.awesomeserver.com" name="www.awesomeserver.com" deployXML="false" unpackWARs="false">
+</Host>]]></source>
+  </subsection>
+</section>
+</body>
+</document>
