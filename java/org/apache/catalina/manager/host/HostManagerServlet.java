@@ -406,7 +406,7 @@ public class HostManagerServlet
             InputStream is = null;
             OutputStream os = null;
             try {
-                is = getServletContext().getResourceAsStream("/manager.xml");
+                is = getServletContext().getResourceAsStream("/WEB-INF/manager.xml");
                 os = new FileOutputStream(new File(configBaseFile, "manager.xml"));
                 byte buffer[] = new byte[512];
                 int len = buffer.length;

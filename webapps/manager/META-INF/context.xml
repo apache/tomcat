@@ -16,13 +16,7 @@
   limitations under the License.
 -->
 <Context antiResourceLocking="false" privileged="true" >
-  <!--
-    Remove the comment markers from around the Valve below to limit access to
-    the manager application to clients connecting from localhost
-  -->
-  <!--
   <Valve className="org.apache.catalina.valves.RemoteAddrValve"
          allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
-  -->
   <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
 </Context>
