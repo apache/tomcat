@@ -279,43 +279,31 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
         if(ctxt.getOptions().getCompilerSourceVM() != null) {
             String opt = ctxt.getOptions().getCompilerSourceVM();
             if(opt.equals("1.1")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_1_1);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_1);
             } else if(opt.equals("1.2")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_1_2);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_2);
             } else if(opt.equals("1.3")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_1_3);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_3);
             } else if(opt.equals("1.4")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_1_4);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_4);
             } else if(opt.equals("1.5")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_1_5);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_5);
             } else if(opt.equals("1.6")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_1_6);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_6);
             } else if(opt.equals("1.7")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_1_7);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_7);
             } else if(opt.equals("1.8")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_1_8);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_8);
             // Version format changed from Java 9 onwards.
             // Support old format that was used in EA implementation as well
             } else if(opt.equals("9") || opt.equals("1.9")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_9);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_9);
             } else if(opt.equals("10")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_10);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_10);
             } else if(opt.equals("11")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_11);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_11);
             } else if(opt.equals("12")) {
-                settings.put(CompilerOptions.OPTION_Source,
-                             CompilerOptions.VERSION_12);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_12);
             } else if(opt.equals("13")) {
                 settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_13);
             } else if(opt.equals("14")) {
@@ -332,72 +320,50 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_Source, "16");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
-                settings.put(CompilerOptions.OPTION_Source,
-                        CompilerOptions.VERSION_1_8);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_8);
             }
         } else {
             // Default to 1.8
-            settings.put(CompilerOptions.OPTION_Source,
-                    CompilerOptions.VERSION_1_8);
+            settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_8);
         }
 
         // Target JVM
         if(ctxt.getOptions().getCompilerTargetVM() != null) {
             String opt = ctxt.getOptions().getCompilerTargetVM();
             if(opt.equals("1.1")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                             CompilerOptions.VERSION_1_1);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_1);
             } else if(opt.equals("1.2")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                             CompilerOptions.VERSION_1_2);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_2);
             } else if(opt.equals("1.3")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                             CompilerOptions.VERSION_1_3);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_3);
             } else if(opt.equals("1.4")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                             CompilerOptions.VERSION_1_4);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_4);
             } else if(opt.equals("1.5")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                             CompilerOptions.VERSION_1_5);
-                settings.put(CompilerOptions.OPTION_Compliance,
-                        CompilerOptions.VERSION_1_5);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_5);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_1_5);
             } else if(opt.equals("1.6")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                             CompilerOptions.VERSION_1_6);
-                settings.put(CompilerOptions.OPTION_Compliance,
-                        CompilerOptions.VERSION_1_6);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_6);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_1_6);
             } else if(opt.equals("1.7")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                             CompilerOptions.VERSION_1_7);
-                settings.put(CompilerOptions.OPTION_Compliance,
-                        CompilerOptions.VERSION_1_7);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_7);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_1_7);
             } else if(opt.equals("1.8")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                             CompilerOptions.VERSION_1_8);
-                settings.put(CompilerOptions.OPTION_Compliance,
-                        CompilerOptions.VERSION_1_8);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_8);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_1_8);
             // Version format changed from Java 9 onwards.
             // Support old format that was used in EA implementation as well
             } else if(opt.equals("9") || opt.equals("1.9")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                             CompilerOptions.VERSION_9);
-                settings.put(CompilerOptions.OPTION_Compliance,
-                        CompilerOptions.VERSION_9);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_9);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_9);
             } else if(opt.equals("10")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                        CompilerOptions.VERSION_10);
-                settings.put(CompilerOptions.OPTION_Compliance,
-                        CompilerOptions.VERSION_10);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_10);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_10);
             } else if(opt.equals("11")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                        CompilerOptions.VERSION_11);
-                settings.put(CompilerOptions.OPTION_Compliance,
-                        CompilerOptions.VERSION_11);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_11);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_11);
             } else if(opt.equals("12")) {
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                        CompilerOptions.VERSION_12);
-                settings.put(CompilerOptions.OPTION_Compliance,
-                        CompilerOptions.VERSION_12);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_12);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_12);
             } else if(opt.equals("13")) {
                 settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_13);
                 settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_13);
@@ -418,19 +384,15 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_Compliance, "16");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));
-                settings.put(CompilerOptions.OPTION_TargetPlatform,
-                        CompilerOptions.VERSION_1_8);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_8);
             }
         } else {
             // Default to 1.8
-            settings.put(CompilerOptions.OPTION_TargetPlatform,
-                    CompilerOptions.VERSION_1_8);
-            settings.put(CompilerOptions.OPTION_Compliance,
-                    CompilerOptions.VERSION_1_8);
+            settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_8);
+            settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_1_8);
         }
 
-        final IProblemFactory problemFactory =
-            new DefaultProblemFactory(Locale.getDefault());
+        final IProblemFactory problemFactory = new DefaultProblemFactory(Locale.getDefault());
 
         final ICompilerRequestor requestor = new ICompilerRequestor() {
                 @Override
