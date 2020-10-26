@@ -273,7 +273,7 @@ cglib.checksum.algorithm=SHA-512
 cglib.checksum.value=faa1d2121e87ae69e179e3aae217accd0834e0da716b91a029fd526e192612e71675f2740bedf48e23ef1edc45f672a2be1b3e78bbfb1ad59c96dd3d2feeedba
 cglib.home=${base.path}/cglib-${cglib.version}
 cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
-cglib.loc=${base-sf.loc}/cglib/cglib-nodep-${cglib.version}.jar
+cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
 
 # ----- objenesis, used by EasyMock, version 2.6 or later -----
 objenesis.version=2.6
