@@ -127,6 +127,9 @@
         with an ECJ version that does not support these values, a warning will
         be logged and the latest supported version will used. (markt)
       </add>
+      <update>
+        Update to the Eclipse JDT compiler 4.17. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
