@@ -121,6 +121,12 @@
         <bug>64794</bug>: Security exception reading system property on
         JspRuntimeLibrary use. (remm)
       </fix>
+      <add>
+        Add support for specifying Java 16 (with the value <code>16</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an ECJ version that does not support these values, a warning will
+        be logged and the latest supported version will used. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
