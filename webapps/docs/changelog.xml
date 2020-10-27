@@ -107,6 +107,11 @@
         <bug>63362</bug>: Add collection of statistics for HTTP/2, WebSocket and
         connections upgraded via the HTTP upgrade mechanism. (markt)
       </fix>
+      <fix>
+        Restore exception catch around Poller.events, as it would cause
+        the NIO poller thread to exit. This is a regression caused when
+        the Poller.events method was refactored. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
