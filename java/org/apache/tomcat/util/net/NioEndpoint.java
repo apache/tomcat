@@ -849,14 +849,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         }
                         break;
                     }
+                    // Either we timed out or we woke up, process events first
+                    if (keyCount == 0) {
+                        hasEvents = (hasEvents | events());
+                    }
                 } catch (Throwable x) {
                     ExceptionUtils.handleThrowable(x);
                     log.error("",x);
                     continue;
-                }
-                // Either we timed out or we woke up, process events first
-                if (keyCount == 0) {
-                    hasEvents = (hasEvents | events());
                 }
 
                 Iterator<SelectionKey> iterator =
