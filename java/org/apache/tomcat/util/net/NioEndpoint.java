@@ -602,16 +602,22 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             for (int i = 0, size = events.size(); i < size && (pe = events.poll()) != null; i++ ) {
                 result = true;
                 NioChannel channel = pe.getSocket();
+                SocketChannel sc = channel.getIOChannel();
                 NioSocketWrapper socketWrapper = channel.getSocketWrapper();
                 int interestOps = pe.getInterestOps();
-                if (interestOps == OP_REGISTER) {
+                if (sc == null) {
+                    log.warn(sm.getString("endpoint.nio.nullSocketChannel"));
+                    if (socketWrapper != null) {
+                        socketWrapper.close();
+                    }
+                } else if (interestOps == OP_REGISTER) {
                     try {
-                        channel.getIOChannel().register(getSelector(), SelectionKey.OP_READ, socketWrapper);
+                        sc.register(getSelector(), SelectionKey.OP_READ, socketWrapper);
                     } catch (Exception x) {
                         log.error(sm.getString("endpoint.nio.registerFail"), x);
                     }
                 } else {
-                    final SelectionKey key = channel.getIOChannel().keyFor(getSelector());
+                    final SelectionKey key = sc.keyFor(getSelector());
                     if (key == null) {
                         // The key was cancelled (e.g. due to socket closure)
                         // and removed from the selector while it was being
@@ -631,7 +637,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 cancelledKey(key, socketWrapper);
                             }
                         } else {
-                            cancelledKey(key, null);
+                            cancelledKey(key, socketWrapper);
                         }
                     }
                 }
