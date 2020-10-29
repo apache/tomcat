@@ -91,6 +91,10 @@
         <bug>63362</bug>: Add collection of statistics for HTTP/2, WebSocket and
         connections upgraded via the HTTP upgrade mechanism. (markt)
       </fix>
+      <add>
+        Provide messages for some <code>SocketTimeoutException</code> instances
+        that did not have one. (markt)
+      </add>
     </changelog>
   </subseciton>
   <subsection name="Web applications">
