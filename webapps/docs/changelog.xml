@@ -116,6 +116,10 @@
         Provide messages for some <code>SocketTimeoutException</code> instances
         that did not have one. (markt)
       </add>
+      <fix>
+        Avoid most of the thread pool use during NIO2 socket accept. Patch
+        submitted by Anil Gursel. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

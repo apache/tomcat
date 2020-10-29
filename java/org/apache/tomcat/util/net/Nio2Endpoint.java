@@ -422,6 +422,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             if (isRunning() && !isPaused()) {
                 if (getMaxConnections() == -1) {
                     serverSock.accept(null, this);
+                } else if (getConnectionCount() < getMaxConnections()) {
+                    try {
+                        // This will not block
+                        countUpOrAwaitConnection();
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                    serverSock.accept(null, this);
                 } else {
                     // Accept again on a new thread since countUpOrAwaitConnection may block
                     getExecutor().execute(this);
