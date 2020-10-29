@@ -112,6 +112,10 @@
         the NIO poller thread to exit. This is a regression caused when
         the Poller.events method was refactored. (remm)
       </fix>
+      <add>
+        Provide messages for some <code>SocketTimeoutException</code> instances
+        that did not have one. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
