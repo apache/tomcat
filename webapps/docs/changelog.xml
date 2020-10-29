@@ -504,8 +504,9 @@
         provided by Ronny Perinke. (markt)
       </fix>
       <fix>
-        Fix a potential issue where the write lock for a WebSocket connection
-        may not be released if an exception occurs during the write. (markt)
+        <bug>64848</bug>: Fix a potential issue where the write lock for a
+        WebSocket connection may not be released if an exception occurs during
+        the write. (markt)
       </fix>
       <add>
         <bug>64644</bug>: Add support for a read idle timeout and a write idle
