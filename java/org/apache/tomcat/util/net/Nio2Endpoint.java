@@ -434,7 +434,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             if (isRunning() && !isPaused()) {
                 if (getMaxConnections() == -1) {
                     serverSock.accept(null, this);
-                } else if (getConnectionCount() < getMaxConnections() - getMaxThreads()) {
+                } else if (getConnectionCount() < getMaxConnections() / 2) {
                     // It is far enough from reaching max connections, so it won't block
                     try {
                         countUpOrAwaitConnection();
