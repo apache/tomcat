@@ -110,6 +110,10 @@
         clarify when a user may wish to deploy additional instances of the
         Manager web application. (markt)
       </fix>
+      <fix>
+        <bug>64797</bug>: Align manager.xml template file in Host-Manager with
+        context.xml of real Manager web application. (isapir)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
