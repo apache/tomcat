@@ -157,6 +157,7 @@
     </changelog>
   </subsection>
   <subsection name="Other">
+    <changelog>
       <add>
         Improvements to French translations. (remm)
       </add>
@@ -166,6 +167,7 @@
       <add>
         Improvements to Russian translations. Provided by Azat. (markt)
       </add>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 10.0.0-M9 (markt)" rtext="2020-10-09">
