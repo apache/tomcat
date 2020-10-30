@@ -156,6 +156,11 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.0-M9 (markt)" rtext="2020-10-09">
   <subsection name="Catalina">
