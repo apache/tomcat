@@ -158,7 +158,10 @@
         Improvements to Spanish translations. Provided by Andrewlanecarr.
         (markt)
       </add>
-    </changelog>
+       <add>
+         Improvements to Russian translations. Provided by Azat. (markt)
+       </add>
+     </changelog>
   </subsection>
 </section>
 <section name="Tomcat 7.0.106 (violetagg)" rtext="released 2020-09-20">
