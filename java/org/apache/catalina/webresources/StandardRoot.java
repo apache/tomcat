@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,6 +39,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.TomcatController;
+import org.apache.catalina.TomcatControllerHandler;
 import org.apache.catalina.TrackedWebResource;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
@@ -581,10 +584,12 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     protected void processWebInfLib() throws LifecycleException {
         WebResource[] possibleJars = listResources("/WEB-INF/lib", false);
 
+        TomcatController tomcatController = TomcatControllerHandler.getTomcatController();
         for (WebResource possibleJar : possibleJars) {
             if (possibleJar.isFile() && possibleJar.getName().endsWith(".jar")) {
-                createWebResourceSet(ResourceSetType.CLASSES_JAR,
-                        "/WEB-INF/classes", possibleJar.getURL(), "/");
+                if (!tomcatController.processWebInfLib(this, possibleJar, classResources)) {
+                    createWebResourceSet(ResourceSetType.CLASSES_JAR, "/WEB-INF/classes", possibleJar.getURL(), "/");
+                }
             }
         }
     }
@@ -730,9 +735,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
         setState(LifecycleState.STARTING);
     }
-
+    
     protected WebResourceSet createMainResourceSet() {
         String docBase = context.getDocBase();
+        
+        TomcatController tomcatController = TomcatControllerHandler.getTomcatController();
 
         WebResourceSet mainResourceSet;
         if (docBase == null) {
@@ -747,9 +754,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             } else if(f.isFile() && docBase.endsWith(".war")) {
                 mainResourceSet = new WarResourceSet(this, "/", f.getAbsolutePath());
             } else {
-                throw new IllegalArgumentException(
-                        sm.getString("standardRoot.startInvalidMain",
-                                f.getAbsolutePath()));
+				mainResourceSet = tomcatController.createMainResourceSet(this, f, docBase, context.getBaseName());
+				if (mainResourceSet == null) {
+					throw new IllegalArgumentException(
+							sm.getString("standardRoot.startInvalidMain", f.getAbsolutePath()));
+				}
             }
         }
 
@@ -827,8 +836,22 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                     endOfFileUrl = jarUrl.indexOf(UriUtil.getWarSeparator());
                 }
                 String fileUrl = jarUrl.substring(4, endOfFileUrl);
+                
                 try {
-                    f = new File(new URL(fileUrl).toURI());
+                    URL rootUrl = new URL(fileUrl);
+                    if ("file".equals(rootUrl.getProtocol())) {
+                        f = new File(rootUrl.toURI());
+                    } else {
+                        try {
+                            URLConnection c = rootUrl.openConnection();
+                            URL connectedUrl = c.getURL();
+                            if("file".equals(connectedUrl.getProtocol())) {
+                                f = new File(connectedUrl.toURI());
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+
                 } catch (MalformedURLException | URISyntaxException e) {
                     throw new IllegalArgumentException(e);
                 }
@@ -850,7 +873,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                         "standardRoot.unsupportedProtocol", url.getProtocol()));
             }
 
-            basePath = f.getAbsolutePath();
+            if (f == null) {
+                basePath = "unknown";
+            } else {
+                basePath = f.getAbsolutePath();
+            }
         }
 
 

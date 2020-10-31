@@ -31,19 +31,21 @@ public class UrlJar extends AbstractInputStreamJar {
         super(jarFileURL);
     }
 
-
     @Override
     public void close() {
         closeStream();
     }
 
-
     @Override
     protected NonClosingJarInputStream createJarInputStream() throws IOException {
-        JarURLConnection jarConn = (JarURLConnection) getJarFileURL().openConnection();
-        URL resourceURL = jarConn.getJarFileURL();
-        URLConnection resourceConn = resourceURL.openConnection();
-        resourceConn.setUseCaches(false);
-        return new NonClosingJarInputStream(resourceConn.getInputStream());
+        URLConnection urlConnection = getJarFileURL().openConnection();
+        if (urlConnection instanceof JarURLConnection) {
+            JarURLConnection jarConn = (JarURLConnection) urlConnection;
+            URL resourceURL = jarConn.getJarFileURL();
+            URLConnection resourceConn = resourceURL.openConnection();
+            resourceConn.setUseCaches(false);
+            return new NonClosingJarInputStream(resourceConn.getInputStream());
+        }
+        return new NonClosingJarInputStream(urlConnection.getInputStream());
     }
 }

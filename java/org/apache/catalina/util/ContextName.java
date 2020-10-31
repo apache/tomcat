@@ -17,6 +17,10 @@
 package org.apache.catalina.util;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.catalina.TomcatControllerHandler;
 
 /**
  * Utility class to manage context names so there is one place where the
@@ -32,6 +36,15 @@ public final class ContextName {
     private final String version;
     private final String name;
 
+    private String extension;
+
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
+
+    public String getExtension() {
+		return extension;
+	}
 
     /**
      * Creates an instance from a context name, display name, base name,
@@ -62,10 +75,22 @@ public final class ContextName {
         }
 
         // Remove any file extensions
-        if (stripFileExtension &&
-                (tmp1.toLowerCase(Locale.ENGLISH).endsWith(".war") ||
-                        tmp1.toLowerCase(Locale.ENGLISH).endsWith(".xml"))) {
-            tmp1 = tmp1.substring(0, tmp1.length() -4);
+        if (stripFileExtension && (tmp1.toLowerCase(Locale.ENGLISH).endsWith(".war")
+                || tmp1.toLowerCase(Locale.ENGLISH).endsWith(".xml"))) {
+            extension = tmp1.substring(tmp1.length() - 3);
+            tmp1 = tmp1.substring(0, tmp1.length() - 4);
+        } else {
+            Pattern specificExtensions = TomcatControllerHandler.getTomcatController().getSpecificExtensions();
+            if (specificExtensions != null) {
+                Matcher matcher = specificExtensions.matcher(tmp1);
+                if (matcher.matches()) {
+                    String strippedFile = matcher.group(1);
+                    if (strippedFile != null) {
+                        tmp1 = strippedFile;
+                    }
+                    extension = matcher.group(2);
+                }
+            }
         }
 
         baseName = tmp1;

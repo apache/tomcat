@@ -60,6 +60,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
+import org.apache.catalina.TomcatControllerHandler;
 import org.apache.catalina.Valve;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
@@ -825,7 +826,7 @@ public class ContextConfig implements LifecycleListener {
             } else {
                 ExpandWar.validate(host, war, pathName);
             }
-        } else {
+        } else if (!TomcatControllerHandler.getTomcatController().specificFixDocBase(originalDocBase)) {
             File docBaseAbsoluteFileWar = new File(docBaseAbsolute + ".war");
             URL war = null;
             if (docBaseAbsoluteFileWar.exists() && docBaseAbsoluteInAppBase) {

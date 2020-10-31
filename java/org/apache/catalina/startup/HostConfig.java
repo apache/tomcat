@@ -60,6 +60,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Manager;
+import org.apache.catalina.TomcatControllerHandler;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.security.DeployXmlPermission;
@@ -427,7 +428,8 @@ public class HostConfig implements LifecycleListener {
         deployWARs(appBase, filteredAppPaths);
         // Deploy expanded folders
         deployDirectories(appBase, filteredAppPaths);
-
+        
+        TomcatControllerHandler.getTomcatController().deploySpecificApp(this, host, invalidWars, deployed, appBase, filteredAppPaths);
     }
 
 
@@ -784,8 +786,7 @@ public class HostConfig implements LifecycleListener {
         }
     }
 
-
-    private boolean validateContextPath(File appBase, String contextPath) {
+    public boolean validateContextPath(File appBase, String contextPath) {
         // More complicated than the ideal as the canonical path may or may
         // not end with File.separator for a directory
 
@@ -821,12 +822,16 @@ public class HostConfig implements LifecycleListener {
         return canonicalDocBase.equals(docBase.toString());
     }
 
+    protected void deployWAR(ContextName cn, File war) {
+        deployWAR(cn, war, ".war");
+    }
+
     /**
      * Deploy packed WAR.
      * @param cn The context name
      * @param war The WAR file
      */
-    protected void deployWAR(ContextName cn, File war) {
+    protected void deployWAR(ContextName cn, File war, String extension) {
 
         File xml = new File(host.getAppBaseFile(),
                 cn.getBaseName() + "/" + Constants.ApplicationContextXml);
@@ -974,7 +979,7 @@ public class HostConfig implements LifecycleListener {
             context.setName(cn.getName());
             context.setPath(cn.getPath());
             context.setWebappVersion(cn.getVersion());
-            context.setDocBase(cn.getBaseName() + ".war");
+            context.setDocBase(cn.getBaseName() + "." + extension);
             host.addChild(context);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -1193,7 +1198,7 @@ public class HostConfig implements LifecycleListener {
      * @param contextName of the context which will be checked
      * @return <code>true</code> if the specified deployment exists
      */
-    protected boolean deploymentExists(String contextName) {
+    public boolean deploymentExists(String contextName) {
         return (deployed.containsKey(contextName) ||
                 (host.findChild(contextName) != null));
     }
@@ -1761,7 +1766,7 @@ public class HostConfig implements LifecycleListener {
      * This class represents the state of a deployed application, as well as
      * the monitored resources.
      */
-    protected static class DeployedApplication {
+    public static class DeployedApplication {
         public DeployedApplication(String name, boolean hasDescriptor) {
             this.name = name;
             this.hasDescriptor = hasDescriptor;
@@ -1831,7 +1836,7 @@ public class HostConfig implements LifecycleListener {
         }
     }
 
-    private static class DeployWar implements Runnable {
+    public static class DeployWar implements Runnable {
 
         private HostConfig config;
         private ContextName cn;
@@ -1845,7 +1850,7 @@ public class HostConfig implements LifecycleListener {
 
         @Override
         public void run() {
-            config.deployWAR(cn, war);
+            config.deployWAR(cn, war, cn.getExtension());
         }
     }
 
