@@ -145,6 +145,12 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <bug>64848</bug>: Fix a variation of this memory leak when a write I/O
+      error occurs on a non-container thread. (markt)
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

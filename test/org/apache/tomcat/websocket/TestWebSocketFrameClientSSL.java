@@ -45,7 +45,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(TesterFirehoseServer.Config.class.getName());
+        ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
@@ -64,7 +64,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
                 new URI("wss://localhost:" + getPort() +
-                        TesterFirehoseServer.Config.PATH));
+                        TesterFirehoseServer.PATH));
         CountDownLatch latch =
                 new CountDownLatch(TesterFirehoseServer.MESSAGE_COUNT);
         BasicText handler = new BasicText(latch);
@@ -92,7 +92,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(TesterFirehoseServer.Config.class.getName());
+        ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
@@ -111,7 +111,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
                 new URI("wss://localhost:" + getPort() +
-                        TesterFirehoseServer.Config.PATH));
+                        TesterFirehoseServer.PATH));
 
         // Process incoming messages very slowly
         MessageHandler handler = new SleepingText(5000);

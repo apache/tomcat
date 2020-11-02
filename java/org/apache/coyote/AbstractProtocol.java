@@ -40,7 +40,6 @@ import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
-import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -405,6 +404,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             getLog().debug(sm.getString("abstractProtocol.waitingProcessor.remove", processor));
         }
         waitingProcessors.remove(processor);
+    }
+
+
+    /*
+     * Primarily for debugging and testing. Could be exposed via JMX if
+     * considered useful.
+     */
+    public int getWaitingProcessorCount() {
+        return waitingProcessors.size();
     }
 
 
@@ -1075,15 +1083,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             if (processor != null) {
                 processor.recycle();
                 if (processor.isUpgrade()) {
-                    // UpgradeProcessorInternal instances can utilise AsyncIO.
-                    // If they do, the processor will not pass through the
-                    // process() method and be removed from waitingProcessors
-                    // so do that here.
-                    if (processor instanceof UpgradeProcessorInternal) {
-                        if (((UpgradeProcessorInternal) processor).hasAsyncIO()) {
-                            getProtocol().removeWaitingProcessor(processor);
-                        }
-                    }
+                    // While UpgradeProcessor instances should not normally be
+                    // present in waitingProcessors there are various scenarios
+                    // where this can happen. E.g.:
+                    // - when AsyncIO is used
+                    // - WebSocket I/O error on non-container thread
+                    // Err on the side of caution and always try and remove any
+                    // UpgradeProcessor instances from waitingProcessors
+                    getProtocol().removeWaitingProcessor(processor);
                 } else {
                     // After recycling, only instances of UpgradeProcessorBase
                     // will return true for isUpgrade().
