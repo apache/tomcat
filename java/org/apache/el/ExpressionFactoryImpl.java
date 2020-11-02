@@ -33,6 +33,7 @@ import org.apache.el.util.MessageFactory;
  *
  * @author Jacob Hookom [jacob@hookom.net]
  */
+@aQute.bnd.annotation.spi.ServiceProvider(value=ExpressionFactory.class)
 public class ExpressionFactoryImpl extends ExpressionFactory {
 
     /**

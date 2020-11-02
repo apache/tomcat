@@ -147,6 +147,10 @@
       <update>
         Update to the Eclipse JDT compiler 4.17. (markt)
       </update>
+      <fix>
+        <bug>64849</bug>: Correct JPMS metadata for the Jakarta Expression
+        Langauge JARs to provide missing ServiceLoader information. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
