@@ -18,11 +18,11 @@ package org.apache.tomcat.websocket.server;
 
 import java.net.URI;
 
-import jakarta.websocket.ClientEndpointConfig;
-import jakarta.websocket.ContainerProvider;
-import jakarta.websocket.MessageHandler;
-import jakarta.websocket.Session;
-import jakarta.websocket.WebSocketContainer;
+import javax.websocket.ClientEndpointConfig;
+import javax.websocket.ContainerProvider;
+import javax.websocket.MessageHandler;
+import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;
