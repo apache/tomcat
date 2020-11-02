@@ -57,7 +57,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(TesterFirehoseServer.Config.class.getName());
+        ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
@@ -83,7 +83,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
                 new URI("ws://localhost:" + getPort() +
-                        TesterFirehoseServer.Config.PATH));
+                        TesterFirehoseServer.PATH));
         CountDownLatch latch =
                 new CountDownLatch(TesterFirehoseServer.MESSAGE_COUNT);
         BasicText handler = new BasicText(latch);

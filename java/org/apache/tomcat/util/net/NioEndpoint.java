@@ -1258,6 +1258,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         @Override
         public void close() throws IOException {
             getSocket().close();
+            getEndpoint().getHandler().release(this);
         }
 
 

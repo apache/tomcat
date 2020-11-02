@@ -74,7 +74,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subseciton name="Coyote">
+  <subsection name="Coyote">
     <changelog>
       <fix>
         Refactor the HTTP/2 window update handling for padding in data frames to
@@ -96,7 +96,13 @@
         that did not have one. (markt)
       </add>
     </changelog>
-  </subseciton>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <bug>64848</bug>: Fix a variation of this memory leak when a write I/O
+      error occurs on a non-container thread. (markt)
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

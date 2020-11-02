@@ -415,6 +415,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    /*
+     * Primarily for debugging and testing. Could be exposed via JMX if
+     * considered useful.
+     */
+    public int getWaitingProcessorCount() {
+        return waitingProcessors.size();
+    }
+
+
     // ----------------------------------------------- Accessors for sub-classes
 
     protected AbstractEndpoint<S> getEndpoint() {
@@ -1010,12 +1019,21 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         private void release(Processor processor) {
             if (processor != null) {
                 processor.recycle();
-                // After recycling, only instances of UpgradeProcessorBase will
-                // return true for isUpgrade().
-                // Instances of UpgradeProcessorBase should not be added to
-                // recycledProcessors since that pool is only for AJP or HTTP
-                // processors
-                if (!processor.isUpgrade()) {
+                if (processor.isUpgrade()) {
+                    // While UpgradeProcessor instances should not normally be
+                    // present in waitingProcessors there are various scenarios
+                    // where this can happen. E.g.:
+                    // - when AsyncIO is used
+                    // - WebSocket I/O error on non-container thread
+                    // Err on the side of caution and always try and remove any
+                    // UpgradeProcessor instances from waitingProcessors
+                    getProtocol().removeWaitingProcessor(processor);
+                } else {
+                    // After recycling, only instances of UpgradeProcessorBase
+                    // will return true for isUpgrade().
+                    // Instances of UpgradeProcessorBase should not be added to
+                    // recycledProcessors since that pool is only for AJP or
+                    // HTTP processors
                     recycledProcessors.push(processor);
                     if (getLog().isDebugEnabled()) {
                         getLog().debug("Pushed Processor [" + processor + "]");
