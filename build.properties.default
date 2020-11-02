@@ -288,12 +288,12 @@ saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-
 
 # ----- bnd, version 5.1.1 or later  -----
 # ----- provides OSGI metadata for JARs       -----
-bnd.version=5.1.1
+bnd.version=5.2.0
 
 # checksums for biz.aQute.bnd-5.1.1.jar
 bnd.checksum.enabled=true
 bnd.checksum.algorithm=MD5|SHA-1
-bnd.checksum.value=0dc5ff0af222ef075b5b0dd488f6aeac|0e542cf0f928107c17ce65f3c68dd2875724fecc
+bnd.checksum.value=3254df4b94104002f79005ae54ec1dbb|1d69d0a5862133ac1f54555c9cd59011d79bbb86
 
 bnd.home=${base.path}/bnd-${bnd.version}
 bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
@@ -303,7 +303,7 @@ bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.b
 # ----- required to avoid Javadoc error when using bnd annotations -----
 osgi-annotations.version=1.0.0
 
-# checksums for biz.aQute.bnd-5.1.1.jar
+# checksums for biz.aQute.bnd-5.2.0.jar
 osgi-annotations.checksum.enabled=true
 osgi-annotations.checksum.algorithm=MD5|SHA-1
 osgi-annotations.checksum.value=153054f987534244f95a399539b11375|b6e802bceba0682353466abf8fadbbd662b2f7f8

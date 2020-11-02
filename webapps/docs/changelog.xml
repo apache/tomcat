@@ -173,6 +173,9 @@
       <add>
         Improvements to Russian translations. Provided by Azat. (markt)
       </add>
+      <fix>
+        Update to bnd 5.2.0. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
