@@ -180,6 +180,11 @@
       <fix>
         Align JPMS module names with current Jakarta EE expectations. (markt)
       </fix>
+      <fix>
+        <bug>64870</bug>: Update to bnd 5.3.0-SNAPSHOT to work around a
+        <a href="https://bugs.openjdk.java.net/browse/JDK-8255854">JRE bug</a>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
