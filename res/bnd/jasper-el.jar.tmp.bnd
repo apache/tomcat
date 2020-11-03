@@ -30,7 +30,7 @@ Export-Package: \
 
 -jpms-module-info: \
     ${module.name};\
-        access=32;\
+        access=0;\
         version=${Bundle-Version}
 -jpms-module-info-options: \
     ${module.name};\
