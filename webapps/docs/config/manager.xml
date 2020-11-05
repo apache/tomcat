@@ -552,6 +552,98 @@
 
   </attributes>
 
+  <h5>DataSourceJDBCStore</h5>
+
+  <p>The <em>DataSourceJDBCStore Store</em> has the same purpose as 
+  JDBCStore but uses only DataSource. This implementation will exhibit improved performance over
+  the JDBCStore described above thanks to optimized synchronization.</p>
+
+  <p>To configure this, add a <code>&lt;Store&gt;</code> nested inside
+  your <code>&lt;Manager&gt;</code> element with the following attributes:
+  </p>
+
+  <attributes>
+
+    <attribute name="className" required="true">
+      <p>Java class name of the implementation to use.  This class must
+      implement the <code>org.apache.catalina.Store</code> interface.  You
+      <strong>must</strong> specify
+      <code>org.apache.catalina.session.DataSourceJDBCStore</code>
+      to use this implementation.</p>
+    </attribute>
+
+    <attribute name="dataSourceName" required="false">
+      <p>Name of the JNDI resource for a JDBC DataSource-factory. If this option
+      is given and a valid JDBC resource can be found, it will be used and any
+      direct configuration of a JDBC connection via <code>connectionURL</code>,
+      <code>connectionName</code>, <code>connectionPassword</code> and
+      <code>driverName</code> will be ignored. Since this code uses prepared
+      statements, you might want to configure pooled prepared statements as
+      shown in <a href="../jndi-resources-howto.html">the JNDI resources
+      How-To</a>.</p>
+    </attribute>
+
+    <attribute name="localDataSource" required="false">
+      <p>This allows the Store to use a DataSource defined for the Context
+      rather than a global DataSource. If not specified, the default is
+      <code>false</code>: use a global DataSource.</p>
+    </attribute>
+
+    <attribute name="sessionAppCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the Engine, Host, and Web Application Context name in the
+      format <code>/Engine/Host/Context</code>. If not specified the default
+      value of <code>app</code> will be used.</p>
+    </attribute>
+
+    <attribute name="sessionDataCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the serialized form of all session attributes for a swapped
+      out session. The column type must accept a binary object (typically called
+      a BLOB). If not specified the default value of <code>data</code> will be
+      used.</p>
+    </attribute>
+
+    <attribute name="sessionIdCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the session identifier of the swapped out session. The
+      column type must accept character string data of at least as many
+      characters as are contained in session identifiers created by Tomcat
+      (typically 32). If not specified the default value of <code>id</code> will
+      be used.</p>
+    </attribute>
+
+    <attribute name="sessionLastAccessedCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the <code>lastAccessedTime</code> property of this session.
+      The column type must accept a Java <code>long</code> (64 bits). If not
+      specified the default value of <code>maxinactive</code> will be used.</p>
+    </attribute>
+
+    <attribute name="sessionMaxInactiveCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the <code>maxInactiveInterval</code> property of this
+      session. The column type must accept a Java <code>integer</code> (32
+      bits). If not specified, the default value of <code>maxinactive</code>
+      will be used.</p>
+    </attribute>
+
+    <attribute name="sessionTable" required="false">
+      <p>Name of the database table to be used for storing swapped out sessions.
+      This table must contain (at least) the database columns that are
+      configured by the other attributes of this element. If not specified the
+      default value of <code>tomcat$sessions</code> will be used.</p>
+    </attribute>
+
+    <attribute name="sessionValidCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains a flag indicating whether this swapped out session is still
+      valid or not. The column type must accept a single character. If not
+      specified the default value of <code>valid</code> will be used.</p>
+    </attribute>
+
+  </attributes>
+
   <p>Before attempting to use the JDBC Based Store for the first time,
   you must create the table that will be used to store swapped out sessions.
   Detailed SQL commands vary depending on the database you are using, but
