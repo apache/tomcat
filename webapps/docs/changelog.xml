@@ -120,6 +120,10 @@
         Avoid most of the thread pool use during NIO2 socket accept. Patch
         submitted by Anil Gursel. (remm)
       </fix>
+      <add>
+        Add additional debug logging for I/O issues when communicating with the
+        user agent. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
