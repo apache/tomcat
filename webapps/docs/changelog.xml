@@ -95,6 +95,10 @@
         Provide messages for some <code>SocketTimeoutException</code> instances
         that did not have one. (markt)
       </add>
+      <add>
+        Add additional debug logging for I/O issues when communicating with the
+        user agent. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
