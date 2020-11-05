@@ -101,6 +101,10 @@
         <bug>55160</bug>: Re-fix this bug after the original fix was reverted by
         a separate fix to timeouts in 7.0.81. (markt)
       </fix>
+      <add>
+        Add additional debug logging for I/O issues when communicating with the
+        user agent. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -141,8 +145,7 @@
       <fix>
         Complete the fix for <bug>63815</bug>. Users wishing to use system
         properties that require quoting with <code>catalina.sh</code> and the
-        <code>debug</code> option must use a JRE that includes the fix for <a
-        href="https://bugs.openjdk.java.net/browse/JDK-8234808">JDK-8234808</a>.
+        <code>debug</code> option must use a JRE that includes the fix for <a href="https://bugs.openjdk.java.net/browse/JDK-8234808">JDK-8234808</a>.
         (markt)
       </fix>
       <add>

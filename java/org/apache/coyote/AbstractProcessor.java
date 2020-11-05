@@ -86,6 +86,9 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      * @param t The error which occurred
      */
     protected void setErrorState(ErrorState errorState, Throwable t) {
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("abstractProcessor.setErrorState", errorState), t);
+        }
         // Use the return value to avoid processing more than one async error
         // in a single async cycle.
         boolean setError = response.setError();
