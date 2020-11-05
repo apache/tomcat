@@ -27,6 +27,8 @@ import jakarta.websocket.RemoteEndpoint.Basic;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 
 /**
@@ -136,6 +138,8 @@ public class TesterFirehoseServer {
 
     private static class Writer implements Runnable {
 
+        private static final Log log = LogFactory.getLog(Writer.class);
+
         private final Session session;
 
         public Writer(Session session) {
@@ -147,7 +151,7 @@ public class TesterFirehoseServer {
             try {
                 doRun();
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                log.error("Error on non-container thread", ioe);
             }
         }
 
