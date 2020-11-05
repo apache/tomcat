@@ -296,13 +296,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
                 String msg = sm.getString("wsRemoteEndpoint.acquireTimeout");
                 wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
-                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg), true);
                 throw new SocketTimeoutException(msg);
             }
         } catch (InterruptedException e) {
             String msg = sm.getString("wsRemoteEndpoint.sendInterrupt");
             wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
-                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg), true);
             throw new IOException(msg, e);
         }
 
@@ -313,14 +313,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 ExceptionUtils.handleThrowable(t);
                 messagePartInProgress.release();
                 wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, t.getMessage()),
-                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()));
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()), true);
                 throw t;
             }
             if (!bsh.getSendResult().isOK()) {
                 messagePartInProgress.release();
                 Throwable t = bsh.getSendResult().getException();
                 wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, t.getMessage()),
-                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()));
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()), true);
                 throw new IOException (t);
             }
             // The BlockingSendHandler doesn't call end message so update the
