@@ -34,9 +34,9 @@ Provide-Capability: \
     Implementation-Vendor='Apache Software Foundation'
 
 -jpms-module-info: \
-    javax.el.api;\
+    java.el;\
         access=32;\
         version=${el.spec.version}
 -jpms-module-info-options: \
-    javax.el.api;\
+    java.el;\
         substitute=el-api

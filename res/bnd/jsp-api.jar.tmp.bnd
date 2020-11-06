@@ -35,9 +35,9 @@ Provide-Capability: \
     Implementation-Vendor='Apache Software Foundation'
 
 -jpms-module-info: \
-    javax.servlet.jsp.api;\
+    java.servlet.jsp;\
         access=32;\
         version=${jsp.spec.version}
 -jpms-module-info-options: \
-    javax.servlet.jsp.api;\
+    java.servlet.jsp;\
         substitute=jsp-api

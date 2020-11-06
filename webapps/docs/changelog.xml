@@ -177,6 +177,9 @@
       <add>
         Improvements to Russian translations. Provided by Azat. (markt)
       </add>
+      <fix>
+        Align JPMS module names with current Jakarta EE expectations. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

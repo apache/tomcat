@@ -35,9 +35,9 @@ Provide-Capability: \
     Implementation-Vendor='Apache Software Foundation'
 
 -jpms-module-info: \
-    javax.security.enterprise.api;\
+    java.security.auth.message;\
         access=32;\
         version=${jaspic.spec.version}
 -jpms-module-info-options: \
-    javax.security.enterprise.api;\
+    java.security.auth.message;\
         substitute=jaspic-api

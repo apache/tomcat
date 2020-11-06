@@ -35,9 +35,9 @@ Provide-Capability: \
     Implementation-Vendor='Apache Software Foundation'
 
 -jpms-module-info: \
-    javax.websocket.api;\
+    java.websocket;\
         access=32;\
         version=${websocket.spec.version}
 -jpms-module-info-options: \
-    javax.websocket.api;\
+    java.websocket;\
         substitute=websocket-api
