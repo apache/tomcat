@@ -65,14 +65,18 @@
         an error. (remm)
       </fix>
       <fix>
-        Remove the entry for <code>org.apache.tomcat.util.descriptor.tld.LocalStrings</code>
-        from tomcat-embed-core's GraalVM tomcat-resource.json. It no more part of the jar
-        since <a href="https://github.com/apache/tomcat/commit/3815b4951eb3acd30a0b77aafa75fbdb928d5782">
-        Fix unwanted JPMS dependency of embed-core on embed-jasper</a>. (mgrigorov)
+        Remove the entry for
+        <code>org.apache.tomcat.util.descriptor.tld.LocalStrings</code>
+        from tomcat-embed-core's GraalVM tomcat-resource.json. It no more part
+        of the jar since
+        <a href="https://github.com/apache/tomcat/commit/3815b4951eb3acd30a0b77aafa75fbdb928d5782">
+        Fix unwanted JPMS dependency of embed-core on embed-jasper</a>.
+        (mgrigorov)
       </fix>
       <fix>
-        Add org.apache.coyote.http11.Http11Nio2Protocol to the list of classes which could be instantiated
-        via reflection in GraalVM. (mgrigorov)
+        Add <code>org.apache.coyote.http11.Http11Nio2Protocol</code> to the list
+        of classes which could be instantiated via reflection in GraalVM.
+        (mgrigorov)
       </fix>
       <add>
         Add <code>JsonErrorReportValve</code> that extends the
@@ -80,8 +84,8 @@
         HTML. (kfujino)
       </add>
       <add>
-        Add GraalVM config for Tomcat JNI related classes. This makes it possible to use the APR
-        protocol in GraalVM native images. (mgrigorov)
+        Add GraalVM config for Tomcat JNI related classes. This makes it
+        possible to use the APR protocol in GraalVM native images. (mgrigorov)
       </add>
       <fix>
         JNDIRealm connections should only be created with the container
