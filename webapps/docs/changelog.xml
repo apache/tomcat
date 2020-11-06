@@ -72,6 +72,10 @@
         classloader as the thread context classloader, just like for the JAAS
         realm. (remm)
       </fix>
+      <add>
+        <bug>64871</bug>: Log a warning if Tomcat blocks access to a file
+        because it uses symlinks. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
