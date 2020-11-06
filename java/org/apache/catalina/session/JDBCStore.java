@@ -67,11 +67,6 @@ public class JDBCStore extends StoreBase {
     protected static final String storeName = "JDBCStore";
 
     /**
-     * Name to register for the background thread.
-     */
-    protected static final String threadName = "JDBCStore";
-
-    /**
      * The connection username to use when trying to connect to the database.
      */
     protected String connectionName = null;
@@ -209,13 +204,6 @@ public class JDBCStore extends StoreBase {
             name = "/" + engineName + "/" + hostName + contextName;
         }
         return name;
-    }
-
-    /**
-     * @return the thread name for this Store.
-     */
-    public String getThreadName() {
-        return threadName;
     }
 
     /**
