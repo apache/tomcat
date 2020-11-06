@@ -26,6 +26,7 @@ import javax.websocket.HandshakeResponse;
 import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpointConfig;
 
+@aQute.bnd.annotation.spi.ServiceProvider(value=ServerEndpointConfig.Configurator.class)
 public class DefaultServerEndpointConfigurator
         extends ServerEndpointConfig.Configurator {
 
