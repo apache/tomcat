@@ -884,6 +884,19 @@ public class FileDirContext extends BaseDirContext {
             canPath = normalize(canPath);
         }
         if (!canPath.equals(absPath)) {
+            if (!canPath.equalsIgnoreCase(absPath)) {
+                // Typically means symlinks are in use but being ignored. Given
+                // the symlink was likely created for a reason, log a warning
+                // that it was ignored.
+                String msg = sm.getString("fileDirContext.canonicalfileCheckFailed",
+                        getDocBase(), absPath, canPath);
+                // Log issues with configuration files at a higher level
+                if(absPath.startsWith("/META-INF/") || absPath.startsWith("/WEB-INF/")) {
+                    log.error(msg);
+                } else {
+                    log.warn(msg);
+                }
+            }
             return null;
         }
 
@@ -900,7 +913,7 @@ public class FileDirContext extends BaseDirContext {
         // expression irrespective of input length.
         for (int i = 0; i < len; i++) {
             char c = name.charAt(i);
-            if (c == '\"' || c == '<' || c == '>') {
+            if (c == '\"' || c == '<' || c == '>' || c == ':') {
                 // These characters are disallowed in Windows file names and
                 // there are known problems for file names with these characters
                 // when using File#getCanonicalPath().
