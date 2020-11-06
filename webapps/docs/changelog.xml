@@ -182,7 +182,9 @@
         Improvements to Russian translations. Provided by Azat. (markt)
       </add>
       <fix>
-        Update to bnd 5.2.0. (markt)
+        Update to bnd 5.3.0-SNAPSHOT to work around a
+        <a href="https://bugs.openjdk.java.net/browse/JDK-8255854">JRE bug</a>.
+        (markt)
       </fix>
     </changelog>
   </subsection>

@@ -286,18 +286,25 @@ saaj-api.home=${base.path}/saaj-api-${saaj-api.version}
 saaj-api.jar=${saaj-api.home}/saaj-api-${saaj-api.version}.jar
 saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-api-${saaj-api.version}.jar
 
-# ----- bnd, version 5.1.1 or later  -----
+# ----- bnd, version 5.3.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
-bnd.version=5.2.0
+# *** Using SNAPSHOT *** Using SNAPSHOT *** Using SNAPSHOT ***
+# The specific version used for release builds will be archived at
+# https://home.apache.org/~markt/dev/deps/bnd-5.3.0-SNAPHOT/
+# *** Using SNAPSHOT *** Using SNAPSHOT *** Using SNAPSHOT ***
+bnd.version=5.3.0-SNAPSHOT
 
 # checksums for biz.aQute.bnd-5.2.0.jar
-bnd.checksum.enabled=true
+# *** Disabled while we depend on SNAPSHOT JARs ***
+bnd.checksum.enabled=false
 bnd.checksum.algorithm=MD5|SHA-1
 bnd.checksum.value=3254df4b94104002f79005ae54ec1dbb|1d69d0a5862133ac1f54555c9cd59011d79bbb86
 
 bnd.home=${base.path}/bnd-${bnd.version}
 bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
-bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
+# *** Temporary change to use the SNAPSHOT repository ***
+# bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
+bnd.loc=https://bndtools.jfrog.io/bndtools/update-snapshot/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
 
 # ----- OSGi annotations bundle, version 1.0.0 or later            -----
 # ----- required to avoid Javadoc error when using bnd annotations -----
