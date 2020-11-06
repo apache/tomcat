@@ -42,7 +42,7 @@ import aQute.bnd.annotation.spi.ServiceConsumer;
  *
  * @since 2.1
  */
-@ServiceConsumer(value=jakarta.el.ExpressionFactory.class)
+@ServiceConsumer(value=ExpressionFactory.class)
 public abstract class ExpressionFactory {
 
     private static final boolean IS_SECURITY_ENABLED =
