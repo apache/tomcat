@@ -290,7 +290,7 @@ saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-
 # ----- provides OSGI metadata for JARs       -----
 bnd.version=5.2.0
 
-# checksums for biz.aQute.bnd-5.1.1.jar
+# checksums for biz.aQute.bnd-5.2.0.jar
 bnd.checksum.enabled=true
 bnd.checksum.algorithm=MD5|SHA-1
 bnd.checksum.value=3254df4b94104002f79005ae54ec1dbb|1d69d0a5862133ac1f54555c9cd59011d79bbb86
