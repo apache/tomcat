@@ -16,8 +16,8 @@
  */
 package org.apache.coyote.http2;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -45,8 +45,8 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
     protected static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
     protected static final long DEFAULT_MAX_HEADER_LIST_SIZE = 1 << 15;
 
-    protected Map<Setting,Long> current = new HashMap<>();
-    protected Map<Setting,Long> pending = new HashMap<>();
+    protected Map<Setting,Long> current = new ConcurrentHashMap<>();
+    protected Map<Setting,Long> pending = new ConcurrentHashMap<>();
 
 
     public ConnectionSettingsBase(String connectionId) {
