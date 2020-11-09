@@ -103,6 +103,9 @@
         Add additional debug logging for I/O issues when communicating with the
         user agent. (markt)
       </add>
+      <fix>
+        <bug>64830</bug>: Fix concurrency issue in HPACK decoder. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
