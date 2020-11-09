@@ -96,6 +96,12 @@
         <bug>64871</bug>: Log a warning if Tomcat blocks access to a file
         because it uses symlinks. (markt)
       </add>
+      <update>
+        Rename <code>JDBCStore</code> to <code>DataSourceStore</code>
+        and remove bottlenecks for database backed session store. Legacy JDBC
+        driver configuration is no longer supported. Patch submitted by
+        Philippe Mouawad. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

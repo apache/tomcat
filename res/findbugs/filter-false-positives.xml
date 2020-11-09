@@ -416,7 +416,7 @@
   <Match>
     <!-- Non-constant strings are configuration settings rather than client
          supplied -->
-    <Class name="org.apache.catalina.session.JDBCStore" />
+    <Class name="org.apache.catalina.session.DataSourceStore" />
     <Or>
       <Method name="clear" />
       <Method name="getSize" />
@@ -429,7 +429,7 @@
   </Match>
   <Match>
     <!-- Syncs aren't intended to protect these fields -->
-    <Class name="org.apache.catalina.session.JDBCStore" />
+    <Class name="org.apache.catalina.session.DataSourceStore" />
     <Or>
       <Field name="dataSourceName" />
       <Field name="sessionAppCol" />
