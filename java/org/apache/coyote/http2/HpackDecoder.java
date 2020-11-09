@@ -72,8 +72,6 @@ public class HpackDecoder {
     private volatile boolean countedCookie;
     private volatile int headerSize = 0;
 
-    private final StringBuilder stringBuilder = new StringBuilder();
-
     HpackDecoder(int maxMemorySize) {
         this.maxMemorySizeHard = maxMemorySize;
         this.maxMemorySizeSoft = maxMemorySize;
@@ -222,19 +220,17 @@ public class HpackDecoder {
         if (huffman) {
             return readHuffmanString(length, buffer);
         }
+        StringBuilder stringBuilder = new StringBuilder(length);
         for (int i = 0; i < length; ++i) {
             stringBuilder.append((char) buffer.get());
         }
-        String ret = stringBuilder.toString();
-        stringBuilder.setLength(0);
-        return ret;
+        return stringBuilder.toString();
     }
 
     private String readHuffmanString(int length, ByteBuffer buffer) throws HpackException {
+        StringBuilder stringBuilder = new StringBuilder(length);
         HPackHuffman.decode(buffer, length, stringBuilder);
-        String ret = stringBuilder.toString();
-        stringBuilder.setLength(0);
-        return ret;
+        return stringBuilder.toString();
     }
 
     private String handleIndexedHeaderName(int index) throws HpackException {
