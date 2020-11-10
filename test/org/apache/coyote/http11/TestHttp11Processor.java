@@ -1744,7 +1744,15 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.setRequestPause(delay);
 
         client.connect();
-        client.processRequest();
+        try {
+            client.processRequest();
+        } catch (IOException ioe) {
+            // Failure is expected on some platforms (notably Windows) if the
+            // longer upload timeout is not used but record the exception in
+            // case it is useful for debugging purposes.
+            // The assertions below will check for the correct behaviour.
+            ioe.printStackTrace();
+        }
 
         if (useLongerUploadTimeout) {
             // Expected response is a 200 response.
