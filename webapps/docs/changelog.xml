@@ -180,6 +180,10 @@
         <code>SameSite=strict</code> for all cookies, including session cookies,
         created by the application. (markt)
       </add>
+      <add>
+        Configure the examples, Manager and Host Manager to use the HTTP header
+        security filter with default settings apart from no HSTS header. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
