@@ -123,6 +123,11 @@
         <bug>64797</bug>: Align manager.xml template file in Host-Manager with
         context.xml of real Manager web application. (isapir)
       </fix>
+      <add>
+        Configure the examples web applications to set
+        <code>SameSite=strict</code> for all cookies, including session cookies,
+        created by the application. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
