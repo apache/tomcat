@@ -52,7 +52,10 @@ import org.apache.tomcat.util.ExceptionUtils;
  * based on inactivity.
  *
  * @author Bip Thelin
+ * @deprecated Removed in Tomcat 10 and replaced by DataSourceStore
+ *  with removal of legacy JDBC code
  */
+@Deprecated
 public class JDBCStore extends StoreBase {
 
     /**
