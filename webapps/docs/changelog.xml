@@ -122,6 +122,10 @@
         <bug>64797</bug>: Align manager.xml template file in Host-Manager with
         context.xml of real Manager web application. (isapir)
       </fix>
+      <add>
+        Configure the examples, Manager and Host Manager to use the HTTP header
+        security filter with default settings apart from no HSTS header. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
