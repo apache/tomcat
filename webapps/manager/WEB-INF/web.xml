@@ -112,9 +112,26 @@
     </init-param>
   </filter>
 
+  <!-- Configured to set X-FRAME-OPTIONS. Disable HSTS in case it interferes -->
+  <!-- with an existing setting. Keep X-Content-Type-Options and             -->
+  <!-- X-XSS-Protection as they are page specific.                           -->
+  <filter>
+    <filter-name>HTTP header security filter</filter-name>
+    <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
+    <init-param>
+      <param-name>hstsEnabled</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </filter>
+
   <filter-mapping>
     <filter-name>CSRF</filter-name>
     <servlet-name>HTMLManager</servlet-name>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>HTTP header security filter</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <!-- Define a Security Constraint on this Application -->
