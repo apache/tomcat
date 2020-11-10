@@ -136,7 +136,8 @@
       </add>
       <add>
         Configure the examples, Manager and Host Manager to use the HTTP header
-        security filter with default settings apart from no HSTS header. (markt)
+        security filter with default settings apart from no HSTS header. Based
+        on a suggestion by Debangshu Kundu. (markt)
       </add>
     </changelog>
   </subsection>
