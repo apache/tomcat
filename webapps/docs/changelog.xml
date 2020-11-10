@@ -92,6 +92,12 @@
         <bug>64871</bug>: Log a warning if Tomcat blocks access to a file
         because it uses symlinks. (markt)
       </add>
+      <update>
+        Rename <code>JDBCStore</code> to <code>DataSourceStore</code>
+        and remove bottlenecks for database backed session store. The
+        <code>JDBCStore</code> is deprecated but remains unchanged. Patch
+        submitted by Philippe Mouawad. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
