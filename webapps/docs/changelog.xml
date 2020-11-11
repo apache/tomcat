@@ -85,7 +85,10 @@
       </add>
       <add>
         Add GraalVM config for Tomcat JNI related classes. This makes it
-        possible to use the APR protocol in GraalVM native images. (mgrigorov)
+        possible to use the APR protocol in GraalVM native images.
+        To use it add the following to the native-image arguments:
+        <code>-H:JNIConfigurationResources=META-INF/native-image/org.apache.tomcat.embed/tomcat-embed-core/tomcat-jni.json</code>
+        (mgrigorov)
       </add>
       <fix>
         JNDIRealm connections should only be created with the container
