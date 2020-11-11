@@ -373,7 +373,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                 public void run() {
                     String name = Thread.currentThread().getName();
                     try {
-                        Thread.currentThread().setName("Membership-MemberDisappeared.");
+                        Thread.currentThread().setName("Membership-MemberDisappeared");
                         service.memberDisappeared(m);
                     }finally {
                         Thread.currentThread().setName(name);
@@ -387,7 +387,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                 public void run() {
                     String name = Thread.currentThread().getName();
                     try {
-                        Thread.currentThread().setName("Membership-MemberAdded.");
+                        Thread.currentThread().setName("Membership-MemberAdded");
                         service.memberAdded(m);
                     }finally {
                         Thread.currentThread().setName(name);
@@ -418,7 +418,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                 public void run() {
                     String name = Thread.currentThread().getName();
                     try {
-                        Thread.currentThread().setName("Membership-MemberAdded.");
+                        Thread.currentThread().setName("Membership-MemberAdded");
                         for (ChannelData datum : data) {
                             try {
                                 if (datum != null && !member.equals(datum.getAddress())) {
@@ -456,7 +456,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                         public void run() {
                             String name = Thread.currentThread().getName();
                             try {
-                                Thread.currentThread().setName("Membership-MemberExpired.");
+                                Thread.currentThread().setName("Membership-MemberExpired");
                                 service.memberDisappeared(member);
                             } finally {
                                 Thread.currentThread().setName(name);
