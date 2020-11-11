@@ -1522,7 +1522,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         protected void doRun() {
-            NioChannel socket = socketWrapper.getSocket();
+            /*
+             * Do not cache and re-use the value of socketWrapper.getSocket() in
+             * this method. If the socket closes the value will be updated to
+             * CLOSED_NIO_CHANNEL and the previous value potentially re-used for
+             * a new connection. That can result in a stale cached value which
+             * in turn can result in unintentionally closing currently active
+             * connections.
+             */
             Poller poller = NioEndpoint.this.poller;
             if (poller == null) {
                 socketWrapper.close();
@@ -1532,7 +1539,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             try {
                 int handshake = -1;
                 try {
-                    if (socket.isHandshakeComplete()) {
+                    if (socketWrapper.getSocket().isHandshakeComplete()) {
                         // No TLS handshaking required. Let the handler
                         // process this socket / event combination.
                         handshake = 0;
@@ -1542,7 +1549,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         // if the handshake failed.
                         handshake = -1;
                     } else {
-                        handshake = socket.handshake(event == SocketEvent.OPEN_READ, event == SocketEvent.OPEN_WRITE);
+                        handshake = socketWrapper.getSocket().handshake(event == SocketEvent.OPEN_READ, event == SocketEvent.OPEN_WRITE);
                         // The handshake process reads/writes from/to the
                         // socket. status may therefore be OPEN_WRITE once
                         // the handshake completes. However, the handshake
@@ -1567,27 +1574,23 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         state = getHandler().process(socketWrapper, event);
                     }
                     if (state == SocketState.CLOSED) {
-                        SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
-                        poller.cancelledKey(key, socketWrapper);
+                        poller.cancelledKey(getSelectionKey(), socketWrapper);
                     }
                 } else if (handshake == -1 ) {
                     getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
-                    SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
-                    poller.cancelledKey(key, socketWrapper);
+                    poller.cancelledKey(getSelectionKey(), socketWrapper);
                 } else if (handshake == SelectionKey.OP_READ){
                     socketWrapper.registerReadInterest();
                 } else if (handshake == SelectionKey.OP_WRITE){
                     socketWrapper.registerWriteInterest();
                 }
             } catch (CancelledKeyException cx) {
-                SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
-                poller.cancelledKey(key, socketWrapper);
+                poller.cancelledKey(getSelectionKey(), socketWrapper);
             } catch (VirtualMachineError vme) {
                 ExceptionUtils.handleThrowable(vme);
             } catch (Throwable t) {
                 log.error(sm.getString("endpoint.processing.fail"), t);
-                SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
-                poller.cancelledKey(key, socketWrapper);
+                poller.cancelledKey(getSelectionKey(), socketWrapper);
             } finally {
                 socketWrapper = null;
                 event = null;
@@ -1597,7 +1600,22 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
             }
         }
+
+        private SelectionKey getSelectionKey() {
+            // Shortcut for Java 11 onwards
+            if (JreCompat.isJre11Available()) {
+                return null;
+            }
+
+            SocketChannel socketChannel = socketWrapper.getSocket().getIOChannel();
+            if (socketChannel == null) {
+                return null;
+            }
+
+            return socketChannel.keyFor(NioEndpoint.this.poller.getSelector());
+        }
     }
+
 
     // ----------------------------------------------- SendfileData Inner Class
 

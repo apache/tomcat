@@ -144,6 +144,10 @@
       <fix>
         <bug>64830</bug>: Fix concurrency issue in HPACK decoder. (markt)
       </fix>
+      <fix>
+        Fix a concurrency issue in the NIO connector that could cause newly
+        created connections to be removed from the poller. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
