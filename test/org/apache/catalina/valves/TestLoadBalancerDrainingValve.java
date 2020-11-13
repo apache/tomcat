@@ -238,6 +238,8 @@ public class TestLoadBalancerDrainingValve {
                 expectedCookie.setPath(cookieConfig.getPath());
                 expectedCookie.setMaxAge(0);
 
+                EasyMock.expect(request.isSecure()).andReturn(true);
+
                 // These two lines just mean EasyMock.expect(response.addCookie) but for a void method
                 response.addCookie(expectedCookie);
                 EasyMock.expect(ctx.getSessionCookieName()).andReturn(sessionCookieName); // Indirect call
