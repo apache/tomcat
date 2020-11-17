@@ -156,14 +156,38 @@ public class Acceptor<U> implements Runnable {
     }
 
 
+    /**
+     * Signals the Acceptor to stop, waiting at most 10 seconds for the stop to
+     * complete before returning. If the stop does not complete in that time a
+     * warning will be logged.
+     *
+     * @deprecated This method will be removed in Tomcat 10.1.x onwards.
+     *             Use {@link #stop(int)} instead.
+     */
+    @Deprecated
     public void stop() {
+        stop(10);
+    }
+
+
+    /**
+     * Signals the Acceptor to stop, optionally waiting for that stop process
+     * to complete before returning. If a wait is requested and the stop does
+     * not complete in that time a warning will be logged.
+     *
+     * @param waitSeconds The time to wait in seconds. Use a value less than
+     *                    zero for no wait.
+     */
+    public void stop(int waitSeconds) {
         stopCalled = true;
-        try {
-            if (!stopLatch.await(10, TimeUnit.SECONDS)) {
-               log.warn(sm.getString("acceptor.stop.fail", getThreadName()));
+        if (waitSeconds > 0) {
+            try {
+                if (!stopLatch.await(waitSeconds, TimeUnit.SECONDS)) {
+                   log.warn(sm.getString("acceptor.stop.fail", getThreadName()));
+                }
+            } catch (InterruptedException e) {
+                log.warn(sm.getString("acceptor.stop.interrupted", getThreadName()), e);
             }
-        } catch (InterruptedException e) {
-            log.warn(sm.getString("acceptor.stop.interrupted", getThreadName()), e);
         }
     }
 
