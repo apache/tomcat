@@ -119,7 +119,7 @@
       <fix>
         Fix processing of URIs with %nn encoded solidus characters when
         <code>encodedSolidusHandling</code> was set to <code>passthrough</code>
-        and the encoded solidus was preceeded by other %nn encoded characters.
+        and the encoded solidus was preceded by other %nn encoded characters.
         Based on a pull request by willmeck. (markt)
       </fix>
       <fix>
@@ -175,7 +175,7 @@
       </update>
       <fix>
         <bug>64849</bug>: Correct JPMS metadata for the Jakarta Expression
-        Langauge JARs to provide missing ServiceLoader information. (markt)
+        Language JARs to provide missing ServiceLoader information. (markt)
       </fix>
     </changelog>
   </subsection>
