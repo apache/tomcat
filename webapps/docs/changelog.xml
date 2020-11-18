@@ -191,8 +191,10 @@
   </subsection>
   <subsection name="WebSocket">
     <changelog>
-      <bug>64848</bug>: Fix a variation of this memory leak when a write I/O
-      error occurs on a non-container thread. (markt)
+      <fix>
+        <bug>64848</bug>: Fix a variation of this memory leak when a write I/O
+        error occurs on a non-container thread. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -1559,10 +1561,12 @@
 </section>
 <section name="Tomcat 10.0.0-M1 (markt)" rtext="2020-02-20">
   <subsection name="General">
-    <scode>
-      This release contains all of the changes upto and including those in
-      Apache Tomcat 9.0.31 plus the additional changes listed below. (markt)
-    </scode>
+    <changelog>
+      <scode>
+        This release contains all of the changes upto and including those in
+        Apache Tomcat 9.0.31 plus the additional changes listed below. (markt)
+      </scode>
+    </changelog>
   </subsection>
   <subsection name="Catalina">
     <changelog>
