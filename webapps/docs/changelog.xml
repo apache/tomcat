@@ -102,6 +102,10 @@
       <update>
         Update the CXF module to Apache CXF 3.4.1. (remm)
       </update>
+      <add>
+        <bug>64931</bug>: Implement validation of <code>changelog.xml</code>
+        file at build time. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
