@@ -486,7 +486,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
         if (running) {
             running = false;
-            acceptor.stop();
+            acceptor.stop(10);
             poller.stop();
             for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
                 socketWrapper.close();
