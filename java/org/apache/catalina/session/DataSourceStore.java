@@ -391,6 +391,7 @@ public class DataSourceStore extends JDBCStore {
      *
      * @exception SQLException if a database error occurs
      */
+    @Override
     protected Connection open() throws SQLException {
         if (dataSourceName != null && dataSource == null) {
             org.apache.catalina.Context context = getManager().getContext();
@@ -427,6 +428,7 @@ public class DataSourceStore extends JDBCStore {
      *
      * @param dbConnection The connection to be closed
      */
+    @Override
     protected void close(Connection dbConnection) {
 
         // Do nothing if the database connection is already closed
