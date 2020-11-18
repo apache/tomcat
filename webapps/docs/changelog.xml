@@ -43,7 +43,9 @@
   <!ATTLIST item href CDATA #REQUIRED>
 
   <!-- Elements of this document -->
-  <!ELEMENT properties (title, no-comments) >
+  <!ELEMENT properties (author*, title, no-comments) >
+  <!ELEMENT author (#PCDATA)>
+  <!ATTLIST author email CDATA #IMPLIED>
   <!ELEMENT no-comments EMPTY>
 
   <!ELEMENT section (subsection)*>
@@ -53,19 +55,27 @@
   <!ELEMENT subsection (changelog+)>
   <!ATTLIST subsection name CDATA #REQUIRED>
 
-  <!ELEMENT changelog (add|update|fix|scode)*>
+  <!ELEMENT changelog (add|update|fix|scode|docs|design)*>
   <!ELEMENT add ANY>
+  <!ELEMENT update ANY>
   <!ELEMENT fix ANY>
   <!ELEMENT scode ANY>
-  <!ELEMENT update ANY>
+  <!ELEMENT docs ANY>
+  <!ELEMENT design ANY>
 
   <!ELEMENT bug (#PCDATA)>
+  <!ELEMENT rev (#PCDATA)>
 
   <!-- Random HTML markup tags. Add more here as needed. -->
   <!ELEMENT a (#PCDATA)>
   <!ATTLIST a href CDATA #REQUIRED>
+  <!ATTLIST a rel CDATA #IMPLIED>
 
+  <!ELEMENT b (#PCDATA)>
   <!ELEMENT code (#PCDATA)>
+  <!ELEMENT em (#PCDATA)>
+  <!ELEMENT strong (#PCDATA)>
+  <!ELEMENT tt (#PCDATA)>
 ]>
 <?xml-stylesheet type="text/xsl" href="tomcat-docs.xsl"?>
 <document url="changelog.html">
@@ -87,7 +97,7 @@
 
   Fixes having an issue number are sorted by their number, ascending.
 
-  There is no ordering by add/update/fix/scode.
+  There is no ordering by add/update/fix/scode/docs/design.
 
   Other fixed issues are added to the end of the list, chronologically.
   They eventually become mixed with the numbered issues (i.e., numbered
