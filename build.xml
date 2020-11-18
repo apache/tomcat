@@ -954,6 +954,11 @@
 
   <target name="build-docs" depends="compile-prepare" description="Builds all documentation from XML sources">
 
+    <!-- Validation of changelog.xml -->
+    <xmlvalidate
+      file="webapps/docs/changelog.xml"
+    />
+
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
         <include name="docs/images/**"/>

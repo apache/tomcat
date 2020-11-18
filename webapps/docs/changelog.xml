@@ -17,6 +17,65 @@
 -->
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
+
+  <!-- DTD is used to validate changelog structure at build time. BZ 64931. -->
+
+  <!ELEMENT document (project?, properties, body)>
+  <!ATTLIST document url CDATA #REQUIRED>
+
+  <!-- body and title are used both in project.xml and in this document -->
+  <!ELEMENT body ANY>
+  <!ELEMENT title (#PCDATA)>
+
+  <!-- Elements of project.xml -->
+  <!ELEMENT project (title, logo, body)>
+  <!ATTLIST project name CDATA #REQUIRED>
+  <!ATTLIST project href CDATA #REQUIRED>
+
+  <!ELEMENT logo (#PCDATA)>
+  <!ATTLIST logo href CDATA #REQUIRED>
+
+  <!ELEMENT menu (item+)>
+  <!ATTLIST menu name CDATA #REQUIRED>
+
+  <!ELEMENT item EMPTY>
+  <!ATTLIST item name CDATA #REQUIRED>
+  <!ATTLIST item href CDATA #REQUIRED>
+
+  <!-- Elements of this document -->
+  <!ELEMENT properties (author*, title, no-comments) >
+  <!ELEMENT author (#PCDATA)>
+  <!ATTLIST author email CDATA #IMPLIED>
+  <!ELEMENT no-comments EMPTY>
+
+  <!ELEMENT section (subsection)*>
+  <!ATTLIST section name CDATA #REQUIRED>
+  <!ATTLIST section rtext CDATA #IMPLIED>
+
+  <!ELEMENT subsection (changelog+)>
+  <!ATTLIST subsection name CDATA #REQUIRED>
+
+  <!ELEMENT changelog (add|update|fix|scode|docs|design)*>
+  <!ELEMENT add ANY>
+  <!ELEMENT update ANY>
+  <!ELEMENT fix ANY>
+  <!ELEMENT scode ANY>
+  <!ELEMENT docs ANY>
+  <!ELEMENT design ANY>
+
+  <!ELEMENT bug (#PCDATA)>
+  <!ELEMENT rev (#PCDATA)>
+
+  <!-- Random HTML markup tags. Add more here as needed. -->
+  <!ELEMENT a (#PCDATA)>
+  <!ATTLIST a href CDATA #REQUIRED>
+  <!ATTLIST a rel CDATA #IMPLIED>
+
+  <!ELEMENT b (#PCDATA)>
+  <!ELEMENT code (#PCDATA)>
+  <!ELEMENT em (#PCDATA)>
+  <!ELEMENT strong (#PCDATA)>
+  <!ELEMENT tt (#PCDATA)>
 ]>
 <?xml-stylesheet type="text/xsl" href="tomcat-docs.xsl"?>
 <document url="changelog.html">
@@ -53,13 +112,21 @@
 
   Fixes having an issue number are sorted by their number, ascending.
 
-  There is no ordering by add/update/fix.
+  There is no ordering by add/update/fix/scode/docs/design.
 
   Other fixed issues are added to the end of the list, chronologically.
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.108 (violetagg)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <add>
+        <bug>64931</bug>: Implement validation of <code>changelog.xml</code>
+        file at build time. (kkolinko)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.107 (violetagg)" rtext="release in progress">
   <subsection name="Catalina">
