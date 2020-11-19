@@ -18,37 +18,20 @@
 
 package org.apache.juli;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.sql.Timestamp;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.ErrorManager;
-import java.util.logging.Filter;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
+import java.util.logging.*;
 import java.util.regex.Pattern;
 
 /**
@@ -58,40 +41,40 @@ import java.util.regex.Pattern;
  * <p>The following configuration properties are available:</p>
  *
  * <ul>
- *   <li><code>directory</code> - The directory where to create the log file.
- *    If the path is not absolute, it is relative to the current working
- *    directory of the application. The Apache Tomcat configuration files usually
- *    specify an absolute path for this property,
- *    <code>${catalina.base}/logs</code>
- *    Default value: <code>logs</code></li>
- *   <li><code>rotatable</code> - If <code>true</code>, the log file will be
- *    rotated on the first write past midnight and the filename will be
- *    <code>{prefix}{date}{suffix}</code>, where date is yyyy-MM-dd. If <code>false</code>,
- *    the file will not be rotated and the filename will be <code>{prefix}{suffix}</code>.
- *    Default value: <code>true</code></li>
- *   <li><code>prefix</code> - The leading part of the log file name.
- *    Default value: <code>juli.</code></li>
- *   <li><code>suffix</code> - The trailing part of the log file name. Default value: <code>.log</code></li>
- *   <li><code>bufferSize</code> - Configures buffering. The value of <code>0</code>
- *    uses system default buffering (typically an 8K buffer will be used). A
- *    value of <code>&lt;0</code> forces a writer flush upon each log write. A
- *    value <code>&gt;0</code> uses a BufferedOutputStream with the defined
- *    value but note that the system default buffering will also be
- *    applied. Default value: <code>-1</code></li>
- *   <li><code>encoding</code> - Character set used by the log file. Default value:
- *    empty string, which means to use the system default character set.</li>
- *   <li><code>level</code> - The level threshold for this Handler. See the
- *    <code>java.util.logging.Level</code> class for the possible levels.
- *    Default value: <code>ALL</code></li>
- *   <li><code>filter</code> - The <code>java.util.logging.Filter</code>
- *    implementation class name for this Handler. Default value: unset</li>
- *   <li><code>formatter</code> - The <code>java.util.logging.Formatter</code>
- *    implementation class name for this Handler. Default value:
- *    <code>java.util.logging.SimpleFormatter</code></li>
- *   <li><code>maxDays</code> - The maximum number of days to keep the log
- *    files. If the specified value is <code>&lt;=0</code> then the log files
- *    will be kept on the file system forever, otherwise they will be kept the
- *    specified maximum days. Default value: <code>-1</code>.</li>
+ * <li><code>directory</code> - The directory where to create the log file.
+ * If the path is not absolute, it is relative to the current working
+ * directory of the application. The Apache Tomcat configuration files usually
+ * specify an absolute path for this property,
+ * <code>${catalina.base}/logs</code>
+ * Default value: <code>logs</code></li>
+ * <li><code>rotatable</code> - If <code>true</code>, the log file will be
+ * rotated on the first write past midnight and the filename will be
+ * <code>{prefix}{date}{suffix}</code>, where date is yyyy-MM-dd. If <code>false</code>,
+ * the file will not be rotated and the filename will be <code>{prefix}{suffix}</code>.
+ * Default value: <code>true</code></li>
+ * <li><code>prefix</code> - The leading part of the log file name.
+ * Default value: <code>juli.</code></li>
+ * <li><code>suffix</code> - The trailing part of the log file name. Default value: <code>.log</code></li>
+ * <li><code>bufferSize</code> - Configures buffering. The value of <code>0</code>
+ * uses system default buffering (typically an 8K buffer will be used). A
+ * value of <code>&lt;0</code> forces a writer flush upon each log write. A
+ * value <code>&gt;0</code> uses a BufferedOutputStream with the defined
+ * value but note that the system default buffering will also be
+ * applied. Default value: <code>-1</code></li>
+ * <li><code>encoding</code> - Character set used by the log file. Default value:
+ * empty string, which means to use the system default character set.</li>
+ * <li><code>level</code> - The level threshold for this Handler. See the
+ * <code>java.util.logging.Level</code> class for the possible levels.
+ * Default value: <code>ALL</code></li>
+ * <li><code>filter</code> - The <code>java.util.logging.Filter</code>
+ * implementation class name for this Handler. Default value: unset</li>
+ * <li><code>formatter</code> - The <code>java.util.logging.Formatter</code>
+ * implementation class name for this Handler. Default value:
+ * <code>java.util.logging.SimpleFormatter</code></li>
+ * <li><code>maxDays</code> - The maximum number of days to keep the log
+ * files. If the specified value is <code>&lt;=0</code> then the log files
+ * will be kept on the file system forever, otherwise they will be kept the
+ * specified maximum days. Default value: <code>-1</code>.</li>
  * </ul>
  */
 public class FileHandler extends Handler {
@@ -99,8 +82,7 @@ public class FileHandler extends Handler {
     public static final int DEFAULT_MAX_DAYS = -1;
     public static final int DEFAULT_BUFFER_SIZE = -1;
 
-    private static volatile ExecutorService DELETE_FILES_SERVICE;
-
+    private static final AsyncTaskExecutor DELETE_FILES_SERVICE = new AsyncTaskExecutor();
     // ------------------------------------------------------------ Constructor
 
 
@@ -120,72 +102,15 @@ public class FileHandler extends Handler {
 
 
     public FileHandler(String directory, String prefix, String suffix, Integer maxDays,
-            Boolean rotatable, Integer bufferSize) {
+                       Boolean rotatable, Integer bufferSize) {
         this.directory = directory;
         this.prefix = prefix;
         this.suffix = suffix;
         this.maxDays = maxDays;
         this.rotatable = rotatable;
         this.bufferSize = bufferSize;
-        initExecutor();
         configure();
         clean();
-    }
-
-    /**
-     * lazy set field `DELETE_FILES_SERVICE` to avoid class `ThreadPoolExecutor` loaded earlier than tomcat start.
-     */
-    private static synchronized void initExecutor(){
-        if (null == DELETE_FILES_SERVICE){
-            DELETE_FILES_SERVICE = Executors.newSingleThreadExecutor(new ThreadFactory() {
-                private static final String NAME_PREFIX = "FileHandlerLogFilesCleaner-";
-                private final boolean isSecurityEnabled;
-                private final ThreadGroup group;
-                private final AtomicInteger threadNumber = new AtomicInteger(1);
-
-                {
-                    SecurityManager s = System.getSecurityManager();
-                    if (s == null) {
-                        this.isSecurityEnabled = false;
-                        this.group = Thread.currentThread().getThreadGroup();
-                    } else {
-                        this.isSecurityEnabled = true;
-                        this.group = s.getThreadGroup();
-                    }
-                }
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                    try {
-                        // Threads should not be created by the webapp classloader
-                        if (isSecurityEnabled) {
-                            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                                Thread.currentThread()
-                                        .setContextClassLoader(getClass().getClassLoader());
-                                return null;
-                            });
-                        } else {
-                            Thread.currentThread()
-                                    .setContextClassLoader(getClass().getClassLoader());
-                        }
-                        Thread t = new Thread(group, r,
-                                NAME_PREFIX + threadNumber.getAndIncrement());
-                        t.setDaemon(true);
-                        return t;
-                    } finally {
-                        if (isSecurityEnabled) {
-                            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                                Thread.currentThread().setContextClassLoader(loader);
-                                return null;
-                            });
-                        } else {
-                            Thread.currentThread().setContextClassLoader(loader);
-                        }
-                    }
-                }
-            });
-        }
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -259,7 +184,7 @@ public class FileHandler extends Handler {
     /**
      * Format and publish a <code>LogRecord</code>.
      *
-     * @param  record  description of the log event
+     * @param record description of the log event
      */
     @Override
     public void publish(LogRecord record) {
@@ -522,7 +447,7 @@ public class FileHandler extends Handler {
             os = bufferSize.intValue() > 0 ? new BufferedOutputStream(fos, bufferSize.intValue()) : fos;
             writer = new PrintWriter(
                     (encoding != null) ? new OutputStreamWriter(os, encoding)
-                                       : new OutputStreamWriter(os), false);
+                            : new OutputStreamWriter(os), false);
             writer.write(getFormatter().getHead(this));
         } catch (Exception e) {
             reportError(null, e, ErrorManager.OPEN_FAILURE);
@@ -590,6 +515,36 @@ public class FileHandler extends Handler {
             return date.substring(0, date.length() - suffix.length());
         } else {
             return null;
+        }
+    }
+
+
+    static class AsyncTaskExecutor {
+
+        private Thread thread;
+        private BlockingQueue<Runnable> tasks;
+
+        AsyncTaskExecutor() {
+            this.tasks = new LinkedBlockingQueue<>();
+            this.thread = new Thread(() -> {
+                try {
+                    this.tasks.take().run();
+                } catch (Exception e) {
+                    System.err.println("take task failed");
+                    e.printStackTrace();
+                }
+            });
+            this.thread.setName("tomcat-async-delete-file");
+            this.thread.start();
+        }
+
+        void submit(Runnable r) {
+            try {
+                this.tasks.put(r);
+            } catch (InterruptedException e) {
+                System.err.println("put task failed");
+                e.printStackTrace();
+            }
         }
     }
 }
