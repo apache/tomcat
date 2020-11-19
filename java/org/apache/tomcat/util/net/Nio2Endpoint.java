@@ -413,6 +413,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
          * @param waitSeconds Ignored for NIO2.
          *
          */
+        @Override
         public void stop(int waitSeconds) {
             acceptor.state = AcceptorState.ENDED;
         }
