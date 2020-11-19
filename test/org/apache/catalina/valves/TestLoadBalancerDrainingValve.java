@@ -55,8 +55,12 @@ public class TestLoadBalancerDrainingValve {
                         Boolean expectInvokeNext = Boolean.valueOf("ACT".equals(jkActivation) || enableIgnore.booleanValue() ||
                                 validSessionId.booleanValue());
                         for (String queryString : queryStrings) {
-                            parameterSets.add(new Object[] { jkActivation, validSessionId, expectInvokeNext,
-                                    enableIgnore, queryString});
+                            for (Boolean secureRequest : booleans) {
+                                for (Boolean secureSessionConfig : booleans) {
+                                    parameterSets.add(new Object[] { jkActivation, validSessionId, expectInvokeNext,
+                                            enableIgnore, queryString, secureRequest, secureSessionConfig});
+                                }
+                            }
                         }
                     }
                 }
@@ -80,6 +84,13 @@ public class TestLoadBalancerDrainingValve {
     @Parameter(4)
     public String queryString;
 
+    @Parameter(5)
+    public Boolean secureRequest;
+
+    @Parameter(6)
+    public boolean secureSessionConfig;
+
+
     @Test
     public void runValve() throws Exception {
         IMocksControl control = EasyMock.createControl();
@@ -95,6 +106,7 @@ public class TestLoadBalancerDrainingValve {
         cookieConfig.setDomain("example.com");
         cookieConfig.setName(sessionCookieName);
         cookieConfig.setPath("/");
+        cookieConfig.setSecure(secureSessionConfig);
 
         // Valve.init requires all of this stuff
         EasyMock.expect(ctx.getMBeanKeyProperties()).andStubReturn("");
@@ -136,6 +148,8 @@ public class TestLoadBalancerDrainingValve {
                 MyCookie expectedCookie = new MyCookie(cookieConfig.getName(), "");
                 expectedCookie.setPath(cookieConfig.getPath());
                 expectedCookie.setMaxAge(0);
+
+                EasyMock.expect(Boolean.valueOf(request.isSecure())).andReturn(secureRequest);
 
                 // These two lines just mean EasyMock.expect(response.addCookie) but for a void method
                 response.addCookie(expectedCookie);
