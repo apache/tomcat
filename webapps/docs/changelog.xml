@@ -104,6 +104,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.61 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>64921</bug>: Ensure that the <code>LoadBalancerDrainingValve</code>
+        uses the correct setting for the secure attribute for any session
+        cookies it creates. Based on a pull request by Andreas Kurth. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
