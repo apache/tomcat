@@ -734,6 +734,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    @Override
+    public long awaitConnectionsClose(long waitMillis) {
+        getLog().info(sm.getString("abstractProtocol.closeConnectionsAwait",
+                Long.valueOf(waitMillis), getName()));
+        return endpoint.awaitConnectionsClose(waitMillis);
+    }
+
+
     private void logPortOffset() {
         if (getPort() != getPortWithOffset()) {
             getLog().info(sm.getString("abstractProtocolHandler.portOffset", getName(),
