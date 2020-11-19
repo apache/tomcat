@@ -22,17 +22,13 @@ import java.io.*;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.sql.Timestamp;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.*;
@@ -86,9 +82,7 @@ public class FileHandler extends Handler {
     public static final int DEFAULT_MAX_DAYS = -1;
     public static final int DEFAULT_BUFFER_SIZE = -1;
 
-    private static volatile ExecutorService DELETE_FILES_SERVICE;
-
-
+    private static final AsyncTaskExecutor DELETE_FILES_SERVICE = new AsyncTaskExecutor();
     // ------------------------------------------------------------ Constructor
 
 
@@ -116,65 +110,7 @@ public class FileHandler extends Handler {
         this.rotatable = rotatable;
         this.bufferSize = bufferSize;
         configure();
-        initExecutor();
         clean();
-    }
-
-
-    /**
-     * lazy init executor to avoid class `ThreadPoolExecutor` loaded earlier than `java agent` start.
-     */
-    private static synchronized void initExecutor() {
-        if (null == DELETE_FILES_SERVICE) {
-            DELETE_FILES_SERVICE = Executors.newSingleThreadExecutor(new ThreadFactory() {
-                private static final String NAME_PREFIX = "FileHandlerLogFilesCleaner-";
-                private final boolean isSecurityEnabled;
-                private final ThreadGroup group;
-                private final AtomicInteger threadNumber = new AtomicInteger(1);
-
-                {
-                    SecurityManager s = System.getSecurityManager();
-                    if (s == null) {
-                        this.isSecurityEnabled = false;
-                        this.group = Thread.currentThread().getThreadGroup();
-                    } else {
-                        this.isSecurityEnabled = true;
-                        this.group = s.getThreadGroup();
-                    }
-                }
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                    try {
-                        // Threads should not be created by the webapp classloader
-                        if (isSecurityEnabled) {
-                            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                                Thread.currentThread()
-                                        .setContextClassLoader(getClass().getClassLoader());
-                                return null;
-                            });
-                        } else {
-                            Thread.currentThread()
-                                    .setContextClassLoader(getClass().getClassLoader());
-                        }
-                        Thread t = new Thread(group, r,
-                                NAME_PREFIX + threadNumber.getAndIncrement());
-                        t.setDaemon(true);
-                        return t;
-                    } finally {
-                        if (isSecurityEnabled) {
-                            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                                Thread.currentThread().setContextClassLoader(loader);
-                                return null;
-                            });
-                        } else {
-                            Thread.currentThread().setContextClassLoader(loader);
-                        }
-                    }
-                }
-            });
-        }
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -579,6 +515,36 @@ public class FileHandler extends Handler {
             return date.substring(0, date.length() - suffix.length());
         } else {
             return null;
+        }
+    }
+
+
+    static class AsyncTaskExecutor {
+
+        private Thread thread;
+        private BlockingQueue<Runnable> tasks;
+
+        AsyncTaskExecutor() {
+            this.tasks = new LinkedBlockingQueue<>();
+            this.thread = new Thread(() -> {
+                try {
+                    this.tasks.take().run();
+                } catch (Exception e) {
+                    System.err.println("take task failed");
+                    e.printStackTrace();
+                }
+            });
+            this.thread.setName("tomcat-async-delete-file");
+            this.thread.start();
+        }
+
+        void submit(Runnable r) {
+            try {
+                this.tasks.put(r);
+            } catch (InterruptedException e) {
+                System.err.println("put task failed");
+                e.printStackTrace();
+            }
         }
     }
 }
