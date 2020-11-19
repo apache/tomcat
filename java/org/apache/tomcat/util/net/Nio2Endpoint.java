@@ -419,8 +419,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
         }
 
-        @Override
-        public void stop() {
+        /**
+         * Signals the Acceptor to stop.
+         *
+         * @param waitSeconds Ignored for NIO2.
+         *
+         */
+        public void stop(int waitSeconds) {
             acceptor.state = AcceptorState.ENDED;
         }
 
