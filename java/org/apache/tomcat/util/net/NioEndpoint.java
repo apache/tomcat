@@ -427,7 +427,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
             socketWrapper.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
-            poller.register(channel, socketWrapper);
+            poller.register(socketWrapper);
             return true;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -489,20 +489,20 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     public static class PollerEvent {
 
-        private NioChannel socket;
+        private NioSocketWrapper socketWrapper;
         private int interestOps;
 
-        public PollerEvent(NioChannel ch, int intOps) {
-            reset(ch, intOps);
+        public PollerEvent(NioSocketWrapper socketWrapper, int intOps) {
+            reset(socketWrapper, intOps);
         }
 
-        public void reset(NioChannel ch, int intOps) {
-            socket = ch;
+        public void reset(NioSocketWrapper socketWrapper, int intOps) {
+            this.socketWrapper = socketWrapper;
             interestOps = intOps;
         }
 
-        public NioChannel getSocket() {
-            return socket;
+        public NioSocketWrapper getSocketWrapper() {
+            return socketWrapper;
         }
 
         public int getInterestOps() {
@@ -515,7 +515,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         public String toString() {
-            return "Poller event: socket [" + socket + "], socketWrapper [" + socket.getSocketWrapper() +
+            return "Poller event: socket [" + socketWrapper.getSocket() + "], socketWrapper [" + socketWrapper +
                     "], interestOps [" + interestOps + "]";
         }
     }
@@ -579,9 +579,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 r = eventCache.pop();
             }
             if (r == null) {
-                r = new PollerEvent(socketWrapper.getSocket(), interestOps);
+                r = new PollerEvent(socketWrapper, interestOps);
             } else {
-                r.reset(socketWrapper.getSocket(), interestOps);
+                r.reset(socketWrapper, interestOps);
             }
             addEvent(r);
             if (close) {
@@ -601,9 +601,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             PollerEvent pe = null;
             for (int i = 0, size = events.size(); i < size && (pe = events.poll()) != null; i++ ) {
                 result = true;
-                NioChannel channel = pe.getSocket();
-                SocketChannel sc = channel.getIOChannel();
-                NioSocketWrapper socketWrapper = channel.getSocketWrapper();
+                NioSocketWrapper socketWrapper = pe.getSocketWrapper();
+                SocketChannel sc = socketWrapper.getSocket().getIOChannel();
                 int interestOps = pe.getInterestOps();
                 if (sc == null) {
                     log.warn(sm.getString("endpoint.nio.nullSocketChannel"));
@@ -653,19 +652,18 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         /**
          * Registers a newly created socket with the poller.
          *
-         * @param socket    The newly created socket
          * @param socketWrapper The socket wrapper
          */
-        public void register(final NioChannel socket, final NioSocketWrapper socketWrapper) {
+        public void register(final NioSocketWrapper socketWrapper) {
             socketWrapper.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             PollerEvent event = null;
             if (eventCache != null) {
                 event = eventCache.pop();
             }
             if (event == null) {
-                event = new PollerEvent(socket, OP_REGISTER);
+                event = new PollerEvent(socketWrapper, OP_REGISTER);
             } else {
-                event.reset(socket, OP_REGISTER);
+                event.reset(socketWrapper, OP_REGISTER);
             }
             addEvent(event);
         }
