@@ -546,9 +546,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 int interestOps = pe.getInterestOps();
                 if (sc == null) {
                     log.warn(sm.getString("endpoint.nio.nullSocketChannel"));
-                    if (socketWrapper != null) {
-                        socketWrapper.close();
-                    }
+                    socketWrapper.close();
                 } else if (interestOps == OP_REGISTER) {
                     try {
                         sc.register(getSelector(), SelectionKey.OP_READ, socketWrapper);
