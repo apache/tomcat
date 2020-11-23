@@ -119,6 +119,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.108 (violetagg)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct a regression in the addition of the HTTP header security filter
+        to the examples web application that prevented the Servlet examples that
+        depend on the asynchronous API from functioning correctly.
+        (kkolinko/markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
