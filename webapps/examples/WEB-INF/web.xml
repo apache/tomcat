@@ -71,6 +71,7 @@
     <filter>
         <filter-name>HTTP header security filter</filter-name>
         <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
+        <async-supported>true</async-supported>
         <init-param>
             <param-name>hstsEnabled</param-name>
             <param-value>false</param-value>
