@@ -129,6 +129,9 @@
         <bug>64931</bug>: Implement validation of <code>changelog.xml</code>
         file at build time. (kkolinko)
       </add>
+      <update>
+        Update to Maven Ant Resolver Tasks 1.3.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
