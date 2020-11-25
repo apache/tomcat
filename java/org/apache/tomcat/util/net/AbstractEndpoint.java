@@ -1328,7 +1328,7 @@ public abstract class AbstractEndpoint<S,U> {
             // Signal to any multiplexed protocols (HTTP/2) that they may wish
             // to stop accepting new streams
             getHandler().pause();
-            // Update the bindSatte. This has the side-effect of disabling
+            // Update the bindState. This has the side-effect of disabling
             // keep-alive for any in-progress connections
             bindState = BindState.SOCKET_CLOSED_ON_STOP;
             try {
