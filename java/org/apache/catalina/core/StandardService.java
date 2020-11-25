@@ -478,7 +478,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             long waitMillis = gracefulStopAwaitMillis;
             if (waitMillis > 0) {
                 for (Connector connector: connectors) {
-                    waitMillis = connector.getProtocolHandler().closeConnectionsAwait(waitMillis);
+                    waitMillis = connector.getProtocolHandler().awaitConnectionsClose(waitMillis);
                 }
             }
 

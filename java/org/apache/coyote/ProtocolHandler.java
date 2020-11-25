@@ -145,7 +145,7 @@ public interface ProtocolHandler {
      *
      * @return The wait time, if any remaining when the method returned
      */
-    public long closeConnectionsAwait(long waitMillis);
+    public long awaitConnectionsClose(long waitMillis);
 
 
     /**

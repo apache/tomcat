@@ -1350,7 +1350,7 @@ public abstract class AbstractEndpoint<S,U> {
      *
      * @return The wait time, if any remaining when the method returned
      */
-    public final long closeConnectionsAwait(long waitMillis) {
+    public final long awaitConnectionsClose(long waitMillis) {
         while (waitMillis > 0 && !connections.isEmpty()) {
             try {
                 Thread.sleep(50);

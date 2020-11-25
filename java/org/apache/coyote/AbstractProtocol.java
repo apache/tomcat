@@ -712,10 +712,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
     @Override
-    public long closeConnectionsAwait(long waitMillis) {
+    public long awaitConnectionsClose(long waitMillis) {
         getLog().info(sm.getString("abstractProtocol.closeConnectionsAwait",
                 Long.valueOf(waitMillis), getName()));
-        return endpoint.closeConnectionsAwait(waitMillis);
+        return endpoint.awaitConnectionsClose(waitMillis);
     }
 
 
