@@ -40,6 +40,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.compiler.ELInterpreter;
 import org.apache.jasper.compiler.ELInterpreterFactory;
+import org.apache.jasper.compiler.StringInterpreter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 @RunWith(Parameterized.class)
@@ -111,6 +112,8 @@ public class TestELInterpreterTagSetters extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
         Context ctxt = (Context) tomcat.getHost().findChild("/test");
         ctxt.getServletContext().setAttribute(ELInterpreter.class.getCanonicalName(), elInterpreter);
+
+        ctxt.getServletContext().setAttribute(StringInterpreter.class.getCanonicalName(), new StringInterpreterEnum());
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug64872-" + target + ".jsp");
 
