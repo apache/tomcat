@@ -16,13 +16,12 @@
 --%>
 <%@ taglib uri="http://tomcat.apache.org/tag-setters" prefix="ts" %>
 <html>
-  <head><title>Bug 64872 TimeUnit test case</title></head>
+  <head><title>Bug 64872b TimeUnit test case</title></head>
   <body>
   <%
-  for (int i=0; i < 1000000; i++) {
+  for (int i=0; i < 100000; i++) {
   %>
-    <p>01 The value of foo is [<ts:tagTimeUnit foo="${'SECONDS'}" />]</p>
-    <p>02 The value of foo is [<ts:tagTimeUnit foo='${"SECONDS"}' />]</p>
+    <p>01 The value of foo is [<ts:tagTimeUnit foo="SECONDS" />]</p>
   <%
   }
   %>
