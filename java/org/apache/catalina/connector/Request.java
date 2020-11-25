@@ -917,6 +917,14 @@ public class Request implements HttpServletRequest {
             if (attr != null) {
                 attributes.put(SSLSupport.PROTOCOL_VERSION_KEY, attr);
             }
+            attr = coyoteRequest.getAttribute(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY);
+            if (attr != null) {
+                attributes.put(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY, attr);
+            }
+            attr = coyoteRequest.getAttribute(SSLSupport.REQUESTED_CIPHERS_KEY);
+            if (attr != null) {
+                attributes.put(SSLSupport.REQUESTED_CIPHERS_KEY, attr);
+            }
             attr = attributes.get(name);
             sslAttributesParsed = true;
         }

@@ -17,6 +17,9 @@
 
 package org.apache.tomcat.util.net;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.net.ssl.SSLSession;
 
 import org.apache.juli.logging.Log;
@@ -63,7 +66,31 @@ public abstract class SSLImplementation {
         }
     }
 
+    /**
+     * Obtain an instance of SSLSupport.
+     *
+     * @param session   The SSL session
+     * @param additionalAttributes  Additional SSL attributes that are not
+     *                              available from the session.
+     *
+     * @return An instance of SSLSupport based on the given session and the
+     *         provided additional attributes
+     */
+    public SSLSupport getSSLSupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
+        return getSSLSupport(session);
+    }
 
+    /**
+     * Obtain an instance of SSLSupport.
+     *
+     * @param session   The TLS session
+     *
+     * @return An instance of SSLSupport based on the given session.
+     *
+     * @deprecated This will be removed in Tomcat 10.1.x onwards.
+     *             Use {@link #getSSLSupport(SSLSession, Map)}.
+     */
+    @Deprecated
     public abstract SSLSupport getSSLSupport(SSLSession session);
 
     public abstract SSLUtil getSSLUtil(SSLHostConfigCertificate certificate);
