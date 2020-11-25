@@ -132,6 +132,10 @@
       <update>
         Update to Maven Ant Resolver Tasks 1.3.0. (markt)
       </update>
+      <fix>
+        <bug>62695</bug>: Provide SHA-256 and SHA-512 checksums for files
+        published via Maven. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
