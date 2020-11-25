@@ -23,7 +23,9 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.WritePendingException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +36,7 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -61,7 +64,7 @@ public class SecureNio2Channel extends Nio2Channel  {
     protected SSLEngine sslEngine;
     protected final Nio2Endpoint endpoint;
 
-    protected boolean sniComplete = false;
+    protected volatile boolean sniComplete = false;
 
     private volatile boolean handshakeComplete;
     private volatile HandshakeStatus handshakeStatus; //gets set by handshake
@@ -70,6 +73,8 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     protected boolean closed;
     protected boolean closing;
+
+    private final Map<String,List<String>> additionalTlsAttributes = new HashMap<>();
 
     private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> handshakeReadCompletionHandler;
     private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> handshakeWriteCompletionHandler;
@@ -432,6 +437,13 @@ public class SecureNio2Channel extends Nio2Channel  {
         sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers,
                 clientRequestedApplicationProtocols);
 
+        // Populate additional TLS attributes obtained from the handshake that
+        // aren't available from the session
+        additionalTlsAttributes.put(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY,
+                extractor.getClientRequestedProtocols());
+        additionalTlsAttributes.put(SSLSupport.REQUESTED_CIPHERS_KEY,
+                extractor.getClientRequestedCipherNames());
+
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.
         getBufHandler().expand(sslEngine.getSession().getApplicationBufferSize());
@@ -561,6 +573,14 @@ public class SecureNio2Channel extends Nio2Channel  {
                    handshakeStatus == HandshakeStatus.NEED_UNWRAP;
         } while (cont);
         return result;
+    }
+
+    public SSLSupport getSSLSupport() {
+        if (sslEngine != null) {
+            SSLSession session = sslEngine.getSession();
+            return endpoint.getSslImplementation().getSSLSupport(session, additionalTlsAttributes);
+        }
+        return null;
     }
 
     /**
