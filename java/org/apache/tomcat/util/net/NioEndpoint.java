@@ -1134,8 +1134,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         private int fillReadBuffer(boolean block, ByteBuffer buffer) throws IOException {
             int n = 0;
-            NioChannel socket = getSocket();
-            if (socket == NioChannel.CLOSED_NIO_CHANNEL) {
+            if (getSocket() == NioChannel.CLOSED_NIO_CHANNEL) {
                 throw new ClosedChannelException();
             }
             if (block) {
@@ -1152,7 +1151,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             throw new SocketTimeoutException();
                         }
                     }
-                    n = socket.read(buffer);
+                    n = getSocket().read(buffer);
                     if (n == -1) {
                         throw new EOFException();
                     } else if (n == 0) {
@@ -1176,7 +1175,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                 } while (n == 0); // TLS needs to loop as reading zero application bytes is possible
             } else {
-                n = socket.read(buffer);
+                n = getSocket().read(buffer);
                 if (n == -1) {
                     throw new EOFException();
                 }
@@ -1188,8 +1187,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         @Override
         protected void doWrite(boolean block, ByteBuffer buffer) throws IOException {
             int n = 0;
-            NioChannel socket = getSocket();
-            if (socket == NioChannel.CLOSED_NIO_CHANNEL) {
+            if (getSocket() == NioChannel.CLOSED_NIO_CHANNEL) {
                 throw new ClosedChannelException();
             }
             if (block) {
@@ -1206,7 +1204,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             throw new SocketTimeoutException();
                         }
                     }
-                    n = socket.write(buffer);
+                    n = getSocket().write(buffer);
                     if (n == -1) {
                         throw new EOFException();
                     } else if (n == 0) {
@@ -1239,7 +1237,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 // write registration.
             } else {
                 do {
-                    n = socket.write(buffer);
+                    n = getSocket().write(buffer);
                     if (n == -1) {
                         throw new EOFException();
                     }
