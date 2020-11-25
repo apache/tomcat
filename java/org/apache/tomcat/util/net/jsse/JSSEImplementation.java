@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net.jsse;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.net.ssl.SSLSession;
 
 import org.apache.tomcat.util.compat.JreCompat;
@@ -40,9 +43,15 @@ public class JSSEImplementation extends SSLImplementation {
         JSSESupport.init();
     }
 
+    @Deprecated
     @Override
     public SSLSupport getSSLSupport(SSLSession session) {
-        return new JSSESupport(session);
+        return getSSLSupport(session, null);
+    }
+
+    @Override
+    public SSLSupport getSSLSupport(SSLSession session, Map<String, List<String>> additionalAttributes) {
+        return new JSSESupport(session, additionalAttributes);
     }
 
     @Override

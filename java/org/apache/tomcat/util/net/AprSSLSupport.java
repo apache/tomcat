@@ -108,6 +108,7 @@ public class AprSSLSupport implements SSLSupport {
         }
     }
 
+
     @Override
     public String getProtocol() throws IOException {
         try {
@@ -116,4 +117,16 @@ public class AprSSLSupport implements SSLSupport {
             throw new IOException(e);
         }
    }
+
+
+    @Override
+    public String getRequestedProtocols() throws IOException {
+        return null;
+    }
+
+
+    @Override
+    public String getRequestedCiphers() throws IOException {
+        return null;
+    }
 }
