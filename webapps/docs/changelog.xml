@@ -106,6 +106,12 @@
 <section name="Tomcat 9.0.41 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>56181</bug>: Update the RemoteIpValve and RemoteIpFilter so that
+        calls to <code>ServletRequest.getRemoteHost()</code> are consistent with
+        the return value of <code>ServletRequest.getRemoteAddr()</code> rather
+        than always returning a value for the proxy. (markt)
+      </fix>
       <add>
         <bug>64080</bug>: Enhance the graceful shutdown feature. Includes a new
         option for <code>StandardService</code>,
