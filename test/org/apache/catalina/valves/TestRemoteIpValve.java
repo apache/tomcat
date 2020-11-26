@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
@@ -92,6 +93,11 @@ public class TestRemoteIpValve {
     }
 
     public static class MockRequest extends Request {
+
+        public MockRequest() {
+            setConnector(new Connector());
+        }
+
         @Override
         public void setAttribute(String name, Object value) {
             getCoyoteRequest().getAttributes().put(name, value);
