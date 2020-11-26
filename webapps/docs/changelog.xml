@@ -107,6 +107,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>56181</bug>: Update the RemoteIpValve and RemoteIpFilter so that
+        calls to <code>ServletRequest.getRemoteHost()</code> are consistent with
+        the return value of <code>ServletRequest.getRemoteAddr()</code> rather
+        than always returning a value for the proxy. (markt)
+      </fix>
+      <fix>
         <bug>64921</bug>: Ensure that the <code>LoadBalancerDrainingValve</code>
         uses the correct setting for the secure attribute for any session
         cookies it creates. Based on a pull request by Andreas Kurth. (markt)
