@@ -119,6 +119,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.108 (violetagg)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>56181</bug>: Update the RemoteIpValve and RemoteIpFilter so that
+        calls to <code>ServletRequest.getRemoteHost()</code> are consistent with
+        the return value of <code>ServletRequest.getRemoteAddr()</code> rather
+        than always returning a value for the proxy. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
