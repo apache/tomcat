@@ -1551,6 +1551,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
     <attributes>
 
+      <attribute name="enableLookups" required="false">
+        <p>Should a DNS lookup be performed to provide a host name when calling
+        <code>ServletRequest#getRemoteHost()</code>. If not specified, the
+        default of <code>false</code> is used.</p>
+      </attribute>
+
       <attribute name="remoteIpHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the list of
         traversed IP addresses starting from the requesting client. If not
