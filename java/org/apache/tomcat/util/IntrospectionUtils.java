@@ -132,7 +132,7 @@ public final class IntrospectionUtils {
                             params[0] = InetAddress.getByName(value);
                         } catch (UnknownHostException exc) {
                             if (log.isDebugEnabled())
-                                log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
+                                log.debug("IntrospectionUtils: Unable to resolve host name [" + value + "]");
                             ok = false;
                         }
                         if (actualMethod != null) {
@@ -145,7 +145,7 @@ public final class IntrospectionUtils {
                             params[0] = Paths.get(value);
                         } catch (InvalidPathException ipe) {
                             if (log.isDebugEnabled())
-                                log.debug("IntrospectionUtils: Unable to resolve path:" + value);
+                                log.debug("IntrospectionUtils: Unable to resolve path [" + value + "]");
                             ok = false;
                         }
                         if (actualMethod != null) {
@@ -154,8 +154,8 @@ public final class IntrospectionUtils {
                         // Unknown type
                     } else {
                         if (log.isDebugEnabled())
-                            log.debug("IntrospectionUtils: Unknown type " +
-                                    paramType.getName());
+                            log.debug("IntrospectionUtils: Unknown type [" +
+                                    paramType.getName() + "]");
                     }
 
                     if (ok) {
