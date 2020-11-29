@@ -20,6 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.Hashtable;
 
 import org.apache.juli.logging.Log;
@@ -131,6 +133,19 @@ public final class IntrospectionUtils {
                         } catch (UnknownHostException exc) {
                             if (log.isDebugEnabled())
                                 log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
+                            ok = false;
+                        }
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(InetAddress.getByName(\"").append(value).append("\"))");
+                        }
+                        // Try a setFoo ( Path )
+                    } else if ("java.nio.file.Path".equals(paramType
+                            .getName())) {
+                        try {
+                            params[0] = Paths.get(value);
+                        } catch (InvalidPathException ipe) {
+                            if (log.isDebugEnabled())
+                                log.debug("IntrospectionUtils: Unable to resolve path:" + value);
                             ok = false;
                         }
                         if (actualMethod != null) {

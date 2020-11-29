@@ -124,6 +124,11 @@
         uses the correct setting for the secure attribute for any session
         cookies it creates. Based on a pull request by Andreas Kurth. (markt)
       </fix>
+      <add>
+        <bug>64943</bug>: Add support for unix domain sockets to
+        <code>org.apache.coyote.http11.Http11AprProtocol</code>. Depends on
+        <code>tomcat-native</code> v1.2.26 and up. (minfrin)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

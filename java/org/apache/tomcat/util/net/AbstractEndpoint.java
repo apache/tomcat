@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -566,6 +567,14 @@ public abstract class AbstractEndpoint<S,U> {
      *                     socket
      */
     protected abstract InetSocketAddress getLocalAddress() throws IOException;
+
+
+    /**
+     * Address for the unix domain socket.
+     */
+    private Path path;
+    public Path getPath() { return path; }
+    public void setPath(Path path) { this.path = path; }
 
 
     /**

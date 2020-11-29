@@ -208,6 +208,13 @@
       The default is <code>POST</code></p>
     </attribute>
 
+    <attribute name="path" required="false">
+      <p>Where supported, the path to a unix domain socket that this
+      <strong>Connector</strong> will create and await incoming connections.
+      The socket is created with world read and write permissions. To protect
+      the socket create the socket in a suitably protected directory.</p>
+    </attribute>
+
     <attribute name="port" required="true">
       <p>The TCP port number on which this <strong>Connector</strong>
       will create a server socket and await incoming connections.  Your
@@ -1126,6 +1133,30 @@
 
   <p>For more information, see the
   <a href="../proxy-howto.html">Proxy Support How-To</a>.</p>
+
+  </subsection>
+
+
+  <subsection name="Unix Domain Socket Support">
+
+  <p>When the <code>path</code> attribute is used, connectors that support
+  unix domain sockets will bind to the socket at the given path. The first
+  connector to support this is the
+  <code>org.apache.coyote.http11.Http11AprProtocol</code> connector when
+  used with the Apache Tomcat Native library v1.2.26 and up, along with
+  Apache Portable Runtime v1.6 and higher.
+  </p>
+
+  <p>The socket path is created with read and write permissions for all
+  users. To protect this socket, place it in a directory with suitable
+  permissions appropriately configured to restrict access as required.
+  </p>
+
+  <p>The unix domain socket can be accessed using the
+  <code>--unix-socket</code> option of the <code>curl</code> command line
+  client, and the unix domain socket support in Apache HTTP server's
+  <code>mod_proxy</code> module.
+  </p>
 
   </subsection>
 

@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -280,6 +281,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         endpoint.setAddress(ia);
     }
 
+    public Path getPath() { return endpoint.getPath(); }
+    public void setPath(Path f) {
+        endpoint.setPath(f);
+    }
 
     public int getPort() { return endpoint.getPort(); }
     public void setPort(int port) {
@@ -347,22 +352,27 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     private String getNameInternal() {
         StringBuilder name = new StringBuilder(getNamePrefix());
         name.append('-');
-        if (getAddress() != null) {
-            name.append(getAddress().getHostAddress());
-            name.append('-');
+        if (getPath() != null) {
+            name.append(getPath().getFileName().toString());
         }
-        int port = getPortWithOffset();
-        if (port == 0) {
-            // Auto binding is in use. Check if port is known
-            name.append("auto-");
-            name.append(getNameIndex());
-            port = getLocalPort();
-            if (port != -1) {
+        else {
+        	if (getAddress() != null) {
+                name.append(getAddress().getHostAddress());
                 name.append('-');
+            }
+            int port = getPortWithOffset();
+            if (port == 0) {
+                // Auto binding is in use. Check if port is known
+                name.append("auto-");
+                name.append(getNameIndex());
+                port = getLocalPort();
+                if (port != -1) {
+                    name.append('-');
+                    name.append(port);
+                }
+            } else {
                 name.append(port);
             }
-        } else {
-            name.append(port);
         }
         return name.toString();
     }

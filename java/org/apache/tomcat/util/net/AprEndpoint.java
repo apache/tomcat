@@ -283,6 +283,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     @Override
     public void bind() throws Exception {
 
+        int family;
+        String hostname = null;
+
         // Create the root APR memory pool
         try {
             rootPool = Pool.create(0);
@@ -292,52 +295,79 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
         // Create the pool for the server socket
         serverSockPool = Pool.create(rootPool);
+
         // Create the APR address that will be bound
-        String addressStr = null;
-        if (getAddress() != null) {
-            addressStr = getAddress().getHostAddress();
+        if (getPath() != null) {
+            if (Library.APR_HAVE_UNIX) {
+                hostname = getPath().toString();
+                family = Socket.APR_UNIX;
+            }
+            else {
+                throw new Exception(sm.getString("endpoint.init.unixnotavail"));
+            }
         }
-        int family = Socket.APR_INET;
-        if (Library.APR_HAVE_IPV6) {
-            if (addressStr == null) {
-                if (!OS.IS_BSD) {
+        else {
+
+            if (getAddress() != null) {
+                hostname = getAddress().getHostAddress();
+            }
+            family = Socket.APR_INET;
+            if (Library.APR_HAVE_IPV6) {
+                if (hostname == null) {
+                    if (!OS.IS_BSD) {
+                        family = Socket.APR_UNSPEC;
+                    }
+                } else if (hostname.indexOf(':') >= 0) {
                     family = Socket.APR_UNSPEC;
                 }
-            } else if (addressStr.indexOf(':') >= 0) {
-                family = Socket.APR_UNSPEC;
             }
-         }
+        }
 
-        long inetAddress = Address.info(addressStr, family, getPortWithOffset(), 0, rootPool);
+        long sockAddress = Address.info(hostname, family, getPortWithOffset(), 0, rootPool);
+
         // Create the APR server socket
-        serverSock = Socket.create(Address.getInfo(inetAddress).family,
+        if (family == Socket.APR_UNIX) {
+            serverSock = Socket.create(family, Socket.SOCK_STREAM, 0, rootPool);
+        }
+        else {
+            serverSock = Socket.create(Address.getInfo(sockAddress).family,
                 Socket.SOCK_STREAM,
                 Socket.APR_PROTO_TCP, rootPool);
-        if (OS.IS_UNIX) {
-            Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
-        }
-        if (Library.APR_HAVE_IPV6) {
-            if (getIpv6v6only()) {
-                Socket.optSet(serverSock, Socket.APR_IPV6_V6ONLY, 1);
-            } else {
-                Socket.optSet(serverSock, Socket.APR_IPV6_V6ONLY, 0);
+            if (OS.IS_UNIX) {
+                Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
             }
+            if (Library.APR_HAVE_IPV6) {
+                if (getIpv6v6only()) {
+                    Socket.optSet(serverSock, Socket.APR_IPV6_V6ONLY, 1);
+                } else {
+                    Socket.optSet(serverSock, Socket.APR_IPV6_V6ONLY, 0);
+                }
+            }
+            // Deal with the firewalls that tend to drop the inactive sockets
+            Socket.optSet(serverSock, Socket.APR_SO_KEEPALIVE, 1);
         }
-        // Deal with the firewalls that tend to drop the inactive sockets
-        Socket.optSet(serverSock, Socket.APR_SO_KEEPALIVE, 1);
+
         // Bind the server socket
-        int ret = Socket.bind(serverSock, inetAddress);
+        int ret = Socket.bind(serverSock, sockAddress);
         if (ret != 0) {
             throw new Exception(sm.getString("endpoint.init.bind", "" + ret, Error.strerror(ret)));
         }
+
         // Start listening on the server socket
         ret = Socket.listen(serverSock, getAcceptCount());
         if (ret != 0) {
             throw new Exception(sm.getString("endpoint.init.listen", "" + ret, Error.strerror(ret)));
         }
-        if (OS.IS_WIN32 || OS.IS_WIN64) {
-            // On Windows set the reuseaddr flag after the bind/listen
-            Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
+
+        if (family == Socket.APR_UNIX) {
+            getPath().toFile().setReadable(true, false);
+            getPath().toFile().setWritable(true, false);
+            getPath().toFile().setExecutable(false, false);
+        } else {
+            if (OS.IS_WIN32 || OS.IS_WIN64) {
+                // On Windows set the reuseaddr flag after the bind/listen
+                Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
+            }
         }
 
         // Enable Sendfile by default if it has not been configured but usage on
