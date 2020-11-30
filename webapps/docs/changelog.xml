@@ -126,6 +126,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>64944</bug>: Ensure that the bytesSent metric is correctly updated
+        when compression is enabled. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
