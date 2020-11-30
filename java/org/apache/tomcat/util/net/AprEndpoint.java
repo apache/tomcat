@@ -360,9 +360,10 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
 
         if (family == Socket.APR_UNIX) {
-            getPath().toFile().setReadable(true, false);
-            getPath().toFile().setWritable(true, false);
-            getPath().toFile().setExecutable(false, false);
+            java.io.File file = getPath().toFile();
+            file.setReadable(true, false);
+            file.setWritable(true, false);
+            file.setExecutable(false, false);
         } else {
             if (OS.IS_WIN32 || OS.IS_WIN64) {
                 // On Windows set the reuseaddr flag after the bind/listen
