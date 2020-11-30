@@ -351,12 +351,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     private String getNameInternal() {
         StringBuilder name = new StringBuilder(getNamePrefix());
-        name.append('-');
         if (getPath() != null) {
-            name.append(getPath().getFileName().toString());
+            for (Path path: getPath()) {
+                name.append('-');
+                name.append(path.toString());
+            }
         }
         else {
-        	if (getAddress() != null) {
+            name.append('-');
+            if (getAddress() != null) {
                 name.append(getAddress().getHostAddress());
                 name.append('-');
             }
