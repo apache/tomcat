@@ -113,6 +113,14 @@
         than always returning a value for the proxy. (markt)
       </fix>
       <fix>
+        <bug>56890</bug>: Align the behaviour of
+        <code>ServletContext.getRealPath(String path)</code> with the recent
+        clarification from the Servlet specification project. If the path
+        parameter does not start with <code>/</code> then Tomcat processes the
+        call as if <code>/</code> is appended to the beginning of the
+        provided path. (markt)
+      </fix>
+      <fix>
         <bug>64921</bug>: Ensure that the <code>LoadBalancerDrainingValve</code>
         uses the correct setting for the secure attribute for any session
         cookies it creates. Based on a pull request by Andreas Kurth. (markt)

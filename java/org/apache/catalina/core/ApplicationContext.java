@@ -526,7 +526,7 @@ public class ApplicationContext implements ServletContext {
     @Override
     public URL getResource(String path) throws MalformedURLException {
 
-        String validatedPath = validateResourcePath(path, false);
+        String validatedPath = validateResourcePath(path, !GET_RESOURCE_REQUIRE_SLASH);
 
         if (validatedPath == null) {
             throw new MalformedURLException(
@@ -545,7 +545,7 @@ public class ApplicationContext implements ServletContext {
     @Override
     public InputStream getResourceAsStream(String path) {
 
-        String validatedPath = validateResourcePath(path, false);
+        String validatedPath = validateResourcePath(path, !GET_RESOURCE_REQUIRE_SLASH);
 
         if (validatedPath == null) {
             return null;
@@ -564,20 +564,16 @@ public class ApplicationContext implements ServletContext {
      * Returns null if the input path is not valid or a path that will be
      * acceptable to resources.getResource().
      */
-    private String validateResourcePath(String path, boolean allowEmptyPath) {
+    private String validateResourcePath(String path, boolean addMissingInitialSlash) {
         if (path == null) {
             return null;
         }
 
-        if (path.length() == 0 && allowEmptyPath) {
-            return path;
-        }
-
         if (!path.startsWith("/")) {
-            if (GET_RESOURCE_REQUIRE_SLASH) {
-                return null;
-            } else {
+            if (addMissingInitialSlash) {
                 return "/" + path;
+            } else {
+                return null;
             }
         }
 
