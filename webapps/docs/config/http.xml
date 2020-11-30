@@ -216,7 +216,7 @@
       will automatically remove the socket on server shutdown. If the socket
       already exists, care must be taken by the administrator to remove the
       socket after verifying that the socket isn't already being used by an
-      existing tomcat process.</p>
+      existing Tomcat process.</p>
     </attribute>
 
     <attribute name="port" required="true">
@@ -1159,7 +1159,7 @@
   <p>Tomcat will automatically remove the socket on server shutdown. If the
   socket already exists startup will fail. Care must be taken by the
   administrator to remove the socket after verifying that the socket isn't
-  already being used by an existing tomcat process.</p>
+  already being used by an existing Tomcat process.</p>
 
   <p>The unix domain socket can be accessed using the
   <code>--unix-socket</code> option of the <code>curl</code> command line
