@@ -212,7 +212,11 @@
       <p>Where supported, the path to a unix domain socket that this
       <strong>Connector</strong> will create and await incoming connections.
       The socket is created with world read and write permissions. To protect
-      the socket create the socket in a suitably protected directory.</p>
+      the socket create the socket in a suitably protected directory. Tomcat
+      will automatically remove the socket on server shutdown. If the socket
+      already exists, care must be taken by the administrator to remove the
+      socket after verifying that the socket isn't already being used by an
+      existing tomcat process.</p>
     </attribute>
 
     <attribute name="port" required="true">
@@ -1151,6 +1155,11 @@
   users. To protect this socket, place it in a directory with suitable
   permissions appropriately configured to restrict access as required.
   </p>
+
+  <p>Tomcat will automatically remove the socket on server shutdown. If the
+  socket already exists startup will fail. Care must be taken by the
+  administrator to remove the socket after verifying that the socket isn't
+  already being used by an existing tomcat process.</p>
 
   <p>The unix domain socket can be accessed using the
   <code>--unix-socket</code> option of the <code>curl</code> command line
