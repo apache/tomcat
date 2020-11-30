@@ -112,6 +112,14 @@
         the return value of <code>ServletRequest.getRemoteAddr()</code> rather
         than always returning a value for the proxy. (markt)
       </fix>
+      <fix>
+        <bug>56890</bug>: Align the behaviour of
+        <code>ServletContext.getRealPath(String path)</code> with the recent
+        clarification from the Servlet specification project. If the path
+        parameter does not start with <code>/</code> then Tomcat processes the
+        call as if <code>/</code> is appended to the beginning of the
+        provided path. (markt)
+      </fix>
       <add>
         <bug>64080</bug>: Enhance the graceful shutdown feature. Includes a new
         option for <code>StandardService</code>,
