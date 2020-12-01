@@ -209,7 +209,7 @@
     </attribute>
 
     <attribute name="path" required="false">
-      <p>Where supported, the path to a unix domain socket that this
+      <p>Where supported, the path to a Unix Domain Socket that this
       <strong>Connector</strong> will create and await incoming connections.
       Tomcat will automatically remove the socket on server shutdown. If the
       socket already exists, care must be taken by the administrator to remove
@@ -219,10 +219,10 @@
 
     <attribute name="pathPermissions" required="false">
       <p>Where supported, the posix permissions that will be applied to the
-      to the unix domain socket specified with <code>path</code> above. The
+      to the Unix Domain Socket specified with <code>path</code> above. The
       permissions are specified as a string of nine characters, in three sets
-      of three: (r)ead, (w)rite and e(x)ecute for owner, group and everyone
-      else respectively. If a permission is not granted, a dash is used. If
+      of three: (r)ead, (w)rite and e(x)ecute for owner, group and others
+      respectively. If a permission is not granted, a hyphen is used. If
       unspecified, the permissions default to <code>rw-rw-rw-</code>.</p>
     </attribute>
 
@@ -1151,7 +1151,7 @@
   <subsection name="Unix Domain Socket Support">
 
   <p>When the <code>path</code> attribute is used, connectors that support
-  unix domain sockets will bind to the socket at the given path. The first
+  Unix Domain Sockets will bind to the socket at the given path. The first
   connector to support this is the
   <code>org.apache.coyote.http11.Http11AprProtocol</code> connector when
   used with the Apache Tomcat Native library v1.2.26 and up, along with
@@ -1171,9 +1171,9 @@
   administrator to remove the socket after verifying that the socket isn't
   already being used by an existing Tomcat process.</p>
 
-  <p>The unix domain socket can be accessed using the
+  <p>The Unix Domain Socket can be accessed using the
   <code>--unix-socket</code> option of the <code>curl</code> command line
-  client, and the unix domain socket support in Apache HTTP server's
+  client, and the Unix Domain Socket support in Apache HTTP server's
   <code>mod_proxy</code> module.
   </p>
 
