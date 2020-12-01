@@ -132,6 +132,11 @@
         uses the correct setting for the secure attribute for any session
         cookies it creates. Based on a pull request by Andreas Kurth. (markt)
       </fix>
+      <fix>
+        <bug>64947</bug>: Don't assume that the <code>Upgrade</code> header has
+        been set on the <code>HttpServletResponse</code> before any call is made
+        to <code>HttpServletRequest.upgrade()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
