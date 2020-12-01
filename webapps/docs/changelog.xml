@@ -136,6 +136,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <update>
+        The APR/Native Connectors for both HTTP and AJP have been deprecated and
+        will be removed in Apache Tomcat 10.1.x onwards. (markt)
+      </update>
       <fix>
         <bug>64944</bug>: Ensure that the bytesSent metric is correctly updated
         when compression is enabled. (markt)

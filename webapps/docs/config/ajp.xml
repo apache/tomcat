@@ -36,6 +36,9 @@
 
 <section name="Introduction">
 
+  <p><strong>Note: The APR/Native AJP Connector is deprecated and will be
+  removed in Tomcat 10.1.x onwards.</strong></p>
+
   <p>The <strong>AJP Connector</strong> element represents a
   <strong>Connector</strong> component that communicates with a web
   connector via the <code>AJP</code> protocol.  This is used for cases
@@ -200,7 +203,7 @@
         <code>org.apache.coyote.ajp.AjpNio2Protocol</code>
         - non blocking Java NIO2 connector.<br/>
         <code>org.apache.coyote.ajp.AjpAprProtocol</code>
-        - the APR/native connector.<br/>
+        - the APR/native connector (deprecated - will be removed in 10.1.x).<br/>
         Custom implementations may also be used.<br/>
         Take a look at our <a href="#Connector_Comparison">Connector
         Comparison</a> chart.
@@ -793,6 +796,9 @@
 
   <subsection name="APR/native specific configuration">
 
+    <p><strong>Note: The APR/Native AJP Connector is deprecated and will be
+    removed in Tomcat 10.1.x onwards.</strong></p>
+
     <p>The APR/native implementation supports the following attributes in
     addition to the common Connector and AJP attributes listed above.</p>
 
@@ -853,7 +859,7 @@
         <th />
         <th style="text-align: center;">Java Nio Connector<br />NIO</th>
         <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
-        <th style="text-align: center;">APR/native Connector<br />APR</th>
+        <th style="text-align: center;">APR/native Connector<br />APR<br />(deprecated)</th>
       </tr>
       <tr>
         <th>Classname</th>

@@ -36,6 +36,9 @@
 
 <section name="Introduction">
 
+  <p><strong>Note: The APR/Native HTTP Connector is deprecated and will be
+  removed in Tomcat 10.1.x onwards.</strong></p>
+
   <p>The <strong>HTTP Connector</strong> element represents a
   <strong>Connector</strong> component that supports the HTTP/1.1 protocol.
   It enables Catalina to function as a stand-alone web server, in addition
@@ -227,7 +230,7 @@
         <code>org.apache.coyote.http11.Http11Nio2Protocol</code> -
               non blocking Java NIO2 connector<br/>
         <code>org.apache.coyote.http11.Http11AprProtocol</code> -
-              the APR/native connector.<br/>
+              the APR/native connector (deprecated - will be removed in 10.1.x).<br/>
         Custom implementations may also be used.<br/>
         Take a look at our <a href="#Connector_Comparison">Connector
         Comparison</a> chart. The configuration for both Java connectors is
@@ -984,6 +987,9 @@
 
   <subsection name="APR/native specific configuration">
 
+    <p><strong>Note: The APR/Native HTTP Connector is deprecated and will be
+    removed in Tomcat 10.1.x onwards.</strong></p>
+
     <p>The following attributes are specific to the APR/native connector.</p>
 
     <attributes>
@@ -1624,7 +1630,7 @@
         <th />
         <th style="text-align: center;">Java Nio Connector<br />NIO</th>
         <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
-        <th style="text-align: center;">APR/native Connector<br />APR</th>
+        <th style="text-align: center;">APR/native Connector<br />APR<br />(deprecated)</th>
       </tr>
       <tr>
         <th>Classname</th>

@@ -119,8 +119,7 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
 <li><a href="logging.html"><strong>Logging</strong></a> -
     Configuring logging in Apache Tomcat.</li>
 <li><a href="apr.html"><strong>Apache Portable Runtime</strong></a> -
-    Using APR to provide superior performance, scalability and better
-    integration with native server technologies.</li>
+    Using APR to provide access to OpenSSL for TLS support.</li>
 <li><a href="virtual-hosting-howto.html"><strong>Virtual Hosting</strong></a> -
     Configuring virtual hosting in Apache Tomcat.</li>
 <li><a href="aio.html"><strong>Advanced IO</strong></a> -
