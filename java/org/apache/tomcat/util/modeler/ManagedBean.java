@@ -559,7 +559,7 @@ public class ManagedBean implements java.io.Serializable {
     private String createOperationKey(OperationInfo operation) {
         StringBuilder key = new StringBuilder(operation.getName());
         key.append('(');
-        StringUtils.join(operation.getSignature(), ',', (x) -> x.getType(), key);
+        StringUtils.join(operation.getSignature(), ',', FeatureInfo::getType, key);
         key.append(')');
 
         return key.toString().intern();
