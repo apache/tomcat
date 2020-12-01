@@ -1839,7 +1839,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
 
         public long getRoundTripTimeNano() {
-            return (long) roundTripTimes.stream().mapToLong(x -> x.longValue()).average().orElse(0);
+            return (long) roundTripTimes.stream().mapToLong(Long::longValue).average().orElse(0);
         }
     }
 
