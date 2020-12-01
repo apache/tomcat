@@ -23,6 +23,8 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -360,10 +362,16 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
 
         if (family == Socket.APR_UNIX) {
-            java.io.File file = getPath().toFile();
-            file.setReadable(true, false);
-            file.setWritable(true, false);
-            file.setExecutable(false, false);
+            FileAttribute<Set<?>> attrs = getPathPermissions();
+            if (attrs != null) {
+                Files.setAttribute(getPath(), attrs.name(), attrs.value());
+            }
+            else {
+                java.io.File file = getPath().toFile();
+                file.setReadable(true, false);
+                file.setWritable(true, false);
+                file.setExecutable(false, false);
+            }
         } else {
             if (OS.IS_WIN32 || OS.IS_WIN64) {
                 // On Windows set the reuseaddr flag after the bind/listen

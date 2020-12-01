@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Hashtable;
 
 import org.apache.juli.logging.Log;
@@ -149,7 +150,20 @@ public final class IntrospectionUtils {
                             ok = false;
                         }
                         if (actualMethod != null) {
-                            actualMethod.append(method.getName()).append("(InetAddress.getByName(\"").append(value).append("\"))");
+                            actualMethod.append(method.getName()).append("(Paths.get(\"").append(value).append("\"))");
+                        }
+                        // Try a setFoo ( FileAttribute )
+                    } else if ("java.nio.file.attribute.FileAttribute".equals(paramType
+                            .getName())) {
+                        try {
+                        	params[0] = PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString(value));
+                        } catch (IllegalArgumentException iae) {
+                            if (log.isDebugEnabled())
+                                log.debug("IntrospectionUtils: Unable to resolve file attribute [" + value + "]");
+                            ok = false;
+                        }
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString(\"").append(value).append("\")))");
                         }
                         // Unknown type
                     } else {

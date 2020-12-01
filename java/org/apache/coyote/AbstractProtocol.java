@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -284,6 +285,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public Path getPath() { return endpoint.getPath(); }
     public void setPath(Path f) {
         endpoint.setPath(f);
+    }
+
+    public FileAttribute<Set<?>> getPathPermissions() { return endpoint.getPathPermissions(); }
+    public void setPathPermissions(FileAttribute<Set<?>> perms) {
+        endpoint.setPathPermissions(perms);
     }
 
     public int getPort() { return endpoint.getPort(); }

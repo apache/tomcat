@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -575,6 +576,14 @@ public abstract class AbstractEndpoint<S,U> {
     private Path path;
     public Path getPath() { return path; }
     public void setPath(Path path) { this.path = path; }
+
+
+    /**
+     * Permissions for the unix domain socket.
+     */
+    private FileAttribute<Set<?>> pathPermissions;
+    public FileAttribute<Set<?>> getPathPermissions() { return pathPermissions; }
+    public void setPathPermissions(FileAttribute<Set<?>> pathPermissions) { this.pathPermissions = pathPermissions; }
 
 
     /**
