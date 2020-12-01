@@ -46,6 +46,8 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
         wrapper.setWriteTimeout(INFINITE_TIMEOUT);
 
         internalHttpUpgradeHandler.setSocketWrapper(wrapper);
+
+        // HTTP/2 uses RequestInfo objects so does not provide upgradeInfo
         UpgradeInfo upgradeInfo = internalHttpUpgradeHandler.getUpgradeInfo();
         if (upgradeInfo != null && upgradeGroupInfo != null) {
             upgradeInfo.setGroupInfo(upgradeGroupInfo);
