@@ -324,7 +324,7 @@ Number number(): {
         t = <NUMBER_DECIMAL>
         {
             if (nativeNumbers) {
-                return new Long(t.image);
+                return Long.valueOf(t.image);
             } else {
                 return new java.math.BigDecimal(t.image);
             }
@@ -333,7 +333,7 @@ Number number(): {
         t = <NUMBER_INTEGER>
         {
             if (nativeNumbers) {
-                return new Double(t.image);
+                return Double.valueOf(t.image);
             } else {
                 return new java.math.BigInteger(substringBefore(t.image, '.'));
             }
