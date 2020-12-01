@@ -138,14 +138,10 @@ public final class ApplicationFilterChain implements FilterChain {
             final ServletResponse res = response;
             try {
                 java.security.AccessController.doPrivileged(
-                    new java.security.PrivilegedExceptionAction<Void>() {
-                        @Override
-                        public Void run()
-                            throws ServletException, IOException {
+                        (java.security.PrivilegedExceptionAction<Void>) () -> {
                             internalDoFilter(req,res);
                             return null;
                         }
-                    }
                 );
             } catch( PrivilegedActionException pe) {
                 Exception e = pe.getException();
