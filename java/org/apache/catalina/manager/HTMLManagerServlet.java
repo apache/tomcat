@@ -957,7 +957,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     orderBy = "DESC";
                 }
                 try {
-                    Collections.sort(sessions, comparator);
+                    sessions.sort(comparator);
                 } catch (IllegalStateException ise) {
                     // at least 1 of the sessions is invalidated
                     req.setAttribute(APPLICATION_ERROR, "Can't sort session list: one session is invalidated");
