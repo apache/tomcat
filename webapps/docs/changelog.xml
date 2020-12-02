@@ -137,6 +137,10 @@
         been set on the <code>HttpServletResponse</code> before any call is made
         to <code>HttpServletRequest.upgrade()</code>. (markt)
       </fix>
+      <fix>
+        Ensure that values are not duplicated when manipulating the vary header.
+        Based on a pull request by Fredrik Fall. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
