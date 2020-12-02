@@ -150,6 +150,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <scode>
+        Start all core threads when starting the receiver and dispatch
+        interceptor. (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
