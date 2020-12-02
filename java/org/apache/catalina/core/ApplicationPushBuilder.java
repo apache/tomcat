@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -147,13 +146,7 @@ public class ApplicationPushBuilder implements PushBuilder {
             if (responseCookie.getMaxAge() < 0) {
                 // Path information not available so can only remove based on
                 // name.
-                Iterator<Cookie> cookieIterator = cookies.iterator();
-                while (cookieIterator.hasNext()) {
-                    Cookie cookie = cookieIterator.next();
-                    if (cookie.getName().equals(responseCookie.getName())) {
-                        cookieIterator.remove();
-                    }
-                }
+                cookies.removeIf(cookie -> cookie.getName().equals(responseCookie.getName()));
             } else {
                 cookies.add(new Cookie(responseCookie.getName(), responseCookie.getValue()));
             }
