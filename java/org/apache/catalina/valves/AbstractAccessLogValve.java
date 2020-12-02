@@ -408,25 +408,14 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Thread local date format cache.
      */
     private static final ThreadLocal<DateFormatCache> localDateCache =
-            new ThreadLocal<DateFormatCache>() {
-        @Override
-        protected DateFormatCache initialValue() {
-            return new DateFormatCache(localCacheSize, Locale.getDefault(), globalDateCache);
-        }
-    };
+            ThreadLocal.withInitial(() -> new DateFormatCache(localCacheSize, Locale.getDefault(), globalDateCache));
 
 
     /**
      * The system time when we last updated the Date that this valve
      * uses for log lines.
      */
-    private static final ThreadLocal<Date> localDate =
-            new ThreadLocal<Date>() {
-        @Override
-        protected Date initialValue() {
-            return new Date();
-        }
-    };
+    private static final ThreadLocal<Date> localDate = ThreadLocal.withInitial(Date::new);
 
     /**
      * Are we doing conditional logging. default null.
