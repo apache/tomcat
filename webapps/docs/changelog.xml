@@ -147,6 +147,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>64951</bug>: Fix a potential file descriptor leak when WebSocket
+        connections are attempted and fail. Patch provided by Maurizio Adami.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
