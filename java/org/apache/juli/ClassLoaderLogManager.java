@@ -52,12 +52,7 @@ public class ClassLoaderLogManager extends LogManager {
 
     private static final boolean isJava9;
 
-    private static ThreadLocal<Boolean> addingLocalRootLogger = new ThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-            return Boolean.FALSE;
-        }
-    };
+    private static ThreadLocal<Boolean> addingLocalRootLogger = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     public static final String DEBUG_PROPERTY =
             ClassLoaderLogManager.class.getName() + ".debug";

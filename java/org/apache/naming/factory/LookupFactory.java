@@ -41,13 +41,7 @@ public class LookupFactory implements ObjectFactory {
     private static final Log log = LogFactory.getLog(LookupFactory.class);
     private static final StringManager sm = StringManager.getManager(LookupFactory.class);
 
-    private static final ThreadLocal<Set<String>> names = new ThreadLocal<Set<String>>() {
-
-        @Override
-        protected Set<String> initialValue() {
-            return new HashSet<>();
-        }
-    };
+    private static final ThreadLocal<Set<String>> names = ThreadLocal.withInitial(HashSet::new);
 
     /**
      * Create a new Resource env instance.

@@ -83,14 +83,7 @@ public class CoyoteAdapter implements Adapter {
 
 
     private static final ThreadLocal<String> THREAD_NAME =
-            new ThreadLocal<String>() {
-
-                @Override
-                protected String initialValue() {
-                    return Thread.currentThread().getName();
-                }
-
-    };
+            ThreadLocal.withInitial(() -> Thread.currentThread().getName());
 
     // ----------------------------------------------------------- Constructors
 
