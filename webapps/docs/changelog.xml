@@ -127,6 +127,10 @@
         the return value of <code>ServletRequest.getRemoteAddr()</code> rather
         than always returning a value for the proxy. (markt)
       </fix>
+      <fix>
+        Ensure that values are not duplicated when manipulating the vary header.
+        Based on a pull request by Fredrik Fall. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
