@@ -74,7 +74,7 @@ public class Cookie implements Cloneable, Serializable {
         } else {
             strictServletCompliance = AccessController.doPrivileged(
                     (PrivilegedAction<Boolean>) () -> Boolean.valueOf(System.getProperty(
-                            "org.apache.catalina.STRICT_SERVLET_COMPLIANCE")));
+                            "org.apache.catalina.STRICT_SERVLET_COMPLIANCE"))).booleanValue();
             propStrictNaming = AccessController.doPrivileged(
                     (PrivilegedAction<String>) () -> System.getProperty(
                             "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING"));
