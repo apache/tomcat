@@ -305,13 +305,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         boolean success = false;
         List<Extension> extensionsAgreed = new ArrayList<>();
         Transformation transformation = null;
-
-        // Open the connection
-        Future<Void> fConnect = socketChannel.connect(sa);
         AsyncChannelWrapper channel = null;
 
-        if (proxyConnect != null) {
-            try {
+        try {
+            // Open the connection
+            Future<Void> fConnect = socketChannel.connect(sa);
+
+            if (proxyConnect != null) {
                 fConnect.get(timeout, TimeUnit.MILLISECONDS);
                 // Proxy CONNECT is clear text
                 channel = new AsyncChannelWrapperNonSecure(socketChannel);
@@ -322,29 +322,20 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                             "wsWebSocketContainer.proxyConnectFail", selectedProxy,
                             Integer.toString(httpResponse.getStatus())));
                 }
-            } catch (TimeoutException | InterruptedException | ExecutionException |
-                    EOFException e) {
-                if (channel != null) {
-                    channel.close();
-                }
-                throw new DeploymentException(
-                        sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
             }
-        }
 
-        if (secure) {
-            // Regardless of whether a non-secure wrapper was created for a
-            // proxy CONNECT, need to use TLS from this point on so wrap the
-            // original AsynchronousSocketChannel
-            SSLEngine sslEngine = createSSLEngine(userProperties, host, port);
-            channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
-        } else if (channel == null) {
-            // Only need to wrap as this point if it wasn't wrapped to process a
-            // proxy CONNECT
-            channel = new AsyncChannelWrapperNonSecure(socketChannel);
-        }
+            if (secure) {
+                // Regardless of whether a non-secure wrapper was created for a
+                // proxy CONNECT, need to use TLS from this point on so wrap the
+                // original AsynchronousSocketChannel
+                SSLEngine sslEngine = createSSLEngine(userProperties, host, port);
+                channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
+            } else if (channel == null) {
+                // Only need to wrap as this point if it wasn't wrapped to process a
+                // proxy CONNECT
+                channel = new AsyncChannelWrapperNonSecure(socketChannel);
+            }
 
-        try {
             fConnect.get(timeout, TimeUnit.MILLISECONDS);
 
             Future<Void> fHandshake = channel.handshake();
@@ -500,7 +491,15 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             throw new DeploymentException(sm.getString("wsWebSocketContainer.httpRequestFailed", path), e);
         } finally {
             if (!success) {
-                channel.close();
+                if (channel != null) {
+                    channel.close();
+                } else {
+                    try {
+                        socketChannel.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                }
             }
         }
 
