@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -121,15 +123,24 @@ public class TestResponseUtil {
 
 
     @Test
-    public void testAddValidWithValidHeadersAlreadyPresent() {
+    public void testAddValidWithValidHeadersAlreadyPresentNoDuplicates() {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
         response.addHeader("vary", "foo");
         response.addHeader("vary", "bar");
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("bar");
         expected.add("foo");
-        doTestAddVaryFieldName(response, "foo", expected);
+
+        ResponseUtil.addVaryFieldName(response, "foo");
+
+        String resultHeader = response.getHeader("vary");
+        List<String> result = new ArrayList<>();
+        for (String value : resultHeader.split(",")) {
+            result.add(value.trim());
+        }
+
+        Assert.assertEquals(expected, result);
     }
 
 

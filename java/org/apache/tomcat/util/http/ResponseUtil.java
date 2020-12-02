@@ -95,13 +95,15 @@ public class ResponseUtil {
 
         // Build single header to replace current multiple headers
         // Replace existing header(s) to ensure any invalid values are removed
-        fieldNames.add(name);
-        StringBuilder varyHeader = new StringBuilder();
-        varyHeader.append(name);
-        for (String fieldName : fieldNames) {
-            varyHeader.append(',');
-            varyHeader.append(fieldName);
+        if (!fieldNames.contains(name)) {
+            fieldNames.add(name);
         }
+        StringBuilder varyHeader = new StringBuilder();
+        for (String fieldName : fieldNames) {
+            varyHeader.append(fieldName);
+            varyHeader.append(',');
+        }
+        varyHeader.deleteCharAt(varyHeader.length() - 1);
         adapter.setHeader(VARY_HEADER, varyHeader.toString());
     }
 
