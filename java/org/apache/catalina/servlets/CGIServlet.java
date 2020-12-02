@@ -1666,12 +1666,7 @@ public final class CGIServlet extends HttpServlet {
                     (new InputStreamReader(proc.getErrorStream()));
                 final BufferedReader stdErrRdr = commandsStdErr ;
 
-                errReaderThread = new Thread() {
-                    @Override
-                    public void run () {
-                        sendToLog(stdErrRdr);
-                    }
-                };
+                errReaderThread = new Thread(() -> sendToLog(stdErrRdr));
                 errReaderThread.start();
 
                 InputStream cgiHeaderStream =

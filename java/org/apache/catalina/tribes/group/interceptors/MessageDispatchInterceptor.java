@@ -97,13 +97,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
 
     public boolean addToQueue(final ChannelMessage msg, final Member[] destination,
             final InterceptorPayload payload) {
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                sendAsyncData(msg, destination, payload);
-            }
-        };
-        executor.execute(r);
+        executor.execute(() -> sendAsyncData(msg, destination, payload));
         return true;
     }
 

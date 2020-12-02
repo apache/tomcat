@@ -579,12 +579,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         endpoint.start();
         monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!isPaused()) {
-                            startAsyncTimeout();
-                        }
+                () -> {
+                    if (!isPaused()) {
+                        startAsyncTimeout();
                     }
                 }, 0, 60, TimeUnit.SECONDS);
     }
@@ -606,13 +603,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 }
             }
             timeoutFuture = getUtilityExecutor().scheduleAtFixedRate(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            long now = System.currentTimeMillis();
-                            for (Processor processor : waitingProcessors) {
-                                processor.timeoutAsync(now);
-                            }
+                    () -> {
+                        long now = System.currentTimeMillis();
+                        for (Processor processor : waitingProcessors) {
+                            processor.timeoutAsync(now);
                         }
                     }, 1, 1, TimeUnit.SECONDS);
         }
