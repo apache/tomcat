@@ -206,19 +206,16 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             acceptor.stop(10);
             // Use the executor to avoid binding the main thread if something bad
             // occurs and unbind will also wait for a bit for it to complete
-            getExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    // Then close all active connections if any remain
-                    try {
-                        for (SocketWrapperBase<Nio2Channel> wrapper : getConnections()) {
-                            wrapper.close();
-                        }
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                    } finally {
-                        allClosed = true;
+            getExecutor().execute(() -> {
+                // Then close all active connections if any remain
+                try {
+                    for (SocketWrapperBase<Nio2Channel> wrapper : getConnections()) {
+                        wrapper.close();
                     }
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                } finally {
+                    allClosed = true;
                 }
             });
             if (nioChannels != null) {

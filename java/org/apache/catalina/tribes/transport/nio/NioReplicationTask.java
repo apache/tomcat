@@ -252,27 +252,24 @@ public class NioReplicationTask extends AbstractRxTask {
             log.trace("Adding key for read event:"+key);
         reader.finish();
         //register our OP_READ interest
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (key.isValid()) {
-                        // cycle the selector so this key is active again
-                        key.selector().wakeup();
-                        // resume interest in OP_READ, OP_WRITE
-                        int resumeOps = key.interestOps() | SelectionKey.OP_READ;
-                        key.interestOps(resumeOps);
-                        if ( log.isTraceEnabled() )
-                            log.trace("Registering key for read:"+key);
-                    }
-                } catch (CancelledKeyException ckx ) {
-                    NioReceiver.cancelledKey(key);
+        Runnable r = () -> {
+            try {
+                if (key.isValid()) {
+                    // cycle the selector so this key is active again
+                    key.selector().wakeup();
+                    // resume interest in OP_READ, OP_WRITE
+                    int resumeOps = key.interestOps() | SelectionKey.OP_READ;
+                    key.interestOps(resumeOps);
                     if ( log.isTraceEnabled() )
-                        log.trace("CKX Cancelling key:"+key);
-
-                } catch (Exception x) {
-                    log.error(sm.getString("nioReplicationTask.error.register.key", key),x);
+                        log.trace("Registering key for read:"+key);
                 }
+            } catch (CancelledKeyException ckx ) {
+                NioReceiver.cancelledKey(key);
+                if ( log.isTraceEnabled() )
+                    log.trace("CKX Cancelling key:"+key);
+
+            } catch (Exception x) {
+                log.error(sm.getString("nioReplicationTask.error.register.key", key),x);
             }
         };
         receiver.addEvent(r);
@@ -287,14 +284,11 @@ public class NioReplicationTask extends AbstractRxTask {
             reader.setCancelled(true);
             reader.finish();
         }
-        Runnable cx = new Runnable() {
-            @Override
-            public void run() {
-                if ( log.isTraceEnabled() )
-                    log.trace("Cancelling key:"+key);
+        Runnable cx = () -> {
+            if ( log.isTraceEnabled() )
+                log.trace("Cancelling key:"+key);
 
-                NioReceiver.cancelledKey(key);
-            }
+            NioReceiver.cancelledKey(key);
         };
         receiver.addEvent(cx);
     }

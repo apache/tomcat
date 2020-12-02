@@ -157,16 +157,13 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
     protected void memberAdded(Member member) {
         Member mbr = setupMember(member);
         if(membership.memberAlive(mbr)) {
-            Runnable r = new Runnable() {
-                @Override
-                public void run(){
-                    String name = Thread.currentThread().getName();
-                    try {
-                        Thread.currentThread().setName("StaticMembership-memberAdded");
-                        membershipListener.memberAdded(mbr);
-                    } finally {
-                        Thread.currentThread().setName(name);
-                    }
+            Runnable r = () -> {
+                String name = Thread.currentThread().getName();
+                try {
+                    Thread.currentThread().setName("StaticMembership-memberAdded");
+                    membershipListener.memberAdded(mbr);
+                } finally {
+                    Thread.currentThread().setName(name);
                 }
             };
             executor.execute(r);
@@ -175,16 +172,13 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
 
     protected void memberDisappeared(Member member) {
         membership.removeMember(member);
-        Runnable r = new Runnable() {
-            @Override
-            public void run(){
-                String name = Thread.currentThread().getName();
-                try {
-                    Thread.currentThread().setName("StaticMembership-memberDisappeared");
-                    membershipListener.memberDisappeared(member);
-                } finally {
-                    Thread.currentThread().setName(name);
-                }
+        Runnable r = () -> {
+            String name = Thread.currentThread().getName();
+            try {
+                Thread.currentThread().setName("StaticMembership-memberDisappeared");
+                membershipListener.memberDisappeared(member);
+            } finally {
+                Thread.currentThread().setName(name);
             }
         };
         executor.execute(r);

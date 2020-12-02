@@ -131,16 +131,13 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
                 if (log.isDebugEnabled()) {
                     log.debug("Member added: " + member);
                 }
-                Runnable r = new Runnable() {
-                    @Override
-                    public void run(){
-                        String name = Thread.currentThread().getName();
-                        try {
-                            Thread.currentThread().setName("CloudMembership-memberAdded");
-                            membershipListener.memberAdded(member);
-                        } finally {
-                            Thread.currentThread().setName(name);
-                        }
+                Runnable r = () -> {
+                    String name = Thread.currentThread().getName();
+                    try {
+                        Thread.currentThread().setName("CloudMembership-memberAdded");
+                        membershipListener.memberAdded(member);
+                    } finally {
+                        Thread.currentThread().setName(name);
                     }
                 };
                 executor.execute(r);
@@ -152,16 +149,13 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
             if (log.isDebugEnabled()) {
                 log.debug("Member disappeared: " + member);
             }
-            Runnable r = new Runnable() {
-                @Override
-                public void run(){
-                    String name = Thread.currentThread().getName();
-                    try {
-                        Thread.currentThread().setName("CloudMembership-memberDisappeared");
-                        membershipListener.memberDisappeared(member);
-                    } finally {
-                        Thread.currentThread().setName(name);
-                    }
+            Runnable r = () -> {
+                String name = Thread.currentThread().getName();
+                try {
+                    Thread.currentThread().setName("CloudMembership-memberDisappeared");
+                    membershipListener.memberDisappeared(member);
+                } finally {
+                    Thread.currentThread().setName(name);
                 }
             };
             executor.execute(r);
