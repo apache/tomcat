@@ -87,7 +87,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
     private final Set<Processor> waitingProcessors =
-            Collections.newSetFromMap(new ConcurrentHashMap<Processor, Boolean>());
+            Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * Controller for the timeout scheduling.

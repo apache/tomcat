@@ -459,11 +459,11 @@ public class TestUtil {
 
     @Test(expected=IllegalArgumentException.class)
     public void testParseExtensionHeaderInvalid01() {
-        Util.parseExtensionHeader(new ArrayList<Extension>(), "ext;a=\"1;b=2");
+        Util.parseExtensionHeader(new ArrayList<>(), "ext;a=\"1;b=2");
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testParseExtensionHeaderInvalid02() {
-        Util.parseExtensionHeader(new ArrayList<Extension>(), "ext;a=1\";b=2");
+        Util.parseExtensionHeader(new ArrayList<>(), "ext;a=1\";b=2");
     }
 }
