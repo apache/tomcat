@@ -111,7 +111,7 @@ public class TestResolverSSL extends TomcatBaseTest {
             "SSL_SRP_USERINFO",
             "SSL_TLS_SNI" };
 
-    public class ResolverTestValve extends ValveBase {
+    public static class ResolverTestValve extends ValveBase {
 
         @Override
         public void invoke(Request request, Response response)
