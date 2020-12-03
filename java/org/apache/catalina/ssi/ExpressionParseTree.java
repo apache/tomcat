@@ -209,7 +209,7 @@ public class ExpressionParseTree {
     /**
      * A node in the expression parse tree.
      */
-    private abstract class Node {
+    private static abstract class Node {
         /**
          * @return {@code true} if the node evaluates to true.
          */
@@ -262,7 +262,7 @@ public class ExpressionParseTree {
     /**
      * A node implementation that represents an operation.
      */
-    private abstract class OppNode extends Node {
+    private static abstract class OppNode extends Node {
         /**
          * The left branch.
          */
@@ -291,7 +291,7 @@ public class ExpressionParseTree {
             left = values.remove(0);
         }
     }
-    private final class NotNode extends OppNode {
+    private static final class NotNode extends OppNode {
         @Override
         public boolean evaluate() {
             return !left.evaluate();
@@ -318,7 +318,7 @@ public class ExpressionParseTree {
             return left + " NOT";
         }
     }
-    private final class AndNode extends OppNode {
+    private static final class AndNode extends OppNode {
         @Override
         public boolean evaluate() {
             if (!left.evaluate()) // Short circuit
@@ -338,7 +338,7 @@ public class ExpressionParseTree {
             return left + " " + right + " AND";
         }
     }
-    private final class OrNode extends OppNode {
+    private static final class OrNode extends OppNode {
         @Override
         public boolean evaluate() {
             if (left.evaluate()) // Short circuit

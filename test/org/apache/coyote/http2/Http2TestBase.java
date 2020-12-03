@@ -584,7 +584,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         }
     }
 
-    private class UpgradableHttp2Protocol extends Http2Protocol {
+    private static class UpgradableHttp2Protocol extends Http2Protocol {
         @Override
         public String getHttpUpgradeName(boolean isSSLEnabled) {
             return "h2c";
