@@ -80,9 +80,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
         if (!isClosed()) {
             try {
                 pool.returnObject(key, this);
-            } catch (final SQLException e) {
-                throw e;
-            } catch (final RuntimeException e) {
+            } catch (final SQLException | RuntimeException e) {
                 throw e;
             } catch (final Exception e) {
                 throw new SQLException("Cannot close CallableStatement (return to pool failed)", e);

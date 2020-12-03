@@ -142,9 +142,7 @@ public class TestRequestFilterValve {
         // TEST
         try {
             valve.invoke(request, response);
-        } catch (IOException ex) {
-            //Ignore
-        } catch (ServletException ex) {
+        } catch (IOException | ServletException ex) {
             //Ignore
         }
 

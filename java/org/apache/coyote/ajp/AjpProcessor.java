@@ -23,6 +23,7 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
@@ -1175,10 +1176,7 @@ public class AjpProcessor extends AbstractProcessor {
                         jsseCerts = temp;
                     }
                 }
-            } catch (java.security.cert.CertificateException e) {
-                getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
-                return;
-            } catch (NoSuchProviderException e) {
+            } catch (CertificateException | NoSuchProviderException e) {
                 getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
                 return;
             }
