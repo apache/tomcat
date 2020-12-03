@@ -353,9 +353,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                 try {
                     client.sendRequest();
                     client.sendRequest();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
+                } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
             }

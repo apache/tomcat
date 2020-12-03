@@ -916,10 +916,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         } catch (final NoSuchElementException e) {
             closeDueToException(info);
             throw new SQLException("Cannot borrow connection from pool", e);
-        } catch (final RuntimeException e) {
-            closeDueToException(info);
-            throw e;
-        } catch (final SQLException e) {
+        } catch (final RuntimeException | SQLException e) {
             closeDueToException(info);
             throw e;
         } catch (final Exception e) {
@@ -956,10 +953,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
                 } catch (final NoSuchElementException e) {
                     closeDueToException(info);
                     throw new SQLException("Cannot borrow connection from pool", e);
-                } catch (final RuntimeException e) {
-                    closeDueToException(info);
-                    throw e;
-                } catch (final SQLException e) {
+                } catch (final RuntimeException | SQLException e) {
                     closeDueToException(info);
                     throw e;
                 } catch (final Exception e) {

@@ -245,10 +245,8 @@ public final class AstValue extends SimpleNode {
         Object result = null;
         try {
             result = m.invoke(t.base, values);
-        } catch (IllegalAccessException iae) {
-            throw new ELException(iae);
-        } catch (IllegalArgumentException iae) {
-            throw new ELException(iae);
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            throw new ELException(e);
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
             if (cause instanceof ThreadDeath) {
