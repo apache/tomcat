@@ -328,11 +328,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         try {
             boolean precompile = preCompile(request);
             serviceJspFile(request, response, jspUri, precompile);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (ServletException e) {
-            throw e;
-        } catch (IOException e) {
+        } catch (RuntimeException | IOException | ServletException e) {
             throw e;
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);

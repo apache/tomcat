@@ -832,9 +832,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                                         f.getName().endsWith(".jar")) {
                                     ExtensionValidator.addSystemResource(f);
                                 }
-                            } catch (URISyntaxException e) {
-                                // Ignore
-                            } catch (IOException e) {
+                            } catch (URISyntaxException | IOException e) {
                                 // Ignore
                             }
                         }

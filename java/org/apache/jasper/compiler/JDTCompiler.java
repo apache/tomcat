@@ -46,6 +46,7 @@ import org.eclipse.jdt.internal.compiler.ICompilerRequestor;
 import org.eclipse.jdt.internal.compiler.IErrorHandlingPolicy;
 import org.eclipse.jdt.internal.compiler.IProblemFactory;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
+import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
@@ -230,9 +231,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                             ClassFileReader classFileReader = new ClassFileReader(classBytes, fileName, true);
                             return new NameEnvironmentAnswer(classFileReader, null);
                         }
-                    } catch (IOException exc) {
-                        log.error("Compilation error", exc);
-                    } catch (org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException exc) {
+                    } catch (IOException | ClassFormatException exc) {
                         log.error("Compilation error", exc);
                     }
                     return null;

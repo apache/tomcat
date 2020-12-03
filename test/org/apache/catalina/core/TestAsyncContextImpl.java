@@ -302,9 +302,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                             result.append("false");
                         }
                         done = true;
-                    } catch (InterruptedException e) {
-                        result.append(e);
-                    } catch (IOException e) {
+                    } catch (InterruptedException | IOException e) {
                         result.append(e);
                     }
                 }
@@ -380,9 +378,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                                     result.append("false");
                                 }
                                 done = true;
-                            } catch (InterruptedException e) {
-                                result.append(e);
-                            } catch (IOException e) {
+                            } catch (InterruptedException | IOException e) {
                                 result.append(e);
                             }
                         }

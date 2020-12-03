@@ -546,11 +546,7 @@ public class WebdavServlet extends DefaultServlet {
                         break;
                     }
                 }
-            } catch (SAXException e) {
-                // Something went wrong - bad request
-                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
-                return;
-            } catch (IOException e) {
+            } catch (SAXException | IOException e) {
                 // Something went wrong - bad request
                 resp.sendError(WebdavStatus.SC_BAD_REQUEST);
                 return;
@@ -980,9 +976,7 @@ public class WebdavServlet extends DefaultServlet {
             // Get the root element of the document
             Element rootElement = document.getDocumentElement();
             lockInfoNode = rootElement;
-        } catch (IOException e) {
-            lockRequestType = LOCK_REFRESH;
-        } catch (SAXException e) {
+        } catch (IOException | SAXException e) {
             lockRequestType = LOCK_REFRESH;
         }
 

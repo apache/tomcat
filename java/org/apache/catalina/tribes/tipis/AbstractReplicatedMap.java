@@ -539,11 +539,7 @@ public abstract class AbstractReplicatedMap<K,V>
                     log.warn(sm.getString("abstractReplicatedMap.transferState.noReplies"));
                 }
             }
-        } catch (ChannelException x) {
-            log.error(sm.getString("abstractReplicatedMap.unable.transferState"), x);
-        } catch (IOException x) {
-            log.error(sm.getString("abstractReplicatedMap.unable.transferState"), x);
-        } catch (ClassNotFoundException x) {
+        } catch (ChannelException | ClassNotFoundException | IOException x) {
             log.error(sm.getString("abstractReplicatedMap.unable.transferState"), x);
         }
         this.state = State.STATETRANSFERRED;
@@ -642,9 +638,7 @@ public abstract class AbstractReplicatedMap<K,V>
                     log.info(sm.getString("abstractReplicatedMap.leftOver.ignored",
                             mapmsg.getTypeDesc()));
             }
-        } catch (IOException x ) {
-            log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"),x);
-        } catch (ClassNotFoundException x ) {
+        } catch (IOException | ClassNotFoundException x) {
             log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"),x);
         }
     }
@@ -661,10 +655,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
         try {
             mapmsg.deserialize(getExternalLoaders());
-        } catch (IOException x) {
-            log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"), x);
-            return;
-        } catch (ClassNotFoundException x) {
+        } catch (IOException | ClassNotFoundException x) {
             log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"), x);
             return;
         }
