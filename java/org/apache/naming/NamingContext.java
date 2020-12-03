@@ -74,7 +74,7 @@ public class NamingContext implements Context {
      * @param name The name of the associated Catalina Context
      */
     public NamingContext(Hashtable<String,Object> env, String name) {
-        this(env, name, new HashMap<String,NamingEntry>());
+        this(env, name, new HashMap<>());
     }
 
 

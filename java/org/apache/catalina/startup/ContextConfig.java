@@ -1847,7 +1847,7 @@ public class ContextConfig implements LifecycleListener {
         }
 
         for (ServletContainerInitializer sci : detectedScis) {
-            initializerClassMap.put(sci, new HashSet<Class<?>>());
+            initializerClassMap.put(sci, new HashSet<>());
 
             HandlesTypes ht;
             try {
