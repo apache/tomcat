@@ -281,7 +281,7 @@ public class TestSsl extends TomcatBaseTest {
         }
     }
 
-    public class SimplePostServlet extends HttpServlet {
+    public static class SimplePostServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
