@@ -213,7 +213,7 @@ public class ExpressionParseTree {
     /**
      * A node in the expression parse tree.
      */
-    private static abstract class Node {
+    private abstract static class Node {
         /**
          * @return {@code true} if the node evaluates to true.
          */
@@ -266,7 +266,7 @@ public class ExpressionParseTree {
     /**
      * A node implementation that represents an operation.
      */
-    private static abstract class OppNode extends Node {
+    private abstract static class OppNode extends Node {
         /**
          * The left branch.
          */

@@ -25,7 +25,7 @@ import org.apache.catalina.util.URLEncoder;
 
 public class Substitution {
 
-    public static abstract class SubstitutionElement {
+    public abstract static class SubstitutionElement {
         public abstract String evaluate(Matcher rule, Matcher cond, Resolver resolver);
     }
 
