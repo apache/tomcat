@@ -1596,10 +1596,7 @@ public class Response implements HttpServletResponse {
                 redirectURLCC.append(location, 0, location.length());
                 return redirectURLCC.toString();
             } catch (IOException e) {
-                IllegalArgumentException iae =
-                    new IllegalArgumentException(location);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(location, e);
             }
 
         } else if (leadingSlash || !UriUtil.hasScheme(location)) {
@@ -1629,10 +1626,7 @@ public class Response implements HttpServletResponse {
                             encodedURI = AccessController.doPrivileged(
                                     new PrivilegedEncodeUrl(urlEncoder, relativePath, pos));
                         } catch (PrivilegedActionException pae){
-                            IllegalArgumentException iae =
-                                new IllegalArgumentException(location);
-                            iae.initCause(pae.getException());
-                            throw iae;
+                            throw new IllegalArgumentException(location, pae.getException());
                         }
                     } else {
                         encodedURI = urlEncoder.encodeURL(relativePath, 0, pos);
@@ -1645,10 +1639,7 @@ public class Response implements HttpServletResponse {
 
                 normalize(redirectURLCC);
             } catch (IOException e) {
-                IllegalArgumentException iae =
-                    new IllegalArgumentException(location);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(location, e);
             }
 
             return redirectURLCC.toString();
