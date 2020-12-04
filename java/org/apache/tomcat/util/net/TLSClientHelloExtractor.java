@@ -150,7 +150,7 @@ public class TLSClientHelloExtractor {
             // Read the extensions until we run out of data or find the data
             // we need
             while (netInBuffer.hasRemaining() && (sniValue == null ||
-                    clientRequestedApplicationProtocols.isEmpty()) || clientRequestedProtocols.isEmpty()) {
+                    clientRequestedApplicationProtocols.isEmpty() || clientRequestedProtocols.isEmpty())) {
                 // Extension type is two byte
                 char extensionType = netInBuffer.getChar();
                 // Extension size is another two bytes
