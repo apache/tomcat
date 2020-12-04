@@ -151,7 +151,8 @@ public interface SSLSupport {
      *
      * @return the list of SSL/TLS protocol versions requested by the client
      *
-     * @throws IOException
+     * @throws IOException If an error occurs trying to obtain the client
+     *   requested protocol information from the socket
      */
     public String getRequestedProtocols() throws IOException;
 
@@ -159,8 +160,8 @@ public interface SSLSupport {
     *
     * @return the list of SSL/TLS ciphers requested by the client
     *
-    * @throws IOException
+     * @throws IOException If an error occurs trying to obtain the client
+     *   request cipher information from the socket
     */
    public String getRequestedCiphers() throws IOException;
 }
-
