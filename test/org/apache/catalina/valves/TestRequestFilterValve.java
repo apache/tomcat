@@ -52,6 +52,20 @@ public class TestRequestFilterValve {
     private static final String HOST_ALLOW_AND_DENY   = "www.example.org";
     private static final String HOST_NO_ALLOW_NO_DENY = "host.example.com";
 
+    private static final String CIDR_ALLOW_PROP       = "127.0.0.0/16";
+    private static final String CIDR_DENY_PROP        = "192.168.0.0/24,127.0.0.0/24";
+    private static final String CIDR_ONLY_ALLOW       = "127.0.1.1";
+    private static final String CIDR_ONLY_DENY        = "192.168.0.1";
+    private static final String CIDR_ALLOW_AND_DENY   = "127.0.0.1";
+    private static final String CIDR_NO_ALLOW_NO_DENY = "192.168.1.1";
+
+    private static final String CIDR6_ALLOW_PROP       = "::/96";
+    private static final String CIDR6_DENY_PROP        = "::f:0:0/112,::/112";
+    private static final String CIDR6_ONLY_ALLOW       = "0:0:0:0:0:0:148f:1";
+    private static final String CIDR6_ONLY_DENY        = "0:0:0:0:0:F:0:a";
+    private static final String CIDR6_ALLOW_AND_DENY   = "0:0:0:0:0:0:0:fA8";
+    private static final String CIDR6_NO_ALLOW_NO_DENY = "1:0:0:0:0:0:0:1";
+
     private static final int PORT = 8080;
     private static final String PORT_MATCH_PATTERN    = ";\\d*";
     private static final String PORT_NO_MATCH_PATTERN = ";8081";
@@ -104,6 +118,10 @@ public class TestRequestFilterValve {
                 valve = new RemoteHostValve();
                 request.setRemoteHost(property);
                 msg.append(" host='" + property + "'");
+            } else if (type.equals("CIDR")) {
+                valve = new RemoteCIDRValve();
+                request.setRemoteAddr(property);
+                msg.append(" ip='" + property + "'");
             }
         }
         Assert.assertNotNull("Invalid test type" + type, valve);
@@ -129,8 +147,10 @@ public class TestRequestFilterValve {
                 ((RemoteAddrValve)valve).setAddConnectorPort(true);
             } else if (valve instanceof RemoteHostValve) {
                 ((RemoteHostValve)valve).setAddConnectorPort(true);
+            } else if (valve instanceof RemoteCIDRValve) {
+                ((RemoteCIDRValve)valve).setAddConnectorPort(true);
             } else {
-                Assert.fail("Can only set 'addConnectorPort' for RemoteAddrValve and RemoteHostValve");
+                Assert.fail("Can only set 'addConnectorPort' for RemoteAddrValve, RemoteHostValve and RemoteCIDRValve");
             }
             msg.append(" addConnectorPort='true'");
         }
@@ -340,5 +360,29 @@ public class TestRequestFilterValve {
                       HOST_ONLY_ALLOW, HOST_ONLY_DENY,
                       HOST_ALLOW_AND_DENY, HOST_NO_ALLOW_NO_DENY,
                       true, "Host");
+    }
+
+    @Test
+    public void testRemoteCIDRValve() {
+        standardTests(CIDR_ALLOW_PROP, CIDR_DENY_PROP,
+                      CIDR_ONLY_ALLOW, CIDR_ONLY_DENY,
+                      CIDR_ALLOW_AND_DENY, CIDR_NO_ALLOW_NO_DENY,
+                      false, "CIDR");
+        standardTests(CIDR_ALLOW_PROP, CIDR_DENY_PROP,
+                      CIDR_ONLY_ALLOW, CIDR_ONLY_DENY,
+                      CIDR_ALLOW_AND_DENY, CIDR_NO_ALLOW_NO_DENY,
+                      true, "CIDR");
+    }
+
+    @Test
+    public void testRemoteCIDR6Valve() {
+        standardTests(CIDR6_ALLOW_PROP, CIDR6_DENY_PROP,
+                      CIDR6_ONLY_ALLOW, CIDR6_ONLY_DENY,
+                      CIDR6_ALLOW_AND_DENY, CIDR6_NO_ALLOW_NO_DENY,
+                      false, "CIDR");
+        standardTests(CIDR6_ALLOW_PROP, CIDR6_DENY_PROP,
+                      CIDR6_ONLY_ALLOW, CIDR6_ONLY_DENY,
+                      CIDR6_ALLOW_AND_DENY, CIDR6_NO_ALLOW_NO_DENY,
+                      true, "CIDR");
     }
 }

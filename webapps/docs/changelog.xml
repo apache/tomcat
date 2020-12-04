@@ -111,6 +111,12 @@
         attributes that provide details of the protocols and ciphers requested
         by a client in the initial TLS handshake. (markt)
       </add>
+      <add>
+        Let the <code>RemoteCIDRValve</code> inherit from
+        <code>RequestFilterValve</code> and support all of its features.
+        Especially add support for connector specific configuration
+        using <code>addConnectorPort</code>. (rjung)
+      </add>
     </changelog>
   </subsection>
 </section>
