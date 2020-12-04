@@ -67,10 +67,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), env);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
-                IllegalArgumentException iae = new IllegalArgumentException (
-                        "Cannot create object name for environment " + env);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException ("Cannot create object name for environment " + env, e);
             }
         }
         return results.toArray(new String[0]);
@@ -90,10 +87,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), contextResource);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
-                IllegalArgumentException iae = new IllegalArgumentException(
-                        "Cannot create object name for resource " + contextResource);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException("Cannot create object name for resource " + contextResource, e);
             }
         }
         return results.toArray(new String[0]);
@@ -115,10 +109,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
                         MBeanUtils.createObjectName(managed.getDomain(), resourceLink);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
-                IllegalArgumentException iae = new IllegalArgumentException(
-                        "Cannot create object name for resource " + resourceLink);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException("Cannot create object name for resource " + resourceLink, e);
             }
         }
         return results.toArray(new String[0]);

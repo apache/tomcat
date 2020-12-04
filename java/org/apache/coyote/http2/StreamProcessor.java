@@ -101,8 +101,7 @@ class StreamProcessor extends AbstractProcessor {
                     if (log.isDebugEnabled()) {
                         log.debug(msg, e);
                     }
-                    ConnectionException ce = new ConnectionException(msg, Http2Error.INTERNAL_ERROR);
-                    ce.initCause(e);
+                    ConnectionException ce = new ConnectionException(msg, Http2Error.INTERNAL_ERROR, e);
                     stream.close(ce);
                     state = SocketState.CLOSED;
                 } finally {
