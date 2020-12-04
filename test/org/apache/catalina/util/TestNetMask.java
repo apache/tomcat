@@ -61,6 +61,9 @@ public final class TestNetMask {
         result.add(new Object[] { "ae31::27:ef2:1/-1", null, Boolean.FALSE, null });
         result.add(new Object[] { "ae31::27:ef2:1/129", null, Boolean.FALSE, null });
 
+        // Invalid port regex suffix after ";"
+        result.add(new Object[] { "1.2.3.4;[", null, Boolean.FALSE, null });
+
         // IPv4
         result.add(new Object[] { "1.2.3.4", "1.2.3.4", Boolean.TRUE, Boolean.TRUE });
 
@@ -98,6 +101,16 @@ public final class TestNetMask {
         // Mixed
         result.add(new Object[] { "10.0.0.0/22", "::1", Boolean.TRUE, Boolean.FALSE });
 
+        // port
+        result.add(new Object[] { "1.2.3.4;8080", "1.2.3.4", Boolean.TRUE, Boolean.FALSE });
+        result.add(new Object[] { "1.2.3.4", "1.2.3.4;8080", Boolean.TRUE, Boolean.FALSE });
+        result.add(new Object[] { "1.2.3.4;", "1.2.3.4;8080", Boolean.TRUE, Boolean.FALSE });
+        result.add(new Object[] { "1.2.3.4;8080", "1.2.3.4;8080", Boolean.TRUE, Boolean.TRUE });
+        result.add(new Object[] { "1.2.3.4;8080", "1.2.3.4;8009", Boolean.TRUE, Boolean.FALSE });
+        result.add(new Object[] { "1.2.3.4;.*", "1.2.3.4;8080", Boolean.TRUE, Boolean.TRUE });
+        result.add(new Object[] { "1.2.3.4;8\\d+", "1.2.3.4;8080", Boolean.TRUE, Boolean.TRUE });
+        result.add(new Object[] { "1.2.3.4;8\\d+", "1.2.3.4;9090", Boolean.TRUE, Boolean.FALSE });
+
         return result;
     }
 
@@ -109,7 +122,7 @@ public final class TestNetMask {
         try {
             netMask = new NetMask(mask);
         } catch (Exception e) {
-            exception =e;
+            exception = e;
         }
 
         if (valid.booleanValue()) {
@@ -122,15 +135,32 @@ public final class TestNetMask {
             return;
         }
 
+        final int portIdx = input.indexOf(";");
+        final boolean usePort = portIdx >= 0 || mask.indexOf(";") >= 0;
+        final int port;
+        final String nonPortPart;
+
+        if (portIdx == -1) {
+            port = -1;
+            nonPortPart = input;
+        } else {
+            port = Integer.parseInt(input.substring(portIdx + 1));
+            nonPortPart = input.substring(0, portIdx);
+        }
+
         InetAddress inetAddress = null;
         try {
-            inetAddress = InetAddress.getByName(input);
+            inetAddress = InetAddress.getByName(nonPortPart);
         } catch (UnknownHostException e) {
             e.printStackTrace();
             Assert.fail();
         }
 
-        Assert.assertEquals(matches, Boolean.valueOf(netMask.matches(inetAddress)));
+        if (usePort) {
+            Assert.assertEquals(matches, Boolean.valueOf(netMask.matches(inetAddress, port)));
+        } else {
+            Assert.assertEquals(matches, Boolean.valueOf(netMask.matches(inetAddress)));
+        }
 
         Assert.assertEquals(mask, netMask.toString());
     }
