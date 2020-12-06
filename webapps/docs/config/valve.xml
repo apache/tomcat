@@ -284,7 +284,8 @@
     the current request and response.  The following pattern codes are
     supported:</p>
     <ul>
-    <li><b>%a</b> - Remote IP address</li>
+    <li><b>%a</b> - Remote IP address.
+        See also <code>%{xxx}a</code> below.</li>
     <li><b>%A</b> - Local IP address</li>
     <li><b>%b</b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
     <li><b>%B</b> - Bytes sent, excluding HTTP headers</li>
@@ -326,6 +327,8 @@
     syntax. Each of them can be used multiple times with different <code>xxx</code> keys:
     </p>
     <ul>
+    <li><b><code>%{xxx}a</code></b> write remote address (client) (<code>xxx==remote</code>) or
+        connection peer address (<code>xxx=peer</code>)</li>
     <li><b><code>%{xxx}i</code></b> write value of incoming header with name <code>xxx</code></li>
     <li><b><code>%{xxx}o</code></b> write value of outgoing header with name <code>xxx</code></li>
     <li><b><code>%{xxx}c</code></b> write value of cookie with name <code>xxx</code></li>
@@ -518,6 +521,12 @@
     <code>true</code>, one can append the server connector port separated with a
     semicolon (";") to allow different expressions for each connector.</p>
 
+    <p>By setting the attribute <code>usePeerAddress</code> to
+    <code>true</code>, the valve will use the connection peer address in its
+    checks. This will differ from the client IP, if a reverse proxy is used
+    in front of Tomcat in combination with either the AJP protocol, or the
+    HTTP protocol plus the <code>RemoteIp(Valve|Filter)</code>.</p>
+
     <p>A refused request will be answered a response with status code
     <code>403</code>. This status code can be overwritten using the attribute
     <code>denyStatus</code>.</p>
@@ -596,6 +605,13 @@
         even if the application does not have a security constraint configured.</p>
         <p>This can be combined with <code>addConnectorPort</code> to trigger authentication
         depending on the client and the connector that is used to access an application.</p>
+      </attribute>
+
+      <attribute name="usePeerAddress" required="false">
+        <p>Use the connection peer address instead of the client IP address.
+        They will differ, if a reverse proxy is used in front of Tomcat in
+        combination with either the AJP protocol, or the HTTP protocol plus
+        the <code>RemoteIp(Valve|Filter)</code>.</p>
       </attribute>
 
     </attributes>
@@ -777,6 +793,12 @@
     <code>true</code>, one can append the server connector port separated with a
     semicolon (";") to allow different expressions for each connector.</p>
 
+    <p>By setting the attribute <code>usePeerAddress</code> to
+    <code>true</code>, the valve will use the connection peer address in its
+    checks. This will differ from the client IP, if a reverse proxy is used
+    in front of Tomcat in combination with either the AJP protocol, or the
+    HTTP protocol plus the <code>RemoteIp(Valve|Filter)</code>.</p>
+
     <p>A refused request will be answered a response with status code
     <code>403</code>. This status code can be overwritten using the attribute
     <code>denyStatus</code>.</p>
@@ -861,6 +883,13 @@
         even if the application does not have a security constraint configured.</p>
         <p>This can be combined with <code>addConnectorPort</code> to trigger authentication
         depending on the client and the connector that is used to access an application.</p>
+      </attribute>
+
+      <attribute name="usePeerAddress" required="false">
+        <p>Use the connection peer address instead of the client IP address.
+        They will differ, if a reverse proxy is used in front of Tomcat in
+        combination with either the AJP protocol, or the HTTP protocol plus
+        the <code>RemoteIp(Valve|Filter)</code>.</p>
       </attribute>
 
     </attributes>
