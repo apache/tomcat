@@ -106,6 +106,11 @@
 <section name="Tomcat 8.5.62 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>60781</bug>: Escape elements in the access log that need to be
+        escaped for the access log to be parsed unambiguously.
+        (fschumacher/markt)
+      </fix>
       <add>
         <bug>64110</bug>: Add support for additional TLS related request
         attributes that provide details of the protocols and ciphers requested
