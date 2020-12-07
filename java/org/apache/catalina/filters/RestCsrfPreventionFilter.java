@@ -104,8 +104,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        if (request instanceof HttpServletRequest &&
-                response instanceof HttpServletResponse) {
+        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
             MethodType mType = MethodType.MODIFYING_METHOD;
             if (nonModifyingMethods.test(((HttpServletRequest) request).getMethod())) {
                 mType = MethodType.NON_MODIFYING_METHOD;
