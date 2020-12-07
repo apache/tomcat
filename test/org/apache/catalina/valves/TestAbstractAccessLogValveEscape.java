@@ -45,6 +45,7 @@ public class TestAbstractAccessLogValveEscape {
         parameters.add(new String[] { "o\u007fk", "o\\u007fk" });
         parameters.add(new String[] { "o\u0080k", "o\\u0080k" });
         parameters.add(new String[] { "o\u00ffk", "o\\u00ffk" });
+        parameters.add(new String[] { "o\"k", "o\\\"k" });
 
         return parameters;
     }
