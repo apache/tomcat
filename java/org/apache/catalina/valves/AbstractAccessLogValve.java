@@ -1875,7 +1875,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 break;
             case '\"':
                 dest.append("\\\"");
-            break;
+                break;
             // Standard C escapes for whitespace (not all standard C escapes)
             case '\f':
                 dest.append("\\f");
