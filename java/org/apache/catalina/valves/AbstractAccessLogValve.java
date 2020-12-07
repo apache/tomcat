@@ -52,6 +52,7 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.IPv6Utils;
 
@@ -1008,7 +1009,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (request != null) {
                 String value = request.getRemoteUser();
                 if (value != null) {
-                    buf.append(value);
+                    escapeAndAppend(value, buf);
                 } else {
                     buf.append('-');
                 }
@@ -1520,9 +1521,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 Response response, long time) {
             Enumeration<String> iter = request.getHeaders(header);
             if (iter.hasMoreElements()) {
-                buf.append(iter.nextElement());
+                escapeAndAppend(iter.nextElement(), buf);
                 while (iter.hasMoreElements()) {
-                    buf.append(',').append(iter.nextElement());
+                    buf.append(',');
+                    escapeAndAppend(iter.nextElement(), buf);
                 }
                 return;
             }
@@ -1553,7 +1555,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     }
                 }
             }
-            buf.append(value);
+            escapeAndAppend(value, buf);
         }
     }
 
@@ -1573,9 +1575,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (null != response) {
                 Iterator<String> iter = response.getHeaders(header).iterator();
                 if (iter.hasNext()) {
-                    buf.append(iter.next());
+                    escapeAndAppend(iter.next(), buf);
                     while (iter.hasNext()) {
-                        buf.append(',').append(iter.next());
+                        buf.append(',');
+                        escapeAndAppend(iter.next(), buf);
                     }
                     return;
                 }
@@ -1605,9 +1608,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
             if (value != null) {
                 if (value instanceof String) {
-                    buf.append((String) value);
+                    escapeAndAppend((String) value, buf);
                 } else {
-                    buf.append(value.toString());
+                    escapeAndAppend(value.toString(), buf);
                 }
             } else {
                 buf.append('-');
@@ -1639,9 +1642,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
             if (value != null) {
                 if (value instanceof String) {
-                    buf.append((String) value);
+                    escapeAndAppend((String) value, buf);
                 } else {
-                    buf.append(value.toString());
+                    escapeAndAppend(value.toString(), buf);
                 }
             } else {
                 buf.append('-');
@@ -1847,6 +1850,101 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return new ConnectionStatusElement();
         default:
             return new StringElement("???" + pattern + "???");
+        }
+    }
+
+
+    /*
+     * This method is intended to mimic the escaping performed by httpd and
+     * mod_log_config. mod_log_config escapes more elements than indicated by the
+     * documentation. See:
+     * https://github.com/apache/httpd/blob/trunk/modules/loggers/mod_log_config.c
+     *
+     * The following escaped elements are not supported by Tomcat:
+     * - %C   cookie value (see %{}c below)
+     * - %e   environment variable
+     * - %f   filename
+     * - %l   remote logname (always logs "-")
+     * - %n   note
+     * - %R   handler
+     * - %ti  trailer request header
+     * - %to  trailer response header
+     * - %V   server name per UseCanonicalName setting
+     *
+     * The following escaped elements are not escaped in Tomcat because values
+     * that would require escaping are rejected before they reach the
+     * AccessLogValve:
+     * - %h   remote host
+     * - %H   request protocol
+     * - %m   request method
+     * - %q   query string
+     * - %r   request line
+     * - %U   request URI
+     * - %v   canonical server name
+     *
+     * The following escaped elements are supported by Tomcat:
+     * - %{}i request header
+     * - %{}o response header
+     * - %u   remote user
+     *
+     * The following additional Tomcat elements are escaped for consistency:
+     * - %{}c cookie value
+     * - %{}r request attribute
+     * - %{}s session attribute
+     *
+     * giving a total of 6 elements that are escaped in Tomcat.
+     *
+     *  Quoting from the httpd docs:
+     * "...non-printable and other special characters in %r, %i and %o are
+     *  escaped using \xhh sequences, where hh stands for the hexadecimal
+     *  representation of the raw byte. Exceptions from this rule are " and \,
+     *  which are escaped by prepending a backslash, and all whitespace
+     *  characters, which are written in their C-style notation (\n, \t, etc)."
+     *
+     *  Reviewing the httpd code, characters with the high bit set are escaped.
+     *  The httpd is assuming a single byte encoding which may not be true for
+     *  Tomcat so Tomcat uses the Java \\uXXXX encoding.
+     */
+    protected static void escapeAndAppend(String input, CharArrayWriter dest) {
+        if (input == null || input.isEmpty()) {
+            dest.append('-');
+            return;
+        }
+
+        for (char c : input.toCharArray()) {
+            switch (c) {
+            // " and \
+            case '\\':
+                dest.append("\\\\");
+                break;
+            case '\"':
+                dest.append("\\\"");
+                break;
+            // Standard C escapes for whitespace (not all standard C escapes)
+            case '\f':
+                dest.append("\\f");
+                break;
+            case '\n':
+                dest.append("\\n");
+                break;
+            case '\r':
+                dest.append("\\r");
+                break;
+            case '\t':
+                dest.append("\\t");
+                break;
+            case '\u000b':
+                dest.append("\\v");
+                break;
+            default:
+                // Control, delete (127) or above 127
+                if (c < 32 || c > 126) {
+                    dest.append("\\u");
+                    dest.append(HexUtils.toHexString(c));
+                } else {
+                    dest.append(c);
+                }
+            }
         }
     }
 }

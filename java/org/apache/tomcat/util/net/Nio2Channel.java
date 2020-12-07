@@ -263,6 +263,10 @@ public class Nio2Channel implements AsynchronousByteChannel {
         public void free() {
         }
         @Override
+        protected ApplicationBufferHandler getAppReadBufHandler() {
+            return ApplicationBufferHandler.EMPTY;
+        }
+        @Override
         public void setAppReadBufHandler(ApplicationBufferHandler handler) {
         }
         @Override
