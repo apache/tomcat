@@ -1869,37 +1869,37 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         for (char c : input.toCharArray()) {
             switch (c) {
-                // " and \
-                case '\\':
-                    dest.append("\\\\");
-                    break;
-                case '\"':
-                    dest.append("\\\"");
+            // " and \
+            case '\\':
+                dest.append("\\\\");
                 break;
-                // Standard C escapes for whitespace (not all standard C escapes)
-                case '\f':
-                    dest.append("\\f");
-                    break;
-                case '\n':
-                    dest.append("\\n");
-                    break;
-                case '\r':
-                    dest.append("\\r");
-                    break;
-                case '\t':
-                    dest.append("\\t");
-                    break;
-                case '\u000b':
-                    dest.append("\\v");
-                    break;
-                default:
-                    // Control, delete (127) or above 127
-                    if (c < 32 || c > 126) {
-                        dest.append("\\u");
-                        dest.append(HexUtils.toHexString(c));
-                    } else {
-                        dest.append(c);
-                    }
+            case '\"':
+                dest.append("\\\"");
+            break;
+            // Standard C escapes for whitespace (not all standard C escapes)
+            case '\f':
+                dest.append("\\f");
+                break;
+            case '\n':
+                dest.append("\\n");
+                break;
+            case '\r':
+                dest.append("\\r");
+                break;
+            case '\t':
+                dest.append("\\t");
+                break;
+            case '\u000b':
+                dest.append("\\v");
+                break;
+            default:
+                // Control, delete (127) or above 127
+                if (c < 32 || c > 126) {
+                    dest.append("\\u");
+                    dest.append(HexUtils.toHexString(c));
+                } else {
+                    dest.append(c);
+                }
             }
         }
     }
