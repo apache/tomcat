@@ -128,8 +128,8 @@
         Support for the peer address has been added to the
         RemoteAddrValve and RemoteCIDRValve with the new attribute
         <code>usePeerAddress</code>. This can be used to restrict access
-        to Tomcat bsed on the reverse proxy IP address, which is especially
-        useful to harden access to AJP connecrtors. The peer address can also
+        to Tomcat based on the reverse proxy IP address, which is especially
+        useful to harden access to AJP connectors. The peer address can also
         be logged in the access log using the new <code>%{peer}a</code>
         syntax. (rjung)
       </add>

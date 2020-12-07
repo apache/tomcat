@@ -100,7 +100,7 @@ public final class Constants {
     /**
      * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
      * be set by other similar components) that identifies for the connector the
-     * conection peer IP address.
+     * connection peer IP address.
      */
     public static final String PEER_ADDR_ATTRIBUTE = "org.apache.tomcat.peerAddr";
 }
