@@ -523,8 +523,8 @@ public class ExpiresFilter extends FilterBase {
 
     /**
      * Expiration configuration starting point. Either the time the
-     * html-page/servlet-response was served ({@link StartingPoint#ACCESS_TIME})
-     * or the last time the html-page/servlet-response was modified (
+     * HTML-page/servlet-response was served ({@link StartingPoint#ACCESS_TIME})
+     * or the last time the HTML-page/servlet-response was modified (
      * {@link StartingPoint#LAST_MODIFICATION_TIME}).
      */
     protected enum StartingPoint {
@@ -1104,7 +1104,7 @@ public class ExpiresFilter extends FilterBase {
         if (str == null || searchStr == null) {
             return false;
         }
-        return str.indexOf(searchStr) >= 0;
+        return str.contains(searchStr);
     }
 
     /**

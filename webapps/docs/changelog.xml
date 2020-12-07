@@ -107,6 +107,13 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>50175</bug>: Add a new attribute to the standard context
+        implementation, <code>skipMemoryLeakChecksOnJvmShutdown</code>, that
+        allows the user to configure Tomcat to skip the memory leak checks
+        usually performed during web application stop if that stop is triggered
+        by a JVM shutdown. (markt)
+      </fix>
+      <fix>
         <bug>60781</bug>: Escape elements in the access log that need to be
         escaped for the access log to be parsed unambiguously.
         (fschumacher/markt)

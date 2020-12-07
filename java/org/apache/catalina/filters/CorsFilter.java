@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -155,8 +156,6 @@ public class CorsFilter implements Filter {
         switch (requestType) {
         case SIMPLE:
             // Handles a Simple CORS request.
-            this.handleSimpleCORS(request, response, filterChain);
-            break;
         case ACTUAL:
             // Handles an Actual CORS request.
             this.handleSimpleCORS(request, response, filterChain);
@@ -516,15 +515,6 @@ public class CorsFilter implements Filter {
 
         switch (corsRequestType) {
         case SIMPLE:
-            request.setAttribute(
-                    CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST,
-                    Boolean.TRUE);
-            request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_ORIGIN,
-                    request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN));
-            request.setAttribute(
-                    CorsFilter.HTTP_REQUEST_ATTRIBUTE_REQUEST_TYPE,
-                    corsRequestType.name().toLowerCase(Locale.ENGLISH));
-            break;
         case ACTUAL:
             request.setAttribute(
                     CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST, Boolean.TRUE);
@@ -749,7 +739,7 @@ public class CorsFilter implements Filter {
         this.exposedHeaders.clear();
         this.exposedHeaders.addAll(setExposedHeaders);
 
-        // For any value other then 'true' this will be false.
+        // For any value other than 'true' this will be false.
         this.supportsCredentials = Boolean.parseBoolean(supportsCredentials);
 
         if (this.supportsCredentials && this.anyOriginAllowed) {
@@ -767,7 +757,7 @@ public class CorsFilter implements Filter {
                     sm.getString("corsFilter.invalidPreflightMaxAge"), e);
         }
 
-        // For any value other then 'true' this will be false.
+        // For any value other than 'true' this will be false.
         this.decorateRequest = Boolean.parseBoolean(decorateRequest);
     }
 
@@ -892,6 +882,7 @@ public class CorsFilter implements Filter {
 
 
     // -------------------------------------------------- CORS Response Headers
+
     /**
      * The Access-Control-Allow-Origin header indicates whether a resource can
      * be shared based by returning the value of the Origin request header in
@@ -1040,8 +1031,8 @@ public class CorsFilter implements Filter {
      *       >http://www.w3.org/TR/cors/#terminology</a>
      */
     public static final Collection<String> SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES =
-            new HashSet<>(Arrays.asList("application/x-www-form-urlencoded",
-                    "multipart/form-data", "text/plain"));
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+                    "application/x-www-form-urlencoded", "multipart/form-data", "text/plain")));
 
     // ------------------------------------------------ Configuration Defaults
     /**

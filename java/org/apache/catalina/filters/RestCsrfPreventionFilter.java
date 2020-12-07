@@ -79,8 +79,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         NON_MODIFYING_METHOD, MODIFYING_METHOD
     }
 
-    private static final Pattern NON_MODIFYING_METHODS_PATTERN = Pattern
-            .compile("GET|HEAD|OPTIONS");
+    private static final Pattern NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
 
     private Set<String> pathsAcceptingParams = new HashSet<>();
 

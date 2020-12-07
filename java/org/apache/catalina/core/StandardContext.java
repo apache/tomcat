@@ -753,6 +753,12 @@ public class StandardContext extends ContainerBase
     private boolean clearReferencesThreadLocals = true;
 
     /**
+     * Should Tomcat skip the memory leak checks when the web application is
+     * stopped as part of the process of shutting down the JVM?
+     */
+    private boolean skipMemoryLeakChecksOnJvmShutdown = false;
+
+    /**
      * Should the effective web.xml be logged when the context starts?
      */
     private boolean logEffectiveWebXml = false;
@@ -2736,6 +2742,16 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("clearReferencesThreadLocals",
                 oldClearReferencesThreadLocals,
                 this.clearReferencesThreadLocals);
+    }
+
+
+    public boolean getSkipMemoryLeakChecksOnJvmShutdown() {
+        return skipMemoryLeakChecksOnJvmShutdown;
+    }
+
+
+    public void setSkipMemoryLeakChecksOnJvmShutdown(boolean skipMemoryLeakChecksOnJvmShutdown) {
+        this.skipMemoryLeakChecksOnJvmShutdown = skipMemoryLeakChecksOnJvmShutdown;
     }
 
 

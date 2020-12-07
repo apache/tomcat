@@ -263,15 +263,18 @@ public class RequestDumperFilter implements Filter {
         return ts.dateString;
     }
 
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // NOOP
     }
 
+
     @Override
     public void destroy() {
         // NOOP
     }
+
 
     private static final class Timestamp {
         private final Date date = new Date(0);

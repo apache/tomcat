@@ -192,8 +192,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(WebappClassLoaderBase.class);
 
 
     // ----------------------------------------------------------- Constructors
@@ -395,6 +394,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * loader from ThreadLocals?
      */
     private boolean clearReferencesThreadLocals = true;
+
+    /**
+     * Should Tomcat skip the memory leak checks when the web application is
+     * stopped as part of the process of shutting down the JVM?
+     */
+    private boolean skipMemoryLeakChecksOnJvmShutdown = false;
 
     /**
      * Holds the class file transformers decorating this class loader. The
@@ -652,6 +657,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
+    public boolean getSkipMemoryLeakChecksOnJvmShutdown() {
+        return skipMemoryLeakChecksOnJvmShutdown;
+    }
+
+
+    public void setSkipMemoryLeakChecksOnJvmShutdown(boolean skipMemoryLeakChecksOnJvmShutdown) {
+        this.skipMemoryLeakChecksOnJvmShutdown = skipMemoryLeakChecksOnJvmShutdown;
+    }
+
+
     // ------------------------------------------------------- Reloader Methods
 
     /**
@@ -855,8 +870,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     clazz = findClassInternal(name);
                 }
             } catch(AccessControlException ace) {
-                log.warn("WebappClassLoader.findClassInternal(" + name
-                        + ") security exception: " + ace.getMessage(), ace);
+                log.warn(sm.getString("webappClassLoader.securityException", name,
+                        ace.getMessage()), ace);
                 throw new ClassNotFoundException(name, ace);
             } catch (RuntimeException e) {
                 if (log.isTraceEnabled())
@@ -867,8 +882,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 try {
                     clazz = super.findClass(name);
                 } catch(AccessControlException ace) {
-                    log.warn("WebappClassLoader.findClassInternal(" + name
-                            + ") security exception: " + ace.getMessage(), ace);
+                    log.warn(sm.getString("webappClassLoader.securityException", name,
+                            ace.getMessage()), ace);
                     throw new ClassNotFoundException(name, ace);
                 } catch (RuntimeException e) {
                     if (log.isTraceEnabled())
@@ -1292,8 +1307,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     try {
                         securityManager.checkPackageAccess(name.substring(0,i));
                     } catch (SecurityException se) {
-                        String error = "Security Violation, attempt to use " +
-                            "Restricted Class: " + name;
+                        String error = sm.getString("webappClassLoader.restrictedPackage", name);
                         log.info(error, se);
                         throw new ClassNotFoundException(error, se);
                     }
@@ -1591,6 +1605,21 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * Clear references.
      */
     protected void clearReferences() {
+
+        // If the JVM is shutting down, skip the memory leak checks
+        if (skipMemoryLeakChecksOnJvmShutdown
+            && !resources.getContext().getParent().getState().isAvailable()) {
+            // During reloading / redeployment the parent is expected to be
+            // available. Parent is not available so this might be a JVM
+            // shutdown.
+            try {
+                Thread dummyHook = new Thread();
+                Runtime.getRuntime().addShutdownHook(dummyHook);
+                Runtime.getRuntime().removeShutdownHook(dummyHook);
+            } catch (IllegalStateException ise) {
+                return;
+            }
+        }
 
         // De-register any remaining JDBC drivers
         clearReferencesJdbc();
