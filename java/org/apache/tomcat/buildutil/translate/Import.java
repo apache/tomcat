@@ -45,7 +45,7 @@ public class Import {
 
         // Skip the original
         if (language.length() == 0) {
-            // Comment this line out if the originals needs to be exported.
+            // Comment this line out if the originals need to be imported.
             return;
         }
 
