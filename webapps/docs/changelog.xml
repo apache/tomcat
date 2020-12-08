@@ -127,6 +127,9 @@
   <subsection name="Other">
     <changelog>
       <add>
+        Improvements to Chinese translations. Provided by leeyazhou. (markt)
+      </add>
+      <add>
         Improvements to French translations. (remm)
       </add>
       <add>
