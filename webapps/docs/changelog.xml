@@ -165,6 +165,15 @@
         <bug>62695</bug>: Provide SHA-256 and SHA-512 checksums for files
         published via Maven. (markt)
       </fix>
+      <add>
+        Improvements to Chinese translations. Provided by leeyazhou. (markt)
+      </add>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
     </changelog>
   </subsection>
 </section>
