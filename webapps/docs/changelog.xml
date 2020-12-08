@@ -124,6 +124,19 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to Chinese translations. Provided by leeyazhou. (markt)
+      </add>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.41 (markt)" rtext="release in progress">
   <subsection name="Catalina">
