@@ -131,6 +131,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>64965</bug>: <code>JspContextWrapper.findAttribute</code> should
+        ignore expired sessions rather than throw an
+        <code>IllegalStateException</code>. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
