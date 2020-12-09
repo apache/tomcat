@@ -470,7 +470,7 @@ public class JspCServletContext implements ServletContext {
                         if (entryName.startsWith(jarPath) &&
                                 entryName.length() > jarPath.length()) {
                             // Let the Set implementation handle duplicates
-                            int sep = entryName.indexOf("/", jarPath.length());
+                            int sep = entryName.indexOf('/', jarPath.length());
                             if (sep < 0) {
                                 // This is a file - strip leading "META-INF/resources"
                                 thePaths.add(entryName.substring(18));
