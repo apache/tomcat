@@ -140,7 +140,7 @@ public final class RemoteCIDRValve extends RequestFilterValve {
     @Override
     public boolean isAllowed(final String property) {
 
-        final int portIdx = property.indexOf(";");
+        final int portIdx = property.indexOf(';');
         final int port;
         final String nonPortPart;
 
