@@ -96,7 +96,7 @@ public final class NetMask {
 
         expression = input;
 
-        final int portIdx = input.indexOf(";");
+        final int portIdx = input.indexOf(';');
         final String nonPortPart;
 
         if (portIdx == -1) {
@@ -116,7 +116,7 @@ public final class NetMask {
             }
         }
 
-        final int idx = nonPortPart.indexOf("/");
+        final int idx = nonPortPart.indexOf('/');
 
         /*
          * Handle the "IP only" case first

@@ -364,7 +364,7 @@ public class RewriteValve extends ValveBase {
                     // Append the query string to the url if there is one and it
                     // hasn't been rewritten
                     String urlStringDecoded = urlDecoded.toString();
-                    int index = urlStringDecoded.indexOf("?");
+                    int index = urlStringDecoded.indexOf('?');
                     String rewrittenQueryStringDecoded;
                     if (index == -1) {
                         rewrittenQueryStringDecoded = null;
