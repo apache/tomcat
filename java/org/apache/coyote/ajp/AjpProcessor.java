@@ -759,6 +759,10 @@ public class AjpProcessor extends AbstractProcessor {
         requestHeaderMessage.getBytes(request.localName());
         request.setLocalPort(requestHeaderMessage.getInt());
 
+        if (socketWrapper != null) {
+            request.peerAddr().setString(socketWrapper.getRemoteAddr());
+        }
+
         boolean isSSL = requestHeaderMessage.getByte() != 0;
         if (isSSL) {
             request.scheme().setString("https");

@@ -456,6 +456,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             }
             break;
         }
+        case REQ_PEER_ADDR_ATTRIBUTE: {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.peerAddr().setString(socketWrapper.getRemoteAddr());
+            }
+            break;
+        }
         case REQ_HOST_ATTRIBUTE: {
             populateRequestAttributeRemoteHost();
             break;

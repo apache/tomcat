@@ -129,10 +129,14 @@ public final class RemoteCIDRValve extends RequestFilterValve {
     @Override
     public void invoke(final Request request, final Response response) throws IOException, ServletException {
         String property;
-        if (getAddConnectorPort()) {
-            property = request.getRequest().getRemoteAddr() + ";" + request.getConnector().getPort();
+        if (getUsePeerAddress()) {
+            property = request.getPeerAddr();
         } else {
             property = request.getRequest().getRemoteAddr();
+        }
+        if (getAddConnectorPort()) {
+            property = property + ";" +
+                request.getConnector().getPort();
         }
         process(property, request, response);
     }

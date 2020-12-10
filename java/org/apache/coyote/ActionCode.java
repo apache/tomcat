@@ -77,6 +77,11 @@ public enum ActionCode {
     REQ_HOST_ADDR_ATTRIBUTE,
 
     /**
+     * Callback for lazy evaluation - extract the connection peer address.
+     */
+    REQ_PEER_ADDR_ATTRIBUTE,
+
+    /**
      * Callback for lazy evaluation - extract the SSL-related attributes
      * including the client certificate if present.
      */

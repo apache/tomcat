@@ -129,6 +129,22 @@
         Especially add support for connector specific configuration
         using <code>addConnectorPort</code>. (rjung)
       </add>
+      <add>
+        Add <code>peerAddress</code> to coyote request, which contains
+        the IP address of the direct connection peer. If a reverse proxy
+        sits in front of Tomcat and the protocol used is AJP or HTTP
+        in combination with the <code>RemoteIp(Valve|Filter)</code>,
+        the peer address might differ from the <code>remoteAddress</code>.
+        The latter then contains the address of the client in front of the
+        reverse proxy, not the address of the proxy itself.
+        Support for the peer address has been added to the
+        RemoteAddrValve and RemoteCIDRValve with the new attribute
+        <code>usePeerAddress</code>. This can be used to restrict access
+        to Tomcat based on the reverse proxy IP address, which is especially
+        useful to harden access to AJP connectors. The peer address can also
+        be logged in the access log using the new <code>%{peer}a</code>
+        syntax. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
