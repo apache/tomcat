@@ -67,6 +67,7 @@ public class TestRequestFilterValve {
     private static final String CIDR6_NO_ALLOW_NO_DENY = "1:0:0:0:0:0:0:1";
 
     private static final int PORT = 8080;
+    private static final String ADDR_OTHER = "1.2.3.4";
     private static final String PORT_MATCH_PATTERN    = ";\\d*";
     private static final String PORT_NO_MATCH_PATTERN = ";8081";
 
@@ -91,9 +92,22 @@ public class TestRequestFilterValve {
         }
     }
 
+    private void twoTests(String allow, String deny, boolean denyStatus,
+                         boolean addConnectorPort,
+                         boolean auth, String property, String type,
+                         boolean allowed) {
+        oneTest(allow, deny, denyStatus, addConnectorPort, false,
+                auth, property, type, allowed);
+        if (!type.equals("Host")) {
+            oneTest(allow, deny, denyStatus, addConnectorPort, true,
+                    auth, property, type, allowed);
+        }
+    }
+
     private void oneTest(String allow, String deny, boolean denyStatus,
-                         boolean addConnectorPort, boolean auth,
-                         String property, String type, boolean allowed) {
+                         boolean addConnectorPort, boolean usePeerAddress,
+                         boolean auth, String property, String type,
+                         boolean allowed) {
         // PREPARE
         RequestFilterValve valve = null;
         Connector connector = new Connector();
@@ -108,19 +122,38 @@ public class TestRequestFilterValve {
         request.setCoyoteRequest(new org.apache.coyote.Request());
 
         Assert.assertNotNull("Invalid test with null type", type);
+
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+
         if (property != null) {
             if (type.equals("Addr")) {
                 valve = new RemoteAddrValve();
-                request.setRemoteAddr(property);
-                msg.append(" ip='" + property + "'");
+                if (usePeerAddress) {
+                    request.setRemoteAddr(ADDR_OTHER);
+                    request.getCoyoteRequest().peerAddr().setString(property);
+                    ((RemoteAddrValve)valve).setUsePeerAddress(true);
+                    msg.append(" peer='" + property + "'");
+                } else {
+                    request.setRemoteAddr(property);
+                    request.getCoyoteRequest().peerAddr().setString(ADDR_OTHER);
+                    msg.append(" ip='" + property + "'");
+                }
             } else if (type.equals("Host")) {
                 valve = new RemoteHostValve();
                 request.setRemoteHost(property);
                 msg.append(" host='" + property + "'");
             } else if (type.equals("CIDR")) {
                 valve = new RemoteCIDRValve();
-                request.setRemoteAddr(property);
-                msg.append(" ip='" + property + "'");
+                if (usePeerAddress) {
+                    request.setRemoteAddr(ADDR_OTHER);
+                    request.getCoyoteRequest().peerAddr().setString(property);
+                    ((RemoteCIDRValve)valve).setUsePeerAddress(true);
+                    msg.append(" peer='" + property + "'");
+                } else {
+                    request.setRemoteAddr(property);
+                    request.getCoyoteRequest().peerAddr().setString(ADDR_OTHER);
+                    msg.append(" ip='" + property + "'");
+                }
             }
         }
         Assert.assertNotNull("Invalid test type" + type, valve);
@@ -185,156 +218,156 @@ public class TestRequestFilterValve {
         // Test without ports
         apat = allow_pat;
         dpat = deny_pat;
-        oneTest(null, null, false, false, auth, AllowAndDeny,  type, false);
-        oneTest(null, null, true,  false, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, false, auth, AllowAndDeny,  type, true);
-        oneTest(apat, null, false, false, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, null, true,  false, auth, AllowAndDeny,  type, true);
-        oneTest(apat, null, true,  false, auth, NoAllowNoDeny, type, false);
-        oneTest(null, dpat, false, false, auth, AllowAndDeny,  type, false);
-        oneTest(null, dpat, false, false, auth, NoAllowNoDeny, type, true);
-        oneTest(null, dpat, true,  false, auth, AllowAndDeny,  type, false);
-        oneTest(null, dpat, true,  false, auth, NoAllowNoDeny, type, true);
-        oneTest(apat, dpat, false, false, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, false, false, auth, OnlyAllow,     type, true);
-        oneTest(apat, dpat, false, false, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, false, false, auth, AllowAndDeny,  type, false);
-        oneTest(apat, dpat, true,  false, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, true,  false, auth, OnlyAllow,     type, true);
-        oneTest(apat, dpat, true,  false, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, true,  false, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, false, false, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, true,  false, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, false, auth, AllowAndDeny,  type, true);
+        twoTests(apat, null, false, false, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, null, true,  false, auth, AllowAndDeny,  type, true);
+        twoTests(apat, null, true,  false, auth, NoAllowNoDeny, type, false);
+        twoTests(null, dpat, false, false, auth, AllowAndDeny,  type, false);
+        twoTests(null, dpat, false, false, auth, NoAllowNoDeny, type, true);
+        twoTests(null, dpat, true,  false, auth, AllowAndDeny,  type, false);
+        twoTests(null, dpat, true,  false, auth, NoAllowNoDeny, type, true);
+        twoTests(apat, dpat, false, false, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, false, false, auth, OnlyAllow,     type, true);
+        twoTests(apat, dpat, false, false, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, false, false, auth, AllowAndDeny,  type, false);
+        twoTests(apat, dpat, true,  false, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, true,  false, auth, OnlyAllow,     type, true);
+        twoTests(apat, dpat, true,  false, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, true,  false, auth, AllowAndDeny,  type, false);
 
         // Test with port in pattern but forgotten "addConnectorPort"
         apat = allow_pat + PORT_MATCH_PATTERN;
         dpat = deny_pat + PORT_MATCH_PATTERN;
-        oneTest(null, null, false, false, auth, AllowAndDeny,  type, false);
-        oneTest(null, null, true,  false, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, false, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, false, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, null, true,  false, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, true,  false, auth, NoAllowNoDeny, type, false);
-        oneTest(null, dpat, false, false, auth, AllowAndDeny,  type, true);
-        oneTest(null, dpat, false, false, auth, NoAllowNoDeny, type, true);
-        oneTest(null, dpat, true,  false, auth, AllowAndDeny,  type, true);
-        oneTest(null, dpat, true,  false, auth, NoAllowNoDeny, type, true);
-        oneTest(apat, dpat, false, false, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, false, false, auth, OnlyAllow,     type, false);
-        oneTest(apat, dpat, false, false, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, false, false, auth, AllowAndDeny,  type, false);
-        oneTest(apat, dpat, true,  false, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, true,  false, auth, OnlyAllow,     type, false);
-        oneTest(apat, dpat, true,  false, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, true,  false, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, false, false, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, true,  false, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, false, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, false, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, null, true,  false, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, true,  false, auth, NoAllowNoDeny, type, false);
+        twoTests(null, dpat, false, false, auth, AllowAndDeny,  type, true);
+        twoTests(null, dpat, false, false, auth, NoAllowNoDeny, type, true);
+        twoTests(null, dpat, true,  false, auth, AllowAndDeny,  type, true);
+        twoTests(null, dpat, true,  false, auth, NoAllowNoDeny, type, true);
+        twoTests(apat, dpat, false, false, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, false, false, auth, OnlyAllow,     type, false);
+        twoTests(apat, dpat, false, false, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, false, false, auth, AllowAndDeny,  type, false);
+        twoTests(apat, dpat, true,  false, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, true,  false, auth, OnlyAllow,     type, false);
+        twoTests(apat, dpat, true,  false, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, true,  false, auth, AllowAndDeny,  type, false);
 
         // Test with "addConnectorPort" but port not in pattern
         apat = allow_pat;
         dpat = deny_pat;
-        oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(null, null, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, null, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(null, dpat, false, true, auth, AllowAndDeny,  type, true);
-        oneTest(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
-        oneTest(null, dpat, true,  true, auth, AllowAndDeny,  type, true);
-        oneTest(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
-        oneTest(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, false, true, auth, OnlyAllow,     type, false);
-        oneTest(apat, dpat, false, true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, true,  true, auth, OnlyAllow,     type, false);
-        oneTest(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, null, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(null, dpat, false, true, auth, AllowAndDeny,  type, true);
+        twoTests(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
+        twoTests(null, dpat, true,  true, auth, AllowAndDeny,  type, true);
+        twoTests(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
+        twoTests(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, false, true, auth, OnlyAllow,     type, false);
+        twoTests(apat, dpat, false, true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, true,  true, auth, OnlyAllow,     type, false);
+        twoTests(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
 
         // Test "addConnectorPort" and with port matching in both patterns
         apat = allow_pat + PORT_MATCH_PATTERN;
         dpat = deny_pat + PORT_MATCH_PATTERN;
-        oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(null, null, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, true, auth, AllowAndDeny,  type, true);
-        oneTest(apat, null, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, null, true,  true, auth, AllowAndDeny,  type, true);
-        oneTest(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(null, dpat, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
-        oneTest(null, dpat, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
-        oneTest(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, false, true, auth, OnlyAllow,     type, true);
-        oneTest(apat, dpat, false, true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, true,  true, auth, OnlyAllow,     type, true);
-        oneTest(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, true, auth, AllowAndDeny,  type, true);
+        twoTests(apat, null, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, null, true,  true, auth, AllowAndDeny,  type, true);
+        twoTests(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(null, dpat, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
+        twoTests(null, dpat, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
+        twoTests(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, false, true, auth, OnlyAllow,     type, true);
+        twoTests(apat, dpat, false, true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, true,  true, auth, OnlyAllow,     type, true);
+        twoTests(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
 
         // Test "addConnectorPort" and with port not matching in both patterns
         apat = allow_pat + PORT_NO_MATCH_PATTERN;
         dpat = deny_pat + PORT_NO_MATCH_PATTERN;
-        oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(null, null, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, null, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(null, dpat, false, true, auth, AllowAndDeny,  type, true);
-        oneTest(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
-        oneTest(null, dpat, true,  true, auth, AllowAndDeny,  type, true);
-        oneTest(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
-        oneTest(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, false, true, auth, OnlyAllow,     type, false);
-        oneTest(apat, dpat, false, true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, true,  true, auth, OnlyAllow,     type, false);
-        oneTest(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, null, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(null, dpat, false, true, auth, AllowAndDeny,  type, true);
+        twoTests(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
+        twoTests(null, dpat, true,  true, auth, AllowAndDeny,  type, true);
+        twoTests(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
+        twoTests(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, false, true, auth, OnlyAllow,     type, false);
+        twoTests(apat, dpat, false, true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, true,  true, auth, OnlyAllow,     type, false);
+        twoTests(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
 
         // Test "addConnectorPort" and with port matching only in allow
         apat = allow_pat + PORT_MATCH_PATTERN;
         dpat = deny_pat + PORT_NO_MATCH_PATTERN;
-        oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(null, null, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, true, auth, AllowAndDeny,  type, true);
-        oneTest(apat, null, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, null, true,  true, auth, AllowAndDeny,  type, true);
-        oneTest(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(null, dpat, false, true, auth, AllowAndDeny,  type, true);
-        oneTest(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
-        oneTest(null, dpat, true,  true, auth, AllowAndDeny,  type, true);
-        oneTest(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
-        oneTest(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, false, true, auth, OnlyAllow,     type, true);
-        oneTest(apat, dpat, false, true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, false, true, auth, AllowAndDeny,  type, true);
-        oneTest(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, true,  true, auth, OnlyAllow,     type, true);
-        oneTest(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, true,  true, auth, AllowAndDeny,  type, true);
+        twoTests(null, null, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, true, auth, AllowAndDeny,  type, true);
+        twoTests(apat, null, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, null, true,  true, auth, AllowAndDeny,  type, true);
+        twoTests(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(null, dpat, false, true, auth, AllowAndDeny,  type, true);
+        twoTests(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
+        twoTests(null, dpat, true,  true, auth, AllowAndDeny,  type, true);
+        twoTests(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
+        twoTests(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, false, true, auth, OnlyAllow,     type, true);
+        twoTests(apat, dpat, false, true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, false, true, auth, AllowAndDeny,  type, true);
+        twoTests(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, true,  true, auth, OnlyAllow,     type, true);
+        twoTests(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, true,  true, auth, AllowAndDeny,  type, true);
 
         // Test "addConnectorPort" and with port matching only in deny
         apat = allow_pat + PORT_NO_MATCH_PATTERN;
         dpat = deny_pat + PORT_MATCH_PATTERN;
-        oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(null, null, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, null, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(null, dpat, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
-        oneTest(null, dpat, true,  true, auth, AllowAndDeny,  type, false);
-        oneTest(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
-        oneTest(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, false, true, auth, OnlyAllow,     type, false);
-        oneTest(apat, dpat, false, true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, false, true, auth, AllowAndDeny,  type, false);
-        oneTest(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
-        oneTest(apat, dpat, true,  true, auth, OnlyAllow,     type, false);
-        oneTest(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
-        oneTest(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(null, null, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, null, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, null, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(null, dpat, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(null, dpat, false, true, auth, NoAllowNoDeny, type, true);
+        twoTests(null, dpat, true,  true, auth, AllowAndDeny,  type, false);
+        twoTests(null, dpat, true,  true, auth, NoAllowNoDeny, type, true);
+        twoTests(apat, dpat, false, true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, false, true, auth, OnlyAllow,     type, false);
+        twoTests(apat, dpat, false, true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, false, true, auth, AllowAndDeny,  type, false);
+        twoTests(apat, dpat, true,  true, auth, NoAllowNoDeny, type, false);
+        twoTests(apat, dpat, true,  true, auth, OnlyAllow,     type, false);
+        twoTests(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
+        twoTests(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
     }
 
     @Test
