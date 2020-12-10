@@ -166,6 +166,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         LOCAL, REMOTE
     }
 
+    /**
+     * The list of our ip address types.
+     */
+    private enum RemoteAddressType {
+        REMOTE, PEER
+    }
+
     //------------------------------------------------------ Constructor
     public AbstractAccessLogValve() {
         super(true);
@@ -862,19 +869,50 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * write remote IP address - %a
      */
     protected class RemoteAddrElement implements AccessLogElement, CachedElement {
+        /**
+         * Type of address to log
+         */
+        private static final String remoteAddress = "remote";
+        private static final String peerAddress = "peer";
+
+        private final RemoteAddressType remoteAddressType;
+
+        public RemoteAddrElement() {
+            remoteAddressType = RemoteAddressType.REMOTE;
+        }
+
+        public RemoteAddrElement(String type) {
+            switch (type) {
+            case remoteAddress:
+                remoteAddressType = RemoteAddressType.REMOTE;
+                break;
+            case peerAddress:
+                remoteAddressType = RemoteAddressType.PEER;
+                break;
+            default:
+                log.error(sm.getString("accessLogValve.invalidRemoteAddressType", type));
+                remoteAddressType = RemoteAddressType.REMOTE;
+                break;
+            }
+        }
+
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             String value = null;
-            if (requestAttributesEnabled) {
-                Object addr = request.getAttribute(REMOTE_ADDR_ATTRIBUTE);
-                if (addr == null) {
-                    value = request.getRemoteAddr();
-                } else {
-                    value = addr.toString();
-                }
+            if (remoteAddressType == RemoteAddressType.PEER) {
+                value = request.getPeerAddr();
             } else {
-                value = request.getRemoteAddr();
+                if (requestAttributesEnabled) {
+                    Object addr = request.getAttribute(REMOTE_ADDR_ATTRIBUTE);
+                    if (addr == null) {
+                        value = request.getRemoteAddr();
+                    } else {
+                        value = addr.toString();
+                    }
+                } else {
+                    value = request.getRemoteAddr();
+                }
             }
 
             if (ipv6Canonical) {
@@ -886,7 +924,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         @Override
         public void cache(Request request) {
             if (!requestAttributesEnabled) {
-                request.getRemoteAddr();
+                if (remoteAddressType == RemoteAddressType.PEER) {
+                    request.getPeerAddr();
+                } else {
+                    request.getRemoteAddr();
+                }
             }
         }
     }
@@ -1728,6 +1770,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return new CookieElement(name);
         case 'o':
             return new ResponseHeaderElement(name);
+        case 'a':
+            return new RemoteAddrElement(name);
         case 'p':
             return new PortElement(name);
         case 'r':
