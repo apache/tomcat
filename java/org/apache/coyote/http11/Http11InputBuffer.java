@@ -668,8 +668,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
 
     /**
-     * Available bytes in the buffers (note that due to encoding, this may not
-     * correspond).
+     * Available bytes in the buffers for the current request.
+     *
+     * Note that when requests are pipelined, the data in byteBuffer may relate
+     * to the next request rather than this one.
      */
     int available(boolean read) {
         int available;
@@ -680,12 +682,19 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             available = activeFilters[lastActiveFilter].available();
         }
 
-        if (available > 0 || !read) {
-            return available;
-        }
-
+        // Only try a non-blocking read if:
+        // - there is no data in the filters
+        // - the caller requested a read
+        // - there is no data in byteBuffer
+        // - the socket wrapper indicates a read is allowed
+        //
+        // Notes: 1. When pipelined requests are being used available may be
+        //        zero even when byteBuffer has data. This is because the data
+        //        in byteBuffer is for the next request. We don't want to
+        //        attempt a read in this case.
+        //        2. wrapper.hasDataToRead() is present to handle the NIO2 case
         try {
-            if (wrapper.hasDataToRead()) {
+            if (available == 0 && read && !byteBuffer.hasRemaining() && wrapper.hasDataToRead()) {
                 fill(false);
                 available = byteBuffer.remaining();
             }
@@ -708,22 +717,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      * faking non-blocking reads with the blocking IO connector.
      */
     boolean isFinished() {
-        if (byteBuffer.limit() > byteBuffer.position()) {
-            // Data to read in the buffer so not finished
-            return false;
-        }
-
-        /*
-         * Don't use fill(false) here because in the following circumstances
-         * BIO will block - possibly indefinitely
-         * - client is using keep-alive and connection is still open
-         * - client has sent the complete request
-         * - client has not sent any of the next request (i.e. no pipelining)
-         * - application has read the complete request
-         */
-
-        // Check the InputFilters
-
+        // The active filters have the definitive information on whether or not
+        // the current request body has been read. Note that byteBuffer may
+        // contain pipelined data so is not a good indicator.
         if (lastActiveFilter >= 0) {
             return activeFilters[lastActiveFilter].isFinished();
         } else {
