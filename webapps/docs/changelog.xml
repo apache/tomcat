@@ -131,6 +131,10 @@
         Ensure that values are not duplicated when manipulating the vary header.
         Based on a pull request by Fredrik Fall. (markt)
       </fix>
+      <fix>
+        Avoid uncaught InaccessibleObjectException on Java 16 trying to clear
+        references threads. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

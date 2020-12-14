@@ -2623,6 +2623,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         log.warn(sm.getString(
                                 "webappClassLoader.stopThreadFail",
                                 thread.getName(), contextName), e);
+                    } catch (RuntimeException e) {
+                        // InaccessibleObjectException is only available in Java 9+,
+                        // swapped for RuntimeException
+                        log.warn(sm.getString(
+                                "webappClassLoader.stopThreadFail",
+                                thread.getName(), contextName), e);
                     }
 
                     // Stopping an executor automatically interrupts the
