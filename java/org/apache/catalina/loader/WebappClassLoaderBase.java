@@ -1802,8 +1802,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 usingExecutor = true;
                             }
                         }
-                    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
-                            IllegalAccessException e) {
+                    } catch (NoSuchFieldException | IllegalAccessException | RuntimeException e) {
+                        // InaccessibleObjectException is only available in Java 9+,
+                        // swapped for RuntimeException
                         log.warn(sm.getString("webappClassLoader.stopThreadFail",
                                 thread.getName(), getContextName()), e);
                     }
