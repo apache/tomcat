@@ -138,6 +138,10 @@
         be logged in the access log using the new <code>%{peer}a</code>
         syntax. (rjung)
       </add>
+      <fix>
+        Avoid uncaught InaccessibleObjectException on Java 16 trying to clear
+        references threads. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
