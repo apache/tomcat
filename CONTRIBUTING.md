@@ -31,7 +31,7 @@ you.
 
 ### Reporting Translation improvements
 
-Apache Tomcat project uses POEditor for managing the localization files. 
+Apache Tomcat project uses POEditor for managing the localization files.
 Please see more at https://cwiki.apache.org/confluence/x/vIPzBQ
 
 ### Your First Code Contribution
