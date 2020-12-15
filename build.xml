@@ -220,6 +220,10 @@
              property="java9.test.option.3"
              value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
   <property name="java9.test.option.3" value="-Dtest.3=3"/>
+  <available classname="java.lang.reflect.InaccessibleObjectException"
+             property="java9.test.option.4"
+             value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+  <property name="java9.test.option.4" value="-Dtest.4=4"/>
 
   <!-- Classpaths -->
   <path id="compile.classpath">
@@ -1537,6 +1541,7 @@
         <jvmarg value="${java9.test.option.1}"/>
         <jvmarg value="${java9.test.option.2}"/>
         <jvmarg value="${java9.test.option.3}"/>
+        <jvmarg value="${java9.test.option.4}"/>
 
         <classpath refid="tomcat.test.run.classpath" />
 
