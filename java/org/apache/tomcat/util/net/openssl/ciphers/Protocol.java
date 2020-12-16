@@ -19,7 +19,7 @@ package org.apache.tomcat.util.net.openssl.ciphers;
 
 import org.apache.tomcat.util.net.Constants;
 
-enum Protocol {
+public enum Protocol {
 
     SSLv3(Constants.SSL_PROTO_SSLv3),
     SSLv2(Constants.SSL_PROTO_SSLv2),

@@ -79,7 +79,7 @@ public class SecurityRoleRef implements Serializable {
             sb.append(", link=");
             sb.append(link);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

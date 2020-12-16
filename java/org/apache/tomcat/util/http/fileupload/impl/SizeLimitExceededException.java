@@ -28,7 +28,7 @@ public class SizeLimitExceededException
     private static final long serialVersionUID = -2474893167098052828L;
 
     /**
-     * Constructs a <code>SizeExceededException</code> with
+     * Constructs a {@code SizeExceededException} with
      * the specified detail message, and actual and permitted sizes.
      *
      * @param message   The detail message.

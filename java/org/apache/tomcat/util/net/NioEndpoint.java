@@ -43,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -238,6 +237,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
         if (running) {
             running = false;
+            acceptor.stop(10);
             if (poller != null) {
                 poller.destroy();
                 poller = null;
@@ -366,8 +366,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
             socketWrapper.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
-            socketWrapper.setSecure(isSSLEnabled());
-            poller.register(channel, socketWrapper);
+            poller.register(socketWrapper);
             return true;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -429,20 +428,20 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     public static class PollerEvent {
 
-        private NioChannel socket;
+        private NioSocketWrapper socketWrapper;
         private int interestOps;
 
-        public PollerEvent(NioChannel ch, int intOps) {
-            reset(ch, intOps);
+        public PollerEvent(NioSocketWrapper socketWrapper, int intOps) {
+            reset(socketWrapper, intOps);
         }
 
-        public void reset(NioChannel ch, int intOps) {
-            socket = ch;
+        public void reset(NioSocketWrapper socketWrapper, int intOps) {
+            this.socketWrapper = socketWrapper;
             interestOps = intOps;
         }
 
-        public NioChannel getSocket() {
-            return socket;
+        public NioSocketWrapper getSocketWrapper() {
+            return socketWrapper;
         }
 
         public int getInterestOps() {
@@ -455,7 +454,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         public String toString() {
-            return "Poller event: socket [" + socket + "], socketWrapper [" + socket.getSocketWrapper() +
+            return "Poller event: socket [" + socketWrapper.getSocket() + "], socketWrapper [" + socketWrapper +
                     "], interestOps [" + interestOps + "]";
         }
     }
@@ -519,9 +518,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 r = eventCache.pop();
             }
             if (r == null) {
-                r = new PollerEvent(socketWrapper.getSocket(), interestOps);
+                r = new PollerEvent(socketWrapper, interestOps);
             } else {
-                r.reset(socketWrapper.getSocket(), interestOps);
+                r.reset(socketWrapper, interestOps);
             }
             addEvent(r);
             if (close) {
@@ -541,17 +540,20 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             PollerEvent pe = null;
             for (int i = 0, size = events.size(); i < size && (pe = events.poll()) != null; i++ ) {
                 result = true;
-                NioChannel channel = pe.getSocket();
-                NioSocketWrapper socketWrapper = channel.getSocketWrapper();
+                NioSocketWrapper socketWrapper = pe.getSocketWrapper();
+                SocketChannel sc = socketWrapper.getSocket().getIOChannel();
                 int interestOps = pe.getInterestOps();
-                if (interestOps == OP_REGISTER) {
+                if (sc == null) {
+                    log.warn(sm.getString("endpoint.nio.nullSocketChannel"));
+                    socketWrapper.close();
+                } else if (interestOps == OP_REGISTER) {
                     try {
-                        channel.getIOChannel().register(getSelector(), SelectionKey.OP_READ, socketWrapper);
+                        sc.register(getSelector(), SelectionKey.OP_READ, socketWrapper);
                     } catch (Exception x) {
                         log.error(sm.getString("endpoint.nio.registerFail"), x);
                     }
                 } else {
-                    final SelectionKey key = channel.getIOChannel().keyFor(getSelector());
+                    final SelectionKey key = sc.keyFor(getSelector());
                     if (key == null) {
                         // The key was cancelled (e.g. due to socket closure)
                         // and removed from the selector while it was being
@@ -571,7 +573,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 cancelledKey(key, socketWrapper);
                             }
                         } else {
-                            cancelledKey(key, attachment);
+                            cancelledKey(key, socketWrapper);
                         }
                     }
                 }
@@ -587,19 +589,18 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         /**
          * Registers a newly created socket with the poller.
          *
-         * @param socket    The newly created socket
          * @param socketWrapper The socket wrapper
          */
-        public void register(final NioChannel socket, final NioSocketWrapper socketWrapper) {
+        public void register(final NioSocketWrapper socketWrapper) {
             socketWrapper.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             PollerEvent event = null;
             if (eventCache != null) {
                 event = eventCache.pop();
             }
             if (event == null) {
-                event = new PollerEvent(socket, OP_REGISTER);
+                event = new PollerEvent(socketWrapper, OP_REGISTER);
             } else {
-                event.reset(socket, OP_REGISTER);
+                event.reset(socketWrapper, OP_REGISTER);
             }
             addEvent(event);
         }
@@ -667,14 +668,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         }
                         break;
                     }
+                    // Either we timed out or we woke up, process events first
+                    if (keyCount == 0) {
+                        hasEvents = (hasEvents | events());
+                    }
                 } catch (Throwable x) {
                     ExceptionUtils.handleThrowable(x);
                     log.error(sm.getString("endpoint.nio.selectorLoopError"), x);
                     continue;
-                }
-                // Either we timed out or we woke up, process events first
-                if (keyCount == 0) {
-                    hasEvents = (hasEvents | events());
                 }
 
                 Iterator<SelectionKey> iterator =
@@ -683,13 +684,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 // any active event.
                 while (iterator != null && iterator.hasNext()) {
                     SelectionKey sk = iterator.next();
+                    iterator.remove();
                     NioSocketWrapper socketWrapper = (NioSocketWrapper) sk.attachment();
                     // Attachment may be null if another thread has called
                     // cancelledKey()
-                    if (socketWrapper == null) {
-                        iterator.remove();
-                    } else {
-                        iterator.remove();
+                    if (socketWrapper != null) {
                         processKey(sk, socketWrapper);
                     }
                 }
@@ -1134,8 +1133,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         private int fillReadBuffer(boolean block, ByteBuffer buffer) throws IOException {
             int n = 0;
-            NioChannel socket = getSocket();
-            if (socket == NioChannel.CLOSED_NIO_CHANNEL) {
+            if (getSocket() == NioChannel.CLOSED_NIO_CHANNEL) {
                 throw new ClosedChannelException();
             }
             if (block) {
@@ -1152,7 +1150,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             throw new SocketTimeoutException();
                         }
                     }
-                    n = socket.read(buffer);
+                    n = getSocket().read(buffer);
                     if (n == -1) {
                         throw new EOFException();
                     } else if (n == 0) {
@@ -1176,7 +1174,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                 } while (n == 0); // TLS needs to loop as reading zero application bytes is possible
             } else {
-                n = socket.read(buffer);
+                n = getSocket().read(buffer);
                 if (n == -1) {
                     throw new EOFException();
                 }
@@ -1188,8 +1186,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         @Override
         protected void doWrite(boolean block, ByteBuffer buffer) throws IOException {
             int n = 0;
-            NioChannel socket = getSocket();
-            if (socket == NioChannel.CLOSED_NIO_CHANNEL) {
+            if (getSocket() == NioChannel.CLOSED_NIO_CHANNEL) {
                 throw new ClosedChannelException();
             }
             if (block) {
@@ -1206,7 +1203,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             throw new SocketTimeoutException();
                         }
                     }
-                    n = socket.write(buffer);
+                    n = getSocket().write(buffer);
                     if (n == -1) {
                         throw new EOFException();
                     } else if (n == 0) {
@@ -1239,7 +1236,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 // write registration.
             } else {
                 do {
-                    n = socket.write(buffer);
+                    n = getSocket().write(buffer);
                     if (n == -1) {
                         throw new EOFException();
                     }
@@ -1359,11 +1356,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         public SSLSupport getSslSupport(String clientCertProvider) {
             if (getSocket() instanceof SecureNioChannel) {
                 SecureNioChannel ch = (SecureNioChannel) getSocket();
-                SSLEngine sslEngine = ch.getSslEngine();
-                if (sslEngine != null) {
-                    SSLSession session = sslEngine.getSession();
-                    return ((NioEndpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
-                }
+                return ch.getSSLSupport();
             }
             return null;
         }
@@ -1518,7 +1511,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         protected void doRun() {
-            NioChannel socket = socketWrapper.getSocket();
+            /*
+             * Do not cache and re-use the value of socketWrapper.getSocket() in
+             * this method. If the socket closes the value will be updated to
+             * CLOSED_NIO_CHANNEL and the previous value potentially re-used for
+             * a new connection. That can result in a stale cached value which
+             * in turn can result in unintentionally closing currently active
+             * connections.
+             */
             Poller poller = NioEndpoint.this.poller;
             if (poller == null) {
                 socketWrapper.close();
@@ -1528,7 +1528,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             try {
                 int handshake = -1;
                 try {
-                    if (socket.isHandshakeComplete()) {
+                    if (socketWrapper.getSocket().isHandshakeComplete()) {
                         // No TLS handshaking required. Let the handler
                         // process this socket / event combination.
                         handshake = 0;
@@ -1538,7 +1538,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         // if the handshake failed.
                         handshake = -1;
                     } else {
-                        handshake = socket.handshake(event == SocketEvent.OPEN_READ, event == SocketEvent.OPEN_WRITE);
+                        handshake = socketWrapper.getSocket().handshake(event == SocketEvent.OPEN_READ, event == SocketEvent.OPEN_WRITE);
                         // The handshake process reads/writes from/to the
                         // socket. status may therefore be OPEN_WRITE once
                         // the handshake completes. However, the handshake
@@ -1563,27 +1563,23 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         state = getHandler().process(socketWrapper, event);
                     }
                     if (state == SocketState.CLOSED) {
-                        SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
-                        poller.cancelledKey(key, socketWrapper);
+                        poller.cancelledKey(getSelectionKey(), socketWrapper);
                     }
                 } else if (handshake == -1 ) {
                     getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
-                    SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
-                    poller.cancelledKey(key, socketWrapper);
+                    poller.cancelledKey(getSelectionKey(), socketWrapper);
                 } else if (handshake == SelectionKey.OP_READ){
                     socketWrapper.registerReadInterest();
                 } else if (handshake == SelectionKey.OP_WRITE){
                     socketWrapper.registerWriteInterest();
                 }
             } catch (CancelledKeyException cx) {
-                SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
-                poller.cancelledKey(key, socketWrapper);
+                poller.cancelledKey(getSelectionKey(), socketWrapper);
             } catch (VirtualMachineError vme) {
                 ExceptionUtils.handleThrowable(vme);
             } catch (Throwable t) {
                 log.error(sm.getString("endpoint.processing.fail"), t);
-                SelectionKey key = JreCompat.isJre11Available() ? null : socket.getIOChannel().keyFor(poller.getSelector());
-                poller.cancelledKey(key, socketWrapper);
+                poller.cancelledKey(getSelectionKey(), socketWrapper);
             } finally {
                 socketWrapper = null;
                 event = null;
@@ -1593,7 +1589,22 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
             }
         }
+
+        private SelectionKey getSelectionKey() {
+            // Shortcut for Java 11 onwards
+            if (JreCompat.isJre11Available()) {
+                return null;
+            }
+
+            SocketChannel socketChannel = socketWrapper.getSocket().getIOChannel();
+            if (socketChannel == null) {
+                return null;
+            }
+
+            return socketChannel.keyFor(NioEndpoint.this.poller.getSelector());
+        }
     }
+
 
     // ----------------------------------------------- SendfileData Inner Class
 

@@ -533,7 +533,7 @@ class Validator {
             String version = n.getTextAttribute("version");
             if (!version.equals("1.2") && !version.equals("2.0") &&
                     !version.equals("2.1") && !version.equals("2.2") &&
-                    !version.equals("2.3")) {
+                    !version.equals("2.3") && !version.equals("3.0")) {
                 err.jspError(n, "jsp.error.jsproot.version.invalid", version);
             }
             visitBody(n);
@@ -1681,7 +1681,7 @@ class Validator {
                     lastArg = true;
                 }
                 String arg = signature.substring(start, p).trim();
-                if (!"".equals(arg)) {
+                if (!arg.isEmpty()) {
                     params.add(arg);
                 }
                 if (lastArg) {

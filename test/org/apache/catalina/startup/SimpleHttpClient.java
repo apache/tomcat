@@ -362,7 +362,7 @@ public abstract class SimpleHttpClient {
     }
 
     /*
-     * Scan an html body for a given html uri element, starting from the
+     * Scan an HTML body for a given HTML uri element, starting from the
      * given index into the source string. If any are found, simply
      * accumulate them as literal strings, including angle brackets.
      * note: nested elements will not be collected.

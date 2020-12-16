@@ -92,7 +92,13 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
     @Override
     protected void afterExecute(Runnable r, Throwable t) {
-        submittedCount.decrementAndGet();
+        // Throwing StopPooledThreadException is likely to cause this method to
+        // be called more than once for a given task based on the typical
+        // implementations of the parent class. This test ensures that
+        // decrementAndGet() is only called once after each task execution.
+        if (!(t instanceof StopPooledThreadException)) {
+            submittedCount.decrementAndGet();
+        }
 
         if (t == null) {
             stopCurrentThreadIfNeeded();
@@ -197,7 +203,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
             // checks that queue.remainingCapacity()==0. I did not understand
             // why, but to get the intended effect of waking up idle threads, I
             // temporarily fake this condition.
-            taskQueue.setForcedRemainingCapacity(Integer.valueOf(0));
+            taskQueue.setForcedRemainingCapacity(0);
         }
 
         // setCorePoolSize(0) wakes idle threads
@@ -209,7 +215,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
         if (taskQueue != null) {
             // ok, restore the state of the queue and pool
-            taskQueue.setForcedRemainingCapacity(null);
+            taskQueue.resetForcedRemainingCapacity();
         }
         this.setCorePoolSize(savedCorePoolSize);
     }

@@ -100,7 +100,6 @@
         <item name="Status"                href="https://wiki.apache.org/tomcat/TomcatVersions"/>
         <item name="Developers"            href="developers.html"/>
         <item name="Architecture"          href="architecture/index.html" />
-        <item name="Functional Specs."     href="funcspecs/index.html"/>
         <item name="Tribes"                href="tribes/introduction.html"/>
     </menu>
 

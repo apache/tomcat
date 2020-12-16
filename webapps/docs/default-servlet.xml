@@ -85,14 +85,14 @@ Tomcat.</p>
 
 <section anchor="change" name="What can I change?">
 <p>
-  The DefaultServlet allows the following initParamters:
+  The DefaultServlet allows the following initParameters:
 </p>
 
 <properties>
   <property name="debug">
         Debugging level. It is not very useful unless you are a tomcat
         developer. As
-        of this writing, useful values are 0, 1, 11, 1000. [0]
+        of this writing, useful values are 0, 1, 11. [0]
   </property>
   <property name="listings">
         If no welcome file is present, can a directory listing be

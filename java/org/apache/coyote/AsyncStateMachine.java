@@ -60,7 +60,7 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * DISPATCHING      - The dispatch is being processed.
  * MUST_ERROR       - ServletRequest.startAsync() has been called from
  *                    Servlet.service() but, before service() exited, an I/O
- *                    error occured on another thread. The container will
+ *                    error occurred on another thread. The container will
  *                    perform the necessary error handling when
  *                    Servlet.service() exits.
  * ERROR            - Something went wrong.
@@ -235,6 +235,9 @@ class AsyncStateMachine {
         if (state == AsyncState.DISPATCHED) {
             generation.incrementAndGet();
             state = AsyncState.STARTING;
+            // Note: In this instance, caller is responsible for calling
+            // asyncCtxt.incrementInProgressAsyncCount() as that allows simpler
+            // error handling.
             this.asyncCtxt = asyncCtxt;
             lastAsyncStart = System.currentTimeMillis();
         } else {
@@ -274,12 +277,14 @@ class AsyncStateMachine {
         } else if (state == AsyncState.MUST_COMPLETE || state == AsyncState.COMPLETING) {
             asyncCtxt.fireOnComplete();
             state = AsyncState.DISPATCHED;
+            asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.MUST_DISPATCH) {
             state = AsyncState.DISPATCHING;
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCHING) {
             state = AsyncState.DISPATCHED;
+            asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.STARTED) {
             // This can occur if an async listener does a dispatch to an async
@@ -401,6 +406,7 @@ class AsyncStateMachine {
         if (state == AsyncState.DISPATCHING ||
                 state == AsyncState.MUST_DISPATCH) {
             state = AsyncState.DISPATCHED;
+            asyncCtxt.decrementInProgressAsyncCount();
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
@@ -413,6 +419,12 @@ class AsyncStateMachine {
         clearNonBlockingListeners();
         if (state == AsyncState.STARTING) {
             state = AsyncState.MUST_ERROR;
+        } else if (state == AsyncState.DISPATCHED) {
+            // Async error handling has moved processing back into an async
+            // state. Need to increment in progress count as it will decrement
+            // when the async state is exited again.
+            asyncCtxt.incrementInProgressAsyncCount();
+            state = AsyncState.ERROR;
         } else {
             state = AsyncState.ERROR;
         }

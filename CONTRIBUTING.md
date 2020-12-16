@@ -29,6 +29,11 @@ Please review our [guide](https://tomcat.apache.org/bugreport.html) on how to
 submit a bug report. This page also has links to other resources to assist
 you.
 
+### Reporting Translation improvements
+
+Apache Tomcat project uses POEditor for managing the localization files.
+Please see more at https://cwiki.apache.org/confluence/x/vIPzBQ
+
 ### Your First Code Contribution
 
 ### Trouble Deciding How to Contribute?
@@ -76,6 +81,7 @@ manually generate the patch file by using diff. If this is what you want, you
 can download the sources from the "Source Code Distributions" section of the
 Download Page. There is one such page for every major Tomcat version:
 
+- [Tomcat 10](https://tomcat.apache.org/download-10.cgi)
 - [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
 - [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
 - [Tomcat 7](https://tomcat.apache.org/download-70.cgi)

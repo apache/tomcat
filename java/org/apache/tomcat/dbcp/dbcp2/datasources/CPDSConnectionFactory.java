@@ -37,8 +37,7 @@ import org.apache.tomcat.dbcp.pool2.PooledObjectFactory;
 import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
 
 /**
- * A {@link PooledObjectFactory} that creates
- * {@link org.apache.tomcat.dbcp.dbcp2.PoolableConnection PoolableConnection}s.
+ * A {@link PooledObjectFactory} that creates {@link org.apache.tomcat.dbcp.dbcp2.PoolableConnection PoolableConnection}s.
  *
  * @since 2.0
  */
@@ -420,7 +419,7 @@ class CPDSConnectionFactory
         builder.append(validatingSet);
         builder.append(", pcMap=");
         builder.append(pcMap);
-        builder.append("]");
+        builder.append(']');
         return builder.toString();
     }
 }

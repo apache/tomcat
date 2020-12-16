@@ -46,7 +46,7 @@ public class TestWebXml {
         WebXml webxml = new WebXml();
 
         // Defaults
-        Assert.assertEquals(4, webxml.getMajorVersion());
+        Assert.assertEquals(5, webxml.getMajorVersion());
         Assert.assertEquals(0, webxml.getMinorVersion());
 
         // Both get changed

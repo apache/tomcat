@@ -275,7 +275,7 @@
 
       <attribute name="allowMultipleLeadingForwardSlashInPath" required="false">
         <p>Tomcat normalises sequences of multiple <code>/</code> characters in
-        a URI to a single <code>/</code>. This is for consistencuy with the
+        a URI to a single <code>/</code>. This is for consistency with the
         behaviour of file systems as URIs are often translated to file system
         paths. As a result, the return value of
         <code>HttpServletRequest#getContextPath()</code> is expected to start
@@ -457,6 +457,14 @@
         the same attribute explicitly for the Context.</p>
       </attribute>
 
+      <attribute name="parallelAnnotationScanning" required="false">
+        <p>When set to <code>true</code> annotation scanning will be performed
+        using the utility executor. It will allow processing scanning in
+        parrallel which may improve deployment type at the expense of higher
+        server load. If not specified, the default of <code>false</code> is
+        used.</p>
+      </attribute>
+
       <attribute name="path" required="false">
         <p>The <em>context path</em> of this web application, which is
         matched against the beginning of each request URI to select the
@@ -625,6 +633,14 @@
         <code>true</code>, else the default value will be <code>false</code>.
         Setting this attribute to <code>true</code> will incur a performance
         penalty.</p>
+      </attribute>
+
+      <attribute name="useBloomFilterForArchives" required="false">
+        <p>If this is <code>true</code> then a bloom filter will be used to
+        speed up archive lookups. This can be beneficial to the deployment
+        speed to web applications that contain very large amount of JARs.</p>
+        <p>If not specified, the default value of <code>false</code> will be
+        used.</p>
       </attribute>
 
       <attribute name="useHttpOnly" required="false">

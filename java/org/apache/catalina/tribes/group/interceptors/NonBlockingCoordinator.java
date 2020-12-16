@@ -46,7 +46,7 @@ import org.apache.juli.logging.LogFactory;
  * <p>Title: Auto merging leader election algorithm</p>
  *
  * <p>Description: Implementation of a simple coordinator algorithm that not only selects a coordinator,
- *    it also merges groups automatically when members are discovered that werent part of the
+ *    it also merges groups automatically when members are discovered that weren't part of the
  *    </p>
  * <p>This algorithm is non blocking meaning it allows for transactions while the coordination phase is going on
  * </p>
@@ -304,9 +304,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             InetSocketAddress addr = new InetSocketAddress(ia, mbr.getPort());
             socket.connect(addr, (int) conTimeout);
             return true;
-        } catch (SocketTimeoutException sx) {
-            //do nothing, we couldn't connect
-        } catch (ConnectException cx) {
+        } catch (SocketTimeoutException | ConnectException x) {
             //do nothing, we couldn't connect
         } catch (Exception x) {
             log.error(sm.getString("nonBlockingCoordinator.memberAlive.failed"),x);

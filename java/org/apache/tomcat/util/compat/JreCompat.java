@@ -50,7 +50,7 @@ public class JreCompat {
     protected static final Method getApplicationProtocolMethod;
 
     static {
-        // This is Tomcat 9 with a minimum Java version of Java 8.
+        // This is Tomcat 10 with a minimum Java version of Java 8.
         // Look for the highest supported JVM first
         if (GraalCompat.isSupported()) {
             instance = new GraalCompat();
@@ -251,7 +251,7 @@ public class JreCompat {
      * @return {code true} if the AccessibleObject can be accessed otherwise
      *         {code false}
      */
-    public boolean canAcccess(Object base, AccessibleObject accessibleObject) {
+    public boolean canAccess(Object base, AccessibleObject accessibleObject) {
         // Java 8 doesn't support modules so default to true
         return true;
     }
@@ -267,5 +267,18 @@ public class JreCompat {
      */
     public boolean isExported(Class<?> type) {
         return true;
+    }
+
+
+    /**
+     * What is the module of the given class?
+     *
+     * @param type  The class to test
+     *
+     * @return Always {@code true} for Java 8. {@code true} if the enclosing
+     *         package is exported for Java 9+
+     */
+    public String getModuleName(Class<?> type) {
+        return "NO_MODULE_JAVA_8";
     }
 }

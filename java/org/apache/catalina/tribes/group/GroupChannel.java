@@ -435,13 +435,13 @@ public class GroupChannel extends ChannelInterceptorBase
                 while ( next != null ) {
                     int nflag = next.getOptionFlag();
                     if (nflag!=0 && (((flag & nflag) == flag ) || ((flag & nflag) == nflag)) ) {
-                        conflicts.append("[");
+                        conflicts.append('[');
                         conflicts.append(first.getClass().getName());
-                        conflicts.append(":");
+                        conflicts.append(':');
                         conflicts.append(flag);
                         conflicts.append(" == ");
                         conflicts.append(next.getClass().getName());
-                        conflicts.append(":");
+                        conflicts.append(':');
                         conflicts.append(nflag);
                         conflicts.append("] ");
                     }//end if
@@ -476,13 +476,7 @@ public class GroupChannel extends ChannelInterceptorBase
             ownExecutor = true;
         }
         super.start(svc);
-        monitorFuture = utilityExecutor.scheduleWithFixedDelay(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        startHeartbeat();
-                    }
-                }, 0, 60, TimeUnit.SECONDS);
+        monitorFuture = utilityExecutor.scheduleWithFixedDelay(this::startHeartbeat, 0, 60, TimeUnit.SECONDS);
     }
 
     protected void startHeartbeat() {

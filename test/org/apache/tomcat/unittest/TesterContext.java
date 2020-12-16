@@ -1290,4 +1290,15 @@ public class TesterContext implements Context {
     @Override
     public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject) {}
 
+    @Override
+    public boolean isParallelAnnotationScanning() { return false; }
+    @Override
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
+
+    @Override
+    public boolean getUseBloomFilterForArchives() { return false; }
+
+    @Override
+    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives) {}
+
 }

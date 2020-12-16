@@ -532,7 +532,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         try {
             connection.setAutoCommit(autoCommit);
             if (cacheState) {
-                autoCommitCached = Boolean.valueOf(autoCommit);
+                autoCommitCached = Boolean.valueOf(connection.getAutoCommit());
             }
         } catch (final SQLException e) {
             autoCommitCached = null;
@@ -556,7 +556,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         try {
             connection.setReadOnly(readOnly);
             if (cacheState) {
-                readOnlyCached = Boolean.valueOf(readOnly);
+                readOnlyCached = Boolean.valueOf(connection.isReadOnly());
             }
         } catch (final SQLException e) {
             readOnlyCached = null;

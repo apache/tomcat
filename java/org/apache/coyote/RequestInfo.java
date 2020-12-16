@@ -98,6 +98,11 @@ public class RequestInfo  {
         return req.remoteAddr().toString();
     }
 
+    public String getPeerAddr() {
+        req.action(ActionCode.REQ_PEER_ADDR_ATTRIBUTE, null);
+        return req.peerAddr().toString();
+    }
+
     /**
      * Obtain the remote address for this connection as reported by an
      * intermediate proxy (if any).

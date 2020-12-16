@@ -12,9 +12,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd, spec-defaults.bnd
+
 Bundle-Name: tomcat-websocket-api
 Bundle-SymbolicName: org.apache.tomcat-websocket-api
-Bundle-Version: @VERSION@
 Export-Package: \
-    jakarta.websocket,\
-    jakarta.websocket.server
+    jakarta.websocket.*;version=${websocket.spec.version}
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaWebSockets;\
+        version:Version=${websocket.spec.version};\
+        uses:='${packages;NAMED;jakarta.websocket.*}'
+
+-namesection: jakarta/websocket*/;\
+    Specification-Title=Jakarta WebSocket;\
+    Specification-Version=${websocket.spec.version};\
+    Specification-Vendor=Eclipse Foundation;\
+    Implementation-Title=jakarta.websocket;\
+    Implementation-Version=${websocket.spec.version}.${websocket.revision};\
+    Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.websocket;\
+        access=32;\
+        version=${websocket.spec.version}
+-jpms-module-info-options: \
+    jakarta.websocket;\
+        substitute=websocket-api

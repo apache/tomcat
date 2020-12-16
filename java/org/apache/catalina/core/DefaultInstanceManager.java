@@ -37,7 +37,6 @@ import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.xml.ws.WebServiceRef;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -45,6 +44,7 @@ import jakarta.annotation.Resource;
 import jakarta.ejb.EJB;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceUnit;
+import jakarta.xml.ws.WebServiceRef;
 
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
@@ -91,7 +91,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         clazz = null;
         try {
-            clazz = Class.forName("javax.xml.ws.WebServiceRef");
+            clazz = Class.forName("jakarta.xml.ws.WebServiceRef");
         } catch (ClassNotFoundException cnfe) {
             // Expected
         }

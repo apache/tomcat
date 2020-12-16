@@ -105,7 +105,20 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     protected final MapperListener mapperListener = new MapperListener(this);
 
 
+    private long gracefulStopAwaitMillis = 0;
+
+
     // ------------------------------------------------------------- Properties
+
+    public long getGracefulStopAwaitMillis() {
+        return gracefulStopAwaitMillis;
+    }
+
+
+    public void setGracefulStopAwaitMillis(long gracefulStopAwaitMillis) {
+        this.gracefulStopAwaitMillis = gracefulStopAwaitMillis;
+    }
+
 
     @Override
     public Mapper getMapper() {
@@ -325,7 +338,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     public String toString() {
         StringBuilder sb = new StringBuilder("StandardService[");
         sb.append(getName());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -453,13 +466,25 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     protected void stopInternal() throws LifecycleException {
 
-        // Pause connectors first
         synchronized (connectorsLock) {
+            // Initiate a graceful stop for each connector
+            // This will only work if the bindOnInit==false which is not the
+            // default.
+            for (Connector connector: connectors) {
+                connector.getProtocolHandler().closeServerSocketGraceful();
+            }
+
+            // Wait for the graceful shutdown to complete
+            long waitMillis = gracefulStopAwaitMillis;
+            if (waitMillis > 0) {
+                for (Connector connector: connectors) {
+                    waitMillis = connector.getProtocolHandler().awaitConnectionsClose(waitMillis);
+                }
+            }
+
+            // Pause the connectors
             for (Connector connector: connectors) {
                 connector.pause();
-                // Close server socket if bound on start
-                // Note: test is in AbstractEndpoint
-                connector.getProtocolHandler().closeServerSocketGraceful();
             }
         }
 
@@ -467,7 +492,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             log.info(sm.getString("standardService.stop.name", this.name));
         setState(LifecycleState.STOPPING);
 
-        // Stop our defined Container second
+        // Stop our defined Container once the Connectors are all paused
         if (engine != null) {
             synchronized (engine) {
                 engine.stop();

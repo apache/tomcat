@@ -56,14 +56,22 @@ public class ListenerCreateRule extends ObjectCreateRule {
                 } else {
                     log.info(sm.getString("listener.createFailed", className));
                 }
-                digester.push(new OptionalListener(className));
+                Object instance = new OptionalListener(className);
+                digester.push(instance);
+                StringBuilder code = digester.getGeneratedCode();
+                if (code != null) {
+                    code.append(OptionalListener.class.getName().replace('$', '.')).append(' ');
+                    code.append(digester.toVariableName(instance)).append(" = new ");
+                    code.append(OptionalListener.class.getName().replace('$', '.')).append("(\"").append(className).append("\");");
+                    code.append(System.lineSeparator());
+                }
             }
         } else {
             super.begin(namespace, name, attributes);
         }
     }
 
-    public class OptionalListener implements LifecycleListener {
+    public static class OptionalListener implements LifecycleListener {
         protected final String className;
         protected final HashMap<String, String> properties = new HashMap<>();
         public OptionalListener(String className) {

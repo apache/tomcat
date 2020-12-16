@@ -127,7 +127,7 @@
  * Connection pooling is useful in applications regardless of whether they run
  * in a J2EE environment and a <code>DataSource</code> can be used within a
  * simpler environment.  The example below shows SharedPoolDataSource using
- * DriverAdapterCPDS as the backend source, though any CPDS is applicable.
+ * DriverAdapterCPDS as the back end source, though any CPDS is applicable.
  * </p>
  *
  * <code>

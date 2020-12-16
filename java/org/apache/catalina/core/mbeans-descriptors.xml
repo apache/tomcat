@@ -208,6 +208,10 @@
                description="The name of this Context"
                type="java.lang.String"/>
 
+    <attribute name="parallelAnnotationScanning"
+               description="The parallel annotation scanning flag"
+               type="boolean"/>
+
     <attribute name="parentClassLoader"
                description="Parent class loader."
                type="java.lang.ClassLoader" />
@@ -319,6 +323,10 @@
 
     <attribute name="unpackWAR"
                description="Unpack WAR property"
+               type="boolean"/>
+
+    <attribute name="useBloomFilterForArchives"
+               description="Use a bloom filter for archives lookups"
                type="boolean"/>
 
     <attribute name="useHttpOnly"

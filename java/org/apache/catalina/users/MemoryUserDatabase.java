@@ -425,7 +425,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
             String pathName = getPathname();
             try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(pathName)) {
-                this.lastModified = resource.getURI().toURL().openConnection().getLastModified();
+                lastModified = resource.getLastModified();
 
                 // Construct a digester to read the XML input file
                 Digester digester = new Digester();
@@ -712,7 +712,7 @@ public class MemoryUserDatabase implements UserDatabase {
         sb.append(this.roles.size());
         sb.append(",userCount=");
         sb.append(this.users.size());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }
@@ -736,7 +736,14 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
         }
         String description = attributes.getValue("description");
         String roles = attributes.getValue("roles");
-        Group group = database.createGroup(groupname, description);
+        Group group = database.findGroup(groupname);
+        if (group == null) {
+            group = database.createGroup(groupname, description);
+        } else {
+            if (group.getDescription() == null) {
+                group.setDescription(description);
+            }
+        }
         if (roles != null) {
             while (roles.length() > 0) {
                 String rolename = null;
@@ -781,8 +788,14 @@ class MemoryRoleCreationFactory extends AbstractObjectCreationFactory {
             rolename = attributes.getValue("name");
         }
         String description = attributes.getValue("description");
-        Role role = database.createRole(rolename, description);
-        return role;
+        Role existingRole = database.findRole(rolename);
+        if (existingRole == null) {
+            return database.createRole(rolename, description);
+        }
+        if (existingRole.getDescription() == null) {
+            existingRole.setDescription(description);
+        }
+        return existingRole;
     }
 
     private final MemoryUserDatabase database;

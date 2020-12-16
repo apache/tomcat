@@ -520,7 +520,7 @@ public class TestArrayELResolver {
 
 
     @Test
-    public void testGetFeatureDescriptiors() {
+    public void testGetFeatureDescriptors() {
         // Should always return null
         ArrayELResolver resolver = new ArrayELResolver();
         Assert.assertNull(resolver.getFeatureDescriptors(null, null));

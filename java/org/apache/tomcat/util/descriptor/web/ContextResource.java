@@ -129,7 +129,7 @@ public class ContextResource extends ResourceBase {
             sb.append(", scope=");
             sb.append(scope);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

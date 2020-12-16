@@ -136,6 +136,9 @@
 
   <section name="APR Connectors Configuration">
 
+    <p><strong>Note: The APR/Native AJP and HTTP Connectors are deprecated and
+    will be removed in Tomcat 10.1.x onwards.</strong></p>
+
     <subsection name="HTTP/HTTPS">
 
       <p>For HTTP configuration, see the <a href="config/http.html">HTTP</a>

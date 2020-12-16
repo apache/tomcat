@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.el.stream.StreamELResolverImpl;
+import org.apache.jasper.runtime.JspRuntimeLibrary;
 
 public class TestJasperELResolver {
 
@@ -53,15 +54,16 @@ public class TestJasperELResolver {
             list.add(new ImplicitObjectELResolver());
         }
 
+        int adjustedForGraalCount = JspRuntimeLibrary.GRAAL ? count + 1 : count;
+
         JasperELResolver resolver =
                 new JasperELResolver(list, new StreamELResolverImpl());
 
-
         Assert.assertEquals(Integer.valueOf(count),
                 getField("appResolversSize", resolver));
-        Assert.assertEquals(9 + count,
+        Assert.assertEquals(9 + adjustedForGraalCount,
                 ((ELResolver[])getField("resolvers", resolver)).length);
-        Assert.assertEquals(Integer.valueOf(9 + count),
+        Assert.assertEquals(Integer.valueOf(9 + adjustedForGraalCount),
                 Integer.valueOf(((AtomicInteger) getField("resolversSize", resolver)).get()));
     }
 

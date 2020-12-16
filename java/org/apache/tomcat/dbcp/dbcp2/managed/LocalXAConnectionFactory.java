@@ -26,6 +26,7 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
 import jakarta.transaction.TransactionManager;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 
 import org.apache.tomcat.dbcp.dbcp2.ConnectionFactory;
 
@@ -317,9 +318,27 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
      */
     public LocalXAConnectionFactory(final TransactionManager transactionManager,
             final ConnectionFactory connectionFactory) {
+        this(transactionManager, null, connectionFactory);
+    }
+
+    /**
+     * Creates an LocalXAConnectionFactory which uses the specified connection factory to create database connections.
+     * The connections are enlisted into transactions using the specified transaction manager.
+     *
+     * @param transactionManager
+     *            the transaction manager in which connections will be enlisted
+     * @param transactionSynchronizationRegistry
+     *            the optional TSR to register synchronizations with
+     * @param connectionFactory
+     *            the connection factory from which connections will be retrieved
+     * @since 2.8.0
+     */
+    public LocalXAConnectionFactory(final TransactionManager transactionManager,
+            final TransactionSynchronizationRegistry transactionSynchronizationRegistry,
+            final ConnectionFactory connectionFactory) {
         Objects.requireNonNull(transactionManager, "transactionManager is null");
         Objects.requireNonNull(connectionFactory, "connectionFactory is null");
-        this.transactionRegistry = new TransactionRegistry(transactionManager);
+        this.transactionRegistry = new TransactionRegistry(transactionManager, transactionSynchronizationRegistry);
         this.connectionFactory = connectionFactory;
     }
 

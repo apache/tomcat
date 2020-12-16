@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -192,22 +191,19 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         }
         if (running) {
             running = false;
-            acceptor.state = AcceptorState.ENDED;
+            acceptor.stop(10);
             // Use the executor to avoid binding the main thread if something bad
             // occurs and unbind will also wait for a bit for it to complete
-            getExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    // Then close all active connections if any remain
-                    try {
-                        for (SocketWrapperBase<Nio2Channel> wrapper : getConnections()) {
-                            wrapper.close();
-                        }
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                    } finally {
-                        allClosed = true;
+            getExecutor().execute(() -> {
+                // Then close all active connections if any remain
+                try {
+                    for (SocketWrapperBase<Nio2Channel> wrapper : getConnections()) {
+                        wrapper.close();
                     }
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                } finally {
+                    allClosed = true;
                 }
             });
             if (nioChannels != null) {
@@ -319,7 +315,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
             socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
-            socketWrapper.setSecure(isSSLEnabled());
             // Continue processing on the same thread as the acceptor is async
             return processSocket(socketWrapper, SocketEvent.OPEN_READ, false);
         } catch (Throwable t) {
@@ -408,6 +403,17 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
         }
 
+        /**
+         * Signals the Acceptor to stop.
+         *
+         * @param waitSeconds Ignored for NIO2.
+         *
+         */
+        @Override
+        public void stop(int waitSeconds) {
+            acceptor.state = AcceptorState.ENDED;
+        }
+
         @Override
         public void completed(AsynchronousSocketChannel socket,
                 Void attachment) {
@@ -417,6 +423,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             // Configure the socket
             if (isRunning() && !isPaused()) {
                 if (getMaxConnections() == -1) {
+                    serverSock.accept(null, this);
+                } else if (getConnectionCount() < getMaxConnections()) {
+                    try {
+                        // This will not block
+                        countUpOrAwaitConnection();
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
                     serverSock.accept(null, this);
                 } else {
                     // Accept again on a new thread since countUpOrAwaitConnection may block
@@ -1525,11 +1539,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         public SSLSupport getSslSupport(String clientCertProvider) {
             if (getSocket() instanceof SecureNio2Channel) {
                 SecureNio2Channel ch = (SecureNio2Channel) getSocket();
-                SSLEngine sslEngine = ch.getSslEngine();
-                if (sslEngine != null) {
-                    SSLSession session = sslEngine.getSession();
-                    return ((Nio2Endpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
-                }
+                return ch.getSSLSupport();
             }
             return null;
         }

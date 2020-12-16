@@ -12,7 +12,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd, spec-defaults.bnd
+
 Bundle-Name: tomcat-el-api
 Bundle-SymbolicName: org.apache.tomcat-el-api
-Bundle-Version: @VERSION@
-Export-Package: jakarta.el
+Export-Package: jakarta.el;version=${el.spec.version}
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaEL;\
+        version:Version=${el.spec.version};\
+        uses:='${packages;NAMED;jakarta.el.*}'
+
+-namesection: jakarta/el*/;\
+    Specification-Title=Jakarta Expression Language;\
+    Specification-Version=${el.spec.version};\
+    Specification-Vendor=Eclipse Foundation;\
+    Implementation-Title=jakarta.el;\
+    Implementation-Version=${el.spec.version}.${el.revision};\
+    Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.el;\
+        access=32;\
+        version=${el.spec.version}
+-jpms-module-info-options: \
+    jakarta.el;\
+        substitute=el-api

@@ -79,14 +79,7 @@ public class CoyoteAdapter implements Adapter {
 
 
     private static final ThreadLocal<String> THREAD_NAME =
-            new ThreadLocal<String>() {
-
-                @Override
-                protected String initialValue() {
-                    return Thread.currentThread().getName();
-                }
-
-    };
+            ThreadLocal.withInitial(() -> Thread.currentThread().getName());
 
     // ----------------------------------------------------------- Constructors
 
@@ -692,11 +685,11 @@ public class CoyoteAdapter implements Adapter {
             // because no ROOT context has been deployed or the URI was invalid
             // so no context could be mapped.
             if (request.getContext() == null) {
-                // Don't overwrite an existing error
-                if (!response.isError()) {
-                    response.sendError(404);
-                }
                 // Allow processing to continue.
+                // If present, the rewrite Valve may rewrite this to a valid
+                // request.
+                // The StandardEngineValve will handle the case of a missing
+                // Host and the StandardHostValve the case of a missing Context.
                 // If present, the error reporting valve will provide a response
                 // body.
                 return true;
@@ -1144,6 +1137,12 @@ public class CoyoteAdapter implements Adapter {
         int pos = 0;
         int index = 0;
 
+
+        // The URL must start with '/' (or '\' that will be replaced soon)
+        if (b[start] != (byte) '/' && b[start] != (byte) '\\') {
+            return false;
+        }
+
         // Replace '\' with '/'
         // Check for null byte
         for (pos = start; pos < end; pos++) {
@@ -1153,15 +1152,9 @@ public class CoyoteAdapter implements Adapter {
                 } else {
                     return false;
                 }
-            }
-            if (b[pos] == (byte) 0) {
+            } else if (b[pos] == (byte) 0) {
                 return false;
             }
-        }
-
-        // The URL must start with '/'
-        if (b[start] != (byte) '/') {
-            return false;
         }
 
         // Replace "//" with "/"

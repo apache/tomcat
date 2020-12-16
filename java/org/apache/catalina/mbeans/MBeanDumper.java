@@ -159,7 +159,7 @@ public class MBeanDumper {
         // The only invalid char is \n
         // We also need to keep the string short and split it with \nSPACE
         // XXX TODO
-        int idx = value.indexOf("\n");
+        int idx = value.indexOf('\n');
         if (idx < 0) {
             return value;
         }
@@ -218,10 +218,10 @@ public class MBeanDumper {
             CompositeData composite = CompositeData.class.cast(value);
             Set<String> keys = composite.getCompositeType().keySet();
             for (String key : keys) {
-                sb.append(sep).append(key).append("=").append(composite.get(key));
+                sb.append(sep).append(key).append('=').append(composite.get(key));
                 sep = ", ";
             }
-            sb.append("}");
+            sb.append('}');
             valueString = sb.toString();
         } else {
             valueString = value.toString();

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -136,6 +137,39 @@ public class Digester extends DefaultHandler2 {
             Digester.propertySources = propertySources;
             propertySourcesSet = true;
         }
+    }
+
+    private static final HashSet<String> generatedClasses = new HashSet<>();
+
+    public static void addGeneratedClass(String className) {
+        generatedClasses.add(className);
+    }
+
+    public static String[] getGeneratedClasses() {
+        return generatedClasses.toArray(new String[0]);
+    }
+
+    public interface GeneratedCodeLoader {
+        Object loadGeneratedCode(String className);
+    }
+
+    private static GeneratedCodeLoader generatedCodeLoader;
+
+    public static boolean isGeneratedCodeLoaderSet() {
+        return (Digester.generatedCodeLoader != null);
+    }
+
+    public static void setGeneratedCodeLoader(GeneratedCodeLoader generatedCodeLoader) {
+        if (Digester.generatedCodeLoader == null) {
+            Digester.generatedCodeLoader = generatedCodeLoader;
+        }
+    }
+
+    public static Object loadGeneratedClass(String className) {
+        if (generatedCodeLoader != null) {
+            return generatedCodeLoader.loadGeneratedCode(className);
+        }
+        return null;
     }
 
     // --------------------------------------------------- Instance Variables
@@ -340,6 +374,10 @@ public class Digester extends DefaultHandler2 {
      */
     protected Log saxLog = LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
 
+    /**
+     * Generated code.
+     */
+    protected StringBuilder code = null;
 
     public Digester() {
         propertySourcesSet = true;
@@ -373,6 +411,42 @@ public class Digester extends DefaultHandler2 {
         }
     }
 
+
+    public void startGeneratingCode() {
+        code = new StringBuilder();
+    }
+
+    public void endGeneratingCode() {
+        code = null;
+        known.clear();
+    }
+
+    public StringBuilder getGeneratedCode() {
+        return code;
+    }
+
+    protected ArrayList<Object> known = new ArrayList<>();
+    public void setKnown(Object object) {
+        known.add(object);
+    }
+    public String toVariableName(Object object) {
+        boolean found = false;
+        int pos = 0;
+        if (known.size() > 0) {
+            for (int i = known.size() - 1; i >= 0; i--) {
+                if (known.get(i) == object) {
+                    pos = i;
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            pos = known.size();
+            known.add(object);
+        }
+        return "tc_" + object.getClass().getSimpleName() + "_" + String.valueOf(pos);
+    }
 
     // ------------------------------------------------------------- Properties
 
@@ -1662,6 +1736,13 @@ public class Digester extends DefaultHandler2 {
     public void addSetProperties(String pattern) {
 
         addRule(pattern, new SetPropertiesRule());
+
+    }
+
+
+    public void addSetProperties(String pattern, String[] excludes) {
+
+        addRule(pattern, new SetPropertiesRule(excludes));
 
     }
 

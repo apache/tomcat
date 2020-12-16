@@ -146,6 +146,40 @@ Tomcat cluster. These include:</p>
       to the order in which they were sent.
       </p>
       <p>
+        The various <code>channelSendOptions</code> values offer a tradeoff
+        between throughput on the sending node and the reliability of
+        replication should the sending or receiving node(s) fail. Here are
+        some common options. "Message" could be any message sent between nodes,
+        but only session-change messages are considered, here.
+      </p>
+      <p>
+        <code>channelSendOptions="8"</code> / <code>channelSendOptions="async"</code>
+        As far as the sender is concerned, the message is "sent"
+        as soon as it has been placed in the queue on the sender for
+        transmission to the other nodes. The message may not reach any or all
+        of the recipient nodes and may not be successfully processed on any
+        nodes that it does reach. This option offers the highest throughput on
+        the sender but the least reliability, as the triggering request will
+        complete without any knowledge of the success/failure of the session
+        replication.
+      </p>
+      <p>
+        <code>channelSendOptions="2"</code> / <code>channelSendOptions="use_ack"</code>
+        The sender will block the completion of the current request until all
+        of the receiving nodes have acknowledged that they have received the
+        message, but have not necessarily processed that message. This option
+        will result in lower throughput on the sending node, because the message
+        must be transmitted and the acknowledgement received, but the
+        reliability is greater than the asynchronous model.
+      </p>
+      <p>
+        <code>channelSendOptions="6"</code> / <code>channelSendOptions="sync,use_ack"</code>
+        The sender will block the completion of the current request until
+        all of the receiving nodes have acknowledged that they have received
+        <u>and</u> processed the message. This option will have the lowest
+        throughput (of these three) but the greatest reliability.
+      </p>
+      <p>
       You may also set these options as a comma separated string, e.g. "async, multicast", which
       will be translated into <code>Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST</code>
       <br/>

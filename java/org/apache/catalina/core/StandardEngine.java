@@ -485,7 +485,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             if (disabled) return;
             if (Container.ADD_CHILD_EVENT.equals(event.getType())) {
                 Context context = (Context) event.getData();
-                if ("".equals(context.getPath())) {
+                if (context.getPath().isEmpty()) {
                     // Force re-calculation and disable listener since it won't
                     // be re-used
                     engine.defaultAccessLog.set(null);

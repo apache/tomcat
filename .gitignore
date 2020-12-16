@@ -30,13 +30,14 @@ mvn.properties
 .project
 .settings
 .idea
+.vscode
 *.iml
 *.ipr
 *.iws
 *.asc
 *.jj
 *.tmp
-maven-ant-tasks-*.jar
+maven-resolver-ant-tasks-*.jar
 thumbs.db
 Thumbs.db
 bin/setenv.*

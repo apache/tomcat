@@ -440,10 +440,6 @@
       <p>The MemoryRealm is not intended for production use as any changes to
       tomcat-users.xml require a restart of Tomcat to take effect.</p>
 
-      <p>The JDBCRealm is not recommended for production use as it is single
-      threaded for all authentication and authorization options. Use the
-      DataSourceRealm instead.</p>
-
       <p>The UserDatabaseRealm is not intended for large-scale installations. It
       is intended for small-scale, relatively static environments.</p>
 

@@ -418,20 +418,10 @@ public class JspServletWrapper {
                 return;
             }
 
-        } catch (ServletException ex) {
-            if (options.getDevelopment()) {
-                throw handleJspException(ex);
-            }
-            throw ex;
         } catch (FileNotFoundException fnfe) {
             // File has been removed. Let caller handle this.
             throw fnfe;
-        } catch (IOException ex) {
-            if (options.getDevelopment()) {
-                throw handleJspException(ex);
-            }
-            throw ex;
-        } catch (IllegalStateException ex) {
+        } catch (ServletException | IOException | IllegalStateException ex) {
             if (options.getDevelopment()) {
                 throw handleJspException(ex);
             }
@@ -495,7 +485,7 @@ public class JspServletWrapper {
             response.sendError
                 (HttpServletResponse.SC_SERVICE_UNAVAILABLE,
                  ex.getMessage());
-        } catch (ServletException ex) {
+        } catch (ServletException | IllegalStateException ex) {
             if(options.getDevelopment()) {
                 throw handleJspException(ex);
             }
@@ -503,11 +493,6 @@ public class JspServletWrapper {
         } catch (IOException ex) {
             if (options.getDevelopment()) {
                 throw new IOException(handleJspException(ex).getMessage(), ex);
-            }
-            throw ex;
-        } catch (IllegalStateException ex) {
-            if(options.getDevelopment()) {
-                throw handleJspException(ex);
             }
             throw ex;
         } catch (Exception ex) {

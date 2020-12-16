@@ -124,7 +124,20 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     protected enum BindState {
-        UNBOUND, BOUND_ON_INIT, BOUND_ON_START, SOCKET_CLOSED_ON_STOP
+        UNBOUND(false),
+        BOUND_ON_INIT(true),
+        BOUND_ON_START(true),
+        SOCKET_CLOSED_ON_STOP(false);
+
+        private final boolean bound;
+
+        private BindState(boolean bound) {
+            this.bound = bound;
+        }
+
+        public boolean isBound() {
+            return bound;
+        }
     }
 
 
@@ -709,7 +722,12 @@ public abstract class AbstractEndpoint<S,U> {
      */
     private int maxKeepAliveRequests=100; // as in Apache HTTPD server
     public int getMaxKeepAliveRequests() {
-        return maxKeepAliveRequests;
+        // Disable keep-alive if the server socket is not bound
+        if (bindState.isBound()) {
+            return maxKeepAliveRequests;
+        } else {
+            return 1;
+        }
     }
     public void setMaxKeepAliveRequests(int maxKeepAliveRequests) {
         this.maxKeepAliveRequests = maxKeepAliveRequests;
@@ -1302,6 +1320,16 @@ public abstract class AbstractEndpoint<S,U> {
      */
     public final void closeServerSocketGraceful() {
         if (bindState == BindState.BOUND_ON_START) {
+            // Stop accepting new connections
+            acceptor.stop(-1);
+            // Release locks that may be preventing the acceptor from stopping
+            releaseConnectionLatch();
+            unlockAccept();
+            // Signal to any multiplexed protocols (HTTP/2) that they may wish
+            // to stop accepting new streams
+            getHandler().pause();
+            // Update the bindState. This has the side-effect of disabling
+            // keep-alive for any in-progress connections
             bindState = BindState.SOCKET_CLOSED_ON_STOP;
             try {
                 doCloseServerSocket();
@@ -1309,6 +1337,30 @@ public abstract class AbstractEndpoint<S,U> {
                 getLog().warn(sm.getString("endpoint.serverSocket.closeFailed", getName()), ioe);
             }
         }
+    }
+
+
+    /**
+     * Wait for the client connections to the server to close gracefully. The
+     * method will return when all of the client connections have closed or the
+     * method has been waiting for {@code waitTimeMillis}.
+     *
+     * @param waitMillis    The maximum time to wait in milliseconds for the
+     *                      client connections to close.
+     *
+     * @return The wait time, if any remaining when the method returned
+     */
+    public final long awaitConnectionsClose(long waitMillis) {
+        while (waitMillis > 0 && !connections.isEmpty()) {
+            try {
+                Thread.sleep(50);
+                waitMillis -= 50;
+            } catch (InterruptedException e) {
+                Thread.interrupted();
+                waitMillis = 0;
+            }
+        }
+        return waitMillis;
     }
 
 

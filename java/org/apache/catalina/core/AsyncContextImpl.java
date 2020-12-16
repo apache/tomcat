@@ -114,7 +114,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         } finally {
             context.fireRequestDestroyEvent(request.getRequest());
             clearServletRequestResponse();
-            this.context.decrementInProgressAsyncCount();
             context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
         }
     }
@@ -207,16 +206,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                     (AsyncDispatcher) requestDispatcher;
             final ServletRequest servletRequest = getRequest();
             final ServletResponse servletResponse = getResponse();
-            // https://bz.apache.org/bugzilla/show_bug.cgi?id=63246
-            // Take a local copy as the dispatch may complete the
-            // request/response and that in turn may trigger recycling of this
-            // object before the in-progress count can be decremented
-            final Context context = this.context;
             this.dispatch = new AsyncRunnable(
                     request, applicationDispatcher, servletRequest, servletResponse);
             this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
             clearServletRequestResponse();
-            context.decrementInProgressAsyncCount();
         }
     }
 
@@ -458,6 +451,18 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
+    @Override
+    public void incrementInProgressAsyncCount() {
+        context.incrementInProgressAsyncCount();
+    }
+
+
+    @Override
+    public void decrementInProgressAsyncCount() {
+        context.decrementInProgressAsyncCount();
+    }
+
+
     private void logDebug(String method) {
         String rHashCode;
         String crHashCode;
@@ -581,7 +586,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             try {
                 applicationDispatcher.dispatch(servletRequest, servletResponse);
             } catch (Exception e) {
-                throw new RuntimeException(sm.getString("asyncContextImpl.asyncDispachError"), e);
+                throw new RuntimeException(sm.getString("asyncContextImpl.asyncDispatchError"), e);
             }
         }
 

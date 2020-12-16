@@ -203,6 +203,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             Set<URI> redirectSet)
             throws DeploymentException {
 
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("wsWebSocketContainer.connect.entry", endpoint.getClass().getName(), path));
+        }
+
         boolean secure = false;
         ByteBuffer proxyConnect = null;
         URI proxyPath;
@@ -301,13 +305,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         boolean success = false;
         List<Extension> extensionsAgreed = new ArrayList<>();
         Transformation transformation = null;
-
-        // Open the connection
-        Future<Void> fConnect = socketChannel.connect(sa);
         AsyncChannelWrapper channel = null;
 
-        if (proxyConnect != null) {
-            try {
+        try {
+            // Open the connection
+            Future<Void> fConnect = socketChannel.connect(sa);
+
+            if (proxyConnect != null) {
                 fConnect.get(timeout, TimeUnit.MILLISECONDS);
                 // Proxy CONNECT is clear text
                 channel = new AsyncChannelWrapperNonSecure(socketChannel);
@@ -318,34 +322,35 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                             "wsWebSocketContainer.proxyConnectFail", selectedProxy,
                             Integer.toString(httpResponse.getStatus())));
                 }
-            } catch (TimeoutException | InterruptedException | ExecutionException |
-                    EOFException e) {
-                if (channel != null) {
-                    channel.close();
-                }
-                throw new DeploymentException(
-                        sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
             }
-        }
 
-        if (secure) {
-            // Regardless of whether a non-secure wrapper was created for a
-            // proxy CONNECT, need to use TLS from this point on so wrap the
-            // original AsynchronousSocketChannel
-            SSLEngine sslEngine = createSSLEngine(userProperties, host, port);
-            channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
-        } else if (channel == null) {
-            // Only need to wrap as this point if it wasn't wrapped to process a
-            // proxy CONNECT
-            channel = new AsyncChannelWrapperNonSecure(socketChannel);
-        }
+            if (secure) {
+                // Regardless of whether a non-secure wrapper was created for a
+                // proxy CONNECT, need to use TLS from this point on so wrap the
+                // original AsynchronousSocketChannel
+                SSLEngine sslEngine = createSSLEngine(userProperties, host, port);
+                channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
+            } else if (channel == null) {
+                // Only need to wrap as this point if it wasn't wrapped to process a
+                // proxy CONNECT
+                channel = new AsyncChannelWrapperNonSecure(socketChannel);
+            }
 
-        try {
             fConnect.get(timeout, TimeUnit.MILLISECONDS);
 
             Future<Void> fHandshake = channel.handshake();
             fHandshake.get(timeout, TimeUnit.MILLISECONDS);
 
+            if (log.isDebugEnabled()) {
+                SocketAddress localAddress = null;
+                try {
+                    localAddress = channel.getLocalAddress();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+                log.debug(sm.getString("wsWebSocketContainer.connect.write",
+                        Integer.valueOf(request.position()), Integer.valueOf(request.limit()), localAddress));
+            }
             writeRequest(channel, request, timeout);
 
             HttpResponse httpResponse = processResponse(response, channel, timeout);
@@ -483,11 +488,18 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             success = true;
         } catch (ExecutionException | InterruptedException | SSLException |
                 EOFException | TimeoutException | URISyntaxException | AuthenticationException e) {
-            throw new DeploymentException(
-                    sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
+            throw new DeploymentException(sm.getString("wsWebSocketContainer.httpRequestFailed", path), e);
         } finally {
             if (!success) {
-                channel.close();
+                if (channel != null) {
+                    channel.close();
+                } else {
+                    try {
+                        socketChannel.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                }
             }
         }
 
@@ -721,7 +733,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         // Request line
         result.put(GET_BYTES);
-        if (null == uri.getPath() || "".equals(uri.getPath())) {
+        final String path = uri.getPath();
+        if (null == path || path.isEmpty()) {
             result.put(ROOT_URI_BYTES);
         } else {
             result.put(uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1));
@@ -802,9 +815,17 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             response.clear();
             // Blocking read
             Future<Integer> read = channel.read(response);
-            Integer bytesRead = read.get(timeout, TimeUnit.MILLISECONDS);
+            Integer bytesRead;
+            try {
+                bytesRead = read.get(timeout, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                TimeoutException te = new TimeoutException(
+                        sm.getString("wsWebSocketContainer.responseFail", Integer.toString(status), headers));
+                te.initCause(e);
+                throw te;
+            }
             if (bytesRead.intValue() == -1) {
-                throw new EOFException();
+                throw new EOFException(sm.getString("wsWebSocketContainer.responseFail", Integer.toString(status), headers));
             }
             response.flip();
             while (response.hasRemaining() && !readHeaders) {

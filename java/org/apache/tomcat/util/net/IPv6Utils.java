@@ -60,7 +60,7 @@ public class IPv6Utils {
         if (ipv6Address.contains(".")) {
             // IPv4 in IPv6
             // e.g. 0:0:0:0:0:FFFF:127.0.0.1
-            int lastColonPos = ipv6Address.lastIndexOf(":");
+            int lastColonPos = ipv6Address.lastIndexOf(':');
             int lastColonsPos = ipv6Address.lastIndexOf("::");
             if (lastColonsPos >= 0 && lastColonPos == lastColonsPos + 1) {
                 /*
@@ -80,7 +80,7 @@ public class IPv6Utils {
         } else if (ipv6Address.contains("%")) {
             // Zone ID
             // e.g. fe80:0:0:0:f0f0:c0c0:1919:1234%4
-            ipv6AddressLength = ipv6Address.lastIndexOf("%");
+            ipv6AddressLength = ipv6Address.lastIndexOf('%');
         }
 
         StringBuilder result = new StringBuilder();
@@ -109,7 +109,7 @@ public class IPv6Utils {
         int length = ipv6AddressLength;
         int change = 0;
 
-        if (colonsPos >= 0 && colonsPos < ipv6AddressLength - 2) {
+        if (colonsPos >= 0 && colonsPos < ipv6AddressLength - 1) {
             int colonCounter = 0;
             for (int i = 0; i < ipv6AddressLength; i++) {
                 if (ipv6Address.charAt(i) == ':') {

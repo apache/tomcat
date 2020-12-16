@@ -29,5 +29,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Resources {
+
+    /**
+     * @return a Resource[] with the value of this Resources
+     */
     public Resource[] value();
 }

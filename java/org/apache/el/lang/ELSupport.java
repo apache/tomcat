@@ -48,13 +48,8 @@ public class ELSupport {
         String coerceToZeroStr;
         if (System.getSecurityManager() != null) {
             coerceToZeroStr = AccessController.doPrivileged(
-                    new PrivilegedAction<String>(){
-                        @Override
-                        public String run() {
-                            return System.getProperty(
-                                    "org.apache.el.parser.COERCE_TO_ZERO", "false");
-                        }
-                    }
+                    (PrivilegedAction<String>) () -> System.getProperty(
+                            "org.apache.el.parser.COERCE_TO_ZERO", "false")
             );
         } else {
             coerceToZeroStr = System.getProperty(
@@ -540,19 +535,20 @@ public class ELSupport {
         if (obj == null)
             return null;
         if (obj instanceof String) {
+            String str = (String) obj;
             PropertyEditor editor = PropertyEditorManager.findEditor(type);
             if (editor == null) {
-                if ("".equals(obj)) {
+                if (str.isEmpty()) {
                     return null;
                 }
                 throw new ELException(MessageFactory.get("error.convert", obj,
                         obj.getClass(), type));
             } else {
                 try {
-                    editor.setAsText((String) obj);
+                    editor.setAsText(str);
                     return editor.getValue();
                 } catch (RuntimeException e) {
-                    if ("".equals(obj)) {
+                    if (str.isEmpty()) {
                         return null;
                     }
                     throw new ELException(MessageFactory.get("error.convert",

@@ -43,7 +43,6 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import java.util.StringTokenizer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -81,6 +80,7 @@ import org.apache.catalina.webresources.CachedResource;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.ContentRange;
+import org.apache.tomcat.util.http.parser.EntityTag;
 import org.apache.tomcat.util.http.parser.Ranges;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
@@ -150,7 +150,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Full range marker.
      */
-    protected static final Ranges FULL = new Ranges(null, new ArrayList<Ranges.Entry>());
+    protected static final Ranges FULL = new Ranges(null, new ArrayList<>());
 
     private static final ContentRange IGNORE = new ContentRange(null, 0, 0, 0);
 
@@ -297,27 +297,31 @@ public class DefaultServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
 
-        if (getServletConfig().getInitParameter("debug") != null)
+        if (getServletConfig().getInitParameter("debug") != null) {
             debug = Integer.parseInt(getServletConfig().getInitParameter("debug"));
+        }
 
-        if (getServletConfig().getInitParameter("input") != null)
+        if (getServletConfig().getInitParameter("input") != null) {
             input = Integer.parseInt(getServletConfig().getInitParameter("input"));
+        }
 
-        if (getServletConfig().getInitParameter("output") != null)
+        if (getServletConfig().getInitParameter("output") != null) {
             output = Integer.parseInt(getServletConfig().getInitParameter("output"));
+        }
 
         listings = Boolean.parseBoolean(getServletConfig().getInitParameter("listings"));
 
-        if (getServletConfig().getInitParameter("readonly") != null)
+        if (getServletConfig().getInitParameter("readonly") != null) {
             readOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("readonly"));
+        }
 
         compressionFormats = parseCompressionFormats(
                 getServletConfig().getInitParameter("precompressed"),
                 getServletConfig().getInitParameter("gzip"));
 
-        if (getServletConfig().getInitParameter("sendfileSize") != null)
-            sendfileSize =
-                Integer.parseInt(getServletConfig().getInitParameter("sendfileSize")) * 1024;
+        if (getServletConfig().getInitParameter("sendfileSize") != null) {
+            sendfileSize = Integer.parseInt(getServletConfig().getInitParameter("sendfileSize")) * 1024;
+        }
 
         fileEncoding = getServletConfig().getInitParameter("fileEncoding");
         if (fileEncoding == null) {
@@ -331,23 +335,26 @@ public class DefaultServlet extends HttpServlet {
             }
         }
 
-        if (getServletConfig().getInitParameter("useBomIfPresent") != null)
-            useBomIfPresent = Boolean.parseBoolean(
-                    getServletConfig().getInitParameter("useBomIfPresent"));
+        if (getServletConfig().getInitParameter("useBomIfPresent") != null) {
+            useBomIfPresent = Boolean.parseBoolean(getServletConfig().getInitParameter("useBomIfPresent"));
+        }
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
         contextXsltFile = getServletConfig().getInitParameter("contextXsltFile");
         localXsltFile = getServletConfig().getInitParameter("localXsltFile");
         readmeFile = getServletConfig().getInitParameter("readmeFile");
 
-        if (getServletConfig().getInitParameter("useAcceptRanges") != null)
+        if (getServletConfig().getInitParameter("useAcceptRanges") != null) {
             useAcceptRanges = Boolean.parseBoolean(getServletConfig().getInitParameter("useAcceptRanges"));
+        }
 
         // Sanity check on the specified buffer sizes
-        if (input < 256)
+        if (input < 256) {
             input = 256;
-        if (output < 256)
+        }
+        if (output < 256) {
             output = 256;
+        }
 
         if (debug > 0) {
             log("DefaultServlet.init:  input buffer size=" + input +
@@ -355,8 +362,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         // Load the web resources
-        resources = (WebResourceRoot) getServletContext().getAttribute(
-                Globals.RESOURCES_ATTR);
+        resources = (WebResourceRoot) getServletContext().getAttribute(Globals.RESOURCES_ATTR);
 
         if (resources == null) {
             throw new UnavailableException(sm.getString("defaultServlet.noResources"));
@@ -905,7 +911,7 @@ public class DefaultServlet extends HttpServlet {
         String eTag = null;
         String lastModifiedHttp = null;
         if (resource.isFile() && !isError) {
-            eTag = resource.getETag();
+            eTag = generateETag(resource);
             lastModifiedHttp = resource.getLastModifiedHttp();
         }
 
@@ -1300,7 +1306,7 @@ public class DefaultServlet extends HttpServlet {
     private static boolean validate(Ranges.Entry range, long length) {
         long start = getStart(range, length);
         long end = getEnd(range, length);
-        return (range != null) && (start >= 0) && (end >= 0) && (start <= end);
+        return (start >= 0) && (end >= 0) && (start <= end);
     }
 
     private static long getStart(Ranges.Entry range, long length) {
@@ -1494,7 +1500,7 @@ public class DefaultServlet extends HttpServlet {
                 // Ignore
             }
 
-            String eTag = resource.getETag();
+            String eTag = generateETag(resource);
             long lastModified = resource.getLastModified();
 
             if (headerValueTime == (-1L)) {
@@ -1507,7 +1513,7 @@ public class DefaultServlet extends HttpServlet {
                 // If the timestamp of the entity the client got differs from
                 // the last modification date of the entity, the entire entity
                 // is returned.
-                if (Math.abs(lastModified  -headerValueTime) > 1000) {
+                if (Math.abs(lastModified - headerValueTime) > 1000) {
                     return FULL;
                 }
             }
@@ -1611,7 +1617,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<listing ");
         sb.append(" contextPath='");
         sb.append(contextPath);
-        sb.append("'");
+        sb.append('\'');
         sb.append(" directory='");
         sb.append(resource.getName());
         sb.append("' ");
@@ -1645,25 +1651,25 @@ public class DefaultServlet extends HttpServlet {
             sb.append("<entry");
             sb.append(" type='")
               .append(childResource.isDirectory()?"dir":"file")
-              .append("'");
+              .append('\'');
             sb.append(" urlPath='")
               .append(rewrittenContextPath)
               .append(rewriteUrl(directoryWebappPath + entry))
               .append(childResource.isDirectory()?"/":"")
-              .append("'");
+              .append('\'');
             if (childResource.isFile()) {
                 sb.append(" size='")
                   .append(renderSize(childResource.getContentLength()))
-                  .append("'");
+                  .append('\'');
             }
             sb.append(" date='")
               .append(childResource.getLastModifiedHttp())
-              .append("'");
+              .append('\'');
 
-            sb.append(">");
+            sb.append('>');
             sb.append(Escape.htmlElementContent(entry));
             if (childResource.isDirectory())
-                sb.append("/");
+                sb.append('/');
             sb.append("</entry>");
         }
         sb.append("</entries>");
@@ -1781,7 +1787,7 @@ public class DefaultServlet extends HttpServlet {
                 parent = "/";
             sb.append(rewriteUrl(parent));
             if (!parent.endsWith("/"))
-                sb.append("/");
+                sb.append('/');
             sb.append("\">");
             sb.append("<b>");
             sb.append(sm.getString("directory.parent", parent));
@@ -1863,11 +1869,11 @@ public class DefaultServlet extends HttpServlet {
             sb.append(rewrittenContextPath);
             sb.append(rewriteUrl(childResource.getWebappPath()));
             if (childResource.isDirectory())
-                sb.append("/");
+                sb.append('/');
             sb.append("\"><tt>");
             sb.append(Escape.htmlElementContent(filename));
             if (childResource.isDirectory())
-                sb.append("/");
+                sb.append('/');
             sb.append("</tt></a></td>\r\n");
 
             sb.append("<td align=\"right\"><tt>");
@@ -2157,41 +2163,37 @@ public class DefaultServlet extends HttpServlet {
      *  request processing is stopped
      * @throws IOException an IO error occurred
      */
-    protected boolean checkIfMatch(HttpServletRequest request,
-            HttpServletResponse response, WebResource resource)
+    protected boolean checkIfMatch(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String eTag = resource.getETag();
-        // Default servlet uses weak matching so we strip any leading "W/" and
-        // then compare using equals
-        if (eTag.startsWith("W/")) {
-            eTag = eTag.substring(2);
-        }
         String headerValue = request.getHeader("If-Match");
         if (headerValue != null) {
-            if (headerValue.indexOf('*') == -1) {
 
-                StringTokenizer commaTokenizer = new StringTokenizer(headerValue, ",");
-                boolean conditionSatisfied = false;
+            boolean conditionSatisfied;
 
-                while (!conditionSatisfied && commaTokenizer.hasMoreTokens()) {
-                    String currentToken = commaTokenizer.nextToken();
-                    currentToken = currentToken.trim();
-                    if (currentToken.startsWith("W/")) {
-                        currentToken = currentToken.substring(2);
+            if (!headerValue.equals("*")) {
+                String resourceETag = generateETag(resource);
+                if (resourceETag == null) {
+                    conditionSatisfied = false;
+                } else {
+                    // RFC 7232 requires strong comparison for If-Match headers
+                    Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), false, resourceETag);
+                    if (matched == null) {
+                        if (debug > 10) {
+                            log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
+                        }
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                        return false;
                     }
-                    if (currentToken.equals(eTag))
-                        conditionSatisfied = true;
+                    conditionSatisfied = matched.booleanValue();
                 }
+            } else {
+                conditionSatisfied = true;
+            }
 
-                // If none of the given ETags match, 412 Precondition failed is
-                // sent back
-                if (!conditionSatisfied) {
-                    response.sendError
-                        (HttpServletResponse.SC_PRECONDITION_FAILED);
-                    return false;
-                }
-
+            if (!conditionSatisfied) {
+                response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return false;
             }
         }
         return true;
@@ -2222,7 +2224,7 @@ public class DefaultServlet extends HttpServlet {
                     // The entity has not been modified since the date
                     // specified by the client. This is not an error case.
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                    response.setHeader("ETag", resource.getETag());
+                    response.setHeader("ETag", generateETag(resource));
 
                     return false;
                 }
@@ -2245,50 +2247,51 @@ public class DefaultServlet extends HttpServlet {
      *  request processing is stopped
      * @throws IOException an IO error occurred
      */
-    protected boolean checkIfNoneMatch(HttpServletRequest request,
-            HttpServletResponse response, WebResource resource)
+    protected boolean checkIfNoneMatch(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String eTag = resource.getETag();
         String headerValue = request.getHeader("If-None-Match");
         if (headerValue != null) {
 
-            boolean conditionSatisfied = false;
+            boolean conditionSatisfied;
 
+            String resourceETag = generateETag(resource);
             if (!headerValue.equals("*")) {
-
-                StringTokenizer commaTokenizer =
-                    new StringTokenizer(headerValue, ",");
-
-                while (!conditionSatisfied && commaTokenizer.hasMoreTokens()) {
-                    String currentToken = commaTokenizer.nextToken();
-                    if (currentToken.trim().equals(eTag))
-                        conditionSatisfied = true;
+                if (resourceETag == null) {
+                    conditionSatisfied = false;
+                } else {
+                    // RFC 7232 requires weak comparison for If-None-Match headers
+                    Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), true, resourceETag);
+                    if (matched == null) {
+                        if (debug > 10) {
+                            log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
+                        }
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                        return false;
+                    }
+                    conditionSatisfied = matched.booleanValue();
                 }
-
             } else {
                 conditionSatisfied = true;
             }
 
             if (conditionSatisfied) {
-
                 // For GET and HEAD, we should respond with
                 // 304 Not Modified.
                 // For every other method, 412 Precondition Failed is sent
                 // back.
-                if ( ("GET".equals(request.getMethod()))
-                     || ("HEAD".equals(request.getMethod())) ) {
+                if ("GET".equals(request.getMethod()) || "HEAD".equals(request.getMethod())) {
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                    response.setHeader("ETag", eTag);
-
-                    return false;
+                    response.setHeader("ETag", resourceETag);
+                } else {
+                    response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
                 }
-                response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
                 return false;
             }
         }
         return true;
     }
+
 
     /**
      * Check if the if-unmodified-since condition is satisfied.
@@ -2319,6 +2322,21 @@ public class DefaultServlet extends HttpServlet {
             return true;
         }
         return true;
+    }
+
+
+    /**
+     * Provides the entity tag (the ETag header) for the given resource.
+     * Intended to be over-ridden by custom DefaultServlet implementations that
+     * wish to use an alternative format for the entity tag.
+     *
+     * @param resource  The resource for which an entity tag is required.
+     *
+     * @return The result of calling {@link WebResource#getETag()} on the given
+     *         resource
+     */
+    protected String generateETag(WebResource resource) {
+        return resource.getETag();
     }
 
 

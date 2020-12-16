@@ -74,7 +74,7 @@ public class NamingContext implements Context {
      * @param name The name of the associated Catalina Context
      */
     public NamingContext(Hashtable<String,Object> env, String name) {
-        this(env, name, new HashMap<String,NamingEntry>());
+        this(env, name, new HashMap<>());
     }
 
 
@@ -804,7 +804,7 @@ public class NamingContext implements Context {
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             // Should never happen
         }
-        GRAAL = result;
+        GRAAL = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
     }
 
     /**

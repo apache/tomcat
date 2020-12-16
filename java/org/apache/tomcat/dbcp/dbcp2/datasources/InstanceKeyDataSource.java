@@ -532,7 +532,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Sets the backend ConnectionPoolDataSource. This property should not be set if using JNDI to access the
+     * Sets the back end ConnectionPoolDataSource. This property should not be set if using JNDI to access the
      * data source.
      *
      * @param v
@@ -689,7 +689,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Gets the value of jndiEnvironment which is used when instantiating a JNDI InitialContext. This InitialContext is
-     * used to locate the backend ConnectionPoolDataSource.
+     * used to locate the back end ConnectionPoolDataSource.
      *
      * @param key
      *            JNDI environment key.
@@ -705,7 +705,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Sets the value of the given JNDI environment property to be used when instantiating a JNDI InitialContext. This
-     * InitialContext is used to locate the backend ConnectionPoolDataSource.
+     * InitialContext is used to locate the back end ConnectionPoolDataSource.
      *
      * @param key
      *            the JNDI environment property to set.
@@ -721,7 +721,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Sets the JNDI environment to be used when instantiating a JNDI InitialContext. This InitialContext is used to
-     * locate the backend ConnectionPoolDataSource.
+     * locate the back end ConnectionPoolDataSource.
      *
      * @param properties
      *            the JNDI environment property to set which will overwrite any current settings
@@ -916,10 +916,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         } catch (final NoSuchElementException e) {
             closeDueToException(info);
             throw new SQLException("Cannot borrow connection from pool", e);
-        } catch (final RuntimeException e) {
-            closeDueToException(info);
-            throw e;
-        } catch (final SQLException e) {
+        } catch (final RuntimeException | SQLException e) {
             closeDueToException(info);
             throw e;
         } catch (final Exception e) {
@@ -956,10 +953,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
                 } catch (final NoSuchElementException e) {
                     closeDueToException(info);
                     throw new SQLException("Cannot borrow connection from pool", e);
-                } catch (final RuntimeException e) {
-                    closeDueToException(info);
-                    throw e;
-                } catch (final SQLException e) {
+                } catch (final RuntimeException | SQLException e) {
                     closeDueToException(info);
                     throw e;
                 } catch (final Exception e) {
@@ -1062,9 +1056,9 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     @Override
     public synchronized String toString() {
         final StringBuilder builder = new StringBuilder(super.toString());
-        builder.append("[");
+        builder.append('[');
         toStringFields(builder);
-        builder.append("]");
+        builder.append(']');
         return builder.toString();
     }
 

@@ -12,9 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-util-scan
 Bundle-SymbolicName: org.apache.tomcat-util-scan
-Bundle-Version: @VERSION@
 Export-Package: \
     org.apache.tomcat.util.descriptor,\
     org.apache.tomcat.util.descriptor.tagplugin,\
@@ -22,3 +24,11 @@ Export-Package: \
     org.apache.tomcat.util.descriptor.web,\
     org.apache.tomcat.util.digester,\
     org.apache.tomcat.util.scan
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=${Bundle-Name}

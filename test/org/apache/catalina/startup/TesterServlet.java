@@ -28,6 +28,19 @@ public class TesterServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    private final boolean explicitClose;
+
+
+    public TesterServlet() {
+        this(false);
+    }
+
+
+    public TesterServlet(boolean explicitClose) {
+        this.explicitClose = explicitClose;
+    }
+
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -35,5 +48,9 @@ public class TesterServlet extends HttpServlet {
         resp.setContentType("text/plain");
         PrintWriter out = resp.getWriter();
         out.print("OK");
+
+        if (explicitClose) {
+            resp.setHeader("Connection", "close");
+        }
     }
 }

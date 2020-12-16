@@ -122,7 +122,7 @@ public class JSSEUtil extends SSLUtilBase {
                         String protocolUpper = protocol.toUpperCase(Locale.ENGLISH);
                         if (!"SSLV2HELLO".equals(protocolUpper) && !"SSLV3".equals(protocolUpper)) {
                             if (protocolUpper.contains("SSL")) {
-                                log.debug(sm.getString("jsse.excludeProtocol", protocol));
+                                log.debug(sm.getString("jsseUtil.excludeProtocol", protocol));
                                 continue;
                             }
                         }
@@ -130,7 +130,7 @@ public class JSSEUtil extends SSLUtilBase {
                     }
 
                     if (implementedProtocols.size() == 0) {
-                        log.warn(sm.getString("jsse.noDefaultProtocols"));
+                        log.warn(sm.getString("jsseUtil.noDefaultProtocols"));
                     }
 
                     String[] implementedCipherSuiteArray = context.getSupportedSSLParameters().getCipherSuites();

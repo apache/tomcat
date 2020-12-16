@@ -762,6 +762,20 @@ public interface Context extends Container, ContextBind {
     public String getContainerSciFilter();
 
 
+    /**
+     * @return the value of the parallel annotation scanning flag.  If true,
+     * it will dispatch scanning to the utility executor.
+     */
+    public boolean isParallelAnnotationScanning();
+
+    /**
+     * Set the parallel annotation scanning value.
+     *
+     * @param parallelAnnotationScanning new parallel annotation scanning flag
+     */
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning);
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -1931,5 +1945,18 @@ public interface Context extends Container, ContextBind {
      */
     public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject);
 
+
+    /**
+     * @return <code>true</code> if the resources archive lookup will
+     * use a bloom filter.
+     */
+    public boolean getUseBloomFilterForArchives();
+
+    /**
+     * Set bloom filter flag value.
+     *
+     * @param useBloomFilterForArchives The new fast class path scan flag
+     */
+    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives);
 
 }

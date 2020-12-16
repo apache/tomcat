@@ -36,6 +36,9 @@
 
 <section name="Introduction">
 
+  <p><strong>Note: The APR/Native HTTP Connector is deprecated and will be
+  removed in Tomcat 10.1.x onwards.</strong></p>
+
   <p>The <strong>HTTP Connector</strong> element represents a
   <strong>Connector</strong> component that supports the HTTP/1.1 protocol.
   It enables Catalina to function as a stand-alone web server, in addition
@@ -89,6 +92,21 @@
       <p>The default timeout for asynchronous requests in milliseconds. If not
       specified, this attribute is set to the Servlet specification default of
       30000 (30 seconds).</p>
+    </attribute>
+
+    <attribute name="continueResponseTiming" required="false">
+      <p>When to respond with a <code>100</code> intermediate response code to a
+      request containing an <code>Expect: 100-continue</code> header.
+      The following values may used:
+      <ul>
+      <li><code>immediately</code> - an intermediate 100 status response
+      will be returned as soon as practical</li>
+      <li><code>onRead</code> - an intermediate 100 status
+      response will be returned only when the Servlet reads the request body,
+      allowing the servlet to inspect the headers and possibly respond
+      before the user agent sends a possibly large request body.</li>
+      </ul>
+      </p>
     </attribute>
 
     <attribute name="defaultSSLHostConfigName" required="false">
@@ -212,7 +230,7 @@
         <code>org.apache.coyote.http11.Http11Nio2Protocol</code> -
               non blocking Java NIO2 connector<br/>
         <code>org.apache.coyote.http11.Http11AprProtocol</code> -
-              the APR/native connector.<br/>
+              the APR/native connector (deprecated - will be removed in 10.1.x).<br/>
         Custom implementations may also be used.<br/>
         Take a look at our <a href="#Connector_Comparison">Connector
         Comparison</a> chart. The configuration for both Java connectors is
@@ -545,7 +563,7 @@
     </attribute>
 
     <attribute name="noCompressionStrongETag" required="false">
-      <p>This flag configures whether resources with a stong ETag will be
+      <p>This flag configures whether resources with a strong ETag will be
       considered for compression. If <code>true</code>, resources with a strong
       ETag will not be compressed. The default value is <code>true</code>.</p>
       <p>This attribute is deprecated. It will be removed in Tomcat 10 onwards
@@ -879,7 +897,7 @@
       <attribute name="useInheritedChannel" required="false">
         <p>(bool)Defines if this connector should inherit an inetd/systemd network socket.
         Only one connector can inherit a network socket. This can option can be
-        used to automatcially start Tomcat once a connection request is made to
+        used to automatically start Tomcat once a connection request is made to
         the systemd super daemon's port.
         The default value is <code>false</code>. See the JavaDoc
         for the <code>java.nio.channels.spi.SelectorProvider</code> class for
@@ -969,6 +987,9 @@
 
   <subsection name="APR/native specific configuration">
 
+    <p><strong>Note: The APR/Native HTTP Connector is deprecated and will be
+    removed in Tomcat 10.1.x onwards.</strong></p>
+
     <p>The following attributes are specific to the APR/native connector.</p>
 
     <attributes>
@@ -1036,16 +1057,16 @@
 
 <section name="Nested Components">
 
-  <p>First implemented in Tomcat 9 and back-ported to 8.5, Tomcat now supports
-  Server Name Indication (SNI). This allows multiple SSL configurations to be
-  associated with a single secure connector with the configuration used for any
-  given connection determined by the host name requested by the client. To
-  facilitate this, the <strong>SSLHostConfig</strong> element was added which
-  can be used to define one of these configurations. Any number of
-  <strong>SSLHostConfig</strong> may be nested in a <strong>Connector</strong>.
-  At the same time, support was added for multiple certificates to be associated
-  with a single <strong>SSLHostConfig</strong>. Each SSL certificate is
-  therefore configured in a <strong>Certificate</strong> element with in an
+  <p>Tomcat supports Server Name Indication (SNI). This allows multiple SSL
+  configurations to be associated with a single secure connector with the
+  configuration used for any given connection determined by the host name
+  requested by the client. To facilitate this, the
+  <strong>SSLHostConfig</strong> element was added which can be used to define
+  one of these configurations. Any number of <strong>SSLHostConfig</strong> may
+  be nested in a <strong>Connector</strong>. At the same time, support was added
+  for multiple certificates to be associated with a single
+  <strong>SSLHostConfig</strong>. Each SSL certificate is therefore configured
+  in a <strong>Certificate</strong> element within an
   <strong>SSLHostConfig</strong>. For further information, see the SSL Support
   section below.</p>
 
@@ -1153,6 +1174,12 @@
   <code>defaultSSLHostConfigName</code> then that will be treated as a configuration
   error. It is expected that Tomcat 10 will drop support for the SSL
   configuration attributes in the <strong>Connector</strong>.</p>
+
+  <p>In addition to the standard TLS related request attributes defined in
+  section 3.10 of the Servlet specification, Tomcat supports a number of
+  additional TLS related attributes. The full list may be found in the <a
+  href="http://tomcat.apache.org/tomcat-10.0-doc/api/index.html">SSLSupport
+  Javadoc</a>.</p>
 
   <p>For more information, see the
   <a href="../ssl-howto.html">SSL Configuration How-To</a>.</p>
@@ -1569,7 +1596,7 @@
     <p>In addition to the standard key store types (JKS and PKCS12), most Java
     runtimes support additional key store types such as Windows-ROOT,
     Windows-My, DKS as well as hardware security modules. Generally, to use
-    these additional keystore types with a TLS Conector in Tomcat:</p>
+    these additional keystore types with a TLS Connector in Tomcat:</p>
 
     <ul>
       <li>Set the certificateKeystoreType and/or truststoreType Connector
@@ -1593,7 +1620,7 @@
     <p>Variations in key store implementations, combined with the key store
     manipulation Tomcat does in the background to allow interoperability between
     JSSE and OpenSSL configuration styles, means that some keystores may need
-    slightly different configuration. Assitance is always available from the
+    slightly different configuration. Assistance is always available from the
     <a href="http://tomcat.apache.org/lists.html#tomcat-users">Apache Tomcat
     users mailing list</a>. We aim to document any key stores that vary from the
     above advice here. Currently there are none we are aware of.</p>
@@ -1609,7 +1636,7 @@
         <th />
         <th style="text-align: center;">Java Nio Connector<br />NIO</th>
         <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
-        <th style="text-align: center;">APR/native Connector<br />APR</th>
+        <th style="text-align: center;">APR/native Connector<br />APR<br />(deprecated)</th>
       </tr>
       <tr>
         <th>Classname</th>

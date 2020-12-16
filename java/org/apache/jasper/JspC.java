@@ -1124,6 +1124,19 @@ public class JspC extends Task implements Options {
         return tagPluginManager;
     }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Hard-coded to {@code false} for pre-compiled code to enable repeatable
+     * builds.
+     */
+    @Override
+    public boolean getGeneratedJavaAddTimestamp() {
+        return false;
+    }
+
+
     /**
      * Adds servlet declaration and mapping for the JSP page servlet to the
      * generated web.xml fragment.
@@ -1147,7 +1160,7 @@ public class JspC extends Task implements Options {
         String packageName = clctxt.getServletPackageName();
 
         String thisServletName;
-        if  ("".equals(packageName)) {
+        if  (packageName.isEmpty()) {
             thisServletName = className;
         } else {
             thisServletName = packageName + '.' + className;

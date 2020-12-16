@@ -38,7 +38,6 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardService;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.realm.DataSourceRealm;
-import org.apache.catalina.realm.JDBCRealm;
 import org.apache.catalina.realm.JNDIRealm;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.catalina.realm.UserDatabaseRealm;
@@ -320,34 +319,6 @@ public class MBeanFactory {
     public String createHttpsConnector(String parent, String address, int port)
         throws Exception {
         return createConnector(parent, address, port, false, true);
-    }
-
-
-    /**
-     * Create a new JDBC Realm.
-     *
-     * @param parent MBean Name of the associated parent component
-     * @param driverName JDBC driver name
-     * @param connectionName the user name for the connection
-     * @param connectionPassword the password for the connection
-     * @param connectionURL the connection URL to the database
-     * @return the object name of the created realm
-     *
-     * @exception Exception if an MBean cannot be created or registered
-     */
-    public String createJDBCRealm(String parent, String driverName,
-        String connectionName, String connectionPassword, String connectionURL)
-        throws Exception {
-
-        // Create a new JDBCRealm instance
-        JDBCRealm realm = new JDBCRealm();
-        realm.setDriverName(driverName);
-        realm.setConnectionName(connectionName);
-        realm.setConnectionPassword(connectionPassword);
-        realm.setConnectionURL(connectionURL);
-
-        // Add the new instance to its parent component
-        return addRealmToParent(parent, realm);
     }
 
 

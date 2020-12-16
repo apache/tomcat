@@ -35,7 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class OpenSSLUtil extends SSLUtilBase {
 
     private static final Log log = LogFactory.getLog(OpenSSLUtil.class);
-    private static final StringManager sm = StringManager.getManager(OpenSSLContext.class);
+    private static final StringManager sm = StringManager.getManager(OpenSSLUtil.class);
 
 
     public OpenSSLUtil(SSLHostConfigCertificate certificate) {
@@ -110,7 +110,7 @@ public class OpenSSLUtil extends SSLUtilBase {
             // KeyStoreException or IOException if it doesn't understand the
             // provided file.
             if (certificate.getCertificateFile() != null) {
-                String msg = sm.getString("openssl.nonJsseCertficate",
+                String msg = sm.getString("openssl.nonJsseCertificate",
                         certificate.getCertificateFile(), certificate.getCertificateKeyFile());
                 if (log.isDebugEnabled()) {
                     log.info(msg, e);

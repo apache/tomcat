@@ -323,14 +323,17 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
 
-        NBWriteServlet servlet = new NBWriteServlet();
+        // Some CI platforms appear to have particularly large write buffers
+        // and appear to ignore the socket.txBufSize below. Therefore, configure
+        // configure the Servlet to keep writing until an error is encountered.
+        NBWriteServlet servlet = new NBWriteServlet(true);
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
         // Note: Low values of socket.txBufSize can trigger very poor
         //       performance. Set it just low enough to ensure that the
         //       non-blocking write servlet will see isReady() == false
-        Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "1048576"));
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "524228"));
         tomcat.start();
 
         SocketFactory factory = SocketFactory.getDefault();
@@ -542,8 +545,19 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     @WebServlet(asyncSupported = true)
     public static class NBWriteServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
+        private final boolean unlimited;
         public transient volatile TestWriteListener wlistener;
         public transient volatile TestReadListener rlistener;
+
+        public NBWriteServlet() {
+            this(false);
+        }
+
+
+        public NBWriteServlet(boolean unlimited) {
+            this.unlimited = unlimited;
+        }
+
 
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -578,7 +592,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             in.setReadListener(rlistener);
             ServletOutputStream out = resp.getOutputStream();
             resp.setBufferSize(200 * 1024);
-            wlistener = new TestWriteListener(actx);
+            wlistener = new TestWriteListener(actx, unlimited);
             out.setWriteListener(wlistener);
         }
 
@@ -730,18 +744,20 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private static class TestWriteListener implements WriteListener {
         AsyncContext ctx;
+        private final boolean unlimited;
         int written = 0;
         public volatile boolean onErrorInvoked = false;
 
-        public TestWriteListener(AsyncContext ctx) {
+        public TestWriteListener(AsyncContext ctx, boolean unlimted) {
             this.ctx = ctx;
+            this.unlimited = unlimted;
         }
 
         @Override
         public void onWritePossible() throws IOException {
             long start = System.currentTimeMillis();
             int before = written;
-            while (written < WRITE_SIZE &&
+            while ((written < WRITE_SIZE || unlimited) &&
                     ctx.getResponse().getOutputStream().isReady()) {
                 ctx.getResponse().getOutputStream().write(
                         DATA, written, CHUNK_SIZE);

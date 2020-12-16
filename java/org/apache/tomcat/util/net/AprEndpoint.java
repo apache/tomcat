@@ -76,7 +76,11 @@ import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
  *
  * @author Mladen Turk
  * @author Remy Maucherat
+ *
+ * @deprecated  The APR/Native Connector will be removed in Tomcat 10.1.x
+ *              onwards.
  */
+@Deprecated
 public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallBack {
 
     // -------------------------------------------------------------- Constants
@@ -486,24 +490,13 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
         if (running) {
             running = false;
+            acceptor.stop(10);
             poller.stop();
             for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
                 socketWrapper.close();
             }
-            long waitLeft = 10000;
-            while (waitLeft > 0 &&
-                    acceptor.getState() != AcceptorState.ENDED &&
-                    serverSock != 0) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                waitLeft -= 50;
-            }
-            if (waitLeft == 0) {
-                log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed",
-                        acceptor.getThreadName()));
+            if (acceptor.getState() != AcceptorState.ENDED && !getBindOnInit()) {
+                log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed", acceptor.getThreadName()));
                 // If the Acceptor is still running force
                 // the hard socket close.
                 if (serverSock != 0) {
@@ -680,7 +673,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             AprSocketWrapper wrapper = new AprSocketWrapper(socket, this);
             connections.put(socket, wrapper);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
-            wrapper.setSecure(isSSLEnabled());
             wrapper.setReadTimeout(getConnectionTimeout());
             wrapper.setWriteTimeout(getConnectionTimeout());
             getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
@@ -723,6 +715,11 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
      */
     protected boolean processSocket(long socket, SocketEvent event) {
         SocketWrapperBase<Long> socketWrapper = connections.get(Long.valueOf(socket));
+        if (socketWrapper == null) {
+            // Socket probably closed from another thread. Triggering another
+            // close in case won't cause an issue.
+            return false;
+        }
         if (event == SocketEvent.OPEN_READ && socketWrapper.readOperation != null) {
             return socketWrapper.readOperation.process();
         } else if (event == SocketEvent.OPEN_WRITE && socketWrapper.writeOperation != null) {
@@ -1246,15 +1243,15 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
          */
         @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("Poller");
             long[] res = new long[pollerSize * 2];
             int count = Poll.pollset(aprPoller, res);
             buf.append(" [ ");
             for (int j = 0; j < count; j++) {
-                buf.append(desc[2*j+1]).append(" ");
+                buf.append(desc[2*j+1]).append(' ');
             }
-            buf.append("]");
+            buf.append(']');
             return buf.toString();
         }
 
@@ -1681,7 +1678,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
          * will be handled asynchronously inside the kernel. As a result,
          * the poller will never be used.
          *
-         * @param data containing the reference to the data which should be snet
+         * @param data containing the reference to the data which should be sent
          * @return true if all the data has been sent right away, and false
          *              otherwise
          */

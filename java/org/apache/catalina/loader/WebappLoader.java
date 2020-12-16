@@ -189,6 +189,17 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
         this.loaderClass = loaderClass;
     }
 
+    /**
+     * Set the ClassLoader instance, without relying on reflection
+     * This method will also invoke {@link #setLoaderClass(String)} with
+     * {@code loaderInstance.getClass().getName()} as an argument
+     *
+     * @param loaderInstance The new ClassLoader instance to use
+     */
+    public void setLoaderInstance(WebappClassLoaderBase loaderInstance) {
+        this.classLoader = loaderInstance;
+        setLoaderClass(loaderInstance.getClass().getName());
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -243,7 +254,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
         String repositories[]=getLoaderRepositories();
         StringBuilder sb=new StringBuilder();
         for (String repository : repositories) {
-            sb.append(repository).append(":");
+            sb.append(repository).append(':');
         }
         return sb.toString();
     }
@@ -398,6 +409,14 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
     private WebappClassLoaderBase createClassLoader()
         throws Exception {
 
+        if (classLoader != null) {
+            return classLoader;
+        }
+
+        if (ParallelWebappClassLoader.class.getName().equals(loaderClass)) {
+            return new ParallelWebappClassLoader(context.getParentClassLoader());
+        }
+
         Class<?> clazz = Class.forName(loaderClass);
         WebappClassLoaderBase classLoader = null;
 
@@ -548,7 +567,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
 
         String contextName = context.getName();
         if (!contextName.startsWith("/")) {
-            name.append("/");
+            name.append('/');
         }
         name.append(contextName);
 

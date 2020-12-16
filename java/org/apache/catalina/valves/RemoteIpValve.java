@@ -17,6 +17,8 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -658,7 +660,22 @@ public class RemoteIpValve extends ValveBase {
             if (remoteIp != null) {
 
                 request.setRemoteAddr(remoteIp);
-                request.setRemoteHost(remoteIp);
+                if (request.getConnector().getEnableLookups()) {
+                    // This isn't a lazy lookup but that would be a little more
+                    // invasive - mainly in Request.getRemoteHost() - and if
+                    // enableLookups is true it seems reasonable that the
+                    // hotsname will be required so look it up here.
+                    try {
+                        InetAddress inetAddress = InetAddress.getByName(remoteIp);
+                        // We know we need a DNS look up so use getCanonicalHostName()
+                        request.setRemoteHost(inetAddress.getCanonicalHostName());
+                    } catch (UnknownHostException e) {
+                        log.debug(sm.getString("remoteIpValve.invalidRemoteAddress", remoteIp), e);
+                        request.setRemoteHost(remoteIp);
+                    }
+                } else {
+                    request.setRemoteHost(remoteIp);
+                }
 
                 if (proxiesHeaderValue.size() == 0) {
                     request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);

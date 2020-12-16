@@ -230,7 +230,7 @@ public final class ForEach implements TagPlugin {
                 "    public boolean hasNext() {\n" +
                 "      return index < a.length;}\n" +
                 "    public Object next() {\n" +
-                "      return new Boolean(a[index++]);}\n" +
+                "      return Boolean.valueOf(a[index++]);}\n" +
                 "    public void remove() {}\n" +
                 "  });\n" +
                 "}"
@@ -244,7 +244,7 @@ public final class ForEach implements TagPlugin {
                 "    public boolean hasNext() {\n" +
                 "      return index < a.length;}\n" +
                 "    public Object next() {\n" +
-                "      return new Byte(a[index++]);}\n" +
+                "      return Byte.valueOf(a[index++]);}\n" +
                 "    public void remove() {}\n" +
                 "  });\n" +
                 "}"
@@ -258,7 +258,7 @@ public final class ForEach implements TagPlugin {
                 "    public boolean hasNext() {\n" +
                 "      return index < a.length;}\n" +
                 "    public Object next() {\n" +
-                "      return new Character(a[index++]);}\n" +
+                "      return Character.valueOf(a[index++]);}\n" +
                 "    public void remove() {}\n" +
                 "  });\n" +
                 "}"
@@ -272,7 +272,7 @@ public final class ForEach implements TagPlugin {
                 "    public boolean hasNext() {\n" +
                 "      return index < a.length;}\n" +
                 "    public Object next() {\n" +
-                "      return new Short(a[index++]);}\n" +
+                "      return Short.valueOf(a[index++]);}\n" +
                 "    public void remove() {}\n" +
                 "  });\n" +
                 "}"
@@ -286,7 +286,7 @@ public final class ForEach implements TagPlugin {
                 "    public boolean hasNext() {\n" +
                 "      return index < a.length;}\n" +
                 "    public Object next() {\n" +
-                "      return new Integer(a[index++]);}\n" +
+                "      return Integer.valueOf(a[index++]);}\n" +
                 "    public void remove() {}\n" +
                 "  });\n" +
                 "}"
@@ -300,7 +300,7 @@ public final class ForEach implements TagPlugin {
                 "    public boolean hasNext() {\n" +
                 "      return index < a.length;}\n" +
                 "    public Object next() {\n" +
-                "      return new Long(a[index++]);}\n" +
+                "      return Long.valueOf(a[index++]);}\n" +
                 "    public void remove() {}\n" +
                 "  });\n" +
                 "}"
@@ -314,7 +314,7 @@ public final class ForEach implements TagPlugin {
                 "    public boolean hasNext() {\n" +
                 "      return index < a.length;}\n" +
                 "    public Object next() {\n" +
-                "      return new Float(a[index++]);}\n" +
+                "      return Float.valueOf(a[index++]);}\n" +
                 "    public void remove() {}\n" +
                 "  });\n" +
                 "}"
@@ -328,7 +328,7 @@ public final class ForEach implements TagPlugin {
                 "    public boolean hasNext() {\n" +
                 "      return index < a.length;}\n" +
                 "    public Object next() {\n" +
-                "      return new Double(a[index++]);}\n" +
+                "      return Double.valueOf(a[index++]);}\n" +
                 "    public void remove() {}\n" +
                 "  });\n" +
                 "}"

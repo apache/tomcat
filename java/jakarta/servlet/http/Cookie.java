@@ -73,32 +73,14 @@ public class Cookie implements Cloneable, Serializable {
                     "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
         } else {
             strictServletCompliance = AccessController.doPrivileged(
-                    new PrivilegedAction<Boolean>() {
-                        @Override
-                        public Boolean run() {
-                            return Boolean.valueOf(System.getProperty(
-                                    "org.apache.catalina.STRICT_SERVLET_COMPLIANCE"));
-                        }
-                    }
-                ).booleanValue();
+                    (PrivilegedAction<Boolean>) () -> Boolean.valueOf(System.getProperty(
+                            "org.apache.catalina.STRICT_SERVLET_COMPLIANCE"))).booleanValue();
             propStrictNaming = AccessController.doPrivileged(
-                    new PrivilegedAction<String>() {
-                        @Override
-                        public String run() {
-                            return System.getProperty(
-                                    "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING");
-                        }
-                    }
-                );
+                    (PrivilegedAction<String>) () -> System.getProperty(
+                            "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING"));
             propFwdSlashIsSeparator = AccessController.doPrivileged(
-                    new PrivilegedAction<String>() {
-                        @Override
-                        public String run() {
-                            return System.getProperty(
-                                    "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
-                        }
-                    }
-                );
+                    (PrivilegedAction<String>) () -> System.getProperty(
+                            "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR"));
         }
 
         if (propStrictNaming == null) {

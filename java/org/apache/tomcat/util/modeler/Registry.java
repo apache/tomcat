@@ -714,8 +714,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
         String className = type;
         String pkg = className;
-        while (pkg.indexOf(".") > 0) {
-            int lastComp = pkg.lastIndexOf(".");
+        while (pkg.indexOf('.') > 0) {
+            int lastComp = pkg.lastIndexOf('.');
             if (lastComp <= 0)
                 return;
             pkg = pkg.substring(0, lastComp);

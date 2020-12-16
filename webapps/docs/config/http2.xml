@@ -186,7 +186,7 @@
 
     <attribute name="streamWriteTimeout" required="false">
       <p>The time, in milliseconds, that Tomcat will wait for additional window
-      update frames to arrive for the stream and/or conenction when an
+      update frames to arrive for the stream and/or connection when an
       application is performing a blocking I/O write and the stream and/or
       connection flow control window is too small for the write to complete.
       Negative values will be treated as an infinite timeout. If not specified,

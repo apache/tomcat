@@ -67,14 +67,16 @@ public class FileItemStreamImpl implements FileItemStream {
 
     /**
      * Creates a new instance.
-     * @param pFileItemIterator Iterator for all files in this upload
+     *
+     * @param pFileItemIterator The {@link FileItemIteratorImpl iterator}, which returned this file
+     * item.
      * @param pName The items file name, or null.
      * @param pFieldName The items field name.
      * @param pContentType The items content type, or null.
      * @param pFormField Whether the item is a form field.
      * @param pContentLength The items content length, if known, or -1
-     * @throws FileUploadException If an error is encountered processing the request
      * @throws IOException Creating the file item failed.
+     * @throws FileUploadException Parsing the incoming data stream failed.
      */
     public FileItemStreamImpl(FileItemIteratorImpl pFileItemIterator, String pName, String pFieldName,
             String pContentType, boolean pFormField,

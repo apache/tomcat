@@ -360,10 +360,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * Should Tomcat call
-     * {@link org.apache.juli.logging.LogFactory#release(ClassLoader)}
-     * when the class loader is stopped? If not specified, the default value
-     * of <code>true</code> is used. Changing the default setting is likely to
-     * lead to memory leaks and other issues.
+     * {@link org.apache.juli.logging.LogFactory#release(ClassLoader)} when the
+     * class loader is stopped? If not specified, the default value of
+     * <code>true</code> is used. Changing the default setting is likely to lead
+     * to memory leaks and other issues.
      */
     private boolean clearReferencesLogFactoryRelease = true;
 
@@ -504,7 +504,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     path = f.getCanonicalPath();
                 } catch (IOException | URISyntaxException e) {
                     log.warn(sm.getString(
-                            "webappClassLoader.addPermisionNoCanonicalFile",
+                            "webappClassLoader.addPermissionNoCanonicalFile",
                             url.toExternalForm()));
                     return;
                 }
@@ -521,7 +521,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             } else {
                 // Unsupported URL protocol
                 log.warn(sm.getString(
-                        "webappClassLoader.addPermisionNoProtocol",
+                        "webappClassLoader.addPermissionNoProtocol",
                         protocol, url.toExternalForm()));
             }
         }
@@ -1802,8 +1802,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 usingExecutor = true;
                             }
                         }
-                    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
-                            IllegalAccessException e) {
+                    } catch (/*SecurityException |*/ NoSuchFieldException | /*IllegalArgumentException |*/
+                            IllegalAccessException | RuntimeException e) {
+                        // FIXME: InaccessibleObjectException is only available in Java 9+,
+                        // swapped for RuntimeException for now
                         log.warn(sm.getString("webappClassLoader.stopThreadFail",
                                 thread.getName(), getContextName()), e);
                     }
@@ -1977,7 +1979,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (jreCompat.isInstanceOfInaccessibleObjectException(t)) {
                 // Must be running on Java 9 without the necessary command line
                 // options.
-                log.warn(sm.getString("webappClassLoader.addExportsThreadLocal"));
+                String currentModule = JreCompat.getInstance().getModuleName(this.getClass());
+                log.warn(sm.getString("webappClassLoader.addExportsThreadLocal", currentModule));
             } else {
                 ExceptionUtils.handleThrowable(t);
                 log.warn(sm.getString(
@@ -2239,7 +2242,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (jreCompat.isInstanceOfInaccessibleObjectException(e)) {
                 // Must be running on Java 9 without the necessary command line
                 // options.
-                log.warn(sm.getString("webappClassLoader.addExportsRmi"));
+                String currentModule = JreCompat.getInstance().getModuleName(this.getClass());
+                log.warn(sm.getString("webappClassLoader.addExportsRmi", currentModule));
             } else {
                 // Re-throw all other exceptions
                 throw e;
@@ -2256,6 +2260,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         } catch (ReflectiveOperationException | SecurityException | ClassCastException e) {
             log.warn(sm.getString(
                     "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
+        } catch (Exception e) {
+            JreCompat jreCompat = JreCompat.getInstance();
+            if (jreCompat.isInstanceOfInaccessibleObjectException(e)) {
+                // Must be running on Java 9 without the necessary command line
+                // options.
+                String currentModule = JreCompat.getInstance().getModuleName(this.getClass());
+                log.warn(sm.getString("webappClassLoader.addExportsJavaIo", currentModule));
+                return;
+            } else {
+                // Re-throw all other exceptions
+                throw e;
+            }
         }
     }
 

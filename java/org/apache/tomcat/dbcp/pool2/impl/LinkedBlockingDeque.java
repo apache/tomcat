@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 
@@ -224,9 +225,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         lock.lock(); // Never contended, but necessary for visibility
         try {
             for (final E e : c) {
-                if (e == null) {
-                    throw new NullPointerException();
-                }
+                Objects.requireNonNull(e);
                 if (!linkLast(e)) {
                     throw new IllegalStateException("Deque full");
                 }
@@ -392,9 +391,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      */
     @Override
     public boolean offerFirst(final E e) {
-        if (e == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(e, "e");
         lock.lock();
         try {
             return linkFirst(e);
@@ -408,9 +405,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      */
     @Override
     public boolean offerLast(final E e) {
-        if (e == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(e, "e");
         lock.lock();
         try {
             return linkLast(e);
@@ -430,9 +425,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      *         for space
      */
     public void putFirst(final E e) throws InterruptedException {
-        if (e == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(e, "e");
         lock.lock();
         try {
             while (!linkFirst(e)) {
@@ -454,9 +447,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      *         for space
      */
     public void putLast(final E e) throws InterruptedException {
-        if (e == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(e, "e");
         lock.lock();
         try {
             while (!linkLast(e)) {
@@ -483,9 +474,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      */
     public boolean offerFirst(final E e, final long timeout, final TimeUnit unit)
         throws InterruptedException {
-        if (e == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(e, "e");
         long nanos = unit.toNanos(timeout);
         lock.lockInterruptibly();
         try {
@@ -517,9 +506,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      */
     public boolean offerLast(final E e, final long timeout, final TimeUnit unit)
         throws InterruptedException {
-        if (e == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(e, "e");
         long nanos = unit.toNanos(timeout);
         lock.lockInterruptibly();
         try {
@@ -940,9 +927,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @throws IllegalArgumentException if c is this instance
      */
     public int drainTo(final Collection<? super E> c, final int maxElements) {
-        if (c == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(c, "c");
         if (c == this) {
             throw new IllegalArgumentException();
         }

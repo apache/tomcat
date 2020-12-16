@@ -267,13 +267,16 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
         PrintWriter writer = response.getWriter();
 
-        // HTML Header Section
-        writer.print(org.apache.catalina.manager.Constants.HTML_HEADER_SECTION);
-
-        // Body Header Section
         Object[] args = new Object[2];
         args[0] = request.getContextPath();
         args[1] = smClient.getString("htmlHostManagerServlet.title");
+
+        // HTML Header Section
+        writer.print(MessageFormat.format(
+            org.apache.catalina.manager.Constants.HTML_HEADER_SECTION, args
+        ));
+
+        // Body Header Section
         writer.print(MessageFormat.format(
                 org.apache.catalina.manager.Constants.BODY_HEADER_SECTION, args));
 

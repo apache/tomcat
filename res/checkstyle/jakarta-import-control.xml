@@ -21,6 +21,7 @@
 
 <import-control pkg="jakarta">
   <allow pkg="java"/>
+  <allow pkg="aQute.bnd.annotation.spi"/>
   <subpackage name="annotation">
     <allow pkg="jakarta.annotation"/>
   </subpackage>

@@ -217,15 +217,10 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 credentialLifetime = GSSCredential.DEFAULT_LIFETIME;
             }
             final PrivilegedExceptionAction<GSSCredential> action =
-                new PrivilegedExceptionAction<GSSCredential>() {
-                    @Override
-                    public GSSCredential run() throws GSSException {
-                        return manager.createCredential(null,
-                                credentialLifetime,
-                                new Oid("1.3.6.1.5.5.2"),
-                                GSSCredential.ACCEPT_ONLY);
-                    }
-                };
+                    () -> manager.createCredential(null,
+                            credentialLifetime,
+                            new Oid("1.3.6.1.5.5.2"),
+                            GSSCredential.ACCEPT_ONLY);
             gssContext = manager.createContext(Subject.doAs(subject, action));
 
             outToken = Subject.doAs(lc.getSubject(), new AcceptAction(gssContext, decoded));

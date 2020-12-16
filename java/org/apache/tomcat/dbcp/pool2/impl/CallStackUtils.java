@@ -72,9 +72,9 @@ public final class CallStackUtils {
     public static CallStack newCallStack(final String messageFormat,
                                          final boolean useTimestamp,
                                          final boolean requireFullStackTrace) {
-        return canCreateSecurityManager() && !requireFullStackTrace
-            ? new SecurityManagerCallStack(messageFormat, useTimestamp)
-            : new ThrowableCallStack(messageFormat, useTimestamp);
+        return canCreateSecurityManager() && !requireFullStackTrace ?
+            new SecurityManagerCallStack(messageFormat, useTimestamp) :
+            new ThrowableCallStack(messageFormat, useTimestamp);
     }
 
     /**

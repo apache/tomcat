@@ -52,8 +52,6 @@ public abstract class SocketWrapperBase<E> {
     private volatile long writeTimeout = -1;
 
     private volatile int keepAliveLeft = 100;
-    private volatile boolean upgraded = false;
-    private boolean secure = false;
     private String negotiatedProtocol = null;
 
     /*
@@ -171,10 +169,6 @@ public abstract class SocketWrapperBase<E> {
         }
     }
 
-    public boolean isUpgraded() { return upgraded; }
-    public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
-    public boolean isSecure() { return secure; }
-    public void setSecure(boolean secure) { this.secure = secure; }
     public String getNegotiatedProtocol() { return negotiatedProtocol; }
     public void setNegotiatedProtocol(String negotiatedProtocol) {
         this.negotiatedProtocol = negotiatedProtocol;
@@ -1401,13 +1395,13 @@ public abstract class SocketWrapperBase<E> {
                         state.wait(unit.toMillis(timeout));
                         if (state.state == CompletionState.PENDING) {
                             if (handler != null && state.callHandler.compareAndSet(true, false)) {
-                                handler.failed(new SocketTimeoutException(), attachment);
+                                handler.failed(new SocketTimeoutException(getTimeoutMsg(read)), attachment);
                             }
                             return CompletionState.ERROR;
                         }
                     } catch (InterruptedException e) {
                         if (handler != null && state.callHandler.compareAndSet(true, false)) {
-                            handler.failed(new SocketTimeoutException(), attachment);
+                            handler.failed(new SocketTimeoutException(getTimeoutMsg(read)), attachment);
                         }
                         return CompletionState.ERROR;
                     }
@@ -1417,11 +1411,22 @@ public abstract class SocketWrapperBase<E> {
         return state.state;
     }
 
+
+    private String getTimeoutMsg(boolean read) {
+        if (read) {
+            return sm.getString("socketWrapper.readTimeout");
+        } else {
+            return sm.getString("socketWrapper.writeTimeout");
+        }
+    }
+
+
     protected abstract <A> OperationState<A> newOperationState(boolean read,
             ByteBuffer[] buffers, int offset, int length,
             BlockingMode block, long timeout, TimeUnit unit, A attachment,
             CompletionCheck check, CompletionHandler<Long, ? super A> handler,
             Semaphore semaphore, VectoredIOCompletionHandler<A> completion);
+
 
     // --------------------------------------------------------- Utility methods
 

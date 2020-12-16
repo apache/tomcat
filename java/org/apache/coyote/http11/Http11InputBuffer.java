@@ -71,7 +71,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     /**
      * State.
      */
-    private boolean parsingHeader;
+    private volatile boolean parsingHeader;
 
 
     /**
@@ -130,7 +130,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private byte prevChr = 0;
     private byte chr = 0;
-    private boolean parsingRequestLine;
+    private volatile boolean parsingRequestLine;
     private int parsingRequestLinePhase = 0;
     private boolean parsingRequestLineEol = false;
     private int parsingRequestLineStart = 0;
@@ -242,12 +242,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     @Override
     public int doRead(ApplicationBufferHandler handler) throws IOException {
-
-        if (lastActiveFilter == -1)
+        if (lastActiveFilter == -1) {
             return inputStreamInputBuffer.doRead(handler);
-        else
+        } else {
             return activeFilters[lastActiveFilter].doRead(handler);
-
+        }
     }
 
 
@@ -267,18 +266,22 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
         byteBuffer.limit(0).position(0);
         lastActiveFilter = -1;
-        parsingHeader = true;
         swallowInput = true;
 
         chr = 0;
         prevChr = 0;
         headerParsePos = HeaderParsePosition.HEADER_START;
-        parsingRequestLine = true;
         parsingRequestLinePhase = 0;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
         headerData.recycle();
+        // Recycled last because they are volatile
+        // All variables visible to this thread are guaranteed to be visible to
+        // any other thread once that thread reads the same volatile. The first
+        // action when parsing input data is to read one of these volatiles.
+        parsingRequestLine = true;
+        parsingHeader = true;
     }
 
 
@@ -386,10 +389,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
             parsingRequestLineStart = byteBuffer.position();
             parsingRequestLinePhase = 2;
-            if (log.isDebugEnabled()) {
-                log.debug("Received ["
-                        + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(), StandardCharsets.ISO_8859_1) + "]");
-            }
         }
         if (parsingRequestLinePhase == 2) {
             //
@@ -648,23 +647,40 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     }
 
 
+    @Override
+    public int available() {
+        return available(false);
+    }
+
+
     /**
-     * Available bytes in the buffers (note that due to encoding, this may not
-     * correspond).
+     * Available bytes in the buffers for the current request.
+     *
+     * Note that when requests are pipelined, the data in byteBuffer may relate
+     * to the next request rather than this one.
      */
     int available(boolean read) {
-        int available = byteBuffer.remaining();
-        if ((available == 0) && (lastActiveFilter >= 0)) {
-            for (int i = 0; (available == 0) && (i <= lastActiveFilter); i++) {
-                available = activeFilters[i].available();
-            }
-        }
-        if (available > 0 || !read) {
-            return available;
+        int available;
+
+        if (lastActiveFilter == -1) {
+            available = inputStreamInputBuffer.available();
+        } else {
+            available = activeFilters[lastActiveFilter].available();
         }
 
+        // Only try a non-blocking read if:
+        // - there is no data in the filters
+        // - the caller requested a read
+        // - there is no data in byteBuffer
+        // - the socket wrapper indicates a read is allowed
+        //
+        // Notes: 1. When pipelined requests are being used available may be
+        //        zero even when byteBuffer has data. This is because the data
+        //        in byteBuffer is for the next request. We don't want to
+        //        attempt a read in this case.
+        //        2. wrapper.hasDataToRead() is present to handle the NIO2 case
         try {
-            if (wrapper.hasDataToRead()) {
+            if (available == 0 && read && !byteBuffer.hasRemaining() && wrapper.hasDataToRead()) {
                 fill(false);
                 available = byteBuffer.remaining();
             }
@@ -687,22 +703,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      * faking non-blocking reads with the blocking IO connector.
      */
     boolean isFinished() {
-        if (byteBuffer.limit() > byteBuffer.position()) {
-            // Data to read in the buffer so not finished
-            return false;
-        }
-
-        /*
-         * Don't use fill(false) here because in the following circumstances
-         * BIO will block - possibly indefinitely
-         * - client is using keep-alive and connection is still open
-         * - client has sent the complete request
-         * - client has not sent any of the next request (i.e. no pipelining)
-         * - application has read the complete request
-         */
-
-        // Check the InputFilters
-
+        // The active filters have the definitive information on whether or not
+        // the current request body has been read. Note that byteBuffer may
+        // contain pipelined data so is not a good indicator.
         if (lastActiveFilter >= 0) {
             return activeFilters[lastActiveFilter].isFinished();
         } else {
@@ -757,6 +760,14 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private boolean fill(boolean block) throws IOException {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Before fill(): [" + parsingHeader +
+                    "], parsingRequestLine: [" + parsingRequestLine +
+                    "], parsingRequestLinePhase: [" + parsingRequestLinePhase +
+                    "], parsingRequestLineStart: [" + parsingRequestLineStart +
+                    "], byteBuffer.position() [" + byteBuffer.position() + "]");
+        }
+
         if (parsingHeader) {
             if (byteBuffer.limit() >= headerBufferSize) {
                 if (parsingRequestLine) {
@@ -782,6 +793,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             throw new CloseNowException(sm.getString("iib.eof.error"));
         }
         byteBuffer.limit(byteBuffer.position()).reset();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Received ["
+                    + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(), StandardCharsets.ISO_8859_1) + "]");
+        }
+
         if (nRead > 0) {
             return true;
         } else if (nRead == -1) {
@@ -1139,6 +1156,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             byteBuffer.position(byteBuffer.limit());
 
             return length;
+        }
+
+        @Override
+        public int available() {
+            return byteBuffer.remaining();
         }
     }
 

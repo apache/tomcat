@@ -12,12 +12,39 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-Automatic-Module-Name: org.apache.tomcat.embed.websocket
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-embed-websocket
 Bundle-SymbolicName: org.apache.tomcat-embed-websocket
-Bundle-Version: @VERSION@
 Export-Package: \
-    jakarta.websocket,\
-    jakarta.websocket.server,\
+    jakarta.websocket.*;version=${websocket.spec.version},\
     org.apache.tomcat.websocket,\
     org.apache.tomcat.websocket.server
+
+-includepackage: \
+    org.apache.tomcat.websocket.pojo
+
+-includeresource.meta-inf: /META-INF/=../META-INF/tomcat-websocket.jar/
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaWebSockets;\
+        version:Version=${websocket.spec.version};\
+        uses:='${packages;NAMED;jakarta.websocket.*}'
+
+-namesection: jakarta/websocket*/;\
+    Specification-Title=Jakarta WebSocket;\
+    Specification-Version=${websocket.spec.version};\
+    Specification-Vendor=Eclipse Foundation;\
+    Implementation-Title=jakarta.websocket;\
+    Implementation-Version=${websocket.spec.version}.${websocket.revision};\
+    Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=${Bundle-Name}

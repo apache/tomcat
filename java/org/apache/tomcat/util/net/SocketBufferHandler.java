@@ -27,6 +27,17 @@ public class SocketBufferHandler {
         @Override
         public void expand(int newSize) {
         }
+        /*
+         * Http2AsyncParser$FrameCompletionHandler will return incomplete
+         * frame(s) to the buffer. If the previous frame (or concurrent write to
+         * a stream) triggered a connection close this call would fail with a
+         * BufferOverflowException as data can't be returned to a buffer of zero
+         * length. Override the method and make it a NO-OP to avoid triggering
+         * the exception.
+         */
+        @Override
+        public void unReadReadBuffer(ByteBuffer returnedData) {
+        }
     };
 
     private volatile boolean readBufferConfiguredForWrite = true;

@@ -921,7 +921,7 @@ public class TestRequest extends TomcatBaseTest {
     }
 
 
-    private void doTestGetReader(String userAgentCharaceterEncoding, boolean expect200)
+    private void doTestGetReader(String userAgentCharacterEncoding, boolean expect200)
             throws Exception {
 
         // Setup Tomcat instance
@@ -937,7 +937,7 @@ public class TestRequest extends TomcatBaseTest {
 
         Charset charset = StandardCharsets.ISO_8859_1;
         try {
-            charset = Charset.forName(userAgentCharaceterEncoding);
+            charset = Charset.forName(userAgentCharacterEncoding);
         } catch (UnsupportedCharsetException e) {
             // Ignore - use default set above
         }
@@ -945,7 +945,7 @@ public class TestRequest extends TomcatBaseTest {
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put("Content-Type",
-                Arrays.asList(new String[] {"text/plain;charset=" + userAgentCharaceterEncoding}));
+                Arrays.asList(new String[] {"text/plain;charset=" + userAgentCharacterEncoding}));
 
         int rc = postUrl(body, "http://localhost:" + getPort() + "/", bc, reqHeaders, null);
 

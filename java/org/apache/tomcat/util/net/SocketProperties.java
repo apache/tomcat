@@ -453,7 +453,7 @@ public class SocketProperties {
                 long poolSize = 0;
                 if (actualBufferPoolSize == -2) {
                     long maxMemory = Runtime.getRuntime().maxMemory();
-                    if (maxMemory > 1024 * 1024 * 1024) {
+                    if (maxMemory > Integer.MAX_VALUE) {
                         actualBufferPoolSize = maxMemory / 32;
                     } else {
                         return 0;

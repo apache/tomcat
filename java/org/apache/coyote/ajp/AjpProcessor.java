@@ -23,6 +23,7 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
@@ -30,7 +31,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,6 +38,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
@@ -670,6 +671,10 @@ public class AjpProcessor extends AbstractProcessor {
         requestHeaderMessage.getBytes(request.localName());
         request.setLocalPort(requestHeaderMessage.getInt());
 
+        if (socketWrapper != null) {
+            request.peerAddr().setString(socketWrapper.getRemoteAddr());
+        }
+
         boolean isSSL = requestHeaderMessage.getByte() != 0;
         if (isSSL) {
             request.scheme().setString("https");
@@ -779,17 +784,12 @@ public class AjpProcessor extends AbstractProcessor {
                     // All 'known' attributes will be processed by the previous
                     // blocks. Any remaining attribute is an 'arbitrary' one.
                     Pattern pattern = protocol.getAllowedRequestAttributesPatternInternal();
-                    if (pattern == null) {
+                    if (pattern != null && pattern.matcher(n).matches()) {
+                        request.setAttribute(n, v);
+                    } else {
+                        log.warn(sm.getString("ajpprocessor.unknownAttribute", n));
                         response.setStatus(403);
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
-                    } else {
-                        Matcher m = pattern.matcher(n);
-                        if (m.matches()) {
-                            request.setAttribute(n, v);
-                        } else {
-                            response.setStatus(403);
-                            setErrorState(ErrorState.CLOSE_CLEAN, null);
-                        }
                     }
                 }
                 break;
@@ -1070,7 +1070,7 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void ack() {
+    protected final void ack(ContinueResponseTiming continueResponseTiming) {
         // NO-OP for AJP
     }
 
@@ -1093,7 +1093,7 @@ public class AjpProcessor extends AbstractProcessor {
         if (empty) {
             return 0;
         } else {
-            return bodyBytes.getByteChunk().getLength();
+            return request.getInputBuffer().available();
         }
     }
 
@@ -1180,10 +1180,7 @@ public class AjpProcessor extends AbstractProcessor {
                         jsseCerts = temp;
                     }
                 }
-            } catch (java.security.cert.CertificateException e) {
-                getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
-                return;
-            } catch (NoSuchProviderException e) {
+            } catch (CertificateException | NoSuchProviderException e) {
                 getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
                 return;
             }
@@ -1314,6 +1311,15 @@ public class AjpProcessor extends AbstractProcessor {
             handler.setByteBuffer(ByteBuffer.wrap(bc.getBuffer(), bc.getStart(), bc.getLength()));
             empty = true;
             return handler.getByteBuffer().remaining();
+        }
+
+        @Override
+        public int available() {
+            if (empty) {
+                return 0;
+            } else {
+                return bodyBytes.getByteChunk().getLength();
+            }
         }
     }
 

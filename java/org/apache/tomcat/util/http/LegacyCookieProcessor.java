@@ -234,12 +234,6 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
 
     @Override
-    public String generateHeader(Cookie cookie) {
-        return generateHeader(cookie, null);
-    }
-
-
-    @Override
     public String generateHeader(Cookie cookie, HttpServletRequest request) {
 
         /*
@@ -269,7 +263,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
 
         // Just use the name supplied in the Cookie
         buf.append(cookie.getName());
-        buf.append("=");
+        buf.append('=');
 
         // Value
         maybeQuote(buf, value, version);

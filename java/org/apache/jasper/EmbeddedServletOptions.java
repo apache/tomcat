@@ -753,17 +753,9 @@ public final class EmbeddedServletOptions implements Options {
         if (dir != null) {
             scratchDir = new File(dir);
         } else {
-            // First try the Servlet 2.2 jakarta.servlet.context.tempdir property
             scratchDir = (File) context.getAttribute(ServletContext.TEMPDIR);
-            if (scratchDir == null) {
-                // Not running in a Servlet 2.2 container.
-                // Try to get the JDK 1.2 java.io.tmpdir property
-                dir = System.getProperty("java.io.tmpdir");
-                if (dir != null)
-                    scratchDir = new File(dir);
-            }
         }
-        if (this.scratchDir == null) {
+        if (scratchDir == null) {
             log.fatal(Localizer.getMessage("jsp.error.no.scratch.dir"));
             return;
         }

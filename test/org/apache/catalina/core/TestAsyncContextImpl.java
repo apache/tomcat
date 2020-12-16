@@ -302,9 +302,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                             result.append("false");
                         }
                         done = true;
-                    } catch (InterruptedException e) {
-                        result.append(e);
-                    } catch (IOException e) {
+                    } catch (InterruptedException | IOException e) {
                         result.append(e);
                     }
                 }
@@ -380,9 +378,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                                     result.append("false");
                                 }
                                 done = true;
-                            } catch (InterruptedException e) {
-                                result.append(e);
-                            } catch (IOException e) {
+                            } catch (InterruptedException | IOException e) {
                                 result.append(e);
                             }
                         }
@@ -2837,7 +2833,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
 
         public void doOnWritePossible() {
-            // Hack to avoid ISE if we try gettign the request after complete/dispatch
+            // Hack to avoid ISE if we try getting the request after complete/dispatch
             ServletRequest req = ac.getRequest();
             if (useComplete) {
                 ac.complete();

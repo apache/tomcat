@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Abstracts configuration file storage. Allows Tomcat embedding using the regular
@@ -92,7 +93,15 @@ public interface ConfigurationSource {
         }
         public long getLastModified()
                 throws MalformedURLException, IOException {
-            return uri.toURL().openConnection().getLastModified();
+            URLConnection connection = null;
+            try {
+                connection = uri.toURL().openConnection();
+                return connection.getLastModified();
+            } finally {
+                if (connection != null) {
+                    connection.getInputStream().close();
+                }
+            }
         }
         @Override
         public void close() throws IOException {

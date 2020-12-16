@@ -404,11 +404,20 @@ public class CachedResource implements WebResource {
         return webResources;
     }
 
+    boolean usesClassLoaderResources() {
+        return usesClassLoaderResources;
+    }
+
+
     // Assume that the cache entry will always include the content unless the
     // resource content is larger than objectMaxSizeBytes. This isn't always the
     // case but it makes tracking the current cache size easier.
     long getSize() {
         long result = CACHE_ENTRY_SIZE;
+        // Longer paths use a noticeable amount of memory so account for this in
+        // the cache size. The fixed component of a String instance's memory
+        // usage is accounted for in the 500 bytes above.
+        result += getWebappPath().length() * 2;
         if (getContentLength() <= objectMaxSizeBytes) {
             result += getContentLength();
         }

@@ -833,6 +833,10 @@ public class StandardContext extends ContainerBase
 
     private boolean dispatcherWrapsSameObject = Globals.STRICT_SERVLET_COMPLIANCE;
 
+    private boolean parallelAnnotationScanning = false;
+
+    private boolean useBloomFilterForArchives = false;
+
     // ----------------------------------------------------- Context Properties
 
     @Override
@@ -1444,6 +1448,40 @@ public class StandardContext extends ContainerBase
                                    oldAntiResourceLocking,
                                    this.antiResourceLocking);
 
+    }
+
+
+    @Override
+    public boolean getUseBloomFilterForArchives() {
+        return this.useBloomFilterForArchives;
+    }
+
+
+    @Override
+    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives) {
+
+        boolean oldUseBloomFilterForArchives = this.useBloomFilterForArchives;
+        this.useBloomFilterForArchives = useBloomFilterForArchives;
+        support.firePropertyChange("useBloomFilterForArchives", oldUseBloomFilterForArchives,
+                this.useBloomFilterForArchives);
+
+    }
+
+
+    @Override
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {
+
+        boolean oldParallelAnnotationScanning = this.parallelAnnotationScanning;
+        this.parallelAnnotationScanning = parallelAnnotationScanning;
+        support.firePropertyChange("parallelAnnotationScanning", oldParallelAnnotationScanning,
+                this.parallelAnnotationScanning);
+
+    }
+
+
+    @Override
+    public boolean isParallelAnnotationScanning() {
+        return this.parallelAnnotationScanning;
     }
 
 
@@ -2136,7 +2174,7 @@ public class StandardContext extends ContainerBase
         if (path == null || path.equals("/")) {
             invalid = true;
             this.path = "";
-        } else if ("".equals(path) || path.startsWith("/")) {
+        } else if (path.isEmpty() || path.startsWith("/")) {
             this.path = path;
         } else {
             invalid = true;

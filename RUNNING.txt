@@ -297,8 +297,8 @@ CATALINA_BASE can be referenced in the XML configuration files processed
 by Tomcat as ${catalina.home} and ${catalina.base} respectively.
 
 For example, the standard manager web application can be kept in
-CATALINA_HOME/webapps/manager and loaded into CATALINA_BASE by using
-the following trick:
+CATALINA_HOME/webapps/manager and loaded into CATALINA_BASE by copying
+its deployment descriptor into the desired virtual host:
 
  * Copy the CATALINA_HOME/webapps/manager/META-INF/context.xml
    file as CATALINA_BASE/conf/Catalina/localhost/manager.xml
@@ -312,6 +312,7 @@ The file will look like the following:
     antiResourceLocking="false" privileged="true" >
     <Valve className="org.apache.catalina.valves.RemoteAddrValve"
          allow="127\.0\.0\.1" />
+    <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
   </Context>
 
 See Deployer chapter in User Guide and Context and Host chapters in the

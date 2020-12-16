@@ -468,19 +468,35 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void readSimplePostResponse(boolean padding) throws Http2Exception, IOException {
-        if (padding) {
-            // Window updates for padding
-            parser.readFrame(true);
-            parser.readFrame(true);
-        }
+        /*
+         * If there is padding there will always be a window update for the
+         * connection and, depending on timing, there may be an update for the
+         * stream. The Window updates for padding (if present) may appear at any
+         * time. The comments in the code below are only indicative of what the
+         * frames are likely to contain. Actual frame order with padding may be
+         * different.
+         */
+
         // Connection window update after reading request body
         parser.readFrame(true);
         // Stream window update after reading request body
         parser.readFrame(true);
         // Headers
         parser.readFrame(true);
-        // Body
+        // Body (includes end of stream)
         parser.readFrame(true);
+
+        if (padding) {
+            // Connection window update for padding
+            parser.readFrame(true);
+
+            // If EndOfStream has not been received then the stream window
+            // update must have been received so a further frame needs to be
+            // read for EndOfStream.
+            if (!output.getTrace().contains("EndOfStream")) {
+                parser.readFrame(true);
+            }
+        }
     }
 
 
@@ -564,11 +580,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         Connector connector = tomcat.getConnector();
         http2Protocol = new UpgradableHttp2Protocol();
         // Short timeouts for now. May need to increase these for CI systems.
-        http2Protocol.setReadTimeout(6000);
-        http2Protocol.setWriteTimeout(6000);
-        http2Protocol.setKeepAliveTimeout(15000);
-        http2Protocol.setStreamReadTimeout(3000);
-        http2Protocol.setStreamWriteTimeout(3000);
+        http2Protocol.setReadTimeout(10000);
+        http2Protocol.setWriteTimeout(10000);
+        http2Protocol.setKeepAliveTimeout(25000);
+        http2Protocol.setStreamReadTimeout(5000);
+        http2Protocol.setStreamWriteTimeout(5000);
         http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
         http2Protocol.setHttp11Protocol(new Http11NioProtocol());
         connector.addUpgradeProtocol(http2Protocol);
@@ -578,7 +594,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         }
     }
 
-    private class UpgradableHttp2Protocol extends Http2Protocol {
+    private static class UpgradableHttp2Protocol extends Http2Protocol {
         @Override
         public String getHttpUpgradeName(boolean isSSLEnabled) {
             return "h2c";
@@ -797,14 +813,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    void sendGoaway(int streamId, int lastStreamId, long errorCode, byte[] debug)
-            throws IOException {
+    byte[] buildGoaway(int streamId, int lastStreamId, long errorCode) {
         byte[] goawayFrame = new byte[17];
-        int len = 8;
-        if (debug != null) {
-            len += debug.length;
-        }
-        ByteUtil.setThreeBytes(goawayFrame, 0, len);
+        ByteUtil.setThreeBytes(goawayFrame, 0, 8);
         // Type
         goawayFrame[3] = FrameType.GOAWAY.getIdByte();
         // No flags
@@ -813,10 +824,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         // Last stream
         ByteUtil.set31Bits(goawayFrame, 9, lastStreamId);
         ByteUtil.setFourBytes(goawayFrame, 13, errorCode);
+        return goawayFrame;
+    }
+
+
+    void sendGoaway(int streamId, int lastStreamId, long errorCode) throws IOException {
+        byte[] goawayFrame = buildGoaway(streamId, lastStreamId, errorCode);
         os.write(goawayFrame);
-        if (debug != null && debug.length > 0) {
-            os.write(debug);
-        }
         os.flush();
     }
 

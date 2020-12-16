@@ -42,8 +42,6 @@ public class TestImportHandlerStandardPackages {
         f.setAccessible(true);
         Object obj = f.get(null);
 
-        Assert.assertTrue("Not Map", obj instanceof Map);
-
         @SuppressWarnings("unchecked")
         Map<String,Set<String>> standardPackageName = (Map<String, Set<String>>) obj;
 
@@ -105,7 +103,7 @@ public class TestImportHandlerStandardPackages {
                 Assert.assertNotNull(files);
                 for (String file : files) {
                     if (!file.endsWith(".class")) {
-                        // Skip non-class resoucres
+                        // Skip non-class resources
                         continue;
                     }
                     if (file.startsWith("Test")) {

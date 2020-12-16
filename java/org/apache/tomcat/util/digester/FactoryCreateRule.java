@@ -173,7 +173,7 @@ public class FactoryCreateRule extends Rule {
             sb.append("creationFactory=");
             sb.append(creationFactory);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

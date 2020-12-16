@@ -245,7 +245,17 @@
         <li>
         <code>%{SSL:variable}</code>, where <em>variable</em> is the
         name of an SSL environment
-        variable, are not implemented yet.  Example:
+        variable, are implemented, except
+        <code>SSL_SESSION_RESUMED</code>, <code>SSL_SECURE_RENEG</code>,
+        <code>SSL_COMPRESS_METHOD</code>, <code>SSL_TLS_SNI</code>,
+        <code>SSL_SRP_USER</code>, <code>SSL_SRP_USERINFO</code>,
+        <code>SSL_CLIENT_VERIFY</code>,
+        <code>SSL_CLIENT_SAN_OTHER_msUPN_n</code>,
+        <code>SSL_CLIENT_CERT_RFC4523_CEA</code>,
+        <code>SSL_SERVER_SAN_OTHER_dnsSRV_n</code>.
+        When OpenSSL is used, the variables related to the server
+        certificate, prefixed by <code>SSL_SERVER_</code> are not available.
+        Example:
         <code>%{SSL:SSL_CIPHER_USEKEYSIZE}</code> may expand to
         <code>128</code>.</li>
 
@@ -418,9 +428,9 @@ public interface RewriteMap {
     <p>The referenced implementation of such a class &ndash; in our example <code>rewriteMapClassName</code> &ndash;
     will be instantiated and initialized with the optional parameter &ndash; <code>optionalParameters</code> from above
     (be careful with whitespace) &ndash; by calling <code>setParameters(String)</code>. That instance
-    will then be registered under the name given as the first paramter of <code>RewriteMap</code> rule.</p>
+    will then be registered under the name given as the first parameter of <code>RewriteMap</code> rule.</p>
 
-    <p>Note: Starting with Tomcat 9 you can use more than one parameter. These have to be separated by spaces. Parameters
+    <p>Note: You can use more than one parameter. These have to be separated by spaces. Parameters
     can be quoted with &quot;. This enables space characters inside parameters.</p>
 
     <p>That map instance will be given the the lookup value that is configured in the corresponding <code>RewriteRule</code> by

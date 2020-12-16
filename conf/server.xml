@@ -61,9 +61,8 @@
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :
-         Java HTTP Connector: /docs/config/http.html
-         Java AJP  Connector: /docs/config/ajp.html
-         APR (HTTP/AJP) Connector: /docs/apr.html
+         HTTP Connector: /docs/config/http.html
+         AJP  Connector: /docs/config/ajp.html
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
     <Connector port="8080" protocol="HTTP/1.1"
@@ -89,24 +88,6 @@
                maxThreads="150" SSLEnabled="true">
         <SSLHostConfig>
             <Certificate certificateKeystoreFile="conf/localhost-rsa.jks"
-                         type="RSA" />
-        </SSLHostConfig>
-    </Connector>
-    -->
-    <!-- Define an SSL/TLS HTTP/1.1 Connector on port 8443 with HTTP/2
-         This connector uses the APR/native implementation which always uses
-         OpenSSL for TLS.
-         Either JSSE or OpenSSL style configuration may be used. OpenSSL style
-         configuration is used below.
-    -->
-    <!--
-    <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
-               maxThreads="150" SSLEnabled="true" >
-        <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
-        <SSLHostConfig>
-            <Certificate certificateKeyFile="conf/localhost-rsa-key.pem"
-                         certificateFile="conf/localhost-rsa-cert.pem"
-                         certificateChainFile="conf/localhost-rsa-chain.pem"
                          type="RSA" />
         </SSLHostConfig>
     </Connector>

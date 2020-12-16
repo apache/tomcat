@@ -27,6 +27,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -50,9 +51,7 @@ import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * RFC 1421 PEM file containing X509 certificates or private keys (PKCS#8 only,
- * i.e. with boundaries containing "BEGIN PRIVATE KEY" or "BEGIN ENCRYPTED PRIVATE KEY",
- * not "BEGIN RSA PRIVATE KEY" or other variations).
+ * RFC 1421 PEM file containing X509 certificates or private keys.
  */
 public class PEMFile {
 
@@ -60,6 +59,16 @@ public class PEMFile {
 
     private static final byte[] OID_EC_PUBLIC_KEY =
             new byte[] { 0x06, 0x07, 0x2A, (byte) 0x86, 0x48, (byte) 0xCE, 0x3D, 0x02, 0x01 };
+
+    public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
+        StringBuilder result = new StringBuilder();
+        result.append(Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
+        result.append(System.lineSeparator());
+        Base64 b64 = new Base64(64);
+        result.append(b64.encodeAsString(certificate.getEncoded()));
+        result.append(Part.END_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
+        return result.toString();
+    }
 
     private String filename;
     private List<X509Certificate> certificates = new ArrayList<>();
@@ -94,7 +103,8 @@ public class PEMFile {
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(Part.BEGIN_BOUNDARY)) {
                     part = new Part();
-                    part.type = line.substring(Part.BEGIN_BOUNDARY.length(), line.length() - 5).trim();
+                    part.type = line.substring(Part.BEGIN_BOUNDARY.length(),
+                            line.length() - Part.FINISH_BOUNDARY.length()).trim();
                 } else if (line.startsWith(Part.END_BOUNDARY)) {
                     parts.add(part);
                     part = null;
@@ -106,20 +116,20 @@ public class PEMFile {
 
         for (Part part : parts) {
             switch (part.type) {
-                case "PRIVATE KEY":
+                case Part.PRIVATE_KEY:
                     privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS8);
                     break;
-                case "EC PRIVATE KEY":
+                case Part.EC_PRIVATE_KEY:
                     privateKey = part.toPrivateKey(null, "EC", Format.RFC5915);
                     break;
-                case "ENCRYPTED PRIVATE KEY":
+                case Part.ENCRYPTED_PRIVATE_KEY:
                     privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8);
                     break;
-                case "RSA PRIVATE KEY":
+                case Part.RSA_PRIVATE_KEY:
                     privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1);
                     break;
-                case "CERTIFICATE":
-                case "X509 CERTIFICATE":
+                case Part.CERTIFICATE:
+                case Part.X509_CERTIFICATE:
                     certificates.add(part.toCertificate());
                     break;
             }
@@ -129,6 +139,14 @@ public class PEMFile {
     private class Part {
         public static final String BEGIN_BOUNDARY = "-----BEGIN ";
         public static final String END_BOUNDARY   = "-----END ";
+        public static final String FINISH_BOUNDARY = "-----";
+
+        public static final String PRIVATE_KEY = "PRIVATE KEY";
+        public static final String EC_PRIVATE_KEY = "EC PRIVATE KEY";
+        public static final String ENCRYPTED_PRIVATE_KEY = "ENCRYPTED PRIVATE KEY";
+        public static final String RSA_PRIVATE_KEY = "RSA PRIVATE KEY";
+        public static final String CERTIFICATE = "CERTIFICATE";
+        public static final String X509_CERTIFICATE = "X509 CERTIFICATE";
 
         public String type;
         public String content = "";
@@ -172,7 +190,7 @@ public class PEMFile {
                 keySpec = privateKeyInfo.getKeySpec(cipher);
             }
 
-            InvalidKeyException exception = new InvalidKeyException(sm.getString("jsse.pemParseError", filename));
+            InvalidKeyException exception = new InvalidKeyException(sm.getString("pemFile.parseError", filename));
             if (keyAlgorithm == null) {
                 for (String algorithm : new String[] {"RSA", "DSA", "EC"}) {
                     try {

@@ -25,8 +25,12 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 public class TestNonBlockingCoordinator {
+
+    private static final Log log = LogFactory.getLog(TestNonBlockingCoordinator.class);
 
     private static final int CHANNEL_COUNT = 10;
 
@@ -35,7 +39,7 @@ public class TestNonBlockingCoordinator {
 
     @Before
     public void setUp() throws Exception {
-        System.out.println("Setup");
+        log.info("Setup");
         channels = new GroupChannel[CHANNEL_COUNT];
         coordinators = new NonBlockingCoordinator[CHANNEL_COUNT];
         Thread[] threads = new Thread[CHANNEL_COUNT];
@@ -43,14 +47,16 @@ public class TestNonBlockingCoordinator {
             channels[i] = new GroupChannel();
             coordinators[i] = new NonBlockingCoordinator();
             channels[i].addInterceptor(coordinators[i]);
-            channels[i].addInterceptor(new TcpFailureDetector());
+            TcpFailureDetector tcpFailureDetector = new TcpFailureDetector();
+            // Double default timeout - mainly for loaded CI systems
+            tcpFailureDetector.setReadTestTimeout(tcpFailureDetector.getReadTestTimeout() * 2);
+            channels[i].addInterceptor(tcpFailureDetector);
             final int j = i;
             threads[i] = new Thread() {
                 @Override
                 public void run() {
                     try {
                         channels[j].start(Channel.DEFAULT);
-                        Thread.sleep(50);
                     } catch (Exception x) {
                         x.printStackTrace();
                     }
@@ -64,44 +70,60 @@ public class TestNonBlockingCoordinator {
         for (int i = 0; i < CHANNEL_COUNT; i++) {
             threads[i].join();
         }
-        Thread.sleep(1000);
+
+        // Allow up to 30s for cluster to form once all the nodes have been
+        // started
+        int count = 0;
+        Member member = null;
+        boolean electionComplete = false;
+        while (!electionComplete && count < 300) {
+            electionComplete = true;
+            member = coordinators[0].getCoordinator();
+            if (member == null) {
+                electionComplete = false;
+            } else {
+                for (int i = 0; i < CHANNEL_COUNT; i++) {
+                    electionComplete = electionComplete && (member.equals(coordinators[i].getCoordinator()));
+                }
+            }
+            Thread.sleep(100);
+            count++;
+        }
     }
+
 
     @Test
     public void testCoord1() throws Exception {
         int expectedCount = channels[0].getMembers().length;
+        log.info("Expecting each channel to have [" + expectedCount + "] members");
         for (int i = 1; i < CHANNEL_COUNT; i++) {
-            Assert.assertEquals("Message count expected to be equal.", expectedCount,
+            Assert.assertEquals("Member count expected to be equal.", expectedCount,
                     channels[i].getMembers().length);
         }
+
         Member member = coordinators[0].getCoordinator();
-        int cnt = 0;
-        while (member == null && (cnt++ < 100)) {
-            try {
-                Thread.sleep(100);
-                member = coordinators[0].getCoordinator();
-            } catch (Exception x) {
-                /* Ignore */
-            }
-        }
+        log.info("Coordinator[0] is:" + member);
         for (int i = 0; i < CHANNEL_COUNT; i++) {
-            Assert.assertEquals(member, coordinators[i].getCoordinator());
+            Assert.assertEquals("Local member " + channels[i].getLocalMember(false), member, coordinators[i].getCoordinator());
         }
-        System.out.println("Coordinator[1] is:" + member);
     }
+
 
     @Test
     public void testCoord2() throws Exception {
+        // Stop current coordinator to trigger new election
         Member member = coordinators[1].getCoordinator();
         System.out.println("Coordinator[2a] is:" + member);
         int index = -1;
-        for ( int i=0; i<CHANNEL_COUNT; i++ ) {
-            if ( channels[i].getLocalMember(false).equals(member) ) {
+        for (int i = 0; i < CHANNEL_COUNT; i++) {
+            if (channels[i].getLocalMember(false).equals(member)) {
                 System.out.println("Shutting down:" + channels[i].getLocalMember(true).toString());
                 channels[i].stop(Channel.DEFAULT);
                 index = i;
+                break;
             }
         }
+
         int dead = index;
         Thread.sleep(1000);
         if (index == 0) {
@@ -109,6 +131,27 @@ public class TestNonBlockingCoordinator {
         } else {
             index = 0;
         }
+
+        // Allow up to 30s for election to complete
+        int count = 0;
+        member = null;
+        boolean electionComplete = false;
+        while (!electionComplete && count < 300) {
+            electionComplete = true;
+            member = coordinators[index].getCoordinator();
+            if (member == null) {
+                electionComplete = false;
+            } else {
+                for (int i = 0; i < CHANNEL_COUNT; i++) {
+                    if (i != dead) {
+                        electionComplete = electionComplete && (member.equals(coordinators[i].getCoordinator()));
+                    }
+                }
+            }
+            Thread.sleep(100);
+            count++;
+        }
+
         System.out.println("Member count:"+channels[index].getMembers().length);
         member = coordinators[index].getCoordinator();
         for (int i = 1; i < CHANNEL_COUNT; i++) {

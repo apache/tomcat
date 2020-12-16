@@ -28,7 +28,11 @@ import org.apache.tomcat.util.net.AprEndpoint;
  *
  * @author Remy Maucherat
  * @author Costin Manolache
+ *
+ * @deprecated  The APR/Native Connector will be removed in Tomcat 10.1.x
+ *              onwards.
  */
+@Deprecated
 public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
     private static final Log log = LogFactory.getLog(Http11AprProtocol.class);

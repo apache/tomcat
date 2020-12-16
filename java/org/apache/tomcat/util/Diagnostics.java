@@ -235,9 +235,7 @@ public class Diagnostics {
                 try {
                     mbean.setUsageThreshold(threshold);
                     return true;
-                } catch (IllegalArgumentException ex) {
-                    // IGNORE
-                } catch (UnsupportedOperationException ex) {
+                } catch (IllegalArgumentException | UnsupportedOperationException ex) {
                     // IGNORE
                 }
                 return false;
@@ -259,9 +257,7 @@ public class Diagnostics {
                 try {
                     mbean.setCollectionUsageThreshold(threshold);
                     return true;
-                } catch (IllegalArgumentException ex) {
-                    // IGNORE
-                } catch (UnsupportedOperationException ex) {
+                } catch (IllegalArgumentException | UnsupportedOperationException ex) {
                     // IGNORE
                 }
                 return false;
@@ -426,7 +422,7 @@ public class Diagnostics {
         sb.append(CRLF);
 
         sb.append(requestedSm.getString("diagnostics.threadDumpTitle"));
-        sb.append(" ");
+        sb.append(' ');
         sb.append(runtimeMXBean.getVmName());
         sb.append(" (");
         sb.append(runtimeMXBean.getVmVersion());

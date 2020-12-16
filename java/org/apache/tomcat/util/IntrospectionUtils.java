@@ -45,15 +45,24 @@ public final class IntrospectionUtils {
      * @return <code>true</code> if operation was successful
      */
     public static boolean setProperty(Object o, String name, String value) {
-        return setProperty(o,name,value,true);
+        return setProperty(o, name, value, true, null);
+    }
+
+    public static boolean setProperty(Object o, String name, String value,
+            boolean invokeSetProperty) {
+        return setProperty(o, name, value, invokeSetProperty, null);
     }
 
     @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value,
-            boolean invokeSetProperty) {
+            boolean invokeSetProperty, StringBuilder actualMethod) {
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
+
+        if (actualMethod == null && XReflectionIntrospectionUtils.isEnabled()) {
+            return XReflectionIntrospectionUtils.setPropertyInternal(o, name, value, invokeSetProperty);
+        }
 
         String setter = "set" + capitalize(name);
 
@@ -67,8 +76,10 @@ public final class IntrospectionUtils {
                 Class<?> paramT[] = item.getParameterTypes();
                 if (setter.equals(item.getName()) && paramT.length == 1
                         && "java.lang.String".equals(paramT[0].getName())) {
-
                     item.invoke(o, new Object[]{value});
+                    if (actualMethod != null) {
+                        actualMethod.append(item.getName()).append("(\"").append(escape(value)).append("\")");
+                    }
                     return true;
                 }
             }
@@ -91,6 +102,9 @@ public final class IntrospectionUtils {
                         } catch (NumberFormatException ex) {
                             ok = false;
                         }
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(Integer.valueOf(\"").append(value).append("\"))");
+                        }
                         // Try a setFoo ( long )
                     } else if ("java.lang.Long".equals(paramType.getName())
                             || "long".equals(paramType.getName())) {
@@ -99,12 +113,16 @@ public final class IntrospectionUtils {
                         } catch (NumberFormatException ex) {
                             ok = false;
                         }
-
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(Long.valueOf(\"").append(value).append("\"))");
+                        }
                         // Try a setFoo ( boolean )
                     } else if ("java.lang.Boolean".equals(paramType.getName())
                             || "boolean".equals(paramType.getName())) {
                         params[0] = Boolean.valueOf(value);
-
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(Boolean.valueOf(\"").append(value).append("\"))");
+                        }
                         // Try a setFoo ( InetAddress )
                     } else if ("java.net.InetAddress".equals(paramType
                             .getName())) {
@@ -115,7 +133,9 @@ public final class IntrospectionUtils {
                                 log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
                             ok = false;
                         }
-
+                        if (actualMethod != null) {
+                            actualMethod.append(method.getName()).append("(InetAddress.getByName(\"").append(value).append("\"))");
+                        }
                         // Unknown type
                     } else {
                         if (log.isDebugEnabled())
@@ -143,6 +163,9 @@ public final class IntrospectionUtils {
             // Ok, no setXXX found, try a setProperty("name", "value")
             if (invokeSetProperty && (setPropertyMethodBool != null ||
                     setPropertyMethodVoid != null)) {
+                if (actualMethod != null) {
+                    actualMethod.append("setProperty(\"").append(name).append("\", \"").append(escape(value)).append("\")");
+                }
                 Object params[] = new Object[2];
                 params[0] = name;
                 params[1] = value;
@@ -175,7 +198,37 @@ public final class IntrospectionUtils {
         return false;
     }
 
+    /**
+     * @param s
+     *            the input string
+     * @return escaped string, per Java rule
+     */
+    public static String escape(String s) {
+
+        if (s == null)
+            return "";
+
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '"')
+                b.append('\\').append('"');
+            else if (c == '\\')
+                b.append('\\').append('\\');
+            else if (c == '\n')
+                b.append('\\').append('n');
+            else if (c == '\r')
+                b.append('\\').append('r');
+            else
+                b.append(c);
+        }
+        return b.toString();
+    }
+
     public static Object getProperty(Object o, String name) {
+        if (XReflectionIntrospectionUtils.isEnabled()) {
+            return XReflectionIntrospectionUtils.getPropertyInternal(o, name);
+        }
         String getter = "get" + capitalize(name);
         String isGetter = "is" + capitalize(name);
 
@@ -239,8 +292,17 @@ public final class IntrospectionUtils {
     public static String replaceProperties(String value,
             Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
             ClassLoader classLoader) {
+            return replaceProperties(value, staticProp, dynamicProp, classLoader, 0);
+    }
 
-        if (value.indexOf('$') < 0) {
+    private static String replaceProperties(String value,
+            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
+            ClassLoader classLoader, int iterationCount) {
+        if (value.indexOf("${") < 0) {
+            return value;
+        }
+        if (iterationCount >=20) {
+            log.warn("System property failed to update and remains [" + value + "]");
             return value;
         }
         StringBuilder sb = new StringBuilder();
@@ -286,7 +348,15 @@ public final class IntrospectionUtils {
         }
         if (prev < value.length())
             sb.append(value.substring(prev));
-        return sb.toString();
+        String newval = sb.toString();
+        if (newval.indexOf("${") < 0) {
+            return newval;
+        }
+        if (newval.equals(value))
+            return value;
+        if (log.isDebugEnabled())
+            log.debug("IntrospectionUtils.replaceProperties iter on: " + newval);
+        return replaceProperties(newval, staticProp, dynamicProp, classLoader, iterationCount+1);
     }
 
     private static String getProperty(String name, Hashtable<Object, Object> staticProp,

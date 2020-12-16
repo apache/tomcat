@@ -209,7 +209,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         sb.append(filterDef.getFilterName());
         sb.append(", filterClass=");
         sb.append(filterDef.getFilterClass());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

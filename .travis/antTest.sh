@@ -21,3 +21,14 @@
 # much logging on stdout
 
 ant -q test 2>&1 > ant-test.log
+RC=$?
+{
+    if grep -q "Testsuites with failed tests:" ant-test.log; then
+        for failed in $(awk 'failed == 1 { print $2 }; /Testsuites with failed tests:/ { failed=1 }' ant-test.log); do
+            echo "Failed test: $failed"
+            cat output/build/logs/$failed
+            echo
+        done
+    fi
+} > test-failures.log
+exit $RC

@@ -30,7 +30,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>locked</code> property.  This class can be used to safely expose
  * Catalina internal parameter map objects to user classes without having
  * to clone them in order to avoid modifications.  When first created, a
- * <code>ParmaeterMap</code> instance is not locked.
+ * <code>ParameterMap</code> instance is not locked.
  *
  * @param <K> The type of Key
  * @param <V> The type of Value

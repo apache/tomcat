@@ -1077,7 +1077,7 @@ public final class CGIServlet extends HttpServlet {
              * SHOULD NOT be defined.
              *
              */
-            if (!("".equals(sPathInfoCGI))) {
+            if (!sPathInfoCGI.isEmpty()) {
                 sPathTranslatedCGI = context.getRealPath(sPathInfoCGI);
             }
             if (sPathTranslatedCGI == null || "".equals(sPathTranslatedCGI)) {
@@ -1161,12 +1161,12 @@ public final class CGIServlet extends HttpServlet {
                         new StringTokenizer (pathInfo, "/");
                 // start with first element
                 while (pathWalker.hasMoreElements() && (is == null)) {
-                    srcPath.append("/");
+                    srcPath.append('/');
                     srcPath.append(pathWalker.nextElement());
                     is = context.getResourceAsStream(srcPath.toString());
                 }
                 destPath.append(tmpDir);
-                destPath.append("/");
+                destPath.append('/');
                 destPath.append(srcPath);
             }
 
@@ -1252,13 +1252,13 @@ public final class CGIServlet extends HttpServlet {
                     sb.append(entry.getKey());
                     sb.append(": [");
                     sb.append(blanksToString(entry.getValue(), "will be set to blank"));
-                    sb.append("]");
+                    sb.append(']');
                     sb.append(System.lineSeparator());
                 }
 
                 sb.append("Derived Command :[");
                 sb.append(nullsToBlanks(command));
-                sb.append("]");
+                sb.append(']');
                 sb.append(System.lineSeparator());
 
 
@@ -1266,7 +1266,7 @@ public final class CGIServlet extends HttpServlet {
                 if (workingDirectory != null) {
                     sb.append(workingDirectory.toString());
                 }
-                sb.append("]");
+                sb.append(']');
                 sb.append(System.lineSeparator());
 
                 sb.append("Command Line Params:");
@@ -1274,7 +1274,7 @@ public final class CGIServlet extends HttpServlet {
                 for (String param : cmdLineParameters) {
                     sb.append("  [");
                     sb.append(param);
-                    sb.append("]");
+                    sb.append(']');
                     sb.append(System.lineSeparator());
                 }
             } else {
@@ -1386,9 +1386,9 @@ public final class CGIServlet extends HttpServlet {
          */
         protected String blanksToString(String couldBeBlank,
                                       String subForBlanks) {
-            return (("".equals(couldBeBlank) || couldBeBlank == null)
+            return (couldBeBlank == null || couldBeBlank.isEmpty())
                     ? subForBlanks
-                    : couldBeBlank);
+                    : couldBeBlank;
         }
 
 
@@ -1666,12 +1666,7 @@ public final class CGIServlet extends HttpServlet {
                     (new InputStreamReader(proc.getErrorStream()));
                 final BufferedReader stdErrRdr = commandsStdErr ;
 
-                errReaderThread = new Thread() {
-                    @Override
-                    public void run () {
-                        sendToLog(stdErrRdr);
-                    }
-                };
+                errReaderThread = new Thread(() -> sendToLog(stdErrRdr));
                 errReaderThread.start();
 
                 InputStream cgiHeaderStream =
@@ -1689,7 +1684,7 @@ public final class CGIServlet extends HttpServlet {
                     try {
                         //set headers
                         String line = null;
-                        while (((line = cgiHeaderReader.readLine()) != null) && !("".equals(line))) {
+                        while (((line = cgiHeaderReader.readLine()) != null) && !line.isEmpty()) {
                             if (log.isTraceEnabled()) {
                                 log.trace("addHeader(\"" + line + "\")");
                             }

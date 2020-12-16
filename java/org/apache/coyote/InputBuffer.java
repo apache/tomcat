@@ -41,4 +41,15 @@ public interface InputBuffer {
      * @throws IOException If an I/O error occurs reading from the input stream
      */
     public int doRead(ApplicationBufferHandler handler) throws IOException;
+
+
+    /**
+     * Obtain an estimate of the number of bytes that can be read without
+     * blocking. Typically, this will be the number of available bytes known to
+     * be buffered.
+     *
+     * @return The number of bytes that can be read without blocking
+     */
+    public int available();
+
 }

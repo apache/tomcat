@@ -95,6 +95,7 @@ public final class Request {
 
     // remote address/host
     private final MessageBytes remoteAddrMB = MessageBytes.newInstance();
+    private final MessageBytes peerAddrMB = MessageBytes.newInstance();
     private final MessageBytes localNameMB = MessageBytes.newInstance();
     private final MessageBytes remoteHostMB = MessageBytes.newInstance();
     private final MessageBytes localAddrMB = MessageBytes.newInstance();
@@ -266,6 +267,10 @@ public final class Request {
 
     public MessageBytes remoteAddr() {
         return remoteAddrMB;
+    }
+
+    public MessageBytes peerAddr() {
+        return peerAddrMB;
     }
 
     public MessageBytes remoteHost() {
@@ -549,6 +554,10 @@ public final class Request {
      * @throws IOException If an I/O error occurs during the copy
      */
     public int doRead(ApplicationBufferHandler handler) throws IOException {
+        if (getBytesRead() == 0 && !response.isCommitted()) {
+            action(ActionCode.ACK, ContinueResponseTiming.ON_REQUEST_BODY_READ);
+        }
+
         int n = inputBuffer.doRead(handler);
         if (n > 0) {
             bytesRead+=n;
@@ -571,7 +580,7 @@ public final class Request {
     /**
      *
      * @param startTime time
-     * @deprecated This setter will be removed in Tomcat 10.1.
+     * @deprecated This setter will be removed in Tomcat 11
      */
     @Deprecated
     public void setStartTime(long startTime) {
@@ -634,6 +643,7 @@ public final class Request {
         localAddrMB.recycle();
         localNameMB.recycle();
         localPort = -1;
+        peerAddrMB.recycle();
         remoteAddrMB.recycle();
         remoteHostMB.recycle();
         remotePort = -1;

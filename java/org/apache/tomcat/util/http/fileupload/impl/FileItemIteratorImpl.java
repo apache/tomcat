@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileItemHeaders;
@@ -110,23 +111,18 @@ public class FileItemIteratorImpl implements FileItemIterator {
     /**
      * Creates a new instance.
      *
-     * @param pFileUploadBase Upload instance
-     * @param pRequestContext The request context.
+     * @param fileUploadBase Main processor.
+     * @param requestContext The request context.
      * @throws FileUploadException An error occurred while
      *   parsing the request.
      * @throws IOException An I/O error occurred.
      */
-    public FileItemIteratorImpl(FileUploadBase pFileUploadBase, RequestContext pRequestContext)
-            throws FileUploadException, IOException {
-        fileUploadBase = pFileUploadBase;
+    public FileItemIteratorImpl(FileUploadBase fileUploadBase, RequestContext requestContext)
+        throws FileUploadException, IOException {
+        this.fileUploadBase = fileUploadBase;
         sizeMax = fileUploadBase.getSizeMax();
         fileSizeMax = fileUploadBase.getFileSizeMax();
-        ctx = pRequestContext;
-        if (ctx == null) {
-            throw new NullPointerException("ctx parameter");
-        }
-
-
+        ctx = Objects.requireNonNull(requestContext, "requestContext");
         skipPreamble = true;
         findNextItem();
     }

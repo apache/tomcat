@@ -215,7 +215,6 @@ public class TestELSupport {
         PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorNoError.class);
         Object result = ELManager.getExpressionFactory().coerceToType(
                 "Foo", TesterType.class);
-        Assert.assertTrue(result instanceof TesterType);
         Assert.assertEquals("Foo", ((TesterType) result).getValue());
     }
 
@@ -224,7 +223,6 @@ public class TestELSupport {
         PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorError.class);
         Object result = ELManager.getExpressionFactory().coerceToType(
                 "Foo", TesterType.class);
-        Assert.assertTrue(result instanceof TesterType);
         Assert.assertEquals("Foo", ((TesterType) result).getValue());
     }
 

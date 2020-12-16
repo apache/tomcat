@@ -153,7 +153,7 @@ import org.apache.tomcat.util.res.StringManager;
  * see setters for doc. It can be used for simple tests and
  * demo.
  *
- * @see <a href="https://svn.apache.org/repos/asf/tomcat/trunk/test/org/apache/catalina/startup/TestTomcat.java">TestTomcat</a>
+ * @see <a href="https://gitbox.apache.org/repos/asf?p=tomcat.git;a=blob;f=test/org/apache/catalina/startup/TestTomcat.java">TestTomcat</a>
  * @author Costin Manolache
  */
 public class Tomcat {
@@ -436,12 +436,30 @@ public class Tomcat {
      * @param source The configuration source
      */
     public void init(ConfigurationSource source) {
+        init(source, null);
+    }
+
+    /**
+     * Initialize the server given the specified configuration source.
+     * The server will be loaded according to the Tomcat configuration
+     * files contained in the source (server.xml, web.xml, context.xml,
+     * SSL certificates, etc).
+     * If no configuration source is specified, it will use the default
+     * locations for these files.
+     * @param source The configuration source
+     * @param catalinaArguments The arguments that should be passed to Catalina
+     */
+    public void init(ConfigurationSource source, String[] catalinaArguments) {
         ConfigFileLoader.setSource(source);
         addDefaultWebXmlToWebapp = false;
         Catalina catalina = new Catalina();
         // Load the Catalina instance with the regular configuration files
         // from specified source
-        catalina.load();
+        if (catalinaArguments == null) {
+            catalina.load();
+        } else {
+            catalina.load(catalinaArguments);
+        }
         // Retrieve and set the server
         server = catalina.getServer();
     }
@@ -970,9 +988,9 @@ public class Tomcat {
         loggerName.append("].[");
         // Context name
         if (contextName == null || contextName.equals("")) {
-            loggerName.append("/");
+            loggerName.append('/');
         } else if (contextName.startsWith("##")) {
-            loggerName.append("/");
+            loggerName.append('/');
             loggerName.append(contextName);
         }
         loggerName.append(']');
@@ -993,6 +1011,7 @@ public class Tomcat {
      * @return newly created {@link Context}
      */
     private Context createContext(Host host, String url) {
+        String defaultContextClass = StandardContext.class.getName();
         String contextClass = StandardContext.class.getName();
         if (host == null) {
             host = this.getHost();
@@ -1001,8 +1020,13 @@ public class Tomcat {
             contextClass = ((StandardHost) host).getContextClass();
         }
         try {
-            return (Context) Class.forName(contextClass).getConstructor()
+            if (defaultContextClass.equals(contextClass)) {
+                return new StandardContext();
+            } else {
+                return (Context) Class.forName(contextClass).getConstructor()
                     .newInstance();
+            }
+
         } catch (ReflectiveOperationException  | IllegalArgumentException | SecurityException e) {
             throw new IllegalArgumentException(sm.getString("tomcat.noContextClass", contextClass, host, url), e);
         }
@@ -1289,9 +1313,19 @@ public class Tomcat {
      */
     public static void main(String[] args) throws Exception {
         // Process some command line parameters
-        for (String arg : args) {
-            if (arg.equals("--no-jmx")) {
+        String[] catalinaArguments = null;
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--no-jmx")) {
                 Registry.disableRegistry();
+            } else if (args[i].equals("--catalina")) {
+                // This was already processed before
+                // Skip the rest of the arguments as they are for Catalina
+                ArrayList<String> result = new ArrayList<>();
+                for (int j = i + 1; j < args.length; j++) {
+                    result.add(args[j]);
+                }
+                catalinaArguments = result.toArray(new String[0]);
+                break;
             }
         }
         SecurityClassLoad.securityClassLoad(Thread.currentThread().getContextClassLoader());
@@ -1299,7 +1333,7 @@ public class Tomcat {
         // Create a Catalina instance and let it parse the configuration files
         // It will also set a shutdown hook to stop the Server when needed
         // Use the default configuration source
-        tomcat.init(null);
+        tomcat.init(null, catalinaArguments);
         boolean await = false;
         String path = "";
         // Process command line parameters
@@ -1319,6 +1353,10 @@ public class Tomcat {
                 await = true;
             } else if (args[i].equals("--no-jmx")) {
                 // This was already processed before
+            } else if (args[i].equals("--catalina")) {
+                // This was already processed before
+                // Skip the rest of the arguments as they are for Catalina
+                break;
             } else {
                 throw new IllegalArgumentException(sm.getString("tomcat.invalidCommandLine", args[i]));
             }

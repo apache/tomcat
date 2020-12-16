@@ -99,7 +99,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
      */
     protected long numberOfSessions = 0;
 
-    protected String sessionIdAttribute = "org.apache.catalina.ha.session.JvmRouteOrignalSessionID";
+    protected String sessionIdAttribute = "org.apache.catalina.ha.session.JvmRouteOriginalSessionID";
 
 
     /*--Logic---------------------------------------------------*/
@@ -348,9 +348,9 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
 
         // set original sessionid at request, to allow application detect the
         // change
-        if (sessionIdAttribute != null && !"".equals(sessionIdAttribute)) {
+        if (sessionIdAttribute != null && !sessionIdAttribute.isEmpty()) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jvmRoute.set.orignalsessionid",sessionIdAttribute,sessionId));
+                log.debug(sm.getString("jvmRoute.set.originalsessionid",sessionIdAttribute,sessionId));
             }
             request.setAttribute(sessionIdAttribute, sessionId);
         }

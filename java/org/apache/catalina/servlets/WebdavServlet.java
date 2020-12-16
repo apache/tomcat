@@ -547,11 +547,7 @@ public class WebdavServlet extends DefaultServlet {
                         break;
                     }
                 }
-            } catch (SAXException e) {
-                // Something went wrong - bad request
-                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
-                return;
-            } catch (IOException e) {
+            } catch (SAXException | IOException e) {
                 // Something went wrong - bad request
                 resp.sendError(WebdavStatus.SC_BAD_REQUEST);
                 return;
@@ -979,9 +975,7 @@ public class WebdavServlet extends DefaultServlet {
             // Get the root element of the document
             Element rootElement = document.getDocumentElement();
             lockInfoNode = rootElement;
-        } catch (IOException e) {
-            lockRequestType = LOCK_REFRESH;
-        } catch (SAXException e) {
+        } catch (IOException | SAXException e) {
             lockRequestType = LOCK_REFRESH;
         }
 
@@ -1994,7 +1988,7 @@ public class WebdavServlet extends DefaultServlet {
         generatePropFindResponse(generatedXML, rewrittenUrl, path, type, propertiesVector,
                 resource.isFile(), false, resource.getCreation(), resource.getLastModified(),
                 resource.getContentLength(), getServletContext().getMimeType(resource.getName()),
-                resource.getETag());
+                generateETag(resource));
     }
 
 
@@ -2500,7 +2494,7 @@ public class WebdavServlet extends DefaultServlet {
 
         @Override
         public InputSource resolveEntity (String publicId, String systemId) {
-            context.log(sm.getString("webdavservlet.enternalEntityIgnored",
+            context.log(sm.getString("webdavservlet.externalEntityIgnored",
                     publicId, systemId));
             return new InputSource(
                     new StringReader("Ignored external entity"));

@@ -518,9 +518,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
     @Override
     public String toString()  {
         StringBuilder buf = new StringBuilder(getClass().getName());
-        buf.append("[");
-        buf.append(getName()).append(",");
-        buf.append(getHostname()).append(",");
+        buf.append('[');
+        buf.append(getName()).append(',');
+        buf.append(getHostname()).append(',');
         buf.append(port).append(", alive=");
         buf.append(memberAliveTime).append(", ");
         buf.append("securePort=").append(securePort).append(", ");
@@ -529,7 +529,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         buf.append("payload=").append(bToS(this.payload,8)).append(", ");
         buf.append("command=").append(bToS(this.command,8)).append(", ");
         buf.append("domain=").append(bToS(this.domain,8));
-        buf.append("]");
+        buf.append(']');
         return buf.toString();
     }
     public static String bToS(byte[] data) {
@@ -537,15 +537,15 @@ public class MemberImpl implements Member, java.io.Externalizable {
     }
     public static String bToS(byte[] data, int max) {
         StringBuilder buf = new StringBuilder(4*16);
-        buf.append("{");
+        buf.append('{');
         for (int i=0; data!=null && i<data.length; i++ ) {
-            buf.append(String.valueOf(data[i])).append(" ");
+            buf.append(String.valueOf(data[i])).append(' ');
             if ( i==max ) {
                 buf.append("...("+data.length+")");
                 break;
             }
         }
-        buf.append("}");
+        buf.append('}');
         return buf.toString();
     }
 

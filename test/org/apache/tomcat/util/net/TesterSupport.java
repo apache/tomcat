@@ -200,7 +200,12 @@ public final class TesterSupport {
     public static ClientSSLSocketFactory configureClientSsl() {
         ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
-            SSLContext sc = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
+            SSLContext sc;
+            if (TesterSupport.TLSV13_AVAILABLE) {
+                 sc = SSLContext.getInstance("TLSv1.3");
+            } else {
+                sc = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
+            }
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
                     null);
@@ -221,7 +226,7 @@ public final class TesterSupport {
         return ks;
     }
 
-    protected static boolean isRenegotiationSupported(Tomcat tomcat) {
+    public static boolean isRenegotiationSupported(Tomcat tomcat) {
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.contains("Apr")) {
             // Disabled by default in 1.1.20 windows binary (2010-07-27)
@@ -250,7 +255,7 @@ public final class TesterSupport {
         return true;
     }
 
-    protected static void configureClientCertContext(Tomcat tomcat) {
+    public static void configureClientCertContext(Tomcat tomcat) {
         TesterSupport.initSsl(tomcat);
 
         /* When running on Java 11, TLSv1.3 is enabled by default. The JSSE

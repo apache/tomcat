@@ -76,7 +76,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         // HTTP2 upgrade
         http2Connect();
 
-        sendGoaway(1, 1, Http2Error.NO_ERROR.getCode(), null);
+        sendGoaway(1, 1, Http2Error.NO_ERROR.getCode());
 
         handleGoAwayResponse(1);
     }

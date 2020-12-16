@@ -45,6 +45,7 @@ import jakarta.websocket.SendResult;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Utf8Encoder;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -274,7 +275,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     private void sendMessageBlock(byte opCode, ByteBuffer payload, boolean last,
             long timeoutExpiry) throws IOException {
-        wsSession.updateLastActive();
+        wsSession.updateLastActiveWrite();
 
         BlockingSendHandler bsh = new BlockingSendHandler();
 
@@ -295,23 +296,31 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
                 String msg = sm.getString("wsRemoteEndpoint.acquireTimeout");
                 wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
-                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg), true);
                 throw new SocketTimeoutException(msg);
             }
         } catch (InterruptedException e) {
             String msg = sm.getString("wsRemoteEndpoint.sendInterrupt");
             wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
-                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg), true);
             throw new IOException(msg, e);
         }
 
         for (MessagePart mp : messageParts) {
-            writeMessagePart(mp);
+            try {
+                writeMessagePart(mp);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                messagePartInProgress.release();
+                wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, t.getMessage()),
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()), true);
+                throw t;
+            }
             if (!bsh.getSendResult().isOK()) {
                 messagePartInProgress.release();
                 Throwable t = bsh.getSendResult().getException();
                 wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, t.getMessage()),
-                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()));
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()), true);
                 throw new IOException (t);
             }
             // The BlockingSendHandler doesn't call end message so update the
@@ -331,7 +340,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     void startMessage(byte opCode, ByteBuffer payload, boolean last,
             SendHandler handler) {
 
-        wsSession.updateLastActive();
+        wsSession.updateLastActiveWrite();
 
         List<MessagePart> messageParts = new ArrayList<>();
         messageParts.add(new MessagePart(last, 0, opCode, payload,
@@ -414,7 +423,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             writeMessagePart(mpNext);
         }
 
-        wsSession.updateLastActive();
+        wsSession.updateLastActiveWrite();
 
         // Some handlers, such as the IntermediateMessageHandler, do not have a
         // nested handler so handler may be null.
@@ -482,6 +491,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             mask = null;
         }
 
+        int payloadSize = mp.getPayload().remaining();
         headerBuffer.clear();
         writeHeader(headerBuffer, mp.isFin(), mp.getRsv(), mp.getOpCode(),
                 isMasked(), mp.getPayload(), mask, first);
@@ -499,6 +509,20 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             doWrite(mp.getEndHandler(), mp.getBlockingWriteTimeoutExpiry(),
                     headerBuffer, mp.getPayload());
         }
+
+        updateStats(payloadSize);
+    }
+
+
+    /**
+     * Hook for updating server side statistics. Called on every frame written
+     * (including when batching is enabled and the frames are buffered locally
+     * until the buffer is full or is flushed).
+     *
+     * @param payloadLength Size of message payload
+     */
+    protected void updateStats(long payloadLength) {
+        // NO-OP by default
     }
 
 

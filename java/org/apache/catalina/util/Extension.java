@@ -242,7 +242,7 @@ public final class Extension {
             sb.append(", specificationVersion=");
             sb.append(specificationVersion);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

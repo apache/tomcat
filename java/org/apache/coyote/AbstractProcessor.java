@@ -99,6 +99,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * @param t The error which occurred
      */
     protected void setErrorState(ErrorState errorState, Throwable t) {
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("abstractProcessor.setErrorState", errorState), t);
+        }
         // Use the return value to avoid processing more than one async error
         // in a single async cycle.
         boolean setError = response.setError();
@@ -390,7 +393,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
         case ACK: {
-            ack();
+            ack((ContinueResponseTiming) param);
             break;
         }
         case CLIENT_FLUSH: {
@@ -433,7 +436,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // Aborted upload or similar.
+            // Cancelled upload or similar.
             // No point reading the remainder of the request.
             disableSwallowRequest();
             // This is an error state. Make sure it is marked as such.
@@ -445,6 +448,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         case REQ_HOST_ADDR_ATTRIBUTE: {
             if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+            }
+            break;
+        }
+        case REQ_PEER_ADDR_ATTRIBUTE: {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.peerAddr().setString(socketWrapper.getRemoteAddr());
             }
             break;
         }
@@ -722,7 +731,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void finishResponse() throws IOException;
 
 
-    protected abstract void ack();
+    protected abstract void ack(ContinueResponseTiming continueResponseTiming);
 
 
     protected abstract void flush() throws IOException;
@@ -791,6 +800,14 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 sslO = sslSupport.getProtocol();
                 if (sslO != null) {
                     request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                }
+                sslO = sslSupport.getRequestedProtocols();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY, sslO);
+                }
+                sslO = sslSupport.getRequestedCiphers();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.REQUESTED_CIPHERS_KEY, sslO);
                 }
                 request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
             }

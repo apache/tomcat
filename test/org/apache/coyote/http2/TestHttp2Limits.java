@@ -39,6 +39,39 @@ public class TestHttp2Limits extends Http2TestBase {
 
     private static final StringManager sm = StringManager.getManager(TestHttp2Limits.class);
 
+
+    @Test
+    public void testSettingsOverheadLimits() throws Exception {
+        http2Connect(false);
+
+        for (int i = 0; i < 100; i++) {
+            try {
+                sendSettings(0, false);
+                parser.readFrame(true);
+            } catch (IOException ioe) {
+                // Server closed connection before client has a chance to read
+                // the Goaway frame. Treat this as a pass.
+                return;
+            }
+            String trace = output.getTrace();
+            if (trace.equals("0-Settings-Ack\n")) {
+                // Test continues
+                output.clearTrace();
+            } else if (trace.startsWith("0-Goaway-[1]-[11]-[Connection [")) {
+                // Test passed
+                return;
+            } else {
+                // Test failed
+                Assert.fail("Unexpected output: " + output.getTrace());
+            }
+            Thread.sleep(100);
+        }
+
+        // Test failed
+        Assert.fail("Connection not closed down");
+    }
+
+
     @Test
     public void testHeaderLimits1x128() throws Exception {
         // Well within limits
@@ -415,21 +448,21 @@ public class TestHttp2Limits extends Http2TestBase {
 
 
     @Test
-    public void doTestPostWithTrailerHeadersDefaultLimit() throws Exception{
+    public void testPostWithTrailerHeadersDefaultLimit() throws Exception{
         doTestPostWithTrailerHeaders(Constants.DEFAULT_MAX_TRAILER_COUNT,
                 Constants.DEFAULT_MAX_TRAILER_SIZE, FailureMode.NONE);
     }
 
 
     @Test
-    public void doTestPostWithTrailerHeadersCount0() throws Exception{
+    public void testPostWithTrailerHeadersCount0() throws Exception{
         doTestPostWithTrailerHeaders(0, Constants.DEFAULT_MAX_TRAILER_SIZE,
                 FailureMode.STREAM_RESET);
     }
 
 
     @Test
-    public void doTestPostWithTrailerHeadersSize0() throws Exception{
+    public void testPostWithTrailerHeadersSize0() throws Exception{
         doTestPostWithTrailerHeaders(Constants.DEFAULT_MAX_TRAILER_COUNT, 0,
                 FailureMode.CONNECTION_RESET);
     }
@@ -492,6 +525,13 @@ public class TestHttp2Limits extends Http2TestBase {
         case STREAM_RESET: {
             // NIO2 can sometimes send window updates depending timing
             skipWindowSizeFrames();
+
+            // Async I/O can sometimes result in a stream closed reset before
+            // the enhance your calm reset
+            if ("3-RST-[5]\n".equals(output.getTrace())) {
+                output.clearTrace();
+                parser.readFrame(true);
+            }
 
             Assert.assertEquals("3-RST-[11]\n", output.getTrace());
             break;
