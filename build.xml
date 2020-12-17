@@ -3720,7 +3720,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
   </macrodef>
 
   <target name="add-osgi" if="${addOSGi}" >
-    <echo message="add-osgi ${jarfile} ${addOSGi}"></echo>
+    <echo message="add-osgi ${jarfile} ${addOSGi}"/>
     <local name="filename"/>
     <basename property="filename" file="${jarfile}"/>
     <bnd
@@ -3740,7 +3740,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
   </target>
 
   <target name="add-graal" if="${addGraal}">
-    <echo message="add-graal  ${addGraal} ${jarfile} ${graalFiles} ${graalPrefix}"></echo>
+    <echo message="add-graal  ${addGraal} ${jarfile} ${graalFiles} ${graalPrefix}"/>
     <zip destfile="${jarfile}" update="true">
       <zipfileset dir="${basedir}/${graalFiles}" prefix="META-INF/native-image/${graalPrefix}" includes="*.*"/>
     </zip>
