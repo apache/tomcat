@@ -616,7 +616,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * is triggered independently of the socket read/write timeouts.
      */
     protected void startAsyncTimeout() {
-        if (timeoutFuture == null || (timeoutFuture != null && timeoutFuture.isDone())) {
+        if (timeoutFuture == null || timeoutFuture.isDone()) {
             if (timeoutFuture != null && timeoutFuture.isDone()) {
                 // There was an error executing the scheduled task, get it and log it
                 try {
