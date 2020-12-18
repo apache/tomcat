@@ -100,7 +100,7 @@ controlRole tomcat]]></source>
     <b>Tip</b>: The password file should be read-only and only accessible by the
     operating system user Tomcat is running as.
     </li>
-    <li>Alterantively, you can configure a JAAS login module with:
+    <li>Alternatively, you can configure a JAAS login module with:
 <source><![CDATA[  -Dcom.sun.management.jmxremote.login.config=%login.module.name%]]></source></li>
     </ol>
 

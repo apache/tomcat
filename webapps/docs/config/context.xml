@@ -460,7 +460,7 @@
       <attribute name="parallelAnnotationScanning" required="false">
         <p>When set to <code>true</code> annotation scanning will be performed
         using the utility executor. It will allow processing scanning in
-        parrallel which may improve deployment type at the expense of higher
+        parallel which may improve deployment type at the expense of higher
         server load. If not specified, the default of <code>false</code> is
         used.</p>
       </attribute>
