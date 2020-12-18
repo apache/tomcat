@@ -762,7 +762,7 @@ public class Catalina {
     /*
      * Load using arguments
      */
-    public void load(String args[]) {
+    public void load(String[] args) {
 
         try {
             if (arguments(args)) {
