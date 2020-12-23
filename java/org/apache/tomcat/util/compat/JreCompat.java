@@ -25,6 +25,7 @@ import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Deque;
 import java.util.jar.JarFile;
 
@@ -308,6 +309,14 @@ public class JreCompat {
      * @return the server socket channel
      */
     public ServerSocketChannel openUnixDomainServerSocketChannel() {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
+    }
+
+    /**
+     * Create socket channel using the specified socket domain socket address.
+     * @return the socket channel
+     */
+    public SocketChannel openUnixDomainSocketChannel() {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
     }
 
