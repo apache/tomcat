@@ -894,6 +894,27 @@
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
+      <attribute name="unixDomainSocketPath" required="false">
+        <p>Where supported, the path to a Unix Domain Socket that this
+        <strong>Connector</strong> will create and await incoming connections.
+        Tomcat will NOT automatically remove the socket on server shutdown.
+        If the socket already exists, care must be taken by the administrator
+        to remove the socket after verifying that the socket isn't already
+        being used by an existing Tomcat process. Using this requires
+        Java 16 or later. When this is specified, the otherwise mandatory
+        <code>port</code> attribute may be omitted.</p>
+      </attribute>
+
+      <attribute name="unixDomainSocketPathPermissions" required="false">
+        <p>Where supported, the posix permissions that will be applied to the
+        to the Unix Domain Socket specified with
+        <code>unixDomainSocketPath</code> above. The
+        permissions are specified as a string of nine characters, in three sets
+        of three: (r)ead, (w)rite and e(x)ecute for owner, group and others
+        respectively. If a permission is not granted, a hyphen is used. If
+        unspecified, the permissions default to <code>rw-rw-rw-</code>.</p>
+      </attribute>
+
       <attribute name="useInheritedChannel" required="false">
         <p>(bool)Defines if this connector should inherit an inetd/systemd network socket.
         Only one connector can inherit a network socket. This can option can be

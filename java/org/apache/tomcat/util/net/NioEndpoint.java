@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
@@ -35,8 +36,15 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +59,7 @@ import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 /**
@@ -111,6 +120,27 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     public void setUseInheritedChannel(boolean useInheritedChannel) { this.useInheritedChannel = useInheritedChannel; }
     public boolean getUseInheritedChannel() { return useInheritedChannel; }
 
+
+    /**
+     * Path for the Unix domain socket, used to create the socket address.
+     */
+    private String unixDomainSocketPath = null;
+    public String getUnixDomainSocketPath() { return this.unixDomainSocketPath; }
+    public void setUnixDomainSocketPath(String unixDomainSocketPath) {
+        this.unixDomainSocketPath = unixDomainSocketPath;
+    }
+
+
+    /**
+     * Permissions which will be set on the Unix domain socket if it is created.
+     */
+    private String unixDomainSocketPathPermissions = null;
+    public String getUnixDomainSocketPathPermissions() { return this.unixDomainSocketPathPermissions; }
+    public void setUnixDomainSocketPathPermissions(String unixDomainSocketPathPermissions) {
+        this.unixDomainSocketPathPermissions = unixDomainSocketPathPermissions;
+    }
+
+
     /**
      * Priority of the poller thread.
      */
@@ -164,12 +194,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     // Separated out to make it easier for folks that extend NioEndpoint to
     // implement custom [server]sockets
     protected void initServerSocket() throws Exception {
-        if (!getUseInheritedChannel()) {
-            serverSock = ServerSocketChannel.open();
-            socketProperties.setProperties(serverSock.socket());
-            InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
-            serverSock.socket().bind(addr,getAcceptCount());
-        } else {
+        if (getUseInheritedChannel()) {
             // Retrieve the channel provided by the OS
             Channel ic = System.inheritedChannel();
             if (ic instanceof ServerSocketChannel) {
@@ -178,6 +203,28 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             if (serverSock == null) {
                 throw new IllegalArgumentException(sm.getString("endpoint.init.bind.inherited"));
             }
+        } else if (getUnixDomainSocketPath() != null) {
+            SocketAddress sa = JreCompat.getInstance().getUnixDomainSocketAddress(getUnixDomainSocketPath());
+            serverSock = JreCompat.getInstance().openUnixDomainServerSocketChannel();
+            serverSock.bind(sa, getAcceptCount());
+            if (getUnixDomainSocketPathPermissions() != null) {
+                FileAttribute<Set<PosixFilePermission>> attrs =
+                        PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString(getUnixDomainSocketPathPermissions()));
+                Path path = Paths.get(getUnixDomainSocketPath());
+                if (attrs != null) {
+                    Files.setAttribute(path, attrs.name(), attrs.value());
+                } else {
+                    java.io.File file = path.toFile();
+                    file.setReadable(true, false);
+                    file.setWritable(true, false);
+                    file.setExecutable(false, false);
+                }
+            }
+        } else {
+            serverSock = ServerSocketChannel.open();
+            socketProperties.setProperties(serverSock.socket());
+            InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
+            serverSock.bind(addr, getAcceptCount());
         }
         serverSock.configureBlocking(true); //mimic APR behavior
     }
@@ -304,7 +351,42 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         serverSock = null;
     }
 
+
     // ------------------------------------------------------ Protected Methods
+
+
+    @Override
+    protected void unlockAccept() {
+        if (getUnixDomainSocketPath() == null) {
+            super.unlockAccept();
+        } else {
+            // Only try to unlock the acceptor if it is necessary
+            if (acceptor == null || acceptor.getState() != AcceptorState.RUNNING) {
+                return;
+            }
+            try {
+                SocketAddress sa = JreCompat.getInstance().getUnixDomainSocketAddress(getUnixDomainSocketPath());
+                try (SocketChannel socket = JreCompat.getInstance().openUnixDomainSocketChannel()) {
+                    // With a UDS, expect no delay connecting and no defer accept
+                    socket.connect(sa);
+                }
+                // Wait for upto 1000ms acceptor threads to unlock
+                long waitLeft = 1000;
+                while (waitLeft > 0 &&
+                        acceptor.getState() == AcceptorState.RUNNING) {
+                    Thread.sleep(5);
+                    waitLeft -= 5;
+                }
+            } catch(Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(sm.getString(
+                            "endpoint.debug.unlock.fail", String.valueOf(getPortWithOffset())), t);
+                }
+            }
+        }
+    }
+
 
     protected SynchronizedStack<NioChannel> getNioChannels() {
         return nioChannels;
@@ -361,7 +443,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             // Set socket properties
             // Disable blocking, polling will be used
             socket.configureBlocking(false);
-            socketProperties.setProperties(socket.socket());
+            if (getUnixDomainSocketPath() == null) {
+                socketProperties.setProperties(socket.socket());
+            }
 
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
@@ -983,6 +1067,15 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
+            if (endpoint.getUnixDomainSocketPath() != null) {
+                // Pretend localhost for easy compatibility
+                localAddr = "127.0.0.1";
+                localName = "localhost";
+                localPort = 0;
+                remoteAddr = "127.0.0.1";
+                remoteHost = "localhost";
+                remotePort = 0;
+            }
             nioChannels = endpoint.getNioChannels();
             poller = endpoint.getPoller();
             socketBufferHandler = channel.getBufHandler();

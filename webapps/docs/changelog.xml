@@ -151,6 +151,13 @@
         combination with the Servlet non-blocking IO API. It was possible that
         some requests could get dropped. (markt)
       </fix>
+      <add>
+        Add support for using Unix domain sockets for NIO when running
+        on Java 16 or later. This uses NIO specific
+        <code>unixDomainSocketPath</code> and
+        <code>unixDomainSocketPathPermissions</code> attributes.
+        Based on a PR submitted by Graham Leggett. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
