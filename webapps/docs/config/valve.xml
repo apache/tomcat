@@ -284,32 +284,32 @@
     the current request and response.  The following pattern codes are
     supported:</p>
     <ul>
-    <li><b>%a</b> - Remote IP address.
+    <li><b><code>%a</code></b> - Remote IP address.
         See also <code>%{xxx}a</code> below.</li>
-    <li><b>%A</b> - Local IP address</li>
-    <li><b>%b</b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
-    <li><b>%B</b> - Bytes sent, excluding HTTP headers</li>
-    <li><b>%h</b> - Remote host name (or IP address if
+    <li><b><code>%A</code></b> - Local IP address</li>
+    <li><b><code>%b</code></b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
+    <li><b><code>%B</code></b> - Bytes sent, excluding HTTP headers</li>
+    <li><b><code>%h</code></b> - Remote host name (or IP address if
         <code>enableLookups</code> for the connector is false)</li>
-    <li><b>%H</b> - Request protocol</li>
-    <li><b>%l</b> - Remote logical username from identd (always returns
+    <li><b><code>%H</code></b> - Request protocol</li>
+    <li><b><code>%l</code></b> - Remote logical username from identd (always returns
         '-')</li>
-    <li><b>%m</b> - Request method (GET, POST, etc.)</li>
-    <li><b>%p</b> - Local port on which this request was received.
+    <li><b><code>%m</code></b> - Request method (GET, POST, etc.)</li>
+    <li><b><code>%p</code></b> - Local port on which this request was received.
         See also <code>%{xxx}p</code> below.</li>
-    <li><b>%q</b> - Query string (prepended with a '?' if it exists)</li>
-    <li><b>%r</b> - First line of the request (method and request URI)</li>
-    <li><b>%s</b> - HTTP status code of the response</li>
-    <li><b>%S</b> - User session ID</li>
-    <li><b>%t</b> - Date and time, in Common Log Format</li>
-    <li><b>%u</b> - Remote user that was authenticated (if any), else '-' (escaped if required)</li>
-    <li><b>%U</b> - Requested URL path</li>
-    <li><b>%v</b> - Local server name</li>
-    <li><b>%D</b> - Time taken to process the request in microseconds</li>
-    <li><b>%T</b> - Time taken to process the request, in seconds</li>
-    <li><b>%F</b> - Time taken to commit the response, in milliseconds</li>
-    <li><b>%I</b> - Current request thread name (can compare later with stacktraces)</li>
-    <li><b>%X</b> - Connection status when response is completed:
+    <li><b><code>%q</code></b> - Query string (prepended with a '?' if it exists)</li>
+    <li><b><code>%r</code></b> - First line of the request (method and request URI)</li>
+    <li><b><code>%s</code></b> - HTTP status code of the response</li>
+    <li><b><code>%S</code></b> - User session ID</li>
+    <li><b><code>%t</code></b> - Date and time, in Common Log Format</li>
+    <li><b><code>%u</code></b> - Remote user that was authenticated (if any), else '-' (escaped if required)</li>
+    <li><b><code>%U</code></b> - Requested URL path</li>
+    <li><b><code>%v</code></b> - Local server name</li>
+    <li><b><code>%D</code></b> - Time taken to process the request in microseconds</li>
+    <li><b><code>%T</code></b> - Time taken to process the request, in seconds</li>
+    <li><b><code>%F</code></b> - Time taken to commit the response, in milliseconds</li>
+    <li><b><code>%I</code></b> - Current request thread name (can compare later with stacktraces)</li>
+    <li><b><code>%X</code></b> - Connection status when response is completed:
       <ul>
       <li><code>X</code> = Connection aborted before the response completed.</li>
       <li><code>+</code> = Connection may be kept alive after the response is sent.</li>
