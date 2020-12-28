@@ -249,6 +249,13 @@ public class RequestFacade implements HttpServletRequest {
 
     // --------------------------------------------------------- Public Methods
 
+    /**
+     * @return the <code>Request</code> for which this object
+     * is the facade.
+     */
+    public Request getRequest() {
+        return request;
+    }
 
     /**
      * Clear facade.
