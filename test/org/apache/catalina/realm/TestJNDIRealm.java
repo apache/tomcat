@@ -117,7 +117,7 @@ public class TestJNDIRealm {
     @Test
     public void testErrorRealm() throws Exception {
         Context context = new TesterContext();
-        JNDIRealm realm = new JNDIRealm();
+        final JNDIRealm realm = new JNDIRealm();
         realm.setContainer(context);
         realm.setUserSearch("");
         // Connect to something that will fail
@@ -125,9 +125,16 @@ public class TestJNDIRealm {
         realm.start();
 
         final CountDownLatch latch = new CountDownLatch(3);
-        (new Thread(() -> { realm.authenticate("foo", "bar"); latch.countDown(); })).start();
-        (new Thread(() -> { realm.authenticate("foo", "bar"); latch.countDown(); })).start();
-        (new Thread(() -> { realm.authenticate("foo", "bar"); latch.countDown(); })).start();
+        Runnable testThread = new Runnable() {
+            @Override
+            public void run() {
+                realm.authenticate("foo", "bar");
+                latch.countDown();
+            }
+        };
+        (new Thread(testThread)).start();
+        (new Thread(testThread)).start();
+        (new Thread(testThread)).start();
 
         Assert.assertTrue(latch.await(30, TimeUnit.SECONDS));
     }
