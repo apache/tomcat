@@ -1309,9 +1309,10 @@ public class JNDIRealm extends RealmBase {
             // Ensure that we have a directory context available
             connection = get();
 
-            // Occasionally the directory context will timeout.  Try one more
-            // time before giving up.
             try {
+
+                // Occasionally the directory context will timeout.  Try one more
+                // time before giving up.
 
                 // Authenticate the specified username if possible
                 principal = authenticate(connection, username, credentials);
@@ -1357,6 +1358,10 @@ public class JNDIRealm extends RealmBase {
 
             // Log the problem for posterity
             containerLog.error(sm.getString("jndiRealm.exception"), e);
+
+            // close the connection so we know it will be reopened.
+            close(connection);
+            closePooledConnections();
 
             // Return "not authenticated" for this request
             if (containerLog.isDebugEnabled())
@@ -2200,8 +2205,12 @@ public class JNDIRealm extends RealmBase {
     protected void close(JNDIConnection connection) {
 
         // Do nothing if there is no opened connection
-        if (connection.context == null)
+        if (connection == null || connection.context == null) {
+            if (connectionPool == null) {
+                singleConnectionLock.unlock();
+            }
             return;
+        }
 
         // Close tls startResponse if used
         if (tls != null) {
