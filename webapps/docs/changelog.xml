@@ -142,6 +142,10 @@
         Avoid uncaught InaccessibleObjectException on Java 16 trying to clear
         references threads. (remm)
       </fix>
+      <fix>
+        <bug>65033</bug>: Fix JNDI realm error handling when connecting to a
+        failed server when pooling was not enabled. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

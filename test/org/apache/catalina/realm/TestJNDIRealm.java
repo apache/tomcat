@@ -112,6 +112,27 @@ public class TestJNDIRealm {
         Assert.assertEquals(USER, principal.getName());
     }
 
+    volatile int count = 0;
+
+    @Test
+    public void testErrorRealm() throws Exception {
+        Context context = new TesterContext();
+        JNDIRealm realm = new JNDIRealm();
+        realm.setContainer(context);
+        realm.setUserSearch("");
+        // Connect to something that will fail
+        realm.setConnectionURL("ldap://127.0.0.1:12345");
+        realm.start();
+
+        count = 0;
+        (new Thread(() -> { realm.authenticate("foo", "bar"); count++; })).start();
+        (new Thread(() -> { realm.authenticate("foo", "bar"); count++; })).start();
+        (new Thread(() -> { realm.authenticate("foo", "bar"); count++; })).start();
+        Thread.sleep(10);
+
+        Assert.assertEquals(3, count);
+    }
+
 
     private JNDIRealm buildRealm(String password) throws javax.naming.NamingException,
             NoSuchFieldException, IllegalAccessException, LifecycleException {
