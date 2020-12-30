@@ -305,7 +305,7 @@ public class JreCompat {
 
 
     /**
-     * Create server socket channel using the specified socket domain socket address.
+     * Create server socket channel using the Unix domain socket ProtocolFamily.
      * @return the server socket channel
      */
     public ServerSocketChannel openUnixDomainServerSocketChannel() {
@@ -313,7 +313,7 @@ public class JreCompat {
     }
 
     /**
-     * Create socket channel using the specified socket domain socket address.
+     * Create socket channel using the Unix domain socket ProtocolFamily.
      * @return the socket channel
      */
     public SocketChannel openUnixDomainSocketChannel() {
