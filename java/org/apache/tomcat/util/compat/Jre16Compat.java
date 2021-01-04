@@ -49,10 +49,8 @@ class Jre16Compat extends Jre9Compat {
             m2 = c1.getMethod("of", String.class);
             m3 = SocketChannel.class.getMethod("open", ProtocolFamily.class);
         } catch (ClassNotFoundException e) {
-            if (c1 == null) {
-                // Must be pre-Java 16
-                log.debug(sm.getString("jre16Compat.javaPre16"), e);
-            }
+            // Must be pre-Java 16
+            log.debug(sm.getString("jre16Compat.javaPre16"), e);
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             // Should never happen
             log.error(sm.getString("jre16Compat.unexpected"), e);
