@@ -1285,7 +1285,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         } catch (IOException e) {
             writer = null;
             currentLogFile = null;
-            log.error(sm.getString("accessLogValve.openFail", pathname), e);
+            log.error(sm.getString("accessLogValve.openFail", pathname, System.getProperty("user.name")), e);
         }
         // Rotating a log file will always trigger a new file to be opened so
         // when a new file is opened, check to see if any old files need to be

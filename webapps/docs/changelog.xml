@@ -135,6 +135,11 @@
         Avoid uncaught InaccessibleObjectException on Java 16 trying to clear
         references threads. (remm)
       </fix>
+      <fix>
+        <bug>65047</bug>: If the <code>AccessLogValve</code> is unable to open
+        the access log file, include information on the current user in the
+        associated log message  (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
