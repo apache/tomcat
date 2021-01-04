@@ -178,6 +178,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>65007</bug>: Clarify that the commands shown in the TLS
+        documentation for importing a signed TLS certificate from a certificate
+        authority are typical examples that may need to be adjusted in some
+        cases. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
