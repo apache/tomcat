@@ -308,10 +308,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else if(opt.equals("14")) {
                 settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_14);
             } else if(opt.equals("15")) {
-                // Constant not available in latest ECJ version shipped with
-                // Tomcat. May be supported in a snapshot build.
-                // This is checked against the actual version below.
-                settings.put(CompilerOptions.OPTION_Source, "15");
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_15);
             } else if(opt.equals("16")) {
                 // Constant not available in latest ECJ version shipped with
                 // Tomcat. May be supported in a snapshot build.
@@ -370,11 +367,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_14);
                 settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_14);
             } else if(opt.equals("15")) {
-                // Constant not available in latest ECJ version shipped with
-                // Tomcat. May be supported in a snapshot build.
-                // This is checked against the actual version below.
-                settings.put(CompilerOptions.OPTION_TargetPlatform, "15");
-                settings.put(CompilerOptions.OPTION_Compliance, "15");
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_15);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_15);
             } else if(opt.equals("16")) {
                 // Constant not available in latest ECJ version shipped with
                 // Tomcat. May be supported in a snapshot build.
