@@ -176,6 +176,9 @@
         ignore expired sessions rather than throw an
         <code>IllegalStateException</code>. (remm)
       </fix>
+      <update>
+        Update to the Eclipse JDT compiler 4.18. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
