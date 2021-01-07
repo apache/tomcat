@@ -167,6 +167,10 @@
         <code>unixDomainSocketPathPermissions</code> attributes.
         Based on a PR submitted by Graham Leggett. (remm)
       </add>
+      <fix>
+        <bug>65001</bug>: Fix error handling for exceptions throw from calls
+        to <code>ReadListener</code> and <code>WriteListener</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
