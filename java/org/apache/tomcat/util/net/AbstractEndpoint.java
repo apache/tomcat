@@ -586,7 +586,7 @@ public abstract class AbstractEndpoint<S,U> {
     private boolean bindOnInit = true;
     public boolean getBindOnInit() { return bindOnInit; }
     public void setBindOnInit(boolean b) { this.bindOnInit = b; }
-    private volatile BindState bindState = BindState.UNBOUND;
+    protected volatile BindState bindState = BindState.UNBOUND;
 
     /**
      * Keepalive timeout, if not set the soTimeout is used.

@@ -349,6 +349,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             serverSock.close();
         }
         serverSock = null;
+        if (getUnixDomainSocketPath() != null && bindState != BindState.UNBOUND) {
+            Files.delete(Paths.get(getUnixDomainSocketPath()));
+        }
     }
 
 
