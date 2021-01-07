@@ -192,8 +192,13 @@ public class CoyoteAdapter implements Adapter {
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
+                        // Need to trigger the call to AbstractProcessor.setErrorState()
+                        // before the listener is called so the listener can call complete
+                        // Therefore no need to set success=false as that would trigger a
+                        // second call to AbstractProcessor.setErrorState()
+                        // https://bz.apache.org/bugzilla/show_bug.cgi?id=65001
+                        res.action(ActionCode.CLOSE_NOW, t);
                         writeListener.onError(t);
-                        success = false;
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
@@ -214,8 +219,13 @@ public class CoyoteAdapter implements Adapter {
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
+                        // Need to trigger the call to AbstractProcessor.setErrorState()
+                        // before the listener is called so the listener can call complete
+                        // Therefore no need to set success=false as that would trigger a
+                        // second call to AbstractProcessor.setErrorState()
+                        // https://bz.apache.org/bugzilla/show_bug.cgi?id=65001
+                        res.action(ActionCode.CLOSE_NOW, t);
                         readListener.onError(t);
-                        success = false;
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
