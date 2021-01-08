@@ -400,13 +400,16 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
     @Override
     protected void doCloseServerSocket() throws IOException {
-        if (!getUseInheritedChannel() && serverSock != null) {
-            // Close server socket
-            serverSock.close();
-        }
-        serverSock = null;
-        if (getUnixDomainSocketPath() != null && bindState != BindState.UNBOUND) {
-            Files.delete(Paths.get(getUnixDomainSocketPath()));
+        try {
+            if (!getUseInheritedChannel() && serverSock != null) {
+                // Close server socket
+                serverSock.close();
+            }
+            serverSock = null;
+        } finally {
+            if (getUnixDomainSocketPath() != null && getBindState().wasBound()) {
+                Files.delete(Paths.get(getUnixDomainSocketPath()));
+            }
         }
     }
 
