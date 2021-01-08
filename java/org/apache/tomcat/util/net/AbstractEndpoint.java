@@ -124,19 +124,25 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     protected enum BindState {
-        UNBOUND(false),
-        BOUND_ON_INIT(true),
-        BOUND_ON_START(true),
-        SOCKET_CLOSED_ON_STOP(false);
+        UNBOUND(false, false),
+        BOUND_ON_INIT(true, true),
+        BOUND_ON_START(true, true),
+        SOCKET_CLOSED_ON_STOP(false, true);
 
         private final boolean bound;
+        private final boolean wasBound;
 
-        private BindState(boolean bound) {
+        private BindState(boolean bound, boolean wasBound) {
             this.bound = bound;
+            this.wasBound = wasBound;
         }
 
         public boolean isBound() {
             return bound;
+        }
+
+        public boolean wasBound() {
+            return wasBound;
         }
     }
 
@@ -586,7 +592,10 @@ public abstract class AbstractEndpoint<S,U> {
     private boolean bindOnInit = true;
     public boolean getBindOnInit() { return bindOnInit; }
     public void setBindOnInit(boolean b) { this.bindOnInit = b; }
-    protected volatile BindState bindState = BindState.UNBOUND;
+    private volatile BindState bindState = BindState.UNBOUND;
+    protected BindState getBindState() {
+        return bindState;
+    }
 
     /**
      * Keepalive timeout, if not set the soTimeout is used.
