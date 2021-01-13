@@ -42,15 +42,7 @@ public class Validation {
         String skipIdentifierCheckStr;
         if (IS_SECURITY_ENABLED) {
             skipIdentifierCheckStr = AccessController.doPrivileged(
-                    new PrivilegedAction<String>(){
-                        @Override
-                        public String run() {
-                            return System.getProperty(
-                                    "org.apache.el.parser.SKIP_IDENTIFIER_CHECK",
-                                    "false");
-                        }
-                    }
-            );
+                    (PrivilegedAction<String>) () -> System.getProperty("org.apache.el.parser.SKIP_IDENTIFIER_CHECK", "false"));
         } else {
             skipIdentifierCheckStr = System.getProperty(
                     "org.apache.el.parser.SKIP_IDENTIFIER_CHECK", "false");

@@ -115,10 +115,10 @@ for your version of Java for details on protocol and algorithm support.</p>
 the <a href="https://www.openssl.org/">OpenSSL</a> cryptographic provider
 through JCA/JCE/JSSE which may provide a different selection of cryptographic
 algorithms and/or performance benefits relative to the SunJCE provider.
-You can also use <code>tcnative</code> to enable the <a href="apr.html">APR</a>
-connector which uses OpenSSL for its cryptographic operations. Check the
-documentation for your version of OpenSSL for details on protocol and
-algorithm support.</p>
+You can also use <code>tcnative</code> to enable the deprecated
+<a href="apr.html">APR</a> connector which uses OpenSSL for its
+cryptographic operations. Check the documentation for your version of OpenSSL
+for details on protocol and algorithm support.</p>
 
 </section>
 
@@ -259,7 +259,7 @@ Tomcat can use three different implementations of SSL:
 <ul>
 <li>JSSE implementation provided as part of the Java runtime</li>
 <li>JSSE implementation that uses OpenSSL</li>
-<li>APR implementation, which uses the OpenSSL engine by default</li>
+<li>APR implementation (deprecated), which uses the OpenSSL engine by default</li>
 </ul>
 <p>
 The exact configuration details depend on which implementation is being used.
@@ -298,7 +298,7 @@ both types in the same SSLHostConfig or Connector element.</p>
            sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"
            .../>]]></source>
 
-<p>Alternatively, to specify an APR connector (the APR library must be available) use:</p>
+<p>Alternatively, to specify a deprecated APR connector (the APR library must be available) use:</p>
 <source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, APR implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11AprProtocol"
            port="8443" .../>]]></source>
@@ -452,6 +452,16 @@ After that you can proceed with importing your Certificate.</p>
     -file &lt;your_certificate_filename&gt;</source>
 </li>
 </ul>
+
+<p>Each Certificate Authority tends to differ slightly from the others. They may
+require slightly different information and/or provide the certificate and
+associated certificate chain in different formats. Additionally, the rules that
+the Certificate Authorities use for issuing certifcates change over time. As a
+result you may find that the commands given above may need to be modified. If
+you require assitance then help is available via the
+<a href="http://tomcat.apache.org/lists.html#tomcat-users">Apache Tomcat users
+mailing list</a>.</p>
+
 </subsection>
 </section>
 

@@ -950,23 +950,30 @@ public class Connector extends LifecycleMBeanBase  {
 
         StringBuilder sb = new StringBuilder("type=");
         sb.append(type);
-        sb.append(",port=");
-        int port = getPortWithOffset();
-        if (port > 0) {
-            sb.append(port);
+        Object path = getProperty("unixDomainSocketPath");
+        if (path != null) {
+            // Maintain MBean name compatibility, even if not accurate
+            sb.append(",port=0,address=");
+            sb.append(ObjectName.quote(path.toString()));
         } else {
-            sb.append("auto-");
-            sb.append(getProperty("nameIndex"));
-        }
-        String address = "";
-        if (addressObj instanceof InetAddress) {
-            address = ((InetAddress) addressObj).getHostAddress();
-        } else if (addressObj != null) {
-            address = addressObj.toString();
-        }
-        if (address.length() > 0) {
-            sb.append(",address=");
-            sb.append(ObjectName.quote(address));
+            sb.append(",port=");
+            int port = getPortWithOffset();
+            if (port > 0) {
+                sb.append(port);
+            } else {
+                sb.append("auto-");
+                sb.append(getProperty("nameIndex"));
+            }
+            String address = "";
+            if (addressObj instanceof InetAddress) {
+                address = ((InetAddress) addressObj).getHostAddress();
+            } else if (addressObj != null) {
+                address = addressObj.toString();
+            }
+            if (address.length() > 0) {
+                sb.append(",address=");
+                sb.append(ObjectName.quote(address));
+            }
         }
         return sb.toString();
     }
@@ -1059,7 +1066,7 @@ public class Connector extends LifecycleMBeanBase  {
     protected void startInternal() throws LifecycleException {
 
         // Validate settings before starting
-        if (getPortWithOffset() < 0) {
+        if (getProperty("unixDomainSocketPath") == null && getPortWithOffset() < 0) {
             throw new LifecycleException(sm.getString(
                     "coyoteConnector.invalidPort", Integer.valueOf(getPortWithOffset())));
         }
@@ -1125,12 +1132,17 @@ public class Connector extends LifecycleMBeanBase  {
         StringBuilder sb = new StringBuilder("Connector[");
         sb.append(getProtocol());
         sb.append('-');
-        int port = getPortWithOffset();
-        if (port > 0) {
-            sb.append(port);
+        Object path = getProperty("unixDomainSocketPath");
+        if (path != null) {
+            sb.append(path.toString());
         } else {
-            sb.append("auto-");
-            sb.append(getProperty("nameIndex"));
+            int port = getPortWithOffset();
+            if (port > 0) {
+                sb.append(port);
+            } else {
+                sb.append("auto-");
+                sb.append(getProperty("nameIndex"));
+            }
         }
         sb.append(']');
         return sb.toString();

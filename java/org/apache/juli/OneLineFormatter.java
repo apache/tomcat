@@ -43,12 +43,8 @@ public class OneLineFormatter extends Formatter {
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
     private static final int THREAD_NAME_CACHE_SIZE = 10000;
-    private static ThreadLocal<ThreadNameCache> threadNameCache = new ThreadLocal<ThreadNameCache>() {
-        @Override
-        protected ThreadNameCache initialValue() {
-            return new ThreadNameCache(THREAD_NAME_CACHE_SIZE);
-        }
-    };
+    private static ThreadLocal<ThreadNameCache> threadNameCache =
+            ThreadLocal.withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
 
     /* Timestamp format */
     private static final String DEFAULT_TIME_FORMAT = "dd-MMM-yyyy HH:mm:ss.SSS";
@@ -109,12 +105,7 @@ public class OneLineFormatter extends Formatter {
 
         final DateFormatCache globalDateCache =
                 new DateFormatCache(globalCacheSize, cachedTimeFormat, null);
-        localDateCache = new ThreadLocal<DateFormatCache>() {
-            @Override
-            protected DateFormatCache initialValue() {
-                return new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache);
-            }
-        };
+        localDateCache = ThreadLocal.withInitial(() -> new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache));
     }
 
 

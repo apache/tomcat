@@ -2391,13 +2391,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             names.add(fragment.getName());
         }
         for (WebXml fragment : group) {
-            Iterator<String> after = fragment.getAfterOrdering().iterator();
-            while (after.hasNext()) {
-                String entry = after.next();
-                if (!names.contains(entry)) {
-                    after.remove();
-                }
-            }
+            fragment.getAfterOrdering().removeIf(entry -> !names.contains(entry));
         }
     }
     private static void orderFragments(Set<WebXml> orderedFragments,

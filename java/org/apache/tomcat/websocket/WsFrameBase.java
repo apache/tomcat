@@ -912,7 +912,7 @@ public abstract class WsFrameBase {
     protected abstract void resumeProcessing();
 
 
-    private abstract class TerminalTransformation implements Transformation {
+    private abstract static class TerminalTransformation implements Transformation {
 
         @Override
         public boolean validateRsvBits(int i) {

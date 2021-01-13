@@ -150,7 +150,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Full range marker.
      */
-    protected static final Ranges FULL = new Ranges(null, new ArrayList<Ranges.Entry>());
+    protected static final Ranges FULL = new Ranges(null, new ArrayList<>());
 
     private static final ContentRange IGNORE = new ContentRange(null, 0, 0, 0);
 

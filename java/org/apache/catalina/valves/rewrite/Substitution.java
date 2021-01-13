@@ -25,11 +25,11 @@ import org.apache.catalina.util.URLEncoder;
 
 public class Substitution {
 
-    public abstract class SubstitutionElement {
+    public abstract static class SubstitutionElement {
         public abstract String evaluate(Matcher rule, Matcher cond, Resolver resolver);
     }
 
-    public class StaticElement extends SubstitutionElement {
+    public static class StaticElement extends SubstitutionElement {
         public String value;
 
         @Override
@@ -59,7 +59,7 @@ public class Substitution {
         }
     }
 
-    public class RewriteCondBackReferenceElement extends SubstitutionElement {
+    public static class RewriteCondBackReferenceElement extends SubstitutionElement {
         public int n;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -67,7 +67,7 @@ public class Substitution {
         }
     }
 
-    public class ServerVariableElement extends SubstitutionElement {
+    public static class ServerVariableElement extends SubstitutionElement {
         public String key;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -75,7 +75,7 @@ public class Substitution {
         }
     }
 
-    public class ServerVariableEnvElement extends SubstitutionElement {
+    public static class ServerVariableEnvElement extends SubstitutionElement {
         public String key;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -83,7 +83,7 @@ public class Substitution {
         }
     }
 
-    public class ServerVariableSslElement extends SubstitutionElement {
+    public static class ServerVariableSslElement extends SubstitutionElement {
         public String key;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -91,7 +91,7 @@ public class Substitution {
         }
     }
 
-    public class ServerVariableHttpElement extends SubstitutionElement {
+    public static class ServerVariableHttpElement extends SubstitutionElement {
         public String key;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {

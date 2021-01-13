@@ -412,9 +412,7 @@ public class StandardJarScanner implements JarScanner {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 // Wrap the exception and re-throw
-                IOException ioe = new IOException();
-                ioe.initCause(t);
-                throw ioe;
+                throw new IOException(t);
             }
         }
     }

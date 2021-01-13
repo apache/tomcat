@@ -126,19 +126,25 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     protected enum BindState {
-        UNBOUND(false),
-        BOUND_ON_INIT(true),
-        BOUND_ON_START(true),
-        SOCKET_CLOSED_ON_STOP(false);
+        UNBOUND(false, false),
+        BOUND_ON_INIT(true, true),
+        BOUND_ON_START(true, true),
+        SOCKET_CLOSED_ON_STOP(false, true);
 
         private final boolean bound;
+        private final boolean wasBound;
 
-        private BindState(boolean bound) {
+        private BindState(boolean bound, boolean wasBound) {
             this.bound = bound;
+            this.wasBound = wasBound;
         }
 
         public boolean isBound() {
             return bound;
+        }
+
+        public boolean wasBound() {
+            return wasBound;
         }
     }
 
@@ -605,6 +611,9 @@ public abstract class AbstractEndpoint<S,U> {
     public boolean getBindOnInit() { return bindOnInit; }
     public void setBindOnInit(boolean b) { this.bindOnInit = b; }
     private volatile BindState bindState = BindState.UNBOUND;
+    protected BindState getBindState() {
+        return bindState;
+    }
 
     /**
      * Keepalive timeout, if not set the soTimeout is used.
@@ -960,7 +969,7 @@ public abstract class AbstractEndpoint<S,U> {
     /**
      * Unlock the server socket acceptor threads using bogus connections.
      */
-    private void unlockAccept() {
+    protected void unlockAccept() {
         // Only try to unlock the acceptor if it is necessary
         if (acceptor == null || acceptor.getState() != AcceptorState.RUNNING) {
             return;

@@ -48,13 +48,8 @@ public class ELSupport {
         String coerceToZeroStr;
         if (System.getSecurityManager() != null) {
             coerceToZeroStr = AccessController.doPrivileged(
-                    new PrivilegedAction<String>(){
-                        @Override
-                        public String run() {
-                            return System.getProperty(
-                                    "org.apache.el.parser.COERCE_TO_ZERO", "false");
-                        }
-                    }
+                    (PrivilegedAction<String>) () -> System.getProperty(
+                            "org.apache.el.parser.COERCE_TO_ZERO", "false")
             );
         } else {
             coerceToZeroStr = System.getProperty(

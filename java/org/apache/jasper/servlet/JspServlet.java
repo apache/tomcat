@@ -128,13 +128,10 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             }
             try {
                 if (SecurityUtil.isPackageProtectionEnabled()){
-                   AccessController.doPrivileged(new PrivilegedExceptionAction<Object>(){
-                        @Override
-                        public Object run() throws IOException, ServletException {
-                            serviceJspFile(null, null, jspFile, true);
-                            return null;
-                        }
-                    });
+                   AccessController.doPrivileged((PrivilegedExceptionAction<Object>) () -> {
+                       serviceJspFile(null, null, jspFile, true);
+                       return null;
+                   });
                 } else {
                     serviceJspFile(null, null, jspFile, true);
                 }
@@ -328,11 +325,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         try {
             boolean precompile = preCompile(request);
             serviceJspFile(request, response, jspUri, precompile);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (ServletException e) {
-            throw e;
-        } catch (IOException e) {
+        } catch (RuntimeException | IOException | ServletException e) {
             throw e;
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);

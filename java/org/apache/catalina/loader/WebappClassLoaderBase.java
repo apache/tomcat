@@ -360,10 +360,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * Should Tomcat call
-     * {@link org.apache.juli.logging.LogFactory#release(ClassLoader)}
-     * when the class loader is stopped? If not specified, the default value
-     * of <code>true</code> is used. Changing the default setting is likely to
-     * lead to memory leaks and other issues.
+     * {@link org.apache.juli.logging.LogFactory#release(ClassLoader)} when the
+     * class loader is stopped? If not specified, the default value of
+     * <code>true</code> is used. Changing the default setting is likely to lead
+     * to memory leaks and other issues.
      */
     private boolean clearReferencesLogFactoryRelease = true;
 
@@ -1802,8 +1802,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 usingExecutor = true;
                             }
                         }
-                    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
-                            IllegalAccessException e) {
+                    } catch (/*SecurityException |*/ NoSuchFieldException | /*IllegalArgumentException |*/
+                            IllegalAccessException | RuntimeException e) {
+                        // FIXME: InaccessibleObjectException is only available in Java 9+,
+                        // swapped for RuntimeException for now
                         log.warn(sm.getString("webappClassLoader.stopThreadFail",
                                 thread.getName(), getContextName()), e);
                     }

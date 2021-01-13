@@ -451,6 +451,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             }
             break;
         }
+        case REQ_PEER_ADDR_ATTRIBUTE: {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.peerAddr().setString(socketWrapper.getRemoteAddr());
+            }
+            break;
+        }
         case REQ_HOST_ATTRIBUTE: {
             populateRequestAttributeRemoteHost();
             break;
@@ -794,6 +800,14 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 sslO = sslSupport.getProtocol();
                 if (sslO != null) {
                     request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                }
+                sslO = sslSupport.getRequestedProtocols();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY, sslO);
+                }
+                sslO = sslSupport.getRequestedCiphers();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.REQUESTED_CIPHERS_KEY, sslO);
                 }
                 request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
             }

@@ -520,10 +520,8 @@ public class PageContextImpl extends PageContext {
             out.clear();
             baseOut.clear();
         } catch (IOException ex) {
-            IllegalStateException ise = new IllegalStateException(Localizer.getMessage(
-                    "jsp.error.attempt_to_clear_flushed_buffer"));
-            ise.initCause(ex);
-            throw ise;
+            throw new IllegalStateException(Localizer.getMessage(
+                    "jsp.error.attempt_to_clear_flushed_buffer"), ex);
         }
 
         // Make sure that the response object is not the wrapper for include

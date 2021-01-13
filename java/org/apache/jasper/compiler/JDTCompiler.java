@@ -46,6 +46,7 @@ import org.eclipse.jdt.internal.compiler.ICompilerRequestor;
 import org.eclipse.jdt.internal.compiler.IErrorHandlingPolicy;
 import org.eclipse.jdt.internal.compiler.IProblemFactory;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
+import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
@@ -203,9 +204,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                             ClassFileReader classFileReader = new ClassFileReader(classBytes, fileName, true);
                             return new NameEnvironmentAnswer(classFileReader, null);
                         }
-                    } catch (IOException exc) {
-                        log.error(Localizer.getMessage("jsp.error.compilation.dependent", className), exc);
-                    } catch (org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException exc) {
+                    } catch (IOException | ClassFormatException exc) {
                         log.error(Localizer.getMessage("jsp.error.compilation.dependent", className), exc);
                     }
                     return null;
@@ -309,10 +308,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else if(opt.equals("14")) {
                 settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_14);
             } else if(opt.equals("15")) {
-                // Constant not available in latest ECJ version shipped with
-                // Tomcat. May be supported in a snapshot build.
-                // This is checked against the actual version below.
-                settings.put(CompilerOptions.OPTION_Source, "15");
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_15);
             } else if(opt.equals("16")) {
                 // Constant not available in latest ECJ version shipped with
                 // Tomcat. May be supported in a snapshot build.
@@ -371,11 +367,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_14);
                 settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_14);
             } else if(opt.equals("15")) {
-                // Constant not available in latest ECJ version shipped with
-                // Tomcat. May be supported in a snapshot build.
-                // This is checked against the actual version below.
-                settings.put(CompilerOptions.OPTION_TargetPlatform, "15");
-                settings.put(CompilerOptions.OPTION_Compliance, "15");
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_15);
+                settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_15);
             } else if(opt.equals("16")) {
                 // Constant not available in latest ECJ version shipped with
                 // Tomcat. May be supported in a snapshot build.

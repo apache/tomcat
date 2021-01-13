@@ -182,7 +182,7 @@ public final class Library {
     public static boolean APR_POLLSET_WAKEABLE      = false;
     /* Support for Unix Domain Sockets.
      */
-    public static boolean APR_HAVE_UNIX           = false;
+    public static boolean APR_HAVE_UNIX             = false;
 
 
     public static int APR_SIZEOF_VOIDP;

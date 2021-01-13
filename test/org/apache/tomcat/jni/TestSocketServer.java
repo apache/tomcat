@@ -34,7 +34,12 @@ import org.junit.Test;
  * It is known that this larger error margin is required for Windows 10. It may
  * be worth revisiting the choice of error margin once that platform is no
  * longer supported.
+ *
+ * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+ *              10.1.x onwards to only those components required to provide
+ *              OpenSSL integration with the NIO and NIO2 connectors.
  */
+@Deprecated
 public class TestSocketServer extends AbstractJniTest {
 
     private static final String HOST = "localhost";

@@ -113,6 +113,7 @@ import org.apache.tomcat.util.http.fileupload.impl.SizeException;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import org.apache.tomcat.util.http.parser.AcceptLanguage;
+import org.apache.tomcat.util.http.parser.Upgrade;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.res.StringManager;
 import org.ietf.jgss.GSSCredential;
@@ -125,6 +126,8 @@ import org.ietf.jgss.GSSException;
  * @author Craig R. McClanahan
  */
 public class Request implements HttpServletRequest {
+
+    private static final String HTTP_UPGRADE_HEADER_NAME = "upgrade";
 
     private static final Log log = LogFactory.getLog(Request.class);
 
@@ -376,6 +379,12 @@ public class Request implements HttpServletRequest {
 
 
     /**
+     * Connection peer address.
+     */
+    protected String peerAddr = null;
+
+
+    /**
      * Remote host.
      */
     protected String remoteHost = null;
@@ -452,6 +461,7 @@ public class Request implements HttpServletRequest {
         localesParsed = false;
         secure = false;
         remoteAddr = null;
+        peerAddr = null;
         remoteHost = null;
         remotePort = -1;
         localPort = -1;
@@ -882,6 +892,14 @@ public class Request implements HttpServletRequest {
             if (attr != null) {
                 attributes.put(SSLSupport.PROTOCOL_VERSION_KEY, attr);
             }
+            attr = coyoteRequest.getAttribute(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY);
+            if (attr != null) {
+                attributes.put(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY, attr);
+            }
+            attr = coyoteRequest.getAttribute(SSLSupport.REQUESTED_CIPHERS_KEY);
+            if (attr != null) {
+                attributes.put(SSLSupport.REQUESTED_CIPHERS_KEY, attr);
+            }
             attr = attributes.get(name);
             sslAttributesParsed = true;
         }
@@ -1254,6 +1272,18 @@ public class Request implements HttpServletRequest {
             remoteAddr = coyoteRequest.remoteAddr().toString();
         }
         return remoteAddr;
+    }
+
+
+    /**
+     * @return the connection peer IP address making this Request.
+     */
+    public String getPeerAddr() {
+        if (peerAddr == null) {
+            coyoteRequest.action(ActionCode.REQ_PEER_ADDR_ATTRIBUTE, coyoteRequest);
+            peerAddr = coyoteRequest.peerAddr().toString();
+        }
+        return peerAddr;
     }
 
 
@@ -2016,8 +2046,8 @@ public class Request implements HttpServletRequest {
                 SecurityException e) {
             throw new ServletException(e);
         }
-        UpgradeToken upgradeToken = new UpgradeToken(handler,
-                getContext(), instanceManager, response.getHeader("upgrade"));
+        UpgradeToken upgradeToken = new UpgradeToken(handler, getContext(), instanceManager,
+                getUpgradeProtocolName(httpUpgradeHandlerClass));
 
         coyoteRequest.action(ActionCode.UPGRADE, upgradeToken);
 
@@ -2027,6 +2057,29 @@ public class Request implements HttpServletRequest {
 
         return handler;
     }
+
+
+    private String getUpgradeProtocolName(Class<? extends HttpUpgradeHandler> httpUpgradeHandlerClass) {
+        // Ideal - the caller has already explicitly set the selected protocol
+        // on the response
+        String result = response.getHeader(HTTP_UPGRADE_HEADER_NAME);
+
+        if (result == null) {
+            // If the request's upgrade header contains a single protocol that
+            // is the protocol that must have been selected
+            List<Upgrade> upgradeProtocols = Upgrade.parse(getHeaders(HTTP_UPGRADE_HEADER_NAME));
+            if (upgradeProtocols != null && upgradeProtocols.size() == 1) {
+                result = upgradeProtocols.get(0).toString();
+            }
+        }
+
+        if (result == null) {
+            // Ugly but use the class name - it is better than nothing
+            result = httpUpgradeHandlerClass.getName();
+        }
+        return result;
+    }
+
 
     /**
      * Return the authentication type used for this Request.

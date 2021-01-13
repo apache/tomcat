@@ -63,6 +63,20 @@ public interface SSLSupport {
             "org.apache.tomcat.util.net.secure_protocol_version";
 
     /**
+     * The request attribute key under which the String indicating the ciphers
+     * requested by the client are recorded.
+     */
+    public static final String REQUESTED_CIPHERS_KEY =
+            "org.apache.tomcat.util.net.secure_requested_ciphers";
+
+    /**
+     * The request attribute key under which the String indicating the protocols
+     * requested by the client are recorded.
+     */
+    public static final String REQUESTED_PROTOCOL_VERSIONS_KEY =
+            "org.apache.tomcat.util.net.secure_requested_protocol_versions";
+
+    /**
      * The cipher suite being used on this connection.
      *
      * @return The name of the cipher suite as returned by the SSL/TLS
@@ -132,5 +146,22 @@ public interface SSLSupport {
      *   information from the socket
      */
     public String getProtocol() throws IOException;
-}
 
+    /**
+     *
+     * @return the list of SSL/TLS protocol versions requested by the client
+     *
+     * @throws IOException If an error occurs trying to obtain the client
+     *   requested protocol information from the socket
+     */
+    public String getRequestedProtocols() throws IOException;
+
+    /**
+    *
+    * @return the list of SSL/TLS ciphers requested by the client
+    *
+     * @throws IOException If an error occurs trying to obtain the client
+     *   request cipher information from the socket
+    */
+   public String getRequestedCiphers() throws IOException;
+}

@@ -102,9 +102,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
                 response.finishResponse();
                 return;
             }
-        } catch (IOException e) {
-            // Ignore
-        } catch (IllegalStateException e) {
+        } catch (IOException | IllegalStateException e) {
             // Ignore
         }
     }
