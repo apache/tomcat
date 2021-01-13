@@ -19,7 +19,9 @@ package org.apache.catalina.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +33,8 @@ import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletContainerInitializer;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRegistration;
 import jakarta.servlet.ServletRequest;
@@ -72,6 +76,11 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.*;
+
 
 public class TestStandardContext extends TomcatBaseTest {
 
@@ -80,6 +89,60 @@ public class TestStandardContext extends TomcatBaseTest {
         "Host: anything\r\n" +
         "Connection: close\r\n" +
         "\r\n";
+
+    @Test
+    public void testExitOnFirstListenerFailure() throws Exception {
+        final Collection<String> visited = new ArrayList<>();
+        final ServletContainerInitializer initializer = (c, ctx) -> {
+            ctx.addListener(new ServletContextListener() {
+                @Override
+                public void contextInitialized(final ServletContextEvent sce) {
+                    visited.add("first:init");
+                    throw new IllegalStateException("test failure");
+                }
+            });
+            ctx.addListener(new ServletContextListener() {
+                @Override
+                public void contextInitialized(final ServletContextEvent sce) {
+                    visited.add("second:init");
+                }
+            });
+        };
+        { // first ensure by default we go through all listeners
+            final Tomcat tomcat = getTomcatInstance();
+            final File docBase = new File(tomcat.getHost().getAppBaseFile(), "ROOT");
+            if (!docBase.mkdirs() && !docBase.isDirectory()) {
+                Assert.fail("Unable to create docBase");
+            }
+
+            final Context root = tomcat.addContext("", "ROOT");
+            root.addServletContainerInitializer(initializer, emptySet());
+            try {
+                tomcat.start();
+                assertEquals(LifecycleState.STOPPED, root.getState());
+            } finally {
+                tearDown();
+            }
+            assertEquals(asList("first:init", "second:init"), visited);
+        }
+        { // now do the same but with the flag to stop ASAP
+            setUp();
+            visited.clear();
+            final Tomcat tomcat = getTomcatInstance();
+            final File docBase = new File(tomcat.getHost().getAppBaseFile(), "ROOT");
+            if (!docBase.mkdirs() && !docBase.isDirectory()) {
+                Assert.fail("Unable to create docBase");
+            }
+
+            final StandardContext root = (StandardContext)
+                    tomcat.addContext("", "ROOT");
+            root.setExitOnFirstListenerFailure(true);
+            root.addServletContainerInitializer(initializer, emptySet());
+            tomcat.start();
+            assertEquals(LifecycleState.STOPPED, root.getState());
+            assertEquals(singletonList("first:init"), visited);
+        }
+    }
 
     @Test
     public void testBug46243() throws Exception {
