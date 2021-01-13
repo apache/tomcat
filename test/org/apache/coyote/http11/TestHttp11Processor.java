@@ -39,7 +39,9 @@ import java.util.concurrent.CountDownLatch;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -353,9 +355,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                 try {
                     client.sendRequest();
                     client.sendRequest();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
+                } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -366,6 +366,49 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // Sleep for 1500 ms which should mean the all of request 1 has been
         // sent and half of request 2
         Thread.sleep(1500);
+
+        // Now read the first response
+        client.readResponse(true);
+        Assert.assertFalse(client.isResponse50x());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
+
+        // Read the second response. No need to sleep, read will block until
+        // there is data to process
+        client.readResponse(true);
+        Assert.assertFalse(client.isResponse50x());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
+    }
+
+
+    @Test
+    public void testPipeliningBug64974() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add protected servlet
+        Wrapper w = Tomcat.addServlet(ctx, "servlet", new Bug64974Servlet());
+        w.setAsyncSupported(true);
+        ctx.addServletMappingDecoded("/foo", "servlet");
+
+        tomcat.start();
+
+        String request =
+                "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: any" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: any" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF;
+
+        final Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+        client.setUseContentLength(true);
+        client.connect();
+        client.sendRequest();
 
         // Now read the first response
         client.readResponse(true);
@@ -574,7 +617,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         String request =
                 "POST /echo HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF;
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 10" + SimpleHttpClient.CRLF;
         if (useExpectation) {
             request += "Expect: 100-continue" + SimpleHttpClient.CRLF;
         }
@@ -1770,6 +1814,49 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
             // Standard response
             doGet(req, resp);
+        }
+    }
+
+
+    private static class Bug64974Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            // Get requests can have bodies although these requests don't.
+            // Needs to be async to trigger the problematic code path
+            AsyncContext ac = req.startAsync();
+            ServletInputStream sis = req.getInputStream();
+            // This triggers a call to Http11InputBuffer.avalable(true) which
+            // did not handle the pipelining case.
+            sis.setReadListener(new Bug64974ReadListener());
+            ac.complete();
+
+            resp.setContentType("text/plain");
+            PrintWriter out = resp.getWriter();
+            out.print("OK");
+        }
+    }
+
+
+    private static class Bug64974ReadListener implements ReadListener {
+
+        @Override
+        public void onDataAvailable() throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onAllDataRead() throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            // NO-OP
         }
     }
 }

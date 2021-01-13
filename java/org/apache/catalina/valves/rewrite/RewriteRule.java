@@ -63,7 +63,7 @@ public class RewriteRule {
                 newEnvSubstitution.setSub(s);
                 newEnvSubstitution.parse(maps);
                 envSubstitution.add(newEnvSubstitution);
-                envResult.add(new ThreadLocal<String>());
+                envResult.add(new ThreadLocal<>());
             }
         }
         if (isCookie()) {

@@ -284,31 +284,32 @@
     the current request and response.  The following pattern codes are
     supported:</p>
     <ul>
-    <li><b>%a</b> - Remote IP address</li>
-    <li><b>%A</b> - Local IP address</li>
-    <li><b>%b</b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
-    <li><b>%B</b> - Bytes sent, excluding HTTP headers</li>
-    <li><b>%h</b> - Remote host name (or IP address if
+    <li><b><code>%a</code></b> - Remote IP address.
+        See also <code>%{xxx}a</code> below.</li>
+    <li><b><code>%A</code></b> - Local IP address</li>
+    <li><b><code>%b</code></b> - Bytes sent, excluding HTTP headers, or '-' if zero</li>
+    <li><b><code>%B</code></b> - Bytes sent, excluding HTTP headers</li>
+    <li><b><code>%h</code></b> - Remote host name (or IP address if
         <code>enableLookups</code> for the connector is false)</li>
-    <li><b>%H</b> - Request protocol</li>
-    <li><b>%l</b> - Remote logical username from identd (always returns
+    <li><b><code>%H</code></b> - Request protocol</li>
+    <li><b><code>%l</code></b> - Remote logical username from identd (always returns
         '-')</li>
-    <li><b>%m</b> - Request method (GET, POST, etc.)</li>
-    <li><b>%p</b> - Local port on which this request was received.
+    <li><b><code>%m</code></b> - Request method (GET, POST, etc.)</li>
+    <li><b><code>%p</code></b> - Local port on which this request was received.
         See also <code>%{xxx}p</code> below.</li>
-    <li><b>%q</b> - Query string (prepended with a '?' if it exists)</li>
-    <li><b>%r</b> - First line of the request (method and request URI)</li>
-    <li><b>%s</b> - HTTP status code of the response</li>
-    <li><b>%S</b> - User session ID</li>
-    <li><b>%t</b> - Date and time, in Common Log Format</li>
-    <li><b>%u</b> - Remote user that was authenticated (if any), else '-'</li>
-    <li><b>%U</b> - Requested URL path</li>
-    <li><b>%v</b> - Local server name</li>
-    <li><b>%D</b> - Time taken to process the request in microseconds</li>
-    <li><b>%T</b> - Time taken to process the request, in seconds</li>
-    <li><b>%F</b> - Time taken to commit the response, in milliseconds</li>
-    <li><b>%I</b> - Current request thread name (can compare later with stacktraces)</li>
-    <li><b>%X</b> - Connection status when response is completed:
+    <li><b><code>%q</code></b> - Query string (prepended with a '?' if it exists)</li>
+    <li><b><code>%r</code></b> - First line of the request (method and request URI)</li>
+    <li><b><code>%s</code></b> - HTTP status code of the response</li>
+    <li><b><code>%S</code></b> - User session ID</li>
+    <li><b><code>%t</code></b> - Date and time, in Common Log Format</li>
+    <li><b><code>%u</code></b> - Remote user that was authenticated (if any), else '-' (escaped if required)</li>
+    <li><b><code>%U</code></b> - Requested URL path</li>
+    <li><b><code>%v</code></b> - Local server name</li>
+    <li><b><code>%D</code></b> - Time taken to process the request in microseconds</li>
+    <li><b><code>%T</code></b> - Time taken to process the request, in seconds</li>
+    <li><b><code>%F</code></b> - Time taken to commit the response, in milliseconds</li>
+    <li><b><code>%I</code></b> - Current request thread name (can compare later with stacktraces)</li>
+    <li><b><code>%X</code></b> - Connection status when response is completed:
       <ul>
       <li><code>X</code> = Connection aborted before the response completed.</li>
       <li><code>+</code> = Connection may be kept alive after the response is sent.</li>
@@ -326,11 +327,13 @@
     syntax. Each of them can be used multiple times with different <code>xxx</code> keys:
     </p>
     <ul>
-    <li><b><code>%{xxx}i</code></b> write value of incoming header with name <code>xxx</code></li>
-    <li><b><code>%{xxx}o</code></b> write value of outgoing header with name <code>xxx</code></li>
-    <li><b><code>%{xxx}c</code></b> write value of cookie with name <code>xxx</code></li>
-    <li><b><code>%{xxx}r</code></b> write value of ServletRequest attribute with name <code>xxx</code></li>
-    <li><b><code>%{xxx}s</code></b> write value of HttpSession attribute with name <code>xxx</code></li>
+    <li><b><code>%{xxx}a</code></b> write remote address (client) (<code>xxx==remote</code>) or
+        connection peer address (<code>xxx=peer</code>)</li>
+    <li><b><code>%{xxx}i</code></b> write value of incoming header with name <code>xxx</code> (escaped if required)</li>
+    <li><b><code>%{xxx}o</code></b> write value of outgoing header with name <code>xxx</code> (escaped if required)</li>
+    <li><b><code>%{xxx}c</code></b> write value of cookie with name <code>xxx</code> (escaped if required)</li>
+    <li><b><code>%{xxx}r</code></b> write value of ServletRequest attribute with name <code>xxx</code> (escaped if required)</li>
+    <li><b><code>%{xxx}s</code></b> write value of HttpSession attribute with name <code>xxx</code> (escaped if required)</li>
     <li><b><code>%{xxx}p</code></b> write local (server) port (<code>xxx==local</code>) or
         remote (client) port (<code>xxx=remote</code>)</li>
     <li><b><code>%{xxx}t</code></b> write timestamp at the end of the request formatted using the
@@ -361,6 +364,17 @@
     </ul>
     <p>By adding multiple <code>%{xxx}t</code> tokens to the pattern, one can
     also log both timestamps.</p>
+
+    <p>Escaping is applied as follows:</p>
+    <ul>
+    <li><code>&quot;</code> is escaped as <code>\&quot;</code></li>
+    <li><code>\</code> is escaped as <code>\\</code></li>
+    <li>Standard C escaping are used for <code>\f</code>, <code>\n</code>,
+        <code>\r</code>, <code>\t</code> and <code>\v</code></li>
+    <li>Any other control characters or characters with code points above 127
+        are encoded using the standard Java unicode escaping
+        (<code>\uXXXX</code>)</li>
+    </ul>
 
     <p>The shorthand pattern <code>pattern=&quot;common&quot;</code>
     corresponds to the Common Log Format defined by
@@ -514,10 +528,22 @@
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
-    <p>Optionally one can append the server connector port separated with a
+    <p>After setting the attribute <code>addConnectorPort</code> to
+    <code>true</code>, one can append the server connector port separated with a
     semicolon (";") to allow different expressions for each connector.</p>
 
-    <p>The behavior when a request is refused can be changed
+    <p>By setting the attribute <code>usePeerAddress</code> to
+    <code>true</code>, the valve will use the connection peer address in its
+    checks. This will differ from the client IP, if a reverse proxy is used
+    in front of Tomcat in combination with either the AJP protocol, or the
+    HTTP protocol plus the <code>RemoteIp(Valve|Filter)</code>.</p>
+
+    <p>A refused request will be answered a response with status code
+    <code>403</code>. This status code can be overwritten using the attribute
+    <code>denyStatus</code>.</p>
+
+    <p>By setting the attribute <code>invalidAuthenticationWhenDeny</code> to
+    <code>true</code>, the behavior when a request is refused can be changed
     to not deny but instead set an invalid <code>authentication</code>
     header. This is useful in combination with the context attribute
     <code>preemptiveAuthentication="true"</code>.</p>
@@ -531,7 +557,9 @@
     <code>::1</code>. Consult your access logs for the actual value.</p>
 
     <p>See also: <a href="#Remote_Host_Valve">Remote Host Valve</a>,
-    <a href="#Remote_IP_Valve">Remote IP Valve</a>.</p>
+    <a href="#Remote_CIDR_Valve">Remote CIDR Valve</a>,
+    <a href="#Remote_IP_Valve">Remote IP Valve</a>,
+    <a href="http.html">HTTP Connector</a> configuration.</p>
   </subsection>
 
   <subsection name="Attributes">
@@ -590,6 +618,13 @@
         depending on the client and the connector that is used to access an application.</p>
       </attribute>
 
+      <attribute name="usePeerAddress" required="false">
+        <p>Use the connection peer address instead of the client IP address.
+        They will differ, if a reverse proxy is used in front of Tomcat in
+        combination with either the AJP protocol, or the HTTP protocol plus
+        the <code>RemoteIp(Valve|Filter)</code>.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -643,10 +678,16 @@
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
-    <p>Optionally one can append the server connector port separated with a
+    <p>After setting the attribute <code>addConnectorPort</code> to
+    <code>true</code>, one can append the server connector port separated with a
     semicolon (";") to allow different expressions for each connector.</p>
 
-    <p>The behavior when a request is refused can be changed
+    <p>A refused request will be answered a response with status code
+    <code>403</code>. This status code can be overwritten using the attribute
+    <code>denyStatus</code>.</p>
+
+    <p>By setting the attribute <code>invalidAuthenticationWhenDeny</code> to
+    <code>true</code>, the behavior when a request is refused can be changed
     to not deny but instead set an invalid <code>authentication</code>
     header. This is useful in combination with the context attribute
     <code>preemptiveAuthentication="true"</code>.</p>
@@ -657,6 +698,8 @@
     a <strong>Connector</strong>.</p>
 
     <p>See also: <a href="#Remote_Address_Valve">Remote Address Valve</a>,
+    <a href="#Remote_CIDR_Valve">Remote CIDR Valve</a>,
+    <a href="#Remote_IP_Valve">Remote IP Valve</a>,
     <a href="http.html">HTTP Connector</a> configuration.</p>
   </subsection>
 
@@ -757,6 +800,26 @@
       </li>
     </ul>
 
+    <p>After setting the attribute <code>addConnectorPort</code> to
+    <code>true</code>, one can append the server connector port separated with a
+    semicolon (";") to allow different expressions for each connector.</p>
+
+    <p>By setting the attribute <code>usePeerAddress</code> to
+    <code>true</code>, the valve will use the connection peer address in its
+    checks. This will differ from the client IP, if a reverse proxy is used
+    in front of Tomcat in combination with either the AJP protocol, or the
+    HTTP protocol plus the <code>RemoteIp(Valve|Filter)</code>.</p>
+
+    <p>A refused request will be answered a response with status code
+    <code>403</code>. This status code can be overwritten using the attribute
+    <code>denyStatus</code>.</p>
+
+    <p>By setting the attribute <code>invalidAuthenticationWhenDeny</code> to
+    <code>true</code>, the behavior when a request is refused can be changed
+    to not deny but instead set an invalid <code>authentication</code>
+    header. This is useful in combination with the context attribute
+    <code>preemptiveAuthentication="true"</code>.</p>
+
     <p>Some more features of this valve are:
     </p>
 
@@ -768,6 +831,10 @@
       <code>fe80::/71</code>, etc).</li>
     </ul>
 
+    <p>See also: <a href="#Remote_Address_Valve">Remote Address Valve</a>,
+    <a href="#Remote_Host_Valve">Remote Host Valve</a>,
+    <a href="#Remote_IP_Valve">Remote IP Valve</a>,
+    <a href="http.html">HTTP Connector</a> configuration.</p>
   </subsection>
 
   <subsection name="Attributes">
@@ -802,20 +869,73 @@
         </p>
       </attribute>
 
+      <attribute name="denyStatus" required="false">
+        <p>HTTP response status code that is used when rejecting denied
+        request. The default value is <code>403</code>. For example,
+        it can be set to the value <code>404</code>.</p>
+      </attribute>
+
+      <attribute name="addConnectorPort" required="false">
+        <p>Append the server connector port to the client IP address separated
+        with a semicolon (";"). If this is set to <code>true</code>, the
+        expressions configured with <code>allow</code> and
+        <code>deny</code> is compared against <code>ADDRESS;PORT</code>
+        where <code>ADDRESS</code> is the client IP address and
+        <code>PORT</code> is the Tomcat connector port which received the
+        request. The default value is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="invalidAuthenticationWhenDeny" required="false">
+        <p>When a request should be denied, do not deny but instead
+        set an invalid <code>authentication</code> header. This only works
+        if the context has the attribute <code>preemptiveAuthentication="true"</code>
+        set. An already existing <code>authentication</code> header will not be
+        overwritten. In effect this will trigger authentication instead of deny
+        even if the application does not have a security constraint configured.</p>
+        <p>This can be combined with <code>addConnectorPort</code> to trigger authentication
+        depending on the client and the connector that is used to access an application.</p>
+      </attribute>
+
+      <attribute name="usePeerAddress" required="false">
+        <p>Use the connection peer address instead of the client IP address.
+        They will differ, if a reverse proxy is used in front of Tomcat in
+        combination with either the AJP protocol, or the HTTP protocol plus
+        the <code>RemoteIp(Valve|Filter)</code>.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
 
-  <subsection name="Example">
+  <subsection name="Example 1" anchor="Remote_CIDR_Valve/Example_localhost">
     <p>To allow access only for the clients connecting from localhost:</p>
-    <pre>
-      &lt;Valve className="org.apache.catalina.valves.RemoteCIDRValve"
-      allow="127.0.0.1, ::1"/&gt;
-    </pre>
+    <source><![CDATA[<Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+   allow="127.0.0.1, ::1"/>]]></source>
+  </subsection>
+
+  <subsection name="Example 2" anchor="Remote_CIDR_Valve/Example_localhost_port">
+    <p>To allow unrestricted access for the clients connecting from the local network
+    but for all clients in network 10. only to port 8443:</p>
+    <source><![CDATA[<Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+   addConnectorPort="true"
+   allow="127.0.0.1;\d*|::1;\d*|10.0.0.0/8;8443"/>]]></source>
+  </subsection>
+
+  <subsection name="Example 3" anchor="Remote_CIDR_Valve/Example_port_auth">
+    <p>To allow access to port 8009 from network 10., but trigger basic
+    authentication if the application is accessed on another port:</p>
+<source><![CDATA[<Context>
+  ...
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         addConnectorPort="true"
+         invalidAuthenticationWhenDeny="true"
+         allow="10.0.0.0/8;8009"/>
+  <Valve className="org.apache.catalina.authenticator.BasicAuthenticator" />
+  ...
+</Context>]]></source>
   </subsection>
 
 </subsection>
-
 
 </section>
 

@@ -135,7 +135,7 @@ public class TestRequest {
     }
 
 
-    private class DoNothingApplicationBufferHandler implements ApplicationBufferHandler {
+    private static class DoNothingApplicationBufferHandler implements ApplicationBufferHandler {
         @Override
         public void setByteBuffer(ByteBuffer buffer) {
 

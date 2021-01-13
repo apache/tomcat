@@ -200,7 +200,12 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
             o = rootJspCtxt.getAttribute(name, REQUEST_SCOPE);
             if (o == null) {
                 if (getSession() != null) {
-                    o = rootJspCtxt.getAttribute(name, SESSION_SCOPE);
+                    try {
+                        o = rootJspCtxt.getAttribute(name, SESSION_SCOPE);
+                    } catch (IllegalStateException ise) {
+                        // Session has been invalidated.
+                        // Ignore and fall through to application scope.
+                    }
                 }
                 if (o == null) {
                     o = rootJspCtxt.getAttribute(name, APPLICATION_SCOPE);

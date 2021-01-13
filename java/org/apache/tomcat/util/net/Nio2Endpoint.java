@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -195,19 +194,16 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             acceptor.stop(10);
             // Use the executor to avoid binding the main thread if something bad
             // occurs and unbind will also wait for a bit for it to complete
-            getExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    // Then close all active connections if any remain
-                    try {
-                        for (SocketWrapperBase<Nio2Channel> wrapper : getConnections()) {
-                            wrapper.close();
-                        }
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                    } finally {
-                        allClosed = true;
+            getExecutor().execute(() -> {
+                // Then close all active connections if any remain
+                try {
+                    for (SocketWrapperBase<Nio2Channel> wrapper : getConnections()) {
+                        wrapper.close();
                     }
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                } finally {
+                    allClosed = true;
                 }
             });
             if (nioChannels != null) {
@@ -1543,11 +1539,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         public SSLSupport getSslSupport(String clientCertProvider) {
             if (getSocket() instanceof SecureNio2Channel) {
                 SecureNio2Channel ch = (SecureNio2Channel) getSocket();
-                SSLEngine sslEngine = ch.getSslEngine();
-                if (sslEngine != null) {
-                    SSLSession session = sslEngine.getSession();
-                    return ((Nio2Endpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
-                }
+                return ch.getSSLSupport();
             }
             return null;
         }

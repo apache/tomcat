@@ -749,8 +749,6 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                                 "naming.invalidEnvEntryType", env.getName()));
                     }
                 }
-            } catch (NumberFormatException e) {
-                log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()));
             } catch (IllegalArgumentException e) {
                 log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()));
             }

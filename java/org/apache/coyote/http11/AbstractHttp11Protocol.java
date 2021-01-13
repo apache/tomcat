@@ -437,7 +437,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * chunked encoding. They are stored in lower case.
      */
     private Set<String> allowedTrailerHeaders =
-            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+            Collections.newSetFromMap(new ConcurrentHashMap<>());
     public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
         // Jump through some hoops so we don't end up with an empty set while
         // doing updates.

@@ -307,7 +307,7 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    private class UserDatabasePrincipal implements Principal {
+    private static class UserDatabasePrincipal implements Principal {
         private final String name;
         private UserDatabasePrincipal(String name) {
             this.name = name;

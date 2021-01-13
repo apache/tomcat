@@ -19,7 +19,13 @@ package org.apache.tomcat.jni;
 /** Address
  *
  * @author Mladen Turk
+ *
+ * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+ *              10.1.x / Tomcat Native 2.x onwards to only include those
+ *              components required to provide OpenSSL integration with the NIO
+ *              and NIO2 connectors.
  */
+@Deprecated
 public class Address {
 
     public static final String APR_ANYADDR = "0.0.0.0";
@@ -40,8 +46,9 @@ public class Address {
 
     /**
      * Create apr_sockaddr_t from hostname, address family, and port.
-     * @param hostname The hostname or numeric address string to resolve/parse, or
-     *               NULL to build an address that corresponds to 0.0.0.0 or ::
+     * @param hostname The hostname or numeric address string to resolve/parse, the
+     *                 path of the Unix Domain Socket, or NULL to build an address
+     *                 that corresponds to 0.0.0.0 or ::
      * @param family The address family to use, or APR_UNSPEC if the system should
      *               decide.
      * @param port The port number.

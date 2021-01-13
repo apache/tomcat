@@ -95,6 +95,7 @@ public final class Request {
 
     // remote address/host
     private final MessageBytes remoteAddrMB = MessageBytes.newInstance();
+    private final MessageBytes peerAddrMB = MessageBytes.newInstance();
     private final MessageBytes localNameMB = MessageBytes.newInstance();
     private final MessageBytes remoteHostMB = MessageBytes.newInstance();
     private final MessageBytes localAddrMB = MessageBytes.newInstance();
@@ -266,6 +267,10 @@ public final class Request {
 
     public MessageBytes remoteAddr() {
         return remoteAddrMB;
+    }
+
+    public MessageBytes peerAddr() {
+        return peerAddrMB;
     }
 
     public MessageBytes remoteHost() {
@@ -638,6 +643,7 @@ public final class Request {
         localAddrMB.recycle();
         localNameMB.recycle();
         localPort = -1;
+        peerAddrMB.recycle();
         remoteAddrMB.recycle();
         remoteHostMB.recycle();
         remotePort = -1;

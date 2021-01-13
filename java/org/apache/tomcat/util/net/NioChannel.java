@@ -30,8 +30,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Base class for a SocketChannel wrapper used by the endpoint.
  * This way, logic for an SSL socket channel remains the same as for
  * a non SSL, making sure we don't need to code for any exception cases.
- *
- * @version 1.0
  */
 public class NioChannel implements ByteChannel, ScatteringByteChannel, GatheringByteChannel {
 
@@ -88,7 +86,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      * Close the connection.
      *
      * @param force Should the underlying socket be forcibly closed?
-     *
      * @throws IOException If closing the secure channel fails.
      */
     public void close(boolean force) throws IOException {
@@ -198,7 +195,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      * Return true if the buffer wrote data. NO-OP for non-secure channel.
      *
      * @return Always returns {@code false} for non-secure channel
-     *
      * @throws IOException Never for non-secure channel
      */
     public boolean flushOutbound() throws IOException {
@@ -214,6 +210,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      * socket is removed from the poller without the socket being selected. This
      * results in a connection limit leak for NIO as the endpoint expects the
      * socket to be selected even in error conditions.
+     *
      * @throws IOException If the current thread was interrupted
      */
     protected void checkInterruptStatus() throws IOException {
@@ -243,6 +240,10 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         }
         @Override
         public void free() {
+        }
+        @Override
+        protected ApplicationBufferHandler getAppReadBufHandler() {
+            return ApplicationBufferHandler.EMPTY;
         }
         @Override
         public void setAppReadBufHandler(ApplicationBufferHandler handler) {

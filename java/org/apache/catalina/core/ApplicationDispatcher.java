@@ -394,9 +394,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 try {
                     ServletOutputStream stream = response.getOutputStream();
                     stream.close();
-                } catch (IllegalStateException f) {
-                    // Ignore
-                } catch (IOException f) {
+                } catch (IllegalStateException | IOException f) {
                     // Ignore
                 }
             } catch (IOException e) {

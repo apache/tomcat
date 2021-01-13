@@ -522,15 +522,15 @@
       </attribute>
 
       <attribute name="Group" required="false">
-        <p>Group is the Multicast IP to boardcast messages to HTTPD, default 224.0.1.105</p>
+        <p>Group is the Multicast IP to broadcast messages to HTTPD, default 224.0.1.105</p>
       </attribute>
 
       <attribute name="Multiport" required="false">
-        <p>Multiport is the Multicast port to boardcast messages to HTTPD, default 23364</p>
+        <p>Multiport is the Multicast port to broadcast messages to HTTPD, default 23364</p>
       </attribute>
 
       <attribute name="Ttl" required="false">
-        <p>Ttl is the TTL for the boardcast messages, default 16</p>
+        <p>Ttl is the TTL for the broadcast messages, default 16</p>
       </attribute>
 
     </attributes>

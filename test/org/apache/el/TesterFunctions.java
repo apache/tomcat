@@ -68,9 +68,7 @@ public class TesterFunctions {
                 try {
                     m = TesterFunctions.class.getMethod("trim", String.class);
                     return m;
-                } catch (SecurityException e) {
-                    // Ignore
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     // Ignore
                 }
             } else if ("concat".equals(localName)) {
@@ -78,9 +76,7 @@ public class TesterFunctions {
                 try {
                     m = TesterFunctions.class.getMethod("concat", String[].class);
                     return m;
-                } catch (SecurityException e) {
-                    // Ignore
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     // Ignore
                 }
             } else if ("concat2".equals(localName)) {
@@ -88,9 +84,7 @@ public class TesterFunctions {
                 try {
                     m = TesterFunctions.class.getMethod("concat2", String.class, String[].class);
                     return m;
-                } catch (SecurityException e) {
-                    // Ignore
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     // Ignore
                 }
             } else if ("toArray".equals(localName)) {
@@ -98,9 +92,7 @@ public class TesterFunctions {
                 try {
                     m = TesterFunctions.class.getMethod("toArray", String.class, String.class);
                     return m;
-                } catch (SecurityException e) {
-                    // Ignore
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     // Ignore
                 }
             }

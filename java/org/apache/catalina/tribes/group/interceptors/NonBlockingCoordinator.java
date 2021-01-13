@@ -304,9 +304,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             InetSocketAddress addr = new InetSocketAddress(ia, mbr.getPort());
             socket.connect(addr, (int) conTimeout);
             return true;
-        } catch (SocketTimeoutException sx) {
-            //do nothing, we couldn't connect
-        } catch (ConnectException cx) {
+        } catch (SocketTimeoutException | ConnectException x) {
             //do nothing, we couldn't connect
         } catch (Exception x) {
             log.error(sm.getString("nonBlockingCoordinator.memberAlive.failed"),x);

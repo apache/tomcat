@@ -207,12 +207,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         private static final long INTERVAL = (1000 * 60 * 60 * 24);
 
         private static final ThreadLocal<ElementTimestampStruct> currentDate =
-                new ThreadLocal<ElementTimestampStruct>() {
-            @Override
-            protected ElementTimestampStruct initialValue() {
-                return new ElementTimestampStruct("yyyy-MM-dd");
-            }
-        };
+                ThreadLocal.withInitial(() -> new ElementTimestampStruct("yyyy-MM-dd"));
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
@@ -235,12 +230,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         private static final long INTERVAL = 1000;
 
         private static final ThreadLocal<ElementTimestampStruct> currentTime =
-                new ThreadLocal<ElementTimestampStruct>() {
-            @Override
-            protected ElementTimestampStruct initialValue() {
-                return new ElementTimestampStruct("HH:mm:ss");
-            }
-        };
+                ThreadLocal.withInitial(() -> new ElementTimestampStruct("HH:mm:ss"));
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,

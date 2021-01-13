@@ -95,7 +95,7 @@ public interface ServletContext {
      * container supports. All implementations that comply with Version 5.0 must
      * have this method return the integer 5.
      *
-     * @return 4
+     * @return 5
      */
     public int getMajorVersion();
 
