@@ -866,8 +866,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     if (state == SocketState.UPGRADING) {
                         // Get the HTTP upgrade handler
                         UpgradeToken upgradeToken = processor.getUpgradeToken();
-                        // Retrieve leftover input
+                        // Restore leftover input to the wrapper so the upgrade
+                        // processor can process it.
                         ByteBuffer leftOverInput = processor.getLeftoverInput();
+                        wrapper.unRead(leftOverInput);
                         if (upgradeToken == null) {
                             // Assume direct HTTP/2 connection
                             UpgradeProtocol upgradeProtocol = getProtocol().getUpgradeProtocol("h2c");
@@ -876,7 +878,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                 release(processor);
                                 // Create the upgrade processor
                                 processor = upgradeProtocol.getProcessor(wrapper, getProtocol().getAdapter());
-                                wrapper.unRead(leftOverInput);
                                 // Associate with the processor with the connection
                                 wrapper.setCurrentProcessor(processor);
                             } else {
@@ -898,7 +899,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                 getLog().debug(sm.getString("abstractConnectionHandler.upgradeCreate",
                                         processor, wrapper));
                             }
-                            wrapper.unRead(leftOverInput);
                             // Associate with the processor with the connection
                             wrapper.setCurrentProcessor(processor);
                             // Initialise the upgrade handler (which may trigger
