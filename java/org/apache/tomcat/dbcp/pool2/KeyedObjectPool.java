@@ -269,6 +269,33 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      */
     void invalidateObject(K key, V obj) throws Exception;
 
+
+    /**
+     * Invalidates an object from the pool, using the provided
+     * {@link DestroyMode}.
+     * <p>
+     * By contract, {@code obj} <strong>must</strong> have been obtained
+     * using {@link #borrowObject borrowObject} or a related method as defined
+     * in an implementation or sub-interface using a {@code key} that is
+     * equivalent to the one used to borrow the {@code Object} in the first
+     * place.
+     * </p>
+     * <p>
+     * This method should be used when an object that has been borrowed is
+     * determined (due to an exception or other problem) to be invalid.
+     * </p>
+     *
+     * @param key the key used to obtain the object
+     * @param obj a {@link #borrowObject borrowed} instance to be returned.
+     * @param mode destroy activation context provided to the factory
+     *
+     * @throws Exception if the instance cannot be invalidated
+     * @since 2.9.0
+     */
+    default void invalidateObject(final K key, final V obj, final DestroyMode mode) throws Exception {
+        invalidateObject(key, obj);
+    }
+
     /**
      * Return an instance to the pool. By contract, {@code obj}
      * <strong>must</strong> have been obtained using

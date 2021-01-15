@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.tomcat.dbcp.pool2.DestroyMode;
 import org.apache.tomcat.dbcp.pool2.ObjectPool;
 import org.apache.tomcat.dbcp.pool2.PoolUtils;
 import org.apache.tomcat.dbcp.pool2.PooledObject;
@@ -456,7 +457,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                     factory.activateObject(p);
                 } catch (final Exception e) {
                     try {
-                        destroy(p);
+                        destroy(p, DestroyMode.NORMAL);
                     } catch (final Exception e1) {
                         // Ignore - activation failure is more important
                     }
@@ -479,7 +480,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                     }
                     if (!validate) {
                         try {
-                            destroy(p);
+                            destroy(p, DestroyMode.NORMAL);
                             destroyedByBorrowValidationCount.incrementAndGet();
                         } catch (final Exception e) {
                             // Ignore - validation failure is more important
@@ -537,7 +538,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
         if (getTestOnReturn() && !factory.validateObject(p)) {
             try {
-                destroy(p);
+                destroy(p, DestroyMode.NORMAL);
             } catch (final Exception e) {
                 swallowException(e);
             }
@@ -555,7 +556,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         } catch (final Exception e1) {
             swallowException(e1);
             try {
-                destroy(p);
+                destroy(p, DestroyMode.NORMAL);
             } catch (final Exception e) {
                 swallowException(e);
             }
@@ -576,7 +577,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         final int maxIdleSave = getMaxIdle();
         if (isClosed() || maxIdleSave > -1 && maxIdleSave <= idleObjects.size()) {
             try {
-                destroy(p);
+                destroy(p, DestroyMode.NORMAL);
             } catch (final Exception e) {
                 swallowException(e);
             }
@@ -605,7 +606,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * {@inheritDoc}
      * <p>
      * Activation of this method decrements the active count and attempts to
-     * destroy the instance.
+     * destroy the instance, using the default (NORMAL) {@link DestroyMode}.
      * </p>
      *
      * @throws Exception             if an exception occurs destroying the
@@ -614,6 +615,23 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     @Override
     public void invalidateObject(final T obj) throws Exception {
+        invalidateObject(obj, DestroyMode.NORMAL);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Activation of this method decrements the active count and attempts to
+     * destroy the instance, using the provided {@link DestroyMode}.
+     * </p>
+     *
+     * @throws Exception             if an exception occurs destroying the
+     *                               object
+     * @throws IllegalStateException if obj does not belong to this pool
+     * @since 2.9.0
+     */
+    @Override
+    public void invalidateObject(final T obj, final DestroyMode mode) throws Exception {
         final PooledObject<T> p = allObjects.get(new IdentityWrapper<>(obj));
         if (p == null) {
             if (isAbandonedConfig()) {
@@ -624,7 +642,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         }
         synchronized (p) {
             if (p.getState() != PooledObjectState.INVALID) {
-                destroy(p);
+                destroy(p, mode);
             }
         }
         ensureIdle(1, false);
@@ -655,7 +673,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
         while (p != null) {
             try {
-                destroy(p);
+                destroy(p, DestroyMode.NORMAL);
             } catch (final Exception e) {
                 swallowException(e);
             }
@@ -775,7 +793,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                     }
 
                     if (evict) {
-                        destroy(underTest);
+                        destroy(underTest, DestroyMode.NORMAL);
                         destroyedByEvictorCount.incrementAndGet();
                     } else {
                         if (testWhileIdle) {
@@ -784,18 +802,18 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                                 factory.activateObject(underTest);
                                 active = true;
                             } catch (final Exception e) {
-                                destroy(underTest);
+                                destroy(underTest, DestroyMode.NORMAL);
                                 destroyedByEvictorCount.incrementAndGet();
                             }
                             if (active) {
                                 if (!factory.validateObject(underTest)) {
-                                    destroy(underTest);
+                                    destroy(underTest, DestroyMode.NORMAL);
                                     destroyedByEvictorCount.incrementAndGet();
                                 } else {
                                     try {
                                         factory.passivateObject(underTest);
                                     } catch (final Exception e) {
-                                        destroy(underTest);
+                                        destroy(underTest, DestroyMode.NORMAL);
                                         destroyedByEvictorCount.incrementAndGet();
                                     }
                                 }
@@ -926,16 +944,17 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * Destroys a wrapped pooled object.
      *
      * @param toDestroy The wrapped pooled object to destroy
+     * @param mode DestroyMode context provided to the factory
      *
      * @throws Exception If the factory fails to destroy the pooled object
      *                   cleanly
      */
-    private void destroy(final PooledObject<T> toDestroy) throws Exception {
+    private void destroy(final PooledObject<T> toDestroy, final DestroyMode mode) throws Exception {
         toDestroy.invalidate();
         idleObjects.remove(toDestroy);
         allObjects.remove(new IdentityWrapper<>(toDestroy.getObject()));
         try {
-            factory.destroyObject(toDestroy);
+            factory.destroyObject(toDestroy, mode);
         } finally {
             destroyedCount.incrementAndGet();
             createCount.decrementAndGet();
@@ -1043,13 +1062,13 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * Recovers abandoned objects which have been checked out but
      * not used since longer than the removeAbandonedTimeout.
      *
-     * @param ac The configuration to use to identify abandoned objects
+     * @param abandonedConfig The configuration to use to identify abandoned objects
      */
-    private void removeAbandoned(final AbandonedConfig ac) {
+    private void removeAbandoned(final AbandonedConfig abandonedConfig) {
         // Generate a list of abandoned objects to remove
         final long now = System.currentTimeMillis();
         final long timeout =
-                now - (ac.getRemoveAbandonedTimeout() * 1000L);
+                now - (abandonedConfig.getRemoveAbandonedTimeout() * 1000L);
         final ArrayList<PooledObject<T>> remove = new ArrayList<>();
         for (PooledObject<T> pooledObject : allObjects.values()) {
             synchronized (pooledObject) {
@@ -1063,11 +1082,11 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
         // Now remove the abandoned objects
         for (PooledObject<T> pooledObject : remove) {
-            if (ac.getLogAbandoned()) {
-                pooledObject.printStackTrace(ac.getLogWriter());
+            if (abandonedConfig.getLogAbandoned()) {
+                pooledObject.printStackTrace(abandonedConfig.getLogWriter());
             }
             try {
-                invalidateObject(pooledObject.getObject());
+                invalidateObject(pooledObject.getObject(), DestroyMode.ABANDONED);
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -1079,8 +1098,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
     @Override
     public void use(final T pooledObject) {
-        final AbandonedConfig ac = this.abandonedConfig;
-        if (ac != null && ac.getUseUsageTracking()) {
+        final AbandonedConfig abandonedCfg = this.abandonedConfig;
+        if (abandonedCfg != null && abandonedCfg.getUseUsageTracking()) {
             final PooledObject<T> wrapper = allObjects.get(new IdentityWrapper<>(pooledObject));
             wrapper.use();
         }
