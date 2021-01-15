@@ -44,7 +44,7 @@ public class FileUploadIOException extends IOException {
      *
      * @param pCause The exceptions cause, if any, or null.
      */
-    public FileUploadIOException(FileUploadException pCause) {
+    public FileUploadIOException(final FileUploadException pCause) {
         // We're not doing super(pCause) cause of 1.3 compatibility.
         cause = pCause;
     }

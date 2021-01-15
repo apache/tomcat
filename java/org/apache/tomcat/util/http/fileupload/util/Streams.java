@@ -63,7 +63,7 @@ public final class Streams {
      * @return Number of bytes, which have been copied.
      * @throws IOException An I/O error occurred.
      */
-    public static long copy(InputStream inputStream, OutputStream outputStream, boolean closeOutputStream)
+    public static long copy(final InputStream inputStream, final OutputStream outputStream, final boolean closeOutputStream)
             throws IOException {
         return copy(inputStream, outputStream, closeOutputStream, new byte[DEFAULT_BUFFER_SIZE]);
     }
@@ -86,16 +86,16 @@ public final class Streams {
      * @return Number of bytes, which have been copied.
      * @throws IOException An I/O error occurred.
      */
-    public static long copy(InputStream inputStream,
-            OutputStream outputStream, boolean closeOutputStream,
-            byte[] buffer)
+    public static long copy(final InputStream inputStream,
+            final OutputStream outputStream, final boolean closeOutputStream,
+            final byte[] buffer)
     throws IOException {
         OutputStream out = outputStream;
         InputStream in = inputStream;
         try {
             long total = 0;
             for (;;) {
-                int res = in.read(buffer);
+                final int res = in.read(buffer);
                 if (res == -1) {
                     break;
                 }
@@ -136,8 +136,8 @@ public final class Streams {
      * @return The streams contents, as a string.
      * @throws IOException An I/O error occurred.
      */
-    public static String asString(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    public static String asString(final InputStream inputStream) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         copy(inputStream, baos, true);
         return baos.toString();
     }
@@ -155,7 +155,7 @@ public final class Streams {
      */
     public static String asString(final InputStream inputStream, final String encoding)
             throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         copy(inputStream, baos, true);
         return baos.toString(encoding);
     }
@@ -170,12 +170,12 @@ public final class Streams {
      * @return Unmodified file name, if valid.
      * @throws InvalidFileNameException The file name was found to be invalid.
      */
-    public static String checkFileName(String fileName) {
+    public static String checkFileName(final String fileName) {
         if (fileName != null  &&  fileName.indexOf('\u0000') != -1) {
             // pFileName.replace("\u0000", "\\0")
             final StringBuilder sb = new StringBuilder();
             for (int i = 0;  i < fileName.length();  i++) {
-                char c = fileName.charAt(i);
+                final char c = fileName.charAt(i);
                 switch (c) {
                     case 0:
                         sb.append("\\0");
