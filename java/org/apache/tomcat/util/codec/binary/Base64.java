@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.codec.binary;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 /**
  * Provides Base64 encoding and decoding as defined by <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>.
@@ -331,9 +332,7 @@ public class Base64 extends BaseNCodec {
      * @since 1.4
      */
     public static byte[] encodeInteger(final BigInteger bigInteger) {
-        if (bigInteger == null) {
-            throw new NullPointerException(sm.getString("base64.nullEncodeParameter"));
-        }
+        Objects.requireNonNull(bigInteger,sm.getString("base64.nullEncodeParameter"));
         return encodeBase64(toIntegerBytes(bigInteger), false);
     }
 
@@ -360,7 +359,7 @@ public class Base64 extends BaseNCodec {
      * @since 1.5
      */
     public static boolean isBase64(final byte[] arrayOctet) {
-        for (byte element : arrayOctet) {
+        for (final byte element : arrayOctet) {
             if (!isBase64(element) && !isWhiteSpace(element)) {
                 return false;
             }
