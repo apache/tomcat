@@ -91,7 +91,7 @@ public final class MimeUtility {
      * @return The decoded text string.
      * @throws UnsupportedEncodingException if the detected encoding in the input text is not supported.
      */
-    public static String decodeText(String text) throws UnsupportedEncodingException {
+    public static String decodeText(final String text) throws UnsupportedEncodingException {
         // if the text contains any encoded tokens, those tokens will be marked with "=?".  If the
         // source string doesn't contain that sequent, no decoding is required.
         if (!text.contains(ENCODED_TOKEN_MARKER)) {
@@ -99,12 +99,12 @@ public final class MimeUtility {
         }
 
         int offset = 0;
-        int endOffset = text.length();
+        final int endOffset = text.length();
 
         int startWhiteSpace = -1;
         int endWhiteSpace = -1;
 
-        StringBuilder decodedText = new StringBuilder(text.length());
+        final StringBuilder decodedText = new StringBuilder(text.length());
 
         boolean previousTokenEncoded = false;
 
@@ -128,7 +128,7 @@ public final class MimeUtility {
                 }
             } else {
                 // we have a word token.  We need to scan over the word and then try to parse it.
-                int wordStart = offset;
+                final int wordStart = offset;
 
                 while (offset < endOffset) {
                     // step over the non white space characters.
@@ -142,12 +142,12 @@ public final class MimeUtility {
                     //NB:  Trailing whitespace on these header strings will just be discarded.
                 }
                 // pull out the word token.
-                String word = text.substring(wordStart, offset);
+                final String word = text.substring(wordStart, offset);
                 // is the token encoded?  decode the word
                 if (word.startsWith(ENCODED_TOKEN_MARKER)) {
                     try {
                         // if this gives a parsing failure, treat it like a non-encoded word.
-                        String decodedWord = decodeWord(word);
+                        final String decodedWord = decodeWord(word);
 
                         // are any whitespace characters significant?  Append 'em if we've got 'em.
                         if (!previousTokenEncoded && startWhiteSpace != -1) {
@@ -162,7 +162,7 @@ public final class MimeUtility {
                         // and get handled as normal text.
                         continue;
 
-                    } catch (ParseException e) {
+                    } catch (final ParseException e) {
                         // just ignore it, skip to next word
                     }
                 }
@@ -193,7 +193,7 @@ public final class MimeUtility {
      * @throws ParseException
      * @throws UnsupportedEncodingException
      */
-    private static String decodeWord(String word) throws ParseException, UnsupportedEncodingException {
+    private static String decodeWord(final String word) throws ParseException, UnsupportedEncodingException {
         // encoded words start with the characters "=?".  If this not an encoded word, we throw a
         // ParseException for the caller.
 
@@ -201,29 +201,29 @@ public final class MimeUtility {
             throw new ParseException("Invalid RFC 2047 encoded-word: " + word);
         }
 
-        int charsetPos = word.indexOf('?', 2);
+        final int charsetPos = word.indexOf('?', 2);
         if (charsetPos == -1) {
             throw new ParseException("Missing charset in RFC 2047 encoded-word: " + word);
         }
 
         // pull out the character set information (this is the MIME name at this point).
-        String charset = word.substring(2, charsetPos).toLowerCase(Locale.ENGLISH);
+        final String charset = word.substring(2, charsetPos).toLowerCase(Locale.ENGLISH);
 
         // now pull out the encoding token the same way.
-        int encodingPos = word.indexOf('?', charsetPos + 1);
+        final int encodingPos = word.indexOf('?', charsetPos + 1);
         if (encodingPos == -1) {
             throw new ParseException("Missing encoding in RFC 2047 encoded-word: " + word);
         }
 
-        String encoding = word.substring(charsetPos + 1, encodingPos);
+        final String encoding = word.substring(charsetPos + 1, encodingPos);
 
         // and finally the encoded text.
-        int encodedTextPos = word.indexOf(ENCODED_TOKEN_FINISHER, encodingPos + 1);
+        final int encodedTextPos = word.indexOf(ENCODED_TOKEN_FINISHER, encodingPos + 1);
         if (encodedTextPos == -1) {
             throw new ParseException("Missing encoded text in RFC 2047 encoded-word: " + word);
         }
 
-        String encodedText = word.substring(encodingPos + 1, encodedTextPos);
+        final String encodedText = word.substring(encodingPos + 1, encodedTextPos);
 
         // seems a bit silly to encode a null string, but easy to deal with.
         if (encodedText.length() == 0) {
@@ -232,7 +232,7 @@ public final class MimeUtility {
 
         try {
             // the decoder writes directly to an output stream.
-            ByteArrayOutputStream out = new ByteArrayOutputStream(encodedText.length());
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(encodedText.length());
 
             byte[] decodedData;
             // Base64 encoded?
@@ -247,7 +247,7 @@ public final class MimeUtility {
             }
             // Convert decoded byte data into a string.
             return new String(decodedData, javaCharset(charset));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new UnsupportedEncodingException("Invalid RFC 2047 encoding");
         }
     }
@@ -260,13 +260,13 @@ public final class MimeUtility {
      *
      * @return The Java equivalent for this name.
      */
-    private static String javaCharset(String charset) {
+    private static String javaCharset(final String charset) {
         // nothing in, nothing out.
         if (charset == null) {
             return null;
         }
 
-        String mappedCharset = MIME2JAVA.get(charset.toLowerCase(Locale.ENGLISH));
+        final String mappedCharset = MIME2JAVA.get(charset.toLowerCase(Locale.ENGLISH));
         // if there is no mapping, then the original name is used.  Many of the MIME character set
         // names map directly back into Java.  The reverse isn't necessarily true.
         if (mappedCharset == null) {

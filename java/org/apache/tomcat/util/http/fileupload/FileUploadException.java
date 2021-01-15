@@ -38,7 +38,7 @@ public class FileUploadException extends IOException {
      *
      * @param msg the error message.
      */
-    public FileUploadException(String msg) {
+    public FileUploadException(final String msg) {
         super(msg);
     }
 
@@ -49,7 +49,7 @@ public class FileUploadException extends IOException {
      * @param msg The exceptions detail message.
      * @param cause The exceptions cause.
      */
-    public FileUploadException(String msg, Throwable cause) {
+    public FileUploadException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 
@@ -59,7 +59,7 @@ public class FileUploadException extends IOException {
      *
      * @param cause The exceptions cause.
      */
-    public FileUploadException(Throwable cause) {
+    public FileUploadException(final Throwable cause) {
         super(cause);
     }
 }
