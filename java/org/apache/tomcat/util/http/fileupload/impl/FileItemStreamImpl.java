@@ -78,9 +78,9 @@ public class FileItemStreamImpl implements FileItemStream {
      * @throws IOException Creating the file item failed.
      * @throws FileUploadException Parsing the incoming data stream failed.
      */
-    public FileItemStreamImpl(FileItemIteratorImpl pFileItemIterator, String pName, String pFieldName,
-            String pContentType, boolean pFormField,
-            long pContentLength) throws FileUploadException, IOException {
+    public FileItemStreamImpl(final FileItemIteratorImpl pFileItemIterator, final String pName, final String pFieldName,
+            final String pContentType, final boolean pFormField,
+            final long pContentLength) throws FileUploadException, IOException {
         fileItemIteratorImpl = pFileItemIterator;
         name = pName;
         fieldName = pFieldName;
@@ -90,7 +90,7 @@ public class FileItemStreamImpl implements FileItemStream {
         if (fileSizeMax != -1) { // Check if limit is already exceeded
             if (pContentLength != -1
                     && pContentLength > fileSizeMax) {
-                FileSizeLimitExceededException e =
+                final FileSizeLimitExceededException e =
                         new FileSizeLimitExceededException(
                                 String.format("The field %s exceeds its maximum permitted size of %s bytes.",
                                         fieldName, Long.valueOf(fileSizeMax)),
@@ -106,10 +106,10 @@ public class FileItemStreamImpl implements FileItemStream {
         if (fileSizeMax != -1) {
             istream = new LimitedInputStream(istream, fileSizeMax) {
                 @Override
-                protected void raiseError(long pSizeMax, long pCount)
+                protected void raiseError(final long pSizeMax, final long pCount)
                         throws IOException {
                     itemStream.close(true);
-                    FileSizeLimitExceededException e =
+                    final FileSizeLimitExceededException e =
                         new FileSizeLimitExceededException(
                             String.format("The field %s exceeds its maximum permitted size of %s bytes.",
                                    fieldName, Long.valueOf(pSizeMax)),
@@ -208,7 +208,7 @@ public class FileItemStreamImpl implements FileItemStream {
      * @param pHeaders The items header object
      */
     @Override
-    public void setHeaders(FileItemHeaders pHeaders) {
+    public void setHeaders(final FileItemHeaders pHeaders) {
         headers = pHeaders;
     }
 

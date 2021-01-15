@@ -103,7 +103,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      *                      which files will be created, should the item size
      *                      exceed the threshold.
      */
-    public DiskFileItemFactory(int sizeThreshold, File repository) {
+    public DiskFileItemFactory(final int sizeThreshold, final File repository) {
         this.sizeThreshold = sizeThreshold;
         this.repository = repository;
     }
@@ -132,7 +132,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      * @see #getRepository()
      *
      */
-    public void setRepository(File repository) {
+    public void setRepository(final File repository) {
         this.repository = repository;
     }
 
@@ -156,7 +156,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      * @see #getSizeThreshold()
      *
      */
-    public void setSizeThreshold(int sizeThreshold) {
+    public void setSizeThreshold(final int sizeThreshold) {
         this.sizeThreshold = sizeThreshold;
     }
 
@@ -177,9 +177,9 @@ public class DiskFileItemFactory implements FileItemFactory {
      * @return The newly created file item.
      */
     @Override
-    public FileItem createItem(String fieldName, String contentType,
-            boolean isFormField, String fileName) {
-        DiskFileItem result = new DiskFileItem(fieldName, contentType,
+    public FileItem createItem(final String fieldName, final String contentType,
+                final boolean isFormField, final String fileName) {
+        final DiskFileItem result = new DiskFileItem(fieldName, contentType,
                 isFormField, fileName, sizeThreshold, repository);
         result.setDefaultCharset(defaultCharset);
         return result;
@@ -199,7 +199,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      * parameter is provided by the sender.
      * @param pCharset the default charset
      */
-    public void setDefaultCharset(String pCharset) {
+    public void setDefaultCharset(final String pCharset) {
         defaultCharset = pCharset;
     }
 }
