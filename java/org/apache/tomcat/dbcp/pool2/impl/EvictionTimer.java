@@ -206,7 +206,7 @@ class EvictionTimer {
          *
          * @param ref the reference to track.
          */
-        private WeakRunner(WeakReference<Runnable> ref) {
+        private WeakRunner(final WeakReference<Runnable> ref) {
            this.ref = ref;
         }
 

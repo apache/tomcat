@@ -211,6 +211,10 @@
         Update the packaged version of the Tomcat Native Library to 1.2.26.
         (markt)
       </update>
+      <add>
+        Update the internal fork of Apache Commons Pool to 2.9.1-SNAPSHOT
+        (2021-01-15). (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
