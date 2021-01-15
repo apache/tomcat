@@ -286,6 +286,11 @@
         specified to wait for client connections to complete and close before
         the Container hierarchy is stopped. (markt)
       </add>
+      <add>
+        <bug>64943</bug>: Add support for Unix Domain Sockets to
+        <code>org.apache.coyote.http11.Http11AprProtocol</code>. Depends on
+        <code>tomcat-native</code> v1.2.26 and up. (minfrin)
+      </add>
       <fix>
         <bug>64921</bug>: Ensure that the <code>LoadBalancerDrainingValve</code>
         uses the correct setting for the secure attribute for any session
