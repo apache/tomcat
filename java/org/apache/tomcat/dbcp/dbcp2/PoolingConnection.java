@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
 
+import org.apache.tomcat.dbcp.pool2.DestroyMode;
 import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
 import org.apache.tomcat.dbcp.pool2.KeyedPooledObjectFactory;
 import org.apache.tomcat.dbcp.pool2.PooledObject;
@@ -129,7 +130,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
         if (pstmtPool != null && clearStatementPoolOnReturn) {
             try {
                 pstmtPool.clear();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new SQLException("Error clearing statement pool", e);
             }
         }
@@ -158,7 +159,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *
      * @return the PStmtKey created for the given arguments.
      */
-    protected PStmtKey createKey(final String sql, final int columnIndexes[]) {
+    protected PStmtKey createKey(final String sql, final int[] columnIndexes) {
         return new PStmtKey(normalizeSQL(sql), getCatalogOrNull(), getSchemaOrNull(), columnIndexes);
     }
 
@@ -278,7 +279,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *
      * @return the PStmtKey created for the given arguments.
      */
-    protected PStmtKey createKey(final String sql, final String columnNames[]) {
+    protected PStmtKey createKey(final String sql, final String[] columnNames) {
         return new PStmtKey(normalizeSQL(sql), getCatalogOrNull(), getSchemaOrNull(), columnNames);
     }
 
@@ -295,6 +296,12 @@ public class PoolingConnection extends DelegatingConnection<Connection>
     public void destroyObject(final PStmtKey key, final PooledObject<DelegatingPreparedStatement> pooledObject)
             throws Exception {
         pooledObject.getObject().getInnermostDelegate().close();
+    }
+
+    @Override
+    public void destroyObject(PStmtKey key, PooledObject<DelegatingPreparedStatement> p,
+            DestroyMode mode) throws Exception {
+        destroyObject(key, p);
     }
 
     private String getCatalogOrNull() {
@@ -517,7 +524,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *
      */
     @Override
-    public PreparedStatement prepareStatement(final String sql, final int columnIndexes[]) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final int[] columnIndexes) throws SQLException {
         return prepareStatement(createKey(sql, columnIndexes));
     }
 
@@ -573,7 +580,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *             Wraps an underlying exception.
      */
     @Override
-    public PreparedStatement prepareStatement(final String sql, final String columnNames[]) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final String[] columnNames) throws SQLException {
         return prepareStatement(createKey(sql, columnNames));
     }
 

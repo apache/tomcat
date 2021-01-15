@@ -82,7 +82,7 @@
  * <strong>java:comp/env</strong> namespace.  So the JNDI path given for
  * the dataSourceName parameter is valid for a
  * <code>ConnectionPoolDataSource</code> that is deployed as given in the
- * <a href="../cpdsadapter/package.html">cpdsadapter example</a>
+ * <a href="../cpdsadapter/package-summary.html">cpdsadapter example</a>
  * </p>
  *
  * <p>

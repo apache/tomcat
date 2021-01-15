@@ -215,6 +215,10 @@
         Update the internal fork of Apache Commons Pool to 2.9.1-SNAPSHOT
         (2021-01-15). (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons DBCP to 2.9.0-SNAPSHOT
+        (2021-01-15). (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
