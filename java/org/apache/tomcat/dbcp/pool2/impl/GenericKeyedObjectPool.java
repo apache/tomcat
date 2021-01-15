@@ -33,6 +33,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.tomcat.dbcp.pool2.DestroyMode;
 import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
 import org.apache.tomcat.dbcp.pool2.KeyedPooledObjectFactory;
 import org.apache.tomcat.dbcp.pool2.PoolUtils;
@@ -375,7 +376,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                         factory.activateObject(key, p);
                     } catch (final Exception e) {
                         try {
-                            destroy(key, p, true);
+                            destroy(key, p, true, DestroyMode.NORMAL);
                         } catch (final Exception e1) {
                             // Ignore - activation failure is more important
                         }
@@ -398,7 +399,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                         }
                         if (!validate) {
                             try {
-                                destroy(key, p, true);
+                                destroy(key, p, true, DestroyMode.NORMAL);
                                 destroyedByBorrowValidationCount.incrementAndGet();
                             } catch (final Exception e) {
                                 // Ignore - validation failure is more important
@@ -471,7 +472,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
         try {
             if (getTestOnReturn() && !factory.validateObject(key, p)) {
                 try {
-                    destroy(key, p, true);
+                    destroy(key, p, true, DestroyMode.NORMAL);
                 } catch (final Exception e) {
                     swallowException(e);
                 }
@@ -484,7 +485,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
             } catch (final Exception e1) {
                 swallowException(e1);
                 try {
-                    destroy(key, p, true);
+                    destroy(key, p, true, DestroyMode.NORMAL);
                 } catch (final Exception e) {
                     swallowException(e);
                 }
@@ -503,7 +504,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
 
             if (isClosed() || maxIdle > -1 && maxIdle <= idleObjects.size()) {
                 try {
-                    destroy(key, p, true);
+                    destroy(key, p, true, DestroyMode.NORMAL);
                 } catch (final Exception e) {
                     swallowException(e);
                 }
@@ -559,6 +560,27 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
      */
     @Override
     public void invalidateObject(final K key, final T obj) throws Exception {
+        invalidateObject(key, obj, DestroyMode.NORMAL);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Activation of this method decrements the active count associated with
+     * the given keyed pool and attempts to destroy {@code obj.}
+     *
+     * @param key pool key
+     * @param obj instance to invalidate
+     * @param mode DestroyMode context provided to factory
+     *
+     * @throws Exception             if an exception occurs destroying the
+     *                               object
+     * @throws IllegalStateException if obj does not belong to the pool
+     *                               under the given key
+     * @since 2.9.0
+     */
+    @Override
+    public void invalidateObject(final K key, final T obj, final DestroyMode mode) throws Exception {
 
         final ObjectDeque<T> objectDeque = poolMap.get(key);
 
@@ -569,7 +591,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
         }
         synchronized (p) {
             if (p.getState() != PooledObjectState.INVALID) {
-                destroy(key, p, true);
+                destroy(key, p, true, mode);
             }
         }
         if (objectDeque.idleObjects.hasTakeWaiters()) {
@@ -627,7 +649,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
 
             while (p != null) {
                 try {
-                    destroy(key, p, true);
+                    destroy(key, p, true, DestroyMode.NORMAL);
                 } catch (final Exception e) {
                     swallowException(e);
                 }
@@ -759,7 +781,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
             // Assume the destruction succeeds
             boolean destroyed = true;
             try {
-                destroyed = destroy(key, p, false);
+                destroyed = destroy(key, p, false, DestroyMode.NORMAL);
             } catch (final Exception e) {
                 swallowException(e);
             }
@@ -936,7 +958,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                 }
 
                 if (evict) {
-                    destroy(evictionKey, underTest, true);
+                    destroy(evictionKey, underTest, true, DestroyMode.NORMAL);
                     destroyedByEvictorCount.incrementAndGet();
                 } else {
                     if (testWhileIdle) {
@@ -945,18 +967,18 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                             factory.activateObject(evictionKey, underTest);
                             active = true;
                         } catch (final Exception e) {
-                            destroy(evictionKey, underTest, true);
+                            destroy(evictionKey, underTest, true, DestroyMode.NORMAL);
                             destroyedByEvictorCount.incrementAndGet();
                         }
                         if (active) {
                             if (!factory.validateObject(evictionKey, underTest)) {
-                                destroy(evictionKey, underTest, true);
+                                destroy(evictionKey, underTest, true, DestroyMode.NORMAL);
                                 destroyedByEvictorCount.incrementAndGet();
                             } else {
                                 try {
                                     factory.passivateObject(evictionKey, underTest);
                                 } catch (final Exception e) {
-                                    destroy(evictionKey, underTest, true);
+                                    destroy(evictionKey, underTest, true, DestroyMode.NORMAL);
                                     destroyedByEvictorCount.incrementAndGet();
                                 }
                             }
@@ -1076,10 +1098,12 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
      * @param toDestroy The wrapped object to be destroyed
      * @param always Should the object be destroyed even if it is not currently
      *               in the set of idle objects for the given key
+     * @param mode DestroyMode context provided to the factory
+     *
      * @return {@code true} if the object was destroyed, otherwise {@code false}
      * @throws Exception If the object destruction failed
      */
-    private boolean destroy(final K key, final PooledObject<T> toDestroy, final boolean always)
+    private boolean destroy(final K key, final PooledObject<T> toDestroy, final boolean always, final DestroyMode mode)
             throws Exception {
 
         final ObjectDeque<T> objectDeque = register(key);
@@ -1100,7 +1124,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
                 toDestroy.invalidate();
 
                 try {
-                    factory.destroyObject(key, toDestroy);
+                    factory.destroyObject(key, toDestroy, mode);
                 } finally {
                     objectDeque.getCreateCount().decrementAndGet();
                     destroyedCount.incrementAndGet();
