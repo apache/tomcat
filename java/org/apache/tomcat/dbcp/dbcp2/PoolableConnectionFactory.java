@@ -28,6 +28,7 @@ import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.dbcp.pool2.DestroyMode;
 import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
 import org.apache.tomcat.dbcp.pool2.ObjectPool;
 import org.apache.tomcat.dbcp.pool2.PooledObject;
@@ -137,6 +138,18 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     @Override
     public void destroyObject(final PooledObject<PoolableConnection> p) throws Exception {
         p.getObject().reallyClose();
+    }
+
+    /**
+     * @since 2.9.0
+     */
+    @Override
+    public void destroyObject(final PooledObject<PoolableConnection> p, final DestroyMode mode) throws Exception {
+        if (mode != null && mode.equals(DestroyMode.ABANDONED)) {
+            p.getObject().getInnermostDelegate().abort(Runnable::run);
+        } else {
+            p.getObject().reallyClose();
+        }
     }
 
     /**
@@ -269,7 +282,6 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     protected int getMaxOpenPreparedStatements() {
         return maxOpenPreparedStatements;
     }
-
     /**
      * Returns the {@link ObjectPool} in which {@link Connection}s are pooled.
      *
@@ -278,7 +290,6 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     public synchronized ObjectPool<PoolableConnection> getPool() {
         return pool;
     }
-
     /**
      * @return Whether to pool statements.
      * @since Made public in 2.6.0.
@@ -293,6 +304,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     public String getValidationQuery() {
         return validationQuery;
     }
+
     /**
      * @return Validation query timeout in seconds.
      * @since 2.6.0
@@ -300,6 +312,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     public int getValidationQueryTimeoutSeconds() {
         return validationQueryTimeoutSeconds;
     }
+
     protected void initializeConnection(final Connection conn) throws SQLException {
         final Collection<String> sqls = connectionInitSqls;
         if (conn.isClosed()) {
@@ -384,7 +397,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
             if (dataSourceJmxObjectName != null) {
                 final StringBuilder base = new StringBuilder(dataSourceJmxObjectName.toString());
                 base.append(Constants.JMX_CONNECTION_BASE_EXT);
-                base.append(Long.toString(connIndex));
+                base.append(connIndex);
                 config.setJmxNameBase(base.toString());
                 config.setJmxNamePrefix(Constants.JMX_STATEMENT_POOL_PREFIX);
             } else {
@@ -399,7 +412,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
         }
 
         // Register this connection with JMX
-        ObjectName connJmxName;
+        final ObjectName connJmxName;
         if (dataSourceJmxObjectName == null) {
             connJmxName = null;
         } else {
@@ -453,6 +466,17 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
+     * Sets whether the pool of statements (which was enabled with {@link #setPoolStatements(boolean)}) should
+     * be cleared when the connection is returned to its pool. Default is false.
+     *
+     * @param clearStatementPoolOnReturn clear or not
+     * @since 2.8.0
+     */
+    public void setClearStatementPoolOnReturn(final boolean clearStatementPoolOnReturn) {
+        this.clearStatementPoolOnReturn = clearStatementPoolOnReturn;
+    }
+
+    /**
      * Sets the SQL statements I use to initialize newly created {@link Connection}s. Using {@code null} turns off
      * connection initialization.
      *
@@ -462,7 +486,6 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     public void setConnectionInitSql(final Collection<String> connectionInitSqls) {
         this.connectionInitSqls = connectionInitSqls;
     }
-
     /**
      * Sets the default "auto commit" setting for borrowed {@link Connection}s
      *
@@ -486,6 +509,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     public void setDefaultQueryTimeout(final Integer defaultQueryTimeoutSeconds) {
         this.defaultQueryTimeoutSeconds = defaultQueryTimeoutSeconds;
     }
+
     /**
      * Sets the default "read only" setting for borrowed {@link Connection}s
      *
@@ -598,17 +622,6 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
 
     public void setPoolStatements(final boolean poolStatements) {
         this.poolStatements = poolStatements;
-    }
-
-    /**
-     * Sets whether the pool of statements (which was enabled with {@link #setPoolStatements(boolean)}) should
-     * be cleared when the connection is returned to its pool. Default is false.
-     *
-     * @param clearStatementPoolOnReturn clear or not
-     * @since 2.8.0
-     */
-    public void setClearStatementPoolOnReturn(final boolean clearStatementPoolOnReturn) {
-        this.clearStatementPoolOnReturn = clearStatementPoolOnReturn;
     }
 
     public void setRollbackOnReturn(final boolean rollbackOnReturn) {

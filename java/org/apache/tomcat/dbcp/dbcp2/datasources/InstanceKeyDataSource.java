@@ -24,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -913,9 +912,6 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         PooledConnectionAndInfo info = null;
         try {
             info = getPooledConnectionAndInfo(userName, userPassword);
-        } catch (final NoSuchElementException e) {
-            closeDueToException(info);
-            throw new SQLException("Cannot borrow connection from pool", e);
         } catch (final RuntimeException | SQLException e) {
             closeDueToException(info);
             throw e;
@@ -950,9 +946,6 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
             for (int i = 0; i < 10; i++) { // Bound the number of retries - only needed if bad instances return
                 try {
                     info = getPooledConnectionAndInfo(userName, userPassword);
-                } catch (final NoSuchElementException e) {
-                    closeDueToException(info);
-                    throw new SQLException("Cannot borrow connection from pool", e);
                 } catch (final RuntimeException | SQLException e) {
                     closeDueToException(info);
                     throw e;

@@ -46,7 +46,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
 
     static synchronized String registerNewInstance(final InstanceKeyDataSource ds) {
         int max = 0;
-        for (String s : instanceMap.keySet()) {
+        for (final String s : instanceMap.keySet()) {
             if (s != null) {
                 try {
                     max = Math.max(max, Integer.parseInt(s));
@@ -81,7 +81,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
     public static void closeAll() throws Exception {
         // Get iterator to loop over all instances of this data source.
         final List<Throwable> exceptionList = new ArrayList<>(instanceMap.size());
-        for (Entry<String, InstanceKeyDataSource> next : instanceMap.entrySet()) {
+        for (final Entry<String, InstanceKeyDataSource> next : instanceMap.entrySet()) {
             // Bullet-proof to avoid anything else but problems from InstanceKeyDataSource#close().
             if (next != null) {
                 final InstanceKeyDataSource value = next.getValue();
@@ -166,7 +166,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
         // Pool properties
         refAddr = ref.get("blockWhenExhausted");
         if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultBlockWhenExhausted(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
+            ikds.setDefaultBlockWhenExhausted(Boolean.parseBoolean(refAddr.getContent().toString()));
         }
 
         refAddr = ref.get("evictionPolicyClassName");
@@ -177,7 +177,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
         // Pool properties
         refAddr = ref.get("lifo");
         if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultLifo(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
+            ikds.setDefaultLifo(Boolean.parseBoolean(refAddr.getContent().toString()));
         }
 
         refAddr = ref.get("maxIdlePerKey");
@@ -217,22 +217,22 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
 
         refAddr = ref.get("testOnCreate");
         if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTestOnCreate(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
+            ikds.setDefaultTestOnCreate(Boolean.parseBoolean(refAddr.getContent().toString()));
         }
 
         refAddr = ref.get("testOnBorrow");
         if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTestOnBorrow(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
+            ikds.setDefaultTestOnBorrow(Boolean.parseBoolean(refAddr.getContent().toString()));
         }
 
         refAddr = ref.get("testOnReturn");
         if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTestOnReturn(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
+            ikds.setDefaultTestOnReturn(Boolean.parseBoolean(refAddr.getContent().toString()));
         }
 
         refAddr = ref.get("testWhileIdle");
         if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTestWhileIdle(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
+            ikds.setDefaultTestWhileIdle(Boolean.parseBoolean(refAddr.getContent().toString()));
         }
 
         refAddr = ref.get("timeBetweenEvictionRunsMillis");
@@ -254,7 +254,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
 
         refAddr = ref.get("rollbackAfterValidation");
         if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setRollbackAfterValidation(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
+            ikds.setRollbackAfterValidation(Boolean.parseBoolean(refAddr.getContent().toString()));
         }
 
         refAddr = ref.get("maxConnLifetimeMillis");

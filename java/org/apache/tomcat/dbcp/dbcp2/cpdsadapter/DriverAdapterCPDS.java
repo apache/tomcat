@@ -85,7 +85,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     private static final long serialVersionUID = -4820523787212147844L;
 
     private static final String GET_CONNECTION_CALLED = "A PooledConnection was already requested from this source, "
-            + "further initialization is not allowed.";
+        + "further initialization is not allowed.";
 
     static {
         // Attempt to prevent deadlocks - see DBCP - 272
@@ -147,8 +147,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         }
     }
 
-    private boolean getBooleanContentString(RefAddr ra) {
-        return Boolean.valueOf(getStringContent(ra)).booleanValue();
+    private boolean getBooleanContentString(final RefAddr ra) {
+        return Boolean.parseBoolean(getStringContent(ra));
     }
 
     /**
@@ -248,7 +248,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      */
     @Override
     public Object getObjectInstance(final Object refObj, final Name name, final Context context,
-            final Hashtable<?, ?> env) throws Exception {
+        final Hashtable<?, ?> env) throws Exception {
         // The spec says to return null if we can't create an instance
         // of the reference
         DriverAdapterCPDS cpds = null;
@@ -351,14 +351,12 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Attempts to establish a database connection.
      *
-     * @param pooledUserName
-     *            name to be used for the connection
-     * @param pooledUserPassword
-     *            password to be used fur the connection
+     * @param pooledUserName name to be used for the connection
+     * @param pooledUserPassword password to be used fur the connection
      */
     @Override
     public PooledConnection getPooledConnection(final String pooledUserName, final String pooledUserPassword)
-            throws SQLException {
+        throws SQLException {
         getConnectionCalled = true;
         PooledConnectionImpl pooledConnection = null;
         // Workaround for buggy WebLogic 5.1 classloader - ignore the exception upon first invocation.
@@ -367,19 +365,19 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
                 update(connectionProperties, KEY_USER, pooledUserName);
                 update(connectionProperties, KEY_PASSWORD, pooledUserPassword);
                 pooledConnection = new PooledConnectionImpl(
-                        DriverManager.getConnection(getUrl(), connectionProperties));
+                    DriverManager.getConnection(getUrl(), connectionProperties));
             } else {
                 pooledConnection = new PooledConnectionImpl(
-                        DriverManager.getConnection(getUrl(), pooledUserName, pooledUserPassword));
+                    DriverManager.getConnection(getUrl(), pooledUserName, pooledUserPassword));
             }
             pooledConnection.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
         } catch (final ClassCircularityError e) {
             if (connectionProperties != null) {
                 pooledConnection = new PooledConnectionImpl(
-                        DriverManager.getConnection(getUrl(), connectionProperties));
+                    DriverManager.getConnection(getUrl(), connectionProperties));
             } else {
                 pooledConnection = new PooledConnectionImpl(
-                        DriverManager.getConnection(getUrl(), pooledUserName, pooledUserPassword));
+                    DriverManager.getConnection(getUrl(), pooledUserName, pooledUserPassword));
             }
             pooledConnection.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
         }
@@ -438,7 +436,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         return ref;
     }
 
-    private String getStringContent(RefAddr ra) {
+    private String getStringContent(final RefAddr ra) {
         return ra.getContent().toString();
     }
 
@@ -480,7 +478,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         return this.accessToUnderlyingConnectionAllowed;
     }
 
-    private boolean isNotEmpty(RefAddr ra) {
+    private boolean isNotEmpty(final RefAddr ra) {
         return ra != null && ra.getContent() != null;
     }
 
@@ -497,8 +495,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Sets the value of the accessToUnderlyingConnectionAllowed property. It controls if the PoolGuard allows access to
      * the underlying connection. (Default: false)
      *
-     * @param allow
-     *            Access to the underlying connection is granted when true.
+     * @param allow Access to the underlying connection is granted when true.
      */
     public synchronized void setAccessToUnderlyingConnectionAllowed(final boolean allow) {
         this.accessToUnderlyingConnectionAllowed = allow;
@@ -515,10 +512,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * null.
      * </p>
      *
-     * @param props
-     *            Connection properties to use when creating new connections.
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
+     * @param props Connection properties to use when creating new connections.
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setConnectionProperties(final Properties props) {
         assertInitializationAllowed();
@@ -537,8 +532,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Sets the value of description. This property is here for use by the code which will deploy this datasource. It is
      * not used internally.
      *
-     * @param v
-     *            Value to assign to description.
+     * @param v Value to assign to description.
      */
     public void setDescription(final String v) {
         this.description = v;
@@ -548,12 +542,9 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Sets the driver class name. Setting the driver class name cause the driver to be registered with the
      * DriverManager.
      *
-     * @param v
-     *            Value to assign to driver.
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
-     * @throws ClassNotFoundException
-     *             if the class cannot be located
+     * @param v Value to assign to driver.
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
+     * @throws ClassNotFoundException if the class cannot be located
      */
     public void setDriver(final String v) throws ClassNotFoundException {
         assertInitializationAllowed();
@@ -583,10 +574,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Gets the maximum number of statements that can remain idle in the pool, without extra ones being released, or
      * negative for no limit.
      *
-     * @param maxIdle
-     *            The maximum number of statements that can remain idle
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
+     * @param maxIdle The maximum number of statements that can remain idle
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setMaxIdle(final int maxIdle) {
         assertInitializationAllowed();
@@ -596,8 +585,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the maximum number of prepared statements.
      *
-     * @param maxPreparedStatements
-     *            the new maximum number of prepared statements
+     * @param maxPreparedStatements the new maximum number of prepared statements
      */
     public void setMaxPreparedStatements(final int maxPreparedStatements) {
         this.maxPreparedStatements = maxPreparedStatements;
@@ -607,12 +595,10 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Sets the minimum amount of time a statement may sit idle in the pool before it is eligible for eviction by the
      * idle object evictor (if any). When non-positive, no objects will be evicted from the pool due to idle time alone.
      *
-     * @param minEvictableIdleTimeMillis
-     *            minimum time to set (in ms)
+     * @param minEvictableIdleTimeMillis minimum time to set (in ms)
      * @see #getMinEvictableIdleTimeMillis()
      * @see #setTimeBetweenEvictionRunsMillis(long)
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setMinEvictableIdleTimeMillis(final int minEvictableIdleTimeMillis) {
         assertInitializationAllowed();
@@ -640,10 +626,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the value of password for the default user.
      *
-     * @param userPassword
-     *            Value to assign to password.
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
+     * @param userPassword Value to assign to password.
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setPassword(final char[] userPassword) {
         assertInitializationAllowed();
@@ -654,10 +638,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the value of password for the default user.
      *
-     * @param userPassword
-     *            Value to assign to password.
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
+     * @param userPassword Value to assign to password.
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setPassword(final String userPassword) {
         assertInitializationAllowed();
@@ -668,10 +650,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Whether to toggle the pooling of <code>PreparedStatement</code>s
      *
-     * @param poolPreparedStatements
-     *            true to pool statements.
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
+     * @param poolPreparedStatements true to pool statements.
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setPoolPreparedStatements(final boolean poolPreparedStatements) {
         assertInitializationAllowed();
@@ -682,12 +662,10 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Sets the number of milliseconds to sleep between runs of the idle object evictor thread. When non-positive, no
      * idle object evictor thread will be run.
      *
-     * @param timeBetweenEvictionRunsMillis
-     *            The number of milliseconds to sleep between runs of the idle object evictor thread. When non-positive,
-     *            no idle object evictor thread will be run.
+     * @param timeBetweenEvictionRunsMillis The number of milliseconds to sleep between runs of the idle object evictor
+     *        thread. When non-positive, no idle object evictor thread will be run.
      * @see #getTimeBetweenEvictionRunsMillis()
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setTimeBetweenEvictionRunsMillis(final long timeBetweenEvictionRunsMillis) {
         assertInitializationAllowed();
@@ -697,10 +675,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the value of URL string used to locate the database for this datasource.
      *
-     * @param v
-     *            Value to assign to url.
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
+     * @param v Value to assign to url.
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setUrl(final String v) {
         assertInitializationAllowed();
@@ -710,10 +686,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the value of default user (login or user name).
      *
-     * @param v
-     *            Value to assign to user.
-     * @throws IllegalStateException
-     *             if {@link #getPooledConnection()} has been called
+     * @param v Value to assign to user.
+     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setUser(final String v) {
         assertInitializationAllowed();
@@ -732,7 +706,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         builder.append("[description=");
         builder.append(description);
         builder.append(", url=");
-        // TODO What if the connection string contains a 'user' or 'password' query parameter but that connection string is not in a legal URL format?
+        // TODO What if the connection string contains a 'user' or 'password' query parameter but that connection string
+        // is not in a legal URL format?
         builder.append(url);
         builder.append(", driver=");
         builder.append(driver);
@@ -753,22 +728,11 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         builder.append(", getConnectionCalled=");
         builder.append(getConnectionCalled);
         builder.append(", connectionProperties=");
-        Properties tmpProps = connectionProperties;
-        tmpProps = mask(tmpProps, "user");
-        tmpProps = mask(tmpProps, "password");
-        builder.append(tmpProps);
+        builder.append(Utils.cloneWithoutCredentials(connectionProperties));
         builder.append(", accessToUnderlyingConnectionAllowed=");
         builder.append(accessToUnderlyingConnectionAllowed);
         builder.append("]");
         return builder.toString();
-    }
-
-    private Properties mask(Properties properties, final String maskValueAtKey) {
-        if (connectionProperties != null && connectionProperties.contains(maskValueAtKey)) {
-            properties = (Properties) connectionProperties.clone();
-            properties.put(maskValueAtKey, "[" + maskValueAtKey + "]");
-        }
-        return properties;
     }
 
     private void update(final Properties properties, final String key, final String value) {

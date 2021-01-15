@@ -58,8 +58,7 @@ class CPDSConnectionFactory
     /**
      * Map of PooledConnections for which close events are ignored. Connections are muted when they are being validated.
      */
-    private final Set<PooledConnection> validatingSet = Collections
-            .newSetFromMap(new ConcurrentHashMap<PooledConnection, Boolean>());
+    private final Set<PooledConnection> validatingSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * Map of PooledConnectionAndInfo instances
@@ -150,7 +149,7 @@ class CPDSConnectionFactory
 
     @Override
     public synchronized PooledObject<PooledConnectionAndInfo> makeObject() {
-        PooledConnectionAndInfo pci;
+        final PooledConnectionAndInfo pci;
         try {
             PooledConnection pc = null;
             if (userName == null) {
@@ -226,11 +225,7 @@ class CPDSConnectionFactory
                 conn = pconn.getConnection();
                 stmt = conn.createStatement();
                 rset = stmt.executeQuery(validationQuery);
-                if (rset.next()) {
-                    valid = true;
-                } else {
-                    valid = false;
-                }
+                valid = rset.next();
                 if (rollbackAfterValidation) {
                     conn.rollback();
                 }

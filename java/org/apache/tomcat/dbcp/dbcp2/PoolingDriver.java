@@ -25,7 +25,6 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.tomcat.dbcp.pool2.ObjectPool;
@@ -37,7 +36,9 @@ import org.apache.tomcat.dbcp.pool2.ObjectPool;
  */
 public class PoolingDriver implements Driver {
 
-    /** Register myself with the {@link DriverManager}. */
+    private static final DriverPropertyInfo[] EMPTY_DRIVER_PROPERTY_INFO_ARRAY = new DriverPropertyInfo[0];
+
+    /* Register myself with the {@link DriverManager}. */
     static {
         try {
             DriverManager.registerDriver(new PoolingDriver());
@@ -133,13 +134,12 @@ public class PoolingDriver implements Driver {
      * @return the pool names.
      */
     public synchronized String[] getPoolNames() {
-        final Set<String> names = pools.keySet();
-        return names.toArray(new String[0]);
+        return pools.keySet().toArray(Utils.EMPTY_STRING_ARRAY);
     }
 
     @Override
     public boolean acceptsURL(final String url) throws SQLException {
-        return url == null ? false : url.startsWith(URL_PREFIX);
+        return url != null && url.startsWith(URL_PREFIX);
     }
 
     @Override
@@ -153,11 +153,9 @@ public class PoolingDriver implements Driver {
                     return null;
                 }
                 return new PoolGuardConnectionWrapper(pool, conn);
-            } catch (final SQLException e) {
-                throw e;
             } catch (final NoSuchElementException e) {
                 throw new SQLException("Cannot get a connection, pool error: " + e.getMessage(), e);
-            } catch (final RuntimeException e) {
+            } catch (final SQLException | RuntimeException e) {
                 throw e;
             } catch (final Exception e) {
                 throw new SQLException("Cannot get a connection, general error: " + e.getMessage(), e);
@@ -212,7 +210,7 @@ public class PoolingDriver implements Driver {
 
     @Override
     public DriverPropertyInfo[] getPropertyInfo(final String url, final Properties info) {
-        return new DriverPropertyInfo[0];
+        return EMPTY_DRIVER_PROPERTY_INFO_ARRAY;
     }
 
     /** My URL prefix */

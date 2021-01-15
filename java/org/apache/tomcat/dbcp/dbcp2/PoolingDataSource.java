@@ -136,11 +136,9 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
                 return null;
             }
             return new PoolGuardConnectionWrapper<>(conn);
-        } catch (final SQLException e) {
-            throw e;
         } catch (final NoSuchElementException e) {
             throw new SQLException("Cannot get a connection, pool error " + e.getMessage(), e);
-        } catch (final RuntimeException e) {
+        } catch (final SQLException | RuntimeException e) {
             throw e;
         } catch (final InterruptedException e) {
             // Reset the interrupt status so it is visible to callers
