@@ -528,7 +528,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
 
             // Set up the poolable connection factory
             boolean success = false;
-            PoolableConnectionFactory poolableConnectionFactory;
+            final PoolableConnectionFactory poolableConnectionFactory;
             try {
                 poolableConnectionFactory = createPoolableConnectionFactory(driverConnectionFactory);
                 poolableConnectionFactory.setPoolStatements(poolPreparedStatements);
@@ -605,7 +605,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     protected GenericObjectPool<PoolableConnection> createObjectPool(final PoolableConnectionFactory factory,
             final GenericObjectPoolConfig<PoolableConnection> poolConfig, final AbandonedConfig abandonedConfig) {
-        GenericObjectPool<PoolableConnection> gop;
+        final GenericObjectPool<PoolableConnection> gop;
         if (abandonedConfig != null && (abandonedConfig.getRemoveAbandonedOnBorrow()
                 || abandonedConfig.getRemoveAbandonedOnMaintenance())) {
             gop = new GenericObjectPool<>(factory, poolConfig, abandonedConfig);
@@ -686,7 +686,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     @Override
     public boolean getAbandonedUsageTracking() {
-        return abandonedConfig == null ? false : abandonedConfig.getUseUsageTracking();
+        return abandonedConfig != null && abandonedConfig.getUseUsageTracking();
     }
 
     /**
@@ -779,8 +779,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     @Override
     public String[] getConnectionInitSqlsAsArray() {
-        final Collection<String> result = getConnectionInitSqls();
-        return result.toArray(new String[0]);
+        return getConnectionInitSqls().toArray(Utils.EMPTY_STRING_ARRAY);
     }
 
     protected GenericObjectPool<PoolableConnection> getConnectionPool() {
@@ -872,8 +871,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     @Override
     public String[] getDisconnectionSqlCodesAsArray() {
-        final Collection<String> result = getDisconnectionSqlCodes();
-        return result.toArray(new String[0]);
+        return getDisconnectionSqlCodes().toArray(Utils.EMPTY_STRING_ARRAY);
     }
 
     /**
@@ -996,7 +994,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     @Override
     public boolean getLogAbandoned() {
-        return abandonedConfig == null ? false : abandonedConfig.getLogAbandoned();
+        return abandonedConfig != null && abandonedConfig.getLogAbandoned();
     }
 
     /**
@@ -1211,7 +1209,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     @Override
     public boolean getRemoveAbandonedOnBorrow() {
-        return abandonedConfig == null ? false : abandonedConfig.getRemoveAbandonedOnBorrow();
+        return abandonedConfig != null && abandonedConfig.getRemoveAbandonedOnBorrow();
     }
 
     /**
@@ -1232,7 +1230,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     @Override
     public boolean getRemoveAbandonedOnMaintenance() {
-        return abandonedConfig == null ? false : abandonedConfig.getRemoveAbandonedOnMaintenance();
+        return abandonedConfig != null && abandonedConfig.getRemoveAbandonedOnMaintenance();
     }
 
     /**
@@ -1460,8 +1458,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * @param value the string to test, may be null.
      * @return boolean false if value is null, otherwise {@link String#isEmpty()}.
      */
-    private boolean isEmpty(String value) {
-        return value == null ? true : value.trim().isEmpty();
+    private boolean isEmpty(final String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     /**
@@ -1509,7 +1507,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      *
      * @since 2.7.0
      */
-    protected void log(String message, Throwable throwable) {
+    protected void log(final String message, final Throwable throwable) {
         if (logWriter != null) {
             logWriter.println(message);
             throwable.printStackTrace(logWriter);

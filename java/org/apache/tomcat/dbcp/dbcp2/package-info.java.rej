@@ -1,0 +1,9 @@
+@@ -53,7 +53,7 @@
+  * actual database {@link java.sql.Connection}s itself, it uses a {@link org.apache.commons.dbcp2.ConnectionFactory} for
+  * that. The {@link org.apache.commons.dbcp2.PoolableConnectionFactory} will take {@link java.sql.Connection}s created
+  * by the {@link org.apache.commons.dbcp2.ConnectionFactory} and wrap them with classes that implement the pooling
+- * behaviour.
++ * behavior.
+  * </p>
+  * <p>
+  * Several implementations of {@link org.apache.commons.dbcp2.ConnectionFactory} are provided--one that uses
