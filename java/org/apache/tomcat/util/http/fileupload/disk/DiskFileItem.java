@@ -165,9 +165,9 @@ public class DiskFileItem
      *                      which files will be created, should the item size
      *                      exceed the threshold.
      */
-    public DiskFileItem(String fieldName,
-            String contentType, boolean isFormField, String fileName,
-            int sizeThreshold, File repository) {
+    public DiskFileItem(final String fieldName,
+            final String contentType, final boolean isFormField, final String fileName,
+            final int sizeThreshold, final File repository) {
         this.fieldName = fieldName;
         this.contentType = contentType;
         this.isFormField = isFormField;
@@ -220,10 +220,10 @@ public class DiskFileItem
      *         not defined.
      */
     public String getCharSet() {
-        ParameterParser parser = new ParameterParser();
+        final ParameterParser parser = new ParameterParser();
         parser.setLowerCaseNames(true);
         // Parameter parser can handle null input
-        Map<String, String> params = parser.parse(getContentType(), ';');
+        final Map<String, String> params = parser.parse(getContentType(), ';');
         return params.get("charset");
     }
 
@@ -300,7 +300,7 @@ public class DiskFileItem
         try {
             fis = new FileInputStream(dfos.getFile());
             IOUtils.readFully(fis, fileData);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             fileData = null;
         } finally {
             IOUtils.closeQuietly(fis);
@@ -338,14 +338,14 @@ public class DiskFileItem
      */
     @Override
     public String getString() {
-        byte[] rawdata = get();
+        final byte[] rawdata = get();
         String charset = getCharSet();
         if (charset == null) {
             charset = defaultCharset;
         }
         try {
             return new String(rawdata, charset);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             return new String(rawdata);
         }
     }
@@ -371,7 +371,7 @@ public class DiskFileItem
      * @throws Exception if an error occurs.
      */
     @Override
-    public void write(File file) throws Exception {
+    public void write(final File file) throws Exception {
         if (isInMemory()) {
             FileOutputStream fout = null;
             try {
@@ -382,7 +382,7 @@ public class DiskFileItem
                 IOUtils.closeQuietly(fout);
             }
         } else {
-            File outputFile = getStoreLocation();
+            final File outputFile = getStoreLocation();
             if (outputFile != null) {
                 // Save the length of the file
                 size = outputFile.length();
@@ -433,7 +433,7 @@ public class DiskFileItem
     @Override
     public void delete() {
         cachedContent = null;
-        File outputFile = getStoreLocation();
+        final File outputFile = getStoreLocation();
         if (outputFile != null && !isInMemory() && outputFile.exists()) {
             outputFile.delete();
         }
@@ -462,7 +462,7 @@ public class DiskFileItem
      *
      */
     @Override
-    public void setFieldName(String fieldName) {
+    public void setFieldName(final String fieldName) {
         this.fieldName = fieldName;
     }
 
@@ -492,7 +492,7 @@ public class DiskFileItem
      *
      */
     @Override
-    public void setFormField(boolean state) {
+    public void setFormField(final boolean state) {
         isFormField = state;
     }
 
@@ -509,7 +509,7 @@ public class DiskFileItem
     public OutputStream getOutputStream()
         throws IOException {
         if (dfos == null) {
-            File outputFile = getTempFile();
+            final File outputFile = getTempFile();
             dfos = new DeferredFileOutputStream(sizeThreshold, outputFile);
         }
         return dfos;
@@ -550,7 +550,7 @@ public class DiskFileItem
         if (dfos == null || dfos.isInMemory()) {
             return;
         }
-        File outputFile = dfos.getFile();
+        final File outputFile = dfos.getFile();
 
         if (outputFile != null && outputFile.exists()) {
             outputFile.delete();
@@ -576,7 +576,7 @@ public class DiskFileItem
                 tempDir = new File(System.getProperty("java.io.tmpdir"));
             }
 
-            String tempFileName = String.format("upload_%s_%s.tmp", UID, getUniqueId());
+            final String tempFileName = String.format("upload_%s_%s.tmp", UID, getUniqueId());
 
             tempFile = new File(tempDir, tempFileName);
         }
@@ -593,7 +593,7 @@ public class DiskFileItem
      */
     private static String getUniqueId() {
         final int limit = 100000000;
-        int current = COUNTER.getAndIncrement();
+        final int current = COUNTER.getAndIncrement();
         String id = Integer.toString(current);
 
         // If you manage to get more than 100 million of ids, you'll
@@ -630,7 +630,7 @@ public class DiskFileItem
      * @param pHeaders The file items headers.
      */
     @Override
-    public void setHeaders(FileItemHeaders pHeaders) {
+    public void setHeaders(final FileItemHeaders pHeaders) {
         headers = pHeaders;
     }
 
@@ -648,7 +648,7 @@ public class DiskFileItem
      * parameter is provided by the sender.
      * @param charset the default charset
      */
-    public void setDefaultCharset(String charset) {
+    public void setDefaultCharset(final String charset) {
         defaultCharset = charset;
     }
 }
