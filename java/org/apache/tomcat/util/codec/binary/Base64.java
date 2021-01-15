@@ -360,8 +360,8 @@ public class Base64 extends BaseNCodec {
      * @since 1.5
      */
     public static boolean isBase64(final byte[] arrayOctet) {
-        for (byte b : arrayOctet) {
-            if (!isBase64(b) && !isWhiteSpace(b)) {
+        for (byte element : arrayOctet) {
+            if (!isBase64(element) && !isWhiteSpace(element)) {
                 return false;
             }
         }
@@ -428,7 +428,8 @@ public class Base64 extends BaseNCodec {
     private static void validateCharacter(final int emptyBitsMask, final Context context) {
         if ((context.ibitWorkArea & emptyBitsMask) != 0) {
             throw new IllegalArgumentException(
-                "Last encoded character (before the paddings if any) is a valid base 64 alphabet but not a possible value. " +
+                "Last encoded character (before the paddings if any) is a valid " +
+                "base 64 alphabet but not a possible value. " +
                 "Expected the discarded bits to be zero.");
         }
     }
@@ -586,8 +587,7 @@ public class Base64 extends BaseNCodec {
             }
             if (lineLength > 0){ // null line-sep forces no chunking rather than throwing IAE
                 this.encodeSize = BYTES_PER_ENCODED_BLOCK + lineSeparator.length;
-                this.lineSeparator = new byte[lineSeparator.length];
-                System.arraycopy(lineSeparator, 0, this.lineSeparator, 0, lineSeparator.length);
+                this.lineSeparator = lineSeparator.clone();
             } else {
                 this.encodeSize = BYTES_PER_ENCODED_BLOCK;
                 this.lineSeparator = null;
