@@ -199,9 +199,7 @@ public interface ObjectPool<T> extends Closeable {
      * @throws Exception if the instance cannot be invalidated
      * @since 2.9.0
      */
-    default void invalidateObject(final T obj, final DestroyMode mode) throws Exception {
-        invalidateObject(obj);
-    }
+    void invalidateObject(final T obj, final DestroyMode mode) throws Exception;
 
     /**
      * Returns an instance to the pool. By contract, {@code obj}

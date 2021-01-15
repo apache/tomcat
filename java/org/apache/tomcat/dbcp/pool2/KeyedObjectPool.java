@@ -278,9 +278,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      * @throws Exception if the instance cannot be invalidated
      * @since 2.9.0
      */
-    default void invalidateObject(final K key, final V obj, final DestroyMode mode) throws Exception {
-        invalidateObject(key, obj);
-    }
+    void invalidateObject(final K key, final V obj, final DestroyMode mode) throws Exception;
 
     /**
      * Return an instance to the pool. By contract, {@code obj}

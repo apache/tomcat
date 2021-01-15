@@ -538,6 +538,11 @@ public final class PoolUtils {
             }
         }
 
+        @Override
+        public void destroyObject(PooledObject<T> p, DestroyMode mode) throws Exception {
+            destroyObject(p);
+        }
+
         /**
          * {@inheritDoc}
          */
@@ -655,6 +660,11 @@ public final class PoolUtils {
             } finally {
                 writeLock.unlock();
             }
+        }
+
+        @Override
+        public void destroyObject(K key, PooledObject<V> p, DestroyMode mode) throws Exception {
+            destroyObject(key, p);
         }
 
         /**

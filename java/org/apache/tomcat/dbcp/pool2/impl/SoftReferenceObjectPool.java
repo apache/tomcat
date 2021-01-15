@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.apache.tomcat.dbcp.pool2.BaseObjectPool;
+import org.apache.tomcat.dbcp.pool2.DestroyMode;
 import org.apache.tomcat.dbcp.pool2.PoolUtils;
 import org.apache.tomcat.dbcp.pool2.PooledObjectFactory;
 
@@ -243,6 +244,11 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         }
         numActive--;
         notifyAll(); // numActive has changed
+    }
+
+    @Override
+    public void invalidateObject(T obj, DestroyMode mode) throws Exception {
+        invalidateObject(obj);
     }
 
     /**
