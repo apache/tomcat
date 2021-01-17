@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import org.apache.tomcat.util.http.fileupload.impl.FileItemIteratorImpl;
 import org.apache.tomcat.util.http.fileupload.impl.FileItemStreamImpl;
@@ -281,7 +280,10 @@ public abstract class FileUploadBase {
         boolean successful = false;
         try {
             final FileItemIterator iter = getItemIterator(ctx);
-            final FileItemFactory fileItemFactory = Objects.requireNonNull(getFileItemFactory(), "No FileItemFactory has been set.");
+            final FileItemFactory fileItemFactory = getFileItemFactory();
+            if (fileItemFactory == null) {
+                throw new NullPointerException("No FileItemFactory has been set.");
+            }
             while (iter.hasNext()) {
                 final FileItemStream item = iter.next();
                 // Don't use getName() here to prevent an InvalidFileNameException.
