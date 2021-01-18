@@ -25,10 +25,6 @@ Items carried over from the 9.0.x list:
  2. Reduce instances of setters and getters for the same property existing on an
     object and its parent. This may require new objects to be exposed via JMX.
 
-New items for 10.0.x onwards:
-
- 1. Remove APR connector.
-
 Deferred until 10.1.x:
 
  1. Remove the ExtensionValidator and associated classes (assuming that the
@@ -38,3 +34,7 @@ Deferred until 10.1.x:
     interface with OpenSSL and clones.
     We might want to park this one until we see what is available direct from
     the JRE with project Panama.
+
+ 3. Remove APR connector.
+
+ 4. Review code forked from Commons projects and consider removing unused code.
