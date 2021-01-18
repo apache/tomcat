@@ -202,6 +202,9 @@
         Update the packaged version of the Tomcat Native Library to 1.2.26.
         (markt)
       </update>
+      <update>
+        Migrate to new code signing service. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
