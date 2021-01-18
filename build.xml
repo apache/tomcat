@@ -227,7 +227,6 @@
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
-    <pathelement location="${saaj-api.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
