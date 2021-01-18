@@ -2572,7 +2572,7 @@ skip.installer property in build.properties" />
   <target name="-installer-sign-uninstaller"
       unless="skip.installer" depends="-installer-create-uninstaller"
       if="${do.codesigning}">
-    <exec executable="${signtool.exec}" failonerror="true">
+    <exec executable="${codesigning.exec}" failonerror="true">
       <arg value="sign"/>
       <arg value="/sha1"/>
       <arg value="${codesigning.certificate.thumbprint}"/>
@@ -2602,7 +2602,7 @@ skip.installer property in build.properties" />
   <target name="installer-sign"
       description="Builds and optionally signs the Windows installer"
       depends="-installer" if="${do.codesigning}" >
-    <exec executable="${signtool.exec}" failonerror="true">
+    <exec executable="${codesigning.exec}" failonerror="true">
       <arg value="sign"/>
       <arg value="/sha1"/>
       <arg value="${codesigning.certificate.thumbprint}"/>
