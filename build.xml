@@ -236,7 +236,6 @@
     <pathelement location="${bnd.jar}"/>
     <pathelement location="${osgi-annotations.jar}"/>
     <pathelement location="${jdt.jar}"/>
-    <pathelement location="${saaj-api.jar}"/>
     <pathelement location="${jaxrpc-lib.jar}"/>
     <pathelement location="${wsdl4j-lib.jar}"/>
   </path>
