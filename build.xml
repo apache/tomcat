@@ -2563,20 +2563,14 @@ skip.installer property in build.properties" />
   <target name="-installer-sign-uninstaller"
       unless="skip.installer" depends="-installer-create-uninstaller"
       if="${do.codesigning}">
-    <taskdef name="signcode"
-        classname="org.apache.tomcat.buildutil.SignCode"
-        classpath="${tomcat.classes}" />
-    <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
-        partnerCode="${codesigning.partnercode}"
-        keyStore="${codesigning.keyStore}"
-        keyStorePassword="${codesigning.keyStorePassword}"
-        applicationName="Apache Tomcat ${version.major.minor} Uninstaller"
-        applicationversion="${version}"
-        signingService="${codesigning.service}">
-      <fileset dir="${tomcat.dist}">
-        <filename name="Uninstall.exe"/>
-      </fileset>
-    </signcode>
+    <exec executable="${codesigning.exec}" failonerror="true">
+      <arg value="sign"/>
+      <arg value="/sha1"/>
+      <arg value="${codesigning.certificate.thumbprint}"/>
+      <arg value="/tr"/>
+      <arg value="http://timestamp.digicert.com"/>
+      <arg value="${tomcat.dist}/Uninstall.exe"/>
+    </exec>
   </target>
 
   <target name="-installer" unless="skip.installer"
@@ -2599,20 +2593,14 @@ skip.installer property in build.properties" />
   <target name="installer-sign"
       description="Builds and optionally signs the Windows installer"
       depends="-installer" if="${do.codesigning}" >
-    <taskdef name="signcode"
-        classname="org.apache.tomcat.buildutil.SignCode"
-        classpath="${tomcat.classes}" />
-    <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
-              partnerCode="${codesigning.partnercode}"
-              keyStore="${codesigning.keyStore}"
-              keyStorePassword="${codesigning.keyStorePassword}"
-              applicationName="Apache Tomcat ${version.major.minor}"
-              applicationversion="${version}"
-              signingService="${codesigning.service}">
-      <fileset dir="${tomcat.release}">
-        <filename name="v${version}/bin/${final.name}.exe"/>
-      </fileset>
-    </signcode>
+    <exec executable="${codesigning.exec}" failonerror="true">
+      <arg value="sign"/>
+      <arg value="/sha1"/>
+      <arg value="${codesigning.certificate.thumbprint}"/>
+      <arg value="/tr"/>
+      <arg value="http://timestamp.digicert.com"/>
+      <arg value="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
+    </exec>
     <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
@@ -3103,17 +3091,6 @@ skip.installer property in build.properties" />
       <param name="checksum.algorithm" value="${jdt.checksum.algorithm}"/>
       <param name="checksum.value" value="${jdt.checksum.value}"/>
     </antcall>
-
-    <!-- Download SAAJ API -->
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${saaj-api.loc}"/>
-      <param name="destfile" value="${saaj-api.jar}"/>
-      <param name="destdir" value="${saaj-api.home}"/>
-      <param name="checksum.enabled" value="${saaj-api.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${saaj-api.checksum.algorithm}"/>
-      <param name="checksum.value" value="${saaj-api.checksum.value}"/>
-    </antcall>
-
 
     <!-- Download WS API -->
     <antcall target="downloadfile">
