@@ -219,6 +219,9 @@
         Update the internal fork of Apache Commons DBCP to 2.9.0-SNAPSHOT
         (2021-01-15). (markt)
       </add>
+      <update>
+        Migrate to new code signing service. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

@@ -71,12 +71,8 @@ gpg.exec=/path/to/gpg
 
 # Code signing of Windows installer
 do.codesigning=false
-codesigning.user=request-via-pmc
-codesigning.pwd=request-via-pmc
-codesigning.partnercode=request-via-pmc
-codesigning.keyStore=request-via-pmc
-codesigning.keyStorePassword=request-via-pmc
-codesigning.service=Microsoft Windows Signing
+codesigning.exec=signtool.exe
+codesigning.certificate.thumbprint=5a606116432aba614c246d15e792f9e4bcf19cbf
 
 # ----- Settings to use when downloading files -----
 trydownload.httpusecaches=true
@@ -280,14 +276,3 @@ findbugs.checksum.value=8c54502a8e1b78ea6b173a186ce6f379|95114d9aaeeba7bd4ea5a3d
 findbugs.home=${base.path}/spotbugs-${findbugs.version}
 findbugs.jar=${findbugs.home}/lib/spotbugs-ant.jar
 findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/spotbugs-${findbugs.version}.tgz
-
-# ----- SAAJ API, used by Code Signing for releases -----
-# ----- No longer part of JRE from Java 11 onwards  -----
-# ----- CDDL Licensed                               -----
-saaj-api.version=1.3.5
-saaj-api.checksum.enabled=true
-saaj-api.checksum.algorithm=MD5|SHA-1
-saaj-api.checksum.value=caae8b4bf2c551155815331e9e96256f|1c399a7fea4d0262a6a39750e419c24f0c769586
-saaj-api.home=${base.path}/saaj-api-${saaj-api.version}
-saaj-api.jar=${saaj-api.home}/saaj-api-${saaj-api.version}.jar
-saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-api-${saaj-api.version}.jar
