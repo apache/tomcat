@@ -89,7 +89,7 @@ public final class ClassLoaderFactory {
                 if (!file.canRead()) {
                     continue;
                 }
-                file = new File(file.getCanonicalPath() + File.separator);
+                file = new File(file.getCanonicalPath());
                 URL url = file.toURI().toURL();
                 if (log.isDebugEnabled()) {
                     log.debug("  Including directory " + url);
