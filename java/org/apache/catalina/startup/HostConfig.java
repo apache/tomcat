@@ -31,6 +31,7 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -147,9 +148,18 @@ public class HostConfig implements LifecycleListener {
     /**
      * List of applications which are being serviced, and shouldn't be
      * deployed/undeployed/redeployed at the moment.
+     * @deprecated Unused. Will be removed in Tomcat 10.1.x onwards. Replaced
+     *             by the private <code>servicedSet</code> field.
      */
+    @Deprecated
     protected final ArrayList<String> serviced = new ArrayList<>();
 
+
+    /**
+     * Set of applications which are being serviced, and shouldn't be
+     * deployed/undeployed/redeployed at the moment.
+     */
+    private Set<String> servicedSet = Collections.newSetFromMap(new ConcurrentHashMap<String,Boolean>());
 
     /**
      * The <code>Digester</code> instance used to parse context descriptors.
@@ -314,21 +324,52 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Add a serviced application to the list.
+     * Add a serviced application to the list and indicates if the application
+     * was already present in the list.
+     *
      * @param name the context name
+     *
+     * @return {@code true} if the application was not already in the list
      */
-    public synchronized void addServiced(String name) {
-        serviced.add(name);
+    public boolean tryAddServiced(String name) {
+        if (servicedSet.add(name)) {
+            synchronized (this) {
+                serviced.add(name);
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Add a serviced application to the list if it is not already present. If
+     * the application is already in the list of serviced applications this
+     * method is a NO-OP.
+     *
+     * @param name the context name
+     *
+     * @deprecated Unused. This method will be removed in Tomcat 10.1.x onwards.
+     *             Use {@link #tryAddServiced} instead.
+     */
+    @Deprecated
+    public void addServiced(String name) {
+        servicedSet.add(name);
+        synchronized (this) {
+            serviced.add(name);
+        }
     }
 
 
     /**
      * Is application serviced ?
+     *
      * @param name the context name
+     *
      * @return state of the application
      */
-    public synchronized boolean isServiced(String name) {
-        return serviced.contains(name);
+    public boolean isServiced(String name) {
+        return servicedSet.contains(name);
     }
 
 
@@ -336,8 +377,11 @@ public class HostConfig implements LifecycleListener {
      * Removed a serviced application from the list.
      * @param name the context name
      */
-    public synchronized void removeServiced(String name) {
-        serviced.remove(name);
+    public void removeServiced(String name) {
+        servicedSet.remove(name);
+        synchronized (this) {
+            serviced.remove(name);
+        }
     }
 
 
