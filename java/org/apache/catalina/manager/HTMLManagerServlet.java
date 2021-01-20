@@ -279,10 +279,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     break;
                 }
 
-                if (isServiced(name)) {
-                    message = smClient.getString("managerServlet.inService", name);
-                } else {
-                    addServiced(name);
+                if (tryAddServiced(name)) {
                     try {
                         warPart.write(file.getAbsolutePath());
                         // Perform new deployment
@@ -290,6 +287,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     } finally {
                         removeServiced(name);
                     }
+                } else {
+                    message = smClient.getString("managerServlet.inService", name);
                 }
                 break;
             }
