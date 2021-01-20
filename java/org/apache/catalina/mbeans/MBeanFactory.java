@@ -469,22 +469,28 @@ public class MBeanFactory {
                                              pname.getKeyProperty("host"));
         if(mserver.isRegistered(deployer)) {
             String contextName = context.getName();
-            mserver.invoke(deployer, "addServiced",
-                           new Object [] {contextName},
-                           new String [] {"java.lang.String"});
-            String configPath = (String)mserver.getAttribute(deployer,
-                                                             "configBaseName");
-            String baseName = context.getBaseName();
-            File configFile = new File(new File(configPath), baseName+".xml");
-            if (configFile.isFile()) {
-                context.setConfigFile(configFile.toURI().toURL());
+            Boolean result = (Boolean) mserver.invoke(deployer, "tryAddServiced",
+                    new Object [] {contextName},
+                    new String [] {"java.lang.String"});
+            if (result.booleanValue()) {
+                try {
+                    String configPath = (String)mserver.getAttribute(deployer, "configBaseName");
+                    String baseName = context.getBaseName();
+                    File configFile = new File(new File(configPath), baseName+".xml");
+                    if (configFile.isFile()) {
+                        context.setConfigFile(configFile.toURI().toURL());
+                    }
+                    mserver.invoke(deployer, "manageApp",
+                            new Object[] {context},
+                            new String[] {"org.apache.catalina.Context"});
+                } finally {
+                    mserver.invoke(deployer, "removeServiced",
+                            new Object [] {contextName},
+                            new String [] {"java.lang.String"});
+                }
+            } else {
+                throw new IllegalStateException(sm.getString("mBeanFactory.contextRemove.addServicedFail", contextName));
             }
-            mserver.invoke(deployer, "manageApp",
-                           new Object[] {context},
-                           new String[] {"org.apache.catalina.Context"});
-            mserver.invoke(deployer, "removeServiced",
-                           new Object [] {contextName},
-                           new String [] {"java.lang.String"});
         } else {
             log.warn("Deployer not found for "+pname.getKeyProperty("host"));
             Service service = getService(pname);
@@ -781,15 +787,22 @@ public class MBeanFactory {
                                              hostName);
         String pathStr = getPathStr(path);
         if(mserver.isRegistered(deployer)) {
-            mserver.invoke(deployer,"addServiced",
-                           new Object[]{pathStr},
-                           new String[] {"java.lang.String"});
-            mserver.invoke(deployer,"unmanageApp",
-                           new Object[] {pathStr},
-                           new String[] {"java.lang.String"});
-            mserver.invoke(deployer,"removeServiced",
-                           new Object[] {pathStr},
-                           new String[] {"java.lang.String"});
+            Boolean result = (Boolean) mserver.invoke(deployer,"tryAddServiced",
+                       new Object[]{pathStr},
+                       new String[] {"java.lang.String"});
+            if (result.booleanValue()) {
+                try {
+                    mserver.invoke(deployer,"unmanageApp",
+                            new Object[] {pathStr},
+                            new String[] {"java.lang.String"});
+                } finally {
+                    mserver.invoke(deployer,"removeServiced",
+                            new Object[] {pathStr},
+                            new String[] {"java.lang.String"});
+                }
+            } else {
+                throw new IllegalStateException(sm.getString("mBeanFactory.removeCreate.addServicedFail", pathStr));
+            }
         } else {
             log.warn("Deployer not found for "+hostName);
             Host host = (Host) engine.findChild(hostName);
