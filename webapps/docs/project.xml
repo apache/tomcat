@@ -75,7 +75,8 @@
         <item name="32) WebSocket"          href="web-socket-howto.html"/>
         <item name="33) Rewrite"            href="rewrite.html"/>
         <item name="34) CDI 2 and JAX-RS"   href="cdi.html"/>
-        <item name="35) GraalVM Support"    href="graal.html"/>
+        <item name="35) AOT/GraalVM Support"
+              href="graal.html"/>
     </menu>
 
     <menu name="Reference">

@@ -23,7 +23,7 @@
     &project;
 
   <properties>
-    <title>GraalVM support</title>
+    <title>Ahead of Time compilation support</title>
   </properties>
 
 <body>
