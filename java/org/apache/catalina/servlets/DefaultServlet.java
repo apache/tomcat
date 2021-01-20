@@ -2216,7 +2216,7 @@ public class DefaultServlet extends HttpServlet {
 
         // First check that the resulting path is under the provided base
         try {
-            if (!candidate.getCanonicalPath().startsWith(base.getCanonicalPath())) {
+            if (!candidate.getCanonicalFile().toPath().startsWith(base.getCanonicalFile().toPath())) {
                 return null;
             }
         } catch (IOException ioe) {
