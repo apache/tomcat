@@ -26,8 +26,8 @@ public class FileUtil {
 
     public FileUtil(File f) throws IOException {
         String path = f.getCanonicalPath();
-        if (!path.endsWith(File.pathSeparator)) {
-            path += File.pathSeparatorChar;
+        if (!path.endsWith(File.separator)) {
+            path += File.separatorChar;
         }
 
         canonicalPath = path;
