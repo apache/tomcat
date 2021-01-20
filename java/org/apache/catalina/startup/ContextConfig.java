@@ -858,7 +858,8 @@ public class ContextConfig implements LifecycleListener {
         String docBaseCanonical = docBaseAbsoluteFile.getCanonicalPath();
 
         // Re-calculate now docBase is a canonical path
-        boolean docBaseCanonicalInAppBase = docBaseCanonical.startsWith(appBase.getPath() + File.separatorChar);
+        boolean docBaseCanonicalInAppBase =
+                docBaseAbsoluteFile.getCanonicalFile().toPath().startsWith(appBase.toPath());
         String docBase;
         if (docBaseCanonicalInAppBase) {
             docBase = docBaseCanonical.substring(appBase.getPath().length());
