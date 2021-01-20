@@ -32,6 +32,7 @@ import javax.servlet.ServletContext;
 import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
+import org.apache.catalina.util.FileUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -402,9 +403,10 @@ public final class FileStore extends StoreBase {
 
         String filename = id + FILE_EXT;
         File file = new File(storageDir, filename);
+        FileUtil storageDirUtil = new FileUtil(storageDir);
 
         // Check the file is within the storage directory
-        if (!file.getCanonicalPath().startsWith(storageDir.getCanonicalPath())) {
+        if (!storageDirUtil.isParentOf(file)) {
             log.warn(sm.getString("fileStore.invalid", file.getPath(), id));
             return null;
         }

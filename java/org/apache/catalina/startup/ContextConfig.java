@@ -75,6 +75,7 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.deploy.ServletDef;
 import org.apache.catalina.deploy.WebXml;
 import org.apache.catalina.util.ContextName;
+import org.apache.catalina.util.FileUtil;
 import org.apache.catalina.util.Introspection;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -761,7 +762,7 @@ public class ContextConfig implements LifecycleListener {
             }
         }
 
-        if (docBase.startsWith(canonicalAppBase.getPath() + File.separatorChar)) {
+        if ((new FileUtil(canonicalAppBase)).isParentOf(docBase)) {
             docBase = docBase.substring(canonicalAppBase.getPath().length());
             docBase = docBase.replace(File.separatorChar, '/');
             if (docBase.startsWith("/")) {

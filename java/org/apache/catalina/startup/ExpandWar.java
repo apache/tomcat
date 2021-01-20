@@ -34,6 +34,7 @@ import java.util.zip.ZipException;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
+import org.apache.catalina.util.FileUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -98,10 +99,7 @@ public class ExpandWar {
             throw new IOException(sm.getString("expandWar.createFailed", docBase));
 
         // Expand the WAR into the new document base directory
-        String canonicalDocBasePrefix = docBase.getCanonicalPath();
-        if (!canonicalDocBasePrefix.endsWith(File.separator)) {
-            canonicalDocBasePrefix += File.separator;
-        }
+        FileUtil docBaseUtil = new FileUtil(docBase);
         JarURLConnection juc = (JarURLConnection) war.openConnection();
         juc.setUseCaches(false);
         JarFile jarFile = null;
@@ -114,14 +112,13 @@ public class ExpandWar {
                 JarEntry jarEntry = jarEntries.nextElement();
                 String name = jarEntry.getName();
                 File expandedFile = new File(docBase, name);
-                if (!expandedFile.getCanonicalPath().startsWith(
-                        canonicalDocBasePrefix)) {
+                if (!docBaseUtil.isParentOf(expandedFile)) {
                     // Trying to expand outside the docBase
                     // Throw an exception to stop the deployment
                     throw new IllegalArgumentException(
                             sm.getString("expandWar.illegalPath",war, name,
                                     expandedFile.getCanonicalPath(),
-                                    canonicalDocBasePrefix));
+                                    docBaseUtil.getCanonicalPath()));
                 }
                 int last = name.lastIndexOf('/');
                 if (last >= 0) {
@@ -209,10 +206,7 @@ public class ExpandWar {
         File docBase = new File(appBase, pathname);
 
         // Calculate the document base directory
-        String canonicalDocBasePrefix = docBase.getCanonicalPath();
-        if (!canonicalDocBasePrefix.endsWith(File.separator)) {
-            canonicalDocBasePrefix += File.separator;
-        }
+        FileUtil docBaseUtil = new FileUtil(docBase);
         JarURLConnection juc = (JarURLConnection) war.openConnection();
         juc.setUseCaches(false);
         JarFile jarFile = null;
@@ -223,14 +217,13 @@ public class ExpandWar {
                 JarEntry jarEntry = jarEntries.nextElement();
                 String name = jarEntry.getName();
                 File expandedFile = new File(docBase, name);
-                if (!expandedFile.getCanonicalPath().startsWith(
-                        canonicalDocBasePrefix)) {
+                if (!docBaseUtil.isParentOf(expandedFile)) {
                     // Entry located outside the docBase
                     // Throw an exception to stop the deployment
                     throw new IllegalArgumentException(
                             sm.getString("expandWar.illegalPath",war, name,
                                     expandedFile.getCanonicalPath(),
-                                    canonicalDocBasePrefix));
+                                    docBaseUtil.getCanonicalPath()));
                 }
             }
         } catch (IOException e) {
