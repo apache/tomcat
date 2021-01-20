@@ -225,6 +225,10 @@
       <update>
         Migrate to new code signing service. (markt)
       </update>
+      <scode>
+        Use <code>java.nio.file.Path</code> to test for one directory being a
+        sub-directory of another in a consistent way. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
