@@ -175,6 +175,10 @@
         <bug>65001</bug>: Fix error handling for exceptions throw from calls
         to <code>ReadListener</code> and <code>WriteListener</code>. (markt)
       </fix>
+      <fix>
+        Avoid possible infinite loop in <code>OpenSSLEngine.unwrap</code>
+        when the destination buffers state is changed concurrently. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
