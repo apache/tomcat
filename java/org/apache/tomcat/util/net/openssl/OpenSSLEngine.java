@@ -567,6 +567,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         while (pendingApp > 0) {
+            if (idx == endOffset) {
+                // Destination buffer state changed (no remaining space although
+                // capacity is still available), so break loop with an error
+                throw new IllegalStateException(sm.getString("engine.invalidDestinationBuffersState"));
+            }
             // Write decrypted data to dsts buffers
             while (idx < endOffset) {
                 ByteBuffer dst = dsts[idx];
