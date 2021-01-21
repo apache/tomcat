@@ -510,6 +510,10 @@ public class HostConfig implements LifecycleListener {
     /**
      * Deploy applications for any directories or WAR files that are found
      * in our "application root" directory.
+     * <p>
+     * Note: It is expected that the caller has successfully added the app
+     *       to servicedSet before calling this method.
+     *
      * @param name The context name which should be deployed
      */
     protected void deployApps(String name) {
@@ -563,11 +567,21 @@ public class HostConfig implements LifecycleListener {
             if (file.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
                 ContextName cn = new ContextName(file, true);
 
-                if (isServiced(cn.getName()) || deploymentExists(cn.getName())) {
-                    continue;
-                }
+                if (tryAddServiced(cn.getName())) {
+                    try {
+                        if (deploymentExists(cn.getName())) {
+                            removeServiced(cn.getName());
+                            continue;
+                        }
 
-                results.add(es.submit(new DeployDescriptor(this, cn, contextXml)));
+                        // DeployDescriptor will call removeServiced
+                        results.add(es.submit(new DeployDescriptor(this, cn, contextXml)));
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        removeServiced(cn.getName());
+                        throw t;
+                    }
+                }
             }
         }
 
@@ -583,6 +597,10 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Deploy specified context descriptor.
+     * <p>
+     * Note: It is expected that the caller has successfully added the app
+     *       to servicedSet before calling this method.
+     *
      * @param cn The context name
      * @param contextXml The descriptor
      */
@@ -764,41 +782,48 @@ public class HostConfig implements LifecycleListener {
             File war = new File(appBase, file);
             if (file.toLowerCase(Locale.ENGLISH).endsWith(".war") && war.isFile() && !invalidWars.contains(file)) {
                 ContextName cn = new ContextName(file, true);
-
-                if (isServiced(cn.getName())) {
-                    continue;
-                }
-                if (deploymentExists(cn.getName())) {
-                    DeployedApplication app = deployed.get(cn.getName());
-                    boolean unpackWAR = unpackWARs;
-                    if (unpackWAR && host.findChild(cn.getName()) instanceof StandardContext) {
-                        unpackWAR = ((StandardContext) host.findChild(cn.getName())).getUnpackWAR();
-                    }
-                    if (!unpackWAR && app != null) {
-                        // Need to check for a directory that should not be
-                        // there
-                        File dir = new File(appBase, cn.getBaseName());
-                        if (dir.exists()) {
-                            if (!app.loggedDirWarning) {
-                                log.warn(sm.getString("hostConfig.deployWar.hiddenDir",
-                                        dir.getAbsoluteFile(), war.getAbsoluteFile()));
-                                app.loggedDirWarning = true;
+                if (tryAddServiced(cn.getName())) {
+                    try {
+                        if (deploymentExists(cn.getName())) {
+                            DeployedApplication app = deployed.get(cn.getName());
+                            boolean unpackWAR = unpackWARs;
+                            if (unpackWAR && host.findChild(cn.getName()) instanceof StandardContext) {
+                                unpackWAR = ((StandardContext) host.findChild(cn.getName())).getUnpackWAR();
                             }
-                        } else {
-                            app.loggedDirWarning = false;
+                            if (!unpackWAR && app != null) {
+                                // Need to check for a directory that should not be
+                                // there
+                                File dir = new File(appBase, cn.getBaseName());
+                                if (dir.exists()) {
+                                    if (!app.loggedDirWarning) {
+                                        log.warn(sm.getString("hostConfig.deployWar.hiddenDir",
+                                                dir.getAbsoluteFile(), war.getAbsoluteFile()));
+                                        app.loggedDirWarning = true;
+                                    }
+                                } else {
+                                    app.loggedDirWarning = false;
+                                }
+                            }
+                            removeServiced(cn.getName());
+                            continue;
                         }
+
+                        // Check for WARs with /../ /./ or similar sequences in the name
+                        if (!validateContextPath(appBase, cn.getBaseName())) {
+                            log.error(sm.getString("hostConfig.illegalWarName", file));
+                            invalidWars.add(file);
+                            removeServiced(cn.getName());
+                            continue;
+                        }
+
+                        // DeployWAR will call removeServiced
+                        results.add(es.submit(new DeployWar(this, cn, war)));
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        removeServiced(cn.getName());
+                        throw t;
                     }
-                    continue;
                 }
-
-                // Check for WARs with /../ /./ or similar sequences in the name
-                if (!validateContextPath(appBase, cn.getBaseName())) {
-                    log.error(sm.getString("hostConfig.illegalWarName", file));
-                    invalidWars.add(file);
-                    continue;
-                }
-
-                results.add(es.submit(new DeployWar(this, cn, war)));
             }
         }
 
@@ -848,6 +873,10 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Deploy packed WAR.
+     * <p>
+     * Note: It is expected that the caller has successfully added the app
+     *       to servicedSet before calling this method.
+     *
      * @param cn The context name
      * @param war The WAR file
      */
@@ -1050,11 +1079,21 @@ public class HostConfig implements LifecycleListener {
             if (dir.isDirectory()) {
                 ContextName cn = new ContextName(file, false);
 
-                if (isServiced(cn.getName()) || deploymentExists(cn.getName())) {
-                    continue;
-                }
+                if (tryAddServiced(cn.getName())) {
+                    try {
+                        if (deploymentExists(cn.getName())) {
+                            removeServiced(cn.getName());
+                            continue;
+                        }
 
-                results.add(es.submit(new DeployDirectory(this, cn, dir)));
+                        // DeployDirectory will call removeServiced
+                        results.add(es.submit(new DeployDirectory(this, cn, dir)));
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        removeServiced(cn.getName());
+                        throw t;
+                    }
+                }
             }
         }
 
@@ -1070,6 +1109,10 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Deploy exploded webapp.
+     * <p>
+     * Note: It is expected that the caller has successfully added the app
+     *       to servicedSet before calling this method.
+     *
      * @param cn The context name
      * @param dir The path to the root folder of the weapp
      */
@@ -1595,8 +1638,12 @@ public class HostConfig implements LifecycleListener {
             // Check for resources modification to trigger redeployment
             DeployedApplication[] apps = deployed.values().toArray(new DeployedApplication[0]);
             for (DeployedApplication app : apps) {
-                if (!isServiced(app.name)) {
-                    checkResources(app, false);
+                if (tryAddServiced(app.name)) {
+                    try {
+                        checkResources(app, false);
+                    } finally {
+                        removeServiced(app.name);
+                    }
                 }
             }
 
@@ -1656,27 +1703,31 @@ public class HostConfig implements LifecycleListener {
                 Context currentContext = (Context) host.findChild(current.getName());
                 if (previousContext != null && currentContext != null &&
                         currentContext.getState().isAvailable() &&
-                        !isServiced(previous.getName())) {
-                    Manager manager = previousContext.getManager();
-                    if (manager != null) {
-                        int sessionCount;
-                        if (manager instanceof DistributedManager) {
-                            sessionCount = ((DistributedManager) manager).getActiveSessionsFull();
-                        } else {
-                            sessionCount = manager.getActiveSessions();
-                        }
-                        if (sessionCount == 0) {
-                            if (log.isInfoEnabled()) {
-                                log.info(sm.getString("hostConfig.undeployVersion", previous.getName()));
+                        tryAddServiced(previous.getName())) {
+                    try {
+                        Manager manager = previousContext.getManager();
+                        if (manager != null) {
+                            int sessionCount;
+                            if (manager instanceof DistributedManager) {
+                                sessionCount = ((DistributedManager) manager).getActiveSessionsFull();
+                            } else {
+                                sessionCount = manager.getActiveSessions();
                             }
-                            DeployedApplication app = deployed.get(previous.getName());
-                            String[] resources = app.redeployResources.keySet().toArray(new String[0]);
-                            // Version is unused - undeploy it completely
-                            // The -1 is a 'trick' to ensure all redeploy
-                            // resources are removed
-                            undeploy(app);
-                            deleteRedeployResources(app, resources, -1, true);
+                            if (sessionCount == 0) {
+                                if (log.isInfoEnabled()) {
+                                    log.info(sm.getString("hostConfig.undeployVersion", previous.getName()));
+                                }
+                                DeployedApplication app = deployed.get(previous.getName());
+                                String[] resources = app.redeployResources.keySet().toArray(new String[0]);
+                                // Version is unused - undeploy it completely
+                                // The -1 is a 'trick' to ensure all redeploy
+                                // resources are removed
+                                undeploy(app);
+                                deleteRedeployResources(app, resources, -1, true);
+                            }
                         }
+                    } finally {
+                        removeServiced(previous.getName());
                     }
                 }
             }
@@ -1733,13 +1784,15 @@ public class HostConfig implements LifecycleListener {
     /**
      * Remove a webapp from our control.
      * Entry point for the admin webapp, and other JMX Context controllers.
+     * <p>
+     * Note: It is expected that the caller has successfully added the app
+     *       to servicedSet before calling this method.
+     *
      * @param contextName The context name
      */
     public void unmanageApp(String contextName) {
-        if(isServiced(contextName)) {
-            deployed.remove(contextName);
-            host.removeChild(host.findChild(contextName));
-        }
+        deployed.remove(contextName);
+        host.removeChild(host.findChild(contextName));
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -1815,7 +1868,11 @@ public class HostConfig implements LifecycleListener {
 
         @Override
         public void run() {
-            config.deployDescriptor(cn, descriptor);
+            try {
+                config.deployDescriptor(cn, descriptor);
+            } finally {
+                config.removeServiced(cn.getName());
+            }
         }
     }
 
@@ -1833,7 +1890,11 @@ public class HostConfig implements LifecycleListener {
 
         @Override
         public void run() {
-            config.deployWAR(cn, war);
+            try {
+                config.deployWAR(cn, war);
+            } finally {
+                config.removeServiced(cn.getName());
+            }
         }
     }
 
@@ -1851,7 +1912,11 @@ public class HostConfig implements LifecycleListener {
 
         @Override
         public void run() {
-            config.deployDirectory(cn, dir);
+            try {
+                config.deployDirectory(cn, dir);
+            } finally {
+                config.removeServiced(cn.getName());
+            }
         }
     }
 
