@@ -209,6 +209,9 @@
       <update>
         Migrate to new code signing service. (markt)
       </update>
+      <update>
+        Update to Commons Daemon 1.2.4. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
