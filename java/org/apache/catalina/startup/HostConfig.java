@@ -367,7 +367,11 @@ public class HostConfig implements LifecycleListener {
      * @param name the context name
      *
      * @return state of the application
+     *
+     * @deprecated Unused. This method will be removed in Tomcat 10.1.x onwards.
+     *             Use {@link #tryAddServiced} instead.
      */
+    @Deprecated
     public boolean isServiced(String name) {
         return servicedSet.contains(name);
     }
