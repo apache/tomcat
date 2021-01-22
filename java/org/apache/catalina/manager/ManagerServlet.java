@@ -846,11 +846,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         // Copy WAR to the host's appBase
                         ExpandWar.copy(uploadedWar, deployedWar);
                     }
-                    // Perform new deployment
-                    check(name);
                 } finally {
                     removeServiced(name);
                 }
+                // Perform new deployment
+                check(name);
             } else {
                 writer.println(smClient.getString("managerServlet.inService", displayPath));
             }
@@ -903,11 +903,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         return;
                     }
                     ExpandWar.copy(localWar, deployedWar);
-                    // Perform new deployment
-                    check(name);
                 } finally {
                     removeServiced(name);
                 }
+                // Perform new deployment
+                check(name);
             } else {
                 writer.println(smClient.getString("managerServlet.inService", displayPath));
             }
@@ -1017,11 +1017,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         }
                         ExpandWar.copy(new File(war), localWar);
                     }
-                    // Perform new deployment
-                    check(name);
                 } finally {
                     removeServiced(name);
                 }
+                // Perform new deployment
+                check(name);
             } else {
                 writer.println(smClient.getString("managerServlet.inService", displayPath));
             }
@@ -1519,11 +1519,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 "managerServlet.deleteFail", xml));
                         return;
                     }
-                    // Perform new deployment
-                    check(name);
                 } finally {
                     removeServiced(name);
                 }
+                // Perform new deployment
+                check(name);
             } else {
                 writer.println(smClient.getString("managerServlet.inService", displayPath));
             }

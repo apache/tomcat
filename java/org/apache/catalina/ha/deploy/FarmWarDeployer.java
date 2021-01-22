@@ -236,10 +236,10 @@ public class FarmWarDeployer extends ClusterListener
                                             "farmWarDeployer.renameFail",
                                             factory.getFile(), deployable));
                                 }
-                                check(contextName);
                             } finally {
                                 removeServiced(contextName);
                             }
+                            check(contextName);
                             if (log.isDebugEnabled())
                                 log.debug(sm.getString(
                                         "farmWarDeployer.deployEnd",
@@ -424,6 +424,7 @@ public class FarmWarDeployer extends ClusterListener
                     } finally {
                         removeServiced(contextName);
                     }
+                    check(contextName);
                 } else
                     log.error(sm.getString("farmWarDeployer.removeFailRemote",
                             contextName));
@@ -458,10 +459,10 @@ public class FarmWarDeployer extends ClusterListener
             if (tryAddServiced(cn.getName())) {
                 try {
                     copy(newWar, deployWar);
-                    check(cn.getName());
                 } finally {
                     removeServiced(cn.getName());
                 }
+                check(cn.getName());
             } else {
                 log.error(sm.getString("farmWarDeployer.servicingDeploy",
                         cn.getName(), deployWar.getName()));
@@ -519,10 +520,7 @@ public class FarmWarDeployer extends ClusterListener
                     log.error(sm.getString("farmWarDeployer.deleteFail", xml));
                 }
             }
-            // Perform new deployment and remove internal HostConfig state
-            check(contextName);
         }
-
     }
 
     /**

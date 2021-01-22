@@ -1667,17 +1667,22 @@ public class HostConfig implements LifecycleListener {
      * it as necessary. This method is for use with functionality such as
      * management web applications that upload new/updated web applications and
      * need to trigger the appropriate action to deploy them. This method
-     * assumes that the web application is currently marked as serviced and that
-     * any uploading/updating has been completed before this method is called.
-     * Any action taken as a result of the checks will complete before this
-     * method returns.
+     * assumes that any uploading/updating has been completed before this method
+     * is called. Any action taken as a result of the checks will complete
+     * before this method returns.
      *
      * @param name The name of the web application to check
      */
     public void check(String name) {
         DeployedApplication app = deployed.get(name);
         if (app != null) {
-            checkResources(app, true);
+            if (tryAddServiced(app.name)) {
+                try {
+                    checkResources(app, true);
+                } finally {
+                    removeServiced(app.name);
+                }
+            }
         }
         deployApps(name);
     }
