@@ -230,6 +230,9 @@
         Use <code>java.nio.file.Path</code> to test for one directory being a
         sub-directory of another in a consistent way. (markt)
       </scode>
+      <update>
+        Update to Commons Daemon 1.2.4. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
