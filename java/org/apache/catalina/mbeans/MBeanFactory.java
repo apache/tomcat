@@ -440,7 +440,6 @@ public class MBeanFactory {
 
         // Return the corresponding MBean name
         return context.getObjectName().toString();
-
     }
 
 
@@ -736,7 +735,6 @@ public class MBeanFactory {
            }
 
         }
-
     }
 
 
