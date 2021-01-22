@@ -38,7 +38,7 @@ import org.apache.juli.logging.LogFactory;
  * <li>expressions that are solely a literal boolean</li>
  * <li>expressions that are solely a constant string used (with coercion where
  *     necessary) with a setter that accepts:</li>
- *     <ul>
+ * <li><ul>
  *     <li>boolean / Boolean</li>
  *     <li>char / Character</li>
  *     <li>BigDecimal</li>
@@ -51,7 +51,7 @@ import org.apache.juli.logging.LogFactory;
  *     <li>BigInteger</li>
  *     <li>Enum</li>
  *     <li>String</li>
- *     </ul>
+ *     </ul></li>
  * </ul>
  * The specification compliance issue is that it essentially skips the first
  * three {@link ELResolver}s listed in section JSP.2.9 and effectively hard
