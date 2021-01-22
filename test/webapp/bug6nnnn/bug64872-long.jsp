@@ -19,7 +19,7 @@
   <head><title>Bug 64872 Long test case</title></head>
   <body>
   <%
-  for (int i=0; i < 1000000; i++) {
+  for (int i=0; i < Integer.parseInt(request.getParameter("iterations")); i++) {
   %>
     <p>01 The value of foo is [<ts:tagLong foo="${'1234'}" />]</p>
     <p>02 The value of foo is [<ts:tagLong foo='${"1234"}' />]</p>
