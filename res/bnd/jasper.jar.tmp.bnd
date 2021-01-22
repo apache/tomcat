@@ -22,6 +22,7 @@ Export-Package: \
     org.apache.jasper.compiler,\
     org.apache.jasper.compiler.tagplugin,\
     org.apache.jasper.el,\
+    org.apache.jasper.optimizations,\
     org.apache.jasper.runtime,\
     org.apache.jasper.security,\
     org.apache.jasper.servlet,\
