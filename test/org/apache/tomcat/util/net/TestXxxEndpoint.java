@@ -203,10 +203,9 @@ public class TestXxxEndpoint extends TomcatBaseTest {
 
     @Test
     public void testUnixDomainSocket() throws Exception {
-
         Tomcat tomcat = getTomcatInstance();
         Connector c = tomcat.getConnector();
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
+        Assume.assumeTrue("NIO Unix domain sockets have to be supported for this test",
                 c.getProtocolHandlerClassName().contains("Nio")
                 && JreCompat.isJre16Available());
 
