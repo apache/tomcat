@@ -129,6 +129,8 @@ class Generator {
 
     private final ELInterpreter elInterpreter;
 
+    private final StringInterpreter stringInterpreter;
+
     /**
      * @param s
      *            the input string
@@ -3014,7 +3016,7 @@ class Generator {
             } else if (attr.isNamedAttribute()) {
                 if (!n.checkIfAttributeIsJspFragment(attr.getName())
                         && !attr.isDynamic()) {
-                    attrValue = convertString(c[0], attrValue, localName,
+                    attrValue = stringInterpreter.convertString(c[0], attrValue, localName,
                             handlerInfo.getPropertyEditorClass(localName), true);
                 }
             } else if (attr.isELInterpreterInput()) {
@@ -3117,7 +3119,7 @@ class Generator {
                             this.isTagFile, attrValue, c[0], mapName);
                 }
             } else {
-                attrValue = convertString(c[0], attrValue, localName,
+                attrValue = stringInterpreter.convertString(c[0], attrValue, localName,
                         handlerInfo.getPropertyEditorClass(localName), false);
             }
             return attrValue;
@@ -3259,75 +3261,6 @@ class Generator {
                 out.print(".setJspId(\"");
                 out.print(createJspId());
                 out.println("\");");
-            }
-        }
-
-        /*
-         * @param c The target class to which to coerce the given string @param
-         * s The string value @param attrName The name of the attribute whose
-         * value is being supplied @param propEditorClass The property editor
-         * for the given attribute @param isNamedAttribute true if the given
-         * attribute is a named attribute (that is, specified using the
-         * jsp:attribute standard action), and false otherwise
-         */
-        private String convertString(Class<?> c, String s, String attrName,
-                Class<?> propEditorClass, boolean isNamedAttribute) {
-
-            String quoted = s;
-            if (!isNamedAttribute) {
-                quoted = quote(s);
-            }
-
-            if (propEditorClass != null) {
-                String className = c.getCanonicalName();
-                return "("
-                        + className
-                        + ")org.apache.jasper.runtime.JspRuntimeLibrary.getValueFromBeanInfoPropertyEditor("
-                        + className + ".class, \"" + attrName + "\", " + quoted
-                        + ", " + propEditorClass.getCanonicalName() + ".class)";
-            } else if (c == String.class) {
-                return quoted;
-            } else if (c == boolean.class) {
-                return JspUtil.coerceToPrimitiveBoolean(s, isNamedAttribute);
-            } else if (c == Boolean.class) {
-                return JspUtil.coerceToBoolean(s, isNamedAttribute);
-            } else if (c == byte.class) {
-                return JspUtil.coerceToPrimitiveByte(s, isNamedAttribute);
-            } else if (c == Byte.class) {
-                return JspUtil.coerceToByte(s, isNamedAttribute);
-            } else if (c == char.class) {
-                return JspUtil.coerceToChar(s, isNamedAttribute);
-            } else if (c == Character.class) {
-                return JspUtil.coerceToCharacter(s, isNamedAttribute);
-            } else if (c == double.class) {
-                return JspUtil.coerceToPrimitiveDouble(s, isNamedAttribute);
-            } else if (c == Double.class) {
-                return JspUtil.coerceToDouble(s, isNamedAttribute);
-            } else if (c == float.class) {
-                return JspUtil.coerceToPrimitiveFloat(s, isNamedAttribute);
-            } else if (c == Float.class) {
-                return JspUtil.coerceToFloat(s, isNamedAttribute);
-            } else if (c == int.class) {
-                return JspUtil.coerceToInt(s, isNamedAttribute);
-            } else if (c == Integer.class) {
-                return JspUtil.coerceToInteger(s, isNamedAttribute);
-            } else if (c == short.class) {
-                return JspUtil.coerceToPrimitiveShort(s, isNamedAttribute);
-            } else if (c == Short.class) {
-                return JspUtil.coerceToShort(s, isNamedAttribute);
-            } else if (c == long.class) {
-                return JspUtil.coerceToPrimitiveLong(s, isNamedAttribute);
-            } else if (c == Long.class) {
-                return JspUtil.coerceToLong(s, isNamedAttribute);
-            } else if (c == Object.class) {
-                return quoted;
-            } else {
-                String className = c.getCanonicalName();
-                return "("
-                        + className
-                        + ")org.apache.jasper.runtime.JspRuntimeLibrary.getValueFromPropertyEditorManager("
-                        + className + ".class, \"" + attrName + "\", " + quoted
-                        + ")";
             }
         }
 
@@ -3596,6 +3529,16 @@ class Generator {
                     e.getMessage());
         }
         this.elInterpreter = elInterpreter;
+
+        StringInterpreter stringInterpreter = null;
+        try {
+            stringInterpreter = StringInterpreterFactory.getStringInterpreter(
+                    compiler.getCompilationContext().getServletContext());
+        } catch (Exception e) {
+            err.jspError("jsp.error.string_interpreter_class.instantiation",
+                    e.getMessage());
+        }
+        this.stringInterpreter = stringInterpreter;
 
         /*
          * Temporary hack. If a JSP page uses the "extends" attribute of the

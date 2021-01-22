@@ -183,6 +183,12 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <add>
+        Add a new <code>StringInterpreter</code> interface that allows
+        applications to provide customised string attribute value to type
+        conversion within JSPs. This allows applications to provide a conversion
+        implementation that is optimised for the application. (markt)
+      </add>
       <fix>
         <bug>64965</bug>: <code>JspContextWrapper.findAttribute</code> should
         ignore expired sessions rather than throw an
