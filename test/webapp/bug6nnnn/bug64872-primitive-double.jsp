@@ -19,7 +19,7 @@
   <head><title>Bug 64872 double test case</title></head>
   <body>
   <%
-  for (int i=0; i < 1000000; i++) {
+  for (int i=0; i < Integer.parseInt(request.getParameter("iterations")); i++) {
   %>
     <p>01 The value of foo is [<ts:tagPrimitiveDouble foo="${'12.34'}" />]</p>
     <p>02 The value of foo is [<ts:tagPrimitiveDouble foo='${"12.34"}' />]</p>

@@ -55,14 +55,15 @@ public class TestELInterpreterTagSetters extends TomcatBaseTest {
         List<Object[]> parameterSets = new ArrayList<>();
 
         ELInterpreter[] elInterpreters = new ELInterpreter[] {
-                // Warm-up
                 // First call will trigger compilation (and therefore be slower)
-                // Call both to ensure both are warmed up
+                // For performance tests call each once to warm-up and once to
+                // test
                 new ELInterpreterWrapper(true, "TagSetters"),
                 new ELInterpreterWrapper(false, "Default"),
-                // Compare times of these test runs
-                new ELInterpreterWrapper(true, "TagSetters"),
-                new ELInterpreterWrapper(false, "Default"),
+                // Uncomment for a performance test and compare times of these
+                // test runs
+                //new ELInterpreterWrapper(true, "TagSetters"),
+                //new ELInterpreterWrapper(false, "Default"),
                 };
 
         for (ELInterpreter elInterpreter : elInterpreters) {
@@ -115,7 +116,11 @@ public class TestELInterpreterTagSetters extends TomcatBaseTest {
 
         ctxt.getServletContext().setAttribute(StringInterpreter.class.getCanonicalName(), new StringInterpreterEnum());
 
-        ByteChunk bc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug64872-" + target + ".jsp");
+        // Change this to 1000000 to test performance
+        String iterations = "1";
+
+        ByteChunk bc = getUrl("http://localhost:" + getPort() +
+                "/test/bug6nnnn/bug64872-" + target + ".jsp?iterations=" + iterations);
 
         String actual = bc.toString();
 
