@@ -496,7 +496,7 @@ alternative EL interpreter. A alternative interpreter primarily targetting tag
 settings is provided at
 <code>org.apache.jasper.optimizations.ELInterpreterTagSetters</code>. See the
 javadoc for details of the optimisations and the impact they have on
-specification compliance. 
+specification compliance.
 </p>
 
 <p>
@@ -504,7 +504,8 @@ An extension point is also provided for coercion of String values to Enums. It
 is provided at
 <code>org.apache.jasper.optimizations.StringInterpreterEnum</code>. See the
 javadoc for details of the optimisations and the impact they have on
-specification compliance.</p>
+specification compliance.
+</p>
 </section>
 
 </body>
