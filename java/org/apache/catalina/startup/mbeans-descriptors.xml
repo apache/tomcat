@@ -142,7 +142,7 @@
     </operation>
 
     <operation name="isServiced"
-               description="Is a web application serviced by another component"
+               description="DEPRECATED: Is a web application serviced by another component"
                impact="ACTION"
                returnType="boolean">
       <parameter name="name"
