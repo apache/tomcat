@@ -2250,6 +2250,8 @@ skip.installer property in build.properties" />
       <arg value="sign"/>
       <arg value="/sha1"/>
       <arg value="${codesigning.certificate.thumbprint}"/>
+      <arg value="/fd"/>
+      <arg value="sha256"/>
       <arg value="/tr"/>
       <arg value="http://timestamp.digicert.com"/>
       <arg value="${tomcat.dist}/Uninstall.exe"/>
@@ -2280,6 +2282,8 @@ skip.installer property in build.properties" />
       <arg value="sign"/>
       <arg value="/sha1"/>
       <arg value="${codesigning.certificate.thumbprint}"/>
+      <arg value="/fd"/>
+      <arg value="sha256"/>
       <arg value="/tr"/>
       <arg value="http://timestamp.digicert.com"/>
       <arg value="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
