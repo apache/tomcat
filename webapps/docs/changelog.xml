@@ -250,6 +250,10 @@
       <update>
         Update to Commons Daemon 1.2.4. (markt)
       </update>
+      <add>
+        Improvements to Brazilian Portuguese translations. Provided by Rual
+        Zaninetti Rosa and Lucas. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
