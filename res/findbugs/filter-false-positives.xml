@@ -301,6 +301,12 @@
     <Pattern code="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
+    <!-- Thread never executed so empty run method not an issue -->
+    <Class name="org.apache.catalina.loader.WebappClassLoaderBase" />
+    <Method name="clearReferences" />
+    <Bug pattern="DM_USELESS_THREAD" />
+  </Match>
+  <Match>
     <!-- Field is only modified during Servlet load -->
     <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
     <Bug code="MSF" />
@@ -427,6 +433,34 @@
     <Class name="org.apache.catalina.servlets.DefaultServlet" />
     <Method name="serveResource" />
     <Bug pattern="ES_COMPARING_STRINGS_WITH_EQ" />
+  </Match>
+  <Match>
+    <!-- Non-constant strings are configuration settings rather than client
+         supplied -->
+    <Class name="org.apache.catalina.session.DataSourceStore" />
+    <Or>
+      <Method name="clear" />
+      <Method name="getSize" />
+      <Method name="keys" />
+      <Method name="load" />
+      <Method name="remove" />
+      <Method name="save" />
+    </Or>
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
+  </Match>
+  <Match>
+    <!-- Non-constant strings are configuration settings rather than client
+         supplied -->
+    <Class name="org.apache.catalina.session.DataSourceStore" />
+    <Or>
+      <Method name="clear" />
+      <Method name="getSize" />
+      <Method name="keys" />
+      <Method name="load" />
+      <Method name="remove" />
+      <Method name="save" />
+    </Or>
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
   </Match>
   <Match>
     <!-- Non-constant strings are configuration settings rather than client
