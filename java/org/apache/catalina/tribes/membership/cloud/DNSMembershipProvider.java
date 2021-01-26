@@ -167,7 +167,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         Member[] members = membership.getMembers();
         if (members != null) {
             for (Member member : members) {
-                if (Arrays.equals(sender.getHost(), sender.getHost())
+                if (Arrays.equals(sender.getHost(), member.getHost())
                         && sender.getPort() == member.getPort()) {
                     found = true;
                     break;
