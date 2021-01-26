@@ -392,6 +392,12 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+  <!-- The stream is closed in the thread  -->
+    <Class name="org.apache.catalina.servlets.CGIServlet$CGIRunner" />
+    <Method name="run" />
+    <Bug pattern="OS_OPEN_STREAM" />
+  </Match>
+  <Match>
   <!-- The header value is safe  -->
     <Class name="org.apache.catalina.servlets.DefaultServlet" />
     <Method name="doDirectoryRedirect" />
@@ -1007,9 +1013,9 @@
   <Match>
     <!-- Simpler to catch Exception than to create dummy implementations of the
          necessary exception hierarchy -->
-    <Class name="org.apache.naming.factory.SendMailFactory$1" />
-    <Method name="run" />
-    <Bug code="DE" />
+    <Class name="org.apache.naming.factory.SendMailFactory" />
+    <Method name="lambda$0" />
+    <Bug pattern="DE_MIGHT_IGNORE" />
   </Match>
   <Match>
     <!-- Simpler to catch Exception than to create dummy implementations of the
