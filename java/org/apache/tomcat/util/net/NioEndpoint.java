@@ -272,9 +272,15 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     Files.setAttribute(path, attrs.name(), attrs.value());
                 } else {
                     java.io.File file = path.toFile();
-                    file.setReadable(true, false);
-                    file.setWritable(true, false);
-                    file.setExecutable(false, false);
+                    if (!file.setReadable(true, false)) {
+                        log.warn(sm.getString("endpoint.nio.perms.readFail", path));
+                    }
+                    if (!file.setWritable(true, false)) {
+                        log.warn(sm.getString("endpoint.nio.perms.writeFail", path));
+                    }
+                    if (!file.setExecutable(false, false)) {
+                        log.warn(sm.getString("endpoint.nio.perms.execFail", path));
+                    }
                 }
             }
         } else {
