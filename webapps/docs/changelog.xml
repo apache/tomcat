@@ -239,6 +239,10 @@
       <update>
         Update to Commons Daemon 1.2.4. (markt)
       </update>
+      <add>
+        Improvements to Russian translations. Provided by Polina and Azat.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
