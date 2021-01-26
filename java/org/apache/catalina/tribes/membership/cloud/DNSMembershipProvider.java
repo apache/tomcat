@@ -22,8 +22,8 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.catalina.tribes.Member;
@@ -162,19 +162,19 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
 
     @Override
     public boolean accept(Serializable msg, Member sender) {
-        // check is the sender is in the member list.
+        // Check if the sender is in the member list.
         boolean found = false;
         Member[] members = membership.getMembers();
         if (members != null) {
             for (Member member : members) {
-		if (Arrays.equals(sender.getHost(), sender.getHost()) && sender.getPort() == member.getPort()) {
+                if (Arrays.equals(sender.getHost(), sender.getHost())
+                        && sender.getPort() == member.getPort()) {
                     found = true;
                     break;
                 }
             }
-        } 
+        }
         if (!found) {
-            // add it and it's thread
             MemberImpl member = new MemberImpl();
             member.setHost(sender.getHost());
             member.setPort(sender.getPort());
@@ -182,27 +182,14 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
             int i = 0;
             StringBuilder buf = new StringBuilder();
             buf.append(host[i++] & 0xff);
-	    for (; i<host.length; i++) {
-                 buf.append(".").append(host[i] & 0xff);
-	    }
+            for (; i < host.length; i++) {
+                buf.append(".").append(host[i] & 0xff);
+            }
 
             byte[] id = md5.digest(buf.toString().getBytes());
             member.setUniqueId(id);
             member.setMemberAliveTime(-1);
-            membership.memberAlive(member);
-            Runnable r = new Runnable() {
-                @Override
-                public void run(){
-                    String name = Thread.currentThread().getName();
-                    try {
-                        Thread.currentThread().setName("CloudMembership-memberAdded");
-                        membershipListener.memberAdded(member);
-                    } finally {
-                        Thread.currentThread().setName(name);
-                    }
-                }
-            };
-            executor.execute(r);
+            updateMember(member, true);
         }
         return false;
     }
