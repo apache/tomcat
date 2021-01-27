@@ -259,6 +259,10 @@
         Improvements to Russian translations. Provided by Polina and Azat.
         (markt)
       </add>
+      <update>
+        Update the NSIS Installer used to build the Windows installer to version
+        3.06.1. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
