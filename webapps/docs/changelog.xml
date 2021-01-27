@@ -172,7 +172,7 @@
         some requests could get dropped. (markt)
       </fix>
       <fix>
-        <bug>65001</bug>: Fix error handling for exceptions throw from calls
+        <bug>65001</bug>: Fix error handling for exceptions thrown from calls
         to <code>ReadListener</code> and <code>WriteListener</code>. (markt)
       </fix>
       <fix>
