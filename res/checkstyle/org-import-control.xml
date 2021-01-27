@@ -16,8 +16,8 @@
   limitations under the License.
 -->
 <!DOCTYPE import-control PUBLIC
-    "-//Puppy Crawl//DTD Import Control 1.1//EN"
-    "http://www.puppycrawl.com/dtds/import_control_1_1.dtd">
+    "-//Checkstyle//DTD ImportControl Configuration 1.4//EN"
+    "https://checkstyle.org/dtds/import_control_1_4.dtd">
 
 <import-control pkg="org.apache">
   <!-- Anything in J2SE is OK but need to list javax by package as not
