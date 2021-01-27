@@ -94,6 +94,8 @@
   <property name="tomcat.jdbc.dir"       value="${basedir}/modules/jdbc-pool"/>
   <!-- build output directory for jdbc-pool -->
   <property name="tomcat.pool"           value="${tomcat.output}/jdbc-pool"/>
+  <!-- build output directory for generated reflectionless code -->
+  <property name="tomcat.xreflect"       value="${tomcat.output}/xreflect"/>
 
   <!-- Jakarta EE 9 specs requires Java 8+ -->
   <property name="compile.source" value="8"/>
@@ -1746,7 +1748,7 @@
            license="${tomcat.manifests}/servlet-api.jar.license"/>
 
     <!-- Leave generated code in an easy place for review -->
-    <copy todir="${java.io.tmpdir}"
+    <copy todir="${tomcat.xreflect}"
           file="${xreflect.directory}/sources/org/apache/tomcat/util/XReflectionIntrospectionUtils.java"
           overwrite="true"/>
     <!-- Delete our temporary compilation directory -->
