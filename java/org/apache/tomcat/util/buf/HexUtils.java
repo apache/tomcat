@@ -78,8 +78,8 @@ public final class HexUtils {
         // 2 bytes / 4 hex digits
         StringBuilder sb = new StringBuilder(4);
 
-        sb.append(hex[(c & 0xf000) >> 4]);
-        sb.append(hex[(c & 0x0f00)]);
+        sb.append(hex[(c & 0xf000) >> 12]);
+        sb.append(hex[(c & 0x0f00) >> 8]);
 
         sb.append(hex[(c & 0xf0) >> 4]);
         sb.append(hex[(c & 0x0f)]);
