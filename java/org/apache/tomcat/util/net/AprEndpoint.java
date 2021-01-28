@@ -2235,6 +2235,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])");
             }
             getEndpoint().connections.remove(getSocket());
+            socketBufferHandler.free();
             socketBufferHandler = SocketBufferHandler.EMPTY;
             nonBlockingWriteBuffer.clear();
             if (sslOutputBuffer != null) {
