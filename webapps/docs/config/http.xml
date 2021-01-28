@@ -1341,7 +1341,8 @@
       <p>The name of the SSL Host. This should either be the fully qualified
       domain name (e.g. <code>tomcat.apache.org</code>) or a wild card domain
       name (e.g. <code>*.apache.org</code>). If not specified, the default value
-      of <code>_default_</code> will be used.</p>
+      of <code>_default_</code> will be used. Provided values are always
+      converted to lower case.</p>
     </attribute>
 
     <attribute name="insecureRenegotiation" required="false">

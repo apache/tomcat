@@ -25,6 +25,7 @@ import java.security.UnrecoverableKeyException;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.management.ObjectName;
@@ -425,10 +426,14 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setHostName(String hostName) {
-        this.hostName = hostName;
+        this.hostName = hostName.toLowerCase(Locale.ENGLISH);
     }
 
 
+    /**
+     * @return The host name associated with this SSL configuration - always in
+     *         lower case.
+     */
     public String getHostName() {
         return hostName;
     }
