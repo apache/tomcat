@@ -68,4 +68,9 @@ public class TestHexUtils {
         // Odd number of hex characters
         HexUtils.fromHexString("aaa");
     }
+
+    @Test
+    public void testToHex01() {
+        Assert.assertEquals("fedc", HexUtils.toHexString((char) 0xfedc));
+    }
 }
