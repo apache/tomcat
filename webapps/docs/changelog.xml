@@ -104,6 +104,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.2 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>65106</bug>: Fix the ConfigFileLoader handling of file URIs when
+        running under a security manager on some JREs. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
