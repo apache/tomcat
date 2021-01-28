@@ -419,7 +419,8 @@ public final class SSLContext {
         }
         // Can't be sure OpenSSL is going to provide the SNI value in lower case
         // so convert it before looking up the SSLContext
-        return sniCallBack.getSslContext(sniHostName.toLowerCase(Locale.ENGLISH));
+        String hostName = (sniHostName == null) ? null : sniHostName.toLowerCase(Locale.ENGLISH);
+        return sniCallBack.getSslContext(hostName);
     }
 
     /**
