@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -69,15 +70,18 @@ public class ConfigFileLoader {
      *                     provided location
      */
     public static InputStream getInputStream(String location) throws IOException {
-        // Location was originally always a file before URI support was added so
-        // try file first.
-
-        File f = new File(location);
-        if (!f.isAbsolute()) {
-            f = new File(CATALINA_BASE_FILE, location);
-        }
-        if (f.isFile()) {
-            return new FileInputStream(f);
+        // Originally only File was supported. Class loader and URI were added
+        // later. However (see bug 65106) treating some URIs as files can cause
+        // problems. Therefore, if path starts with a valid URI scheme then skip
+        // straight to processing this as a URI.
+        if (!UriUtil.isAbsoluteURI(location)) {
+            File f = new File(location);
+            if (!f.isAbsolute()) {
+                f = new File(CATALINA_BASE_FILE, location);
+            }
+            if (f.isFile()) {
+                return new FileInputStream(f);
+            }
         }
 
         // File didn't work so try URI.
