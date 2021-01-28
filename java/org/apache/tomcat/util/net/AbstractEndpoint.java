@@ -375,7 +375,18 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
 
-
+    /**
+     * Look up the SSLHostConfig for the given host name. Lookup order is:
+     * <ol>
+     * <li>exact match</li>
+     * <li>wild card match</li>
+     * <li>default SSLHostConfig</li>
+     * </ol>
+     *
+     * @param sniHostName   Host name - must be in lower case
+     *
+     * @return The SSLHostConfig for the given host name.
+     */
     protected SSLHostConfig getSSLHostConfig(String sniHostName) {
         SSLHostConfig result = null;
 
