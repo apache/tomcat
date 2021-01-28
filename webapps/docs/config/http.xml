@@ -115,7 +115,8 @@
       connections) if the client connection does not provide SNI or if the SNI
       is provided but does not match any configured
       <strong>SSLHostConfig</strong>. If not specified the default value of
-      <code>_default_</code> will be used.</p>
+      <code>_default_</code> will be used. Provided values are always converted
+      to lower case.</p>
     </attribute>
 
     <attribute name="discardFacades" required="false">
