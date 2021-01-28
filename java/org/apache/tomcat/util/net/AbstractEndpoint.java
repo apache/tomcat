@@ -298,12 +298,15 @@ public abstract class AbstractEndpoint<S,U> {
         if (hostName == null) {
             return null;
         }
-        // Host names are case insensitive
-        if (hostName.equalsIgnoreCase(getDefaultSSLHostConfigName())) {
+        // Host names are case insensitive but stored/processed in lower case
+        // internally because they are used as keys in a ConcurrentMap where
+        // keys are compared in a case sensitive manner.
+        String hostNameLower = hostName.toLowerCase(Locale.ENGLISH);
+        if (hostNameLower.equals(getDefaultSSLHostConfigName())) {
             throw new IllegalArgumentException(
                     sm.getString("endpoint.removeDefaultSslHostConfig", hostName));
         }
-        SSLHostConfig sslHostConfig = sslHostConfigs.remove(hostName);
+        SSLHostConfig sslHostConfig = sslHostConfigs.remove(hostNameLower);
         unregisterJmx(sslHostConfig);
         return sslHostConfig;
     }
@@ -316,7 +319,13 @@ public abstract class AbstractEndpoint<S,U> {
      *                 reloaded. This must match a current SSL host
      */
     public void reloadSslHostConfig(String hostName) {
-        SSLHostConfig sslHostConfig = sslHostConfigs.get(hostName);
+        // Host names are case insensitive but stored/processed in lower case
+        // internally because they are used as keys in a ConcurrentMap where
+        // keys are compared in a case sensitive manner.
+        // This method can be called via various paths so convert the supplied
+        // host name to lower case here to ensure the conversion occurs whatever
+        // the call path.
+        SSLHostConfig sslHostConfig = sslHostConfigs.get(hostName.toLowerCase(Locale.ENGLISH));
         if (sslHostConfig == null) {
             throw new IllegalArgumentException(
                     sm.getString("endpoint.unknownSslHostName", hostName));
