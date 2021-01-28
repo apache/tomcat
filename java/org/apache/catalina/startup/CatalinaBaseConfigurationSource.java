@@ -110,7 +110,7 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
         // Then try URI.
         URI uri = null;
         try {
-            uri = getURI(name);
+            uri = getURIInternal(name);
         } catch (IllegalArgumentException e) {
             throw new IOException(sm.getString("catalinaConfigurationSource.cannotObtainURL", name), e);
         }
@@ -144,6 +144,10 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
             // Ignore
         }
 
+        return getURIInternal(name);
+    }
+
+    private URI getURIInternal(String name) {
         // Then try URI.
         // Using resolve() enables the code to handle relative paths that did
         // not point to a file
@@ -155,5 +159,4 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
         }
         return uri;
     }
-
 }
