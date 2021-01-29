@@ -30,6 +30,7 @@ Configuration is located in `conf/server.xml`, `conf/web.xml`, `conf/logging.pro
 ### Maven build
 
 Update Tomcat version number in the `pom.xml`, customize Tomcat components in the dependencies to keep the ones needed (only the main `tomcat-catalina` is mandatory). Custom Tomcat components sources can be added to the usual Maven build path and will be included in the package that is built.
+
 ```
 mvn clean; mvn package
 ```
@@ -39,11 +40,13 @@ mvn clean; mvn package
 ```
 docker build -t apache/tomcat-stuffed:1.0 -f ./Dockerfile .
 ```
+
 Docker build arguments include `namespace` (default is `tomcat`) and `port` which should match the Tomcat port in `server.xml` (default is `8080`). Other ports that need to be exposed can be added in the `Dockerfile` as needed. Webapps should be added to the `webapps` folder where they will be auto deployed by the host if using the defaults. Otherwise, the `Dockerfile` command line can be edited like below to include the necessary resources and command line arguments to run a single or multiple hardcoded web applications.
 
 ## Running
 
 Add a webapp as folder mywebapp (for this example, or specify another path), or a path from which a configured Host will auto deploy
+
 ```
 --path: Specify a path the wepapp will use
 --war: Add the spcified path (directory or war) as a webapp (if no path has been specified, it will be the root webapp)
@@ -74,6 +77,7 @@ An example `tomcat.yaml` is included which uses the Docker image. It uses the he
 ### Cluster
 
 If using the Kubernetes cloud clustering membership provider, the pod needs to have the permission to view other pods. For example with Openshift, this is done with:
+
 ```
 oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default -n $(oc project -q)
 ```
