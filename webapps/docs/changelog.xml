@@ -118,10 +118,6 @@
         Ensure that SNI provided host names are matched to SSL virtual host
         configurations in a case insensitive manner. (markt)
       </fix>
-      <fix>
-        <bug>65111</bug>: Free direct memory buffers in the APR connector.
-        (remm)
-      </fix>
     </changelog>
   </subsection>
 </section>
