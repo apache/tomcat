@@ -418,7 +418,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
      * Encapsulate the logic needed to run a suitably-configured tomcat
      * instance, send it an HTTP request and process the server response
      */
-    private abstract class FormAuthClientBase extends SimpleHttpClient {
+    private abstract static class FormAuthClientBase extends SimpleHttpClient {
 
         protected static final String LOGIN_PARAM_TAG = "action=";
         protected static final String LOGIN_RESOURCE = "j_security_check";

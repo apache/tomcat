@@ -23,7 +23,7 @@
     &project;
 
   <properties>
-    <title>GraalVM support</title>
+    <title>Ahead of Time compilation support</title>
   </properties>
 
 <body>
@@ -201,9 +201,6 @@ mvn package</source>
   <p>
     Missing items for better Tomcat functionality:
     <ul>
-      <li><a href="https://github.com/oracle/graal/issues/460">Java
-        serialization</a>: Clustering and session persistence are not
-        functional</li>
       <li><a href="https://github.com/oracle/graal/issues/2103">JMX</a>:
         The usual monitoring and management is not usable</li>
       <li>java.util.logging LogManager: Configuration through a system property

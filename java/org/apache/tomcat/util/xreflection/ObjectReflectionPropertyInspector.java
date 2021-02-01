@@ -52,7 +52,7 @@ public final class ObjectReflectionPropertyInspector {
 
         Set<SetPropertyClass> baseClasses = getKnownClasses()
             .stream()
-            .map(c -> processClass(c))
+            .map(ObjectReflectionPropertyInspector::processClass)
             .collect(Collectors.toSet());
         generateCode(
             baseClasses,

@@ -325,7 +325,7 @@ public class ReplicationValve
                     log.debug(sm.getString("ReplicationValve.crossContext.add"));
                 }
                 //FIXME add Pool of Arraylists
-                crossContextSessions.set(new ArrayList<DeltaSession>());
+                crossContextSessions.set(new ArrayList<>());
             }
             getNext().invoke(request, response);
             if(context != null && cluster != null

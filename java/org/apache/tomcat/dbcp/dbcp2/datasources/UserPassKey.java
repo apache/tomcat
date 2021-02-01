@@ -18,6 +18,7 @@
 package org.apache.tomcat.dbcp.dbcp2.datasources;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.apache.tomcat.dbcp.dbcp2.Utils;
 
@@ -75,14 +76,7 @@ class UserPassKey implements Serializable {
             return false;
         }
         final UserPassKey other = (UserPassKey) obj;
-        if (userName == null) {
-            if (other.userName != null) {
-                return false;
-            }
-        } else if (!userName.equals(other.userName)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(userName, other.userName);
     }
 
     /**
@@ -117,18 +111,7 @@ class UserPassKey implements Serializable {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
-        return result;
+        return Objects.hash(userName);
     }
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer(super.toString());
-        sb.append("[");
-        sb.append(userName);
-        sb.append(']');
-        return sb.toString();
-    }
 }

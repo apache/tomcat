@@ -117,11 +117,11 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
         // Add with all CRLF split between the CR and LF
         List<String> parts = new ArrayList<>();
         int lastPos = 0;
-        int pos = request.indexOf("\n");
+        int pos = request.indexOf('\n');
         while (pos > -1) {
             parts.add(request.substring(lastPos, pos));
             lastPos = pos;
-            pos = request.indexOf("\n", lastPos + 1);
+            pos = request.indexOf('\n', lastPos + 1);
         }
         parts.add(request.substring(lastPos));
         parameterSets.add(new Object[] { isHttp09, parts.toArray(new String[0]), valid });

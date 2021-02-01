@@ -287,7 +287,7 @@ public class ResolverImpl extends Resolver {
         StringTokenizer tokenizer = new StringTokenizer(fullDN, ",");
         while (tokenizer.hasMoreElements()) {
             String token = tokenizer.nextToken().trim();
-            int pos = token.indexOf("=");
+            int pos = token.indexOf('=');
             if (pos > 0 && (pos + 1) < token.length()) {
                 components.put(token.substring(0, pos), token.substring(pos + 1));
             }

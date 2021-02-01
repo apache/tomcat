@@ -35,8 +35,8 @@ public class SizeLimitExceededException
      * @param actual    The actual request size.
      * @param permitted The maximum permitted request size.
      */
-    public SizeLimitExceededException(String message, long actual,
-            long permitted) {
+    public SizeLimitExceededException(final String message, final long actual,
+            final long permitted) {
         super(message, actual, permitted);
     }
 

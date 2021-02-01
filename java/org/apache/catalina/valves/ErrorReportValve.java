@@ -320,9 +320,7 @@ public class ErrorReportValve extends ValveBase {
                 writer.write(sb.toString());
                 response.finishResponse();
             }
-        } catch (IOException e) {
-            // Ignore
-        } catch (IllegalStateException e) {
+        } catch (IOException | IllegalStateException e) {
             // Ignore
         }
 

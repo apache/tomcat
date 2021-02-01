@@ -46,13 +46,7 @@ public class BeanELResolver extends ELResolver {
             cacheSizeStr = System.getProperty(CACHE_SIZE_PROP, "1000");
         } else {
             cacheSizeStr = AccessController.doPrivileged(
-                    new PrivilegedAction<String>() {
-
-                    @Override
-                    public String run() {
-                        return System.getProperty(CACHE_SIZE_PROP, "1000");
-                    }
-                });
+                    (PrivilegedAction<String>) () -> System.getProperty(CACHE_SIZE_PROP, "1000"));
         }
         CACHE_SIZE = Integer.parseInt(cacheSizeStr);
     }

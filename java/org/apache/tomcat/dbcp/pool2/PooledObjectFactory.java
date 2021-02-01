@@ -84,7 +84,8 @@ public interface PooledObjectFactory<T> {
   PooledObject<T> makeObject() throws Exception;
 
   /**
-   * Destroys an instance no longer needed by the pool.
+   * Destroys an instance no longer needed by the pool, using the default (NORMAL)
+   * DestroyMode.
    * <p>
    * It is important for implementations of this method to be aware that there
    * is no guarantee about what state {@code obj} will be in and the
@@ -104,6 +105,26 @@ public interface PooledObjectFactory<T> {
    * @see ObjectPool#invalidateObject
    */
   void destroyObject(PooledObject<T> p) throws Exception;
+
+  /**
+   * Destroys an instance no longer needed by the pool, using the provided
+   * DestroyMode.
+   *
+   * @param p a {@code PooledObject} wrapping the instance to be destroyed
+   * @param mode DestroyMode providing context to the factory
+   *
+   * @throws Exception should be avoided as it may be swallowed by
+   *    the pool implementation.
+   *
+   * @see #validateObject
+   * @see ObjectPool#invalidateObject
+   * @see #destroyObject(PooledObject)
+   * @see DestroyMode
+   * @since 2.9.0
+   */
+  default void destroyObject(final PooledObject<T> p, final DestroyMode mode) throws Exception {
+      destroyObject(p);
+  }
 
   /**
    * Ensures that the instance is safe to be returned by the pool.

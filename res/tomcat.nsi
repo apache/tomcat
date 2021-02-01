@@ -15,6 +15,8 @@
 
 ; Tomcat script for Nullsoft Installer
 
+Unicode true
+
 !ifdef UNINSTALLONLY
   OutFile "tempinstaller.exe"
 !else

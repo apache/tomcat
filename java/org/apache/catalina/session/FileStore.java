@@ -351,7 +351,7 @@ public final class FileStore extends StoreBase {
         File file = new File(storageDir, filename);
 
         // Check the file is within the storage directory
-        if (!file.getCanonicalPath().startsWith(storageDir.getCanonicalPath())) {
+        if (!file.getCanonicalFile().toPath().startsWith(storageDir.getCanonicalFile().toPath())) {
             log.warn(sm.getString("fileStore.invalid", file.getPath(), id));
             return null;
         }

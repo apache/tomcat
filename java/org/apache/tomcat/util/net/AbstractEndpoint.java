@@ -27,6 +27,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -135,19 +136,25 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     protected enum BindState {
-        UNBOUND(false),
-        BOUND_ON_INIT(true),
-        BOUND_ON_START(true),
-        SOCKET_CLOSED_ON_STOP(false);
+        UNBOUND(false, false),
+        BOUND_ON_INIT(true, true),
+        BOUND_ON_START(true, true),
+        SOCKET_CLOSED_ON_STOP(false, true);
 
         private final boolean bound;
+        private final boolean wasBound;
 
-        private BindState(boolean bound) {
+        private BindState(boolean bound, boolean wasBound) {
             this.bound = bound;
+            this.wasBound = wasBound;
         }
 
         public boolean isBound() {
             return bound;
+        }
+
+        public boolean wasBound() {
+            return wasBound;
         }
     }
 
@@ -217,11 +224,15 @@ public abstract class AbstractEndpoint<S,U> {
     // ----------------------------------------------------------------- Properties
 
     private String defaultSSLHostConfigName = SSLHostConfig.DEFAULT_SSL_HOST_NAME;
+    /**
+     * @return The host name for the default SSL configuration for this endpoint
+     *         - always in lower case.
+     */
     public String getDefaultSSLHostConfigName() {
         return defaultSSLHostConfigName;
     }
     public void setDefaultSSLHostConfigName(String defaultSSLHostConfigName) {
-        this.defaultSSLHostConfigName = defaultSSLHostConfigName;
+        this.defaultSSLHostConfigName = defaultSSLHostConfigName.toLowerCase(Locale.ENGLISH);
     }
 
 
@@ -298,12 +309,15 @@ public abstract class AbstractEndpoint<S,U> {
         if (hostName == null) {
             return null;
         }
-        // Host names are case insensitive
-        if (hostName.equalsIgnoreCase(getDefaultSSLHostConfigName())) {
+        // Host names are case insensitive but stored/processed in lower case
+        // internally because they are used as keys in a ConcurrentMap where
+        // keys are compared in a case sensitive manner.
+        String hostNameLower = hostName.toLowerCase(Locale.ENGLISH);
+        if (hostNameLower.equals(getDefaultSSLHostConfigName())) {
             throw new IllegalArgumentException(
                     sm.getString("endpoint.removeDefaultSslHostConfig", hostName));
         }
-        SSLHostConfig sslHostConfig = sslHostConfigs.remove(hostName);
+        SSLHostConfig sslHostConfig = sslHostConfigs.remove(hostNameLower);
         unregisterJmx(sslHostConfig);
         return sslHostConfig;
     }
@@ -316,7 +330,13 @@ public abstract class AbstractEndpoint<S,U> {
      *                 reloaded. This must match a current SSL host
      */
     public void reloadSslHostConfig(String hostName) {
-        SSLHostConfig sslHostConfig = sslHostConfigs.get(hostName);
+        // Host names are case insensitive but stored/processed in lower case
+        // internally because they are used as keys in a ConcurrentMap where
+        // keys are compared in a case sensitive manner.
+        // This method can be called via various paths so convert the supplied
+        // host name to lower case here to ensure the conversion occurs whatever
+        // the call path.
+        SSLHostConfig sslHostConfig = sslHostConfigs.get(hostName.toLowerCase(Locale.ENGLISH));
         if (sslHostConfig == null) {
             throw new IllegalArgumentException(
                     sm.getString("endpoint.unknownSslHostName", hostName));
@@ -375,7 +395,18 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
 
-
+    /**
+     * Look up the SSLHostConfig for the given host name. Lookup order is:
+     * <ol>
+     * <li>exact match</li>
+     * <li>wild card match</li>
+     * <li>default SSLHostConfig</li>
+     * </ol>
+     *
+     * @param sniHostName   Host name - must be in lower case
+     *
+     * @return The SSLHostConfig for the given host name.
+     */
     protected SSLHostConfig getSSLHostConfig(String sniHostName) {
         SSLHostConfig result = null;
 
@@ -618,6 +649,9 @@ public abstract class AbstractEndpoint<S,U> {
     public boolean getBindOnInit() { return bindOnInit; }
     public void setBindOnInit(boolean b) { this.bindOnInit = b; }
     private volatile BindState bindState = BindState.UNBOUND;
+    protected BindState getBindState() {
+        return bindState;
+    }
 
     /**
      * Keepalive timeout, if not set the soTimeout is used.
@@ -971,7 +1005,7 @@ public abstract class AbstractEndpoint<S,U> {
     /**
      * Unlock the server socket acceptor threads using bogus connections.
      */
-    private void unlockAccept() {
+    protected void unlockAccept() {
         // Only try to unlock the acceptor if it is necessary
         if (acceptor == null || acceptor.getState() != AcceptorState.RUNNING) {
             return;

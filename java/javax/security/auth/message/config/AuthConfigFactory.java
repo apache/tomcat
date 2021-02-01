@@ -64,30 +64,25 @@ public abstract class AuthConfigFactory {
                 final String className = getFactoryClassName();
                 try {
                     factory = AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<AuthConfigFactory>() {
-                        @Override
-                        public AuthConfigFactory run() throws ReflectiveOperationException,
-                                IllegalArgumentException, SecurityException {
-                            // Load this class with the same class loader as used for
-                            // this class. Note that the Thread context class loader
-                            // should not be used since that would trigger a memory leak
-                            // in container environments.
-                            if (className.equals("org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl")) {
-                                return new org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl();
-                            } else {
-                                Class<?> clazz = Class.forName(className);
-                                return (AuthConfigFactory) clazz.getConstructor().newInstance();
-                            }
-                        }
-                    });
+                            (PrivilegedExceptionAction<AuthConfigFactory>) () -> {
+                                // Load this class with the same class loader as used for
+                                // this class. Note that the Thread context class loader
+                                // should not be used since that would trigger a memory leak
+                                // in container environments.
+                                if (className.equals("org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl")) {
+                                    return new org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl();
+                                } else {
+                                    Class<?> clazz = Class.forName(className);
+                                    return (AuthConfigFactory) clazz.getConstructor().newInstance();
+                                }
+                            });
                 } catch (PrivilegedActionException e) {
                     Exception inner = e.getException();
                     if (inner instanceof InstantiationException) {
-                        throw (SecurityException) new SecurityException("AuthConfigFactory error:" +
-                                inner.getCause().getMessage()).initCause(inner.getCause());
+                        throw new SecurityException("AuthConfigFactory error:" +
+                                inner.getCause().getMessage(), inner.getCause());
                     } else {
-                        throw (SecurityException) new SecurityException(
-                                "AuthConfigFactory error: " + inner).initCause(inner);
+                        throw new SecurityException("AuthConfigFactory error: " + inner, inner);
                     }
                 }
             }
@@ -130,12 +125,8 @@ public abstract class AuthConfigFactory {
     }
 
     private static String getFactoryClassName() {
-        String className = AccessController.doPrivileged(new PrivilegedAction<String>() {
-            @Override
-            public String run() {
-                return Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
-            }
-        });
+        String className = AccessController.doPrivileged(
+                (PrivilegedAction<String>) () -> Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY));
 
         if (className != null) {
             return className;

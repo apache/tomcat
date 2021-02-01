@@ -457,6 +457,69 @@
     </operation>
   </mbean>
 
+  <mbean name="RemoteCIDRValve"
+         description="Concrete implementation of RequestFilterValve that filters based on the string representation of the remote client's network address in CIDR format"
+         domain="Catalina"
+         group="Valve"
+         type="org.apache.catalina.valves.RemoteCIDRValve">
+
+    <attribute name="addConnectorPort"
+               description="Append the server connector port to the client network CIDR separated by a semicolon"
+               type="boolean"/>
+
+    <attribute name="allow"
+               description="The allow expression"
+               type="java.lang.String"/>
+
+    <attribute name="allowValid"
+               description="Becomes false if assigned value of allow expression is not syntactically correct"
+               is="true"
+               type="boolean"
+               writeable="false"/>
+
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               is="true"
+               type="boolean"/>
+
+    <attribute name="className"
+               description="Fully qualified class name of the managed object"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="deny"
+               description="The deny expression"
+               type="java.lang.String"/>
+
+    <attribute name="denyStatus"
+               description="HTTP response status code that is used when rejecting denied request"
+               type="int"/>
+
+    <attribute name="denyValid"
+               description="Becomes false if assigned value of deny expression is not syntactically correct"
+               is="true"
+               type="boolean"
+               writeable="false"/>
+
+    <attribute name="invalidAuthenticationWhenDeny"
+               description="Send an invalid authentication header instead of deny"
+               type="boolean"/>
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <operation name="isAllowed"
+               description="Tests whether a client with this host name is allowed access by the current valve configuration"
+               impact="INFO"
+               returnType="boolean">
+      <parameter name="hostName"
+          description="host name to be tested"
+                 type="java.lang.String"/>
+    </operation>
+  </mbean>
+
   <mbean name="RemoteIpValve"
          description="Valve that sets client information (eg IP address) based on data from a trusted proxy"
          domain="Catalina"

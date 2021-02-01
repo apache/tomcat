@@ -21,8 +21,11 @@ import java.io.IOException;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Deque;
 import java.util.jar.JarFile;
 
@@ -42,6 +45,7 @@ public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean graalAvailable;
+    private static final boolean jre16Available;
     private static final boolean jre11Available;
     private static final boolean jre9Available;
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
@@ -50,20 +54,31 @@ public class JreCompat {
     protected static final Method getApplicationProtocolMethod;
 
     static {
+        boolean result = false;
+        try {
+            Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage.ImageInfo");
+            result = Boolean.TRUE.equals(nativeImageClazz.getMethod("inImageCode").invoke(null));
+        } catch (ClassNotFoundException e) {
+            // Must be Graal
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            // Should never happen
+        }
+        graalAvailable = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
+
         // This is Tomcat 9 with a minimum Java version of Java 8.
         // Look for the highest supported JVM first
-        if (GraalCompat.isSupported()) {
-            instance = new GraalCompat();
-            graalAvailable = true;
-            jre9Available = Jre9Compat.isSupported();
+        if (Jre16Compat.isSupported()) {
+            instance = new Jre16Compat();
+            jre9Available = true;
+            jre16Available = true;
         } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
-            graalAvailable = false;
             jre9Available = true;
+            jre16Available = false;
         } else {
             instance = new JreCompat();
-            graalAvailable = false;
             jre9Available = false;
+            jre16Available = false;
         }
         jre11Available = instance.jarFileRuntimeMajorVersion() >= 11;
 
@@ -102,6 +117,11 @@ public class JreCompat {
 
     public static boolean isJre11Available() {
         return jre11Available;
+    }
+
+
+    public static boolean isJre16Available() {
+        return jre16Available;
     }
 
 
@@ -281,4 +301,32 @@ public class JreCompat {
     public String getModuleName(Class<?> type) {
         return "NO_MODULE_JAVA_8";
     }
+
+
+    /**
+     * Return Unix domain socket address for given path.
+     * @param path The path
+     * @return the socket address
+     */
+    public SocketAddress getUnixDomainSocketAddress(String path) {
+        return null;
+    }
+
+
+    /**
+     * Create server socket channel using the Unix domain socket ProtocolFamily.
+     * @return the server socket channel
+     */
+    public ServerSocketChannel openUnixDomainServerSocketChannel() {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
+    }
+
+    /**
+     * Create socket channel using the Unix domain socket ProtocolFamily.
+     * @return the socket channel
+     */
+    public SocketChannel openUnixDomainSocketChannel() {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
+    }
+
 }

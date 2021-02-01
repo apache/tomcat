@@ -127,44 +127,12 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
         Member[] announcedMembers = fetchMembers();
         // Add new members or refresh the members in the membership
         for (Member member : announcedMembers) {
-            if (membership.memberAlive(member)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Member added: " + member);
-                }
-                Runnable r = new Runnable() {
-                    @Override
-                    public void run(){
-                        String name = Thread.currentThread().getName();
-                        try {
-                            Thread.currentThread().setName("CloudMembership-memberAdded");
-                            membershipListener.memberAdded(member);
-                        } finally {
-                            Thread.currentThread().setName(name);
-                        }
-                    }
-                };
-                executor.execute(r);
-            }
+            updateMember(member, true);
         }
         // Remove non refreshed members from the membership
         Member[] expired = membership.expire(expirationTime);
         for (Member member : expired) {
-            if (log.isDebugEnabled()) {
-                log.debug("Member disappeared: " + member);
-            }
-            Runnable r = new Runnable() {
-                @Override
-                public void run(){
-                    String name = Thread.currentThread().getName();
-                    try {
-                        Thread.currentThread().setName("CloudMembership-memberDisappeared");
-                        membershipListener.memberDisappeared(member);
-                    } finally {
-                        Thread.currentThread().setName(name);
-                    }
-                }
-            };
-            executor.execute(r);
+            updateMember(member, false);
         }
     }
 
@@ -173,6 +141,36 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
      * @return the member array
      */
     protected abstract Member[] fetchMembers();
+
+    /**
+     * Add or remove specified member.
+     * @param member the member to add
+     * @param add true if the member is added, false otherwise
+     */
+    protected void updateMember(Member member, boolean add) {
+        if (add && !membership.memberAlive(member)) {
+            return;
+        }
+        if (log.isDebugEnabled()) {
+            String message = add ? "Member added: " + member : "Member disappeared: " + member;
+            log.debug(message);
+        }
+        Runnable r = () -> {
+            String name = Thread.currentThread().getName();
+            try {
+                String threadName = add ? "CloudMembership-memberAdded" : "CloudMembership-memberDisappeared";
+                Thread.currentThread().setName(threadName);
+                if (add) {
+                    membershipListener.memberAdded(member);
+                } else {
+                    membershipListener.memberDisappeared(member);
+                }
+            } finally {
+                Thread.currentThread().setName(name);
+            }
+        };
+        executor.execute(r);
+    }
 
     @Override
     public void messageReceived(Serializable msg, Member sender) {

@@ -24,11 +24,11 @@
     <classpathentry kind="var" path="ANT_HOME/lib/ant.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/jaxrpc-1.1-rc4/geronimo-spec-jaxrpc-1.1-rc4.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/wsdl4j-1.6.3/wsdl4j-1.6.3.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/ecj-4.17/ecj-4.17.jar"/>
+    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/ecj-4.18/ecj-4.18.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/easymock-4.2/easymock-4.2.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/hamcrest-2.2/hamcrest-2.2.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/cglib-3.3.0/cglib-nodep-3.3.0.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/objenesis-3.1/objenesis-3.1.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/bnd-5.1.1/biz.aQute.bnd-5.1.1.jar"/>
+    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/bnd-5.3.0-SNAPSHOT/biz.aQute.bnd-5.3.0-SNAPSHOT.jar"/>
     <classpathentry kind="output" path=".settings/output"/>
 </classpath>

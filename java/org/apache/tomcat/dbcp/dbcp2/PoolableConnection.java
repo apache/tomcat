@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.concurrent.Executor;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
@@ -44,7 +45,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     static {
         try {
             MBEAN_SERVER = ManagementFactory.getPlatformMBeanServer();
-        } catch (NoClassDefFoundError | Exception ex) {
+        } catch (final NoClassDefFoundError | Exception ex) {
             // ignore - JMX not available
         }
     }
@@ -205,9 +206,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
                 // pool is closed, so close the connection
                 passivate();
                 getInnermostDelegate().close();
-            } catch (final SQLException e) {
-                throw e;
-            } catch (final RuntimeException e) {
+            } catch (final SQLException | RuntimeException e) {
                 throw e;
             } catch (final Exception e) {
                 throw new SQLException("Cannot close connection (return to pool failed)", e);
@@ -233,6 +232,19 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
         }
 
         super.closeInternal();
+    }
+
+    /**
+     * Abort my underlying {@link Connection}.
+     *
+     * @since 2.9.0
+     */
+    @Override
+    public void abort(Executor executor) throws SQLException {
+        if (jmxObjectName != null) {
+            jmxObjectName.unregisterMBean();
+        }
+        super.abort(executor);
     }
 
     /**

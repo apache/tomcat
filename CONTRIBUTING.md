@@ -29,6 +29,11 @@ Please review our [guide](https://tomcat.apache.org/bugreport.html) on how to
 submit a bug report. This page also has links to other resources to assist
 you.
 
+### Reporting Translation improvements
+
+Apache Tomcat project uses POEditor for managing the localization files.
+Please see more at https://cwiki.apache.org/confluence/x/vIPzBQ
+
 ### Your First Code Contribution
 
 ### Trouble Deciding How to Contribute?

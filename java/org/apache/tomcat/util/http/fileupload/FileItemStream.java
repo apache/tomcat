@@ -40,7 +40,7 @@ public interface FileItemStream extends FileItemHeadersSupport {
      * {@link java.util.Iterator#hasNext()} has been invoked on the
      * iterator, which created the {@link FileItemStream}.
      */
-    public static class ItemSkippedException extends IOException {
+    class ItemSkippedException extends IOException {
 
         /**
          * The exceptions serial version UID, which is being used

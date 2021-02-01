@@ -49,9 +49,9 @@ public final class RFC2231Utility {
      * @param paramName The parameter, which is being checked.
      * @return {@code true}, if encoded as per RFC 2231, {@code false} otherwise
      */
-    public static boolean hasEncodedValue(String paramName) {
+    public static boolean hasEncodedValue(final String paramName) {
         if (paramName != null) {
-            return paramName.lastIndexOf("*") == (paramName.length() - 1);
+            return paramName.lastIndexOf('*') == (paramName.length() - 1);
         }
         return false;
     }
@@ -62,10 +62,10 @@ public final class RFC2231Utility {
      * @param paramName The parameter, which is being inspected.
      * @return stripped {@code paramName} of Asterisk (*), if RFC2231 encoded
      */
-    public static String stripDelimiter(String paramName) {
+    public static String stripDelimiter(final String paramName) {
         if (hasEncodedValue(paramName)) {
-            StringBuilder paramBuilder = new StringBuilder(paramName);
-            paramBuilder.deleteCharAt(paramName.lastIndexOf("*"));
+            final StringBuilder paramBuilder = new StringBuilder(paramName);
+            paramBuilder.deleteCharAt(paramName.lastIndexOf('*'));
             return paramBuilder.toString();
         }
         return paramName;
@@ -87,19 +87,19 @@ public final class RFC2231Utility {
      * @return Decoded text based on charset encoding
      * @throws UnsupportedEncodingException The requested character set wasn't found.
      */
-    public static String decodeText(String encodedText) throws UnsupportedEncodingException {
-        int langDelimitStart = encodedText.indexOf('\'');
+    public static String decodeText(final String encodedText) throws UnsupportedEncodingException {
+        final int langDelimitStart = encodedText.indexOf('\'');
         if (langDelimitStart == -1) {
             // missing charset
             return encodedText;
         }
-        String mimeCharset = encodedText.substring(0, langDelimitStart);
-        int langDelimitEnd = encodedText.indexOf('\'', langDelimitStart + 1);
+        final String mimeCharset = encodedText.substring(0, langDelimitStart);
+        final int langDelimitEnd = encodedText.indexOf('\'', langDelimitStart + 1);
         if (langDelimitEnd == -1) {
             // missing language
             return encodedText;
         }
-        byte[] bytes = fromHex(encodedText.substring(langDelimitEnd + 1));
+        final byte[] bytes = fromHex(encodedText.substring(langDelimitEnd + 1));
         return new String(bytes, getJavaCharset(mimeCharset));
     }
 
@@ -108,16 +108,16 @@ public final class RFC2231Utility {
      * @param text - ASCII text input
      * @return Byte array of characters decoded from ASCII table
      */
-    private static byte[] fromHex(String text) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream(text.length());
+    private static byte[] fromHex(final String text) {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(text.length());
         for (int i = 0; i < text.length();) {
-            char c = text.charAt(i++);
+            final char c = text.charAt(i++);
             if (c == '%') {
                 if (i > text.length() - 2) {
                     break; // unterminated sequence
                 }
-                byte b1 = HEX_DECODE[text.charAt(i++) & 0x7f];
-                byte b2 = HEX_DECODE[text.charAt(i++) & 0x7f];
+                final byte b1 = HEX_DECODE[text.charAt(i++) & 0x7f];
+                final byte b2 = HEX_DECODE[text.charAt(i++) & 0x7f];
                 out.write((b1 << 4) | b2);
             } else {
                 out.write((byte) c);
@@ -126,7 +126,7 @@ public final class RFC2231Utility {
         return out.toByteArray();
     }
 
-    private static String getJavaCharset(String mimeCharset) {
+    private static String getJavaCharset(final String mimeCharset) {
         // good enough for standard values
         return mimeCharset;
     }

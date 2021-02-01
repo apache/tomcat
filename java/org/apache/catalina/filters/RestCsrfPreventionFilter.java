@@ -104,8 +104,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        if (request instanceof HttpServletRequest &&
-                response instanceof HttpServletResponse) {
+        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
             MethodType mType = MethodType.MODIFYING_METHOD;
             if (nonModifyingMethods.test(((HttpServletRequest) request).getMethod())) {
                 mType = MethodType.NON_MODIFYING_METHOD;
@@ -129,16 +128,13 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     private static interface RestCsrfPreventionStrategy {
-        static final NonceSupplier<HttpServletRequest, String> nonceFromRequestHeader = (r, k) -> r
-                .getHeader(k);
-        static final NonceSupplier<HttpServletRequest, String[]> nonceFromRequestParams = (r, k) -> r
-                .getParameterValues(k);
+        static final NonceSupplier<HttpServletRequest, String> nonceFromRequestHeader = HttpServletRequest::getHeader;
+        static final NonceSupplier<HttpServletRequest, String[]> nonceFromRequestParams = ServletRequest::getParameterValues;
         static final NonceSupplier<HttpSession, String> nonceFromSession = (s, k) -> Objects
                 .isNull(s) ? null : (String) s.getAttribute(k);
 
-        static final NonceConsumer<HttpServletResponse> nonceToResponse = (r, k, v) -> r.setHeader(
-                k, v);
-        static final NonceConsumer<HttpSession> nonceToSession = (s, k, v) -> s.setAttribute(k, v);
+        static final NonceConsumer<HttpServletResponse> nonceToResponse = HttpServletResponse::setHeader;
+        static final NonceConsumer<HttpSession> nonceToSession = HttpSession::setAttribute;
 
         boolean apply(HttpServletRequest request, HttpServletResponse response) throws IOException;
     }
@@ -194,8 +190,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     private class FetchRequest implements RestCsrfPreventionStrategy {
-        private final Predicate<String> fetchRequest = s -> Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE
-                .equalsIgnoreCase(s);
+        private final Predicate<String> fetchRequest = Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE::equalsIgnoreCase;
 
         @Override
         public boolean apply(HttpServletRequest request, HttpServletResponse response) {

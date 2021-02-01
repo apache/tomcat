@@ -858,7 +858,8 @@ public class ContextConfig implements LifecycleListener {
         String docBaseCanonical = docBaseAbsoluteFile.getCanonicalPath();
 
         // Re-calculate now docBase is a canonical path
-        boolean docBaseCanonicalInAppBase = docBaseCanonical.startsWith(appBase.getPath() + File.separatorChar);
+        boolean docBaseCanonicalInAppBase =
+                docBaseAbsoluteFile.getCanonicalFile().toPath().startsWith(appBase.toPath());
         String docBase;
         if (docBaseCanonicalInAppBase) {
             docBase = docBaseCanonical.substring(appBase.getPath().length());
@@ -1847,7 +1848,7 @@ public class ContextConfig implements LifecycleListener {
         }
 
         for (ServletContainerInitializer sci : detectedScis) {
-            initializerClassMap.put(sci, new HashSet<Class<?>>());
+            initializerClassMap.put(sci, new HashSet<>());
 
             HandlesTypes ht;
             try {
@@ -1925,12 +1926,9 @@ public class ContextConfig implements LifecycleListener {
                                 "/", resources.getAbsolutePath(), null, "/");
                     }
                 }
-            } catch (IOException ioe) {
+            } catch (IOException | URISyntaxException e) {
                 log.error(sm.getString("contextConfig.resourceJarFail", url,
                         context.getName()));
-            } catch (URISyntaxException e) {
-                log.error(sm.getString("contextConfig.resourceJarFail", url,
-                    context.getName()));
             }
         }
     }
@@ -2248,10 +2246,7 @@ public class ContextConfig implements LifecycleListener {
                 webResource.getName().endsWith(".class")) {
             try (InputStream is = webResource.getInputStream()) {
                 processAnnotationsStream(is, fragment, handlesTypesOnly, javaClassCache);
-            } catch (IOException e) {
-                log.error(sm.getString("contextConfig.inputStreamWebResource",
-                        webResource.getWebappPath()),e);
-            } catch (ClassFormatException e) {
+            } catch (IOException | ClassFormatException e) {
                 log.error(sm.getString("contextConfig.inputStreamWebResource",
                         webResource.getWebappPath()),e);
             }
@@ -2296,10 +2291,7 @@ public class ContextConfig implements LifecycleListener {
                 if (entryName.endsWith(".class")) {
                     try (InputStream is = jar.getEntryInputStream()) {
                         processAnnotationsStream(is, fragment, handlesTypesOnly, javaClassCache);
-                    } catch (IOException e) {
-                        log.error(sm.getString("contextConfig.inputStreamJar",
-                                entryName, url),e);
-                    } catch (ClassFormatException e) {
+                    } catch (IOException | ClassFormatException e) {
                         log.error(sm.getString("contextConfig.inputStreamJar",
                                 entryName, url),e);
                     }
@@ -2332,10 +2324,7 @@ public class ContextConfig implements LifecycleListener {
         } else if (file.getName().endsWith(".class") && file.canRead()) {
             try (FileInputStream fis = new FileInputStream(file)) {
                 processAnnotationsStream(fis, fragment, handlesTypesOnly, javaClassCache);
-            } catch (IOException e) {
-                log.error(sm.getString("contextConfig.inputStreamFile",
-                        file.getAbsolutePath()),e);
-            } catch (ClassFormatException e) {
+            } catch (IOException | ClassFormatException e) {
                 log.error(sm.getString("contextConfig.inputStreamFile",
                         file.getAbsolutePath()),e);
             }
@@ -2519,10 +2508,7 @@ public class ContextConfig implements LifecycleListener {
                 ClassParser parser = new ClassParser(is);
                 JavaClass clazz = parser.parse();
                 populateJavaClassCache(clazz.getClassName(), clazz, javaClassCache);
-            } catch (ClassFormatException e) {
-                log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
-                        className), e);
-            } catch (IOException e) {
+            } catch (ClassFormatException | IOException e) {
                 log.debug(sm.getString("contextConfig.invalidSciHandlesTypes",
                         className), e);
             }

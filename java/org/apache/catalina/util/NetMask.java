@@ -18,6 +18,8 @@ package org.apache.catalina.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -72,6 +74,16 @@ public final class NetMask {
      */
     private final int lastByteShift;
 
+    /**
+     * Should we use the port pattern when matching
+     */
+    private final boolean foundPort;
+
+    /**
+     * The regular expression used to test for the server port (optional).
+     */
+    private final Pattern portPattern;
+
 
     /**
      * Constructor
@@ -84,16 +96,36 @@ public final class NetMask {
 
         expression = input;
 
-        final int idx = input.indexOf("/");
+        final int portIdx = input.indexOf(';');
+        final String nonPortPart;
+
+        if (portIdx == -1) {
+            foundPort = false;
+            nonPortPart = input;
+            portPattern = null;
+        } else {
+            foundPort = true;
+            nonPortPart = input.substring(0, portIdx);
+            try {
+                portPattern = Pattern.compile(input.substring(portIdx + 1));
+            } catch (PatternSyntaxException e) {
+                /*
+                 * In case of error never match any non-empty port given
+                 */
+                throw new IllegalArgumentException(sm.getString("netmask.invalidPort", input), e);
+            }
+        }
+
+        final int idx = nonPortPart.indexOf('/');
 
         /*
          * Handle the "IP only" case first
          */
         if (idx == -1) {
             try {
-                netaddr = InetAddress.getByName(input).getAddress();
+                netaddr = InetAddress.getByName(nonPortPart).getAddress();
             } catch (UnknownHostException e) {
-                throw new IllegalArgumentException(sm.getString("netmask.invalidAddress", input));
+                throw new IllegalArgumentException(sm.getString("netmask.invalidAddress", nonPortPart));
             }
             nrBytes = netaddr.length;
             lastByteShift = 0;
@@ -105,7 +137,7 @@ public final class NetMask {
          * and the CIDR.
          */
 
-        final String addressPart = input.substring(0, idx), cidrPart = input.substring(idx + 1);
+        final String addressPart = nonPortPart.substring(0, idx), cidrPart = nonPortPart.substring(idx + 1);
 
         try {
             /*
@@ -158,12 +190,46 @@ public final class NetMask {
 
 
     /**
+     * Test if a given address and port matches this netmask.
+     *
+     * @param addr The {@link java.net.InetAddress} to test
+     * @param port The port to test
+     * @return true on match, false otherwise
+     */
+    public boolean matches(final InetAddress addr, int port) {
+        if (!foundPort) {
+            return false;
+        }
+        final String portString = Integer.toString(port);
+        if (!portPattern.matcher(portString).matches()) {
+            return false;
+        }
+        return matches(addr, true);
+    }
+
+
+    /**
      * Test if a given address matches this netmask.
      *
      * @param addr The {@link java.net.InetAddress} to test
      * @return true on match, false otherwise
      */
     public boolean matches(final InetAddress addr) {
+        return matches(addr, false);
+    }
+
+
+    /**
+     * Test if a given address matches this netmask.
+     *
+     * @param addr The {@link java.net.InetAddress} to test
+     * @param checkedPort Indicates, whether we already checked the port
+     * @return true on match, false otherwise
+     */
+    public boolean matches(final InetAddress addr, boolean checkedPort) {
+        if (!checkedPort && foundPort) {
+            return false;
+        }
         final byte[] candidate = addr.getAddress();
 
         /*

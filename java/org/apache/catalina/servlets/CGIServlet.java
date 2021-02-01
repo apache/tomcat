@@ -800,8 +800,8 @@ public final class CGIServlet extends HttpServlet {
             // does not contain an unencoded "=" this is an indexed query.
             // The parsed query string becomes the command line parameters
             // for the cgi command.
-            if (enableCmdLineArguments && (req.getMethod().equals("GET")
-                || req.getMethod().equals("POST") || req.getMethod().equals("HEAD"))) {
+            if (enableCmdLineArguments && (req.getMethod().equals("GET") || req.getMethod().equals("POST") ||
+                    req.getMethod().equals("HEAD"))) {
                 String qs;
                 if (isIncluded) {
                     qs = (String) req.getAttribute(
@@ -1013,10 +1013,7 @@ public final class CGIServlet extends HttpServlet {
             sCGIFullName = sCGINames[2];
             sCGIName = sCGINames[3];
 
-            if (sCGIFullPath == null
-                || sCGIScriptName == null
-                || sCGIFullName == null
-                || sCGIName == null) {
+            if (sCGIFullPath == null || sCGIScriptName == null || sCGIFullName == null || sCGIName == null) {
                 return false;
             }
 
@@ -1049,8 +1046,7 @@ public final class CGIServlet extends HttpServlet {
              * (see method findCGI, where the real work is done)
              *
              */
-            if (pathInfo == null
-                || (pathInfo.substring(sCGIFullName.length()).length() <= 0)) {
+            if (pathInfo == null || (pathInfo.substring(sCGIFullName.length()).length() <= 0)) {
                 sPathInfoCGI = "";
             } else {
                 sPathInfoCGI = pathInfo.substring(sCGIFullName.length());
@@ -1386,9 +1382,7 @@ public final class CGIServlet extends HttpServlet {
          */
         protected String blanksToString(String couldBeBlank,
                                       String subForBlanks) {
-            return (couldBeBlank == null || couldBeBlank.isEmpty())
-                    ? subForBlanks
-                    : couldBeBlank;
+            return (couldBeBlank == null || couldBeBlank.isEmpty()) ? subForBlanks : couldBeBlank;
         }
 
 
@@ -1469,11 +1463,7 @@ public final class CGIServlet extends HttpServlet {
          * Checks and sets ready status
          */
         protected void updateReadyStatus() {
-            if (command != null
-                && env != null
-                && wd != null
-                && params != null
-                && response != null) {
+            if (command != null && env != null && wd != null && params != null && response != null) {
                 readyToRun = true;
             } else {
                 readyToRun = false;
@@ -1609,13 +1599,11 @@ public final class CGIServlet extends HttpServlet {
                 log.debug("envp: [" + env + "], command: [" + command + "]");
             }
 
-            if ((command.contains(File.separator + "." + File.separator))
-                || (command.contains(File.separator + ".."))
-                || (command.contains(".." + File.separator))) {
-                throw new IOException(this.getClass().getName()
-                                      + "Illegal Character in CGI command "
-                                      + "path ('.' or '..') detected.  Not "
-                                      + "running CGI [" + command + "].");
+            if ((command.contains(File.separator + "." + File.separator)) ||
+                    (command.contains(File.separator + "..")) ||
+                    (command.contains(".." + File.separator))) {
+                throw new IOException(this.getClass().getName() + "Illegal Character in CGI command path " +
+                        "('.' or '..') detected.  Not running CGI [" + command + "].");
             }
 
             /* original content/structure of this section taken from
@@ -1666,12 +1654,7 @@ public final class CGIServlet extends HttpServlet {
                     (new InputStreamReader(proc.getErrorStream()));
                 final BufferedReader stdErrRdr = commandsStdErr ;
 
-                errReaderThread = new Thread() {
-                    @Override
-                    public void run () {
-                        sendToLog(stdErrRdr);
-                    }
-                };
+                errReaderThread = new Thread(() -> sendToLog(stdErrRdr));
                 errReaderThread.start();
 
                 InputStream cgiHeaderStream =

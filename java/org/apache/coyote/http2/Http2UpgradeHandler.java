@@ -1181,12 +1181,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // maximum number of concurrent streams.
         long max = localSettings.getMaxConcurrentStreams();
 
-        final int size = streams.size();
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.pruneStart", connectionId,
-                    Long.toString(max), Integer.toString(size)));
-        }
-
         // Only need ~+10% for streams that are in the priority tree,
         // Ideally need to retain information for a "significant" amount of time
         // after sending END_STREAM (RFC 7540, page 20) so we detect potential
@@ -1196,6 +1190,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         max = max * 5;
         if (max > Integer.MAX_VALUE) {
             max = Integer.MAX_VALUE;
+        }
+
+        final int size = streams.size();
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.pruneStart", connectionId,
+                    Long.toString(max), Integer.toString(size)));
         }
 
         int toClose = size - (int) max;
@@ -1227,7 +1227,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (stream.isClosedFinal()) {
                 // This stream went from IDLE to CLOSED and is likely to have
                 // been created by the client as part of the priority tree.
-                // Candidate for steo 3.
+                // Candidate for step 3.
                 candidatesStepThree.add(stream.getIdentifier());
             } else if (stream.getChildStreams().size() == 0) {
                 // Prune it
@@ -1839,7 +1839,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
 
         public long getRoundTripTimeNano() {
-            return (long) roundTripTimes.stream().mapToLong(x -> x.longValue()).average().orElse(0);
+            return (long) roundTripTimes.stream().mapToLong(Long::longValue).average().orElse(0);
         }
     }
 

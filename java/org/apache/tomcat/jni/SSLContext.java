@@ -17,6 +17,7 @@
 
 package org.apache.tomcat.jni;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -416,7 +417,10 @@ public final class SSLContext {
         if (sniCallBack == null) {
             return 0;
         }
-        return sniCallBack.getSslContext(sniHostName);
+        // Can't be sure OpenSSL is going to provide the SNI value in lower case
+        // so convert it before looking up the SSLContext
+        String hostName = (sniHostName == null) ? null : sniHostName.toLowerCase(Locale.ENGLISH);
+        return sniCallBack.getSslContext(hostName);
     }
 
     /**
@@ -470,7 +474,8 @@ public final class SSLContext {
          * This callback is made during the TLS handshake when the client uses
          * the SNI extension to request a specific TLS host.
          *
-         * @param sniHostName The host name requested by the client
+         * @param sniHostName The host name requested by the client - must be in
+         *                    lower case
          *
          * @return The Java representation of the pointer to the OpenSSL
          *         SSLContext to use for the given host or zero if no SSLContext

@@ -125,7 +125,13 @@ public class TestSsl extends TomcatBaseTest {
                         byte[] endOfHeaders = "\r\n\r\n".getBytes();
                         int found = 0;
                         while (found != endOfHeaders.length) {
-                            if (is.read() == endOfHeaders[found]) {
+                            int c = is.read();
+                            if (c == -1) {
+                                // EOF
+                                System.err.println("Unexpected EOF");
+                                errorCount.incrementAndGet();
+                                break;
+                            } else if (c == endOfHeaders[found]) {
                                 found++;
                             } else {
                                 found = 0;
@@ -252,7 +258,11 @@ public class TestSsl extends TomcatBaseTest {
         char[] endOfHeaders ="\r\n\r\n".toCharArray();
         int found = 0;
         while (found != endOfHeaders.length) {
-            if (r.read() == endOfHeaders[found]) {
+            int c = r.read();
+            if (c == -1) {
+                // EOF
+                Assert.fail("Unexpected EOF");
+            } else if (c == endOfHeaders[found]) {
                 found++;
             } else {
                 found = 0;
@@ -281,7 +291,7 @@ public class TestSsl extends TomcatBaseTest {
         }
     }
 
-    public class SimplePostServlet extends HttpServlet {
+    public static class SimplePostServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
