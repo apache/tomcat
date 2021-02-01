@@ -103,7 +103,7 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 9.0.44 (markt)" rtext="in development">
+<section name="Tomcat 8.5.64 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -121,7 +121,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.43 (markt)" rtext="release in progress">
+<section name="Tomcat 8.5.63 (markt)" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
       <fix>
