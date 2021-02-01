@@ -104,6 +104,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.3 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>64943</bug>: Add support for Unix Domain Sockets to
+        <code>org.apache.coyote.http11.Http11AprProtocol</code>. Depends on
+        <code>tomcat-native</code> 1.2.26 and up. (minfrin)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.2 (markt)" rtext="release in progress">
   <subsection name="Catalina">
@@ -313,11 +322,6 @@
         <code>gracefulStopAwaitMillis</code>, that allows a time to be
         specified to wait for client connections to complete and close before
         the Container hierarchy is stopped. (markt)
-      </add>
-      <add>
-        <bug>64943</bug>: Add support for Unix Domain Sockets to
-        <code>org.apache.coyote.http11.Http11AprProtocol</code>. Depends on
-        <code>tomcat-native</code> 1.2.26 and up. (minfrin)
       </add>
       <fix>
         <bug>64921</bug>: Ensure that the <code>LoadBalancerDrainingValve</code>
