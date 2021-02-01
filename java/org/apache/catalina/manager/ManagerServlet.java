@@ -735,10 +735,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param request  Servlet request we are processing
      * @param smClient i18n messages using the locale of the client
      */
-    protected synchronized void deploy
-        (PrintWriter writer, ContextName cn,
-         String tag, boolean update, HttpServletRequest request,
-         StringManager smClient) {
+    protected void deploy(PrintWriter writer, ContextName cn, String tag, boolean update,
+            HttpServletRequest request, StringManager smClient) {
 
         if (debug >= 1) {
             log("deploy: Deploying web application '" + cn + "'");
