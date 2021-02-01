@@ -1227,7 +1227,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (stream.isClosedFinal()) {
                 // This stream went from IDLE to CLOSED and is likely to have
                 // been created by the client as part of the priority tree.
-                // Candidate for steo 3.
+                // Candidate for step 3.
                 candidatesStepThree.add(stream.getIdentifier());
             } else if (stream.getChildStreams().size() == 0) {
                 // Prune it
