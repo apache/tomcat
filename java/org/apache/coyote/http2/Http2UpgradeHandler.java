@@ -1181,12 +1181,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // maximum number of concurrent streams.
         long max = localSettings.getMaxConcurrentStreams();
 
-        final int size = streams.size();
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.pruneStart", connectionId,
-                    Long.toString(max), Integer.toString(size)));
-        }
-
         // Only need ~+10% for streams that are in the priority tree,
         // Ideally need to retain information for a "significant" amount of time
         // after sending END_STREAM (RFC 7540, page 20) so we detect potential
@@ -1196,6 +1190,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         max = max * 5;
         if (max > Integer.MAX_VALUE) {
             max = Integer.MAX_VALUE;
+        }
+
+        final int size = streams.size();
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.pruneStart", connectionId,
+                    Long.toString(max), Integer.toString(size)));
         }
 
         int toClose = size - (int) max;
