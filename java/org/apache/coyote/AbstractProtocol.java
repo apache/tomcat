@@ -207,6 +207,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    @Override
+    public String getId() {
+        return endpoint.getId();
+    }
+
+
     // ---------------------- Properties that are passed through to the EndPoint
 
     @Override
@@ -370,9 +376,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     private String getNameInternal() {
         StringBuilder name = new StringBuilder(getNamePrefix());
         name.append('-');
-        String path = getProperty("unixDomainSocketPath");
-        if (path != null) {
-            name.append(path);
+        String id = getId();
+        if (id != null) {
+            name.append(id);
         } else {
             if (getAddress() != null) {
                 name.append(getAddress().getHostAddress());

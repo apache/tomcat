@@ -207,6 +207,17 @@ public interface ProtocolHandler {
 
 
     /**
+     * The default behavior is to identify connectors uniquely with address
+     * and port. However, certain connectors are not using that and need
+     * some other identifier, which then can be used as a replacement.
+     * @return the id
+     */
+    public default String getId() {
+        return null;
+    }
+
+
+    /**
      * Create a new ProtocolHandler for the given protocol.
      * @param protocol the protocol
      * @param apr if <code>true</code> the APR protcol handler will be used

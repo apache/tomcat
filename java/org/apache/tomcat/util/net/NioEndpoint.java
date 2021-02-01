@@ -231,6 +231,18 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     }
 
 
+    @Override
+    public String getId() {
+        if (getUseInheritedChannel()) {
+            return "JVMInheritedChannel";
+        } else if (getUnixDomainSocketPath() != null) {
+            return getUnixDomainSocketPath();
+        } else {
+            return null;
+        }
+    }
+
+
     // ----------------------------------------------- Public Lifecycle Methods
 
     /**

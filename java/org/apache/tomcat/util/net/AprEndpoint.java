@@ -274,6 +274,16 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     }
 
 
+    @Override
+    public String getId() {
+        if (getUnixDomainSocketPath() != null) {
+            return getUnixDomainSocketPath();
+        } else {
+            return null;
+        }
+    }
+
+
     // ----------------------------------------------- Public Lifecycle Methods
 
 

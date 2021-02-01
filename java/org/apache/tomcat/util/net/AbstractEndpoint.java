@@ -836,6 +836,17 @@ public abstract class AbstractEndpoint<S,U> {
     protected abstract boolean getDeferAccept();
 
 
+    /**
+     * The default behavior is to identify connectors uniquely with address
+     * and port. However, certain connectors are not using that and need
+     * some other identifier, which then can be used as a replacement.
+     * @return the id
+     */
+    public String getId() {
+        return null;
+    }
+
+
     protected final List<String> negotiableProtocols = new ArrayList<>();
     public void addNegotiatedProtocol(String negotiableProtocol) {
         negotiableProtocols.add(negotiableProtocol);
