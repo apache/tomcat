@@ -899,7 +899,9 @@
         <p>Where supported, the path to a Unix Domain Socket that this
         <strong>Connector</strong> will create and await incoming connections.
         When this is specified, the otherwise mandatory <code>port</code>
-        attribute may be omitted.</p>
+        attribute may be omitted.
+        See <a href="#Unix_Domain_Socket_Support">Unix Domain Socket Support</a>
+        for more information.</p>
       </attribute>
 
       <attribute name="unixDomainSocketPathPermissions" required="false">
