@@ -120,6 +120,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Remove the restriction that prevented the Manager web application
+        deploying different web applications in parallel. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.43 (markt)" rtext="2021-02-02">
   <subsection name="Catalina">
