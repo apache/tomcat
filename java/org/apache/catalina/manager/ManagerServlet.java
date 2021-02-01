@@ -744,10 +744,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param request  Servlet request we are processing
      * @param smClient i18n messages using the locale of the client
      */
-    protected synchronized void deploy
-        (PrintWriter writer, String config, ContextName cn,
-         String tag, boolean update, HttpServletRequest request,
-         StringManager smClient) {
+    protected void deploy(PrintWriter writer, String config, ContextName cn, String tag, boolean update,
+            HttpServletRequest request, StringManager smClient) {
 
         if (config != null && config.length() == 0) {
             config = null;
