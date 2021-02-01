@@ -104,6 +104,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.44 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Revert an incorrect fix for a potential resource leak that broke
+        deployment via the Ant deploy task. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
