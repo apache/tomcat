@@ -79,6 +79,7 @@ public class Socket {
     public static final int APR_UNSPEC = 0;
     public static final int APR_INET   = 1;
     public static final int APR_INET6  = 2;
+    public static final int APR_UNIX   = 3;
 
     public static final int APR_PROTO_TCP  =   6; /** TCP  */
     public static final int APR_PROTO_UDP  =  17; /** UDP  */

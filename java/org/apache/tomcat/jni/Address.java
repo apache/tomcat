@@ -40,8 +40,9 @@ public class Address {
 
     /**
      * Create apr_sockaddr_t from hostname, address family, and port.
-     * @param hostname The hostname or numeric address string to resolve/parse, or
-     *               NULL to build an address that corresponds to 0.0.0.0 or ::
+     * @param hostname The hostname or numeric address string to resolve/parse, the
+     *                 path of the Unix Domain Socket, or NULL to build an address
+     *                 that corresponds to 0.0.0.0 or ::
      * @param family The address family to use, or APR_UNSPEC if the system should
      *               decide.
      * @param port The port number.

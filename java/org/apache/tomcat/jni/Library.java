@@ -177,6 +177,12 @@ public final class Library {
     /* Is the O_NONBLOCK flag inherited from listening sockets?
      */
     public static boolean APR_O_NONBLOCK_INHERITED  = false;
+    /* Poll operations are interruptable by apr_pollset_wakeup().
+     */
+    public static boolean APR_POLLSET_WAKEABLE      = false;
+    /* Support for Unix Domain Sockets.
+     */
+    public static boolean APR_HAVE_UNIX             = false;
 
 
     public static int APR_SIZEOF_VOIDP;
@@ -244,6 +250,8 @@ public final class Library {
             APR_CHARSET_EBCDIC      = has(18);
             APR_TCP_NODELAY_INHERITED = has(19);
             APR_O_NONBLOCK_INHERITED  = has(20);
+            APR_POLLSET_WAKEABLE      = has(21);
+            APR_HAVE_UNIX             = has(22);
             if (APR_MAJOR_VERSION < 1) {
                 throw new UnsatisfiedLinkError("Unsupported APR Version (" +
                                                aprVersionString() + ")");

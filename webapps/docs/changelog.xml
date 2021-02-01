@@ -148,6 +148,11 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        <bug>64943</bug>: Add support for Unix Domain Sockets to
+        <code>org.apache.coyote.http11.Http11AprProtocol</code>. Depends on
+        <code>tomcat-native</code> 1.2.26 and up. (minfrin)
+      </add>
       <fix>
         <bug>65303</bug>: Fix a possible <code>NullPointerException</code> if
         an error occurs on an HTTP/1.1 connection being upgraded to HTTP/2 or on

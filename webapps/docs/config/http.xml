@@ -931,12 +931,8 @@
       <attribute name="unixDomainSocketPath" required="false">
         <p>Where supported, the path to a Unix Domain Socket that this
         <strong>Connector</strong> will create and await incoming connections.
-        Tomcat will NOT automatically remove the socket on server shutdown.
-        If the socket already exists, care must be taken by the administrator
-        to remove the socket after verifying that the socket isn't already
-        being used by an existing Tomcat process. Using this requires
-        Java 16 or later. When this is specified, the otherwise mandatory
-        <code>port</code> attribute may be omitted.</p>
+        When this is specified, the otherwise mandatory <code>port</code>
+        attribute may be omitted.</p>
       </attribute>
 
       <attribute name="unixDomainSocketPathPermissions" required="false">
@@ -1194,6 +1190,41 @@
 
   <p>For more information, see the
   <a href="../proxy-howto.html">Proxy Support How-To</a>.</p>
+
+  </subsection>
+
+
+  <subsection name="Unix Domain Socket Support">
+
+  <p>When the <code>unixDomainSocketPath</code> attribute is used, connectors
+  that support Unix Domain Sockets will bind to the socket at the given path.
+  </p>
+
+  <p>For users of Java 16 and higher, support is provided within the NIO
+  connectors. For users of Java earlier than 16, support is provided by
+  the <code>org.apache.coyote.http11.Http11AprProtocol</code> connector when
+  used with the Apache Tomcat Native library v1.2.26 and up, along with
+  Apache Portable Runtime v1.6 and higher.
+  </p>
+
+  <p>The socket path is created with read and write permissions for all
+  users. To protect this socket, place it in a directory with suitable
+  permissions appropriately configured to restrict access as required.
+  Alternatively, on platforms that support posix permissions, the
+  permissions on the socket can be set directly with the
+  <code>unixDomainSocketPathPermissions</code> option.
+  </p>
+
+  <p>Tomcat will automatically remove the socket on server shutdown. If the
+  socket already exists startup will fail. Care must be taken by the
+  administrator to remove the socket after verifying that the socket isn't
+  already being used by an existing Tomcat process.</p>
+
+  <p>The Unix Domain Socket can be accessed using the
+  <code>--unix-socket</code> option of the <code>curl</code> command line
+  client, and the Unix Domain Socket support in Apache HTTP server's
+  <code>mod_proxy</code> module.
+  </p>
 
   </subsection>
 
