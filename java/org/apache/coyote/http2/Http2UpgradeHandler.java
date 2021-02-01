@@ -1218,40 +1218,23 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Step 1
         // Iterator is in key order so we automatically have the oldest streams
         // first
-        for (AbstractNonZeroStream stream : streams.values()) {
-            // Never remove active streams
-            if (stream instanceof Stream && ((Stream) stream).isActive()) {
-                continue;
-            }
-
-            if (stream.isClosedFinal()) {
-                // This stream went from IDLE to CLOSED and is likely to have
-                // been created by the client as part of the priority tree.
-                // Candidate for step 3.
-                candidatesStepThree.add(stream.getIdentifier());
-            } else if (stream.getChildStreams().size() == 0) {
-                // Prune it
-                AbstractStream parent = stream.getParentStream();
-                streams.remove(stream.getIdentifier());
-                stream.detachFromParent();
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.pruned", connectionId, stream.getIdAsString()));
-                }
-                if (--toClose < 1) {
-                    return;
+        // Tests depend on parent/child relationship between streams so need to
+        // lock on priorityTreeLock to ensure a consistent view.
+        synchronized (priorityTreeLock) {
+            for (AbstractNonZeroStream stream : streams.values()) {
+                // Never remove active streams
+                if (stream instanceof Stream && ((Stream) stream).isActive()) {
+                    continue;
                 }
 
-                // If removing this child made the parent childless then see if
-                // the parent can be removed.
-                // Don't try and remove Stream 0 as that is the connection
-                // Don't try and remove 'newer' streams. We'll get to them as we
-                // work through the ordered list of streams.
-                while (toClose > 0 && parent.getIdAsInt() > 0 && parent.getIdAsInt() < stream.getIdAsInt() &&
-                        parent.getChildStreams().isEmpty()) {
-                    // This case is safe since we know parent ID > 0 therefore
-                    // this isn't the connection
-                    stream = (AbstractNonZeroStream) parent;
-                    parent = stream.getParentStream();
+                if (stream.isClosedFinal()) {
+                    // This stream went from IDLE to CLOSED and is likely to have
+                    // been created by the client as part of the priority tree.
+                    // Candidate for step 3.
+                    candidatesStepThree.add(stream.getIdentifier());
+                } else if (stream.getChildStreams().size() == 0) {
+                    // Prune it
+                    AbstractStream parent = stream.getParentStream();
                     streams.remove(stream.getIdentifier());
                     stream.detachFromParent();
                     if (log.isDebugEnabled()) {
@@ -1260,12 +1243,33 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     if (--toClose < 1) {
                         return;
                     }
-                    // Also need to remove this stream from the step 2 list
-                    candidatesStepTwo.remove(stream.getIdentifier());
+
+                    // If removing this child made the parent childless then see if
+                    // the parent can be removed.
+                    // Don't try and remove Stream 0 as that is the connection
+                    // Don't try and remove 'newer' streams. We'll get to them as we
+                    // work through the ordered list of streams.
+                    while (toClose > 0 && parent.getIdAsInt() > 0 && parent.getIdAsInt() < stream.getIdAsInt() &&
+                            parent.getChildStreams().isEmpty()) {
+                        // This case is safe since we know parent ID > 0 therefore
+                        // this isn't the connection
+                        stream = (AbstractNonZeroStream) parent;
+                        parent = stream.getParentStream();
+                        streams.remove(stream.getIdentifier());
+                        stream.detachFromParent();
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("upgradeHandler.pruned", connectionId, stream.getIdAsString()));
+                        }
+                        if (--toClose < 1) {
+                            return;
+                        }
+                        // Also need to remove this stream from the step 2 list
+                        candidatesStepTwo.remove(stream.getIdentifier());
+                    }
+                } else {
+                    // Closed, with children. Candidate for step 2.
+                    candidatesStepTwo.add(stream.getIdentifier());
                 }
-            } else {
-                // Closed, with children. Candidate for step 2.
-                candidatesStepTwo.add(stream.getIdentifier());
             }
         }
 
