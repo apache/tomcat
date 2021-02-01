@@ -950,7 +950,7 @@ public class Connector extends LifecycleMBeanBase  {
 
         StringBuilder sb = new StringBuilder("type=");
         sb.append(type);
-        String id = protocolHandler.getId();
+        String id = (protocolHandler != null) ? protocolHandler.getId() : null;
         if (id != null) {
             // Maintain MBean name compatibility, even if not accurate
             sb.append(",port=0,address=");
@@ -1066,7 +1066,8 @@ public class Connector extends LifecycleMBeanBase  {
     protected void startInternal() throws LifecycleException {
 
         // Validate settings before starting
-        if (protocolHandler.getId() == null && getPortWithOffset() < 0) {
+        String id = (protocolHandler != null) ? protocolHandler.getId() : null;
+        if (id == null && getPortWithOffset() < 0) {
             throw new LifecycleException(sm.getString(
                     "coyoteConnector.invalidPort", Integer.valueOf(getPortWithOffset())));
         }
@@ -1132,9 +1133,9 @@ public class Connector extends LifecycleMBeanBase  {
         StringBuilder sb = new StringBuilder("Connector[");
         sb.append(getProtocol());
         sb.append('-');
-        Object id = protocolHandler.getId();
+        String id = (protocolHandler != null) ? protocolHandler.getId() : null;
         if (id != null) {
-            sb.append(id.toString());
+            sb.append(id);
         } else {
             int port = getPortWithOffset();
             if (port > 0) {
