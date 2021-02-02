@@ -55,7 +55,7 @@ install:
     - ant -version
     - rm -rf $HOME/tmp
     - export CURR_PWD=`pwd`
-    - svn co -q https://svn.apache.org/repos/asf/apr/apr/branches/1.6.x/ $HOME/tmp/apr
+    - git clone -q -b 1.6.x --single-branch https://github.com/apache/apr.git HOME/tmp/apr
     - cd $HOME/tmp/apr
     - ./buildconf
     - ./configure --prefix=$HOME/tmp/apr-build
