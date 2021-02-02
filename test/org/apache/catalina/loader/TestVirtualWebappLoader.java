@@ -54,6 +54,8 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
         loader.setContext(ctx);
         ctx.setLoader(loader);
 
+        ctx.setResources(new StandardRoot(ctx));
+        ctx.resourcesStart();
 
         loader.start();
         Assert.assertSame(cl, loader.getClassLoader());
