@@ -489,7 +489,7 @@ public class MBeanFactory {
                             new String [] {"java.lang.String"});
                 }
             } else {
-                throw new IllegalStateException(sm.getString("mBeanFactory.contextRemove.addServicedFail", contextName));
+                throw new IllegalStateException(sm.getString("mBeanFactory.contextCreate.addServicedFail", contextName));
             }
         } else {
             log.warn("Deployer not found for "+pname.getKeyProperty("host"));
@@ -801,7 +801,7 @@ public class MBeanFactory {
                             new String[] {"java.lang.String"});
                 }
             } else {
-                throw new IllegalStateException(sm.getString("mBeanFactory.removeCreate.addServicedFail", pathStr));
+                throw new IllegalStateException(sm.getString("mBeanFactory.removeContext.addServicedFail", pathStr));
             }
         } else {
             log.warn("Deployer not found for "+hostName);
