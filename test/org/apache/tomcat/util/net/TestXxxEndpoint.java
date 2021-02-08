@@ -206,7 +206,7 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Connector c = tomcat.getConnector();
         Assume.assumeTrue("NIO Unix domain sockets have to be supported for this test",
-                c.getProtocolHandlerClassName().contains("Nio")
+                c.getProtocolHandlerClassName().contains("NioProtocol")
                 && JreCompat.isJre16Available());
 
         final String unixDomainSocketPath = "/tmp/testUnixDomainSocket";
