@@ -118,6 +118,10 @@
         <bug>65118</bug>: Fix a potential <code>NullPointerException</code> when
         pruning closed HTTP/2 streams from the connection. (markt)
       </fix>
+      <fix>
+        Avoid NullPointerException when a secure channel is closed before the
+        SSL engine was initialized. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

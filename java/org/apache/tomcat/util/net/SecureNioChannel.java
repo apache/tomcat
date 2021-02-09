@@ -551,6 +551,11 @@ public class SecureNioChannel extends NioChannel {
             return;
         }
         closing = true;
+        if (sslEngine == null) {
+            netOutBuffer.clear();
+            closed = true;
+            return;
+        }
         sslEngine.closeOutbound();
 
         if (!flush(netOutBuffer)) {
