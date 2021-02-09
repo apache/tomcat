@@ -596,8 +596,15 @@ public class SecureNio2Channel extends Nio2Channel  {
      */
     @Override
     public void close() throws IOException {
-        if (closing) return;
+        if (closing) {
+            return;
+        }
         closing = true;
+        if (sslEngine == null) {
+            netOutBuffer.clear();
+            closed = true;
+            return;
+        }
         sslEngine.closeOutbound();
         long timeout = endpoint.getConnectionTimeout();
 
