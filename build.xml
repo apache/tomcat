@@ -808,6 +808,7 @@
     <mkdir dir="${tomcat.build}/logs"/>
     <mkdir dir="${tomcat.build}/temp"/>
     <mkdir dir="${tomcat.build}/webapps"/>
+    <mkdir dir="${tomcat.build}/webapps-javaee"/>
 
     <!-- Property that determines if manifests need updating -->
     <uptodate property="manifests.uptodate"

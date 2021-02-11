@@ -1129,6 +1129,10 @@
                type="java.lang.String"
                writeable="false" />
 
+    <attribute name="legacyAppBase"
+               description="The legacy (Java EE) application root for this Host"
+               type="java.lang.String"/>
+
     <attribute name="managedResource"
                description="The managed resource this MBean is associated with"
                type="java.lang.Object"/>
