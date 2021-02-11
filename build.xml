@@ -240,6 +240,7 @@
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${jaxrpc-lib.jar}"/>
     <pathelement location="${wsdl4j-lib.jar}"/>
+    <pathelement location="${migration-lib.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -1461,6 +1462,17 @@
       </fileset>
     </delete>
     <copy file="${jdt.jar}" todir="${tomcat.build}/lib"/>
+
+    <!-- Delete all other versions of Tomcat Migration Tool for Jakarta EE and copy the current one -->
+    <local name="migration.jar.filename" />
+    <basename property="migration.jar.filename" file="${migration-lib.jar}"/>
+    <delete verbose="true">
+      <fileset dir="${tomcat.build}/lib">
+        <include name="jakartaee-migration-*.jar"/>
+        <exclude name="${migration-lib.jar.filename}"/>
+      </fileset>
+    </delete>
+    <copy file="${migration-lib.jar}" todir="${tomcat.build}/lib"/>
 
     <!-- Add sources for examples -->
     <antcall target="examples-sources" />
@@ -3123,6 +3135,16 @@ skip.installer property in build.properties" />
       <param name="checksum.enabled" value="${wsdl4j-lib.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${wsdl4j-lib.checksum.algorithm}"/>
       <param name="checksum.value" value="${wsdl4j-lib.checksum.value}"/>
+    </antcall>
+
+    <!-- Tomcat Migration Tool for Jakarta EE -->
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${migration-lib.loc}"/>
+      <param name="destfile" value="${migration-lib.jar}"/>
+      <param name="destdir" value="${migration-lib.home}"/>
+      <param name="checksum.enabled" value="${migration-lib.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${migration-lib.checksum.algorithm}"/>
+      <param name="checksum.value" value="${migration-lib.checksum.value}"/>
     </antcall>
 
   </target>

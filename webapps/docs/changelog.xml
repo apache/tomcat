@@ -121,12 +121,19 @@
         of use in JMX descriptors. (remm)
       </fix>
       <update>
-        Allow the loader to directly use the JakartaEE migration tool as a
-        <code>ClassFileTransformer</code> using the
+        Allow the loader to directly use the Tomcat Migration Tool for JakartaEE
+        as a <code>ClassFileTransformer</code> using the
         <code>jakartaConverter</code> attribute. This only supports javax to
         jakarta conversion for classes, not for classloader resources or
         static files. (remm)
       </update>
+      <add>
+        Integrate the Tomcat Migration Tool for JakartaEE at deployment time.
+        Java EE web applications placed in the <code>webapps-ee</code> directory
+        will be migrated to Jakarta EE 9 and placed in the <code>webapps</code>
+        where it will be deployed (or not) based on the current settings for
+        automatic deployment. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

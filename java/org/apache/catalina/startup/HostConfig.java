@@ -68,6 +68,7 @@ import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jakartaee.Migration;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.digester.Digester;
@@ -465,6 +466,8 @@ public class HostConfig implements LifecycleListener {
      * in our "application root" directory.
      */
     protected void deployApps() {
+        // Migrate legacy Java EE apps from legacyAppBase
+        migrateLegacyApps();
         File appBase = host.getAppBaseFile();
         File configBase = host.getConfigBaseFile();
         String[] filteredAppPaths = filterAppPaths(appBase.list());
@@ -1224,6 +1227,87 @@ public class HostConfig implements LifecycleListener {
     }
 
 
+    protected void migrateLegacyApps() {
+        File appBase = host.getAppBaseFile();
+        File legacyAppBase = host.getLegacyAppBaseFile();
+        if (!legacyAppBase.isDirectory()) {
+            return;
+        }
+
+        ExecutorService es = host.getStartStopExecutor();
+        List<Future<?>> results = new ArrayList<>();
+
+        String[] migrationCandidates = legacyAppBase.list();
+        for (String migrationCandidate : migrationCandidates) {
+            File source = new File(legacyAppBase, migrationCandidate);
+            File destination = new File(appBase, migrationCandidate);
+
+            ContextName cn;
+            if (source.lastModified() > destination.lastModified()) {
+                if (source.isFile() && source.getName().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+                    cn = new ContextName(migrationCandidate, true);
+                } else if (source.isDirectory()) {
+                    cn = new ContextName(migrationCandidate, false);
+                } else {
+                    continue;
+                }
+
+                if (tryAddServiced(cn.getBaseName())) {
+                    try {
+                        // MigrateApp will call removeServiced
+                        results.add(es.submit(new MigrateApp(this, cn, source, destination)));
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        removeServiced(cn.getName());
+                        throw t;
+                    }
+                }
+            }
+        }
+
+        for (Future<?> result : results) {
+            try {
+                result.get();
+            } catch (Exception e) {
+                log.error(sm.getString("hostConfig.migrateApp.threaded.error"), e);
+            }
+        }
+    }
+
+
+    protected void migrateLegacyApp(File source, File destination) {
+        File tempNew = null;
+        File tempOld = null;
+        try {
+            tempNew = File.createTempFile("new", null, host.getLegacyAppBaseFile());
+            tempOld = File.createTempFile("old", null, host.getLegacyAppBaseFile());
+
+            // The use of defaults is deliberate here to avoid having to
+            // recreate every configuration option on the host. Better to change
+            // the defaults if necessary than to start adding configuration
+            // options. Users that need non-default options can convert manually
+            // via migration.[sh|bat]
+            Migration migration = new Migration();
+            migration.setSource(source);
+            migration.setDestination(tempNew);
+            migration.execute();
+
+            // Use rename
+            destination.renameTo(tempOld);
+            tempNew.renameTo(destination);
+            ExpandWar.delete(tempOld);
+
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn("Migration failure", t);
+        } finally {
+            if (tempNew != null && tempNew.exists()) {
+                ExpandWar.delete(tempNew);
+            }
+        }
+    }
+
+
     /**
      * Check if a webapp is already deployed in this host.
      *
@@ -1923,6 +2007,31 @@ public class HostConfig implements LifecycleListener {
         public void run() {
             try {
                 config.deployDirectory(cn, dir);
+            } finally {
+                config.removeServiced(cn.getName());
+            }
+        }
+    }
+
+
+    private static class MigrateApp implements Runnable {
+
+        private HostConfig config;
+        private ContextName cn;
+        private File source;
+        private File destination;
+
+        public MigrateApp(HostConfig config, ContextName cn, File source, File destination) {
+            this.config = config;
+            this.cn = cn;
+            this.source = source;
+            this.destination = destination;
+        }
+
+        @Override
+        public void run() {
+            try {
+                config.migrateLegacyApp(source, destination);
             } finally {
                 config.removeServiced(cn.getName());
             }

@@ -303,3 +303,15 @@ osgi-annotations.checksum.value=153054f987534244f95a399539b11375|b6e802bceba0682
 osgi-annotations.home=${base.path}/osgi-annotations-${osgi-annotations.version}
 osgi-annotations.jar=${osgi-annotations.home}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar
 osgi-annotations.loc=${base-maven.loc}/org/osgi/org.osgi.annotation.bundle/${osgi-annotations.version}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar
+
+# ----- Tomcat Migration Tool for Jakarta EE -----
+migration-lib.version=0.2.0
+
+# checksums for jakartaee-migration-0.2.0-shaded.jar
+migration-lib.checksum.enabled=true
+migration-lib.checksum.algorithm=MD5|SHA-1
+migration-lib.checksum.value=c7dc838f46901157722ac2f49af854c8|73f53ba52e443f0e992a2aa57d42927d884709eb
+
+migration-lib.home=${base.path}/migration-${migration-lib.version}
+migration-lib.jar=${migration-lib.home}/jakartaee-migration-${migration-lib.version}-shaded.jar
+migration-lib.loc=${base-maven.loc}/org/apache/tomcat/jakartaee-migration/${migration-lib.version}/jakartaee-migration-${migration-lib.version}-shaded.jar
