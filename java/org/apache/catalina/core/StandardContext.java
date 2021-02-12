@@ -1480,7 +1480,7 @@ public class StandardContext extends ContainerBase
 
 
     @Override
-    public boolean isParallelAnnotationScanning() {
+    public boolean getParallelAnnotationScanning() {
         return this.parallelAnnotationScanning;
     }
 

@@ -1291,7 +1291,7 @@ public class TesterContext implements Context {
     public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject) {}
 
     @Override
-    public boolean isParallelAnnotationScanning() { return false; }
+    public boolean getParallelAnnotationScanning() { return false; }
     @Override
     public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
 

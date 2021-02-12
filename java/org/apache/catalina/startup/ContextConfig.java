@@ -1379,7 +1379,7 @@ public class ContextConfig implements LifecycleListener {
 
         Map<String, JavaClassCacheEntry> javaClassCache;
 
-        if (context.isParallelAnnotationScanning()) {
+        if (context.getParallelAnnotationScanning()) {
             javaClassCache = new ConcurrentHashMap<>();
         } else {
             javaClassCache = new HashMap<>();
@@ -2144,7 +2144,7 @@ public class ContextConfig implements LifecycleListener {
     protected void processAnnotations(Set<WebXml> fragments,
             boolean handlesTypesOnly, Map<String, JavaClassCacheEntry> javaClassCache) {
 
-        if (context.isParallelAnnotationScanning()) {
+        if (context.getParallelAnnotationScanning()) {
             processAnnotationsInParallel(fragments, handlesTypesOnly, javaClassCache);
         } else {
             for (WebXml fragment : fragments) {
