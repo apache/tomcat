@@ -85,7 +85,12 @@ public class ConfigFileLoader {
         }
 
         // File didn't work so try URI.
-        URI uri = getURI(location);
+        URI uri = null;
+        try {
+            uri = getURI(location);
+        } catch (IllegalArgumentException e) {
+            throw new IOException(sm.getString("configFileLoader.cannotObtainURL", location));
+        }
 
         // Obtain the input stream we need
         try {

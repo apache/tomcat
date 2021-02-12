@@ -122,6 +122,9 @@
         Avoid NullPointerException when a secure channel is closed before the
         SSL engine was initialized. (remm)
       </fix>
+      <fix>
+        Improve error message for failed ConfigFileLoader lookups. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
