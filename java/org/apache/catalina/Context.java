@@ -764,8 +764,18 @@ public interface Context extends Container, ContextBind {
     /**
      * @return the value of the parallel annotation scanning flag.  If true,
      * it will dispatch scanning to the utility executor.
+     * @deprecated This method will be removed in Tomcat 11 onwards
      */
-    public boolean isParallelAnnotationScanning();
+    @Deprecated
+    public default boolean isParallelAnnotationScanning() {
+        return getParallelAnnotationScanning();
+    }
+
+    /**
+     * @return the value of the parallel annotation scanning flag.  If true,
+     * it will dispatch scanning to the utility executor.
+     */
+    public boolean getParallelAnnotationScanning();
 
     /**
      * Set the parallel annotation scanning value.
