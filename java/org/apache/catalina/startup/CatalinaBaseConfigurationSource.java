@@ -109,7 +109,7 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
         try {
             uri = getURIInternal(name);
         } catch (IllegalArgumentException e) {
-            throw new IOException(sm.getString("catalinaConfigurationSource.cannotObtainURL", name), e);
+            throw new IOException(sm.getString("catalinaConfigurationSource.cannotObtainURL", name));
         }
 
         // Obtain the input stream we need
