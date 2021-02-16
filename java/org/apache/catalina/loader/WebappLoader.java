@@ -21,7 +21,10 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
+import java.lang.instrument.ClassFileTransformer;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -84,6 +87,14 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
      * configure our ClassLoader.
      */
     private boolean delegate = false;
+
+
+    /**
+     * The profile name which will be used by the converter, or null if not used.
+     * Any invalid profile value will default to the TOMCAT profile, which
+     * converts all packages used by Tomcat.
+     */
+    private String jakartaConverter = null;
 
 
     /**
@@ -169,6 +180,32 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
         this.delegate = delegate;
         support.firePropertyChange("delegate", Boolean.valueOf(oldDelegate),
                                    Boolean.valueOf(this.delegate));
+    }
+
+
+    /**
+     * @return a non null String if the loader will attempt to use the
+     *  Jakarta converter. The String is the name of the profile
+     *  used for conversion.
+     */
+    public String getJakartaConverter() {
+        return jakartaConverter;
+    }
+
+
+    /**
+     * Set the Jakarta converter.
+     *
+     * @param jakartaConverter The profile name which will be used by the converter
+     *   Any invalid profile value will default to the TOMCAT profile, which
+     *   converts all packages used by Tomcat.
+     */
+    public void setJakartaConverter(String jakartaConverter) {
+        String oldJakartaConverter = this.jakartaConverter;
+        this.jakartaConverter = jakartaConverter;
+        support.firePropertyChange("jakartaConverter",
+                oldJakartaConverter,
+                this.jakartaConverter);
     }
 
 
@@ -326,6 +363,26 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
             classLoader = createClassLoader();
             classLoader.setResources(context.getResources());
             classLoader.setDelegate(this.delegate);
+
+            // Set Jakarta class converter
+            if (getJakartaConverter() != null) {
+                try {
+                    Class<?> jakartaEnumClass = Class.forName("org.apache.tomcat.jakartaee.EESpecProfile");
+                    Method valueOf = jakartaEnumClass.getMethod("valueOf", String.class);
+                    Object profile = null;
+                    try {
+                        profile = valueOf.invoke(null, getJakartaConverter());
+                    } catch (InvocationTargetException ignored) {
+                        profile = valueOf.invoke(null, "TOMCAT");
+                    }
+                    ClassFileTransformer transformer =
+                            (ClassFileTransformer) Class.forName("org.apache.tomcat.jakartaee.ClassConverter")
+                            .getConstructor(jakartaEnumClass).newInstance(profile);
+                    classLoader.addTransformer(transformer);
+                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                    log.warn(sm.getString("webappLoader.noJakartaConverter"), e);
+                }
+            }
 
             // Configure our repositories
             setClassPath();

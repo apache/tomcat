@@ -120,6 +120,13 @@
         <code>getParallelAnnotationScanning</code> for consistency and ease
         of use in JMX descriptors. (remm)
       </fix>
+      <update>
+        Allow the loader to directly use the JakartaEE migration tool as a
+        <code>ClassFileTransformer</code> using the
+        <code>jakartaConverter</code> attribute. This only supports javax to
+        jakarta conversion for classes, not for classloader resources or
+        static files. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

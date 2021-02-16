@@ -103,6 +103,17 @@
 
     <attributes>
 
+      <attribute name="jakartaConverter" required="false">
+        <p>If the Tomcat JakartaEE Migration Tool JAR is placed in the Catalina
+        <code>lib</code> folder, this attribute allows using it. The value of
+        the attribute should be the desired profile name for the conversion.
+        If an invalid value is specified, the <code>TOMCAT</code> profile will
+        be used, which includes all javax classes which are used by Tomcat.
+        Only classes will be converted, classloader resources (loaded using
+        <code>getResource</code> or <code>getResourceAsStream</code> will not
+        be processed).</p>
+      </attribute>
+
       <attribute name="loaderClass" required="false">
         <p>Java class name of the <code>java.lang.ClassLoader</code>
         implementation class to use. Custom implementations must extend
