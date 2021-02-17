@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.loader;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
@@ -1136,6 +1138,41 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         WebResource resource = resources.getClassLoaderResource(path);
         if (resource.exists()) {
             stream = resource.getInputStream();
+            // Filter out .class resources through the ClassFileTranformer
+            if (name.endsWith(".class") && transformers.size() > 0) {
+                // If the resource is a class, decorate it with any attached transformers
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buf = new byte[8192];
+                int numRead;
+                try {
+                    while ((numRead = stream.read(buf)) >= 0) {
+                        baos.write(buf, 0, numRead);
+                    }
+                } catch (IOException e) {
+                    log.error(sm.getString("webappClassLoader.transformError", name), e);
+                    return null;
+                } finally {
+                    try {
+                        stream.close();
+                    } catch (IOException e) {
+                    }
+                }
+                byte[] binaryContent = baos.toByteArray();
+                String internalName = path.substring(1, path.length() - CLASS_FILE_SUFFIX.length());
+                for (ClassFileTransformer transformer : this.transformers) {
+                    try {
+                        byte[] transformed = transformer.transform(
+                                this, internalName, null, null, binaryContent);
+                        if (transformed != null) {
+                            binaryContent = transformed;
+                        }
+                    } catch (IllegalClassFormatException e) {
+                        log.error(sm.getString("webappClassLoader.transformError", name), e);
+                        return null;
+                    }
+                }
+                stream = new ByteArrayInputStream(binaryContent);
+            }
             trackLastModified(path, resource);
         }
         try {
