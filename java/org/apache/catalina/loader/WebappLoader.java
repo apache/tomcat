@@ -367,17 +367,19 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
             // Set Jakarta class converter
             if (getJakartaConverter() != null) {
                 try {
-                    Class<?> jakartaEnumClass = Class.forName("org.apache.tomcat.jakartaee.EESpecProfile");
-                    Method valueOf = jakartaEnumClass.getMethod("valueOf", String.class);
-                    Object profile = null;
+                    ClassFileTransformer transformer = null;
                     try {
-                        profile = valueOf.invoke(null, getJakartaConverter());
-                    } catch (InvocationTargetException ignored) {
-                        profile = valueOf.invoke(null, "TOMCAT");
+                        Class<?> jakartaEnumClass = Class.forName("org.apache.tomcat.jakartaee.EESpecProfile");
+                        Method valueOf = jakartaEnumClass.getMethod("valueOf", String.class);
+                        Object profile = valueOf.invoke(null, getJakartaConverter());
+                        transformer =
+                                (ClassFileTransformer) Class.forName("org.apache.tomcat.jakartaee.ClassConverter")
+                                .getConstructor(jakartaEnumClass).newInstance(profile);
+                    } catch (InvocationTargetException | NoSuchMethodException ignored) {
+                        // Use default value with no argument constructor
+                        transformer =
+                                (ClassFileTransformer) Class.forName("org.apache.tomcat.jakartaee.ClassConverter").newInstance();
                     }
-                    ClassFileTransformer transformer =
-                            (ClassFileTransformer) Class.forName("org.apache.tomcat.jakartaee.ClassConverter")
-                            .getConstructor(jakartaEnumClass).newInstance(profile);
                     classLoader.addTransformer(transformer);
                 } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                     log.warn(sm.getString("webappLoader.noJakartaConverter"), e);
