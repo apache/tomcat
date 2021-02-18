@@ -765,11 +765,13 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     private boolean fill(boolean block) throws IOException {
 
         if (log.isDebugEnabled()) {
-            log.debug("Before fill(): [" + parsingHeader +
+            log.debug("Before fill(): parsingHeader: [" + parsingHeader +
                     "], parsingRequestLine: [" + parsingRequestLine +
                     "], parsingRequestLinePhase: [" + parsingRequestLinePhase +
                     "], parsingRequestLineStart: [" + parsingRequestLineStart +
-                    "], byteBuffer.position() [" + byteBuffer.position() + "]");
+                    "], byteBuffer.position(): [" + byteBuffer.position() +
+                    "], byteBuffer.limit(): [" + byteBuffer.limit() +
+                    "], end: [" + end + "]");
         }
 
         if (parsingHeader) {
@@ -784,13 +786,20 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             byteBuffer.limit(end).position(end);
         }
 
+        int nRead = -1;
         byteBuffer.mark();
-        if (byteBuffer.position() < byteBuffer.limit()) {
-            byteBuffer.position(byteBuffer.limit());
+        try {
+            if (byteBuffer.position() < byteBuffer.limit()) {
+                byteBuffer.position(byteBuffer.limit());
+            }
+            byteBuffer.limit(byteBuffer.capacity());
+            nRead = wrapper.read(block, byteBuffer);
+        } finally {
+            // Ensure that the buffer limit and position are returned to a
+            // consistent "ready for read" state if an error occurs during in
+            // the above code block.
+            byteBuffer.limit(byteBuffer.position()).reset();
         }
-        byteBuffer.limit(byteBuffer.capacity());
-        int nRead = wrapper.read(block, byteBuffer);
-        byteBuffer.limit(byteBuffer.position()).reset();
 
         if (log.isDebugEnabled()) {
             log.debug("Received ["
