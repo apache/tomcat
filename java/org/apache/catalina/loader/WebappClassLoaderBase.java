@@ -1139,7 +1139,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (resource.exists()) {
             stream = resource.getInputStream();
             // Filter out .class resources through the ClassFileTranformer
-            if (name.endsWith(".class") && transformers.size() > 0) {
+            if (name.endsWith(CLASS_FILE_SUFFIX) && transformers.size() > 0) {
                 // If the resource is a class, decorate it with any attached transformers
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 byte[] buf = new byte[8192];
