@@ -3018,6 +3018,31 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testCanceledPostChunked() throws Exception {
+        doTestCanceledPost(new String[] {
+                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + SimpleHttpClient.CRLF +
+                "Transfer-Encoding: Chunked" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "10" + SimpleHttpClient.CRLF +
+                "This is 16 bytes" + SimpleHttpClient.CRLF
+                });
+    }
+
+
+    @Test
+    public void testCanceledPostNoChunking() throws Exception {
+        doTestCanceledPost(new String[] {
+                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + SimpleHttpClient.CRLF +
+                "Content-Length: 100" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "This is 16 bytes"
+                });
+    }
+
+
     /*
      * Tests an error on an async thread when the client closes the connection
      * before fully writing the request body.
@@ -3035,8 +3060,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
      * would normally be considered very poor practice. It is only safe in this
      * test as the Servlet only processes a single request.
      */
-    @Test
-    public void testCanceledPost() throws Exception {
+    private void doTestCanceledPost(String[] request) throws Exception {
         CountDownLatch partialReadLatch = new CountDownLatch(1);
         CountDownLatch clientCloseLatch = new CountDownLatch(1);
         CountDownLatch threadCompleteLatch = new CountDownLatch(1);
@@ -3058,12 +3082,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         PostClient client = new PostClient();
         client.setPort(getPort());
-        client.setRequest(new String[] { "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
-                                         "Host: localhost:" + SimpleHttpClient.CRLF +
-                                         "Content-Length: 100" + SimpleHttpClient.CRLF +
-                                         SimpleHttpClient.CRLF +
-                                         "This is 16 bytes"
-                                         });
+        client.setRequest(request);
         client.connect();
         client.sendRequest();
 
