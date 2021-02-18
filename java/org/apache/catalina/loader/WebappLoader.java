@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -42,6 +41,8 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jakartaee.ClassConverter;
+import org.apache.tomcat.jakartaee.EESpecProfile;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.compat.JreCompat;
@@ -366,24 +367,17 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
 
             // Set Jakarta class converter
             if (getJakartaConverter() != null) {
+                ClassFileTransformer transformer = null;
                 try {
-                    ClassFileTransformer transformer = null;
-                    try {
-                        Class<?> jakartaEnumClass = Class.forName("org.apache.tomcat.jakartaee.EESpecProfile");
-                        Method valueOf = jakartaEnumClass.getMethod("valueOf", String.class);
-                        Object profile = valueOf.invoke(null, getJakartaConverter());
-                        transformer =
-                                (ClassFileTransformer) Class.forName("org.apache.tomcat.jakartaee.ClassConverter")
-                                .getConstructor(jakartaEnumClass).newInstance(profile);
-                    } catch (InvocationTargetException | NoSuchMethodException ignored) {
-                        // Use default value with no argument constructor
-                        transformer =
-                                (ClassFileTransformer) Class.forName("org.apache.tomcat.jakartaee.ClassConverter").newInstance();
-                    }
-                    classLoader.addTransformer(transformer);
-                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-                    log.warn(sm.getString("webappLoader.noJakartaConverter"), e);
+                    EESpecProfile profile = EESpecProfile.valueOf(getJakartaConverter());
+                    // FIXME: transformer = new ClassConverter(profile); after 0.2
+                    transformer =
+                            (ClassFileTransformer) ClassConverter.class.getConstructor(EESpecProfile.class).newInstance(profile);
+                } catch (InvocationTargetException | NoSuchMethodException | IllegalArgumentException ignored) {
+                    // Use default value with no argument constructor
+                    transformer = new ClassConverter();
                 }
+                classLoader.addTransformer(transformer);
             }
 
             // Configure our repositories
