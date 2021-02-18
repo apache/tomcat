@@ -132,6 +132,12 @@
         Avoid NullPointerException when a secure channel is closed before the
         SSL engine was initialized. (remm)
       </fix>
+      <fix>
+        Ensure that the <code>ReadListener</code>'s <code>onError()</code> event
+        is triggered if the client closes the connection before sending the
+        entire request body and the server is ready the request body using
+        non-blocking I/O. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

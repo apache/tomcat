@@ -761,11 +761,13 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     private boolean fill(boolean block) throws IOException {
 
         if (log.isDebugEnabled()) {
-            log.debug("Before fill(): [" + parsingHeader +
+            log.debug("Before fill(): parsingHeader: [" + parsingHeader +
                     "], parsingRequestLine: [" + parsingRequestLine +
                     "], parsingRequestLinePhase: [" + parsingRequestLinePhase +
                     "], parsingRequestLineStart: [" + parsingRequestLineStart +
-                    "], byteBuffer.position() [" + byteBuffer.position() + "]");
+                    "], byteBuffer.position(): [" + byteBuffer.position() +
+                    "], byteBuffer.limit(): [" + byteBuffer.limit() +
+                    "], end: [" + end + "]");
         }
 
         if (parsingHeader) {
@@ -780,19 +782,25 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             byteBuffer.limit(end).position(end);
         }
 
-        byteBuffer.mark();
-        if (byteBuffer.position() < byteBuffer.limit()) {
-            byteBuffer.position(byteBuffer.limit());
-        }
-        byteBuffer.limit(byteBuffer.capacity());
-        SocketWrapperBase<?> socketWrapper = this.wrapper;
         int nRead = -1;
-        if (socketWrapper != null) {
-            nRead = socketWrapper.read(block, byteBuffer);
-        } else {
-            throw new CloseNowException(sm.getString("iib.eof.error"));
+        byteBuffer.mark();
+        try {
+            if (byteBuffer.position() < byteBuffer.limit()) {
+                byteBuffer.position(byteBuffer.limit());
+            }
+            byteBuffer.limit(byteBuffer.capacity());
+            SocketWrapperBase<?> socketWrapper = this.wrapper;
+            if (socketWrapper != null) {
+                nRead = socketWrapper.read(block, byteBuffer);
+            } else {
+                throw new CloseNowException(sm.getString("iib.eof.error"));
+            }
+        } finally {
+            // Ensure that the buffer limit and position are returned to a
+            // consistent "ready for read" state if an error occurs during in
+            // the above code block.
+            byteBuffer.limit(byteBuffer.position()).reset();
         }
-        byteBuffer.limit(byteBuffer.position()).reset();
 
         if (log.isDebugEnabled()) {
             log.debug("Received ["
