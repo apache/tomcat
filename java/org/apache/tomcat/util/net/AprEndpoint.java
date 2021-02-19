@@ -2364,6 +2364,25 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         private void doWriteInternal(ByteBuffer from) throws IOException {
+
+            if (previousIOException != null) {
+                /*
+                 * Socket has previously seen an IOException on write.
+                 *
+                 * Blocking writes assume that buffer is always fully written so
+                 * there is no code checking for incomplete writes, retaining
+                 * the unwritten data and attempting to write it as part of a
+                 * subsequent write call.
+                 *
+                 * Because of the above, when an IOException is triggered we
+                 * need so skip subsequent attempts to write as otherwise it
+                 * will appear to the client as if some data was dropped just
+                 * before the connection is lost. It is better if the client
+                 * just sees the dropped connection.
+                 */
+                throw new IOException(previousIOException);
+            }
+
             int thisTime;
 
             do {
@@ -2400,8 +2419,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     // 10053 on Windows is connection aborted
                     throw new EOFException(sm.getString("socket.apr.clientAbort"));
                 } else if (thisTime < 0) {
-                    throw new IOException(sm.getString("socket.apr.write.error",
+                    previousIOException = new IOException(sm.getString("socket.apr.write.error",
                             Integer.valueOf(-thisTime), getSocket(), this));
+                    throw previousIOException;
                 }
             } while ((thisTime > 0 || getBlockingStatus()) && from.hasRemaining());
 

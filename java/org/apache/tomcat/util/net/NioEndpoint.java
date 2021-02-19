@@ -1305,6 +1305,23 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 throw new ClosedChannelException();
             }
             if (block) {
+                if (previousIOException != null) {
+                    /*
+                     * Socket has previously timed out.
+                     *
+                     * Blocking writes assume that buffer is always fully
+                     * written so there is no code checking for incomplete
+                     * writes, retaining the unwritten data and attempting to
+                     * write it as part of a subsequent write call.
+                     *
+                     * Because of the above, when a timeout is triggered we need
+                     * so skip subsequent attempts to write as otherwise it will
+                     * appear to the client as if some data was dropped just
+                     * before the connection is lost. It is better if the client
+                     * just sees the dropped connection.
+                     */
+                    throw new IOException(previousIOException);
+                }
                 long timeout = getWriteTimeout();
                 long startNanos = 0;
                 do {
@@ -1315,7 +1332,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         }
                         timeout -= elapsedMillis;
                         if (timeout <= 0) {
-                            throw new SocketTimeoutException();
+                            previousIOException = new SocketTimeoutException();
+                            throw previousIOException;
                         }
                     }
                     n = getSocket().write(buffer);

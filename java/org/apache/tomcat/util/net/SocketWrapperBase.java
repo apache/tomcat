@@ -51,6 +51,8 @@ public abstract class SocketWrapperBase<E> {
     private volatile long readTimeout = -1;
     private volatile long writeTimeout = -1;
 
+    protected volatile IOException previousIOException = null;
+
     private volatile int keepAliveLeft = 100;
     private String negotiatedProtocol = null;
 

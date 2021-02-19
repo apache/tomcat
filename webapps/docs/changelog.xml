@@ -157,6 +157,11 @@
         entire request body and the server is ready the request body using
         non-blocking I/O. (markt)
       </fix>
+      <fix>
+        <bug>65137</bug>: Ensure that a response is not corrupted as well as
+        incomplete if the connection is closed before the response is fully
+        written due to a write timeout. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
