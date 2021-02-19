@@ -32,8 +32,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Base class for a SocketChannel wrapper used by the endpoint.
  * This way, logic for an SSL socket channel remains the same as for
  * a non SSL, making sure we don't need to code for any exception cases.
- *
- * @version 1.0
  */
 public class NioChannel implements ByteChannel, ScatteringByteChannel, GatheringByteChannel {
 
@@ -62,6 +60,12 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         bufHandler.reset();
     }
 
+    /**
+     * @return the socketWrapper
+     */
+    SocketWrapperBase<NioChannel> getSocketWrapper() {
+        return socketWrapper;
+    }
 
     void setSocketWrapper(SocketWrapperBase<NioChannel> socketWrapper) {
         this.socketWrapper = socketWrapper;

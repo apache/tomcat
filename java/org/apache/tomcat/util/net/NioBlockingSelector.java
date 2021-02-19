@@ -49,9 +49,6 @@ public class NioBlockingSelector {
     protected Selector sharedSelector;
 
     protected BlockPoller poller;
-    public NioBlockingSelector() {
-
-    }
 
     public void open(Selector selector) {
         sharedSelector = selector;
@@ -63,7 +60,7 @@ public class NioBlockingSelector {
     }
 
     public void close() {
-        if (poller!=null) {
+        if (poller != null) {
             poller.disable();
             poller.interrupt();
             poller = null;
@@ -74,10 +71,11 @@ public class NioBlockingSelector {
      * Performs a blocking write using the bytebuffer for data to be written
      * If the <code>selector</code> parameter is null, then it will perform a busy write that could
      * take up a lot of CPU cycles.
+     *
      * @param buf ByteBuffer - the buffer containing the data, we will write as long as <code>(buf.hasRemaining()==true)</code>
      * @param socket SocketChannel - the socket to write data to
      * @param writeTimeout long - the timeout for this write operation in milliseconds, -1 means no timeout
-     * @return int - returns the number of bytes written
+     * @return the number of bytes written
      * @throws EOFException if write returns -1
      * @throws SocketTimeoutException if the write times out
      * @throws IOException if an IO Exception occurs in the underlying socket logic
@@ -85,22 +83,42 @@ public class NioBlockingSelector {
     public int write(ByteBuffer buf, NioChannel socket, long writeTimeout)
             throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-        if ( key == null ) throw new IOException("Key no longer registered");
+        if (key == null) {
+            throw new IOException("Key no longer registered");
+        }
         KeyReference reference = keyReferenceStack.pop();
         if (reference == null) {
             reference = new KeyReference();
         }
         NioSocketWrapper att = (NioSocketWrapper) key.attachment();
+        if (att.previousIOException != null) {
+            /*
+             * Socket has previously seen an IOException on write.
+             *
+             * Blocking writes assume that buffer is always fully written so
+             * there is no code checking for incomplete writes, retaining
+             * the unwritten data and attempting to write it as part of a
+             * subsequent write call.
+             *
+             * Because of the above, when an IOException is triggered we
+             * need so skip subsequent attempts to write as otherwise it
+             * will appear to the client as if some data was dropped just
+             * before the connection is lost. It is better if the client
+             * just sees the dropped connection.
+             */
+            throw new IOException(att.previousIOException);
+        }
         int written = 0;
         boolean timedout = false;
         int keycount = 1; //assume we can write
         long time = System.currentTimeMillis(); //start the timeout timer
         try {
-            while ( (!timedout) && buf.hasRemaining()) {
+            while (!timedout && buf.hasRemaining()) {
                 if (keycount > 0) { //only write if we were registered for a write
                     int cnt = socket.write(buf); //write the data
-                    if (cnt == -1)
+                    if (cnt == -1) {
                         throw new EOFException();
+                    }
                     written += cnt;
                     if (cnt > 0) {
                         time = System.currentTimeMillis(); //reset our timeout timer
@@ -108,8 +126,10 @@ public class NioBlockingSelector {
                     }
                 }
                 try {
-                    if ( att.getWriteLatch()==null || att.getWriteLatch().getCount()==0) att.startWriteLatch(1);
-                    poller.add(att,SelectionKey.OP_WRITE,reference);
+                    if (att.getWriteLatch() == null || att.getWriteLatch().getCount() == 0) {
+                        att.startWriteLatch(1);
+                    }
+                    poller.add(att, SelectionKey.OP_WRITE, reference);
                     if (writeTimeout < 0) {
                         att.awaitWriteLatch(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
                     } else {
@@ -118,23 +138,26 @@ public class NioBlockingSelector {
                 } catch (InterruptedException ignore) {
                     // Ignore
                 }
-                if ( att.getWriteLatch()!=null && att.getWriteLatch().getCount()> 0) {
+                if (att.getWriteLatch() != null && att.getWriteLatch().getCount() > 0) {
                     //we got interrupted, but we haven't received notification from the poller.
                     keycount = 0;
-                }else {
+                } else {
                     //latch countdown has happened
                     keycount = 1;
                     att.resetWriteLatch();
                 }
 
-                if (writeTimeout > 0 && (keycount == 0))
+                if (writeTimeout > 0 && (keycount == 0)) {
                     timedout = (System.currentTimeMillis() - time) >= writeTimeout;
-            } //while
-            if (timedout)
-                throw new SocketTimeoutException();
+                }
+            }
+            if (timedout) {
+                att.previousIOException = new SocketTimeoutException();
+                throw att.previousIOException;
+            }
         } finally {
-            poller.remove(att,SelectionKey.OP_WRITE);
-            if (timedout && reference.key!=null) {
+            poller.remove(att, SelectionKey.OP_WRITE);
+            if (timedout && reference.key != null) {
                 poller.cancelKey(reference.key);
             }
             reference.key = null;
@@ -147,17 +170,20 @@ public class NioBlockingSelector {
      * Performs a blocking read using the bytebuffer for data to be read
      * If the <code>selector</code> parameter is null, then it will perform a busy read that could
      * take up a lot of CPU cycles.
+     *
      * @param buf ByteBuffer - the buffer containing the data, we will read as until we have read at least one byte or we timed out
      * @param socket SocketChannel - the socket to write data to
      * @param readTimeout long - the timeout for this read operation in milliseconds, -1 means no timeout
-     * @return int - returns the number of bytes read
+     * @return the number of bytes read
      * @throws EOFException if read returns -1
      * @throws SocketTimeoutException if the read times out
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
     public int read(ByteBuffer buf, NioChannel socket, long readTimeout) throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-        if ( key == null ) throw new IOException("Key no longer registered");
+        if (key == null) {
+            throw new IOException("Key no longer registered");
+        }
         KeyReference reference = keyReferenceStack.pop();
         if (reference == null) {
             reference = new KeyReference();
@@ -168,7 +194,7 @@ public class NioBlockingSelector {
         int keycount = 1; //assume we can read
         long time = System.currentTimeMillis(); //start the timeout timer
         try {
-            while(!timedout) {
+            while (!timedout) {
                 if (keycount > 0) { //only read if we were registered for a read
                     read = socket.read(buf);
                     if (read != 0) {
@@ -176,7 +202,9 @@ public class NioBlockingSelector {
                     }
                 }
                 try {
-                    if ( att.getReadLatch()==null || att.getReadLatch().getCount()==0) att.startReadLatch(1);
+                    if (att.getReadLatch()==null || att.getReadLatch().getCount()==0) {
+                        att.startReadLatch(1);
+                    }
                     poller.add(att,SelectionKey.OP_READ, reference);
                     if (readTimeout < 0) {
                         att.awaitReadLatch(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -194,14 +222,16 @@ public class NioBlockingSelector {
                     keycount = 1;
                     att.resetReadLatch();
                 }
-                if (readTimeout >= 0 && (keycount == 0))
+                if (readTimeout >= 0 && (keycount == 0)) {
                     timedout = (System.currentTimeMillis() - time) >= readTimeout;
-            } //while
-            if (timedout)
+                }
+            }
+            if (timedout) {
                 throw new SocketTimeoutException();
+            }
         } finally {
             poller.remove(att,SelectionKey.OP_READ);
-            if (timedout && reference.key!=null) {
+            if (timedout && reference.key != null) {
                 poller.cancelKey(reference.key);
             }
             reference.key = null;
