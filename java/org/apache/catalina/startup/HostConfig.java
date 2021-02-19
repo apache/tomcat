@@ -1282,7 +1282,7 @@ public class HostConfig implements LifecycleListener {
             tempNew = File.createTempFile("new", null, host.getLegacyAppBaseFile());
             tempOld = File.createTempFile("old", null, host.getLegacyAppBaseFile());
             // createTempFile is not directly compatible with directories, so cleanup
-            ExpandWar.delete(tempNew);
+            tempNew.delete();
 
             // The use of defaults is deliberate here to avoid having to
             // recreate every configuration option on the host. Better to change
@@ -1301,7 +1301,7 @@ public class HostConfig implements LifecycleListener {
 
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.warn("Migration failure", t);
+            log.warn(sm.getString("hostConfig.migrateError"), t);
         } finally {
             if (tempNew != null && tempNew.exists()) {
                 ExpandWar.delete(tempNew);
