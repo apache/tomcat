@@ -1281,6 +1281,8 @@ public class HostConfig implements LifecycleListener {
         try {
             tempNew = File.createTempFile("new", null, host.getLegacyAppBaseFile());
             tempOld = File.createTempFile("old", null, host.getLegacyAppBaseFile());
+            // createTempFile is not directly compatible with directories, so cleanup
+            ExpandWar.delete(tempNew);
 
             // The use of defaults is deliberate here to avoid having to
             // recreate every configuration option on the host. Better to change
