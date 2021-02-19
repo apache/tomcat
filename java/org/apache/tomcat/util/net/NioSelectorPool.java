@@ -96,8 +96,7 @@ public class NioSelectorPool {
         if (enabled) {
             active.decrementAndGet();
         }
-        if (enabled && (maxSpareSelectors == -1
-                || spare.get() < Math.min(maxSpareSelectors, maxSelectors))) {
+        if (enabled && (maxSpareSelectors == -1 || spare.get() < Math.min(maxSpareSelectors, maxSelectors))) {
             spare.incrementAndGet();
             selectors.offer(s);
         } else {
@@ -264,8 +263,9 @@ public class NioSelectorPool {
                     //register OP_WRITE to the selector
                     if (key == null) {
                         key = socket.getIOChannel().register(selector, SelectionKey.OP_READ);
+                    } else {
+                        key.interestOps(SelectionKey.OP_READ);
                     }
-                    else key.interestOps(SelectionKey.OP_READ);
                     if (readTimeout == 0) {
                         timedout = (read == 0);
                     } else if (readTimeout < 0) {
@@ -274,7 +274,7 @@ public class NioSelectorPool {
                         keycount = selector.select(readTimeout);
                     }
                 }
-                if (readTimeout > 0 && (selector == null || keycount == 0) ) {
+                if (readTimeout > 0 && (selector == null || keycount == 0)) {
                     timedout = (System.currentTimeMillis() - time) >= readTimeout;
                 }
             }

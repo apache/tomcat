@@ -68,7 +68,7 @@ public class NioBlockingSelector {
     }
 
     /**
-     * Performs a blocking write using the byte buffer for data to be written
+     * Performs a blocking write using the bytebuffer for data to be written
      * If the <code>selector</code> parameter is null, then it will perform a busy write that could
      * take up a lot of CPU cycles.
      *
