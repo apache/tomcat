@@ -151,6 +151,23 @@ public class NioSelectorPool {
         if (shared) {
             return blockingSelector.write(buf, socket, writeTimeout);
         }
+        if (socket.getSocketWrapper().previousIOException != null) {
+            /*
+             * Socket has previously seen an IOException on write.
+             *
+             * Blocking writes assume that buffer is always fully written so
+             * there is no code checking for incomplete writes, retaining
+             * the unwritten data and attempting to write it as part of a
+             * subsequent write call.
+             *
+             * Because of the above, when an IOException is triggered we
+             * need so skip subsequent attempts to write as otherwise it
+             * will appear to the client as if some data was dropped just
+             * before the connection is lost. It is better if the client
+             * just sees the dropped connection.
+             */
+            throw new IOException(socket.getSocketWrapper().previousIOException);
+        }
         SelectionKey key = null;
         int written = 0;
         boolean timedout = false;
@@ -191,7 +208,8 @@ public class NioSelectorPool {
                 }
             }
             if (timedout) {
-                throw new SocketTimeoutException();
+                socket.getSocketWrapper().previousIOException = new SocketTimeoutException();
+                throw socket.getSocketWrapper().previousIOException;
             }
         } finally {
             if (key != null) {
