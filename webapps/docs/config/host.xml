@@ -184,6 +184,25 @@
         used.</p>
       </attribute>
 
+      <attribute name="legacyAppBase" required="false">
+        <p>The legacy Application Base directory for this virtual host. This is
+        the pathname of a directory that may contain Java EE web applications to
+        be converted to Jakarta EE before deployment. Java EE applications
+        packaged as WAR files or directories placed in this directory will be
+        converted to Jakarta EE using the Apache Tomcart Migration Tool for
+        Jakarta EE. The conversion will be performed using default settings. The
+        resulting WAR or directory will be placed in the <code>appBase</code>
+        confiugured for this virtual host.</p>
+        <p>If the default settings are not appropriate for the migration of an
+        application, the full range of migration options may be accessed by
+        performing the migration manually. The <code>migrate.[sh|bat]</code>
+        scripts are provided in the <code>$CATALINA_HOME/bin</code> directory
+        for this purpose.</p>
+        <p>You may specify an absolute pathname, or a pathname that is
+        relative to the <code>$CATALINA_BASE</code> directory. If not specified,
+        the default of <code>webapps-javaee</code> will be used.</p>
+      </attribute>
+
       <attribute name="name" required="true">
         <p>Usually the network name of this virtual host, as registered in your
         <em>Domain Name Service</em> server. Regardless of the case used to
