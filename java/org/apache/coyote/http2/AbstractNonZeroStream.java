@@ -122,7 +122,7 @@ abstract class AbstractNonZeroStream extends AbstractStream {
      * level. This is the caller's responsibility.
      */
     void replaceStream(AbstractNonZeroStream replacement) {
-        replacement.setParentStream(getParentStream());
+        getParentStream().addChild(replacement);
         detachFromParent();
         for (AbstractNonZeroStream child : getChildStreams()) {
             replacement.addChild(child);
