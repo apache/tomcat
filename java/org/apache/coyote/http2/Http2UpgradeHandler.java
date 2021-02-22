@@ -750,7 +750,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     void writeBody(Stream stream, ByteBuffer data, int len, boolean finished) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdAsString(),
-                    Integer.toString(len)));
+                    Integer.toString(len), Boolean.valueOf(finished)));
         }
 
         reduceOverheadCount();
@@ -1250,7 +1250,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     // work through the ordered list of streams.
                     while (toClose > 0 && parent.getIdAsInt() > 0 && parent.getIdAsInt() < stream.getIdAsInt() &&
                             parent.getChildStreams().isEmpty()) {
-                        // This case is safe since we know parent ID > 0 therefore
+                        // This cast is safe since we know parent ID > 0 therefore
                         // this isn't the connection
                         stream = (AbstractNonZeroStream) parent;
                         parent = stream.getParentStream();
