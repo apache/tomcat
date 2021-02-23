@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.ObjectName;
 
@@ -362,11 +363,6 @@ public class TesterContext implements Context {
     @Override
     public void setApplicationLifecycleListeners(Object[] listeners) {
         // NO-OP
-    }
-
-    @Override
-    public String getCharset(Locale locale) {
-        return null;
     }
 
     @Override
@@ -739,9 +735,24 @@ public class TesterContext implements Context {
         // NO-OP
     }
 
+    private final Map<String,String> localEncodingMap = new ConcurrentHashMap<>();
+
     @Override
     public void addLocaleEncodingMappingParameter(String locale, String encoding) {
-        // NO-OP
+        localEncodingMap.put(locale, encoding);
+    }
+    @Override
+    public String getCharset(Locale locale) {
+        // Match full language_country_variant first, then language_country,
+        // then language only
+        String charset = localEncodingMap.get(locale.toString());
+        if (charset == null) {
+            charset = localEncodingMap.get(locale.getLanguage() + "_" + locale.getCountry());
+            if (charset == null) {
+                charset = localEncodingMap.get(locale.getLanguage());
+            }
+        }
+        return charset;
     }
 
     @Override

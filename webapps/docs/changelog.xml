@@ -134,6 +134,13 @@
         <code>webapps</code> where it will be deployed (or not) based on the
         current settings for automatic deployment. (markt)
       </add>
+      <fix>
+        <bug>64938</bug>: Align the behaviour when <code>null</code> is passed
+        to the <code>ServletResponse</code> methods
+        <code>setCharacterEncoding()</code>, <code>setContentType()</code> and
+        <code>setLocale()</code> with the recent clarification from the Jakarta
+        Servlet project of the expected behaviour in these cases. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
