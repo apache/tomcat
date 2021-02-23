@@ -121,6 +121,13 @@
         <code>WriteListener.onWritePossible()</code> and
         <code>ReadListener.onDataAvailable()</code>. (markt)
       </add>
+      <fix>
+        <bug>64938</bug>: Align the behaviour when <code>null</code> is passed
+        to the <code>ServletResponse</code> methods
+        <code>setCharacterEncoding()</code>, <code>setContentType()</code> and
+        <code>setLocale()</code> with the recent clarification from the Jakarta
+        Servlet project of the expected behaviour in these cases. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

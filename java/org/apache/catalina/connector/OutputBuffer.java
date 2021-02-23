@@ -591,6 +591,11 @@ public class OutputBuffer extends Writer {
         }
 
         if (charset == null) {
+            if (coyoteResponse.getCharacterEncoding() != null) {
+                // setCharacterEncoding() was called with an invalid character set
+                // Trigger an UnsupportedEncodingException
+                charset = B2CConverter.getCharset(coyoteResponse.getCharacterEncoding());
+            }
             if (enc == null) {
                 charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
             } else {

@@ -437,6 +437,8 @@ public final class Response {
     public void setLocale(Locale locale) {
 
         if (locale == null) {
+            this.locale = null;
+            this.contentLanguage = null;
             return;
         }
 
@@ -469,15 +471,17 @@ public final class Response {
             return;
         }
         if (characterEncoding == null) {
+            this.charset = null;
+            this.characterEncoding = null;
             return;
         }
 
+        this.characterEncoding = characterEncoding;
         try {
             this.charset = B2CConverter.getCharset(characterEncoding);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalArgumentException(e);
         }
-        this.characterEncoding = characterEncoding;
     }
 
 
