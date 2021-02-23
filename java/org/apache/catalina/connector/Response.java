@@ -749,6 +749,12 @@ public class Response implements HttpServletResponse {
 
         if (type == null) {
             getCoyoteResponse().setContentType(null);
+            try {
+                getCoyoteResponse().setCharacterEncoding(null);
+            } catch (UnsupportedEncodingException e) {
+                // Can never happen when calling with null
+            }
+            isCharacterEncodingSet = false;
             return;
         }
 
@@ -808,7 +814,11 @@ public class Response implements HttpServletResponse {
             log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
             return;
         }
-        isCharacterEncodingSet = true;
+        if (charset == null) {
+            isCharacterEncodingSet = false;
+        } else {
+            isCharacterEncodingSet = true;
+        }
     }
 
 
@@ -842,16 +852,24 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        // In some error handling scenarios, the context is unknown
-        // (e.g. a 404 when a ROOT context is not present)
-        Context context = getContext();
-        if (context != null) {
-            String charset = context.getCharset(locale);
-            if (charset != null) {
-                try {
-                    getCoyoteResponse().setCharacterEncoding(charset);
-                } catch (UnsupportedEncodingException e) {
-                    log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+        if (locale == null) {
+            try {
+                getCoyoteResponse().setCharacterEncoding(null);
+            } catch (UnsupportedEncodingException e) {
+                // Impossible when calling with null
+            }
+        } else {
+            // In some error handling scenarios, the context is unknown
+            // (e.g. a 404 when a ROOT context is not present)
+            Context context = getContext();
+            if (context != null) {
+                String charset = context.getCharset(locale);
+                if (charset != null) {
+                    try {
+                        getCoyoteResponse().setCharacterEncoding(charset);
+                    } catch (UnsupportedEncodingException e) {
+                        log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+                    }
                 }
             }
         }

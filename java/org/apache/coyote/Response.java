@@ -456,8 +456,9 @@ public final class Response {
     public void setLocale(Locale locale) {
 
         if (locale == null) {
-            return;  // throw an exception?
-        }
+            this.locale = null;
+            this.contentLanguage = null;
+            return;        }
 
         // Save the locale for use by getLocale()
         this.locale = locale;
@@ -491,11 +492,13 @@ public final class Response {
             return;
         }
         if (characterEncoding == null) {
+            this.charset = null;
+            this.characterEncoding = null;
             return;
         }
 
-        this.charset = B2CConverter.getCharset(characterEncoding);
         this.characterEncoding = characterEncoding;
+        this.charset = B2CConverter.getCharset(characterEncoding);
     }
 
 

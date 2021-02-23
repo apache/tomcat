@@ -115,6 +115,13 @@
         Catalina implementation. (remm)
       </fix>
       <fix>
+        <bug>64938</bug>: Align the behaviour when <code>null</code> is passed
+        to the <code>ServletResponse</code> methods
+        <code>setCharacterEncoding()</code>, <code>setContentType()</code> and
+        <code>setLocale()</code> with the recent clarification from the Jakarta
+        Servlet project of the expected behaviour in these cases. (markt)
+      </fix>
+      <fix>
         <bug>65135</bug>: Rename Context method
         <code>isParallelAnnotationScanning</code> to
         <code>getParallelAnnotationScanning</code> for consistency and ease
