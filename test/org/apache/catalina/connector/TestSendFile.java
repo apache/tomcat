@@ -88,7 +88,9 @@ public class TestSendFile extends TomcatBaseTest {
             }
         } finally {
             for (File f : files) {
-                Assert.assertTrue("Failed to clean up [" + f + "]", f.delete());
+                boolean deleteResult = f.delete();
+                System.out.println("Deleting [" + f.getAbsolutePath() + "] returned [" + deleteResult + "]");
+                Assert.assertTrue("Failed to clean up [" + f + "]", deleteResult);
             }
         }
     }
