@@ -110,6 +110,11 @@
         Revert an incorrect fix for a potential resource leak that broke
         deployment via the Ant deploy task. (markt)
       </fix>
+      <fix>
+        Ensure that the <code>AsyncListener.onError()</code> event is triggered
+        when a I/O error occurs during non-blocking I/O. There were some cases
+        discovered where this was not happening. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

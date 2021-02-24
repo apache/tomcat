@@ -199,6 +199,7 @@ public class CoyoteAdapter implements Adapter {
                         // https://bz.apache.org/bugzilla/show_bug.cgi?id=65001
                         res.action(ActionCode.CLOSE_NOW, t);
                         writeListener.onError(t);
+                        asyncConImpl.setErrorState(t, true);
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
@@ -226,6 +227,7 @@ public class CoyoteAdapter implements Adapter {
                         // https://bz.apache.org/bugzilla/show_bug.cgi?id=65001
                         res.action(ActionCode.CLOSE_NOW, t);
                         readListener.onError(t);
+                        asyncConImpl.setErrorState(t, true);
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
