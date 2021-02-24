@@ -122,9 +122,9 @@ public final class Response {
     private long commitTime = -1;
 
     /**
-     * Holds request error exception.
+     * Holds response writing error exception.
      */
-    Exception errorException = null;
+    private Exception errorException = null;
 
     /**
      * With the introduction of async processing and the possibility of
@@ -272,7 +272,8 @@ public final class Response {
     // -----------------Error State --------------------
 
     /**
-     * Set the error Exception that occurred during request processing.
+     * Set the error Exception that occurred during the writing of the response
+     * processing.
      *
      * @param ex The exception that occurred
      */
@@ -282,7 +283,7 @@ public final class Response {
 
 
     /**
-     * Get the Exception that occurred during request processing.
+     * Get the Exception that occurred during the writing of the response.
      *
      * @return The exception that occurred
      */
@@ -292,7 +293,7 @@ public final class Response {
 
 
     public boolean isExceptionPresent() {
-        return ( errorException != null );
+        return errorException != null;
     }
 
 
