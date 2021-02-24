@@ -136,6 +136,11 @@
         incomplete if the connection is closed before the response is fully
         written due to a write timeout. (markt)
       </fix>
+      <fix>
+        Related to bug <bug>65131</bug>, make sure all errors from OpenSSL are
+        fully cleared, as there could be more than one error present after
+        an operation (confirmed in the OpenSSL API documentation). (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
