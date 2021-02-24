@@ -183,6 +183,10 @@ public class CoyoteAdapter implements Adapter {
                                 readListener != null) {
                             readListener.onAllDataRead();
                         }
+                        // User code may have swallowed an IOException
+                        if (response.getCoyoteResponse().isExceptionPresent()) {
+                            throw response.getCoyoteResponse().getErrorException();
+                        }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                         // Need to trigger the call to AbstractProcessor.setErrorState()
@@ -210,6 +214,10 @@ public class CoyoteAdapter implements Adapter {
                         }
                         if (request.isFinished() && req.sendAllDataReadEvent()) {
                             readListener.onAllDataRead();
+                        }
+                        // User code may have swallowed an IOException
+                        if (request.getCoyoteRequest().isExceptionPresent()) {
+                            throw request.getCoyoteRequest().getErrorException();
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);

@@ -125,6 +125,12 @@
         when a I/O error occurs during non-blocking I/O. There were some cases
         discovered where this was not happening. (markt)
       </fix>
+      <add>
+        Make the non-blocking I/O error handling more robust by handling the
+        case where the application code swallows an <code>IOException</code> in
+        <code>WriteListener.onWritePossible()</code> and
+        <code>ReadListener.onDataAvailable()</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

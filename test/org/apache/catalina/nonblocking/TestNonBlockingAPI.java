@@ -1313,6 +1313,18 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testNonBlockingWriteError02NoSwallow() throws Exception {
+        doTestNonBlockingWriteError02(false);
+    }
+
+
+    @Test
+    public void testNonBlockingWriteError02Swallow() throws Exception {
+        doTestNonBlockingWriteError02(true);
+    }
+
+
     /*
      * Tests client disconnect in the following scenario:
      * - async with non-blocking IO
@@ -1321,8 +1333,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
      * - client disconnects
      * - server attempts a write
      */
-    @Test
-    public void testNonBlockingWriteError02() throws Exception {
+    private void doTestNonBlockingWriteError02(boolean swallowIoException) throws Exception {
         CountDownLatch responseCommitLatch = new CountDownLatch(1);
         CountDownLatch clientCloseLatch = new CountDownLatch(1);
         CountDownLatch asyncCompleteLatch = new CountDownLatch(1);
@@ -1333,7 +1344,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
-        NBWriteServlet02 writeServlet = new NBWriteServlet02(responseCommitLatch, clientCloseLatch, asyncCompleteLatch);
+        NBWriteServlet02 writeServlet =
+                new NBWriteServlet02(responseCommitLatch, clientCloseLatch, asyncCompleteLatch, swallowIoException);
         Wrapper wrapper = Tomcat.addServlet(ctx, "writeServlet", writeServlet);
         wrapper.setAsyncSupported(true);
         ctx.addServletMappingDecoded("/*", "writeServlet");
@@ -1355,7 +1367,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         client.disconnect();
         clientCloseLatch.countDown();
 
-        Assert.assertTrue("Failed to complete async processing", asyncCompleteLatch.await(10, TimeUnit.SECONDS));
+        Assert.assertTrue("Failed to complete async processing", asyncCompleteLatch.await(60, TimeUnit.SECONDS));
     }
 
 
@@ -1366,12 +1378,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final CountDownLatch responseCommitLatch;
         private final CountDownLatch clientCloseLatch;
         private final CountDownLatch asyncCompleteLatch;
+        private final boolean swallowIoException;
 
         public NBWriteServlet02(CountDownLatch responseCommitLatch, CountDownLatch clientCloseLatch,
-                CountDownLatch asyncCompleteLatch) {
+                CountDownLatch asyncCompleteLatch, boolean swallowIoException) {
             this.responseCommitLatch = responseCommitLatch;
             this.clientCloseLatch = clientCloseLatch;
             this.asyncCompleteLatch = asyncCompleteLatch;
+            this.swallowIoException = swallowIoException;
         }
 
         @Override
@@ -1383,7 +1397,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             ac.addListener(new TestAsyncListener02(asyncCompleteLatch));
             ac.setTimeout(5000);
 
-            WriteListener writeListener = new TestWriteListener02(ac, responseCommitLatch, clientCloseLatch);
+            WriteListener writeListener =
+                    new TestWriteListener02(ac, responseCommitLatch, clientCloseLatch, swallowIoException);
             resp.getOutputStream().setWriteListener(writeListener);
         }
     }
@@ -1424,37 +1439,45 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final AsyncContext ac;
         private final CountDownLatch responseCommitLatch;
         private final CountDownLatch clientCloseLatch;
+        private final boolean swallowIoException;
         private volatile int stage = 0;
 
         public TestWriteListener02(AsyncContext ac, CountDownLatch responseCommitLatch,
-                CountDownLatch clientCloseLatch) {
+                CountDownLatch clientCloseLatch, boolean swallowIoException) {
             this.ac = ac;
             this.responseCommitLatch = responseCommitLatch;
             this.clientCloseLatch = clientCloseLatch;
+            this.swallowIoException = swallowIoException;
         }
 
         @Override
         public void onWritePossible() throws IOException {
-            ServletOutputStream sos = ac.getResponse().getOutputStream();
-            do {
-                if (stage == 0) {
-                    // Commit the response
-                    ac.getResponse().flushBuffer();
-                    responseCommitLatch.countDown();
-                    stage++;
-                } else if (stage == 1) {
-                    // Wait for the client to drop the connection
-                    try {
-                        clientCloseLatch.await();
-                    } catch (InterruptedException e) {
-                        // Ignore
+            try {
+                ServletOutputStream sos = ac.getResponse().getOutputStream();
+                do {
+                    if (stage == 0) {
+                        // Commit the response
+                        ac.getResponse().flushBuffer();
+                        responseCommitLatch.countDown();
+                        stage++;
+                    } else if (stage == 1) {
+                        // Wait for the client to drop the connection
+                        try {
+                            clientCloseLatch.await();
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
+                        sos.print("TEST");
+                        stage++;
+                    } else if (stage == 2) {
+                        sos.flush();
                     }
-                    sos.print("TEST");
-                    stage++;
-                } else if (stage == 2) {
-                    sos.flush();
+                } while (sos.isReady());
+            } catch (IOException ioe) {
+                if (!swallowIoException) {
+                    throw ioe;
                 }
-            } while (sos.isReady());
+            }
         }
 
         @Override
