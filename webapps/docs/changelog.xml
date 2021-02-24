@@ -120,6 +120,11 @@
         <code>getParallelAnnotationScanning</code> for consistency and ease
         of use in JMX descriptors. (remm)
       </fix>
+      <fix>
+        Ensure that the <code>AsyncListener.onError()</code> event is triggered
+        when a I/O error occurs during non-blocking I/O. There were some cases
+        discovered where this was not happening. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -317,7 +317,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     @Test
-    public void testNonBlockingWriteError() throws Exception {
+    public void testNonBlockingWriteError01() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -387,8 +387,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // Listeners are invoked and access valve entries created on a different
         // thread so give that thread a chance to complete its work.
         int count = 0;
-        while (count < 100 &&
-                !(servlet.wlistener.onErrorInvoked || servlet.rlistener.onErrorInvoked)) {
+        while (count < 100 && !servlet.wlistener.onErrorInvoked) {
             Thread.sleep(100);
             count ++;
         }
@@ -398,8 +397,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             count ++;
         }
 
-        Assert.assertTrue("Error listener should have been invoked.",
-                servlet.wlistener.onErrorInvoked || servlet.rlistener.onErrorInvoked);
+        Assert.assertTrue("Error listener should have been invoked.", servlet.wlistener.onErrorInvoked);
 
         // TODO Figure out why non-blocking writes with the NIO connector appear
         // to be slower on Linux
@@ -550,7 +548,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
         private final boolean unlimited;
         public transient volatile TestWriteListener wlistener;
-        public transient volatile TestReadListener rlistener;
 
         public NBWriteServlet() {
             this(false);
@@ -590,9 +587,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 }
             });
             // step 2 - notify on read
-            ServletInputStream in = req.getInputStream();
-            rlistener = new TestReadListener(actx, true, false);
-            in.setReadListener(rlistener);
             ServletOutputStream out = resp.getOutputStream();
             resp.setBufferSize(200 * 1024);
             wlistener = new TestWriteListener(actx, unlimited);
@@ -625,7 +619,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         protected final boolean usingNonBlockingWrite;
         protected final boolean ignoreIsReady;
         protected final StringBuilder body = new StringBuilder();
-        public volatile boolean onErrorInvoked = false;
 
 
         public TestReadListener(AsyncContext ctx,
@@ -678,7 +671,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         public void onError(Throwable throwable) {
             log.info("ReadListener.onError totalData=" + body.toString().length());
             throwable.printStackTrace();
-            onErrorInvoked = true;
         }
     }
 
@@ -1181,7 +1173,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         tomcat.start();
 
-        PostClient client = new PostClient();
+        ResponseOKClient client = new ResponseOKClient();
         client.setPort(getPort());
         client.setRequest(request);
         client.connect();
@@ -1198,7 +1190,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
 
-    private static final class PostClient extends SimpleHttpClient {
+    private static final class ResponseOKClient extends SimpleHttpClient {
 
         @Override
         public boolean isResponseBodyOK() {
@@ -1317,6 +1309,157 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             // This is the expected behaviour so clear the failed flag.
             testFailed.set(false);
             ac.complete();
+        }
+    }
+
+
+    /*
+     * Tests client disconnect in the following scenario:
+     * - async with non-blocking IO
+     * - response has been committed
+     * - no data in buffers
+     * - client disconnects
+     * - server attempts a write
+     */
+    @Test
+    public void testNonBlockingWriteError02() throws Exception {
+        CountDownLatch responseCommitLatch = new CountDownLatch(1);
+        CountDownLatch clientCloseLatch = new CountDownLatch(1);
+        CountDownLatch asyncCompleteLatch = new CountDownLatch(1);
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        NBWriteServlet02 writeServlet = new NBWriteServlet02(responseCommitLatch, clientCloseLatch, asyncCompleteLatch);
+        Wrapper wrapper = Tomcat.addServlet(ctx, "writeServlet", writeServlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMappingDecoded("/*", "writeServlet");
+
+        tomcat.start();
+
+        ResponseOKClient client = new ResponseOKClient();
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF
+                });
+        client.connect();
+        client.sendRequest();
+
+        responseCommitLatch.await();
+
+        client.disconnect();
+        clientCloseLatch.countDown();
+
+        Assert.assertTrue("Failed to complete async processing", asyncCompleteLatch.await(10, TimeUnit.SECONDS));
+    }
+
+
+    private static class NBWriteServlet02 extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final CountDownLatch responseCommitLatch;
+        private final CountDownLatch clientCloseLatch;
+        private final CountDownLatch asyncCompleteLatch;
+
+        public NBWriteServlet02(CountDownLatch responseCommitLatch, CountDownLatch clientCloseLatch,
+                CountDownLatch asyncCompleteLatch) {
+            this.responseCommitLatch = responseCommitLatch;
+            this.clientCloseLatch = clientCloseLatch;
+            this.asyncCompleteLatch = asyncCompleteLatch;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            AsyncContext ac = req.startAsync();
+            ac.addListener(new TestAsyncListener02(asyncCompleteLatch));
+            ac.setTimeout(5000);
+
+            WriteListener writeListener = new TestWriteListener02(ac, responseCommitLatch, clientCloseLatch);
+            resp.getOutputStream().setWriteListener(writeListener);
+        }
+    }
+
+
+    private static class TestAsyncListener02 implements AsyncListener {
+
+        private final CountDownLatch asyncCompleteLatch;
+
+        public TestAsyncListener02(CountDownLatch asyncCompleteLatch) {
+            this.asyncCompleteLatch = asyncCompleteLatch;
+        }
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            asyncCompleteLatch.countDown();
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+    }
+
+    private static class TestWriteListener02 implements WriteListener {
+
+        private final AsyncContext ac;
+        private final CountDownLatch responseCommitLatch;
+        private final CountDownLatch clientCloseLatch;
+        private volatile int stage = 0;
+
+        public TestWriteListener02(AsyncContext ac, CountDownLatch responseCommitLatch,
+                CountDownLatch clientCloseLatch) {
+            this.ac = ac;
+            this.responseCommitLatch = responseCommitLatch;
+            this.clientCloseLatch = clientCloseLatch;
+        }
+
+        @Override
+        public void onWritePossible() throws IOException {
+            ServletOutputStream sos = ac.getResponse().getOutputStream();
+            do {
+                if (stage == 0) {
+                    // Commit the response
+                    ac.getResponse().flushBuffer();
+                    responseCommitLatch.countDown();
+                    stage++;
+                } else if (stage == 1) {
+                    // Wait for the client to drop the connection
+                    try {
+                        clientCloseLatch.await();
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                    sos.print("TEST");
+                    stage++;
+                } else if (stage == 2) {
+                    sos.flush();
+                }
+            } while (sos.isReady());
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            // NO-OP
         }
     }
 }
