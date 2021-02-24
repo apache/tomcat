@@ -141,6 +141,11 @@
         <code>setLocale()</code> with the recent clarification from the Jakarta
         Servlet project of the expected behaviour in these cases. (markt)
       </fix>
+      <fix>
+        Ensure that the <code>AsyncListener.onError()</code> event is triggered
+        when a I/O error occurs during non-blocking I/O. There were some cases
+        discovered where this was not happening. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
