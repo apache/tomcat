@@ -963,7 +963,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      *       appropriately.
      */
     private static void clearLastError() {
-        while (SSL.getLastErrorNumber() != SSL.SSL_ERROR_NONE);
+        while (SSL.getLastErrorNumber() != SSL.SSL_ERROR_NONE) {
+            // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
+        }
     }
 
     private SSLEngineResult.Status getEngineStatus() {
