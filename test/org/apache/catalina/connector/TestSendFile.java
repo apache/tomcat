@@ -60,36 +60,31 @@ public class TestSendFile extends TomcatBaseTest {
         File[] files = new File[ITERATIONS];
         for (int i = 0; i < ITERATIONS; i++) {
             files[i] = generateFile(TEMP_DIR, "-" + i, EXPECTED_CONTENT_LENGTH * (i + 1));
+            addDeleteOnTearDown(files[i]);
         }
-        try {
 
-            for (int i = 0; i < ITERATIONS; i++) {
-                WritingServlet servlet = new WritingServlet(files[i]);
-                Tomcat.addServlet(root, "servlet" + i, servlet);
-                root.addServletMappingDecoded("/servlet" + i, "servlet" + i);
-            }
+        for (int i = 0; i < ITERATIONS; i++) {
+            WritingServlet servlet = new WritingServlet(files[i]);
+            Tomcat.addServlet(root, "servlet" + i, servlet);
+            root.addServletMappingDecoded("/servlet" + i, "servlet" + i);
+        }
 
-            tomcat.start();
+        tomcat.start();
 
-            ByteChunk bc = new ByteChunk();
-            Map<String, List<String>> respHeaders = new HashMap<>();
-            for (int i = 0; i < ITERATIONS; i++) {
-                long start = System.currentTimeMillis();
-                int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null,
-                        respHeaders);
-                Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-                System.out.println("Client received " + bc.getLength() + " bytes in "
-                        + (System.currentTimeMillis() - start) + " ms.");
-                Assert.assertEquals("Expected [" + EXPECTED_CONTENT_LENGTH * (i + 1L) +
-                        "], was [" + bc.getLength() + "]",
-                        EXPECTED_CONTENT_LENGTH * (i + 1L), bc.getLength());
+        ByteChunk bc = new ByteChunk();
+        Map<String, List<String>> respHeaders = new HashMap<>();
+        for (int i = 0; i < ITERATIONS; i++) {
+            long start = System.currentTimeMillis();
+            int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null,
+                    respHeaders);
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            System.out.println("Client received " + bc.getLength() + " bytes in "
+                    + (System.currentTimeMillis() - start) + " ms.");
+            Assert.assertEquals("Expected [" + EXPECTED_CONTENT_LENGTH * (i + 1L) +
+                    "], was [" + bc.getLength() + "]",
+                    EXPECTED_CONTENT_LENGTH * (i + 1L), bc.getLength());
 
-                bc.recycle();
-            }
-        } finally {
-            for (File f : files) {
-                Assert.assertTrue("Failed to clean up [" + f + "]", f.delete());
-            }
+            bc.recycle();
         }
     }
 
