@@ -1375,9 +1375,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private final CountDownLatch responseCommitLatch;
-        private final CountDownLatch clientCloseLatch;
-        private final CountDownLatch asyncCompleteLatch;
+        private final transient CountDownLatch responseCommitLatch;
+        private final transient CountDownLatch clientCloseLatch;
+        private final transient CountDownLatch asyncCompleteLatch;
         private final boolean swallowIoException;
 
         public NBWriteServlet02(CountDownLatch responseCommitLatch, CountDownLatch clientCloseLatch,
@@ -1440,7 +1440,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final CountDownLatch responseCommitLatch;
         private final CountDownLatch clientCloseLatch;
         private final boolean swallowIoException;
-        private volatile int stage = 0;
+        private volatile AtomicInteger stage = new AtomicInteger(0);
 
         public TestWriteListener02(AsyncContext ac, CountDownLatch responseCommitLatch,
                 CountDownLatch clientCloseLatch, boolean swallowIoException) {
@@ -1455,12 +1455,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             try {
                 ServletOutputStream sos = ac.getResponse().getOutputStream();
                 do {
-                    if (stage == 0) {
+                    if (stage.get() == 0) {
                         // Commit the response
                         ac.getResponse().flushBuffer();
                         responseCommitLatch.countDown();
-                        stage++;
-                    } else if (stage == 1) {
+                        stage.incrementAndGet();
+                    } else if (stage.get() == 1) {
                         // Wait for the client to drop the connection
                         try {
                             clientCloseLatch.await();
@@ -1468,8 +1468,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                             // Ignore
                         }
                         sos.print("TEST");
-                        stage++;
-                    } else if (stage == 2) {
+                        stage.incrementAndGet();
+                    } else if (stage.get() == 2) {
                         sos.flush();
                     }
                 } while (sos.isReady());
