@@ -71,7 +71,7 @@ install:
     - cd $CURR_PWD
     - yes | cp build.properties.default build.properties
     - echo >> build.properties
-    - echo "test.threads=8" >> build.properties
+    - echo "test.threads=2" >> build.properties
     - echo "test.relaxTiming=true" >> build.properties
     - echo "test.excludePerformance=true" >> build.properties
     - echo "test.openssl.path=/dev/null/openssl" >> build.properties
