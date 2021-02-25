@@ -532,6 +532,12 @@
     <Bug code="NP" />
   </Match>
   <Match>
+    <!-- legacyAppBase is tested a few lines earlier -->
+    <Class name="org.apache.catalina.startup.HostConfig" />
+    <Method name="migrateLegacyApps" />
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+  </Match>
+  <Match>
     <!-- Domain resolution not an issue here -->
     <Class name="org.apache.catalina.startup.WebappServiceLoader" />
     <Method name="load" />

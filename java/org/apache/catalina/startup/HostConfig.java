@@ -1237,6 +1237,7 @@ public class HostConfig implements LifecycleListener {
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<>();
 
+        // Should not be null as we test above if this is a directory
         String[] migrationCandidates = legacyAppBase.list();
         for (String migrationCandidate : migrationCandidates) {
             File source = new File(legacyAppBase, migrationCandidate);
@@ -1282,7 +1283,8 @@ public class HostConfig implements LifecycleListener {
             tempNew = File.createTempFile("new", null, host.getLegacyAppBaseFile());
             tempOld = File.createTempFile("old", null, host.getLegacyAppBaseFile());
             // createTempFile is not directly compatible with directories, so cleanup
-            tempNew.delete();
+            Files.delete(tempNew.toPath());
+            Files.delete(tempOld.toPath());
 
             // The use of defaults is deliberate here to avoid having to
             // recreate every configuration option on the host. Better to change
@@ -1295,8 +1297,8 @@ public class HostConfig implements LifecycleListener {
             migration.execute();
 
             // Use rename
-            destination.renameTo(tempOld);
-            tempNew.renameTo(destination);
+            Files.move(destination.toPath(), tempOld.toPath());
+            Files.move(tempNew.toPath(), destination.toPath());
             ExpandWar.delete(tempOld);
 
         } catch (Throwable t) {
