@@ -183,6 +183,10 @@
       <add>
         Improvements to Korean translations. (woonsan)
       </add>
+      <add>
+        Improvements to Brazilian Portuguese translations. Provided by Thiago.
+        (mark)
+      </add>
     </changelog>
   </subsection>
 </section>
