@@ -119,7 +119,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.109 (violetagg)" rtext="in development">
-</section>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
+    </changelog>
+  </subsection></section>
 <section name="Tomcat 7.0.108 (violetagg)" rtext="released 2021-02-05">
   <subsection name="Catalina">
     <changelog>
