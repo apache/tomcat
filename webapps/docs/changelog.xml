@@ -177,6 +177,9 @@
       <update>
         Update the CXF module to Apache CXF 3.4.2. (remm)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
