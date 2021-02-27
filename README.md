@@ -1,6 +1,6 @@
 ## Welcome to Apache Tomcat!
 
-## What Is It?
+######## What Is It?
 
 The Apache Tomcat® software is an open source implementation of the Java
 Servlet, JavaServer Pages, Java Expression Language and Java WebSocket
