@@ -437,7 +437,7 @@ public final class Response {
     public void setLocale(Locale locale) {
 
         if (locale == null) {
-            return;  // throw an exception?
+            return;
         }
 
         // Save the locale for use by getLocale()
@@ -481,16 +481,16 @@ public final class Response {
     }
 
 
+    public Charset getCharset() {
+        return charset;
+    }
+
+
     /**
      * @return The name of the current encoding
      */
     public String getCharacterEncoding() {
         return characterEncoding;
-    }
-
-
-    public Charset getCharset() {
-        return charset;
     }
 
 

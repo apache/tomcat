@@ -134,7 +134,6 @@ public class OutputBuffer extends Writer {
 
     // ----------------------------------------------------------- Constructors
 
-
     /**
      * Default constructor. Allocate the buffer with the default buffer size.
      */
@@ -146,7 +145,7 @@ public class OutputBuffer extends Writer {
 
 
     /**
-     * Alternate constructor which allows specifying the initial buffer size.
+     * Create the buffer with the specified initial size.
      *
      * @param size Buffer size to use
      */
@@ -160,7 +159,6 @@ public class OutputBuffer extends Writer {
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Associated Coyote response.
