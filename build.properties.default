@@ -273,29 +273,22 @@ findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/
 
 # ----- bnd, version 5.3.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
-# *** Using SNAPSHOT *** Using SNAPSHOT *** Using SNAPSHOT ***
-# The specific version used for release builds will be archived at
-# https://home.apache.org/~markt/dev/deps/bnd-5.3.0-SNAPHOT/
-# *** Using SNAPSHOT *** Using SNAPSHOT *** Using SNAPSHOT ***
-bnd.version=5.3.0-SNAPSHOT
+bnd.version=5.3.0
 
-# checksums for biz.aQute.bnd-5.2.0.jar
-# *** Disabled while we depend on SNAPSHOT JARs ***
-bnd.checksum.enabled=false
+# checksums for biz.aQute.bnd-5.3.0.jar
+bnd.checksum.enabled=true
 bnd.checksum.algorithm=MD5|SHA-1
-bnd.checksum.value=3254df4b94104002f79005ae54ec1dbb|1d69d0a5862133ac1f54555c9cd59011d79bbb86
+bnd.checksum.value=7cba73481ee6e72b182ba5c13801aafe|10ec0974db02f810e9345b218f4de4abe898ab04
 
 bnd.home=${base.path}/bnd-${bnd.version}
 bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
-# *** Temporary change to use the SNAPSHOT repository ***
-# bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
-bnd.loc=https://bndtools.jfrog.io/bndtools/update-snapshot/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
+bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
 
 # ----- OSGi annotations bundle, version 1.0.0 or later            -----
 # ----- required to avoid Javadoc error when using bnd annotations -----
 osgi-annotations.version=1.0.0
 
-# checksums for biz.aQute.bnd-5.2.0.jar
+# checksums for OSGi annotations, version 1.0.0
 osgi-annotations.checksum.enabled=true
 osgi-annotations.checksum.algorithm=MD5|SHA-1
 osgi-annotations.checksum.value=153054f987534244f95a399539b11375|b6e802bceba0682353466abf8fadbbd662b2f7f8
