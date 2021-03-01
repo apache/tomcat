@@ -200,6 +200,9 @@
       <add>
         Improvements to Chinese translations. Provided by shawn. (mark)
       </add>
+      <update>
+        Update to bnd 5.3.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
