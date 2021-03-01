@@ -310,25 +310,3 @@ cobertura.checksum.value=63a8c5b3f5c1226fcc52cc9c9ea2a812|705d23e5a8815aff3bc4ad
 cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
 cobertura.loc=${base-sf.loc}/cobertura/cobertura-${cobertura.version}-bin.tar.gz
-
-<<<<<<< HEAD
-# ----- SAAJ API, used by Code Signing for releases -----
-# ----- No longer part of JRE from Java 11 onwards  -----
-# ----- CDDL Licensed                               -----
-saaj-api.version=1.3.5
-saaj-api.checksum.enabled=true
-saaj-api.checksum.algorithm=MD5|SHA-1
-saaj-api.checksum.value=caae8b4bf2c551155815331e9e96256f|1c399a7fea4d0262a6a39750e419c24f0c769586
-saaj-api.home=${base.path}/saaj-api-${saaj-api.version}
-saaj-api.jar=${saaj-api.home}/saaj-api-${saaj-api.version}.jar
-saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-api-${saaj-api.version}.jar
-=======
-# ----- Findbugs -----
-findbugs.version=3.1.12
-findbugs.checksum.enabled=true
-findbugs.checksum.algorithm=MD5|SHA-1
-findbugs.checksum.value=8c54502a8e1b78ea6b173a186ce6f379|95114d9aaeeba7bd4ea5a3d6a2167cd6c87bb943
-findbugs.home=${base.path}/spotbugs-${findbugs.version}
-findbugs.jar=${findbugs.home}/lib/spotbugs-ant.jar
-findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/spotbugs-${findbugs.version}.tgz
->>>>>>> 4f25dd7cc0... Update to new code signing service.
