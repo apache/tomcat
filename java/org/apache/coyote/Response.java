@@ -458,7 +458,8 @@ public final class Response {
         if (locale == null) {
             this.locale = null;
             this.contentLanguage = null;
-            return;        }
+            return;
+        }
 
         // Save the locale for use by getLocale()
         this.locale = locale;
