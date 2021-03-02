@@ -464,6 +464,12 @@
       <p>The <strong>persistAuthentication</strong> controls whether the
       authenticated Principal associated with the session (if any) is included
       when the session is persisted during a restart or to a Store.</p>
+
+      <p>When using the <strong>JDBCStore</strong>, the session store should be
+      secured (dedciated credentials, appropriate permissions) such that only
+      the <strong>JDBCStore</strong> is able to access the persisted session
+      data. In particular, the <strong>JDBCStore</strong> should be accessible
+      via any credentials available to a web application.</p>
     </subsection>
 
     <subsection name="Cluster">
