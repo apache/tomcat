@@ -304,7 +304,6 @@ public class CoyoteAdapter implements Adapter {
                 // trigger a close
                 success = false;
                 Throwable t = (Throwable)req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-                req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
                 if (t != null) {
                     asyncConImpl.setErrorState(t, true);
                 }
