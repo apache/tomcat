@@ -162,11 +162,10 @@ public class CoyoteAdapter implements Adapter {
                     if (res.getWriteListener() != null) {
                         res.getWriteListener().onError(t);
                     }
+                    res.action(ActionCode.CLOSE_NOW, t);
+                    asyncConImpl.setErrorState(t, true);
                 } finally {
                     context.unbind(false, oldCL);
-                }
-                if (t != null) {
-                    asyncConImpl.setErrorState(t, true);
                 }
             }
 
@@ -195,8 +194,8 @@ public class CoyoteAdapter implements Adapter {
                         // Therefore no need to set success=false as that would trigger a
                         // second call to AbstractProcessor.setErrorState()
                         // https://bz.apache.org/bugzilla/show_bug.cgi?id=65001
-                        res.action(ActionCode.CLOSE_NOW, t);
                         writeListener.onError(t);
+                        res.action(ActionCode.CLOSE_NOW, t);
                         asyncConImpl.setErrorState(t, true);
                     } finally {
                         context.unbind(false, oldCL);
@@ -228,8 +227,8 @@ public class CoyoteAdapter implements Adapter {
                         // Therefore no need to set success=false as that would trigger a
                         // second call to AbstractProcessor.setErrorState()
                         // https://bz.apache.org/bugzilla/show_bug.cgi?id=65001
-                        res.action(ActionCode.CLOSE_NOW, t);
                         readListener.onError(t);
+                        res.action(ActionCode.CLOSE_NOW, t);
                         asyncConImpl.setErrorState(t, true);
                     } finally {
                         context.unbind(false, oldCL);
