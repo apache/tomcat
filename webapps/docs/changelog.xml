@@ -159,6 +159,10 @@
         fully cleared, as there could be more than one error present after
         an operation (confirmed in the OpenSSL API documentation). (remm)
       </fix>
+      <fix>
+        Make handling of OpenSSL read errors more robust when plain text data is
+        reported to be available to read. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
