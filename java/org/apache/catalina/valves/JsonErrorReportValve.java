@@ -83,7 +83,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
         }
         String jsonReport = "{\n" +
                             "  \"type\": \"" + type + "\",\n" +
-                            "  \"message\": \"" + message + "\"\n" +
+                            "  \"message\": \"" + message + "\",\n" +
                             "  \"description\": \"" + description + "\"\n" +
                             "}";
         try {
