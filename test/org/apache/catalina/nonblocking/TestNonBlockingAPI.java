@@ -154,11 +154,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     private void testNonBlockingWriteInternal(boolean keepAlive) throws Exception {
+        AtomicBoolean asyncContextIsComplete = new AtomicBoolean(false);
+
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
-        NBWriteServlet servlet = new NBWriteServlet();
+        NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete);
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
@@ -314,11 +316,25 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
 
         Assert.assertEquals(WRITE_SIZE, totalBodyRead);
+        Assert.assertTrue("AsyncContext should have been completed.", asyncContextIsComplete.get());
     }
 
 
     @Test
-    public void testNonBlockingWriteError01() throws Exception {
+    public void testNonBlockingWriteError01ListenerComplete() throws Exception {
+        doTestNonBlockingWriteError01NoListenerComplete(true);
+    }
+
+
+    @Test
+    public void testNonBlockingWriteError01NoListenerComplete() throws Exception {
+        doTestNonBlockingWriteError01NoListenerComplete(false);
+    }
+
+
+    private void doTestNonBlockingWriteError01NoListenerComplete(boolean listenerCompletesOnError) throws Exception {
+        AtomicBoolean asyncContextIsComplete = new AtomicBoolean(false);
+
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -330,7 +346,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // Some CI platforms appear to have particularly large write buffers
         // and appear to ignore the socket.txBufSize below. Therefore, configure
         // configure the Servlet to keep writing until an error is encountered.
-        NBWriteServlet servlet = new NBWriteServlet(true);
+        NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete, true, listenerCompletesOnError);
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
@@ -393,12 +409,18 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             count ++;
         }
 
+        while (count < 100 && !asyncContextIsComplete.get()) {
+            Thread.sleep(100);
+            count ++;
+        }
+
         while (count < 100 && alv.getEntryCount() < 1) {
             Thread.sleep(100);
             count ++;
         }
 
         Assert.assertTrue("Error listener should have been invoked.", servlet.wlistener.onErrorInvoked);
+        Assert.assertTrue("Async context should have been completed.", asyncContextIsComplete.get());
 
         // TODO Figure out why non-blocking writes with the NIO connector appear
         // to be slower on Linux
@@ -547,16 +569,20 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     @WebServlet(asyncSupported = true)
     public static class NBWriteServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
+        private final AtomicBoolean asyncContextIsComplete;
         private final boolean unlimited;
+        private final boolean listenerCompletesOnError;
         public transient volatile TestWriteListener wlistener;
 
-        public NBWriteServlet() {
-            this(false);
+        public NBWriteServlet(AtomicBoolean asyncContextIsComplete) {
+            this(asyncContextIsComplete, false, true);
         }
 
 
-        public NBWriteServlet(boolean unlimited) {
+        public NBWriteServlet(AtomicBoolean asyncContextIsComplete, boolean unlimited, boolean listenerCompletesOnError) {
+            this.asyncContextIsComplete = asyncContextIsComplete;
             this.unlimited = unlimited;
+            this.listenerCompletesOnError = listenerCompletesOnError;
         }
 
 
@@ -580,11 +606,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 @Override
                 public void onError(AsyncEvent event) throws IOException {
                     log.info("AsyncListener.onError");
+                    if (listenerCompletesOnError) {
+                        event.getAsyncContext().complete();
+                    }
                 }
 
                 @Override
                 public void onComplete(AsyncEvent event) throws IOException {
                     log.info("onComplete");
+                    asyncContextIsComplete.set(true);
                 }
             });
             // step 2 - notify on read
