@@ -591,8 +591,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     throw new SSLException(e);
                 }
 
-                if (bytesRead == 0) {
-                    break;
+                if (bytesRead <= 0) {
+                    // This should not be possible. pendingApp is positive
+                    // therefore the read should have read at least one byte.
+                    throw new IllegalStateException(sm.getString("engine.failedToReadAvailableBytes"));
                 }
 
                 bytesProduced += bytesRead;
