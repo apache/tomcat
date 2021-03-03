@@ -128,6 +128,11 @@
         <code>setLocale()</code> with the recent clarification from the Jakarta
         Servlet project of the expected behaviour in these cases. (markt)
       </fix>
+      <scode>
+        Make the <code>StandardContext.postWorkDirectory()</code> protected
+        rather than private to help users wishing to customise the default
+        work directory behaviour. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

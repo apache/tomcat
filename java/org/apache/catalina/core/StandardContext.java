@@ -6036,7 +6036,7 @@ public class StandardContext extends ContainerBase
     /**
      * Set the appropriate context attribute for our work directory.
      */
-    private void postWorkDirectory() {
+    protected void postWorkDirectory() {
 
         // Acquire (or calculate) the work directory path
         String workDir = getWorkDir();
