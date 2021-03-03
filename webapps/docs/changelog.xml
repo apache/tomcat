@@ -156,6 +156,11 @@
         Correct syntax error in output of <code>JsonErrorReportValve</code>.
         Pull request provided by Viraj Kanwade. (markt)
       </fix>
+      <scode>
+        Make the <code>StandardContext.postWorkDirectory()</code> protected
+        rather than private to help users wishing to customise the default
+        work directory behaviour. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
