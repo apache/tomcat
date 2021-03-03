@@ -138,6 +138,10 @@
         <code>WriteListener.onWritePossible()</code> and
         <code>ReadListener.onDataAvailable()</code>. (markt)
       </add>
+      <fix>
+        Correct syntax error in output of <code>JsonErrorReportValve</code>.
+        Pull request provided by Viraj Kanwade. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
