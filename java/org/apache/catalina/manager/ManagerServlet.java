@@ -782,7 +782,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             config = config.substring("file:".length());
         }
 
-        System.out.println("deployed bundle : " + baseName);
         File deployedBundle = new File(host.getAppBaseFile(), baseName + ".war");
 
         // Determine full path for uploaded Bundle
@@ -887,6 +886,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String baseName = cn.getBaseName();
         String name = cn.getName();
         String displayPath = cn.getDisplayName();
+
+        System.out.println("deployed bundle : " + baseName);
 
         // Find the local Bundle file
         File localBundle = new File(new File(versioned, tag), baseName + ".war");
