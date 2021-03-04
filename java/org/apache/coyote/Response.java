@@ -627,8 +627,10 @@ public final class Response {
         trailerFieldsSupplier = null;
         // Servlet 3.1 non-blocking write listener
         listener = null;
-        fireListener = false;
-        registeredForWrite = false;
+        synchronized (nonBlockingStateLock) {
+            fireListener = false;
+            registeredForWrite = false;
+        }
 
         // update counters
         contentWritten=0;
