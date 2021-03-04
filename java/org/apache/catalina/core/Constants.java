@@ -16,7 +16,16 @@
  */
 package org.apache.catalina.core;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Constants {
+    /**
+     *  accepted bundle extensions
+     *  a bundle is package war file,
+     *  for the moment could be renamed...
+     */
+    public static final List<String> AcceptedExtensions = Arrays.asList(".war", ".q");
 
     public static final String Package = "org.apache.catalina.core";
     public static final int MAJOR_VERSION = 5;

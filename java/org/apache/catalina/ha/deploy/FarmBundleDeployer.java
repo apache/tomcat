@@ -38,21 +38,22 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
-
+import org.apache.catalina.startup.HostConfig;
+import org.apache.catalina.core.Constants;
 
 /**
  * <p>
- * A farm war deployer is a class that is able to deploy/undeploy web
- * applications in WAR from within the cluster.
+ * A farm bundle deployer is a class that is able to deploy/undeploy web
+ * applications in Bundle from within the cluster.
  * </p>
  * Any host can act as the admin, and will have three directories
  * <ul>
  * <li>watchDir - the directory where we watch for changes</li>
  * <li>deployDir - the directory where we install applications</li>
  * <li>tempDir - a temporaryDirectory to store binary data when downloading a
- * war from the cluster</li>
+ * bundle from the cluster</li>
  * </ul>
- * Currently we only support deployment of WAR files since they are easier to
+ * Currently we only support deployment of Bundle files since they are easier to
  * send across the wire.
  *
  * @author Peter Rossbach
@@ -139,7 +140,7 @@ public class FarmBundleDeployer extends ClusterListener
             return;
         Container hcontainer = getCluster().getContainer();
         if(!(hcontainer instanceof Host)) {
-            log.error(sm.getString("farmWarDeployer.hostOnly"));
+            log.error(sm.getString("farmBundleDeployer.hostOnly"));
             return ;
         }
         host = (Host) hcontainer;
@@ -147,7 +148,7 @@ public class FarmBundleDeployer extends ClusterListener
         // Check to correct engine and host setup
         Container econtainer = host.getParent();
         if(!(econtainer instanceof Engine)) {
-            log.error(sm.getString("farmWarDeployer.hostParentEngine",
+            log.error(sm.getString("farmBundleDeployer.hostParentEngine",
                     host.getName()));
             return ;
         }
@@ -158,7 +159,7 @@ public class FarmBundleDeployer extends ClusterListener
             oname = new ObjectName(engine.getName() + ":type=Deployer,host="
                     + hostname);
         } catch (Exception e) {
-            log.error(sm.getString("farmWarDeployer.mbeanNameFail",
+            log.error(sm.getString("farmBundleDeployer.mbeanNameFail",
                     engine.getName(), hostname),e);
             return;
         }
@@ -166,7 +167,7 @@ public class FarmBundleDeployer extends ClusterListener
             watcher = new BundleWatcher(this, getWatchDirFile());
             if (log.isInfoEnabled()) {
                 log.info(sm.getString(
-                        "farmWarDeployer.watchDir", getWatchDir()));
+                        "farmBundleDeployer.watchDir", getWatchDir()));
             }
         }
 
@@ -181,7 +182,7 @@ public class FarmBundleDeployer extends ClusterListener
         getCluster().addClusterListener(this);
 
         if (log.isInfoEnabled())
-            log.info(sm.getString("farmWarDeployer.started"));
+            log.info(sm.getString("farmBundleDeployer.started"));
     }
 
     /*
@@ -200,7 +201,7 @@ public class FarmBundleDeployer extends ClusterListener
 
         }
         if (log.isInfoEnabled())
-            log.info(sm.getString("farmWarDeployer.stopped"));
+            log.info(sm.getString("farmBundleDeployer.stopped"));
     }
 
     /**
@@ -216,14 +217,14 @@ public class FarmBundleDeployer extends ClusterListener
             if (msg instanceof FileMessage) {
                 FileMessage fmsg = (FileMessage) msg;
                 if (log.isDebugEnabled())
-                    log.debug(sm.getString("farmWarDeployer.msgRxDeploy",
+                    log.debug(sm.getString("farmBundleDeployer.msgRxDeploy",
                             fmsg.getContextName(), fmsg.getFileName()));
                 FileMessageFactory factory = getFactory(fmsg);
                 // TODO correct second try after app is in service!
                 if (factory.writeMessage(fmsg)) {
-                    //last message received war file is completed
+                    //last message received bundle file is completed
                     String name = factory.getFile().getName();
-                    if (!name.endsWith(".war"))
+                    if (!HostConfig.isValidExtension(name))
                         name = name + ".war";
                     File deployable = new File(getDeployDirFile(), name);
                     try {
@@ -233,7 +234,7 @@ public class FarmBundleDeployer extends ClusterListener
                                 remove(contextName);
                                 if (!factory.getFile().renameTo(deployable)) {
                                     log.error(sm.getString(
-                                            "farmWarDeployer.renameFail",
+                                            "farmBundleDeployer.renameFail",
                                             factory.getFile(), deployable));
                                 }
                             } finally {
@@ -242,14 +243,14 @@ public class FarmBundleDeployer extends ClusterListener
                             check(contextName);
                             if (log.isDebugEnabled())
                                 log.debug(sm.getString(
-                                        "farmWarDeployer.deployEnd",
+                                        "farmBundleDeployer.deployEnd",
                                         contextName));
                         } else
                             log.error(sm.getString(
-                                    "farmWarDeployer.servicingDeploy",
+                                    "farmBundleDeployer.servicingDeploy",
                                     contextName, name));
                     } catch (Exception ex) {
-                        log.error(sm.getString("farmWarDeployer.fileMessageError"), ex);
+                        log.error(sm.getString("farmBundleDeployer.fileMessageError"), ex);
                     } finally {
                         removeFactory(fmsg);
                     }
@@ -259,7 +260,7 @@ public class FarmBundleDeployer extends ClusterListener
                     UndeployMessage umsg = (UndeployMessage) msg;
                     String contextName = umsg.getContextName();
                     if (log.isDebugEnabled())
-                        log.debug(sm.getString("farmWarDeployer.msgRxUndeploy",
+                        log.debug(sm.getString("farmBundleDeployer.msgRxUndeploy",
                                 contextName));
                     if (tryAddServiced(contextName)) {
                         try {
@@ -269,26 +270,26 @@ public class FarmBundleDeployer extends ClusterListener
                         }
                         if (log.isDebugEnabled())
                             log.debug(sm.getString(
-                                    "farmWarDeployer.undeployEnd",
+                                    "farmBundleDeployer.undeployEnd",
                                     contextName));
                     } else
                         log.error(sm.getString(
-                                "farmWarDeployer.servicingUndeploy",
+                                "farmBundleDeployer.servicingUndeploy",
                                 contextName));
                 } catch (Exception ex) {
-                    log.error(sm.getString("farmWarDeployer.undeployMessageError"), ex);
+                    log.error(sm.getString("farmBundleDeployer.undeployMessageError"), ex);
                 }
             }
         } catch (java.io.IOException x) {
-            log.error(sm.getString("farmWarDeployer.msgIoe"), x);
+            log.error(sm.getString("farmBundleDeployer.msgIoe"), x);
         }
     }
 
     /**
-     * Create factory for all transported war files
+     * Create factory for all transported bundle files
      *
      * @param msg The file
-     * @return Factory for all app message (war files)
+     * @return Factory for all app message (bundle files)
      * @throws java.io.FileNotFoundException Missing file error
      * @throws java.io.IOException Other IO error
      */
@@ -305,7 +306,7 @@ public class FarmBundleDeployer extends ClusterListener
     }
 
     /**
-     * Remove file (war) from messages
+     * Remove file (bundle) from messages
      *
      * @param msg The file
      */
@@ -341,7 +342,7 @@ public class FarmBundleDeployer extends ClusterListener
      *            The context name to which this application should be installed
      *            (must be unique)
      * @param webapp
-     *            A WAR file or unpacked directory structure containing the web
+     *            A Bundle file or unpacked directory structure containing the web
      *            application to be installed
      *
      * @exception IllegalArgumentException
@@ -363,13 +364,13 @@ public class FarmBundleDeployer extends ClusterListener
         FileMessage msg = new FileMessage(localMember, webapp.getName(),
                 contextName);
         if(log.isDebugEnabled())
-            log.debug(sm.getString("farmWarDeployer.sendStart", contextName,
+            log.debug(sm.getString("farmBundleDeployer.sendStart", contextName,
                     webapp));
         msg = factory.readMessage(msg);
         while (msg != null) {
             for (Member member : members) {
                 if (log.isDebugEnabled())
-                    log.debug(sm.getString("farmWarDeployer.sendFragment",
+                    log.debug(sm.getString("farmBundleDeployer.sendFragment",
                             contextName, webapp, member));
                 getCluster().send(msg, member);
             }
@@ -377,7 +378,7 @@ public class FarmBundleDeployer extends ClusterListener
         }
         if(log.isDebugEnabled())
             log.debug(sm.getString(
-                    "farmWarDeployer.sendEnd", contextName, webapp));
+                    "farmBundleDeployer.sendEnd", contextName, webapp));
     }
 
     /**
@@ -385,7 +386,7 @@ public class FarmBundleDeployer extends ClusterListener
      * name. If this application is successfully removed, a ContainerEvent of
      * type <code>REMOVE_EVENT</code> will be sent to all registered
      * listeners, with the removed <code>Context</code> as an argument.
-     * Deletes the web application war file and/or directory if they exist in
+     * Deletes the web application bundle file and/or directory if they exist in
      * the Host's appBase.
      *
      * @param contextName
@@ -406,13 +407,13 @@ public class FarmBundleDeployer extends ClusterListener
             throws IOException {
         if (getCluster().getMembers().length > 0) {
             if (log.isInfoEnabled())
-                log.info(sm.getString("farmWarDeployer.removeStart", contextName));
+                log.info(sm.getString("farmBundleDeployer.removeStart", contextName));
             Member localMember = getCluster().getLocalMember();
             UndeployMessage msg = new UndeployMessage(localMember, System
                     .currentTimeMillis(), "Undeploy:" + contextName + ":"
                     + System.currentTimeMillis(), contextName);
             if (log.isDebugEnabled())
-                log.debug(sm.getString("farmWarDeployer.removeTxMsg", contextName));
+                log.debug(sm.getString("farmBundleDeployer.removeTxMsg", contextName));
             cluster.send(msg);
         }
         // remove locally
@@ -426,11 +427,11 @@ public class FarmBundleDeployer extends ClusterListener
                     }
                     check(contextName);
                 } else
-                    log.error(sm.getString("farmWarDeployer.removeFailRemote",
+                    log.error(sm.getString("farmBundleDeployer.removeFailRemote",
                             contextName));
 
             } catch (Exception ex) {
-                log.error(sm.getString("farmWarDeployer.removeFailLocal",
+                log.error(sm.getString("farmBundleDeployer.removeFailLocal",
                         contextName), ex);
             }
         }
@@ -438,7 +439,7 @@ public class FarmBundleDeployer extends ClusterListener
     }
 
     /**
-     * Modification from watchDir war detected!
+     * Modification from watchDir bundle detected!
      *
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileModified(File)
      */
@@ -449,11 +450,11 @@ public class FarmBundleDeployer extends ClusterListener
             ContextName cn = new ContextName(deployBundle.getName(), true);
             if (deployBundle.exists() && deployBundle.lastModified() > newBundle.lastModified()) {
                 if (log.isInfoEnabled())
-                    log.info(sm.getString("farmWarDeployer.alreadyDeployed", cn.getName()));
+                    log.info(sm.getString("farmBundleDeployer.alreadyDeployed", cn.getName()));
                 return;
             }
             if (log.isInfoEnabled())
-                log.info(sm.getString("farmWarDeployer.modInstall",
+                log.info(sm.getString("farmBundleDeployer.modInstall",
                         cn.getName(), deployBundle.getAbsolutePath()));
             // install local
             if (tryAddServiced(cn.getName())) {
@@ -464,12 +465,12 @@ public class FarmBundleDeployer extends ClusterListener
                 }
                 check(cn.getName());
             } else {
-                log.error(sm.getString("farmWarDeployer.servicingDeploy",
+                log.error(sm.getString("farmBundleDeployer.servicingDeploy",
                         cn.getName(), deployBundle.getName()));
             }
             install(cn.getName(), deployBundle);
         } catch (Exception x) {
-            log.error(sm.getString("farmWarDeployer.modInstallFail"), x);
+            log.error(sm.getString("farmBundleDeployer.modInstallFail"), x);
         }
     }
 
@@ -483,11 +484,11 @@ public class FarmBundleDeployer extends ClusterListener
         try {
             ContextName cn = new ContextName(removeBundle.getName(), true);
             if (log.isInfoEnabled())
-                log.info(sm.getString("farmWarDeployer.removeLocal",
+                log.info(sm.getString("farmBundleDeployer.removeLocal",
                         cn.getName()));
             remove(cn.getName(), true);
         } catch (Exception x) {
-            log.error(sm.getString("farmWarDeployer.removeLocalFail"), x);
+            log.error(sm.getString("farmBundleDeployer.removeLocalFail"), x);
         }
     }
 
@@ -502,22 +503,25 @@ public class FarmBundleDeployer extends ClusterListener
         Context context = (Context) host.findChild(contextName);
         if (context != null) {
             if(log.isDebugEnabled())
-                log.debug(sm.getString("farmWarDeployer.undeployLocal",
+                log.debug(sm.getString("farmBundleDeployer.undeployLocal",
                         contextName));
             context.stop();
-            String baseName = context.getBaseName();
-            File war = new File(host.getAppBaseFile(), baseName + ".war");
-            File dir = new File(host.getAppBaseFile(), baseName);
-            File xml = new File(configBase, baseName + ".xml");
-            if (war.exists()) {
-                if (!war.delete()) {
-                    log.error(sm.getString("farmWarDeployer.deleteFail", war));
-                }
-            } else if (dir.exists()) {
-                undeployDir(dir);
-            } else {
-                if (!xml.delete()) {
-                    log.error(sm.getString("farmWarDeployer.deleteFail", xml));
+            //TODO: search remove
+            for(String extension: Constants.AcceptedExtensions){
+                String baseName = context.getBaseName();
+                File bundle = new File(host.getAppBaseFile(), baseName + extension);
+                File dir = new File(host.getAppBaseFile(), baseName);
+                File xml = new File(configBase, baseName + ".xml");
+                if (bundle.exists()) {
+                    if (!bundle.delete()) {
+                        log.error(sm.getString("farmBundleDeployer.deleteFail", bundle));
+                    }
+                } else if (dir.exists()) {
+                    undeployDir(dir);
+                } else {
+                    if (!xml.delete()) {
+                        log.error(sm.getString("farmBundleDeployer.deleteFail", xml));
+                    }
                 }
             }
         }
@@ -542,12 +546,12 @@ public class FarmBundleDeployer extends ClusterListener
                 undeployDir(file);
             } else {
                 if (!file.delete()) {
-                    log.error(sm.getString("farmWarDeployer.deleteFail", file));
+                    log.error(sm.getString("farmBundleDeployer.deleteFail", file));
                 }
             }
         }
         if (!dir.delete()) {
-            log.error(sm.getString("farmWarDeployer.deleteFail", dir));
+            log.error(sm.getString("farmBundleDeployer.deleteFail", dir));
         }
     }
 
@@ -753,7 +757,7 @@ public class FarmBundleDeployer extends ClusterListener
                 }
             }
         } catch (IOException e) {
-            log.error(sm.getString("farmWarDeployer.fileCopyFail",
+            log.error(sm.getString("farmBundleDeployer.fileCopyFail",
                     from, to), e);
             return false;
         }
@@ -768,7 +772,7 @@ public class FarmBundleDeployer extends ClusterListener
                 os.write(buf, 0, len);
             }
         } catch (IOException e) {
-            log.error(sm.getString("farmWarDeployer.fileCopyFail",
+            log.error(sm.getString("farmBundleDeployer.fileCopyFail",
                     from, to), e);
             return false;
         }

@@ -77,14 +77,6 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     *  accepted bundle extensions
-     *  a bundle is package war file,
-     *  for the moment could be renamed...
-     */
-    public static final List<String> ACCEPTED_EXTENSIONS = Arrays.asList(".war", ".q");
-
-
-    /**
      * The string resources for this package.
      */
     protected static final StringManager sm = StringManager.getManager(HostConfig.class);
@@ -682,7 +674,7 @@ public class HostConfig implements LifecycleListener {
                     //refactored so that any valid extension would be processed
                     String bundlePath = docBase.getAbsolutePath().toLowerCase(Locale.ENGLISH);
                     String extension = "";
-                    for(String validExtension: HostConfig.ACCEPTED_EXTENSIONS){
+                    for(String validExtension: org.apache.catalina.core.Constants.AcceptedExtensions){
                         if(bundlePath.toLowerCase(Locale.ENGLISH).endsWith(validExtension)){
                             extension = validExtension;
                             isExternalBundle = true;
@@ -749,7 +741,7 @@ public class HostConfig implements LifecycleListener {
 
                     boolean docBaseExists = false;
                     File bundleDocBase = null;
-                    for(String extension: HostConfig.ACCEPTED_EXTENSIONS){
+                    for(String extension: org.apache.catalina.core.Constants.AcceptedExtensions){
                         bundleDocBase = new File(expandedDocBase.getAbsolutePath() + extension);
                         if (bundleDocBase.exists()) {
                             deployedApp.redeployResources.put(
@@ -884,7 +876,7 @@ public class HostConfig implements LifecycleListener {
 
 
     protected boolean isValidExtension(File file){
-        for(String validExtension: HostConfig.ACCEPTED_EXTENSIONS){
+        for(String validExtension: org.apache.catalina.core.Constants.AcceptedExtensions){
             if(file.getName().toLowerCase(Locale.ENGLISH).endsWith(validExtension)){
                 return true;
             }
@@ -893,7 +885,7 @@ public class HostConfig implements LifecycleListener {
     }
 
     public static boolean isValidExtension(String bundlePath){
-        for(String validExtension: HostConfig.ACCEPTED_EXTENSIONS){
+        for(String validExtension: org.apache.catalina.core.Constants.AcceptedExtensions){
             if(bundlePath.toLowerCase(Locale.ENGLISH).endsWith(validExtension)){
                 return true;
             }

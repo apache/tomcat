@@ -187,14 +187,14 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
 
         String deployPath = request.getParameter("deployPath");
-        String deployBundle = request.getParameter("deployBundel");
+        String deployBundle = request.getParameter("deployBundle");
         String deployConfig = request.getParameter("deployConfig");
         ContextName deployCn = null;
         if (deployPath != null && deployPath.length() > 0) {
             deployCn = new ContextName(deployPath, request.getParameter("deployVersion"));
         } else if (deployConfig != null && deployConfig.length() > 0) {
             deployCn = ContextName.extractFromPath(deployConfig);
-        } else if (deployBundel != null && deployBundel.length() > 0) {
+        } else if (deployBundle != null && deployBundle.length() > 0) {
             deployCn = ContextName.extractFromPath(deployBundle);
         }
 

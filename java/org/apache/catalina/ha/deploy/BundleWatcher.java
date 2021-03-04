@@ -24,24 +24,25 @@ import java.util.Map;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.catalina.startup.HostConfig;
 
 /**
- * The <b>WarWatcher </b> watches the deployDir for changes made to the
- * directory (adding new WAR files-&gt;deploy or remove WAR files-&gt;undeploy)
+ * The <b>BundleWatcher </b> watches the deployDir for changes made to the
+ * directory (adding new Bundle files-&gt;deploy or remove Bundle files-&gt;undeploy)
  * and notifies a listener of the changes made.
  *
  * @author Peter Rossbach
  * @version 1.1
  */
-public class WarWatcher {
+public class BundleWatcher {
 
     /*--Static Variables----------------------------------------*/
-    private static final Log log = LogFactory.getLog(WarWatcher.class);
-    private static final StringManager sm = StringManager.getManager(WarWatcher.class);
+    private static final Log log = LogFactory.getLog(BundleWatcher.class);
+    private static final StringManager sm = StringManager.getManager(BundleWatcher.class);
 
     /*--Instance Variables--------------------------------------*/
     /**
-     * Directory to watch for war files
+     * Directory to watch for bundle files
      */
     protected final File watchDir;
 
@@ -53,11 +54,11 @@ public class WarWatcher {
     /**
      * Currently deployed files
      */
-    protected final Map<String, WarInfo> currentStatus = new HashMap<>();
+    protected final Map<String, BundleInfo> currentStatus = new HashMap<>();
 
     /*--Constructor---------------------------------------------*/
 
-    public WarWatcher(FileChangeListener listener, File watchDir) {
+    public BundleWatcher(FileChangeListener listener, File watchDir) {
         this.listener = listener;
         this.watchDir = watchDir;
     }
@@ -69,10 +70,10 @@ public class WarWatcher {
      */
     public void check() {
         if (log.isDebugEnabled())
-            log.debug(sm.getString("warWatcher.checkingWars", watchDir));
-        File[] list = watchDir.listFiles(new WarFilter());
+            log.debug(sm.getString("bundleWatcher.checkingBundles", watchDir));
+        File[] list = watchDir.listFiles(new BundleFilter());
         if (list == null) {
-            log.warn(sm.getString("warWatcher.cantListWatchDir",
+            log.warn(sm.getString("bundleWatcher.cantListWatchDir",
                                   watchDir));
 
             list = new File[0];
@@ -80,46 +81,46 @@ public class WarWatcher {
         //first make sure all the files are listed in our current status
         for (File file : list) {
             if (!file.exists())
-                log.warn(sm.getString("warWatcher.listedFileDoesNotExist",
+                log.warn(sm.getString("bundleWatcher.listedFileDoesNotExist",
                         file, watchDir));
 
-            addWarInfo(file);
+            addBundleInfo(file);
         }
 
         // Check all the status codes and update the FarmDeployer
-        for (Iterator<Map.Entry<String,WarInfo>> i =
+        for (Iterator<Map.Entry<String, BundleInfo>> i =
                 currentStatus.entrySet().iterator(); i.hasNext();) {
-            Map.Entry<String,WarInfo> entry = i.next();
-            WarInfo info = entry.getValue();
+            Map.Entry<String,BundleInfo> entry = i.next();
+            BundleInfo info = entry.getValue();
             if(log.isTraceEnabled())
-                log.trace(sm.getString("warWatcher.checkingWar",
-                                       info.getWar()));
+                log.trace(sm.getString("bundleWatcher.checkingBundle",
+                                       info.getBundle()));
             int check = info.check();
             if (check == 1) {
-                listener.fileModified(info.getWar());
+                listener.fileModified(info.getBundle());
             } else if (check == -1) {
-                listener.fileRemoved(info.getWar());
+                listener.fileRemoved(info.getBundle());
                 //no need to keep in memory
                 i.remove();
             }
             if(log.isTraceEnabled())
-                log.trace(sm.getString("warWatcher.checkWarResult",
+                log.trace(sm.getString("bundleWatcher.checkBundleResult",
                                        Integer.valueOf(check),
-                                       info.getWar()));
+                                       info.getBundle()));
         }
 
     }
 
     /**
-     * add cluster war to the watcher state
-     * @param warfile The WAR to add
+     * add cluster bundle to the watcher state
+     * @param bundlefile The Bundle to add
      */
-    protected void addWarInfo(File warfile) {
-        WarInfo info = currentStatus.get(warfile.getAbsolutePath());
+    protected void addBundleInfo(File bundlefile) {
+        BundleInfo info = currentStatus.get(bundlefile.getAbsolutePath());
         if (info == null) {
-            info = new WarInfo(warfile);
+            info = new BundleInfo(bundlefile);
             info.setLastState(-1); //assume file is non existent
-            currentStatus.put(warfile.getAbsolutePath(), info);
+            currentStatus.put(bundlefile.getAbsolutePath(), info);
         }
     }
 
@@ -134,40 +135,40 @@ public class WarWatcher {
     /*--Inner classes-------------------------------------------*/
 
     /**
-     * File name filter for war files
+     * File name filter for bundle files
      */
-    protected static class WarFilter implements java.io.FilenameFilter {
+    protected static class BundleFilter implements java.io.FilenameFilter {
         @Override
         public boolean accept(File path, String name) {
             if (name == null)
                 return false;
-            return name.endsWith(".war");
+            return HostConfig.isValidExtension(name);
         }
     }
 
     /**
-     * File information on existing WAR files
+     * File information on existing Bundle files
      */
-    protected static class WarInfo {
-        protected final File war;
+    protected static class BundleInfo {
+        protected final File bundle;
 
         protected long lastChecked = 0;
 
         protected long lastState = 0;
 
-        public WarInfo(File war) {
-            this.war = war;
-            this.lastChecked = war.lastModified();
-            if (!war.exists())
+        public BundleInfo(File bundle) {
+            this.bundle = bundle;
+            this.lastChecked = bundle.lastModified();
+            if (!bundle.exists())
                 lastState = -1;
         }
 
         public boolean modified() {
-            return war.exists() && war.lastModified() > lastChecked;
+            return bundle.exists() && bundle.lastModified() > lastChecked;
         }
 
         public boolean exists() {
-            return war.exists();
+            return bundle.exists();
         }
 
         /**
@@ -197,20 +198,20 @@ public class WarWatcher {
             return result;
         }
 
-        public File getWar() {
-            return war;
+        public File getBundle() {
+            return bundle;
         }
 
         @Override
         public int hashCode() {
-            return war.getAbsolutePath().hashCode();
+            return bundle.getAbsolutePath().hashCode();
         }
 
         @Override
         public boolean equals(Object other) {
-            if (other instanceof WarInfo) {
-                WarInfo wo = (WarInfo) other;
-                return wo.getWar().equals(getWar());
+            if (other instanceof BundleInfo) {
+                BundleInfo wo = (BundleInfo) other;
+                return wo.getBundle().equals(getBundle());
             } else {
                 return false;
             }
