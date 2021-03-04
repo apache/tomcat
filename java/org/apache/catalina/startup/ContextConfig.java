@@ -801,52 +801,56 @@ public class ContextConfig implements LifecycleListener {
         ContextName cn = new ContextName(context.getPath(), context.getWebappVersion());
         String pathName = cn.getBaseName();
 
-        boolean unpackWARs = true;
+        boolean unpackBundles = true;
         if (host instanceof StandardHost) {
-            unpackWARs = ((StandardHost) host).isUnpackBundles();
-            if (unpackWARs && context instanceof StandardContext) {
-                unpackWARs =  ((StandardContext) context).getUnpackBundle();
+            unpackBundles = ((StandardHost) host).isUnpackBundles();
+            if (unpackBundles && context instanceof StandardContext) {
+                unpackBundles =  ((StandardContext) context).getUnpackBundle();
             }
         }
 
-        // At this point we need to determine if we have a WAR file in the
+        System.out.println("context config 1....");
+
+        // At this point we need to determine if we have a Bundle file in the
         // appBase that needs to be expanded. Therefore we consider the absolute
         // docBase NOT the canonical docBase. This is because some users symlink
-        // WAR files into the appBase and we want this to work correctly.
+        // Bundle files into the appBase and we want this to work correctly.
         boolean docBaseAbsoluteInAppBase = docBaseAbsolute.startsWith(appBase.getPath() + File.separatorChar);
-        if (docBaseAbsolute.toLowerCase(Locale.ENGLISH).endsWith(".war") && !docBaseAbsoluteFile.isDirectory()) {
-            URL war = UriUtil.buildJarUrl(docBaseAbsoluteFile);
-            if (unpackWARs) {
-                docBaseAbsolute = ExpandWar.expand(host, war, pathName);
+        if (HostConfig.isValidExtension(docBaseAbsolute) &&
+                !docBaseAbsoluteFile.isDirectory()) {
+            System.out.println("context config....");
+            URL bundle = UriUtil.buildJarUrl(docBaseAbsoluteFile);
+            if (unpackBundles) {
+                docBaseAbsolute = ExpandBundle.expand(host, bundle, pathName);
                 docBaseAbsoluteFile = new File(docBaseAbsolute);
                 if (context instanceof StandardContext) {
                     ((StandardContext) context).setOriginalDocBase(originalDocBase);
                 }
             } else {
-                ExpandWar.validate(host, war, pathName);
+                ExpandBundle.validate(host, bundle, pathName);
             }
         } else {
-            File docBaseAbsoluteFileWar = new File(docBaseAbsolute + ".war");
-            URL war = null;
-            if (docBaseAbsoluteFileWar.exists() && docBaseAbsoluteInAppBase) {
-                war = UriUtil.buildJarUrl(docBaseAbsoluteFileWar);
+            File docBaseAbsoluteFileBundle = new File(docBaseAbsolute + ".war");
+            URL bundle = null;
+            if (docBaseAbsoluteFileBundle.exists() && docBaseAbsoluteInAppBase) {
+                bundle = UriUtil.buildJarUrl(docBaseAbsoluteFileBundle);
             }
             if (docBaseAbsoluteFile.exists()) {
-                if (war != null && unpackWARs) {
-                    // Check if WAR needs to be re-expanded (e.g. if it has
-                    // changed). Note: HostConfig.deployWar() takes care of
+                if (bundle != null && unpackBundles) {
+                    // Check if Bundle needs to be re-expanded (e.g. if it has
+                    // changed). Note: HostConfig.deployBundle() takes care of
                     // ensuring that the correct XML file is used.
-                    // This will be a NO-OP if the WAR is unchanged.
-                    ExpandWar.expand(host, war, pathName);
+                    // This will be a NO-OP if the Bundle is unchanged.
+                    ExpandBundle.expand(host, bundle, pathName);
                 }
             } else {
-                if (war != null) {
-                    if (unpackWARs) {
-                        docBaseAbsolute = ExpandWar.expand(host, war, pathName);
+                if (bundle != null) {
+                    if (unpackBundles) {
+                        docBaseAbsolute = ExpandBundle.expand(host, bundle, pathName);
                         docBaseAbsoluteFile = new File(docBaseAbsolute);
                     } else {
-                        docBaseAbsoluteFile = docBaseAbsoluteFileWar;
-                        ExpandWar.validate(host, war, pathName);
+                        docBaseAbsoluteFile = docBaseAbsoluteFileBundle;
+                        ExpandBundle.validate(host, bundle, pathName);
                     }
                 }
                 if (context instanceof StandardContext) {
@@ -906,7 +910,8 @@ public class ContextConfig implements LifecycleListener {
                 return;
             }
 
-            if (originalDocBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+            System.out.println("is ends with original doc base ...." + originalDocBase);
+            if (HostConfig.isValidExtension(originalDocBase)) {
                 antiLockingDocBase = new File(tmpFile, deploymentCount++ + "-" + docBase + ".war");
             } else {
                 antiLockingDocBase = new File(tmpFile, deploymentCount++ + "-" + docBase);
@@ -920,8 +925,8 @@ public class ContextConfig implements LifecycleListener {
             }
 
             // Cleanup just in case an old deployment is lying around
-            ExpandWar.delete(antiLockingDocBase);
-            if (ExpandWar.copy(docBaseFile, antiLockingDocBase)) {
+            ExpandBundle.delete(antiLockingDocBase);
+            if (ExpandBundle.copy(docBaseFile, antiLockingDocBase)) {
                 context.setDocBase(antiLockingDocBase.getPath());
             }
         }
@@ -1120,7 +1125,7 @@ public class ContextConfig implements LifecycleListener {
         // Remove (partially) folders and files created by antiLocking
         if (antiLockingDocBase != null) {
             // No need to log failure - it is expected in this case
-            ExpandWar.delete(antiLockingDocBase, false);
+            ExpandBundle.delete(antiLockingDocBase, false);
         }
 
         // Reset ServletContextInitializer scanning
@@ -1151,7 +1156,7 @@ public class ContextConfig implements LifecycleListener {
         if (context instanceof StandardContext) {
             String workDir = ((StandardContext) context).getWorkPath();
             if (workDir != null) {
-                ExpandWar.delete(new File(workDir));
+                ExpandBundle.delete(new File(workDir));
             }
         }
     }

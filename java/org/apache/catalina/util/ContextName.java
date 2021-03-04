@@ -17,6 +17,7 @@
 package org.apache.catalina.util;
 
 import java.util.Locale;
+import org.apache.catalina.startup.HostConfig;
 
 /**
  * Utility class to manage context names so there is one place where the
@@ -38,7 +39,7 @@ public final class ContextName {
      * directory name, WAR name or context.xml name.
      *
      * @param name  The name to use as the basis for this object
-     * @param stripFileExtension    If a .war or .xml file extension is present
+     * @param stripFileExtension    If a bundle or .xml file extension is present
      *                              at the end of the provided name should it be
      *                              removed?
      */
@@ -63,9 +64,10 @@ public final class ContextName {
 
         // Remove any file extensions
         if (stripFileExtension &&
-                (tmp1.toLowerCase(Locale.ENGLISH).endsWith(".war") ||
+                (HostConfig.isValidExtension(tmp1) ||
                         tmp1.toLowerCase(Locale.ENGLISH).endsWith(".xml"))) {
-            tmp1 = tmp1.substring(0, tmp1.length() -4);
+            String extension = HostConfig.getExtension(tmp1);
+            tmp1 = tmp1.substring(0, tmp1.length() -extension.length());
         }
 
         baseName = tmp1;
