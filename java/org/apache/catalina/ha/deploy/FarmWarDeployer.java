@@ -57,11 +57,11 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Peter Rossbach
  */
-public class FarmWarDeployer extends ClusterListener
+public class FarmBundleDeployer extends ClusterListener
         implements ClusterDeployer, FileChangeListener {
     /*--Static Variables----------------------------------------*/
-    private static final Log log = LogFactory.getLog(FarmWarDeployer.class);
-    private static final StringManager sm = StringManager.getManager(FarmWarDeployer.class);
+    private static final Log log = LogFactory.getLog(FarmBundleDeployer.class);
+    private static final StringManager sm = StringManager.getManager(FarmBundleDeployer.class);
 
     /*--Instance Variables--------------------------------------*/
     protected boolean started = false;
@@ -89,7 +89,7 @@ public class FarmWarDeployer extends ClusterListener
 
     protected boolean watchEnabled = false;
 
-    protected WarWatcher watcher = null;
+    protected BundleWatcher watcher = null;
 
     /**
      * Iteration count for background processing.
@@ -129,7 +129,7 @@ public class FarmWarDeployer extends ClusterListener
     protected int maxValidTime = 5 * 60;
 
     /*--Constructor---------------------------------------------*/
-    public FarmWarDeployer() {
+    public FarmBundleDeployer() {
     }
 
     /*--Logic---------------------------------------------------*/
@@ -163,7 +163,7 @@ public class FarmWarDeployer extends ClusterListener
             return;
         }
         if (watchEnabled) {
-            watcher = new WarWatcher(this, getWatchDirFile());
+            watcher = new BundleWatcher(this, getWatchDirFile());
             if (log.isInfoEnabled()) {
                 log.info(sm.getString(
                         "farmWarDeployer.watchDir", getWatchDir()));
@@ -443,45 +443,45 @@ public class FarmWarDeployer extends ClusterListener
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileModified(File)
      */
     @Override
-    public void fileModified(File newWar) {
+    public void fileModified(File newBundle) {
         try {
-            File deployWar = new File(getDeployDirFile(), newWar.getName());
-            ContextName cn = new ContextName(deployWar.getName(), true);
-            if (deployWar.exists() && deployWar.lastModified() > newWar.lastModified()) {
+            File deployBundle = new File(getDeployDirFile(), newBundle.getName());
+            ContextName cn = new ContextName(deployBundle.getName(), true);
+            if (deployBundle.exists() && deployBundle.lastModified() > newBundle.lastModified()) {
                 if (log.isInfoEnabled())
                     log.info(sm.getString("farmWarDeployer.alreadyDeployed", cn.getName()));
                 return;
             }
             if (log.isInfoEnabled())
                 log.info(sm.getString("farmWarDeployer.modInstall",
-                        cn.getName(), deployWar.getAbsolutePath()));
+                        cn.getName(), deployBundle.getAbsolutePath()));
             // install local
             if (tryAddServiced(cn.getName())) {
                 try {
-                    copy(newWar, deployWar);
+                    copy(newBundle, deployBundle);
                 } finally {
                     removeServiced(cn.getName());
                 }
                 check(cn.getName());
             } else {
                 log.error(sm.getString("farmWarDeployer.servicingDeploy",
-                        cn.getName(), deployWar.getName()));
+                        cn.getName(), deployBundle.getName()));
             }
-            install(cn.getName(), deployWar);
+            install(cn.getName(), deployBundle);
         } catch (Exception x) {
             log.error(sm.getString("farmWarDeployer.modInstallFail"), x);
         }
     }
 
     /**
-     * War remove from watchDir
+     * Bundle remove from watchDir
      *
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileRemoved(File)
      */
     @Override
-    public void fileRemoved(File removeWar) {
+    public void fileRemoved(File removeBundle) {
         try {
-            ContextName cn = new ContextName(removeWar.getName(), true);
+            ContextName cn = new ContextName(removeBundle.getName(), true);
             if (log.isInfoEnabled())
                 log.info(sm.getString("farmWarDeployer.removeLocal",
                         cn.getName()));

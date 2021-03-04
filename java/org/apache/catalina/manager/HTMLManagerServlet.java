@@ -187,15 +187,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
 
         String deployPath = request.getParameter("deployPath");
-        String deployWar = request.getParameter("deployWar");
+        String deployBundle = request.getParameter("deployBundel");
         String deployConfig = request.getParameter("deployConfig");
         ContextName deployCn = null;
         if (deployPath != null && deployPath.length() > 0) {
             deployCn = new ContextName(deployPath, request.getParameter("deployVersion"));
         } else if (deployConfig != null && deployConfig.length() > 0) {
             deployCn = ContextName.extractFromPath(deployConfig);
-        } else if (deployWar != null && deployWar.length() > 0) {
-            deployCn = ContextName.extractFromPath(deployWar);
+        } else if (deployBundel != null && deployBundel.length() > 0) {
+            deployCn = ContextName.extractFromPath(deployBundle);
         }
 
         String tlsHostName = request.getParameter("tlsHostName");
@@ -211,7 +211,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         } else if (command.equals("/upload")) {
             message = upload(request, smClient);
         } else if (command.equals("/deploy")) {
-            message = deployInternal(deployConfig, deployCn, deployWar,
+            message = deployInternal(deployConfig, deployCn, deployBundle,
                     smClient);
         } else if (command.equals("/reload")) {
             message = reload(cn, smClient);
@@ -242,7 +242,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         try {
             while (true) {
-                Part warPart = request.getPart("deployWar");
+                Part warPart = request.getPart("deployBundle");
                 if (warPart == null) {
                     message = smClient.getString(
                             "htmlManagerServlet.deployUploadNoFile");
