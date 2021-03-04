@@ -25,12 +25,12 @@ import java.security.Permission;
 import org.apache.tomcat.util.buf.UriUtil;
 
 
-public class WarURLConnection extends URLConnection {
+public class BundleURLConnection extends URLConnection {
 
     private final URLConnection wrappedJarUrlConnection;
     private boolean connected;
 
-    protected WarURLConnection(URL url) throws IOException {
+    protected BundleURLConnection(URL url) throws IOException {
         super(url);
         URL innerJarUrl = UriUtil.warToJar(url);
         wrappedJarUrlConnection = innerJarUrl.openConnection();

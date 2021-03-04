@@ -25,7 +25,7 @@ public class Handler extends URLStreamHandler {
 
     @Override
     protected URLConnection openConnection(URL u) throws IOException {
-        return new WarURLConnection(u);
+        return new BundleURLConnection(u);
     }
 
     @Override

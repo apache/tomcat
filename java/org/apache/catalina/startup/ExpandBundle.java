@@ -38,15 +38,15 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Expand out a WAR in a Host's appBase.
+ * Expand out a Bundle in a Host's appBase.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  * @author Glenn L. Nielsen
  */
-public class ExpandWar {
+public class ExpandBundle {
 
-    private static final Log log = LogFactory.getLog(ExpandWar.class);
+    private static final Log log = LogFactory.getLog(ExpandBundle.class);
 
     /**
      * The string resources for this package.
@@ -56,55 +56,55 @@ public class ExpandWar {
 
 
     /**
-     * Expand the WAR file found at the specified URL into an unpacked
+     * Expand the Bundle file found at the specified URL into an unpacked
      * directory structure.
      *
-     * @param host Host war is being installed for
-     * @param war URL of the web application archive to be expanded
+     * @param host Host bundle is being installed for
+     * @param bundle URL of the web application archive to be expanded
      *  (must start with "jar:")
      * @param pathname Context path name for web application
      *
      * @exception IllegalArgumentException if this is not a "jar:" URL or if the
-     *            WAR file is invalid
+     *            Bundle file is invalid
      * @exception IOException if an input/output error was encountered
      *  during expansion
      *
-     * @return The absolute path to the expanded directory for the given WAR
+     * @return The absolute path to the expanded directory for the given Bundle
      */
-    public static String expand(Host host, URL war, String pathname)
+    public static String expand(Host host, URL bundle, String pathname)
         throws IOException {
 
         /* Obtaining the last modified time opens an InputStream and there is no
          * explicit close method. We have to obtain and then close the
          * InputStream to avoid a file leak and the associated locked file.
          */
-        JarURLConnection juc = (JarURLConnection) war.openConnection();
+        JarURLConnection juc = (JarURLConnection) bundle.openConnection();
         juc.setUseCaches(false);
         URL jarFileUrl = juc.getJarFileURL();
         URLConnection jfuc = jarFileUrl.openConnection();
 
         boolean success = false;
         File docBase = new File(host.getAppBaseFile(), pathname);
-        File warTracker = new File(host.getAppBaseFile(), pathname + Constants.WarTracker);
-        long warLastModified = -1;
+        File bundleTracker = new File(host.getAppBaseFile(), pathname + Constants.BundleTracker);
+        long bundleLastModified = -1;
 
         try (InputStream is = jfuc.getInputStream()) {
-            // Get the last modified time for the WAR
-            warLastModified = jfuc.getLastModified();
+            // Get the last modified time for the Bundle
+            bundleLastModified = jfuc.getLastModified();
         }
 
-        // Check to see of the WAR has been expanded previously
+        // Check to see of the Bundle has been expanded previously
         if (docBase.exists()) {
-            // A WAR was expanded. Tomcat will have set the last modified
-            // time of warTracker file to the last modified time of the WAR so
-            // changes to the WAR while Tomcat is stopped can be detected
-            if (!warTracker.exists() || warTracker.lastModified() == warLastModified) {
-                // No (detectable) changes to the WAR
+            // A Bundle was expanded. Tomcat will have set the last modified
+            // time of bundleTracker file to the last modified time of the Bundle so
+            // changes to the Bundle while Tomcat is stopped can be detected
+            if (!bundleTracker.exists() || bundleTracker.lastModified() == bundleLastModified) {
+                // No (detectable) changes to the Bundle
                 success = true;
                 return docBase.getAbsolutePath();
             }
 
-            // WAR must have been modified. Remove expanded directory.
+            // Bundle must have been modified. Remove expanded directory.
             log.info(sm.getString("expandWar.deleteOld", docBase));
             if (!delete(docBase)) {
                 throw new IOException(sm.getString("expandWar.deleteFailed", docBase));
@@ -116,13 +116,13 @@ public class ExpandWar {
             throw new IOException(sm.getString("expandWar.createFailed", docBase));
         }
 
-        // Expand the WAR into the new document base directory
+        // Expand the Bundle into the new document base directory
         Path canonicalDocBasePath = docBase.getCanonicalFile().toPath();
 
-        // Creating war tracker parent (normally META-INF)
-        File warTrackerParent = warTracker.getParentFile();
-        if (!warTrackerParent.isDirectory() && !warTrackerParent.mkdirs()) {
-            throw new IOException(sm.getString("expandWar.createFailed", warTrackerParent.getAbsolutePath()));
+        // Creating bundle tracker parent (normally META-INF)
+        File bundleTrackerParent = bundleTracker.getParentFile();
+        if (!bundleTrackerParent.isDirectory() && !bundleTrackerParent.mkdirs()) {
+            throw new IOException(sm.getString("expandWar.createFailed", bundleTrackerParent.getAbsolutePath()));
         }
 
         try (JarFile jarFile = juc.getJarFile()) {
@@ -136,7 +136,7 @@ public class ExpandWar {
                     // Trying to expand outside the docBase
                     // Throw an exception to stop the deployment
                     throw new IllegalArgumentException(
-                            sm.getString("expandWar.illegalPath",war, name,
+                            sm.getString("expandWar.illegalPath", bundle, name,
                                     expandedFile.getCanonicalPath(),
                                     canonicalDocBasePath));
                 }
@@ -171,13 +171,13 @@ public class ExpandWar {
                 }
             }
 
-            // Create the warTracker file and align the last modified time
-            // with the last modified time of the WAR
-            if (!warTracker.createNewFile()) {
-                throw new IOException(sm.getString("expandWar.createFileFailed", warTracker));
+            // Create the bundleTracker file and align the last modified time
+            // with the last modified time of the Bundle
+            if (!bundleTracker.createNewFile()) {
+                throw new IOException(sm.getString("expandWar.createFileFailed", bundleTracker));
             }
-            if (!warTracker.setLastModified(warLastModified)) {
-                throw new IOException(sm.getString("expandWar.lastModifiedFailed", warTracker));
+            if (!bundleTracker.setLastModified(bundleLastModified)) {
+                throw new IOException(sm.getString("expandWar.lastModifiedFailed", bundleTracker));
             }
 
             success = true;
@@ -197,25 +197,25 @@ public class ExpandWar {
 
 
     /**
-     * Validate the WAR file found at the specified URL.
+     * Validate the Bundle file found at the specified URL.
      *
-     * @param host Host war is being installed for
-     * @param war URL of the web application archive to be validated
+     * @param host Host bundle is being installed for
+     * @param bundle URL of the web application archive to be validated
      *  (must start with "jar:")
      * @param pathname Context path name for web application
      *
      * @exception IllegalArgumentException if this is not a "jar:" URL or if the
-     *            WAR file is invalid
+     *            Bundle file is invalid
      * @exception IOException if an input/output error was encountered
      *            during validation
      */
-    public static void validate(Host host, URL war, String pathname) throws IOException {
+    public static void validate(Host host, URL bundle, String pathname) throws IOException {
 
         File docBase = new File(host.getAppBaseFile(), pathname);
 
         // Calculate the document base directory
         Path canonicalDocBasePath = docBase.getCanonicalFile().toPath();
-        JarURLConnection juc = (JarURLConnection) war.openConnection();
+        JarURLConnection juc = (JarURLConnection) bundle.openConnection();
         juc.setUseCaches(false);
         try (JarFile jarFile = juc.getJarFile()) {
             Enumeration<JarEntry> jarEntries = jarFile.entries();
@@ -227,7 +227,7 @@ public class ExpandWar {
                     // Entry located outside the docBase
                     // Throw an exception to stop the deployment
                     throw new IllegalArgumentException(
-                            sm.getString("expandWar.illegalPath",war, name,
+                            sm.getString("expandWar.illegalPath", bundle, name,
                                     expandedFile.getCanonicalPath(),
                                     canonicalDocBasePath));
                 }

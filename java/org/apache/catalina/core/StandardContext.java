@@ -471,9 +471,9 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Unpack WAR property.
+     * Unpack Bundle property.
      */
-    private boolean unpackWAR = true;
+    private boolean unpackBundle = true;
 
 
     /**
@@ -2461,20 +2461,20 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * @return unpack WAR flag.
+     * @return unpack Bundle flag.
      */
-    public boolean getUnpackWAR() {
-        return unpackWAR;
+    public boolean getUnpackBundle() {
+        return unpackBundle;
     }
 
 
     /**
-     * Unpack WAR flag mutator.
+     * Unpack Bundle flag mutator.
      *
-     * @param unpackWAR <code>true</code> to unpack WARs on deployment
+     * @param unpackBundle <code>true</code> to unpack Bundles on deployment
      */
-    public void setUnpackWAR(boolean unpackWAR) {
-        this.unpackWAR = unpackWAR;
+    public void setUnpackBundle(boolean unpackBundle) {
+        this.unpackBundle = unpackBundle;
     }
 
 
@@ -2483,7 +2483,7 @@ public class StandardContext extends ContainerBase
      * config folder. The doesn't occur by default.
      *
      * @return <code>true</code> if the <code>META-INF/context.xml</code> file included
-     *     in a WAR will be copied to the host configuration base folder on deployment
+     *     in a Bundle will be copied to the host configuration base folder on deployment
      */
     public boolean getCopyXML() {
         return copyXML;

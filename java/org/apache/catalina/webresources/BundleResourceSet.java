@@ -25,12 +25,12 @@ import org.apache.catalina.WebResourceRoot;
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a WAR file.
  */
-public class WarResourceSet extends AbstractSingleArchiveResourceSet {
+public class BundleResourceSet extends AbstractSingleArchiveResourceSet {
 
     /**
      * A no argument constructor is required for this to work with the digester.
      */
-    public WarResourceSet() {
+    public BundleResourceSet() {
     }
 
 
@@ -50,7 +50,7 @@ public class WarResourceSet extends AbstractSingleArchiveResourceSet {
      * @throws IllegalArgumentException if the webAppMount is not valid (valid
      *         paths must start with '/')
      */
-    public WarResourceSet(WebResourceRoot root, String webAppMount, String base)
+    public BundleResourceSet(WebResourceRoot root, String webAppMount, String base)
             throws IllegalArgumentException {
         super(root, webAppMount, base, "/");
     }
@@ -59,6 +59,6 @@ public class WarResourceSet extends AbstractSingleArchiveResourceSet {
     @Override
     protected WebResource createArchiveResource(JarEntry jarEntry,
             String webAppPath, Manifest manifest) {
-        return new WarResource(this, webAppPath, getBaseUrlString(), jarEntry);
+        return new BundleResource(this, webAppPath, getBaseUrlString(), jarEntry);
     }
 }

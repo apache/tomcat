@@ -26,14 +26,14 @@ import org.apache.tomcat.util.buf.UriUtil;
  * Represents a single resource (file or directory) that is located within a
  * WAR.
  */
-public class WarResource extends AbstractSingleArchiveResource {
+public class BundleResource extends AbstractSingleArchiveResource {
 
-    private static final Log log = LogFactory.getLog(WarResource.class);
+    private static final Log log = LogFactory.getLog(BundleResource.class);
 
 
-    public WarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
+    public BundleResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
             String baseUrl, JarEntry jarEntry) {
-        super(archiveResourceSet, webAppPath, "war:" + baseUrl + UriUtil.getWarSeparator(),
+        super(archiveResourceSet, webAppPath, "war:" + baseUrl + UriUtil.getBundleSeparator(),
                 jarEntry, baseUrl);
     }
 

@@ -190,7 +190,7 @@ public final class UriUtil {
     }
 
 
-    public static String getWarSeparator() {
+    public static String getBundleSeparator() {
         return WAR_SEPARATOR;
     }
 

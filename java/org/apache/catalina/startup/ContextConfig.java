@@ -803,9 +803,9 @@ public class ContextConfig implements LifecycleListener {
 
         boolean unpackWARs = true;
         if (host instanceof StandardHost) {
-            unpackWARs = ((StandardHost) host).isUnpackWARs();
+            unpackWARs = ((StandardHost) host).isUnpackBundles();
             if (unpackWARs && context instanceof StandardContext) {
-                unpackWARs =  ((StandardContext) context).getUnpackWAR();
+                unpackWARs =  ((StandardContext) context).getUnpackBundle();
             }
         }
 

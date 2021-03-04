@@ -159,9 +159,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Unpack WARs property.
+     * Unpack Bundles property.
      */
-    private boolean unpackWARs = true;
+    private boolean unpackBundles = true;
 
 
     /**
@@ -578,20 +578,20 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return <code>true</code> if WARs should be unpacked on deployment.
+     * @return <code>true</code> if Bundles should be unpacked on deployment.
      */
-    public boolean isUnpackWARs() {
-        return unpackWARs;
+    public boolean isUnpackBundles() {
+        return unpackBundles;
     }
 
 
     /**
-     * Unpack WARs flag mutator.
+     * Unpack Bundles flag mutator.
      *
-     * @param unpackWARs <code>true</code> to unpack WARs on deployment
+     * @param unpackBundles <code>true</code> to unpack Bundles on deployment
      */
-    public void setUnpackWARs(boolean unpackWARs) {
-        this.unpackWARs = unpackWARs;
+    public void setUnpackBundles(boolean unpackBundles) {
+        this.unpackBundles = unpackBundles;
     }
 
 

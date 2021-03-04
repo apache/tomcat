@@ -42,6 +42,7 @@ import org.apache.catalina.TrackedWebResource;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceSet;
+import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -402,7 +403,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
         if (file.isFile()) {
             if (archivePath != null) {
-                // Must be a JAR nested inside a WAR if archivePath is non-null
+                // Must be a JAR nested inside a Bundle if archivePath is non-null
                 resourceSet = new JarWarResourceSet(this, webAppMount, base,
                         archivePath, internalPath);
             } else if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar")) {
@@ -649,10 +650,10 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     /*
      * Returns true if and only if all the resources for this web application
-     * are provided via a packed WAR file. It is used to optimise cache
-     * validation in this case on the basis that the WAR file will not change.
+     * are provided via a packed Bundle file. It is used to optimise cache
+     * validation in this case on the basis that the Bundle file will not change.
      */
-    protected boolean isPackedWarFile() {
+    protected boolean isPackedBundleFile() {
         return main instanceof WarResourceSet && preResources.isEmpty() && postResources.isEmpty();
     }
 
@@ -744,7 +745,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             }
             if (f.isDirectory()) {
                 mainResourceSet = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
-            } else if(f.isFile() && docBase.endsWith(".war")) {
+            } else if(f.isFile() && HostConfig.isValidExtension(docBase)) {
                 mainResourceSet = new WarResourceSet(this, "/", f.getAbsolutePath());
             } else {
                 throw new IllegalArgumentException(
@@ -824,7 +825,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 if ("jar".equals(url.getProtocol())) {
                     endOfFileUrl = jarUrl.indexOf("!/");
                 } else {
-                    endOfFileUrl = jarUrl.indexOf(UriUtil.getWarSeparator());
+                    endOfFileUrl = jarUrl.indexOf(UriUtil.getBundleSeparator());
                 }
                 String fileUrl = jarUrl.substring(4, endOfFileUrl);
                 try {
