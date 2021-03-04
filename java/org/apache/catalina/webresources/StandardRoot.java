@@ -654,7 +654,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
      * validation in this case on the basis that the Bundle file will not change.
      */
     protected boolean isPackedBundleFile() {
-        return main instanceof WarResourceSet && preResources.isEmpty() && postResources.isEmpty();
+        return main instanceof BundleResourceSet && preResources.isEmpty() && postResources.isEmpty();
     }
 
 
@@ -746,7 +746,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             if (f.isDirectory()) {
                 mainResourceSet = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
             } else if(f.isFile() && HostConfig.isValidExtension(docBase)) {
-                mainResourceSet = new WarResourceSet(this, "/", f.getAbsolutePath());
+                mainResourceSet = new BundleResourceSet(this, "/", f.getAbsolutePath());
             } else {
                 throw new IllegalArgumentException(
                         sm.getString("standardRoot.startInvalidMain",

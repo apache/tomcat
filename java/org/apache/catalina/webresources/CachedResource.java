@@ -124,7 +124,7 @@ public class CachedResource implements WebResource {
         }
 
         // Assume resources inside WARs will not change
-        if (!root.isPackedWarFile()) {
+        if (!root.isPackedBundleFile()) {
             WebResource webResourceInternal = root.getResourceInternal(
                     webAppPath, useClassLoaderResources);
             if (!webResource.exists() && webResourceInternal.exists()) {
@@ -168,7 +168,7 @@ public class CachedResource implements WebResource {
         }
 
         // Assume resources inside WARs will not change
-        if (root.isPackedWarFile()) {
+        if (root.isPackedBundleFile()) {
             nextCheck = ttl + now;
             return true;
         } else {

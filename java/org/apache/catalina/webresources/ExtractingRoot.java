@@ -45,7 +45,7 @@ public class ExtractingRoot extends StandardRoot {
 
         // Don't extract JAR files unless the application is deployed as a
         // packed WAR file.
-        if (!super.isPackedWarFile()) {
+        if (!super.isPackedBundleFile()) {
             super.processWebInfLib();
             return;
         }
@@ -88,7 +88,7 @@ public class ExtractingRoot extends StandardRoot {
 
 
     @Override
-    protected boolean isPackedWarFile() {
+    protected boolean isPackedBundleFile() {
         return false;
     }
 
@@ -97,7 +97,7 @@ public class ExtractingRoot extends StandardRoot {
     protected void stopInternal() throws LifecycleException {
         super.stopInternal();
 
-        if (super.isPackedWarFile()) {
+        if (super.isPackedBundleFile()) {
             // Remove the extracted JARs from the work directory
             File expansionTarget = getExpansionTarget();
             ExpandWar.delete(expansionTarget);

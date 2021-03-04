@@ -900,7 +900,7 @@ public class HostConfig implements LifecycleListener {
         }
         return false;
     }
-    
+
     public static String getExtension(String bundleName){
         if (bundleName.contains(".")) {
             return bundleName.substring(bundleName.lastIndexOf("."));
