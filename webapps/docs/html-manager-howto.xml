@@ -323,16 +323,16 @@ WAR or Directory URL: file:C:/path/to/foo
 Tomcat server (running on Unix) is deployed as the web application
 context named <code>/bar</code>. Notice that there is no <code>path</code>
 parameter so the context path defaults to the name of the web application
-archive file without the ".war" extension.</p>
+archive file without the "bundle" extension.</p>
 <source>WAR or Directory URL: jar:file:/path/to/bar.war!/</source>
 
 </subsection>
 
-<subsection name="Deploy a Directory or War from the Host appBase">
+<subsection name="Deploy a Directory or Bundle from the Host appBase">
 
-<p>Install a web application directory or ".war" file located in your Host
+<p>Install a web application directory or "bundle" file located in your Host
 appBase directory. If no <i>Context Path</i> is specified the directory name
-or the war file name without the ".war" extension is used as the path.</p>
+or the war file name without the "bundle" extension is used as the path.</p>
 
 <p>In this example the web application located in a subdirectory named
 <code>foo</code> in the Host appBase directory of the Tomcat server is
@@ -342,7 +342,7 @@ to the name of the web application directory.</p>
 <source>WAR or Directory URL: foo</source>
 
 
-<p>In this example the ".war" file <code>bar.war</code> located in your
+<p>In this example the "bundle" file <code>bar.war</code> located in your
 Host appBase directory on the Tomcat server is deployed as the web
 application context named <code>/bartoo</code>.</p>
 <source>Context Path: /bartoo
@@ -354,7 +354,7 @@ WAR or Directory URL: bar.war</source>
 
 <p>If the Host deployXML flag is set to true, you can install a web
 application using a Context configuration ".xml" file and an optional
-".war" file or web application directory. The <i>Context Path</i>
+"bundle" file or web application directory. The <i>Context Path</i>
 is not used when installing a web application using a context ".xml"
 configuration file.</p>
 

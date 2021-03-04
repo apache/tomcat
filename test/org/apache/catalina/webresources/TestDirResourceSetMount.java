@@ -27,7 +27,7 @@ import org.junit.BeforeClass;
 
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceSet;
-import org.apache.catalina.startup.ExpandWar;
+import org.apache.catalina.startup.ExpandBundle;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestDirResourceSetMount extends AbstractTestResourceSetMount {
@@ -44,7 +44,7 @@ public class TestDirResourceSetMount extends AbstractTestResourceSetMount {
 
     @AfterClass
     public static void after() {
-        ExpandWar.delete(tempDir.toFile());
+        ExpandBundle.delete(tempDir.toFile());
     }
 
 

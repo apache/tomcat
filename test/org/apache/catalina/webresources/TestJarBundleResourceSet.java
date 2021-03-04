@@ -28,7 +28,7 @@ import org.apache.catalina.WebResource;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestJarWarResourceSet extends TomcatBaseTest {
+public class TestJarBundleResourceSet extends TomcatBaseTest {
 
     @Before
     public void register() {
@@ -37,7 +37,7 @@ public class TestJarWarResourceSet extends TomcatBaseTest {
 
 
     @Test
-    public void testJarWarMetaInf() throws LifecycleException  {
+    public void testJarMetaInf() throws LifecycleException  {
         Tomcat tomcat = getTomcatInstance();
 
         File warFile = new File("test/webresources/war-url-connection.war");

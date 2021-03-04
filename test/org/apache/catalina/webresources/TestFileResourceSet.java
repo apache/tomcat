@@ -25,7 +25,7 @@ import java.nio.file.attribute.FileAttribute;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import org.apache.catalina.startup.ExpandWar;
+import org.apache.catalina.startup.ExpandBundle;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 public class TestFileResourceSet extends AbstractTestFileResourceSet {
@@ -42,7 +42,7 @@ public class TestFileResourceSet extends AbstractTestFileResourceSet {
 
     @AfterClass
     public static void after() {
-        ExpandWar.delete(tempDir.toFile());
+        ExpandBundle.delete(tempDir.toFile());
     }
 
 
