@@ -24,6 +24,8 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.apache.tomcat.util.compat.JrePlatform;
+
 /*
  * Tests for Unix Domain Sockets.
  *
@@ -52,6 +54,7 @@ public class TestUnixDomainSocketServer extends AbstractJniTest {
 
     @Before
     public void init() throws Exception {
+        Assume.assumeFalse(JrePlatform.IS_WINDOWS);
         Assume.assumeTrue(Library.APR_HAVE_UNIX);
         pool = Pool.create(0);
         long unixAddress = Address.info(PATH, Socket.APR_UNIX,
