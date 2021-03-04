@@ -683,7 +683,6 @@ public class HostConfig implements LifecycleListener {
 
                     // Check that a Bundle or DIR in the appBase is not 'hidden'
                     //added extension
-                    System.out.println("instantiating bundle with extension " + extension + " named " + cn.getBaseName());
                     File bundle = new File(host.getAppBaseFile(), cn.getBaseName() + extension);
                     if (bundle.exists()) {
                         log.warn(sm.getString("hostConfig.deployDescriptor.hiddenWar",
@@ -798,8 +797,6 @@ public class HostConfig implements LifecycleListener {
             return;
         }
 
-        System.out.println("app base " + appBase.getName());
-
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<>();
 
@@ -816,7 +813,6 @@ public class HostConfig implements LifecycleListener {
                     !invalidBundles.contains(file) &&
                         bundle.isFile()) {
 
-                System.out.println("passes all the checks... continue");
                 ContextName cn = new ContextName(file, true);
                 if (tryAddServiced(cn.getName())) {
                     try {
@@ -846,14 +842,12 @@ public class HostConfig implements LifecycleListener {
 
                         // Check for Bundle with /../ /./ or similar sequences in the name
                         if (!validateContextPath(appBase, cn.getBaseName())) {
-                            System.out.println("isnt valid bundle..." + cn.getBaseName());
                             log.error(sm.getString("hostConfig.illegalWarName", file));
                             invalidBundles.add(file);
                             removeServiced(cn.getName());
                             continue;
                         }
 
-                        System.out.println("deploy bundle! " + bundle.getName());
                         // DeployBundle will call removeServiced
                         results.add(es.submit(new DeployBundle(this, cn, bundle)));
                     } catch (Throwable t) {
@@ -1084,13 +1078,10 @@ public class HostConfig implements LifecycleListener {
             LifecycleListener listener = (LifecycleListener) clazz.getConstructor().newInstance();
             context.addLifecycleListener(listener);
 
-            System.out.println("set bundle extension " + bundleExtension);
-
             context.setName(cn.getName());
             context.setPath(cn.getPath());
             context.setWebappVersion(cn.getVersion());
 
-            System.out.println("base name " + cn.getBaseName());
             context.setDocBase(cn.getBaseName() + bundleExtension);
             host.addChild(context);
         } catch (Throwable t) {
@@ -2061,7 +2052,6 @@ public class HostConfig implements LifecycleListener {
         @Override
         public void run() {
             try {
-                System.out.println("cn : " + cn);
                 config.deployBundle(cn, bundle);
             } finally {
                 config.removeServiced(cn.getName());

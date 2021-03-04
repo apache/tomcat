@@ -809,8 +809,6 @@ public class ContextConfig implements LifecycleListener {
             }
         }
 
-        System.out.println("context config 1....");
-
         // At this point we need to determine if we have a Bundle file in the
         // appBase that needs to be expanded. Therefore we consider the absolute
         // docBase NOT the canonical docBase. This is because some users symlink
@@ -818,7 +816,7 @@ public class ContextConfig implements LifecycleListener {
         boolean docBaseAbsoluteInAppBase = docBaseAbsolute.startsWith(appBase.getPath() + File.separatorChar);
         if (HostConfig.isValidExtension(docBaseAbsolute) &&
                 !docBaseAbsoluteFile.isDirectory()) {
-            System.out.println("context config....");
+
             URL bundle = UriUtil.buildJarUrl(docBaseAbsoluteFile);
             if (unpackBundles) {
                 docBaseAbsolute = ExpandBundle.expand(host, bundle, pathName);
@@ -910,7 +908,6 @@ public class ContextConfig implements LifecycleListener {
                 return;
             }
 
-            System.out.println("is ends with original doc base ...." + originalDocBase);
             if (HostConfig.isValidExtension(originalDocBase)) {
                 antiLockingDocBase = new File(tmpFile, deploymentCount++ + "-" + docBase + ".war");
             } else {

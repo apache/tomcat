@@ -83,8 +83,6 @@ public final class ClassLoaderFactory {
         // Construct the "class path" for this class loader
         Set<URL> set = new LinkedHashSet<>();
 
-        System.out.println("directories .... " + packed);
-
         // Add unpacked directories
         if (unpacked != null) {
             for (File file : unpacked) {
