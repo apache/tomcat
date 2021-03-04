@@ -85,7 +85,7 @@
                is="true"
                type="boolean"/>
 
-     <attribute name="unpackWARs"
+     <attribute name="unpackBundles"
                description="The unpack WARs flag"
                is="true"
                type="boolean"/>

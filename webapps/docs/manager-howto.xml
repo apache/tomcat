@@ -477,7 +477,7 @@ on the server.</p>
 
 <subsection name="Deployment Notes">
 
-<p>If the Host is configured with unpackWARs=true and you deploy a war
+<p>If the Host is configured with unpackBundles=true and you deploy a war
 file, the war will be unpacked into a directory in your Host appBase
 directory.</p>
 

@@ -458,7 +458,7 @@ public class MBeanFactory {
      * @param autoDeploy Should we auto deploy?
      * @param deployOnStartup Deploy on server startup?
      * @param deployXML Should we deploy Context XML config files property?
-     * @param unpackWARs Should we unpack WARs when auto deploying?
+     * @param unpackBundles Should we unpack WARs when auto deploying?
      * @return the object name of the created host
      *
      * @exception Exception if an MBean cannot be created or registered
@@ -468,7 +468,7 @@ public class MBeanFactory {
                                      boolean autoDeploy,
                                      boolean deployOnStartup,
                                      boolean deployXML,
-                                     boolean unpackWARs)
+                                     boolean unpackBundles)
         throws Exception {
 
         // Create a new StandardHost instance
@@ -478,7 +478,7 @@ public class MBeanFactory {
         host.setAutoDeploy(autoDeploy);
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
-        host.setUnpackWARs(unpackWARs);
+        host.setUnpackBundles(unpackBundles);
 
         // add HostConfig for active reloading
         HostConfig hostConfig = new HostConfig();

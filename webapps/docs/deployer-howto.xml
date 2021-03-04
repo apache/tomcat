@@ -200,7 +200,7 @@
                 a .WAR when the new .WAR is provided. In this case the exploded
                 web application is removed, and the .WAR is expanded again.
                 Note that the explosion will not occur if the Host is configured
-                so that .WARs are not exploded with a <code>unpackWARs</code>
+                so that .WARs are not exploded with a <code>unpackBundles</code>
                 attribute set to "false", in which case the web application
                 will be simply redeployed as a compressed archive.
             </li>

@@ -59,7 +59,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.startup.ExpandWar;
+import org.apache.catalina.startup.ExpandBundle;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.ServerInfo;
@@ -75,6 +75,7 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
+import org.apache.catalina.startup.HostConfig;
 
 
 /**
@@ -93,13 +94,13 @@ import org.apache.tomcat.util.security.Escape;
  *     web application, based on the contents of the context configuration
  *     file found at the specified URL.  The <code>docBase</code> attribute
  *     of the context configuration file is used to locate the actual
- *     WAR or directory containing the application.</li>
- * <li><b>/deploy?config={config-url}&amp;war={war-url}/</b> - Install and start
+ *     Bundle or directory containing the application.</li>
+ * <li><b>/deploy?config={config-url}&amp;bundle={bundle-url}/</b> - Install and start
  *     a new web application, based on the contents of the context
  *     configuration file found at <code>{config-url}</code>, overriding the
  *     <code>docBase</code> attribute with the contents of the web
- *     application archive found at <code>{war-url}</code>.</li>
- * <li><b>/deploy?path=/xxx&amp;war={war-url}</b> - Install and start a new
+ *     application archive found at <code>{bundle-url}</code>.</li>
+ * <li><b>/deploy?path=/xxx&amp;bundle={bundle-url}</b> - Install and start a new
  *     web application attached to context path <code>/xxx</code>, based
  *     on the contents of the web application archive found at the
  *     specified URL.</li>
@@ -130,8 +131,8 @@ import org.apache.tomcat.util.security.Escape;
  * <li><b>/threaddump</b> - Write a JVM thread dump.</li>
  * <li><b>/undeploy?path=/xxx</b> - Shutdown and remove the web application
  *     attached to context path <code>/xxx</code> for this virtual host,
- *     and remove the underlying WAR file or document base directory.
- *     (<em>NOTE</em> - This is only allowed if the WAR file or document
+ *     and remove the underlying Bundle file or document base directory.
+ *     (<em>NOTE</em> - This is only allowed if the Bundle file or document
  *     base is stored in the <code>appBase</code> directory of this host,
  *     typically as a result of being placed there via the <code>/deploy</code>
  *     command.</li>
@@ -316,15 +317,15 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             command = request.getServletPath();
 
         String path = request.getParameter("path");
-        String war = request.getParameter("war");
+        String bundle = request.getParameter("bundle");
         String config = request.getParameter("config");
         ContextName cn = null;
         if (path != null) {
             cn = new ContextName(path, request.getParameter("version"));
         } else if (config != null) {
             cn = ContextName.extractFromPath(config);
-        } else if (war != null) {
-            cn = ContextName.extractFromPath(war);
+        } else if (bundle != null) {
+            cn = ContextName.extractFromPath(bundle);
         }
 
         String type = request.getParameter("type");
@@ -353,8 +354,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (command == null) {
             writer.println(smClient.getString("managerServlet.noCommand"));
         } else if (command.equals("/deploy")) {
-            if (war != null || config != null) {
-                deploy(writer, config, cn, war, update, smClient);
+            if (bundle != null || config != null) {
+                deploy(writer, config, cn, bundle, update, smClient);
             } else if (tag != null) {
                 deploy(writer, cn, tag, smClient);
             } else {
@@ -769,7 +770,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String displayPath = cn.getDisplayName();
 
         // If app exists deployment can only proceed if update is true
-        // Note existing WAR will be deleted and then replaced
+        // Note existing Bundle will be deleted and then replaced
         Context context = (Context) host.findChild(name);
         if (context != null && !update) {
             writer.println(smClient.getString("managerServlet.alreadyContext",
@@ -781,22 +782,23 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             config = config.substring("file:".length());
         }
 
-        File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
+        System.out.println("deployed bundle : " + baseName);
+        File deployedBundle = new File(host.getAppBaseFile(), baseName + ".war");
 
-        // Determine full path for uploaded WAR
-        File uploadedWar;
+        // Determine full path for uploaded Bundle
+        File uploadedBundle;
         if (tag == null) {
             if (update) {
                 // Append ".tmp" to the file name so it won't get deployed if auto
-                // deployment is enabled. It also means the old war won't get
+                // deployment is enabled. It also means the old bundle won't get
                 // deleted if the upload fails
-                uploadedWar = new File(deployedWar.getAbsolutePath() + ".tmp");
-                if (uploadedWar.exists() && !uploadedWar.delete()) {
+                uploadedBundle = new File(deployedBundle.getAbsolutePath() + ".tmp");
+                if (uploadedBundle.exists() && !uploadedBundle.delete()) {
                     writer.println(smClient.getString("managerServlet.deleteFail",
-                            uploadedWar));
+                            uploadedBundle));
                 }
             } else {
-                uploadedWar = deployedWar;
+                uploadedBundle = deployedBundle;
             }
         } else {
             File uploadPath = new File(versioned, tag);
@@ -805,10 +807,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         uploadPath));
                 return;
             }
-            uploadedWar = new File(uploadPath, baseName + ".war");
+            uploadedBundle = new File(uploadPath, baseName + ".war");
         }
         if (debug >= 2) {
-            log("Uploading WAR file to " + uploadedWar);
+            log("Uploading Bundle file to " + uploadedBundle);
         }
 
         try {
@@ -820,29 +822,29 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                     "managerServlet.mkdirFail",configBase));
                             return;
                         }
-                        if (ExpandWar.copy(new File(config),
+                        if (ExpandBundle.copy(new File(config),
                                 new File(configBase, baseName + ".xml")) == false) {
                             throw new Exception(sm.getString("managerServlet.copyError", config));
                         }
                     }
-                    // Upload WAR
-                    uploadWar(writer, request, uploadedWar, smClient);
+                    // Upload Bundle
+                    uploadBundle(writer, request, uploadedBundle, smClient);
                     if (update && tag == null) {
-                        if (deployedWar.exists() && !deployedWar.delete()) {
+                        if (deployedBundle.exists() && !deployedBundle.delete()) {
                             writer.println(smClient.getString("managerServlet.deleteFail",
-                                    deployedWar));
+                                    deployedBundle));
                             return;
                         }
-                        // Rename uploaded WAR file
-                        if (!uploadedWar.renameTo(deployedWar)) {
+                        // Rename uploaded Bundle file
+                        if (!uploadedBundle.renameTo(deployedBundle)) {
                             writer.println(smClient.getString("managerServlet.renameFail",
-                                    uploadedWar, deployedWar));
+                                    uploadedBundle, deployedBundle));
                             return;
                         }
                     }
                     if (tag != null) {
-                        // Copy WAR to the host's appBase
-                        ExpandWar.copy(uploadedWar, deployedWar);
+                        // Copy Bundle to the host's appBase
+                        ExpandBundle.copy(uploadedBundle, deployedBundle);
                     }
                 } finally {
                     removeServiced(name);
@@ -886,21 +888,21 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String name = cn.getName();
         String displayPath = cn.getDisplayName();
 
-        // Find the local WAR file
-        File localWar = new File(new File(versioned, tag), baseName + ".war");
+        // Find the local Bundle file
+        File localBundle = new File(new File(versioned, tag), baseName + ".war");
 
-        File deployedWar = new File(host.getAppBaseFile(), baseName + ".war");
+        File deployedBundle = new File(host.getAppBaseFile(), baseName + ".war");
 
-        // Copy WAR to appBase
+        // Copy Bundle to appBase
         try {
             if (tryAddServiced(name)) {
                 try {
-                    if (!deployedWar.delete()) {
+                    if (!deployedBundle.delete()) {
                         writer.println(smClient.getString("managerServlet.deleteFail",
-                                deployedWar));
+                                deployedBundle));
                         return;
                     }
-                    ExpandWar.copy(localWar, deployedWar);
+                    ExpandBundle.copy(localBundle, deployedBundle);
                 } finally {
                     removeServiced(name);
                 }
@@ -927,25 +929,25 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param writer    Writer to render results to
      * @param config    URL of the context configuration file to be installed
      * @param cn        Name of the application to be installed
-     * @param war       URL of the web application archive to be installed
+     * @param bundle       URL of the web application archive to be installed
      * @param update    true to override any existing webapp on the path
      * @param smClient  i18n messages using the locale of the client
      */
     protected void deploy(PrintWriter writer, String config, ContextName cn,
-            String war, boolean update, StringManager smClient) {
+            String bundle, boolean update, StringManager smClient) {
 
         if (config != null && config.length() == 0) {
             config = null;
         }
-        if (war != null && war.length() == 0) {
-            war = null;
+        if (bundle != null && bundle.length() == 0) {
+            bundle = null;
         }
 
         if (debug >= 1) {
             if (config != null) {
-                if (war != null) {
+                if (bundle != null) {
                     log("install: Installing context configuration at '" +
-                            config + "' from '" + war + "'");
+                            config + "' from '" + bundle + "'");
                 } else {
                     log("install: Installing context configuration at '" +
                             config + "'");
@@ -953,9 +955,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             } else {
                 if (cn != null) {
                     log("install: Installing web application '" + cn +
-                            "' from '" + war + "'");
+                            "' from '" + bundle + "'");
                 } else {
-                    log("install: Installing web application from '" + war + "'");
+                    log("install: Installing web application from '" + bundle + "'");
                 }
             }
         }
@@ -980,8 +982,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (config != null && (config.startsWith("file:"))) {
             config = config.substring("file:".length());
         }
-        if (war != null && (war.startsWith("file:"))) {
-            war = war.substring("file:".length());
+        if (bundle != null && (bundle.startsWith("file:"))) {
+            bundle = bundle.substring("file:".length());
         }
 
         try {
@@ -999,21 +1001,21 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                     "managerServlet.deleteFail", localConfig));
                             return;
                         }
-                        ExpandWar.copy(new File(config), localConfig);
+                        ExpandBundle.copy(new File(config), localConfig);
                     }
-                    if (war != null) {
-                        File localWar;
-                        if (war.endsWith(".war")) {
-                            localWar = new File(host.getAppBaseFile(), baseName + ".war");
+                    if (bundle != null) {
+                        File localBundle;
+                        if (HostConfig.isValidExtension(bundle)) {
+                            localBundle = new File(host.getAppBaseFile(), baseName + ".war");
                         } else {
-                            localWar = new File(host.getAppBaseFile(), baseName);
+                            localBundle = new File(host.getAppBaseFile(), baseName);
                         }
-                        if (localWar.exists() && !ExpandWar.delete(localWar)) {
+                        if (localBundle.exists() && !ExpandBundle.delete(localBundle)) {
                             writer.println(smClient.getString(
-                                    "managerServlet.deleteFail", localWar));
+                                    "managerServlet.deleteFail", localBundle));
                             return;
                         }
-                        ExpandWar.copy(new File(war), localWar);
+                        ExpandBundle.copy(new File(bundle), localBundle);
                     }
                 } finally {
                     removeServiced(name);
@@ -1501,14 +1503,14 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     ExceptionUtils.handleThrowable(t);
                 }
                 try {
-                    File war = new File(host.getAppBaseFile(), baseName + ".war");
+                    File bundle = new File(host.getAppBaseFile(), baseName + ".war");
                     File dir = new File(host.getAppBaseFile(), baseName);
                     File xml = new File(configBase, baseName + ".xml");
-                    if (war.exists() && !war.delete()) {
+                    if (bundle.exists() && !bundle.delete()) {
                         writer.println(smClient.getString(
-                                "managerServlet.deleteFail", war));
+                                "managerServlet.deleteFail", bundle));
                         return;
-                    } else if (dir.exists() && !ExpandWar.delete(dir, false)) {
+                    } else if (dir.exists() && !ExpandBundle.delete(dir, false)) {
                         writer.println(smClient.getString(
                                 "managerServlet.deleteFail", dir));
                         return;
@@ -1637,32 +1639,32 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     /**
-     * Upload the WAR file included in this request, and store it at the
+     * Upload the Bundle file included in this request, and store it at the
      * specified file location.
      *
      * @param writer    Writer to render to
      * @param request   The servlet request we are processing
-     * @param war       The file into which we should store the uploaded WAR
+     * @param bundle       The file into which we should store the uploaded Bundle
      * @param smClient  The StringManager used to construct i18n messages based
      *                  on the Locale of the client
      *
      * @exception IOException if an I/O error occurs during processing
      */
-    protected void uploadWar(PrintWriter writer, HttpServletRequest request,
-            File war, StringManager smClient) throws IOException {
+    protected void uploadBundle(PrintWriter writer, HttpServletRequest request,
+            File bundle, StringManager smClient) throws IOException {
 
-        if (war.exists() && !war.delete()) {
-            String msg = smClient.getString("managerServlet.deleteFail", war);
+        if (bundle.exists() && !bundle.delete()) {
+            String msg = smClient.getString("managerServlet.deleteFail", bundle);
             throw new IOException(msg);
         }
 
         try (ServletInputStream istream = request.getInputStream();
-                OutputStream ostream = new FileOutputStream(war)) {
+                OutputStream ostream = new FileOutputStream(bundle)) {
             IOTools.flow(istream, ostream);
         } catch (IOException e) {
-            if (war.exists() && !war.delete()) {
+            if (bundle.exists() && !bundle.delete()) {
                 writer.println(
-                        smClient.getString("managerServlet.deleteFail", war));
+                        smClient.getString("managerServlet.deleteFail", bundle));
             }
             throw e;
         }

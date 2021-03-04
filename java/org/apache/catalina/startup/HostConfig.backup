@@ -136,7 +136,7 @@ public class HostConfig implements LifecycleListener {
      * Should we unpack WAR files when auto-deploying applications in the
      * <code>appBase</code> directory?
      */
-    protected boolean unpackWARs = false;
+    protected boolean unpackBundles = false;
 
 
     /**
@@ -277,17 +277,17 @@ public class HostConfig implements LifecycleListener {
      * @return the unpack WARs flag.
      */
     public boolean isUnpackBundles() {
-        return this.unpackWARs;
+        return this.unpackBundles;
     }
 
 
     /**
      * Set the unpack WARs flag.
      *
-     * @param unpackWARs The new unpack WARs flag
+     * @param unpackBundles The new unpack WARs flag
      */
-    public void setUnpackWARs(boolean unpackWARs) {
-        this.unpackWARs = unpackWARs;
+    public void setUnpackBundles(boolean unpackBundles) {
+        this.unpackBundles = unpackBundles;
     }
 
 
@@ -712,7 +712,7 @@ public class HostConfig implements LifecycleListener {
                 }
             }
 
-            boolean unpackWAR = unpackWARs;
+            boolean unpackWAR = unpackBundles;
             if (unpackWAR && context instanceof StandardContext) {
                 unpackWAR = ((StandardContext) context).getUnpackWAR();
             }
@@ -798,7 +798,7 @@ public class HostConfig implements LifecycleListener {
                     try {
                         if (deploymentExists(cn.getName())) {
                             DeployedApplication app = deployed.get(cn.getName());
-                            boolean unpackWAR = unpackWARs;
+                            boolean unpackWAR = unpackBundles;
                             if (unpackWAR && host.findChild(cn.getName()) instanceof StandardContext) {
                                 unpackWAR = ((StandardContext) host.findChild(cn.getName())).getUnpackWAR();
                             }
@@ -910,11 +910,11 @@ public class HostConfig implements LifecycleListener {
 
         // If there is an expanded directory then any xml in that directory
         // should only be used if the directory is not out of date and
-        // unpackWARs is true. Note the code below may apply further limits
+        // unpackBundles is true. Note the code below may apply further limits
         boolean useXml = false;
         // If the xml file exists then expandedDir must exists so no need to
         // test that here
-        if (xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified())) {
+        if (xml.exists() && unpackBundles && (!warTracker.exists() || warTracker.lastModified() == war.lastModified())) {
             useXml = true;
         }
 
@@ -1035,7 +1035,7 @@ public class HostConfig implements LifecycleListener {
         } finally {
             // If we're unpacking WARs, the docBase will be mutated after
             // starting the context
-            boolean unpackWAR = unpackWARs;
+            boolean unpackWAR = unpackBundles;
             if (unpackWAR && context instanceof StandardContext) {
                 unpackWAR = ((StandardContext) context).getUnpackWAR();
             }
@@ -1446,7 +1446,7 @@ public class HostConfig implements LifecycleListener {
                         app.redeployResources.put(resources[i],
                                 Long.valueOf(resource.lastModified()));
                         app.timestamp = System.currentTimeMillis();
-                        boolean unpackWAR = unpackWARs;
+                        boolean unpackWAR = unpackBundles;
                         if (unpackWAR && context instanceof StandardContext) {
                             unpackWAR = ((StandardContext) context).getUnpackWAR();
                         }
@@ -1868,7 +1868,7 @@ public class HostConfig implements LifecycleListener {
         host.addChild(context);
         // Add the eventual unpacked WAR and all the resources which will be
         // watched inside it
-        boolean unpackWAR = unpackWARs;
+        boolean unpackWAR = unpackBundles;
         if (unpackWAR && context instanceof StandardContext) {
             unpackWAR = ((StandardContext) context).getUnpackWAR();
         }
@@ -1947,7 +1947,7 @@ public class HostConfig implements LifecycleListener {
         public long timestamp = System.currentTimeMillis();
 
         /**
-         * In some circumstances, such as when unpackWARs is true, a directory
+         * In some circumstances, such as when unpackBundles is true, a directory
          * may be added to the appBase that is ignored. This flag indicates that
          * the user has been warned so that the warning is not logged on every
          * run of the auto deployer.

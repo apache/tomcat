@@ -126,7 +126,7 @@
       <th colspan="4">Result</th>
     </tr>
     <tr>
-      <th>deployXML</th><th>copyXML</th><th>unpackWARs</th>
+      <th>deployXML</th><th>copyXML</th><th>unpackBundles</th>
       <th>XML</th><th>WAR</th><th>DIR</th><th>Notes</th>
     </tr>
     <tr>
@@ -247,7 +247,7 @@
         before the change and isn't present after it either. '-' rather than 'N'
         is used to focus attention on what changes.</li>
     <li>'R' means that the directory is re-created by expanding the WAR file.
-        This will only happen if <em>unpackWARs</em> is <code>true</code>.</li>
+        This will only happen if <em>unpackBundles</em> is <code>true</code>.</li>
     <li>'XW' means that the if the WAR contains a META-INF/context.xml file it
         will be extracted and placed in the Host&apos;s <em>configBase</em>.
         This only happens if <em>copyXML</em> is <code>true</code> and
@@ -381,7 +381,7 @@
         is used to focus attention on what changes.</li>
     <li>'M' means that the artifact has been modified.</li>
     <li>'R' means that the directory is deleted and re-created by expanding the
-        WAR file. This will only happen if <em>unpackWARs</em> is
+        WAR file. This will only happen if <em>unpackBundles</em> is
         <code>true</code>.</li>
   </ul>
 
@@ -502,11 +502,11 @@
 
   <ul>
     <li>If a WAR is added, any DIR is removed and may be recreated depending on
-        <em>unpackWARs</em>.</li>
+        <em>unpackBundles</em>.</li>
     <li>If an XML file is added that refers to an external <em>docBase</em> any
         WAR or DIR in the appBase will be removed. The DIR may be recreated if
-        the external resource is a WAR and <em>unpackWARs</em> is true.</li>
-    <li>If a DIR is added when a WAR already exists and <em>unpackWARs</em> is
+        the external resource is a WAR and <em>unpackBundles</em> is true.</li>
+    <li>If a DIR is added when a WAR already exists and <em>unpackBundles</em> is
         <code>false</code>, the DIR will be ignored but a warning will be
         logged when the DIR is first detected. If the WAR is removed, the DIR
         will be left and may be deployed via automatic deployment.</li>
@@ -528,7 +528,7 @@
   <ol>
     <li><em>deployXML</em> and <em>copyXML</em> are ignored since an XML file
         was discovered in the <em>configBase</em>.</li>
-    <li><em>unpackWARs</em> is ignored since there is no WAR file.</li>
+    <li><em>unpackBundles</em> is ignored since there is no WAR file.</li>
     <li>The context will fail to start because there is no content in the
         expected <em>docBase</em>.</li>
     <li>The web application fails to deploy because it contains an embedded

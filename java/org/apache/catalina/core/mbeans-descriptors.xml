@@ -1162,8 +1162,8 @@
                description="Determines if old versions of applications deployed using parallel deployment are automatically undeployed when no longer used. Requires autoDeploy to be enabled."
                type="boolean"/>
 
-    <attribute name="unpackWARs"
-               description="Unpack WARs property"
+    <attribute name="unpackBundles"
+               description="Unpack Bundles property"
                is="true"
                type="boolean"/>
 

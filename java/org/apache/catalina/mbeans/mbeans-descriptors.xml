@@ -187,7 +187,7 @@
       <parameter name="deployXML"
           description="deploy Context XML config files property"
                type="boolean"/>
-      <parameter name="unpackWARs"
+      <parameter name="unpackBundles"
           description="Unpack WARs property"
                type="boolean"/>
     </operation>

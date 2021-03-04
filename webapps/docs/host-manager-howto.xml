@@ -231,7 +231,7 @@ localhost:</source>
     <p><i>Example response</i>:</p>
     <source>OK - Configuration persisted</source>
     <p><i>Example manual entry</i>:</p>
-    <source><![CDATA[<Host appBase="www.awesomeserver.com" name="www.awesomeserver.com" deployXML="false" unpackWARs="false">
+    <source><![CDATA[<Host appBase="www.awesomeserver.com" name="www.awesomeserver.com" deployXML="false" unpackBundles="false">
 </Host>]]></source>
   </subsection>
 </section>

@@ -422,7 +422,7 @@ including a Context configuration XML file in
 
 <subsection name="Deployment Notes">
 
-<p>If the Host is configured with unpackWARs=true and you install a war
+<p>If the Host is configured with unpackBundles=true and you install a war
 file, the war will be unpacked into a directory in your Host appBase
 directory.</p>
 

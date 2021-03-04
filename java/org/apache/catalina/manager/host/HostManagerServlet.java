@@ -255,13 +255,13 @@ public class HostManagerServlet
         boolean autoDeploy = booleanParameter(request, "autoDeploy", true, htmlMode);
         boolean deployOnStartup = booleanParameter(request, "deployOnStartup", true, htmlMode);
         boolean deployXML = booleanParameter(request, "deployXML", true, htmlMode);
-        boolean unpackWARs = booleanParameter(request, "unpackWARs", true, htmlMode);
+        boolean unpackBundles = booleanParameter(request, "unpackBundles", true, htmlMode);
         boolean copyXML = booleanParameter(request, "copyXML", false, htmlMode);
         add(writer, name, aliases, appBase, manager,
             autoDeploy,
             deployOnStartup,
             deployXML,
-            unpackWARs,
+            unpackBundles,
             copyXML,
             smClient);
     }
@@ -332,7 +332,7 @@ public class HostManagerServlet
      * @param autoDeploy Flag value
      * @param deployOnStartup Flag value
      * @param deployXML Flag value
-     * @param unpackWARs Flag value
+     * @param unpackBundles Flag value
      * @param copyXML Flag value
      * @param smClient StringManager for the client's locale
      */
@@ -342,7 +342,7 @@ public class HostManagerServlet
          boolean autoDeploy,
          boolean deployOnStartup,
          boolean deployXML,
-         boolean unpackWARs,
+         boolean unpackBundles,
          boolean copyXML,
          StringManager smClient) {
         if (debug >= 1) {
@@ -420,7 +420,7 @@ public class HostManagerServlet
         host.setAutoDeploy(autoDeploy);
         host.setDeployOnStartup(deployOnStartup);
         host.setDeployXML(deployXML);
-        host.setUnpackWARs(unpackWARs);
+        host.setUnpackBundles(unpackBundles);
         host.setCopyXML(copyXML);
 
         // Add new host

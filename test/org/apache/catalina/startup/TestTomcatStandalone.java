@@ -61,7 +61,7 @@ public class TestTomcatStandalone extends LoggingBaseTest {
                 + "               resourceName=\"UserDatabase\"/>\n"
                 + "      </Realm>\n" + "\n"
                 + "      <Host name=\"localhost\"  appBase=\"webapps\"\n"
-                + "            unpackWARs=\"true\" autoDeploy=\"true\">\n"
+                + "            unpackBundles=\"true\" autoDeploy=\"true\">\n"
                 + "\n"
                 + "        <Valve className=\"org.apache.catalina.valves.AccessLogValve\" directory=\"logs\"\n"
                 + "               prefix=\"localhost_access_log\" suffix=\".txt\"\n"

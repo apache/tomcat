@@ -37,7 +37,7 @@ public class TestHandlerIntegration extends TomcatBaseTest {
         Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
         skipTldsForResourceJars(ctx);
 
-        ((StandardHost) tomcat.getHost()).setUnpackWARs(false);
+        ((StandardHost) tomcat.getHost()).setUnpackBundles(false);
 
         tomcat.start();
 

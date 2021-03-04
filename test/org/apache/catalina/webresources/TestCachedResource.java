@@ -84,7 +84,7 @@ public class TestCachedResource extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         File docBase = new File("test/webresources/war-url-connection.war");
         Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
-        ((StandardHost) tomcat.getHost()).setUnpackWARs(false);
+        ((StandardHost) tomcat.getHost()).setUnpackBundles(false);
         tomcat.start();
 
         WebResourceRoot root = ctx.getResources();

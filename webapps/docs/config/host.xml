@@ -297,7 +297,7 @@
         will be used by default.</p>
       </attribute>
 
-      <attribute name="unpackWARs" required="false">
+      <attribute name="unpackBundles" required="false">
         <p>Set to <code>true</code> if you want web applications that are
         placed in the <code>appBase</code> directory as web application
         archive (WAR) files to be unpacked into a corresponding disk directory

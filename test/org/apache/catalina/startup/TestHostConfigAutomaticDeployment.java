@@ -113,7 +113,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
     /*
      * Expected behaviour for deployment of an XML file.
-     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     * deployXML  copyXML  unpackBundles      XML  WAR  DIR
      *    Y/N       Y/N       Y/N           Y    N    N
      *
      * Note: Context will fail to start because no valid docBase is present.
@@ -178,7 +178,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     /*
      * Expected behaviour for deployment of an XML file that points to an
      * external WAR.
-     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     * deployXML  copyXML  unpackBundles      XML  WAR  DIR
      *    Y/N       Y/N        Y            Y    N    Y
      *    Y/N       Y/N        N            Y    N    N
      *
@@ -254,7 +254,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     /*
      * Expected behaviour for deployment of an XML file that points to an
      * external DIR.
-     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     * deployXML  copyXML  unpackBundles      XML  WAR  DIR
      *    Y/N       Y/N       Y/N           Y    N    N
      *
      * Notes: Any context.xml file embedded in the external DIR file is ignored.
@@ -326,7 +326,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
     /*
      * Expected behaviour for deployment of a WAR with an embedded XML file.
-     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     * deployXML  copyXML  unpackBundles      XML  WAR  DIR
      *     N        Y/N        N            N    Y    N
      *     N        Y/N        Y            N    Y    Y
      *     Y         N         N            N    Y    N
@@ -393,7 +393,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
     /*
      * Expected behaviour for deployment of a WAR without an embedded XML file.
-     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     * deployXML  copyXML  unpackBundles      XML  WAR  DIR
      *    Y/N       Y/N        N            N    Y    N
      *    Y/N       Y/N        Y            N    Y    Y
      */
@@ -456,7 +456,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
     /*
      * Expected behaviour for deployment of a DIR with an embedded XML file.
-     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     * deployXML  copyXML  unpackBundles      XML  WAR  DIR
      *     N        Y/N       Y/N           N    N    Y
      *     Y         N        Y/N           N    N    Y
      *     Y         Y        Y/N           Y    N    Y
@@ -520,7 +520,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
     /*
      * Expected behaviour for deployment of a DIR without an embedded XML file.
-     * deployXML  copyXML  unpackWARs      XML  WAR  DIR
+     * deployXML  copyXML  unpackBundles      XML  WAR  DIR
      *    Y/N       Y/N       Y/N           N    N    Y
      */
     @Test
@@ -580,7 +580,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     }
 
     private void doTestDeployment(boolean deployXML, boolean copyXML,
-            boolean unpackWARs, LifecycleState resultState, String cookieName,
+            boolean unpackBundles, LifecycleState resultState, String cookieName,
             boolean resultXml, boolean resultWar, boolean resultDir)
             throws Exception {
 
@@ -593,7 +593,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         StandardHost host = (StandardHost) tomcat.getHost();
         host.setDeployXML(deployXML);
         host.setCopyXML(copyXML);
-        host.setUnpackWARs(unpackWARs);
+        host.setUnpackBundles(unpackBundles);
 
         // Trigger automatic deployment
         host.backgroundProcess();
@@ -647,7 +647,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      *   Y    Y    N    Y       WAR        N    N    -   -
      *   Y    Y    N    Y       XML        R    Y    -   Y
      *
-     * Notes: 1. The DIR will be re-created since unpackWARs is true.
+     * Notes: 1. The DIR will be re-created since unpackBundles is true.
      *        2. The XML will be extracted from the WAR/DIR if deployXML and
      *           copyXML are true.
      */
@@ -833,7 +833,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
 
         if ((startWar || startExternalWar) && !startDir) {
-            host.setUnpackWARs(false);
+            host.setUnpackBundles(false);
         }
 
         // Deploy the files we copied
@@ -1114,7 +1114,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
 
         if ((startWar || startExternalWar) && !startDir) {
-            host.setUnpackWARs(false);
+            host.setUnpackBundles(false);
         }
 
         // Deploy the files we copied
@@ -1260,11 +1260,11 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
      * Addition of a file  is treated as if the added file has been modified
      * with the following additional actions:
      * - If a WAR is added, any DIR is removed and may be recreated depending on
-     *   unpackWARs.
+     *   unpackBundles.
      * - If an XML file is added that refers to an external docBase any WAR or
      *   DIR in the appBase will be removed. The DIR may be recreated if the
-     *   external resource is a WAR and unpackWARs is true.
-     * - If a DIR is added when a WAR already exists and unpackWARs is false,
+     *   external resource is a WAR and unpackBundles is true.
+     * - If a DIR is added when a WAR already exists and unpackBundles is false,
      *   the DIR will be ignored but a warning will be logged when the DIR is
      *   first detected. If the WAR is removed, the DIR will be left and may be
      *   deployed via automatic deployment.
@@ -1434,7 +1434,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
 
         if ((startWar || startExternalWar) && !startDir) {
-            host.setUnpackWARs(false);
+            host.setUnpackBundles(false);
         }
 
         host.setCopyXML(copyXML);
@@ -1561,7 +1561,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
 
     /*
      * Test context unpackWAR setting.
-     * If context.getUnpackWAR != Host.getUnpackWARs the Host wins.
+     * If context.getUnpackWAR != Host.getUnpackBundles the Host wins.
      */
     @Test
     public void testUnpackWARFFF() throws Exception  {
@@ -1604,13 +1604,13 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         doTestUnpackWAR(true, true, true, true);
     }
 
-    private void doTestUnpackWAR(boolean unpackWARs, boolean unpackWAR,
+    private void doTestUnpackWAR(boolean unpackBundles, boolean unpackWAR,
             boolean external, boolean resultDir) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
         StandardHost host = (StandardHost) tomcat.getHost();
 
-        host.setUnpackWARs(unpackWARs);
+        host.setUnpackBundles(unpackBundles);
 
         tomcat.start();
 
@@ -1642,13 +1642,13 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         testBrokenAppWithAntiLocking(true);
     }
 
-    private void testBrokenAppWithAntiLocking(boolean unpackWARs)
+    private void testBrokenAppWithAntiLocking(boolean unpackBundles)
             throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
         StandardHost host = (StandardHost) tomcat.getHost();
 
-        host.setUnpackWARs(unpackWARs);
+        host.setUnpackBundles(unpackBundles);
 
         File war = createWar(WAR_BROKEN_SOURCE, false);
         createXmlInConfigBaseForExternal(war, true);
@@ -1661,7 +1661,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         tomcat.getHost().backgroundProcess();
 
         Assert.assertTrue(war.isFile());
-        if (unpackWARs) {
+        if (unpackBundles) {
             Assert.assertTrue(dir.isDirectory());
         }
     }

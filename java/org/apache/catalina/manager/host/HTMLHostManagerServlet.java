@@ -410,8 +410,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         args[1] = "deployXML";
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
-        args[0] = smClient.getString("htmlHostManagerServlet.addUnpackWARs");
-        args[1] = "unpackWARs";
+        args[0] = smClient.getString("htmlHostManagerServlet.addUnpackBundles");
+        args[1] = "unpackBundles";
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
 
