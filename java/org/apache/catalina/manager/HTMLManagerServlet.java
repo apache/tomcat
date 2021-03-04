@@ -53,6 +53,7 @@ import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
+import org.apache.catalina.startup.HostConfig;
 
 /**
 * Servlet that enables remote management of the web applications deployed
@@ -242,16 +243,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         try {
             while (true) {
-                Part warPart = request.getPart("deployBundle");
-                if (warPart == null) {
+                Part bundlePart = request.getPart("deployBundle");
+                if (bundlePart == null) {
                     message = smClient.getString(
                             "htmlManagerServlet.deployUploadNoFile");
                     break;
                 }
-                String filename = warPart.getSubmittedFileName();
-                if (!filename.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+                String filename = bundlePart.getSubmittedFileName();
+                if (!HostConfig.isValidExtension(filename)) {
                     message = smClient.getString(
-                            "htmlManagerServlet.deployUploadNotWar", filename);
+                            "htmlManagerServlet.deployUploadNotBundle", filename);
                     break;
                 }
                 // Get the filename if uploaded name includes a path
@@ -269,7 +270,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 File file = new File(host.getAppBaseFile(), filename);
                 if (file.exists()) {
                     message = smClient.getString(
-                            "htmlManagerServlet.deployUploadWarExists",
+                            "htmlManagerServlet.deployUploadBundleExists",
                             filename);
                     break;
                 }
@@ -286,7 +287,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
                 if (tryAddServiced(name)) {
                     try {
-                        warPart.write(file.getAbsolutePath());
+                        bundlePart.write(file.getAbsolutePath());
                     } finally {
                         removeServiced(name);
                     }
@@ -311,17 +312,17 @@ public final class HTMLManagerServlet extends ManagerServlet {
      *
      * @param config URL of the context configuration file to be deployed
      * @param cn Name of the application to be deployed
-     * @param war URL of the web application archive to be deployed
+     * @param bundle URL of the web application archive to be deployed
      * @param smClient internationalized strings
      * @return message String
      */
-    protected String deployInternal(String config, ContextName cn, String war,
+    protected String deployInternal(String config, ContextName cn, String bundle,
             StringManager smClient) {
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        super.deploy(printWriter, config, cn, war, false, smClient);
+        super.deploy(printWriter, config, cn, bundle, false, smClient);
 
         return stringWriter.toString();
     }
@@ -544,7 +545,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args[3] = smClient.getString("htmlManagerServlet.deployPath");
         args[4] = smClient.getString("htmlManagerServlet.deployVersion");
         args[5] = smClient.getString("htmlManagerServlet.deployConfig");
-        args[6] = smClient.getString("htmlManagerServlet.deployWar");
+        args[6] = smClient.getString("htmlManagerServlet.deployBundle");
         args[7] = smClient.getString("htmlManagerServlet.deployButton");
         writer.print(MessageFormat.format(DEPLOY_SECTION, args));
 
@@ -1309,7 +1310,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  <small>{6}</small>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"text\" name=\"deployWar\" size=\"40\">\n" +
+        "  <input type=\"text\" name=\"deployBundle\" size=\"40\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "<tr>\n" +
@@ -1339,7 +1340,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  <small>{2}</small>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"file\" name=\"deployWar\" size=\"40\">\n" +
+        "  <input type=\"file\" name=\"deployBundle\" size=\"40\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "<tr>\n" +
