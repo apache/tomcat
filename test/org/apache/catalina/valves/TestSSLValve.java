@@ -29,6 +29,7 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.tomcat.unittest.TesterLogValidationFilter;
+import org.apache.tomcat.util.buf.UEncoder;
 import org.easymock.EasyMock;
 
 public class TestSSLValve {
@@ -184,6 +185,17 @@ public class TestSSLValve {
 
 
     @Test
+    public void testSslClientCertHeaderEscaped() throws Exception {
+        String cert = certificateEscaped();
+        mockRequest.setHeader(valve.getSslClientEscapedCertHeader(), cert);
+
+        valve.invoke(mockRequest, null);
+
+        assertCertificateParsed();
+    }
+
+
+    @Test
     public void testSslClientCertNull() throws Exception {
         TesterLogValidationFilter f = TesterLogValidationFilter.add(null, "", null,
                 "org.apache.catalina.valves.SSLValve");
@@ -315,6 +327,17 @@ public class TestSSLValve {
 
     private static String certificateSingleLine(String separator) {
         return certificateSingleLine(CERTIFICATE_LINES, separator);
+    }
+
+
+    private static String certificateEscaped() throws Exception {
+        String cert = certificateSingleLine(CERTIFICATE_LINES, "\n");
+        String escaped = new UEncoder(UEncoder.SafeCharsSet.DEFAULT).encodeURL(cert, 0, cert.length()).toString();
+        Assert.assertTrue(escaped, escaped.contains("%0a")); // newline is escaped
+        Assert.assertTrue(escaped, escaped.contains("%20")); // space is escaped
+        Assert.assertTrue(escaped, escaped.contains("%2b")); // + is escaped
+        Assert.assertTrue(escaped, escaped.contains("%2f")); // / is escaped
+        return escaped;
     }
 
 
