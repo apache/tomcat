@@ -1297,7 +1297,9 @@ public class HostConfig implements LifecycleListener {
             migration.execute();
 
             // Use rename
-            Files.move(destination.toPath(), tempOld.toPath());
+            if (destination.exists()) {
+                Files.move(destination.toPath(), tempOld.toPath());
+            }
             Files.move(tempNew.toPath(), destination.toPath());
             ExpandWar.delete(tempOld);
 
