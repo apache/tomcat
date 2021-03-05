@@ -3044,7 +3044,7 @@ skip.installer property in build.properties" />
     </sequential>
   </macrodef>
 
-  <target name="downloadgz" unless="exist" depends="testexist,setproxy">
+  <target name="downloadgz" unless="exist" if="${execute.download}" depends="testexist,setproxy">
     <!-- Download and extract the package -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
@@ -3061,7 +3061,7 @@ skip.installer property in build.properties" />
     <delete file="${temp.file}.tar.gz"/>
   </target>
 
-  <target name="downloadgz-2" unless="exist" depends="testexist">
+  <target name="downloadgz-2" unless="exist" if="${execute.download}" depends="testexist">
     <!-- Download and extract the package from the two alternative locations -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
@@ -3086,7 +3086,7 @@ skip.installer property in build.properties" />
     <delete file="${temp.file}.tar.gz"/>
   </target>
 
-  <target name="downloadzip" unless="exist" depends="testexist,setproxy">
+  <target name="downloadzip" unless="exist" if="${execute.download}" depends="testexist,setproxy">
     <!-- Download and extract the package -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
@@ -3102,7 +3102,7 @@ skip.installer property in build.properties" />
     <delete file="${temp.file}"/>
   </target>
 
-  <target name="downloadzip-2" unless="exist" depends="testexist">
+  <target name="downloadzip-2" unless="exist" if="${execute.download}" depends="testexist">
     <!-- Download and extract the package from the two alternative locations -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
@@ -3126,7 +3126,7 @@ skip.installer property in build.properties" />
     <delete file="${temp.file}"/>
   </target>
 
-  <target name="downloadfile" unless="exist" depends="testexist,setproxy">
+  <target name="downloadfile" unless="exist" if="${execute.download}" depends="testexist,setproxy">
     <!-- Download the file -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
@@ -3141,7 +3141,7 @@ skip.installer property in build.properties" />
     <move file="${temp.file}" tofile="${destfile}"/>
   </target>
 
-  <target name="downloadfile-2" unless="exist" depends="testexist">
+  <target name="downloadfile-2" unless="exist" if="${execute.download}" depends="testexist">
     <!-- Download the file from the two alternative locations -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
