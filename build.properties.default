@@ -36,6 +36,7 @@ git.branch=master
 # Note enabling validation uses Checkstyle which is LGPL licensed
 ant.version.required=1.9.8
 execute.validate=false
+execute.download=true
 execute.test.nio=true
 execute.test.nio2=true
 # Still requires APR/native library to be present
