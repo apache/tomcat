@@ -30,6 +30,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.UDecoder;
 
 /**
  * When using mod_proxy_http, the client SSL information is not included in the
@@ -65,6 +66,7 @@ public class SSLValve extends ValveBase {
     private static final Log log = LogFactory.getLog(SSLValve.class);
 
     private String sslClientCertHeader = "ssl_client_cert";
+    private String sslClientEscapedCertHeader = "ssl_client_escaped_cert";
     private String sslCipherHeader = "ssl_cipher";
     private String sslSessionIdHeader = "ssl_session_id";
     private String sslCipherUserKeySizeHeader = "ssl_cipher_usekeysize";
@@ -81,6 +83,14 @@ public class SSLValve extends ValveBase {
 
     public void setSslClientCertHeader(String sslClientCertHeader) {
         this.sslClientCertHeader = sslClientCertHeader;
+    }
+
+    public String getSslClientEscapedCertHeader() {
+        return sslClientEscapedCertHeader;
+    }
+
+    public void setSslClientEscapedCertHeader(String sslClientEscapedCertHeader) {
+        this.sslClientEscapedCertHeader = sslClientEscapedCertHeader;
     }
 
     public String getSslCipherHeader() {
@@ -128,6 +138,8 @@ public class SSLValve extends ValveBase {
          * processing below:
          * - mod_header converts the '\n' into ' '
          * - nginx converts the '\n' into multiple ' '
+         * - nginx ssl_client_escaped_cert uses "uri component" escaping,
+         *   keeping only ALPHA, DIGIT, "-", ".", "_", "~"
          *
          * The code assumes that the trimmed header value starts with
          * '-----BEGIN CERTIFICATE-----' and ends with
@@ -137,7 +149,13 @@ public class SSLValve extends ValveBase {
          *       separate lines, the CertificateFactory is tolerant of any
          *       additional whitespace.
          */
-        String headerValue = mygetHeader(request, sslClientCertHeader);
+        String headerValue;
+        String headerEscapedValue = mygetHeader(request, sslClientEscapedCertHeader);
+        if (headerEscapedValue != null) {
+            headerValue = UDecoder.URLDecode(headerEscapedValue, null);
+        } else {
+            headerValue = mygetHeader(request, sslClientCertHeader);
+        }
         if (headerValue != null) {
             headerValue = headerValue.trim();
             if (headerValue.length() > 27) {
