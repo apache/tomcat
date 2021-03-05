@@ -179,6 +179,11 @@
         resulting in one of the deployments failing and errors being reported.
         (markt)
       </fix>
+      <fix>
+        Improve the <code>SSLValve</code> so it is able to handle escaped
+        client certificate headers from Nginx. Based on a patch by Florent
+        Guillaume. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

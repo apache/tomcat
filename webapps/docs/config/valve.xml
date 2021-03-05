@@ -1218,6 +1218,14 @@
         used.</p>
       </attribute>
 
+      <attribute name="sslClientEscapedCertHeader" required="false">
+        <p>Allows setting a custom name for the ssl_client_escaped_cert header.
+        If not specified, the default of <code>ssl_client_escaped_cert</code> is
+        used.</p>
+        <p>This header is useful for Nginx proxying, and takes precedence over
+        the ssl_client_cert header.</p>
+      </attribute>
+
       <attribute name="sslCipherHeader" required="false">
         <p>Allows setting a custom name for the ssl_cipher header.
         If not specified, the default of <code>ssl_cipher</code> is
