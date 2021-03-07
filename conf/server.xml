@@ -119,6 +119,13 @@
       <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
       -->
 
+      <!--
+        Please take a look at documentation at: 
+        /docs/config/valve.html#Health_Check_Valve
+        By default is the path "/health"
+      -->
+      <Valve className="org.apache.catalina.valves.HealthCheckValve" />
+      
       <!-- Use the LockOutRealm to prevent attempts to guess user passwords
            via a brute-force attack -->
       <Realm className="org.apache.catalina.realm.LockOutRealm">
