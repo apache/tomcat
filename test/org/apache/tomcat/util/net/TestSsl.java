@@ -80,6 +80,12 @@ public class TestSsl extends TomcatBaseTest {
     }
 
     private static final int POST_DATA_SIZE = 16 * 1024 * 1024;
+    private static final byte[] POST_DATA;
+    static {
+        POST_DATA = new byte[POST_DATA_SIZE]; // 16MB
+        Arrays.fill(POST_DATA, (byte) 1);
+
+    }
 
     @Test
     public void testPost() throws Exception {
@@ -107,15 +113,12 @@ public class TestSsl extends TomcatBaseTest {
 
                         OutputStream os = socket.getOutputStream();
 
-                        byte[] bytes = new byte[POST_DATA_SIZE]; // 16MB
-                        Arrays.fill(bytes, (byte) 1);
-
                         os.write("POST /post HTTP/1.1\r\n".getBytes());
                         os.write("Host: localhost\r\n".getBytes());
-                        os.write(("Content-Length: " + Integer.valueOf(bytes.length) + "\r\n\r\n").getBytes());
+                        os.write(("Content-Length: " + Integer.valueOf(POST_DATA.length) + "\r\n\r\n").getBytes());
                         // Write in 128KB blocks
-                        for (int i = 0; i < bytes.length / (128 * 1024); i++) {
-                            os.write(bytes, 0, 1024 * 128);
+                        for (int i = 0; i < POST_DATA.length / (128 * 1024); i++) {
+                            os.write(POST_DATA, 0, 1024 * 128);
                             Thread.sleep(10);
                         }
                         os.flush();
@@ -139,11 +142,11 @@ public class TestSsl extends TomcatBaseTest {
                             }
                         }
 
-                        for (int i = 0; i < bytes.length; i++) {
+                        for (int i = 0; i < POST_DATA.length; i++) {
                             int read = is.read();
-                            if (bytes[i] != read) {
+                            if (POST_DATA[i] != read) {
                                 System.err.println("Byte in position [" + i + "] had value [" + read +
-                                        "] rather than [" + Byte.toString(bytes[i]) + "]");
+                                        "] rather than [" + Byte.toString(POST_DATA[i]) + "]");
                                 errorCount.incrementAndGet();
                                 break;
                             }
