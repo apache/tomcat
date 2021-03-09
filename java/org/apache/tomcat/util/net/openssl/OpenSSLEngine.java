@@ -940,34 +940,50 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void checkLastError() throws SSLException {
-        long error = SSL.getLastErrorNumber();
-        if (error != SSL.SSL_ERROR_NONE) {
-            String err = SSL.getErrorString(error);
-            if (logger.isDebugEnabled()) {
-                logger.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
-            }
+        String sslError = getLastError();
+        if (sslError != null) {
             // Many errors can occur during handshake and need to be reported
             if (!handshakeFinished) {
                 sendHandshakeError = true;
             } else {
-                throw new SSLException(err);
+                throw new SSLException(sslError);
             }
         }
     }
 
 
-    /*
+    /**
+     * Clear out any errors, but log a warning.
+     */
+    private static void clearLastError() {
+        getLastError();
+    }
+
+    /**
      * Many calls to SSL methods do not check the last error. Those that do
      * check the last error need to ensure that any previously ignored error is
      * cleared prior to the method call else errors may be falsely reported.
+     * @return the first error in the stack
      *
-     * TODO: Check last error after every call to an SSL method and respond
-     *       appropriately.
+     * TODO: Improve error handling. Ideally, before any SSL_read, SSL_write,
+     *  clearLastError should always be called, and getLastError should be called
+     *  after on any negative result.
+     *
      */
-    private static void clearLastError() {
-        while (SSL.getLastErrorNumber() != SSL.SSL_ERROR_NONE) {
+    private static String getLastError() {
+        String sslError = null;
+        long error;
+        while ((error = SSL.getLastErrorNumber()) != SSL.SSL_ERROR_NONE) {
             // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
+            String err = SSL.getErrorString(error);
+            if (sslError == null) {
+                sslError = err;
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
+            }
         }
+        return sslError;
     }
 
     private SSLEngineResult.Status getEngineStatus() {
