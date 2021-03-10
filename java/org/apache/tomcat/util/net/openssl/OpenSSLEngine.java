@@ -308,7 +308,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
         }
 
-        return -1;
+        return 0;
     }
 
     /**
@@ -430,11 +430,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, handshakeStatus, 0, 0);
             }
 
+            clearLastError();
             // Write the pending data from the network BIO into the dst buffer
             try {
                 bytesProduced = readEncryptedData(networkBIO, dst, pendingNet);
             } catch (Exception e) {
                 throw new SSLException(e);
+            }
+            if (bytesProduced == 0) {
+                checkLastError();
             }
 
             // If isOutboundDone is set, then the data from the network BIO
@@ -457,11 +461,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             while (src.hasRemaining()) {
 
+                clearLastError();
                 // Write plain text application data to the SSL engine
                 try {
                     bytesConsumed += writePlaintextData(ssl, src);
                 } catch (Exception e) {
                     throw new SSLException(e);
+                }
+                if (bytesConsumed == 0) {
+                    checkLastError();
                 }
 
                 // Check to see if the engine wrote data into the network BIO
@@ -474,11 +482,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                 SSLEngineResult.Status.BUFFER_OVERFLOW, getHandshakeStatus(), bytesConsumed, bytesProduced);
                     }
 
+                    clearLastError();
                     // Write the pending data from the network BIO into the dst buffer
                     try {
                         bytesProduced += readEncryptedData(networkBIO, dst, pendingNet);
                     } catch (Exception e) {
                         throw new SSLException(e);
+                    }
+                    if (bytesProduced == 0) {
+                        checkLastError();
                     }
 
                     return new SSLEngineResult(getEngineStatus(), getHandshakeStatus(), bytesConsumed, bytesProduced);
@@ -541,15 +553,16 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // Write encrypted data to network BIO
-        int written = -1;
+        clearLastError();
+        int written = 0;
         try {
             written = writeEncryptedData(networkBIO, src);
         } catch (Exception e) {
             throw new SSLException(e);
         }
         // OpenSSL can return 0 or -1 to these calls if nothing was written
-        if (written < 0) {
-            written = 0;
+        if (written == 0) {
+            checkLastError();
         }
 
         // There won't be any application data until we're done handshaking
@@ -584,6 +597,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     break;
                 }
 
+                clearLastError();
                 int bytesRead;
                 try {
                     bytesRead = readPlaintextData(ssl, dst);
@@ -591,7 +605,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     throw new SSLException(e);
                 }
 
-                if (bytesRead <= 0) {
+                if (bytesRead == 0) {
+                    checkLastError();
                     // This should not be possible. pendingApp is positive
                     // therefore the read should have read at least one byte.
                     throw new IllegalStateException(sm.getString("engine.failedToReadAvailableBytes"));
@@ -963,12 +978,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Many calls to SSL methods do not check the last error. Those that do
      * check the last error need to ensure that any previously ignored error is
      * cleared prior to the method call else errors may be falsely reported.
+     * Ideally, before any SSL_read, SSL_write, clearLastError should always
+     * be called, and getLastError should be called after on any negative or
+     * zero result.
      * @return the first error in the stack
-     *
-     * TODO: Improve error handling. Ideally, before any SSL_read, SSL_write,
-     *  clearLastError should always be called, and getLastError should be called
-     *  after on any negative result.
-     *
      */
     private static String getLastError() {
         String sslError = null;
