@@ -50,6 +50,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.TesterSupport;
@@ -58,7 +59,13 @@ import org.apache.tomcat.util.net.TesterSupport;
  * Tests for compliance with the <a href="https://tools.ietf.org/html/rfc7540">
  * HTTP/2 specification</a>.
  */
+@org.junit.runner.RunWith(org.junit.runners.Parameterized.class)
 public abstract class Http2TestBase extends TomcatBaseTest {
+
+    @org.junit.runners.Parameterized.Parameters
+    public static Object[][] data() {
+        return new Object[Integer.getInteger("tomcat.test.http2.loopCount", 1).intValue()][0];
+    }
 
     // Nothing special about this date apart from it being the date I ran the
     // test that demonstrated that most HTTP/2 tests were failing because the
@@ -941,7 +948,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                     connector.getProtocolHandlerClassName().contains("Nio2"));
 
             Assume.assumeTrue("This test is only expected to trigger an exception on Windows",
-                    System.getProperty("os.name").startsWith("Windows"));
+                    JrePlatform.IS_WINDOWS);
         }
     }
 
