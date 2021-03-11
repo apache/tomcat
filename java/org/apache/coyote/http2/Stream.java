@@ -651,7 +651,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    boolean isPushSupported() {
+    final boolean isPushSupported() {
         return handler.getRemoteSettings().getEnablePush();
     }
 
@@ -784,7 +784,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
         @Override
-        public synchronized int doWrite(ByteBuffer chunk) throws IOException {
+        public final synchronized int doWrite(ByteBuffer chunk) throws IOException {
             if (closed) {
                 throw new IllegalStateException(
                         sm.getString("stream.closed", getConnectionId(), getIdAsString()));
@@ -929,10 +929,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 closed = true;
                 flush(true);
             }
-        }
-
-        public boolean isClosed() {
-            return closed;
         }
 
         /**

@@ -793,7 +793,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         pingHeader[3] = FrameType.PING.getIdByte();
         // Flags
         if (ack) {
-            ByteUtil.setOneBytes(pingHeader, 4, 0x01);
+            setOneBytes(pingHeader, 4, 0x01);
         }
         // Stream
         ByteUtil.set31Bits(pingHeader, 5, streamId);
@@ -868,7 +868,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         // Payload
         ByteUtil.set31Bits(priorityFrame, 9, streamDependencyId);
-        ByteUtil.setOneBytes(priorityFrame, 13, weight);
+        setOneBytes(priorityFrame, 13, weight);
 
         os.write(priorityFrame);
         os.flush();
@@ -943,6 +943,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             Assume.assumeTrue("This test is only expected to trigger an exception on Windows",
                     System.getProperty("os.name").startsWith("Windows"));
         }
+    }
+
+
+    static void setOneBytes(byte[] output, int firstByte, int value) {
+        output[firstByte] = (byte) (value & 0xFF);
     }
 
 
