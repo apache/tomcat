@@ -331,7 +331,7 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    public void recycle() {
+    public final void recycle() {
         // StreamProcessor instances are not re-used.
 
         // Calling removeRequestProcessor even though the RequestProcesser was
@@ -350,19 +350,19 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected Log getLog() {
+    protected final Log getLog() {
         return log;
     }
 
 
     @Override
-    public void pause() {
+    public final void pause() {
         // NO-OP. Handled by the Http2UpgradeHandler
     }
 
 
     @Override
-    public SocketState service(SocketWrapperBase<?> socket) throws IOException {
+    public final SocketState service(SocketWrapperBase<?> socket) throws IOException {
         try {
             adapter.service(request, response);
         } catch (Exception e) {
@@ -395,7 +395,7 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected boolean flushBufferedWrite() throws IOException {
+    protected final boolean flushBufferedWrite() throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("streamProcessor.flushBufferedWrite.entry",
                     stream.getConnectionId(), stream.getIdAsString()));

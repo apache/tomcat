@@ -72,13 +72,13 @@ public class HpackDecoder {
     private volatile boolean countedCookie;
     private volatile int headerSize = 0;
 
-    public HpackDecoder(int maxMemorySize) {
+    HpackDecoder(int maxMemorySize) {
         this.maxMemorySizeHard = maxMemorySize;
         this.maxMemorySizeSoft = maxMemorySize;
         headerTable = new Hpack.HeaderField[DEFAULT_RING_BUFFER_SIZE];
     }
 
-    public HpackDecoder() {
+    HpackDecoder() {
         this(Hpack.DEFAULT_TABLE_SIZE);
     }
 
@@ -91,7 +91,7 @@ public class HpackDecoder {
      *
      * @throws HpackException If the packed data is not valid
      */
-    public void decode(ByteBuffer buffer) throws HpackException {
+    void decode(ByteBuffer buffer) throws HpackException {
         while (buffer.hasRemaining()) {
             int originalPos = buffer.position();
             byte b = buffer.get();
@@ -382,7 +382,7 @@ public class HpackDecoder {
     }
 
 
-    public HeaderEmitter getHeaderEmitter() {
+    HeaderEmitter getHeaderEmitter() {
         return headerEmitter;
     }
 

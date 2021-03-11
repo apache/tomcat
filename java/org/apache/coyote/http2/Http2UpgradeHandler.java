@@ -73,7 +73,7 @@ import org.apache.tomcat.util.res.StringManager;
  *     </li>
  * </ul>
  */
-public class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler,
+class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler,
         Input, Output {
 
     private static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
@@ -1009,14 +1009,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             }
         }
         return result;
-    }
-
-
-
-    @Override
-    @Deprecated
-    protected synchronized void doNotifyAll() {
-        // NO-OP. Unused.
     }
 
 

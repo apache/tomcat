@@ -42,13 +42,13 @@ abstract class AbstractStream {
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
 
-    public AbstractStream(Integer identifier) {
+    AbstractStream(Integer identifier) {
         this.identifier = identifier;
         this.idAsString = identifier.toString();
     }
 
 
-    public Integer getIdentifier() {
+    final Integer getIdentifier() {
         return identifier;
     }
 
@@ -58,12 +58,12 @@ abstract class AbstractStream {
     }
 
 
-    public int getIdAsInt() {
+    final int getIdAsInt() {
         return identifier.intValue();
     }
 
 
-    void detachFromParent() {
+    final void detachFromParent() {
         if (parentStream != null) {
             parentStream.getChildStreams().remove(this);
             parentStream = null;
@@ -77,7 +77,7 @@ abstract class AbstractStream {
     }
 
 
-    boolean isDescendant(AbstractStream stream) {
+    final boolean isDescendant(AbstractStream stream) {
         // Is the passed in Stream a descendant of this Stream?
         // Start at the passed in Stream and work up
         AbstractStream parent = stream.getParentStream();
@@ -88,12 +88,12 @@ abstract class AbstractStream {
     }
 
 
-    AbstractStream getParentStream() {
+    final AbstractStream getParentStream() {
         return parentStream;
     }
 
 
-    void setParentStream(AbstractStream parentStream) {
+    final void setParentStream(AbstractStream parentStream) {
         this.parentStream = parentStream;
     }
 
@@ -103,12 +103,12 @@ abstract class AbstractStream {
     }
 
 
-    protected synchronized void setWindowSize(long windowSize) {
+    final synchronized void setWindowSize(long windowSize) {
         this.windowSize = windowSize;
     }
 
 
-    protected synchronized long getWindowSize() {
+    final synchronized long getWindowSize() {
         return windowSize;
     }
 
@@ -119,7 +119,7 @@ abstract class AbstractStream {
      * @throws Http2Exception If the window size is now higher than
      *  the maximum allowed
      */
-    protected synchronized void incrementWindowSize(int increment) throws Http2Exception {
+    synchronized void incrementWindowSize(int increment) throws Http2Exception {
         // No need for overflow protection here.
         // Increment can't be more than Integer.MAX_VALUE and once windowSize
         // goes beyond 2^31-1 an error is triggered.
@@ -143,7 +143,7 @@ abstract class AbstractStream {
     }
 
 
-    protected synchronized void decrementWindowSize(int decrement) {
+    final synchronized void decrementWindowSize(int decrement) {
         // No need for overflow protection here. Decrement can never be larger
         // the Integer.MAX_VALUE and once windowSize goes negative no further
         // decrements are permitted
@@ -155,10 +155,7 @@ abstract class AbstractStream {
     }
 
 
-    protected abstract String getConnectionId();
+    abstract String getConnectionId();
 
-    protected abstract int getWeight();
-
-    @Deprecated // Unused
-    protected abstract void doNotifyAll();
+    abstract int getWeight();
 }

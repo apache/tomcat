@@ -31,22 +31,15 @@ class RecycledStream extends AbstractNonZeroStream {
 
 
     @Override
-    protected String getConnectionId() {
+    String getConnectionId() {
         return connectionId;
     }
 
 
     @SuppressWarnings("sync-override")
     @Override
-    protected void incrementWindowSize(int increment) throws Http2Exception {
+    void incrementWindowSize(int increment) throws Http2Exception {
         // NO-OP
-    }
-
-
-    @Override
-    @Deprecated
-    protected synchronized void doNotifyAll() {
-        // NO-OP. Unused.
     }
 }
 

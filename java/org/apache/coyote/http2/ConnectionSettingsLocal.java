@@ -30,20 +30,20 @@ import java.util.Map;
  * client will respond (almost certainly by closing the connection) as defined
  * in the HTTP/2 specification.
  */
-public class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentException> {
+class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentException> {
 
     private static final String ENDPOINT_NAME = "Local(client->server)";
 
     private boolean sendInProgress = false;
 
 
-    public ConnectionSettingsLocal(String connectionId) {
+    ConnectionSettingsLocal(String connectionId) {
         super(connectionId);
     }
 
 
     @Override
-    protected synchronized void set(Setting setting, Long value) {
+    final synchronized void set(Setting setting, Long value) {
         checkSend();
         if (current.get(setting).longValue() == value.longValue()) {
             pending.remove(setting);
@@ -53,7 +53,7 @@ public class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgum
     }
 
 
-    synchronized byte[] getSettingsFrameForPending() {
+    final synchronized byte[] getSettingsFrameForPending() {
         checkSend();
         int payloadSize = pending.size() * 6;
         byte[] result = new byte[9 + payloadSize];
@@ -75,7 +75,7 @@ public class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgum
     }
 
 
-    synchronized boolean ack() {
+    final synchronized boolean ack() {
         if (sendInProgress) {
             sendInProgress = false;
             current.putAll(pending);
@@ -96,7 +96,7 @@ public class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgum
 
 
     @Override
-    void throwException(String msg, Http2Error error) throws IllegalArgumentException {
+    final void throwException(String msg, Http2Error error) throws IllegalArgumentException {
         throw new IllegalArgumentException(msg);
     }
 

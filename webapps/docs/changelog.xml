@@ -110,6 +110,10 @@
         Improve consistency of OpenSSL error stack handling in the TLS engine,
         and log all errors found as debug. (remm)
       </fix>
+      <scode>
+        Re-factor the HTTP/2 implementation classes to better align with 9.0.x
+        and 10.0.x to make maintenance simpler. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>

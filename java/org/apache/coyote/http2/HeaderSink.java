@@ -23,7 +23,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
  * the connection close process has started if headers for new streams are
  * received.
  */
-public class HeaderSink implements HeaderEmitter {
+class HeaderSink implements HeaderEmitter {
 
     @Override
     public void emitHeader(String name, String value) {

@@ -49,7 +49,7 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
 
     @Override
-    protected final int getWeight() {
+    final int getWeight() {
         return weight;
     }
 
