@@ -143,7 +143,6 @@ public class TestHttp2Limits extends Http2TestBase {
         // Bug 60232
         doTestHeaderLimits(1, 12*1024, 1024, FailureMode.STREAM_RESET);
 
-
         output.clearTrace();
         sendSimpleGetRequest(5);
         parser.readFrame(true);
