@@ -57,13 +57,8 @@ class StreamStateMachine {
     }
 
 
-    final synchronized void receivedPushPromise() {
-        stateChange(State.IDLE, State.RESERVED_REMOTE);
-    }
-
-
-    final synchronized void sentStartOfHeaders() {
-        stateChange(State.IDLE, State.OPEN);
+    final synchronized void sentHeaders() {
+        // No change if currently OPEN
         stateChange(State.RESERVED_LOCAL, State.HALF_CLOSED_REMOTE);
     }
 

@@ -553,7 +553,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final void sentHeaders() {
-        state.sentStartOfHeaders();
+        state.sentHeaders();
     }
 
 
