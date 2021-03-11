@@ -464,7 +464,7 @@ class StreamProcessor extends AbstractProcessor {
     }
 
 
-    private void endRequest() throws IOException {
+    private void endRequest() {
         if (!stream.isInputFinished() && getErrorState().isIoAllowed()) {
             if (handler.hasAsyncIO() && !stream.isContentLengthInconsistent()) {
                 // Need an additional checks for asyncIO as the end of stream
@@ -477,12 +477,11 @@ class StreamProcessor extends AbstractProcessor {
             // The request has been processed but the request body has not been
             // fully read. This typically occurs when Tomcat rejects an upload
             // of some form (e.g. PUT or POST). Need to tell the client not to
-            // send any more data but only if a reset has not already been
-            // triggered.
+            // send any more data on this stream (reset).
             StreamException se = new StreamException(
                     sm.getString("streamProcessor.cancel", stream.getConnectionId(),
                             stream.getIdAsString()), Http2Error.CANCEL, stream.getIdAsInt());
-            handler.sendStreamReset(se);
+            stream.close(se);
         }
     }
 }
