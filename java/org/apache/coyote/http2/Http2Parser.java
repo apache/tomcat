@@ -208,7 +208,7 @@ class Http2Parser {
             }
         }
         if (Flags.hasPadding(flags)) {
-            output.swallowedPadding(streamId, padLength);
+            output.onSwallowedDataFramePayload(streamId, padLength);
         }
     }
 
@@ -731,7 +731,20 @@ class Http2Parser {
         ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) throws Http2Exception;
         void endRequestBodyFrame(int streamId) throws Http2Exception;
         void receivedEndOfStream(int streamId) throws ConnectionException;
-        void swallowedPadding(int streamId, int paddingLength) throws ConnectionException, IOException;
+        /**
+         * Notification triggered when the parser swallows some or all of a DATA
+         * frame payload without writing it to the ByteBuffer returned by
+         * {@link #startRequestBodyFrame(int, int, boolean)}.
+         *
+         * @param streamId  The stream on which the payload that has been
+         *                  swallowed was received
+         * @param swallowedDataBytesCount   The number of bytes that the parser
+         *                                  swallowed.
+         *
+         * @throws ConnectionException
+         * @throws IOException
+         */
+        void onSwallowedDataFramePayload(int streamId, int swallowedDataBytesCount) throws ConnectionException, IOException;
 
         // Header frames
         HeaderEmitter headersStart(int streamId, boolean headersEndStream)

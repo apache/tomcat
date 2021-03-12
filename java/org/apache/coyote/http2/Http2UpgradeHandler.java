@@ -1503,11 +1503,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public void swallowedPadding(int streamId, int paddingLength) throws
+    public void onSwallowedDataFramePayload(int streamId, int swallowedDataBytesCount) throws
             ConnectionException, IOException {
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         // +1 is for the payload byte used to define the padding length
-        writeWindowUpdate(abstractNonZeroStream, paddingLength + 1, false);
+        writeWindowUpdate(abstractNonZeroStream, swallowedDataBytesCount + 1, false);
     }
 
 
