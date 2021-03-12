@@ -110,6 +110,11 @@
         Improve consistency of OpenSSL error stack handling in the TLS engine,
         and log all errors found as debug. (remm)
       </fix>
+      <fix>
+        Ensure that HTTP/2 streams are only recycled once as multiple attempts
+        to recycle an HTTP/2 stream may result in
+        <code>NullPointerException</code>s. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
