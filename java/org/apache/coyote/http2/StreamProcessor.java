@@ -74,7 +74,16 @@ class StreamProcessor extends AbstractProcessor {
                         handler.getProtocol().getHttp11Protocol().addWaitingProcessor(this);
                     } else if (state == SocketState.CLOSED) {
                         handler.getProtocol().getHttp11Protocol().removeWaitingProcessor(this);
-                        if (!getErrorState().isConnectionIoAllowed()) {
+                        if (!stream.isInputFinished() && getErrorState().isIoAllowed()) {
+                            // The request has been processed but the request body has not been
+                            // fully read. This typically occurs when Tomcat rejects an upload
+                            // of some form (e.g. PUT or POST). Need to tell the client not to
+                            // send any more data on this stream (reset).
+                            StreamException se = new StreamException(
+                                    sm.getString("streamProcessor.cancel", stream.getConnectionId(),
+                                            stream.getIdAsString()), Http2Error.CANCEL, stream.getIdAsInt());
+                            stream.close(se);
+                        } else if (!getErrorState().isConnectionIoAllowed()) {
                             ConnectionException ce = new ConnectionException(sm.getString(
                                     "streamProcessor.error.connection", stream.getConnectionId(),
                                     stream.getIdAsString()), Http2Error.INTERNAL_ERROR);
@@ -373,13 +382,6 @@ class StreamProcessor extends AbstractProcessor {
             setErrorState(ErrorState.CLOSE_NOW, e);
         }
 
-        if (!isAsync()) {
-            // If this is an async request then the request ends when it has
-            // been completed. The AsyncContext is responsible for calling
-            // endRequest() in that case.
-            endRequest();
-        }
-
         if (getErrorState().isError()) {
             action(ActionCode.CLOSE, null);
             request.updateCounters();
@@ -420,21 +422,6 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final SocketState dispatchEndRequest() throws IOException {
-        endRequest();
         return SocketState.CLOSED;
-    }
-
-
-    private void endRequest() {
-        if (!stream.isInputFinished() && getErrorState().isIoAllowed()) {
-            // The request has been processed but the request body has not been
-            // fully read. This typically occurs when Tomcat rejects an upload
-            // of some form (e.g. PUT or POST). Need to tell the client not to
-            // send any more data on this stream (reset).
-            StreamException se = new StreamException(
-                    sm.getString("streamProcessor.cancel", stream.getConnectionId(),
-                            stream.getIdAsString()), Http2Error.CANCEL, stream.getIdAsInt());
-            stream.close(se);
-        }
     }
 }
