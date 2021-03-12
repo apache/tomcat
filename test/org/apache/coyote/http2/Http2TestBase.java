@@ -1197,10 +1197,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void swallowedPadding(int streamId, int paddingLength) {
+        public void onSwallowedDataFramePayload(int streamId, int swallowedDataBytesCount) {
             trace.append(streamId);
-            trace.append("-SwallowedPadding-[");
-            trace.append(paddingLength);
+            trace.append("-SwallowedDataFramePayload-[");
+            trace.append(swallowedDataBytesCount);
             trace.append("]\n");
         }
 
