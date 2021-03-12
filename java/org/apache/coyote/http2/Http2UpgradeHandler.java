@@ -1082,27 +1082,39 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private Stream getStream(int streamId, boolean unknownIsError) throws ConnectionException {
+    private Stream getStream(int streamId) {
         Integer key = Integer.valueOf(streamId);
         AbstractStream result = streams.get(key);
         if (result instanceof Stream) {
             return (Stream) result;
         }
-        if (unknownIsError) {
-            // Stream has been closed and removed from the map
-            throw new ConnectionException(sm.getString("upgradeHandler.stream.closed", key.toString()),
-                    Http2Error.PROTOCOL_ERROR);
-        }
         return null;
     }
 
 
-    private AbstractNonZeroStream getStreamMayBeClosed(int streamId, boolean unknownIsError) throws ConnectionException {
-        Integer key = Integer.valueOf(streamId);
-        AbstractNonZeroStream result = streams.get(key);
+    private Stream getStream(int streamId, boolean unknownIsError) throws ConnectionException {
+        Stream result = getStream(streamId);
         if (result == null && unknownIsError) {
             // Stream has been closed and removed from the map
-            throw new ConnectionException(sm.getString("upgradeHandler.stream.closed", key.toString()),
+            throw new ConnectionException(sm.getString("upgradeHandler.stream.closed", Integer.toString(streamId)),
+                    Http2Error.PROTOCOL_ERROR);
+        }
+        return result;
+    }
+
+
+    private AbstractNonZeroStream getAbstractNonZeroStream(int streamId) {
+        Integer key = Integer.valueOf(streamId);
+        return streams.get(key);
+    }
+
+
+    private AbstractNonZeroStream getAbstractNonZeroStream(int streamId, boolean unknownIsError)
+            throws ConnectionException {
+        AbstractNonZeroStream result = getAbstractNonZeroStream(streamId);
+        if (result == null && unknownIsError) {
+            // Stream has been closed and removed from the map
+            throw new ConnectionException(sm.getString("upgradeHandler.stream.closed", Integer.toString(streamId)),
                     Http2Error.PROTOCOL_ERROR);
         }
         return result;
@@ -1561,7 +1573,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
         }
 
-        AbstractNonZeroStream abstractNonZeroStream = getStreamMayBeClosed(streamId, true);
+        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         if (abstractNonZeroStream instanceof Stream) {
             Stream stream = (Stream) abstractNonZeroStream;
             stream.checkState(FrameType.DATA);
@@ -1576,7 +1588,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void endRequestBodyFrame(int streamId) throws Http2Exception {
-        AbstractNonZeroStream abstractNonZeroStream = getStreamMayBeClosed(streamId, true);
+        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         if (abstractNonZeroStream instanceof Stream) {
             ((Stream) abstractNonZeroStream).getInputBuffer().onDataAvailable();
         }
@@ -1585,7 +1597,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void receivedEndOfStream(int streamId) throws ConnectionException {
-        AbstractNonZeroStream abstractNonZeroStream = getStreamMayBeClosed(streamId, connectionState.get().isNewStreamAllowed());
+        AbstractNonZeroStream abstractNonZeroStream =
+                getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
         if (abstractNonZeroStream instanceof Stream) {
             Stream stream = (Stream) abstractNonZeroStream;
             stream.receivedEndOfStream();
@@ -1599,7 +1612,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     @Override
     public void swallowedPadding(int streamId, int paddingLength) throws
             ConnectionException, IOException {
-        AbstractNonZeroStream abstractNonZeroStream = getStreamMayBeClosed(streamId, true);
+        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         // +1 is for the payload byte used to define the padding length
         writeWindowUpdate(abstractNonZeroStream, paddingLength + 1, false);
     }
@@ -1662,11 +1675,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         increaseOverheadCount();
 
-        AbstractNonZeroStream abstractNonZeroStream = getStreamMayBeClosed(streamId, false);
+        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId);
         if (abstractNonZeroStream == null) {
             abstractNonZeroStream = createRemoteStream(streamId);
         }
-        AbstractStream parentStream = getStreamMayBeClosed(parentStreamId, false);
+        AbstractStream parentStream = getAbstractNonZeroStream(parentStreamId);
         if (parentStream == null) {
             parentStream = this;
         }
@@ -1697,7 +1710,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void headersEnd(int streamId) throws Http2Exception {
-        AbstractNonZeroStream abstractNonZeroStream = getStreamMayBeClosed(streamId, connectionState.get().isNewStreamAllowed());
+        AbstractNonZeroStream abstractNonZeroStream =
+                getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
         if (abstractNonZeroStream instanceof Stream) {
             setMaxProcessedStream(streamId);
             Stream stream = (Stream) abstractNonZeroStream;
@@ -1735,7 +1749,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             log.debug(sm.getString("upgradeHandler.reset.receive", getConnectionId(), Integer.toString(streamId),
                     Long.toString(errorCode)));
         }
-        AbstractNonZeroStream abstractNonZeroStream = getStreamMayBeClosed(streamId, true);
+        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         abstractNonZeroStream.checkState(FrameType.RST);
         if (abstractNonZeroStream instanceof Stream) {
             Stream stream = (Stream) abstractNonZeroStream;
@@ -1841,7 +1855,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
             incrementWindowSize(increment);
         } else {
-            AbstractNonZeroStream stream = getStreamMayBeClosed(streamId, true);
+            AbstractNonZeroStream stream = getAbstractNonZeroStream(streamId, true);
 
             // Check for small increments which are inefficient
             if (average < overheadThreshold) {
