@@ -115,6 +115,10 @@
         to recycle an HTTP/2 stream may result in
         <code>NullPointerException</code>s. (markt)
       </fix>
+      <scode>
+        Simplify the closing on an HTTP/2 stream when an error condition is
+        present. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
