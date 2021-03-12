@@ -1869,8 +1869,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     void replaceStream(AbstractNonZeroStream original, AbstractNonZeroStream replacement) {
         synchronized (priorityTreeLock) {
-            streams.replace(original.getIdentifier(), replacement);
-            original.replaceStream(replacement);
+            AbstractNonZeroStream current = streams.get(original.getIdentifier());
+            // Might already have been recycled or removed from the priority
+            // tree entirely. Only replace it if the full stream is still in the
+            // priority tree.
+            if (current instanceof Stream) {
+                streams.put(original.getIdentifier(), replacement);
+                original.replaceStream(replacement);
+            }
         }
     }
 

@@ -114,6 +114,11 @@
         Re-factor the HTTP/2 implementation classes to better align with 9.0.x
         and 10.0.x to make maintenance simpler. (markt)
       </scode>
+      <fix>
+        Ensure that HTTP/2 streams are only recycled once as multiple attempts
+        to recycle an HTTP/2 stream may result in
+        <code>NullPointerException</code>s. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
