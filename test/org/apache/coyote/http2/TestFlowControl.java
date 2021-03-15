@@ -87,10 +87,10 @@ public class TestFlowControl extends Http2TestBase {
                 "3-Header-[:status]-[404]\n" +
                 "3-Header-[content-type]-[text/html;charset=utf-8]\n" +
                 "3-Header-[content-language]-[en]\n" +
-                "3-Header-[content-length]-[692]\n" +
+                "3-Header-[content-length]-[691]\n" +
                 "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                 "3-HeadersEnd\n" +
-                "3-Body-692\n" +
+                "3-Body-691\n" +
                 "3-EndOfStream\n" +
                 "3-RST-[8]\n", output.getTrace());
         output.clearTrace();
