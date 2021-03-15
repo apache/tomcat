@@ -1467,20 +1467,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
 
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
-        if (abstractNonZeroStream instanceof Stream) {
-            Stream stream = (Stream) abstractNonZeroStream;
-            stream.checkState(FrameType.DATA);
-            stream.receivedData(payloadSize);
-            return stream.getInputByteBuffer();
-        } else {
-            abstractNonZeroStream.checkState(FrameType.DATA);
-            return null;
-        }
+        abstractNonZeroStream.checkState(FrameType.DATA);
+        abstractNonZeroStream.receivedData(payloadSize);
+        return abstractNonZeroStream.getInputByteBuffer();
     }
 
 
     @Override
-    public void endRequestBodyFrame(int streamId) throws Http2Exception {
+    public void endRequestBodyFrame(int streamId) throws Http2Exception, IOException {
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         if (abstractNonZeroStream instanceof Stream) {
             ((Stream) abstractNonZeroStream).getInputBuffer().onDataAvailable();
@@ -1503,11 +1497,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public void onSwallowedDataFramePayload(int streamId, int swallowedDataBytesCount) throws
-            ConnectionException, IOException {
-        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
-        // +1 is for the payload byte used to define the padding length
-        writeWindowUpdate(abstractNonZeroStream, swallowedDataBytesCount + 1, false);
+    public void onSwallowedDataFramePayload(int streamId, int swallowedDataBytesCount) throws IOException {
+        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId);
+        writeWindowUpdate(abstractNonZeroStream, swallowedDataBytesCount, false);
     }
 
 

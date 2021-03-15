@@ -1183,10 +1183,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         @Override
         public void onSwallowedDataFramePayload(int streamId, int swallowedDataBytesCount) {
-            trace.append(streamId);
-            trace.append("-SwallowedDataFramePayload-[");
-            trace.append(swallowedDataBytesCount);
-            trace.append("]\n");
+            // NO-OP
+            // Many tests swallow request bodies which triggers this
+            // notification. It is added to the trace to reduce noise.
         }
 
 
