@@ -85,7 +85,7 @@ class Http2Parser {
         try {
             validateFrame(expected, frameType, streamId, flags, payloadSize);
         } catch (StreamException se) {
-            swallow(streamId, payloadSize, false);
+            swallowPayload(streamId, payloadSize, false);
             throw se;
         }
 
@@ -166,11 +166,11 @@ class Http2Parser {
 
         ByteBuffer dest = output.startRequestBodyFrame(streamId, payloadSize, endOfStream);
         if (dest == null) {
-            swallow(streamId, dataLength, false);
+            swallowPayload(streamId, dataLength, false);
             // Process padding before sending any notifications in case padding
             // is invalid.
             if (padLength > 0) {
-                swallow(streamId, padLength, true);
+                swallowPayload(streamId, padLength, true);
             }
             if (endOfStream) {
                 output.receivedEndOfStream(streamId);
@@ -178,7 +178,7 @@ class Http2Parser {
         } else {
             synchronized (dest) {
                 if (dest.remaining() < dataLength) {
-                    swallow(streamId, dataLength, false);
+                    swallowPayload(streamId, dataLength, false);
                     // Client has sent more data than permitted by Window size
                     throw new StreamException(sm.getString("http2Parser.processFrameData.window", connectionId),
                             Http2Error.FLOW_CONTROL_ERROR, streamId);
@@ -187,7 +187,7 @@ class Http2Parser {
                 // Process padding before sending any notifications in case
                 // padding is invalid.
                 if (padLength > 0) {
-                    swallow(streamId, padLength, true);
+                    swallowPayload(streamId, padLength, true);
                 }
                 if (endOfStream) {
                     output.receivedEndOfStream(streamId);
@@ -212,7 +212,7 @@ class Http2Parser {
         try {
             hpackDecoder.setHeaderEmitter(output.headersStart(streamId, headersEndStream));
         } catch (StreamException se) {
-            swallow(streamId, payloadSize, false);
+            swallowPayload(streamId, payloadSize, false);
             throw se;
         }
 
@@ -252,7 +252,7 @@ class Http2Parser {
 
         readHeaderPayload(streamId, payloadSize);
 
-        swallow(streamId, padLength, true);
+        swallowPayload(streamId, padLength, true);
 
         if (Flags.isEndOfHeaders(flags)) {
             onHeadersComplete(streamId);
@@ -461,7 +461,7 @@ class Http2Parser {
     private void readUnknownFrame(int streamId, FrameType frameType, int flags, int payloadSize)
             throws IOException {
         try {
-            swallow(streamId, payloadSize, false);
+            swallowPayload(streamId, payloadSize, false);
         } catch (ConnectionException e) {
             // Will never happen because swallow() is called with mustBeZero set
             // to false
@@ -470,7 +470,7 @@ class Http2Parser {
     }
 
 
-    private void swallow(int streamId, int len, boolean mustBeZero)
+    private void swallowPayload(int streamId, int len, boolean mustBeZero)
             throws IOException, ConnectionException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.swallow.debug", connectionId,
