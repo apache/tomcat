@@ -123,6 +123,12 @@
         Simplify the closing on an HTTP/2 stream when an error condition is
         present. (markt)
       </scode>
+      <fix>
+        <bug>65179</bug>: Ensure that the connection level flow control window
+        from the client to the server is updated when handling DATA frames
+        received for completed streams else the flow control window  may become
+        exhausted. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

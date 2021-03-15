@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.nio.ByteBuffer;
+
 /**
  * Represents a closed stream in the priority tree. Used in preference to the
  * full {@link Stream} as has much lower memory usage.
@@ -23,10 +25,12 @@ package org.apache.coyote.http2;
 class RecycledStream extends AbstractNonZeroStream {
 
     private final String connectionId;
+    private int remainingFlowControlWindow;
 
-    RecycledStream(String connectionId, Integer identifier, StreamStateMachine state) {
+    RecycledStream(String connectionId, Integer identifier, StreamStateMachine state, int remainingFlowControlWindow) {
         super(identifier, state);
         this.connectionId = connectionId;
+        this.remainingFlowControlWindow = remainingFlowControlWindow;
     }
 
 
@@ -41,5 +45,27 @@ class RecycledStream extends AbstractNonZeroStream {
     void incrementWindowSize(int increment) throws Http2Exception {
         // NO-OP
     }
-}
 
+
+    @Override
+    void receivedData(int payloadSize) throws ConnectionException {
+        remainingFlowControlWindow -= payloadSize;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation will return an zero length ByteBuffer to trigger a
+     * flow control error if more DATA frame payload than the remaining flow
+     * control window is received for this recycled stream.
+     */
+    @Override
+    ByteBuffer getInputByteBuffer() {
+        if (remainingFlowControlWindow < 0) {
+            return ZERO_LENGTH_BYTEBUFFER;
+        } else {
+            return null;
+        }
+    }
+}

@@ -478,9 +478,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
+    @Override
     final ByteBuffer getInputByteBuffer() {
         if (inputBuffer == null) {
-            return null;
+            // This must either be a push or an HTTP upgrade. Either way there
+            // should not be a request body so return a zero length ByteBuffer
+            // to trigger a flow control error.
+            return ZERO_LENGTH_BYTEBUFFER;
         }
         return inputBuffer.getInBuffer();
     }
@@ -508,7 +512,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    final void receivedData(int payloadSize) throws ConnectionException {
+    @Override
+    final void receivedData(int payloadSize) throws Http2Exception {
         contentLengthReceived += payloadSize;
         long contentLengthHeader = coyoteRequest.getContentLengthLong();
         if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
@@ -609,6 +614,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 state.sendReset();
                 cancelAllocationRequests();
                 handler.sendStreamReset(se);
+                inputBuffer.swallowUnread();
             } catch (IOException ioe) {
                 ConnectionException ce = new ConnectionException(
                         sm.getString("stream.reset.fail"), Http2Error.PROTOCOL_ERROR, ioe);
@@ -637,7 +643,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.recycle", getConnectionId(), getIdAsString()));
         }
-        handler.replaceStream(this, new RecycledStream(getConnectionId(), getIdentifier(), state));
+        handler.replaceStream(
+                this, new RecycledStream(getConnectionId(), getIdentifier(), state, getInputByteBuffer().remaining()));
     }
 
 
@@ -987,7 +994,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         // 'write mode'.
         private volatile ByteBuffer inBuffer;
         private volatile boolean readInterest;
-        private boolean resetReceived = false;
+        private volatile boolean closed;
+        private boolean resetReceived;
 
         /**
          * @deprecated Unused. Will be removed in Tomcat 9. Use
@@ -1175,8 +1183,10 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         /*
          * Called after placing some data in the inBuffer.
          */
-        final synchronized boolean onDataAvailable() {
-            if (readInterest) {
+        final synchronized void onDataAvailable() throws IOException {
+            if (closed) {
+                swallowUnread();
+            } else if (readInterest) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("stream.inputBuffer.dispatch"));
                 }
@@ -1186,7 +1196,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 // the incoming connection and streams are processed on their
                 // own.
                 coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
-                return true;
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("stream.inputBuffer.signal"));
@@ -1194,7 +1203,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 synchronized (inBuffer) {
                     inBuffer.notifyAll();
                 }
-                return false;
             }
         }
 
@@ -1211,13 +1219,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
         private final void ensureBuffersExist() {
-            if (inBuffer == null) {
+            if (inBuffer == null && !closed) {
                 // The client must obey Tomcat's window size when sending so
                 // this is the initial window size set by Tomcat that the client
                 // uses (i.e. the local setting is required here).
                 int size = handler.getLocalSettings().getInitialWindowSize();
                 synchronized (this) {
-                    if (inBuffer == null) {
+                    if (inBuffer == null && !closed) {
                         inBuffer = ByteBuffer.allocate(size);
                         outBuffer = new byte[size];
                     }
@@ -1239,6 +1247,20 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
                     inBuffer.notifyAll();
+                }
+            }
+        }
+
+        private final void swallowUnread() throws IOException {
+            if (inBuffer != null) {
+                synchronized (inputBuffer) {
+                    closed = true;
+                    int unreadByteCount = inBuffer.position();
+                    if (unreadByteCount > 0) {
+                        inBuffer.position(0);
+                        inBuffer.limit(inBuffer.limit() - unreadByteCount);
+                        handler.onSwallowedDataFramePayload(getIdAsInt(), unreadByteCount);
+                    }
                 }
             }
         }
