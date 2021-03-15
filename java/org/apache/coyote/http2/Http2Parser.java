@@ -124,7 +124,7 @@ class Http2Parser {
             readContinuationFrame(streamId, flags, payloadSize, null);
             break;
         case UNKNOWN:
-            readUnknownFrame(streamId, frameType, flags, payloadSize, null);
+            readUnknownFrame(streamId, frameTypeId, flags, payloadSize, null);
         }
 
         return true;
@@ -516,15 +516,15 @@ class Http2Parser {
     }
 
 
-    protected void readUnknownFrame(int streamId, FrameType frameType, int flags, int payloadSize, ByteBuffer buffer)
+    protected void readUnknownFrame(int streamId, int frameTypeId, int flags, int payloadSize, ByteBuffer buffer)
             throws IOException {
         try {
-            swallowPayload(streamId, frameType.getId(), payloadSize, false, buffer);
+            swallowPayload(streamId, frameTypeId, payloadSize, false, buffer);
         } catch (ConnectionException e) {
             // Will never happen because swallow() is called with mustBeZero set
             // to false
         }
-        output.swallowed(streamId, frameType, flags, payloadSize);
+        output.onSwallowedUnknownFrame(streamId, frameTypeId, flags, payloadSize);
     }
 
 
@@ -776,7 +776,19 @@ class Http2Parser {
         // Window size
         void incrementWindowSize(int streamId, int increment) throws Http2Exception;
 
-        // Testing
-        void swallowed(int streamId, FrameType frameType, int flags, int size) throws IOException;
+        /**
+         * Notification triggered when the parser swallows the payload of an
+         * unknown frame.
+         *
+         * @param streamId      The stream on which the swallowed frame was
+         *                      received
+         * @param frameTypeId   The (unrecognised) type of swallowed frame
+         * @param flags         The flags set in the header of the swallowed
+         *                      frame
+         * @param size          The payload size of the swallowed frame
+         *
+         * @throws IOException
+         */
+        void onSwallowedUnknownFrame(int streamId, int frameTypeId, int flags, int size) throws IOException;
     }
 }
