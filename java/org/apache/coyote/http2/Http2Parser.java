@@ -759,8 +759,9 @@ class Http2Parser {
          * @param swallowedDataBytesCount   The number of bytes that the parser
          *                                  swallowed.
          *
-         * @throws ConnectionException
-         * @throws IOException
+         * @throws ConnectionException If an error fatal to the HTTP/2
+ *                 connection occurs while swallowing the payload
+         * @throws IOException If an I/O occurred while swallowing the payload
          */
         void onSwallowedDataFramePayload(int streamId, int swallowedDataBytesCount) throws ConnectionException, IOException;
 
@@ -801,7 +802,8 @@ class Http2Parser {
          *                      frame
          * @param size          The payload size of the swallowed frame
          *
-         * @throws IOException
+         * @throws IOException If an I/O occurred while swallowing the unknown
+         *         frame
          */
         void onSwallowedUnknownFrame(int streamId, int frameTypeId, int flags, int size) throws IOException;
     }
