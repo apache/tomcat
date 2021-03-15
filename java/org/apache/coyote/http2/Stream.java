@@ -67,20 +67,17 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private final Http2UpgradeHandler handler;
     private final WindowAllocationManager allocationManager = new WindowAllocationManager(this);
+    private final Request coyoteRequest;
+    private final Response coyoteResponse = new Response();
+    private final StreamInputBuffer inputBuffer;
+    private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
+    private final Http2OutputBuffer http2OutputBuffer = new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
 
     // State machine would be too much overhead
     private int headerState = HEADER_STATE_START;
     private StreamException headerException = null;
 
-    // These will be set to null once the Stream closes to reduce the memory
-    // footprint.
-    private volatile Request coyoteRequest;
     private volatile StringBuilder cookieHeader = null;
-    private volatile Response coyoteResponse = new Response();
-    private volatile StreamInputBuffer inputBuffer;
-    private volatile StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
-    private volatile Http2OutputBuffer http2OutputBuffer =
-            new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
 
 
     Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -482,8 +479,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final ByteBuffer getInputByteBuffer() {
-        // Avoid NPE if Stream has been closed on Stream specific thread
-        StreamInputBuffer inputBuffer = this.inputBuffer;
         if (inputBuffer == null) {
             return null;
         }
@@ -515,11 +510,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     final void receivedData(int payloadSize) throws ConnectionException {
         contentLengthReceived += payloadSize;
-        Request coyoteRequest = this.coyoteRequest;
-        // Avoid NPE if Stream has been closed on Stream specific thread
-        if (coyoteRequest == null) {
-            return;
-        }
         long contentLengthHeader = coyoteRequest.getContentLengthLong();
         if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
             throw new ConnectionException(sm.getString("stream.header.contentLength",
