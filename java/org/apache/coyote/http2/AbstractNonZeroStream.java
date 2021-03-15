@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 import org.apache.juli.logging.Log;
@@ -30,6 +31,8 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
     private static final Log log = LogFactory.getLog(AbstractNonZeroStream.class);
     private static final StringManager sm = StringManager.getManager(AbstractNonZeroStream.class);
+
+    protected static final ByteBuffer ZERO_LENGTH_BYTEBUFFER = ByteBuffer.allocate(0);
 
     protected final StreamStateMachine state;
 
@@ -140,4 +143,17 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     final void checkState(FrameType frameType) throws Http2Exception {
         state.checkFrameType(frameType);
     }
+
+
+    /**
+     * Obtain the ByteBuffer to store DATA frame payload data for this stream
+     * that has been received from the client.
+     *
+     * @return {@code null} if the DATA frame payload can be swallowed, or a
+     *         ByteBuffer with at least enough space remaining for the current
+     *         flow control window for stream data from the client.
+     */
+    abstract ByteBuffer getInputByteBuffer();
+
+    abstract void receivedData(int payloadSize) throws Http2Exception;
 }
