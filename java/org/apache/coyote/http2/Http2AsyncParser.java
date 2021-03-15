@@ -106,7 +106,7 @@ class Http2AsyncParser extends Http2Parser {
                 payload.flip();
                 try {
                     if (streamException) {
-                        swallowPayload(streamId, payloadSize, false, payload);
+                        swallowPayload(streamId, frameTypeId, payloadSize, false, payload);
                     } else {
                         readSettingsFrame(flags, payloadSize, payload);
                     }
@@ -170,6 +170,7 @@ class Http2AsyncParser extends Http2Parser {
         private boolean validated = false;
         private CompletionState state = null;
         protected int payloadSize;
+        protected int frameTypeId;
         protected FrameType frameType;
         protected int flags;
         protected int streamId;
@@ -202,7 +203,8 @@ class Http2AsyncParser extends Http2Parser {
                 }
                 parsedFrameHeader = true;
                 payloadSize = ByteUtil.getThreeBytes(frameHeaderBuffer, 0);
-                frameType = FrameType.valueOf(ByteUtil.getOneByte(frameHeaderBuffer, 3));
+                frameTypeId = ByteUtil.getOneByte(frameHeaderBuffer, 3);
+                frameType = FrameType.valueOf(frameTypeId);
                 flags = ByteUtil.getOneByte(frameHeaderBuffer, 4);
                 streamId = ByteUtil.get31Bits(frameHeaderBuffer, 5);
             }
@@ -239,7 +241,7 @@ class Http2AsyncParser extends Http2Parser {
                     do {
                         continueParsing = false;
                         if (streamException) {
-                            swallowPayload(streamId, payloadSize, false, payload);
+                            swallowPayload(streamId, frameTypeId, payloadSize, false, payload);
                         } else {
                             switch (frameType) {
                             case DATA:
@@ -280,7 +282,8 @@ class Http2AsyncParser extends Http2Parser {
                         if (payload.remaining() >= 9) {
                             int position = payload.position();
                             payloadSize = ByteUtil.getThreeBytes(payload, position);
-                            frameType = FrameType.valueOf(ByteUtil.getOneByte(payload, position + 3));
+                            frameTypeId = ByteUtil.getOneByte(payload, position + 3);
+                            frameType = FrameType.valueOf(frameTypeId);
                             flags = ByteUtil.getOneByte(payload, position + 4);
                             streamId = ByteUtil.get31Bits(payload, position + 5);
                             streamException = false;
