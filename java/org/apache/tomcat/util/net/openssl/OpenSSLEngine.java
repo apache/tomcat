@@ -234,8 +234,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Write plain text data to the OpenSSL internal BIO
      *
      * Calling this function with src.remaining == 0 is undefined.
+     * @throws SSLException if the OpenSSL error check fails
      */
-    private static int writePlaintextData(final long ssl, final ByteBuffer src) {
+    private int writePlaintextData(final long ssl, final ByteBuffer src) throws SSLException {
+        clearLastError();
         final int pos = src.position();
         final int limit = src.limit();
         final int len = Math.min(limit - pos, MAX_PLAINTEXT_LENGTH);
@@ -244,6 +246,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (src.isDirect()) {
             final long addr = Buffer.address(src) + pos;
             sslWrote = SSL.writeToSSL(ssl, addr, len);
+            if (sslWrote <= 0) {
+                checkLastError();
+            }
             if (sslWrote >= 0) {
                 src.position(pos + sslWrote);
                 return sslWrote;
@@ -259,6 +264,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 src.limit(limit);
 
                 sslWrote = SSL.writeToSSL(ssl, addr, len);
+                if (sslWrote <= 0) {
+                    checkLastError();
+                }
                 if (sslWrote >= 0) {
                     src.position(pos + sslWrote);
                     return sslWrote;
@@ -277,13 +285,18 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     /**
      * Write encrypted data to the OpenSSL network BIO.
+     * @throws SSLException if the OpenSSL error check fails
      */
-    private static int writeEncryptedData(final long networkBIO, final ByteBuffer src) {
+    private int writeEncryptedData(final long networkBIO, final ByteBuffer src) throws SSLException {
+        clearLastError();
         final int pos = src.position();
         final int len = src.remaining();
         if (src.isDirect()) {
             final long addr = Buffer.address(src) + pos;
             final int netWrote = SSL.writeToBIO(networkBIO, addr, len);
+            if (netWrote <= 0) {
+                checkLastError();
+            }
             if (netWrote >= 0) {
                 src.position(pos + netWrote);
                 return netWrote;
@@ -296,6 +309,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 buf.put(src);
 
                 final int netWrote = SSL.writeToBIO(networkBIO, addr, len);
+                if (netWrote <= 0) {
+                    checkLastError();
+                }
                 if (netWrote >= 0) {
                     src.position(pos + netWrote);
                     return netWrote;
@@ -313,8 +329,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     /**
      * Read plain text data from the OpenSSL internal BIO
+     * @throws SSLException if the OpenSSL error check fails
      */
-    private static int readPlaintextData(final long ssl, final ByteBuffer dst) {
+    private int readPlaintextData(final long ssl, final ByteBuffer dst) throws SSLException {
+        clearLastError();
         if (dst.isDirect()) {
             final int pos = dst.position();
             final long addr = Buffer.address(dst) + pos;
@@ -323,6 +341,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (sslRead > 0) {
                 dst.position(pos + sslRead);
                 return sslRead;
+            } else {
+                checkLastError();
             }
         } else {
             final int pos = dst.position();
@@ -339,6 +359,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     dst.put(buf);
                     dst.limit(limit);
                     return sslRead;
+                } else {
+                    checkLastError();
                 }
             } finally {
                 buf.clear();
@@ -351,8 +373,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     /**
      * Read encrypted data from the OpenSSL network BIO
+     * @throws SSLException if the OpenSSL error check fails
      */
-    private static int readEncryptedData(final long networkBIO, final ByteBuffer dst, final int pending) {
+    private int readEncryptedData(final long networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
+        clearLastError();
         if (dst.isDirect() && dst.remaining() >= pending) {
             final int pos = dst.position();
             final long addr = Buffer.address(dst) + pos;
@@ -360,6 +384,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (bioRead > 0) {
                 dst.position(pos + bioRead);
                 return bioRead;
+            } else {
+                checkLastError();
             }
         } else {
             final ByteBuffer buf = ByteBuffer.allocateDirect(pending);
@@ -374,6 +400,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     dst.put(buf);
                     dst.limit(oldLimit);
                     return bioRead;
+                } else {
+                    checkLastError();
                 }
             } finally {
                 buf.clear();
@@ -430,15 +458,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, handshakeStatus, 0, 0);
             }
 
-            clearLastError();
             // Write the pending data from the network BIO into the dst buffer
             try {
                 bytesProduced = readEncryptedData(networkBIO, dst, pendingNet);
             } catch (Exception e) {
                 throw new SSLException(e);
-            }
-            if (bytesProduced == 0) {
-                checkLastError();
             }
 
             // If isOutboundDone is set, then the data from the network BIO
@@ -461,15 +485,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             while (src.hasRemaining()) {
 
-                clearLastError();
                 // Write plain text application data to the SSL engine
                 try {
                     bytesConsumed += writePlaintextData(ssl, src);
                 } catch (Exception e) {
                     throw new SSLException(e);
-                }
-                if (bytesConsumed == 0) {
-                    checkLastError();
                 }
 
                 // Check to see if the engine wrote data into the network BIO
@@ -482,15 +502,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                 SSLEngineResult.Status.BUFFER_OVERFLOW, getHandshakeStatus(), bytesConsumed, bytesProduced);
                     }
 
-                    clearLastError();
                     // Write the pending data from the network BIO into the dst buffer
                     try {
                         bytesProduced += readEncryptedData(networkBIO, dst, pendingNet);
                     } catch (Exception e) {
                         throw new SSLException(e);
-                    }
-                    if (bytesProduced == 0) {
-                        checkLastError();
                     }
 
                     return new SSLEngineResult(getEngineStatus(), getHandshakeStatus(), bytesConsumed, bytesProduced);
@@ -553,16 +569,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // Write encrypted data to network BIO
-        clearLastError();
         int written = 0;
         try {
             written = writeEncryptedData(networkBIO, src);
         } catch (Exception e) {
             throw new SSLException(e);
-        }
-        // OpenSSL can return 0 or -1 to these calls if nothing was written
-        if (written == 0) {
-            checkLastError();
         }
 
         // There won't be any application data until we're done handshaking
@@ -597,7 +608,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     break;
                 }
 
-                clearLastError();
                 int bytesRead;
                 try {
                     bytesRead = readPlaintextData(ssl, dst);
@@ -606,7 +616,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 }
 
                 if (bytesRead == 0) {
-                    checkLastError();
                     // This should not be possible. pendingApp is positive
                     // therefore the read should have read at least one byte.
                     throw new IllegalStateException(sm.getString("engine.failedToReadAvailableBytes"));
