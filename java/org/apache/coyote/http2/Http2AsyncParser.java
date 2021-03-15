@@ -275,7 +275,7 @@ class Http2AsyncParser extends Http2Parser {
                                 readContinuationFrame(streamId, flags, payloadSize, payload);
                                 break;
                             case UNKNOWN:
-                                readUnknownFrame(streamId, frameType, flags, payloadSize, payload);
+                                readUnknownFrame(streamId, frameTypeId, flags, payloadSize, payload);
                             }
                         }
                         // See if there is a new 9 byte header and continue parsing if possible

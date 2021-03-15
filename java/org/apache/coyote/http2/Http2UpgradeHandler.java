@@ -1768,7 +1768,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public void swallowed(int streamId, FrameType frameType, int flags, int size)
+    public void onSwallowedUnknownFrame(int streamId, int frameTypeId, int flags, int size)
             throws IOException {
         // NO-OP.
     }
