@@ -79,18 +79,26 @@ public class TestFlowControl extends Http2TestBase {
         parser.readFrame(true);
         // body
         parser.readFrame(true);
-        // reset (becasue the request body was not fully read)
+        // reset (because the request body was not fully read)
         parser.readFrame(true);
+
         // Validate response
+        // Response size varies as error page is generated and includes version
+        // number
+        String trace = output.getTrace();
+        int start = trace.indexOf("[content-length]-[") + 18;
+        int end = trace.indexOf("]", start);
+        String contentLength = trace.substring(start, end);
+
         Assert.assertEquals(
                 "3-HeadersStart\n" +
                 "3-Header-[:status]-[404]\n" +
                 "3-Header-[content-type]-[text/html;charset=utf-8]\n" +
                 "3-Header-[content-language]-[en]\n" +
-                "3-Header-[content-length]-[692]\n" +
+                "3-Header-[content-length]-[" + contentLength + "]\n" +
                 "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                 "3-HeadersEnd\n" +
-                "3-Body-692\n" +
+                "3-Body-" + contentLength + "\n" +
                 "3-EndOfStream\n" +
                 "3-RST-[8]\n", output.getTrace());
         output.clearTrace();
