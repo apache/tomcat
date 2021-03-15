@@ -78,14 +78,15 @@ class Http2Parser {
         }
 
         int payloadSize = ByteUtil.getThreeBytes(frameHeaderBuffer, 0);
-        FrameType frameType = FrameType.valueOf(ByteUtil.getOneByte(frameHeaderBuffer, 3));
+        int frameTypeId = ByteUtil.getOneByte(frameHeaderBuffer, 3);
+        FrameType frameType = FrameType.valueOf(frameTypeId);
         int flags = ByteUtil.getOneByte(frameHeaderBuffer, 4);
         int streamId = ByteUtil.get31Bits(frameHeaderBuffer, 5);
 
         try {
             validateFrame(expected, frameType, streamId, flags, payloadSize);
         } catch (StreamException se) {
-            swallowPayload(streamId, payloadSize, false);
+            swallowPayload(streamId, frameTypeId, payloadSize, false);
             throw se;
         }
 
@@ -166,11 +167,11 @@ class Http2Parser {
 
         ByteBuffer dest = output.startRequestBodyFrame(streamId, payloadSize, endOfStream);
         if (dest == null) {
-            swallowPayload(streamId, dataLength, false);
+            swallowPayload(streamId, FrameType.DATA.getId(), dataLength, false);
             // Process padding before sending any notifications in case padding
             // is invalid.
             if (padLength > 0) {
-                swallowPayload(streamId, padLength, true);
+                swallowPayload(streamId, FrameType.DATA.getId(), padLength, true);
             }
             if (endOfStream) {
                 output.receivedEndOfStream(streamId);
@@ -178,7 +179,7 @@ class Http2Parser {
         } else {
             synchronized (dest) {
                 if (dest.remaining() < dataLength) {
-                    swallowPayload(streamId, dataLength, false);
+                    swallowPayload(streamId, FrameType.DATA.getId(), dataLength, false);
                     // Client has sent more data than permitted by Window size
                     throw new StreamException(sm.getString("http2Parser.processFrameData.window", connectionId),
                             Http2Error.FLOW_CONTROL_ERROR, streamId);
@@ -187,7 +188,7 @@ class Http2Parser {
                 // Process padding before sending any notifications in case
                 // padding is invalid.
                 if (padLength > 0) {
-                    swallowPayload(streamId, padLength, true);
+                    swallowPayload(streamId, FrameType.DATA.getId(), padLength, true);
                 }
                 if (endOfStream) {
                     output.receivedEndOfStream(streamId);
@@ -212,7 +213,7 @@ class Http2Parser {
         try {
             hpackDecoder.setHeaderEmitter(output.headersStart(streamId, headersEndStream));
         } catch (StreamException se) {
-            swallowPayload(streamId, payloadSize, false);
+            swallowPayload(streamId, FrameType.HEADERS.getId(), payloadSize, false);
             throw se;
         }
 
@@ -252,7 +253,7 @@ class Http2Parser {
 
         readHeaderPayload(streamId, payloadSize);
 
-        swallowPayload(streamId, padLength, true);
+        swallowPayload(streamId, FrameType.HEADERS.getId(), padLength, true);
 
         if (Flags.isEndOfHeaders(flags)) {
             onHeadersComplete(streamId);
@@ -461,7 +462,7 @@ class Http2Parser {
     private void readUnknownFrame(int streamId, FrameType frameType, int flags, int payloadSize)
             throws IOException {
         try {
-            swallowPayload(streamId, payloadSize, false);
+            swallowPayload(streamId, frameType.getId(), payloadSize, false);
         } catch (ConnectionException e) {
             // Will never happen because swallow() is called with mustBeZero set
             // to false
@@ -470,7 +471,21 @@ class Http2Parser {
     }
 
 
-    private void swallowPayload(int streamId, int len, boolean mustBeZero)
+    /**
+     * Swallow some or all of the bytes from the payload of an HTTP/2 frame.
+     *
+     * @param streamId      Stream being swallowed
+     * @param frameTypeId   Type of HTTP/2 frame for which the bytes will be
+     *                      swallowed
+     * @param len           Number of bytes to swallow
+     * @param isPadding     Are the bytes to be swallowed padding bytes?
+     *
+     * @throws IOException If an I/O error occurs reading additional bytes into
+     *                     the input buffer.
+     * @throws ConnectionException If the swallowed bytes are expected to have a
+     *                             value of zero but do not
+     */
+    protected void swallowPayload(int streamId, int frameTypeId, int len, boolean isPadding)
             throws IOException, ConnectionException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.swallow.debug", connectionId,
@@ -484,7 +499,7 @@ class Http2Parser {
         while (read < len) {
             int thisTime = Math.min(buffer.length, len - read);
             input.fill(true, buffer, 0, thisTime);
-            if (mustBeZero) {
+            if (isPadding) {
                 // Validate the padding is zero since receiving non-zero padding
                 // is a strong indication of either a faulty client or a server
                 // side bug.
