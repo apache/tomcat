@@ -106,7 +106,7 @@ class Http2AsyncParser extends Http2Parser {
                 payload.flip();
                 try {
                     if (streamException) {
-                        swallow(streamId, payloadSize, false, payload);
+                        swallowPayload(streamId, payloadSize, false, payload);
                     } else {
                         readSettingsFrame(flags, payloadSize, payload);
                     }
@@ -239,7 +239,7 @@ class Http2AsyncParser extends Http2Parser {
                     do {
                         continueParsing = false;
                         if (streamException) {
-                            swallow(streamId, payloadSize, false, payload);
+                            swallowPayload(streamId, payloadSize, false, payload);
                         } else {
                             switch (frameType) {
                             case DATA:
