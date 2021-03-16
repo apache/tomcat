@@ -1256,6 +1256,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 synchronized (inputBuffer) {
                     closed = true;
                     int unreadByteCount = inBuffer.position();
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("stream.inputBuffer.swallowUnread", Integer.valueOf(unreadByteCount)));
+                    }
                     if (unreadByteCount > 0) {
                         inBuffer.position(0);
                         inBuffer.limit(inBuffer.limit() - unreadByteCount);
