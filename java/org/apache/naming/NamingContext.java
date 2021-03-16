@@ -873,6 +873,9 @@ public class NamingContext implements Context {
                             entry.value = obj;
                         }
                     }
+                    if (obj == null) {
+                        throw new NamingException(sm.getString("namingContext.failResolvingReference"));
+                    }
                     return obj;
                 } catch (NamingException e) {
                     throw e;
