@@ -73,10 +73,10 @@
     <p>
       The logging frameworks used by different web applications are independent.
       See <a href="class-loader-howto.html">class loading</a> for more details.
-      The exception to this rule is <code>java.util.logging</code>. If it used
-      directly or indirectly by your logging library then elements of it will be
-      shared across web applications because it is loaded by the system class
-      loader.
+      The exception to this rule is <code>java.util.logging</code>. If it is
+      used directly or indirectly by your logging library then elements of it
+      will be shared across web applications because it is loaded by the system
+      class loader.
     </p>
 
     <subsection name="Java logging API &#8212; java.util.logging">
