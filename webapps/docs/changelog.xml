@@ -127,6 +127,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Include the new <code>org.apache.jasper.optimizations</code> package in
+        the list of OSGi exported packages for the Jasper embedded JAR. Patch
+        provided by Sokratis Zappis. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.44 (markt)" rtext="2021-03-10">
   <subsection name="Catalina">
