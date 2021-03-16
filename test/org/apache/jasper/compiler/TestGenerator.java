@@ -17,8 +17,10 @@
 
 package org.apache.jasper.compiler;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Scanner;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.jsp.JspException;
@@ -30,8 +32,12 @@ import jakarta.servlet.jsp.tagext.VariableInfo;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.jasper.servlet.JasperInitializer;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestGenerator extends TomcatBaseTest {
@@ -212,7 +218,7 @@ public class TestGenerator extends TomcatBaseTest {
                 response.contains("[1:attribute1: '', attribute2: '']"));
         Assert.assertTrue(response,
                 response.contains("[2:attribute1: '', attribute2: '']"));
-   }
+    }
 
     public static class Bug56529 extends TagSupport {
 
@@ -284,5 +290,49 @@ public class TestGenerator extends TomcatBaseTest {
         String result = res.toString();
         System.out.println(result);
         assertEcho(result, "ASYNC");
+    }
+
+    @Test
+    public void testTrimSpacesExtended01() throws Exception {
+        doTestTrimSpacesExtended(false);
+    }
+
+    @Test
+    public void testTrimSpacesExtended02() throws Exception {
+        doTestTrimSpacesExtended(true);
+    }
+
+    private void doTestTrimSpacesExtended(boolean removeBlankLines) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        ctxt.addServletContainerInitializer(new JasperInitializer(), null);
+
+        Tomcat.initWebappDefaults(ctxt);
+        Wrapper w = (Wrapper) ctxt.findChild("jsp");
+        if (removeBlankLines) {
+            w.addInitParameter("trimSpaces", "extended");
+        }
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/jsp/trim-spaces-extended.jsp");
+
+        String result = res.toString();
+        Scanner scanner = new Scanner(result);
+        int blankLineCount = 0;
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            if (line.length() == 0) {
+                blankLineCount++;
+            }
+        }
+        if (!removeBlankLines && blankLineCount == 0) {
+            Assert.fail("TrimSpaceOptions.EXTENDED not configured but balnk lines have been removed");
+        } else if (removeBlankLines && blankLineCount > 0) {
+            Assert.fail("TrimSpaceOptions.EXTENDED does not allow the line to be just a new line character");
+        }
+        scanner.close();
     }
 }

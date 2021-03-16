@@ -142,6 +142,13 @@
         the list of OSGi exported packages for the Jasper embedded JAR. Patch
         provided by Sokratis Zappis. (markt)
       </fix>
+      <add>
+        Add a new option for the <code>trimSpaces</code> configuration.
+        <code>extended</code> will attempt to remove leading and trailing
+        whitespace from template text and collapse sequences of whitespace and
+        newlines within template text into a single new line. Based on a pull
+        request by kamnani. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
