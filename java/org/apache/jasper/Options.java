@@ -101,8 +101,11 @@ public interface Options {
      * @return {@link TrimSpacesOption#TRUE} to remove template text that
      *         consists only of whitespace from the output completely,
      *         {@link TrimSpacesOption#SINGLE} to replace such template text
-     *         with a single space or {@link TrimSpacesOption#FALSE} to leave
-     *         such template text unchanged
+     *         with a single space, {@link TrimSpacesOption#FALSE} to leave
+     *         such template text unchanged or {@link TrimSpacesOption#EXTENDED}
+     *         to remove template text that consists only of whitespace and to
+     *         replace any sequence of whitespace and new lines within template
+     *         text with a single new line.
      */
     public TrimSpacesOption getTrimSpaces();
 

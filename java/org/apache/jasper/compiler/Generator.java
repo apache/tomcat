@@ -40,6 +40,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -52,6 +54,7 @@ import org.apache.el.util.JreCompat;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.jasper.TrimSpacesOption;
 import org.apache.jasper.compiler.Node.NamedAttribute;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
 import org.xml.sax.Attributes;
@@ -96,6 +99,10 @@ class Generator {
             System.getProperty(
                     "org.apache.jasper.compiler.Generator.STRICT_GET_PROPERTY",
                     "true"));
+
+    private static final Pattern PRE_TAG_PATTERN = Pattern.compile("(?s).*(<pre>|</pre>).*");
+
+    private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("(\\s*(\\n|\\r)+\\s*)");
 
     private final ServletWriter out;
 
@@ -2110,6 +2117,21 @@ class Generator {
         public void visit(Node.TemplateText n) throws JasperException {
 
             String text = n.getText();
+            // If the extended option is being used attempt to minimize the
+            // frequency of regex operations.
+            if ((ctxt != null) && ctxt.getOptions().getTrimSpaces().equals(TrimSpacesOption.EXTENDED) &&
+                    text.contains("\n")) {
+                // Ensure there are no <pre> or </pre> tags embedded in this
+                // text - if there are, we want to NOT modify the whitespace.
+                Matcher preMatcher = PRE_TAG_PATTERN.matcher(text);
+                if (!preMatcher.matches()) {
+                    Matcher matcher = BLANK_LINE_PATTERN.matcher(text);
+                    String revisedText = matcher.replaceAll("\n");
+                    // Leading and trailing whitespace can be trimmed so remove
+                    // it here as the regex won't remove it.
+                    text = revisedText.trim();
+                }
+            }
 
             int textSize = text.length();
             if (textSize == 0) {
