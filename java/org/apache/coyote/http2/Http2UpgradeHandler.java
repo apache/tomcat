@@ -1469,7 +1469,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         abstractNonZeroStream.checkState(FrameType.DATA);
         abstractNonZeroStream.receivedData(payloadSize);
-        return abstractNonZeroStream.getInputByteBuffer();
+        ByteBuffer result = abstractNonZeroStream.getInputByteBuffer();
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.startRequestBodyFrame.result",
+                    getConnectionId(), abstractNonZeroStream.getIdAsString(), result));
+        }
+
+        return result;
     }
 
 
