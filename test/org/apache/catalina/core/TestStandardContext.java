@@ -16,12 +16,15 @@
  */
 package org.apache.catalina.core;
 
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;
@@ -45,20 +48,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.*;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
-import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.LifecycleState;
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -71,6 +67,10 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+
+import static java.lang.ClassLoader.getSystemClassLoader;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class TestStandardContext extends TomcatBaseTest {
@@ -1039,6 +1039,121 @@ public class TestStandardContext extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             resp.getWriter().print("OK");
+        }
+    }
+
+    @Test
+    public void testNoWarningForNotConfigurableClassLoader() throws Exception {
+        final Logger logger = Logger.getLogger("org.apache.catalina.core.StandardContext");
+        final Level level = logger.getLevel();
+
+        {   // standard case
+            final InMemoryLogBuffer buffer = new InMemoryLogBuffer();
+            logger.addHandler(buffer);
+
+            final Tomcat tomcat = getTomcatInstance();
+            tomcat.addContext("/test", null);
+            tomcat.start();
+            tearDown();
+            logger.removeHandler(buffer);
+            assertTrue(buffer.debug.toString(), buffer.records.isEmpty());
+        }
+        setUp();
+        {   // inaccurate classloader for tomcat
+            final InMemoryLogBuffer buffer = new InMemoryLogBuffer();
+            logger.addHandler(buffer);
+            logger.setLevel(Level.FINEST);
+            final Tomcat tomcat = getTomcatInstance();
+            final Context ctx = new StandardContext();
+            ctx.setName("test");
+            ctx.setPath("/test");
+            ctx.setDocBase(null);
+            ctx.addLifecycleListener(new Tomcat.FixContextListener());
+            ctx.setLoader(new Loader() { // maybe we should have a BaseLoader
+                private Context context;
+                @Override
+                public void backgroundProcess() {
+                    // no-op
+                }
+
+                @Override
+                public ClassLoader getClassLoader() {
+                    return getSystemClassLoader();
+                }
+
+                @Override
+                public Context getContext() {
+                    return context;
+                }
+
+                @Override
+                public void setContext(final Context context) {
+                    this.context = context;
+                }
+
+                @Override
+                public boolean getDelegate() {
+                    return false;
+                }
+
+                @Override
+                public void setDelegate(final boolean delegate) {
+                    // no-op
+                }
+
+                @Override
+                public void addPropertyChangeListener(final PropertyChangeListener listener) {
+                    // no-op
+                }
+
+                @Override
+                public boolean modified() {
+                    return false;
+                }
+
+                @Override
+                public void removePropertyChangeListener(final PropertyChangeListener listener) {
+                    // no-op
+                }
+            });
+            tomcat.getHost().addChild(ctx);
+            tomcat.start();
+            logger.removeHandler(buffer);
+            assertEquals(buffer.debug.toString(), 6, buffer.records.size());
+            /*
+            Starting test
+            Configuring default Resources
+            Processing standard container startup
+            Skipping classloader configuration. <<--- this is the message we care in this test
+            Configuring application event listeners
+            Starting completed
+             */
+        }
+
+        logger.setLevel(level);
+    }
+
+    private static class InMemoryLogBuffer extends Handler {
+        private final Collection<LogRecord> records = new ArrayList<>();
+        private final StringBuilder debug = new StringBuilder();
+
+        @Override
+        public void publish(final LogRecord record) {
+            records.add(record);
+            debug.append(record.getLevel().getName())
+                    .append(": ")
+                    .append(record.getMessage())
+                    .append("\n");
+        }
+
+        @Override
+        public void flush() {
+            // no-op
+        }
+
+        @Override
+        public void close() throws SecurityException {
+            flush();
         }
     }
 }

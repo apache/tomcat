@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -4977,22 +4978,28 @@ public class StandardContext extends ContainerBase
                     ((Lifecycle) loader).start();
                 }
 
-                // since the loader just started, the webapp classloader is now
-                // created.
-                setClassLoaderProperty("clearReferencesRmiTargets",
-                        getClearReferencesRmiTargets());
-                setClassLoaderProperty("clearReferencesStopThreads",
-                        getClearReferencesStopThreads());
-                setClassLoaderProperty("clearReferencesStopTimerThreads",
-                        getClearReferencesStopTimerThreads());
-                setClassLoaderProperty("clearReferencesHttpClientKeepAliveThread",
-                        getClearReferencesHttpClientKeepAliveThread());
-                setClassLoaderProperty("clearReferencesObjectStreamClassCaches",
-                        getClearReferencesObjectStreamClassCaches());
-                setClassLoaderProperty("clearReferencesObjectStreamClassCaches",
-                        getClearReferencesObjectStreamClassCaches());
-                setClassLoaderProperty("clearReferencesThreadLocals",
-                        getClearReferencesThreadLocals());
+                ClassLoader cl = getLoader().getClassLoader();
+                if (isConfigurableClassLoader(cl)) {
+                    // since the loader just started, the webapp classloader is now
+                    // created.
+                    setClassLoaderProperty("clearReferencesRmiTargets",
+                            getClearReferencesRmiTargets());
+                    setClassLoaderProperty("clearReferencesStopThreads",
+                            getClearReferencesStopThreads());
+                    setClassLoaderProperty("clearReferencesStopTimerThreads",
+                            getClearReferencesStopTimerThreads());
+                    setClassLoaderProperty("clearReferencesHttpClientKeepAliveThread",
+                            getClearReferencesHttpClientKeepAliveThread());
+                    setClassLoaderProperty("clearReferencesObjectStreamClassCaches",
+                            getClearReferencesObjectStreamClassCaches());
+                    setClassLoaderProperty("clearReferencesObjectStreamClassCaches",
+                            getClearReferencesObjectStreamClassCaches());
+                    setClassLoaderProperty("clearReferencesThreadLocals",
+                            getClearReferencesThreadLocals());
+                } else {
+                    log.debug(sm.getString(
+                            "standardContext.webappClassLoader.skippingClassLoaderConfiguration"));
+                }
 
                 // By calling unbindThread and bindThread in a row, we setup the
                 // current Thread CCL to be the webapp classloader
@@ -5208,6 +5215,17 @@ public class StandardContext extends ContainerBase
         }
     }
 
+    // simplified heuristic but protected so can be extended
+    // if we have one of these two classloader in a standard tomcat it means
+    // instance loader so clean up will happen with the jvm so let's ignore "cant set clearX"
+    // messages which are warnings and bothering for no real reason
+    //
+    // note that children can add more classloader types but should also
+    // check if it means missing some checks/not respecting the configuration and if so
+    // logging a message.
+    protected boolean isConfigurableClassLoader(final ClassLoader cl) {
+        return cl != ClassLoader.getSystemClassLoader() && URLClassLoader.class != cl.getClass();
+    }
 
     private void checkConstraintsForUncoveredMethods(
             SecurityConstraint[] constraints) {
