@@ -1028,7 +1028,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void endRequestBodyFrame(int streamId) throws Http2Exception {
+        public void endRequestBodyFrame(int streamId, int dataLength) throws Http2Exception {
             if (bodyBuffer != null) {
                 if (bodyBuffer.limit() > 0) {
                     trace.append(lastStreamId + "-Body-");

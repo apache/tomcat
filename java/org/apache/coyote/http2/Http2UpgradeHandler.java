@@ -1481,10 +1481,17 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public void endRequestBodyFrame(int streamId) throws Http2Exception, IOException {
+    public void endRequestBodyFrame(int streamId, int dataLength) throws Http2Exception, IOException {
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         if (abstractNonZeroStream instanceof Stream) {
             ((Stream) abstractNonZeroStream).getInputBuffer().onDataAvailable();
+        } else {
+            // The Stream was recycled between the call in Http2Parser to
+            // startRequestBodyFrame() and the synchronized block that contains
+            // the call to this method. This means the bytes read will have been
+            // written to the original stream and, effectively, swallowed.
+            // Therefore, need to notify that those bytes were swallowed here.
+            onSwallowedDataFramePayload(streamId, dataLength);
         }
     }
 
