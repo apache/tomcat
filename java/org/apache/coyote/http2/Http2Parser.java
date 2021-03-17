@@ -208,7 +208,7 @@ class Http2Parser {
                 if (endOfStream) {
                     output.receivedEndOfStream(streamId);
                 }
-                output.endRequestBodyFrame(streamId);
+                output.endRequestBodyFrame(streamId, dataLength);
             }
         }
     }
@@ -747,7 +747,7 @@ class Http2Parser {
 
         // Data frames
         ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) throws Http2Exception;
-        void endRequestBodyFrame(int streamId) throws Http2Exception, IOException;
+        void endRequestBodyFrame(int streamId, int dataLength) throws Http2Exception, IOException;
         void receivedEndOfStream(int streamId) throws ConnectionException;
         /**
          * Notification triggered when the parser swallows some or all of a DATA
