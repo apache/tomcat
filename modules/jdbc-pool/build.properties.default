@@ -29,6 +29,10 @@ version.build=0
 version.patch=1
 version.suffix=
 
+# ----- Reproducible builds -----
+# Uncomment and set to current time for reproducible builds
+#ant.tstamp.now.iso=2021-03-18T06:00:00Z
+
 # ----- Default Base Path for Dependent Packages -----
 # Please note this path must be absolute, not relative,
 # as it is referenced with different working directory
