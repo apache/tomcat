@@ -18,12 +18,12 @@ package org.apache.tomcat.util.xreflection;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 
-final class SetPropertyClass {
+final class SetPropertyClass implements Comparable<SetPropertyClass> {
 
     static final String OBJECT_VAR_NAME = "o";
     static final String NAME_VAR_NAME = "name";
@@ -32,8 +32,8 @@ final class SetPropertyClass {
 
     private final SetPropertyClass parent;
     private final Class<?> clazz;
-    private Set<SetPropertyClass> children = new HashSet<>();
-    private Set<ReflectionProperty> properties = new HashSet<>();
+    private Set<SetPropertyClass> children = new TreeSet<>();
+    private Set<ReflectionProperty> properties = new TreeSet<>();
     private final boolean isAbstract;
     private final Method genericSetPropertyMethod;
     private final Method genericGetPropertyMethod;
@@ -432,5 +432,10 @@ final class SetPropertyClass {
 
 
         return code.toString();
+    }
+
+    @Override
+    public int compareTo(SetPropertyClass o) {
+        return clazz.getName().compareTo(o.clazz.getName());
     }
 }
