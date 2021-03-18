@@ -30,4 +30,9 @@ X-Compile-Target-JDK: ${compile.target}
 
 -noclassforname: true
 
+-reproducible: true
+-noextraheaders: true
+
+-removeheaders: DSTAMP,TODAY,TSTAMP
+
 module.name: org.apache.${replace;${Bundle-Name};-;.}
