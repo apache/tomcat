@@ -737,6 +737,7 @@
     files placed in JARs -->
     <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
       <fileset dir="${tomcat.classes}"/>
+      <fileset dir="${tomcat.i18n}"/>
     </touch>
   </target>
 
@@ -894,76 +895,91 @@
       filesId="files.tomcat-dbcp" />
 
     <!-- i18n JARs -->
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-de.jar"
-      manifest="${tomcat.manifests}/default.manifest">
+    <!-- zip task used rather than jar to control reproducibility -->
+    <zip destfile="${tomcat.build}/lib/tomcat-i18n-de.jar">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_de.properties" />
       </fileset>
+      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
+      <zipfileset file="${tomcat.manifests}/default.manifest"
+        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </jar>
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
-      manifest="${tomcat.manifests}/default.manifest">
+    </zip>
+    <zip destfile="${tomcat.build}/lib/tomcat-i18n-es.jar">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_es.properties" />
       </fileset>
+      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
+      <zipfileset file="${tomcat.manifests}/default.manifest"
+        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </jar>
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
-      manifest="${tomcat.manifests}/default.manifest">
+    </zip>
+    <zip destfile="${tomcat.build}/lib/tomcat-i18n-fr.jar">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_fr.properties" />
       </fileset>
+      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
+      <zipfileset file="${tomcat.manifests}/default.manifest"
+        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </jar>
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar"
-      manifest="${tomcat.manifests}/default.manifest">
+    </zip>
+    <zip destfile="${tomcat.build}/lib/tomcat-i18n-ja.jar">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ja.properties" />
       </fileset>
+      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
+      <zipfileset file="${tomcat.manifests}/default.manifest"
+        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </jar>
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ko.jar"
-      manifest="${tomcat.manifests}/default.manifest">
+    </zip>
+    <zip destfile="${tomcat.build}/lib/tomcat-i18n-ko.jar">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ko.properties" />
       </fileset>
+      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
+      <zipfileset file="${tomcat.manifests}/default.manifest"
+        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </jar>
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ru.jar"
-      manifest="${tomcat.manifests}/default.manifest">
+    </zip>
+    <zip destfile="${tomcat.build}/lib/tomcat-i18n-ru.jar">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ru.properties" />
       </fileset>
+      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
+      <zipfileset file="${tomcat.manifests}/default.manifest"
+        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </jar>
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-zh-CN.jar"
-      manifest="${tomcat.manifests}/default.manifest">
+    </zip>
+    <zip destfile="${tomcat.build}/lib/tomcat-i18n-zh-CN.jar">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_zh_CN.properties" />
       </fileset>
+      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
+      <zipfileset file="${tomcat.manifests}/default.manifest"
+        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </jar>
+    </zip>
 
   </target>
 
