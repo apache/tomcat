@@ -19,7 +19,7 @@ package org.apache.tomcat.util.xreflection;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 
-final class ReflectionProperty {
+final class ReflectionProperty implements Comparable<ReflectionProperty> {
     private final String clazz;
     private final String propertyName;
     private final Class<?> propertyType;
@@ -115,5 +115,15 @@ final class ReflectionProperty {
         sb.append(", type=").append(propertyType);
         sb.append('}');
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(ReflectionProperty o) {
+        // Class then property name
+        int result = clazz.compareTo(o.clazz);
+        if (result == 0) {
+            result = propertyName.compareTo(o.propertyName);
+        }
+        return result;
     }
 }
