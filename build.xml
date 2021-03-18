@@ -261,6 +261,7 @@
     <format property="today" pattern="MMM d yyyy" locale="en" timezone="UTC"/>
     <format property="today-iso-8601" pattern="yyyy-MM-dd" locale="en" timezone="UTC"/>
     <format property="tstamp" pattern="HH:mm:ss" locale="en" timezone="UTC"/>
+    <format property="tstamp.file" pattern="MM/dd/yyyy hh:mm:ss aa"/>
   </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
@@ -985,6 +986,11 @@
     <native2ascii src="java" dest="${tomcat.classes}" includes="**/LocalStrings.properties,**/Messages*.properties" encoding="UTF-8"/>
     <native2ascii src="java" dest="${tomcat.i18n}" includes="**/LocalStrings_*.properties" encoding="UTF-8"/>
 
+    <!-- Reproducible builds: consistent timestamps for class files and other
+    files placed in JARs -->
+    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+      <fileset dir="${tomcat.classes}"/>
+    </touch>
   </target>
 
   <target name="build-manifests" unless="manifests.uptodate"
@@ -1006,6 +1012,10 @@
       <fileset dir="${tomcat.home}/res/META-INF" />
     </copy>
 
+    <!-- Reproducible builds: consistent timestamps for files in META-INF -->
+    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+      <fileset dir="${tomcat.manifests}"/>
+    </touch>
   </target>
 
   <target name="package" depends="compile,build-manifests" >
@@ -3666,7 +3676,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
         <srcfiles file="@{license}" />
       </uptodate>
       <sequential unless:true="${jar.uptodate}">
-        <jar jarfile="@{jarfile}" manifest="@{manifest}" >
+        <zip destfile="@{jarfile}" filesonly="true" >
           <fileset dir="@{filesDir}">
             <patternset refid="@{filesId}"/>
             <!-- Javadoc exclusions -->
@@ -3674,9 +3684,10 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
           </fileset>
           <zipfileset dir="@{meta-inf}" prefix="META-INF/"
                       excludes=".gitignore" />
+          <zipfileset file="@{manifest}" fullpath="META-INF/MANIFEST.MF" />
           <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
           <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
-        </jar>
+        </zip>
         <antcall target="add-osgi" >
           <param name="jarfile" value="@{jarfile}" />
           <param name="addOSGi" value="@{addOSGi}" />
