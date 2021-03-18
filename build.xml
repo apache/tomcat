@@ -80,6 +80,7 @@
   <property name="tomcat.dist"           value="${tomcat.output}/dist"/>
   <property name="tomcat.embed"          value="${tomcat.output}/embed"/>
   <property name="tomcat.embed.sources"  value="${tomcat.output}/embed-src-jars"/>
+  <property name="tomcat.graal"          value="${tomcat.output}/graal"/>
   <property name="tomcat.i18n"           value="${tomcat.output}/i18n"/>
   <property name="tomcat.manifests"      value="${tomcat.output}/manifests"/>
   <property name="tomcat.release"        value="${tomcat.output}/release"/>
@@ -3757,8 +3758,15 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
 
   <target name="add-graal" if="${addGraal}">
     <echo message="add-graal  ${addGraal} ${jarfile} ${graalFiles} ${graalPrefix}"></echo>
-    <zip destfile="${jarfile}" update="true">
-      <zipfileset dir="${basedir}/${graalFiles}" prefix="META-INF/native-image/${graalPrefix}" includes="*.*"/>
+    <!-- Reproducible builds: consistent timestamps for graal files -->
+    <copy todir="${tomcat.graal}/${graalPrefix}">
+      <fileset dir="${basedir}/${graalFiles}" />
+    </copy>
+    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+      <fileset dir="${tomcat.graal}/${graalPrefix}"/>
+    </touch>
+    <zip destfile="${jarfile}" update="true" filesonly="true">
+      <zipfileset dir="${tomcat.graal}/${graalPrefix}" prefix="META-INF/native-image/${graalPrefix}" includes="*.*"/>
     </zip>
   </target>
 
