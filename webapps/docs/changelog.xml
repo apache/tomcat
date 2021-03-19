@@ -151,6 +151,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Implement the first phase of reproducible builds. Sequential builds on
+        the same machine now produce identical output provided that the Ant
+        property <code>ant.tstamp.now.iso</code> is set. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.4 (markt)" rtext="2021-03-10">
   <subsection name="Catalina">
