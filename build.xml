@@ -2463,37 +2463,37 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
     <!-- Digester and dependencies -->
     <zip destfile="${tomcat.deployer}/lib/catalina-deployer.jar">
-       <fileset dir="${tomcat.classes}">
-          <include name="org/apache/catalina/startup/DigesterFactory.class" />
-          <include name="org/apache/catalina/util/SchemaResolver.class" />
-          <include name="org/apache/catalina/util/StringManager.class" />
-          <include name="org/apache/tomcat/util/*" />
-          <include name="org/apache/tomcat/util/digester/**" />
-          <exclude name="org/apache/tomcat/util/bcel" />
-          <exclude name="org/apache/tomcat/util/buf" />
-          <exclude name="org/apache/tomcat/util/codec" />
-          <exclude name="org/apache/tomcat/util/collections" />
-          <exclude name="org/apache/tomcat/util/compat" />
-          <exclude name="org/apache/tomcat/util/descriptor" />
-          <exclude name="org/apache/tomcat/util/file" />
-          <exclude name="org/apache/tomcat/util/http" />
-          <exclude name="org/apache/tomcat/util/log" />
-          <exclude name="org/apache/tomcat/util/modeler" />
-          <exclude name="org/apache/tomcat/util/net" />
-          <exclude name="org/apache/tomcat/util/res" />
-          <exclude name="org/apache/tomcat/util/scan" />
-          <exclude name="org/apache/tomcat/util/security" />
-          <exclude name="org/apache/tomcat/util/threads" />
-          <exclude name="**/package.html" />
-          <exclude name="**/LocalStrings_*" />
-       </fileset>
-       <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
-       <zipfileset file="${tomcat.manifests}/default.manifest"
-         fullpath="META-INF/MANIFEST.MF" />
-       <zipfileset file="${tomcat.manifests}/default.notice"
-         fullpath="META-INF/NOTICE" />
-       <zipfileset file="${tomcat.manifests}/default.license"
-         fullpath="META-INF/LICENSE" />
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/catalina/startup/DigesterFactory.class" />
+        <include name="org/apache/catalina/util/SchemaResolver.class" />
+        <include name="org/apache/catalina/util/StringManager.class" />
+        <include name="org/apache/tomcat/util/*" />
+        <include name="org/apache/tomcat/util/digester/**" />
+        <exclude name="org/apache/tomcat/util/bcel" />
+        <exclude name="org/apache/tomcat/util/buf" />
+        <exclude name="org/apache/tomcat/util/codec" />
+        <exclude name="org/apache/tomcat/util/collections" />
+        <exclude name="org/apache/tomcat/util/compat" />
+        <exclude name="org/apache/tomcat/util/descriptor" />
+        <exclude name="org/apache/tomcat/util/file" />
+        <exclude name="org/apache/tomcat/util/http" />
+        <exclude name="org/apache/tomcat/util/log" />
+        <exclude name="org/apache/tomcat/util/modeler" />
+        <exclude name="org/apache/tomcat/util/net" />
+        <exclude name="org/apache/tomcat/util/res" />
+        <exclude name="org/apache/tomcat/util/scan" />
+        <exclude name="org/apache/tomcat/util/security" />
+        <exclude name="org/apache/tomcat/util/threads" />
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
+      <zipfileset file="${tomcat.manifests}/default.manifest"
+        fullpath="META-INF/MANIFEST.MF" />
+      <zipfileset file="${tomcat.manifests}/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="${tomcat.manifests}/default.license"
+        fullpath="META-INF/LICENSE" />
     </zip>
 
     <!-- Main build script -->
