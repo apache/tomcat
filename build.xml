@@ -2588,6 +2588,10 @@ skip.installer property in build.properties" />
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
     </fixcrlf>
+    <!-- Reproducible builds: consistent timestamps for installer files -->
+    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+      <fileset dir="${tomcat.dist}"/>
+    </touch>
   </target>
 
   <target name="-installer-create-tempinstaller"
@@ -2615,7 +2619,10 @@ skip.installer property in build.properties" />
     <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
       <arg value="${tomcat.dist}/tempinstaller.exe" />
     </exec>
-
+    <!-- Reproducible builds: consistent timestamps for installer files -->
+    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+      <fileset dir="${tomcat.dist}"/>
+    </touch>
   </target>
 
   <target name="-installer-sign-uninstaller"
