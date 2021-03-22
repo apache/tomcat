@@ -194,6 +194,13 @@ public final class Request {
         this.listener = listener;
     }
 
+    public boolean isReady() {
+        AtomicBoolean result = new AtomicBoolean();
+        action(ActionCode.NB_READ_INTEREST, result);
+        return result.get();
+    }
+
+
     private final AtomicBoolean allDataReadEventSent = new AtomicBoolean(false);
 
     public boolean sendAllDataReadEvent() {

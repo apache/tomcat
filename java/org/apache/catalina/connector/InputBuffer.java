@@ -27,8 +27,6 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import jakarta.servlet.ReadListener;
 
 import org.apache.catalina.security.SecurityUtil;
@@ -301,9 +299,7 @@ public class InputBuffer extends Reader
             return true;
         }
 
-        AtomicBoolean result = new AtomicBoolean();
-        coyoteRequest.action(ActionCode.NB_READ_INTEREST, result);
-        return result.get();
+        return coyoteRequest.isReady();
     }
 
 
