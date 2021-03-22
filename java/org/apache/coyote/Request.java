@@ -167,7 +167,18 @@ public final class Request {
      */
     private Exception errorException = null;
 
+    /*
+     * State for non-blocking output is maintained here as it is the one point
+     * easily reachable from the CoyoteInputStream and the CoyoteAdapter which
+     * both need access to state.
+     */
     volatile ReadListener listener;
+    // Ensures listener is only fired after a call is isReady()
+    private boolean fireListener = false;
+    // Tracks read registration to prevent duplicate registrations
+    private boolean registeredForRead = false;
+    // Lock used to manage concurrent access to above flags
+    private final Object nonBlockingStateLock = new Object();
 
     public ReadListener getReadListener() {
         return listener;
@@ -202,6 +213,14 @@ public final class Request {
         // has been finished will register the socket for read interest and that
         // is not required.
         if (!isFinished() && isReady()) {
+            synchronized (nonBlockingStateLock) {
+                // Ensure we don't get multiple read registrations
+                registeredForRead = true;
+                // Need to set the fireListener flag otherwise when the
+                // container tries to trigger onDataAvailable, nothing will
+                // happen
+                fireListener = true;
+            }
             action(ActionCode.DISPATCH_READ, null);
             if (!ContainerThreadMarker.isContainerThread()) {
                 // Not on a container thread so need to execute the dispatch
@@ -211,13 +230,42 @@ public final class Request {
     }
 
     public boolean isReady() {
-        AtomicBoolean result = new AtomicBoolean();
-        action(ActionCode.NB_READ_INTEREST, result);
-        return result.get();
+        // Assume read is not possible
+        boolean ready = false;
+        synchronized (nonBlockingStateLock) {
+            if (registeredForRead) {
+                fireListener = true;
+                return false;
+            }
+            ready = checkRegisterForRead();
+            fireListener = !ready;
+        }
+        return ready;
+    }
+
+    private boolean checkRegisterForRead() {
+        AtomicBoolean ready = new AtomicBoolean(false);
+        synchronized (nonBlockingStateLock) {
+            if (!registeredForRead) {
+                action(ActionCode.NB_READ_INTEREST, ready);
+                registeredForRead = !ready.get();
+            }
+        }
+        return ready.get();
     }
 
     public void onDataAvailable() throws IOException {
-        listener.onDataAvailable();
+        boolean fire = false;
+        synchronized (nonBlockingStateLock) {
+            registeredForRead = false;
+            if (fireListener) {
+                fireListener = false;
+                fire = true;
+            }
+        }
+        if (fire) {
+            listener.onDataAvailable();
+        }
     }
 
 
@@ -728,6 +776,10 @@ public final class Request {
         attributes.clear();
 
         listener = null;
+        synchronized (nonBlockingStateLock) {
+            fireListener = false;
+            registeredForRead = false;
+        }
         allDataReadEventSent.set(false);
 
         startTimeNanos = -1;

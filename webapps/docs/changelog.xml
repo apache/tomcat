@@ -132,6 +132,11 @@
         present. (markt)
       </scode>
       <fix>
+        <bug>64771</bug>: Prevent concurrent calls to
+        <code>ServletInputStream.isReady()</code> corrupting the input buffer.
+        (markt)
+      </fix>
+      <fix>
         <bug>65179</bug>: Ensure that the connection level flow control window
         from the client to the server is updated when handling DATA frames
         received for completed streams else the flow control window  may become
