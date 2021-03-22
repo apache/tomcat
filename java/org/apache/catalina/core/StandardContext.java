@@ -116,7 +116,6 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
@@ -5262,16 +5261,6 @@ public class StandardContext extends ContainerBase
         }
     }
 
-
-    private void setClassLoaderProperty(String name, boolean value) {
-        ClassLoader cl = getLoader().getClassLoader();
-        if (!IntrospectionUtils.setProperty(cl, name, Boolean.toString(value))) {
-            // Failed to set
-            log.info(sm.getString(
-                    "standardContext.webappClassLoader.missingProperty",
-                    name, Boolean.toString(value)));
-        }
-    }
 
     private Map<String, Map<String, String>> buildInjectionMap(NamingResourcesImpl namingResources) {
         Map<String, Map<String, String>> injectionMap = new HashMap<>();
