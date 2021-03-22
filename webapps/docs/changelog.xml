@@ -110,6 +110,10 @@
         Avoid NPE when a JNDI reference cannot be resolved in favor of a
         NamingException. (remm)
       </fix>
+      <fix>
+        Avoid using reflection for setting properties on the webapp
+        classloader. Based on a patch submitted by Romain Manni-Bucau. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
