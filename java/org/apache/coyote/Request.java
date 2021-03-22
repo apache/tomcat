@@ -215,6 +215,10 @@ public final class Request {
         return result.get();
     }
 
+    public void onDataAvailable() throws IOException {
+        listener.onDataAvailable();
+    }
+
 
     private final AtomicBoolean allDataReadEventSent = new AtomicBoolean(false);
 
