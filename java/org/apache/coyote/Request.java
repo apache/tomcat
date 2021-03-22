@@ -191,6 +191,22 @@ public final class Request {
         }
 
         this.listener = listener;
+
+        // The container is responsible for the first call to
+        // listener.onDataAvailable(). If isReady() returns true, the container
+        // needs to call listener.onDataAvailable() from a new thread. If
+        // isReady() returns false, the socket will be registered for read and
+        // the container will call listener.onDataAvailable() once data arrives.
+        // Must call isFinished() first as a call to isReady() if the request
+        // has been finished will register the socket for read interest and that
+        // is not required.
+        if (!isFinished() && isReady()) {
+            action(ActionCode.DISPATCH_READ, null);
+            if (!ContainerThreadMarker.isContainerThread()) {
+                // Not on a container thread so need to execute the dispatch
+                action(ActionCode.DISPATCH_EXECUTE, null);
+            }
+        }
     }
 
     public boolean isReady() {
