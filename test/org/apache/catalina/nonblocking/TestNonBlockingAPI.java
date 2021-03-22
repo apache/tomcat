@@ -127,9 +127,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String, List<String>> resHeaders = new HashMap<>();
+        Map<String, List<String>> reqHeaders = new HashMap<>();
         int rc = postUrl(true, new DataWriter(async ? 0 : 500, async ? 2000000 : 5),
-                "http://localhost:" + getPort() + "/", new ByteChunk(), resHeaders, null);
+                "http://localhost:" + getPort() + "/", new ByteChunk(), reqHeaders, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         if (async) {
