@@ -51,8 +51,8 @@ import org.apache.tomcat.util.res.StringManager;
 public final class Response {
 
     private static final StringManager sm = StringManager.getManager(Response.class);
-
     private static final Log log = LogFactory.getLog(Response.class);
+
 
     // ----------------------------------------------------- Class Variables
 
@@ -686,13 +686,16 @@ public final class Response {
      * need access to state.
      */
     volatile WriteListener listener;
+    // Ensures listener is only fired after a call is isReady()
     private boolean fireListener = false;
+    // Tracks write registration to prevent duplicate registrations
     private boolean registeredForWrite = false;
+    // Lock used to manage concurrent access to above flags
     private final Object nonBlockingStateLock = new Object();
 
     public WriteListener getWriteListener() {
         return listener;
-}
+    }
 
     public void setWriteListener(WriteListener listener) {
         if (listener == null) {
