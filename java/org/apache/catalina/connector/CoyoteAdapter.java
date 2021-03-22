@@ -207,7 +207,7 @@ public class CoyoteAdapter implements Adapter {
                         // onAllDataRead() event. Therefore, make sure
                         // onDataAvailable() is not called in this case.
                         if (!request.isFinished()) {
-                            readListener.onDataAvailable();
+                            req.onDataAvailable();
                         }
                         if (request.isFinished() && req.sendAllDataReadEvent()) {
                             readListener.onAllDataRead();
