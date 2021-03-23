@@ -2961,6 +2961,7 @@ skip.installer property in build.properties" />
       <patternset refid="text.files"/>
       <include name="bin/*.bat" />
       <include name="bin/*.sh" />
+      <include name=".travis/*.sh" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
@@ -2984,6 +2985,7 @@ skip.installer property in build.properties" />
       <patternset refid="text.files"/>
       <include name="bin/*.bat" />
       <include name="bin/*.sh" />
+      <include name=".travis/*.sh" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
