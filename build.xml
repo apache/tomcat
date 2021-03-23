@@ -2962,6 +2962,7 @@ skip.installer property in build.properties" />
       <include name="bin/*.bat" />
       <include name="bin/*.sh" />
       <include name=".travis/*.sh" />
+      <include name="res/graal/*.sh" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
@@ -2986,6 +2987,7 @@ skip.installer property in build.properties" />
       <include name="bin/*.bat" />
       <include name="bin/*.sh" />
       <include name=".travis/*.sh" />
+      <include name="res/graal/*.sh" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
