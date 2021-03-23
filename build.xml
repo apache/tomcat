@@ -334,6 +334,7 @@
     <include name="**/*.xsd"/>
     <include name="**/*.xsl"/>
     <include name="**/*.yaml"/>
+    <include name="**/*.yml"/>
     <include name="**/Dockerfile"/>
     <!-- Exclude files that use 16-bit encodings. -->
     <!-- This prevents fixcrlf corrupting them during a release -->
