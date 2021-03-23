@@ -1252,9 +1252,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
         private final void swallowUnread() throws IOException {
+            synchronized (this) {
+                closed = true;
+            }
             if (inBuffer != null) {
                 synchronized (inBuffer) {
-                    closed = true;
                     int unreadByteCount = inBuffer.position();
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("stream.inputBuffer.swallowUnread", Integer.valueOf(unreadByteCount)));
