@@ -732,13 +732,6 @@
     when loading the ResourceBundles -->
     <native2ascii src="java" dest="${tomcat.classes}" includes="**/LocalStrings.properties,**/Messages*.properties" encoding="UTF-8"/>
     <native2ascii src="java" dest="${tomcat.i18n}" includes="**/LocalStrings_*.properties" encoding="UTF-8"/>
-
-    <!-- Reproducible builds: consistent timestamps for class files and other
-    files placed in JARs -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
-      <fileset dir="${tomcat.classes}"/>
-      <fileset dir="${tomcat.i18n}"/>
-    </touch>
   </target>
 
   <target name="build-manifests" unless="manifests.uptodate"
@@ -759,11 +752,6 @@
       <filterset refid="version.filters"/>
       <fileset dir="${tomcat.home}/res/META-INF" />
     </copy>
-
-    <!-- Reproducible builds: consistent timestamps for files in META-INF -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
-      <fileset dir="${tomcat.manifests}"/>
-    </touch>
   </target>
 
   <target name="package" depends="compile,build-manifests" >
@@ -895,91 +883,83 @@
       filesId="files.tomcat-dbcp" />
 
     <!-- i18n JARs -->
-    <!-- zip task used rather than jar to control reproducibility -->
-    <zip destfile="${tomcat.build}/lib/tomcat-i18n-de.jar">
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-de.jar"
+         manifest="${tomcat.manifests}/default.manifest"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_de.properties" />
       </fileset>
-      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
-      <zipfileset file="${tomcat.manifests}/default.manifest"
-        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </zip>
-    <zip destfile="${tomcat.build}/lib/tomcat-i18n-es.jar">
+    </jar>
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
+         manifest="${tomcat.manifests}/default.manifest"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_es.properties" />
       </fileset>
-      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
-      <zipfileset file="${tomcat.manifests}/default.manifest"
-        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </zip>
-    <zip destfile="${tomcat.build}/lib/tomcat-i18n-fr.jar">
+    </jar>
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
+         manifest="${tomcat.manifests}/default.manifest"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_fr.properties" />
       </fileset>
-      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
-      <zipfileset file="${tomcat.manifests}/default.manifest"
-        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </zip>
-    <zip destfile="${tomcat.build}/lib/tomcat-i18n-ja.jar">
+    </jar>
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar"
+         manifest="${tomcat.manifests}/default.manifest"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ja.properties" />
       </fileset>
-      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
-      <zipfileset file="${tomcat.manifests}/default.manifest"
-        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </zip>
-    <zip destfile="${tomcat.build}/lib/tomcat-i18n-ko.jar">
+    </jar>
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ko.jar"
+         manifest="${tomcat.manifests}/default.manifest"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ko.properties" />
       </fileset>
-      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
-      <zipfileset file="${tomcat.manifests}/default.manifest"
-        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </zip>
-    <zip destfile="${tomcat.build}/lib/tomcat-i18n-ru.jar">
+    </jar>
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ru.jar"
+         manifest="${tomcat.manifests}/default.manifest"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ru.properties" />
       </fileset>
-      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
-      <zipfileset file="${tomcat.manifests}/default.manifest"
-        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </zip>
-    <zip destfile="${tomcat.build}/lib/tomcat-i18n-zh-CN.jar">
+    </jar>
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-zh-CN.jar"
+         manifest="${tomcat.manifests}/default.manifest"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_zh_CN.properties" />
       </fileset>
-      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
-      <zipfileset file="${tomcat.manifests}/default.manifest"
-        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </zip>
+    </jar>
 
   </target>
 
@@ -2111,7 +2091,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
 
     <!-- Digester and dependencies -->
-    <zip destfile="${tomcat.deployer}/lib/catalina-deployer.jar">
+    <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar"
+         manifest="${tomcat.manifests}/default.manifest"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/catalina/startup/DigesterFactory.class" />
         <include name="org/apache/catalina/util/SchemaResolver.class" />
@@ -2136,14 +2118,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
       </fileset>
-      <zipfileset file="${tomcat.manifests}" fullpath="META-INF" />
-      <zipfileset file="${tomcat.manifests}/default.manifest"
-        fullpath="META-INF/MANIFEST.MF" />
       <zipfileset file="${tomcat.manifests}/default.notice"
         fullpath="META-INF/NOTICE" />
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
-    </zip>
+    </jar>
 
     <!-- Main build script -->
     <copy todir="${tomcat.deployer}">
@@ -3391,7 +3370,9 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
         <srcfiles file="@{license}" />
       </uptodate>
       <sequential unless:true="${jar.uptodate}">
-        <zip destfile="@{jarfile}" filesonly="true" >
+        <jar jarfile="@{jarfile}"
+             manifest="@{manifest}"
+             modificationtime="${tstamp.file}">
           <fileset dir="@{filesDir}">
             <patternset refid="@{filesId}"/>
             <!-- Javadoc exclusions -->
@@ -3399,10 +3380,9 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
           </fileset>
           <zipfileset dir="@{meta-inf}" prefix="META-INF/"
                       excludes=".gitignore" />
-          <zipfileset file="@{manifest}" fullpath="META-INF/MANIFEST.MF" />
           <zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
           <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
-        </zip>
+        </jar>
       </sequential>
     </sequential>
   </macrodef>
