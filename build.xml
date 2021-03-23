@@ -1799,7 +1799,8 @@
       <fileset dir="${tomcat.embed}"/>
     </touch>
 
-    <zip destfile="${tomcat.embed}/${final.name}-embed.zip">
+    <zip destfile="${tomcat.embed}/${final.name}-embed.zip"
+         encoding="UTF8">
       <fileset dir="${tomcat.embed}">
         <include name="**" />
         <exclude name="*.asc" />
@@ -2735,7 +2736,8 @@ skip.installer property in build.properties" />
       <fileset dir="${tomcat.dist}"/>
     </touch>
 
-    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip">
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip"
+         encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
         <include name="bin/**"/>
@@ -2775,7 +2777,8 @@ skip.installer property in build.properties" />
     </touch>
 
     <!-- Windows x86 package -->
-    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip">
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip"
+         encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
         <include name="bin/**"/>
@@ -2801,7 +2804,8 @@ skip.installer property in build.properties" />
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip" />
 
     <!-- Windows x64 package -->
-    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip">
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip"
+         encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
         <include name="bin/**"/>
@@ -2849,7 +2853,8 @@ skip.installer property in build.properties" />
       <fileset dir="${tomcat.deployer}"/>
     </touch>
 
-    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip">
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip"
+         encoding="UTF8">
       <zipfileset file="${tomcat.deployer}" fullpath="${final.name}-deployer"/>
       <zipfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer" includes="**" />
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="LICENSE" />
@@ -2984,7 +2989,8 @@ skip.installer property in build.properties" />
       <fileset dir="${tomcat.dist}"/>
     </touch>
 
-    <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip">
+    <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip"
+         encoding="UTF8">
       <zipfileset file="${tomcat.dist}/src" fullpath="${final-src.name}" />
       <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
     </zip>
@@ -3844,7 +3850,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
       <fileset dir="${tomcat.graal}/${graalPrefix}"/>
     </touch>
-    <zip destfile="${jarfile}" update="true" filesonly="true">
+    <zip destfile="${jarfile}" update="true" filesonly="true"
+         encoding="UTF8">
       <zipfileset dir="${tomcat.graal}/${graalPrefix}" prefix="META-INF/native-image/${graalPrefix}" includes="*.*"/>
     </zip>
   </target>
