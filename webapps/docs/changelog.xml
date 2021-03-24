@@ -169,6 +169,9 @@
         Ant version is now 1.9.10. (markt)
       </add>
       <add>
+        Improvements to Chinese translations. Provided by Ruan Wenjun. (mark)
+      </add>
+      <add>
         Improvements to French translations. (remm)
       </add>
     </changelog>
