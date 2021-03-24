@@ -162,6 +162,10 @@
       <add>
         Improvements to French translations. (remm)
       </add>
+      <add>
+        Improvements to Japanese translations. Provided by kfujino and
+        Shirayuking. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
