@@ -20,6 +20,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
@@ -120,9 +122,7 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  */
 class AsyncStateMachine {
 
-    /**
-     * The string manager for this package.
-     */
+    private static final Log log = LogFactory.getLog(AsyncStateMachine.class);
     private static final StringManager sm = StringManager.getManager(AsyncStateMachine.class);
 
     private enum AsyncState {
@@ -234,7 +234,7 @@ class AsyncStateMachine {
     synchronized void asyncStart(AsyncContextCallback asyncCtxt) {
         if (state == AsyncState.DISPATCHED) {
             generation.incrementAndGet();
-            state = AsyncState.STARTING;
+            updateState(AsyncState.STARTING);
             // Note: In this instance, caller is responsible for calling
             // asyncCtxt.incrementInProgressAsyncCount() as that allows simpler
             // error handling.
@@ -249,7 +249,7 @@ class AsyncStateMachine {
 
     synchronized void asyncOperation() {
         if (state==AsyncState.STARTED) {
-            state = AsyncState.READ_WRITE_OP;
+            updateState(AsyncState.READ_WRITE_OP);
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
@@ -265,25 +265,25 @@ class AsyncStateMachine {
     synchronized SocketState asyncPostProcess() {
         if (state == AsyncState.COMPLETE_PENDING) {
             clearNonBlockingListeners();
-            state = AsyncState.COMPLETING;
+            updateState(AsyncState.COMPLETING);
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCH_PENDING) {
             clearNonBlockingListeners();
-            state = AsyncState.DISPATCHING;
+            updateState(AsyncState.DISPATCHING);
             return SocketState.ASYNC_END;
         } else  if (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP) {
-            state = AsyncState.STARTED;
+            updateState(AsyncState.STARTED);
             return SocketState.LONG;
         } else if (state == AsyncState.MUST_COMPLETE || state == AsyncState.COMPLETING) {
             asyncCtxt.fireOnComplete();
-            state = AsyncState.DISPATCHED;
+            updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.MUST_DISPATCH) {
-            state = AsyncState.DISPATCHING;
+            updateState(AsyncState.DISPATCHING);
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCHING) {
-            state = AsyncState.DISPATCHED;
+            updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.STARTED) {
@@ -300,7 +300,7 @@ class AsyncStateMachine {
 
     synchronized boolean asyncComplete() {
         if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
-            state = AsyncState.COMPLETE_PENDING;
+            updateState(AsyncState.COMPLETE_PENDING);
             return false;
         }
 
@@ -309,9 +309,9 @@ class AsyncStateMachine {
         if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
-            state = AsyncState.MUST_COMPLETE;
+            updateState(AsyncState.MUST_COMPLETE);
         } else if (state == AsyncState.STARTED) {
-            state = AsyncState.COMPLETING;
+            updateState(AsyncState.COMPLETING);
             // A dispatch to a container thread is always required.
             // If on a non-container thread, need to get back onto a container
             // thread to complete the processing.
@@ -331,7 +331,7 @@ class AsyncStateMachine {
             // The socket will be added to the poller when the container thread
             // exits the AbstractConnectionHandler.process() method so don't do
             // a dispatch here which would add it to the poller a second time.
-            state = AsyncState.COMPLETING;
+            updateState(AsyncState.COMPLETING);
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
@@ -343,7 +343,7 @@ class AsyncStateMachine {
 
     synchronized boolean asyncTimeout() {
         if (state == AsyncState.STARTED) {
-            state = AsyncState.TIMING_OUT;
+            updateState(AsyncState.TIMING_OUT);
             return true;
         } else if (state == AsyncState.COMPLETING ||
                 state == AsyncState.DISPATCHING ||
@@ -361,7 +361,7 @@ class AsyncStateMachine {
 
     synchronized boolean asyncDispatch() {
         if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
-            state = AsyncState.DISPATCH_PENDING;
+            updateState(AsyncState.DISPATCH_PENDING);
             return false;
         }
 
@@ -370,9 +370,9 @@ class AsyncStateMachine {
         if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
             // Processing is on a container thread so no need to transfer
             // processing to a new container thread
-            state = AsyncState.MUST_DISPATCH;
+            updateState(AsyncState.MUST_DISPATCH);
         } else if (state == AsyncState.STARTED) {
-            state = AsyncState.DISPATCHING;
+            updateState(AsyncState.DISPATCHING);
             // A dispatch to a container thread is always required.
             // If on a non-container thread, need to get back onto a container
             // thread to complete the processing.
@@ -392,7 +392,7 @@ class AsyncStateMachine {
             // The socket will be added to the poller when the container thread
             // exits the AbstractConnectionHandler.process() method so don't do
             // a dispatch here which would add it to the poller a second time.
-            state = AsyncState.DISPATCHING;
+            updateState(AsyncState.DISPATCHING);
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
@@ -405,7 +405,7 @@ class AsyncStateMachine {
     synchronized void asyncDispatched() {
         if (state == AsyncState.DISPATCHING ||
                 state == AsyncState.MUST_DISPATCH) {
-            state = AsyncState.DISPATCHED;
+            updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();
         } else {
             throw new IllegalStateException(
@@ -418,15 +418,15 @@ class AsyncStateMachine {
     synchronized boolean asyncError() {
         clearNonBlockingListeners();
         if (state == AsyncState.STARTING) {
-            state = AsyncState.MUST_ERROR;
+            updateState(AsyncState.MUST_ERROR);
         } else if (state == AsyncState.DISPATCHED) {
             // Async error handling has moved processing back into an async
             // state. Need to increment in progress count as it will decrement
             // when the async state is exited again.
             asyncCtxt.incrementInProgressAsyncCount();
-            state = AsyncState.ERROR;
+            updateState(AsyncState.ERROR);
         } else {
-            state = AsyncState.ERROR;
+            updateState(AsyncState.ERROR);
         }
         return !ContainerThreadMarker.isContainerThread();
     }
@@ -502,5 +502,13 @@ class AsyncStateMachine {
     private void clearNonBlockingListeners() {
         processor.getRequest().listener = null;
         processor.getRequest().getResponse().listener = null;
+    }
+
+
+    private synchronized void updateState(AsyncState newState) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("asyncStateMachine.stateChange", state, newState));
+        }
+        state = newState;
     }
 }
