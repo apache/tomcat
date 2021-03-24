@@ -1731,12 +1731,6 @@
       <classpath refid="compile.classpath" />
     </javac>
 
-    <!-- Reproducible builds: consistent timestamps for class files and other
-    files placed in JARs -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
-      <fileset dir="${xreflect.directory}/classes"/>
-    </touch>
-
     <!-- Create the binary JAR file -->
     <jarIt jarfile="${tomcat-embed-programmatic.jar}"
            filesDir="${xreflect.directory}/classes"
@@ -1773,12 +1767,8 @@
       <patternset refid="text.files" />
     </fixcrlf>
 
-    <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
-      <fileset dir="${tomcat.embed}"/>
-    </touch>
-
     <zip destfile="${tomcat.embed}/${final.name}-embed.zip"
+         modificationtime="${tstamp.file}"
          encoding="UTF8">
       <fileset dir="${tomcat.embed}">
         <include name="**" />
@@ -2710,12 +2700,8 @@ skip.installer property in build.properties" />
       <patternset refid="text.files" />
     </fixcrlf>
 
-    <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
-      <fileset dir="${tomcat.dist}"/>
-    </touch>
-
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip"
+         modificationtime="${tstamp.file}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
@@ -2750,13 +2736,9 @@ skip.installer property in build.properties" />
       <patternset refid="text.files" />
     </fixcrlf>
 
-    <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
-      <fileset dir="${tomcat.dist}"/>
-    </touch>
-
     <!-- Windows x86 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip"
+         modificationtime="${tstamp.file}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
@@ -2784,6 +2766,7 @@ skip.installer property in build.properties" />
 
     <!-- Windows x64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip"
+         modificationtime="${tstamp.file}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
@@ -2826,13 +2809,8 @@ skip.installer property in build.properties" />
       <patternset refid="text.files" />
     </fixcrlf>
 
-    <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
-      <fileset dir="${tomcat.dist}"/>
-      <fileset dir="${tomcat.deployer}"/>
-    </touch>
-
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip"
+         modificationtime="${tstamp.file}"
          encoding="UTF8">
       <zipfileset file="${tomcat.deployer}" fullpath="${final.name}-deployer"/>
       <zipfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer" includes="**" />
@@ -2965,12 +2943,8 @@ skip.installer property in build.properties" />
       <include name="res/graal/*.sh" />
     </fixcrlf>
 
-    <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
-      <fileset dir="${tomcat.dist}"/>
-    </touch>
-
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip"
+         modificationtime="${tstamp.file}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}/src" fullpath="${final-src.name}" />
       <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
@@ -3820,10 +3794,8 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <copy todir="${tomcat.graal}/${graalPrefix}">
       <fileset dir="${basedir}/${graalFiles}" />
     </copy>
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
-      <fileset dir="${tomcat.graal}/${graalPrefix}"/>
-    </touch>
     <zip destfile="${jarfile}" update="true" filesonly="true"
+         modificationtime="${tstamp.file}"
          encoding="UTF8">
       <zipfileset dir="${tomcat.graal}/${graalPrefix}" prefix="META-INF/native-image/${graalPrefix}" includes="*.*"/>
     </zip>

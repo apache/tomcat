@@ -139,7 +139,9 @@
       <sourcepath location="${basedir}/src/main/java"/>
     </javadoc>
     <!-- connection pool API  file-->
-    <jar jarfile="${tomcat-jdbc-api.jar}" update="true">
+    <jar jarfile="${tomcat-jdbc-api.jar}"
+         update="true"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.api}"/>
       <fileset refid="license.notice"/>
     </jar>
