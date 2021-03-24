@@ -28,6 +28,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -2739,29 +2741,34 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
 
     private void doTestAsyncIoEnd(boolean useThread, boolean useComplete) throws Exception {
-        Tomcat tomcat = getTomcatInstance();
+        LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
+        try {
+            Tomcat tomcat = getTomcatInstance();
 
-        // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+            // No file system docBase required
+            Context ctx = tomcat.addContext("", null);
 
-        AsyncIoEndServlet asyncIoEndServlet = new AsyncIoEndServlet(useThread, useComplete);
-        Wrapper wrapper = Tomcat.addServlet(ctx, "asyncIoEndServlet", asyncIoEndServlet);
-        wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/asyncIoEndServlet", "asyncIoEndServlet");
+            AsyncIoEndServlet asyncIoEndServlet = new AsyncIoEndServlet(useThread, useComplete);
+            Wrapper wrapper = Tomcat.addServlet(ctx, "asyncIoEndServlet", asyncIoEndServlet);
+            wrapper.setAsyncSupported(true);
+            ctx.addServletMappingDecoded("/asyncIoEndServlet", "asyncIoEndServlet");
 
-        SimpleServlet simpleServlet = new SimpleServlet();
-        Tomcat.addServlet(ctx, "simpleServlet", simpleServlet);
-        ctx.addServletMappingDecoded("/simpleServlet", "simpleServlet");
+            SimpleServlet simpleServlet = new SimpleServlet();
+            Tomcat.addServlet(ctx, "simpleServlet", simpleServlet);
+            ctx.addServletMappingDecoded("/simpleServlet", "simpleServlet");
 
-        tomcat.start();
+            tomcat.start();
 
-        ByteChunk body = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + "/asyncIoEndServlet", body, null);
+            ByteChunk body = new ByteChunk();
+            int rc = getUrl("http://localhost:" + getPort() + "/asyncIoEndServlet", body, null);
 
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals("OK", body.toString());
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            Assert.assertEquals("OK", body.toString());
 
-        Assert.assertFalse(asyncIoEndServlet.getInvalidStateDetected());
+            Assert.assertFalse(asyncIoEndServlet.getInvalidStateDetected());
+        } finally {
+            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.INFO);
+        }
     }
 
 
