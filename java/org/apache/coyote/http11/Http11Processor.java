@@ -787,6 +787,7 @@ public class Http11Processor extends AbstractProcessor {
                 // so remove it.
                 headers.removeHeader("content-length");
                 request.setContentLength(-1);
+                keepAlive = false;
             } else {
                 inputBuffer.addActiveFilter(inputFilters[Constants.IDENTITY_FILTER]);
                 contentDelimitation = true;
