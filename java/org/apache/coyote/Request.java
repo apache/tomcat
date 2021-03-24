@@ -790,6 +790,8 @@ public final class Request {
         authType.recycle();
         attributes.clear();
 
+        errorException = null;
+
         listener = null;
         synchronized (nonBlockingStateLock) {
             fireListener = false;
