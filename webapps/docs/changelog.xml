@@ -168,6 +168,9 @@
         property <code>ant.tstamp.now.iso</code> is set. The minimum required
         Ant version is now 1.9.10. (markt)
       </add>
+      <add>
+        Improvements to Chinese translations. Provided by Ruan Wenjun. (mark)
+      </add>
     </changelog>
   </subsection>
 </section>
