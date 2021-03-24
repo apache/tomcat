@@ -130,6 +130,10 @@
       <add>
         Improvements to Chinese translations. Provided by shawn. (mark)
       </add>
+      <add>
+        Improvements to Japanese translations. Provided by kfujino and
+        Shirayuking. (markt)
+      </add>
     </changelog>
   </subsection></section>
 <section name="Tomcat 7.0.108 (violetagg)" rtext="released 2021-02-05">
