@@ -2848,7 +2848,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             } else {
                 ac.dispatch("/simpleServlet");
             }
-            if (req.isAsyncStarted()) {
+            if (!useThread && req.isAsyncStarted()) {
                 invalidStateDetected = true;
             }
         }
