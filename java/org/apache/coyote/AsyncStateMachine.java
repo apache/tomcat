@@ -91,21 +91,23 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  *    |                                   /  |  \                                     |
  *    |                    OT-complete() /   |   \    OT-dispatch()                   |
  *    |   COMPLETE_PENDING«------«------/    |    \-------»---------»DISPATCH_PENDING |
- *    |          |                           |                           |            |
- *    |    post()|   timeout()         post()|   post()            post()|  timeout() |
- *    |          |   |--|                    |  |--|                     |    |--|    |
- *    |         \|/ \|/ |   complete()      \|/\|/ |   dispatch()       \|/  \|/ |    |
+ *    |          |    /|\                    |                       /|\ |            |
+ *    |          |     |                     |                        |  |post()      |
+ *    |          |     |complete()           |              dispatch()|  |            |
+ *    |          |     |                     |                        |  |            |
+ *    |          |     |---------«-------«-- | --«---READ_WRITE--»----|  |            |
+ *    |          |                           |        /  /|\             |            |
+ *    |          |                           | post()/   /               |            |
+ *    |          |                           |      /   /                |            |
+ *    |          |                           |     /   /                 |            |
+ *    |          |                           |    /   /                  |            |
+ *    |    post()|   timeout()         post()|   /   /asyncOperation()   |  timeout() |
+ *    |          |   |--|                    |   |  /                    |    |--|    |
+ *    |         \|/ \|/ |   complete()      \|/ \|//   dispatch()       \|/  \|/ |    |
  *    |--«-----COMPLETING«--------«----------STARTED--------»---------»DISPATCHING----|
- *            /|\  /|\ /|\                   | /|\ \                   /|\ /|\ /|\
- *             |    |   |                    |  \   \asyncOperation()   |   |   |
- *             |    |   |           timeout()|   \   \                  |   |   |
- *             |    |   |                    |    \   \                 |   |   |
- *             |    |   |                    |     \   \                |   |   |
- *             |    |   |                    |      \   \               |   |   |
- *             |    |   |                    |       \   \              |   |   |
- *             |    |   |                    |  post()\   \   dispatch()|   |   |
- *             |    |   |   complete()       |         \ \|/            |   |   |
- *             |    |   |---«------------«-- | --«---READ_WRITE----»----|   |   |
+ *            /|\  /|\                       | /|\ |                       /|\ /|\
+ *             |    |                        |  |--|                        |   |
+ *             |    |               timeout()|  post()                      |   |
  *             |    |                        |                              |   |
  *             |    |       complete()      \|/         dispatch()          |   |
  *             |    |------------«-------TIMING_OUT--------»----------------|   |
@@ -360,7 +362,8 @@ class AsyncStateMachine {
 
 
     synchronized boolean asyncDispatch() {
-        if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
+        if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING ||
+                state == AsyncState.READ_WRITE_OP) {
             updateState(AsyncState.DISPATCH_PENDING);
             return false;
         }
