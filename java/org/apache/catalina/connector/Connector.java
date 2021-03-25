@@ -63,7 +63,6 @@ public class Connector extends LifecycleMBeanBase  {
 
     // ------------------------------------------------------------ Constructor
 
-
     /**
      * Defaults to using HTTP/1.1 NIO implementation.
      */
@@ -101,8 +100,8 @@ public class Connector extends LifecycleMBeanBase  {
         setThrowOnFailure(Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"));
     }
 
-    // ----------------------------------------------------- Instance Variables
 
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * The <code>Service</code> we are associated with (if any).
