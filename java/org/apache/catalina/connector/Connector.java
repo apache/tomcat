@@ -106,7 +106,6 @@ public class Connector extends LifecycleMBeanBase  {
 
     // ----------------------------------------------------- Instance Variables
 
-
     /**
      * The <code>Service</code> we are associated with (if any).
      */

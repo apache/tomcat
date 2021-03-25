@@ -40,9 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  */
 @SuppressWarnings("deprecation")
-public class ResponseFacade
-    implements HttpServletResponse {
-
+public class ResponseFacade implements HttpServletResponse {
 
     // ----------------------------------------------------------- DoPrivileged
 
@@ -86,8 +84,8 @@ public class ResponseFacade
         }
     }
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Construct a wrapper for the specified response.
@@ -219,11 +217,9 @@ public class ResponseFacade
 
     @Override
     public void setContentLength(int len) {
-
         if (isCommitted()) {
             return;
         }
-
         response.setContentLength(len);
     }
 
@@ -278,12 +274,9 @@ public class ResponseFacade
 
 
     @Override
-    public void flushBuffer()
-        throws IOException {
+    public void flushBuffer() throws IOException {
 
         if (isFinished()) {
-            //            throw new IllegalStateException
-            //                (/*sm.getString("responseFacade.finished")*/);
             return;
         }
 
@@ -308,10 +301,8 @@ public class ResponseFacade
             }
         } else {
             response.setAppCommitted(true);
-
             response.flushBuffer();
         }
-
     }
 
 
