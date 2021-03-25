@@ -91,19 +91,23 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  *    |                                   /  |  \                                     |
  *    |                    OT-complete() /   |   \    OT-dispatch()                   |
  *    |   COMPLETE_PENDING«------«------/    |    \-------»---------»DISPATCH_PENDING |
- *    |          |    /|\                    |                       /|\ |            |
- *    |          |     |                     |                        |  |post()      |
- *    |          |     |complete()           |              dispatch()|  |            |
- *    |          |     |                     |                        |  |            |
- *    |          |     |---------«-------«-- | --«---READ_WRITE--»----|  |            |
- *    |          |                           |        /  /|\             |            |
- *    |          |                           | post()/   /               |            |
- *    |          |                           |      /   /                |            |
- *    |          |                           |     /   /                 |            |
- *    |          |                           |    /   /                  |            |
- *    |    post()|   timeout()         post()|   /   /asyncOperation()   |  timeout() |
- *    |          |   |--|                    |   |  /                    |    |--|    |
- *    |         \|/ \|/ |   complete()      \|/ \|//   dispatch()       \|/  \|/ |    |
+ *    |        |      /|\                    |                       /|\ |            |
+ *    |        |       |                     |                        |  |post()      |
+ *    |        |       |OT-complete()        |           OT-dispatch()|  |            |
+ *    |        |       |---------«-------«---|---«--\                 |  |            |
+ *    |        |                             |       \                |  |            |
+ *    |        |         /-------«-------«-- | --«---READ_WRITE--»----|  |            |
+ *    |        |        / ST-complete()      |        /  /|\  \          |            |
+ *    |        |       /                     | post()/   /     \         |            |
+ *    |        |      /                      |      /   /       \        |            |
+ *    |        |     /                       |     /   /         \       |            |
+ *    |        |    /                        |    /   /           \      |            |
+ *    |        |   /                         |   |   /             \     |            |
+ *    |        |  /                          |   |  /  ST-dispatch()\    |            |
+ *    |        |  |                          |   | |                 \   |            |
+ *    |  post()|  |  timeout()         post()|   | |asyncOperation()  \  |  timeout() |
+ *    |        |  |  |--|                    |   | |                  |  |    |--|    |
+ *    |       \|/\|/\|/ |     complete()    \|/ \|/|   dispatch()    \|/\|/  \|/ |    |
  *    |--«-----COMPLETING«--------«----------STARTED--------»---------»DISPATCHING----|
  *            /|\  /|\                       | /|\ |                       /|\ /|\
  *             |    |                        |  |--|                        |   |
@@ -301,7 +305,8 @@ public class AsyncStateMachine {
 
 
     public synchronized boolean asyncComplete() {
-        if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
+        if (!ContainerThreadMarker.isContainerThread() &&
+                (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP)) {
             updateState(AsyncState.COMPLETE_PENDING);
             return false;
         }
@@ -361,10 +366,9 @@ public class AsyncStateMachine {
     }
 
 
-
     public synchronized boolean asyncDispatch() {
-        if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING ||
-                state == AsyncState.READ_WRITE_OP) {
+        if (!ContainerThreadMarker.isContainerThread() &&
+                (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP)) {
             updateState(AsyncState.DISPATCH_PENDING);
             return false;
         }
