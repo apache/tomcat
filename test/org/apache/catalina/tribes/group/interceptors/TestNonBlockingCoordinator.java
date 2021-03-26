@@ -43,7 +43,7 @@ public class TestNonBlockingCoordinator {
     @Before
     public void setUp() throws Exception {
         LogManager.getLogManager().getLogger(
-                "org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator").setLevel(Level.ALL);
+                "org.apache.catalina.tribes.group.interceptors.TestNonBlockingCoordinator").setLevel(Level.ALL);
         try {
             log.info("Setup");
             channels = new GroupChannel[CHANNEL_COUNT];
@@ -97,7 +97,7 @@ public class TestNonBlockingCoordinator {
             }
         } finally {
             LogManager.getLogManager().getLogger(
-                    "org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator").setLevel(Level.INFO);
+                    "org.apache.catalina.tribes.group.interceptors.TestNonBlockingCoordinator").setLevel(Level.INFO);
         }
     }
 
