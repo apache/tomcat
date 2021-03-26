@@ -113,11 +113,11 @@ public class TestNonBlockingCoordinator {
     public void testCoord2() throws Exception {
         // Stop current coordinator to trigger new election
         Member member = coordinators[1].getCoordinator();
-        System.out.println("Coordinator[2a] is:" + member);
+        log.info("Coordinator[2a] is:" + member);
         int index = -1;
         for (int i = 0; i < CHANNEL_COUNT; i++) {
             if (channels[i].getLocalMember(false).equals(member)) {
-                System.out.println("Shutting down:" + channels[i].getLocalMember(true).toString());
+                log.info("Shutting down:" + channels[i].getLocalMember(true).toString());
                 channels[i].stop(Channel.DEFAULT);
                 index = i;
                 break;
@@ -152,19 +152,19 @@ public class TestNonBlockingCoordinator {
             count++;
         }
 
-        System.out.println("Member count:"+channels[index].getMembers().length);
+        log.info("Member count:"+channels[index].getMembers().length);
         member = coordinators[index].getCoordinator();
         for (int i = 1; i < CHANNEL_COUNT; i++) {
             if (i != dead) {
                 Assert.assertEquals(member, coordinators[i].getCoordinator());
             }
         }
-        System.out.println("Coordinator[2b] is:" + member);
+        log.info("Coordinator[2b] is:" + member);
     }
 
     @After
     public void tearDown() throws Exception {
-        System.out.println("tearDown");
+        log.info("tearDown");
         for ( int i=0; i<CHANNEL_COUNT; i++ ) {
             channels[i].stop(Channel.DEFAULT);
         }
