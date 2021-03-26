@@ -760,9 +760,15 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
     @Override
     public void fireInterceptorEvent(InterceptorEvent event) {
-        if (event instanceof CoordinationEvent &&
-            ((CoordinationEvent)event).type == CoordinationEvent.EVT_CONF_RX)
-            log.info(event);
+        if (event instanceof CoordinationEvent) {
+            if (((CoordinationEvent) event).type == CoordinationEvent.EVT_CONF_RX) {
+                log.info(event);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(event);
+                }
+            }
+        }
     }
 
     public static class CoordinationEvent implements InterceptorEvent {
