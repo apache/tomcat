@@ -16,6 +16,9 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,55 +42,62 @@ public class TestNonBlockingCoordinator {
 
     @Before
     public void setUp() throws Exception {
-        log.info("Setup");
-        channels = new GroupChannel[CHANNEL_COUNT];
-        coordinators = new NonBlockingCoordinator[CHANNEL_COUNT];
-        Thread[] threads = new Thread[CHANNEL_COUNT];
-        for ( int i=0; i<CHANNEL_COUNT; i++ ) {
-            channels[i] = new GroupChannel();
-            coordinators[i] = new NonBlockingCoordinator();
-            channels[i].addInterceptor(coordinators[i]);
-            TcpFailureDetector tcpFailureDetector = new TcpFailureDetector();
-            // Double default timeout - mainly for loaded CI systems
-            tcpFailureDetector.setReadTestTimeout(tcpFailureDetector.getReadTestTimeout() * 2);
-            channels[i].addInterceptor(tcpFailureDetector);
-            final int j = i;
-            threads[i] = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        channels[j].start(Channel.DEFAULT);
-                    } catch (Exception x) {
-                        x.printStackTrace();
+        LogManager.getLogManager().getLogger(
+                "org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator").setLevel(Level.ALL);
+        try {
+            log.info("Setup");
+            channels = new GroupChannel[CHANNEL_COUNT];
+            coordinators = new NonBlockingCoordinator[CHANNEL_COUNT];
+            Thread[] threads = new Thread[CHANNEL_COUNT];
+            for ( int i=0; i<CHANNEL_COUNT; i++ ) {
+                channels[i] = new GroupChannel();
+                coordinators[i] = new NonBlockingCoordinator();
+                channels[i].addInterceptor(coordinators[i]);
+                TcpFailureDetector tcpFailureDetector = new TcpFailureDetector();
+                // Double default timeout - mainly for loaded CI systems
+                tcpFailureDetector.setReadTestTimeout(tcpFailureDetector.getReadTestTimeout() * 2);
+                channels[i].addInterceptor(tcpFailureDetector);
+                final int j = i;
+                threads[i] = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            channels[j].start(Channel.DEFAULT);
+                        } catch (Exception x) {
+                            x.printStackTrace();
+                        }
+                    }
+                };
+            }
+            TesterUtil.addRandomDomain(channels);
+            for (int i = 0; i < CHANNEL_COUNT; i++) {
+                threads[i].start();
+            }
+            for (int i = 0; i < CHANNEL_COUNT; i++) {
+                threads[i].join();
+            }
+
+            // Allow up to 30s for cluster to form once all the nodes have been
+            // started
+            int count = 0;
+            Member member = null;
+            boolean electionComplete = false;
+            while (!electionComplete && count < 300) {
+                electionComplete = true;
+                member = coordinators[0].getCoordinator();
+                if (member == null) {
+                    electionComplete = false;
+                } else {
+                    for (int i = 0; i < CHANNEL_COUNT; i++) {
+                        electionComplete = electionComplete && (member.equals(coordinators[i].getCoordinator()));
                     }
                 }
-            };
-        }
-        TesterUtil.addRandomDomain(channels);
-        for (int i = 0; i < CHANNEL_COUNT; i++) {
-            threads[i].start();
-        }
-        for (int i = 0; i < CHANNEL_COUNT; i++) {
-            threads[i].join();
-        }
-
-        // Allow up to 30s for cluster to form once all the nodes have been
-        // started
-        int count = 0;
-        Member member = null;
-        boolean electionComplete = false;
-        while (!electionComplete && count < 300) {
-            electionComplete = true;
-            member = coordinators[0].getCoordinator();
-            if (member == null) {
-                electionComplete = false;
-            } else {
-                for (int i = 0; i < CHANNEL_COUNT; i++) {
-                    electionComplete = electionComplete && (member.equals(coordinators[i].getCoordinator()));
-                }
+                Thread.sleep(100);
+                count++;
             }
-            Thread.sleep(100);
-            count++;
+        } finally {
+            LogManager.getLogManager().getLogger(
+                    "org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator").setLevel(Level.INFO);
         }
     }
 
