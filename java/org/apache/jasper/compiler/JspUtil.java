@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
@@ -126,12 +126,12 @@ public class JspUtil {
 
         // AttributesImpl.removeAttribute is broken, so we do this...
         int tempLength = (attrs == null) ? 0 : attrs.getLength();
-        Vector<String> temp = new Vector<>(tempLength, 1);
+        ArrayList<String> temp = new ArrayList<>(tempLength);
         for (int i = 0; i < tempLength; i++) {
             @SuppressWarnings("null")  // If attrs==null, tempLength == 0
             String qName = attrs.getQName(i);
             if ((!qName.equals("xmlns")) && (!qName.startsWith("xmlns:"))) {
-                temp.addElement(qName);
+                temp.add(qName);
             }
         }
 
@@ -143,7 +143,7 @@ public class JspUtil {
                 Node node = tagBody.getNode(i);
                 if (node instanceof Node.NamedAttribute) {
                     String attrName = node.getAttributeValue("name");
-                    temp.addElement(attrName);
+                    temp.add(attrName);
                     // Check if this value appear in the attribute of the node
                     if (n.getAttributeValue(attrName) != null) {
                         err.jspError(n,
@@ -325,7 +325,7 @@ public class JspUtil {
             c = double.class;
         } else if ("void".equals(type)) {
             c = void.class;
-        } else if (type.indexOf('[') < 0) {
+        } else {
             c = loader.loadClass(type);
         }
 
@@ -768,7 +768,7 @@ public class JspUtil {
      * @return Java package corresponding to the given path
      */
     public static final String makeJavaPackage(String path) {
-        String classNameComponents[] = split(path, "/");
+        String classNameComponents[] = path.split("/");
         StringBuilder legalClassNames = new StringBuilder();
         for (String classNameComponent : classNameComponents) {
             if (classNameComponent.length() > 0) {
@@ -779,37 +779,6 @@ public class JspUtil {
             }
         }
         return legalClassNames.toString();
-    }
-
-    /**
-     * Splits a string into it's components.
-     *
-     * @param path
-     *            String to split
-     * @param pat
-     *            Pattern to split at
-     * @return the components of the path
-     */
-    private static final String[] split(String path, String pat) {
-        Vector<String> comps = new Vector<>();
-        int pos = path.indexOf(pat);
-        int start = 0;
-        while (pos >= 0) {
-            if (pos > start) {
-                String comp = path.substring(start, pos);
-                comps.add(comp);
-            }
-            start = pos + pat.length();
-            pos = path.indexOf(pat, start);
-        }
-        if (start < path.length()) {
-            comps.add(path.substring(start));
-        }
-        String[] result = new String[comps.size()];
-        for (int i = 0; i < comps.size(); i++) {
-            result[i] = comps.elementAt(i);
-        }
-        return result;
     }
 
     /**
@@ -991,8 +960,7 @@ public class JspUtil {
 
         if (t == null) {
             // Should never happen
-            throw new IllegalArgumentException("Unable to extract type from [" +
-                    type + "]");
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.unable.getType", type));
         }
 
         StringBuilder resultType = new StringBuilder(t);

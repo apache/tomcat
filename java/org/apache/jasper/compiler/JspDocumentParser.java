@@ -648,7 +648,7 @@ class JspDocumentParser
 
         if (current instanceof Node.NamedAttribute) {
             boolean isTrim = ((Node.NamedAttribute)current).isTrim();
-            Node.Nodes subElems = ((Node.NamedAttribute)current).getBody();
+            Node.Nodes subElems = current.getBody();
             for (int i = 0; subElems != null && i < subElems.size(); i++) {
                 Node subElem = subElems.getNode(i);
                 if (!(subElem instanceof Node.TemplateText)) {
@@ -735,8 +735,7 @@ class JspDocumentParser
             startMark = new Mark(ctxt, path, locator.getLineNumber(),
                     locator.getColumnNumber());
             @SuppressWarnings("unused")
-            Node unused = new Node.Comment(
-                    new String(buf, offset, len), startMark, current);
+            Node unused = new Node.Comment(new String(buf, offset, len), startMark, current);
         }
     }
 

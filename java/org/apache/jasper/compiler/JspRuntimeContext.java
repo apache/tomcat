@@ -381,8 +381,7 @@ public final class JspRuntimeContext {
                     ctxt.incrementRemoved();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    jsw.getServletContext().log("Background compile failed",
-                                                t);
+                    jsw.getServletContext().log(Localizer.getMessage("jsp.error.backgroundCompilationFailed"), t);
                 }
             }
         }
@@ -405,7 +404,7 @@ public final class JspRuntimeContext {
                     jsw.getServlet();
                 }
             } catch (ServletException e) {
-                jsw.getServletContext().log("Servlet reload failed", e);
+                jsw.getServletContext().log(Localizer.getMessage("jsp.error.reload"), e);
             }
         }
     }
