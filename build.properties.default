@@ -147,19 +147,19 @@ jdt.loc.1=http://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj
 jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 
 # ----- Tomcat native library -----
-tomcat-native.version=1.2.26
+tomcat-native.version=1.2.27
 tomcat-native.src.checksum.enabled=true
 tomcat-native.src.checksum.algorithm=SHA-512
-tomcat-native.src.checksum.value=cad9d9efdb6c980afcf304bd78e5ea572271075e153e2015d393dd5e6f4612992c7d0ac499c9aeafe0c3874832356e197564717df15b36a48aba775960659ac2
+tomcat-native.src.checksum.value=99e356cef89bdc35cfcb98fafe0d5dda8375461382053969509b6b24d9129ca89782bc618c58245980c921abbdb25eece80cb129e33ad06741d22681b84d7742
 tomcat-native.win.checksum.enabled=true
 tomcat-native.win.checksum.algorithm=SHA-512
-tomcat-native.win.checksum.value=607b45074fda397f2fc49f0f3b4128df5373d692b82167f39f5430e04846b788db1487c0805173c924ab0c94d5767b6c5bba887a1148f104eca39c09d19539d1
+tomcat-native.win.checksum.value=90553cb8d74f00e00ac220a18c5c647c5b74f0487020d41efe33beb501c2caac43d77363a7820c2e91ac7a0f23967a2077e704e8db56ad18978780346a642ca3
 tomcat-native.home=${base.path}/tomcat-native-${tomcat-native.version}
 tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
 tomcat-native.loc.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
 tomcat-native.loc.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
-tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1i-win32-bin.zip
-tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1i-win32-bin.zip
+tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1k-win32-bin.zip
+tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1k-win32-bin.zip
 
 # ----- NSIS, version 3.0 or later -----
 nsis.version=3.06.1
