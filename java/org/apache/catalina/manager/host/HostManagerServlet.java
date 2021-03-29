@@ -674,7 +674,6 @@ public class HostManagerServlet
             } else {
                 writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
             }
-            return;
         }
     }
 
