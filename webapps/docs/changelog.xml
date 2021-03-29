@@ -190,6 +190,10 @@
       <add>
         Improvements to Korean translations. (woonsan)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.27.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
