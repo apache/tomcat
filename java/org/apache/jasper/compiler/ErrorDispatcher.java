@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -316,7 +317,7 @@ public class ErrorDispatcher {
                                 String errMsg, String fname, Node.Nodes page)
                 throws IOException, JasperException {
 
-        ArrayList<JavacErrorDetail> errors = new ArrayList<>();
+        List<JavacErrorDetail> errors = new ArrayList<>();
         StringBuilder errMsgBuf = null;
         int lineNum = -1;
         JavacErrorDetail javacError = null;

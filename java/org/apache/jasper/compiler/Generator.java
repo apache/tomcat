@@ -1079,9 +1079,7 @@ class Generator {
             String flush = n.getTextAttribute("flush");
             Node.JspAttribute page = n.getPage();
 
-            boolean isFlush = false; // default to false;
-            if ("true".equals(flush))
-                isFlush = true;
+            boolean isFlush = "true".equals(flush);
 
             n.setBeginJavaLine(out.getJavaLine());
 
@@ -3416,11 +3414,7 @@ class Generator {
         } else if (n instanceof Node.NamedAttribute) {
             ci = ((Node.NamedAttribute) n).getChildInfo();
         } else {
-            // Cannot access err since this method is static, but at
-            // least flag an error.
-            throw new JasperException("Unexpected Node Type");
-            // err.getString(
-            // "jsp.error.internal.unexpected_node_type" ) );
+            throw new JasperException(Localizer.getMessage("jsp.error.internal.unexpectedNodeType"));
         }
 
         if (ci.hasUseBean()) {
@@ -3632,8 +3626,8 @@ class Generator {
         String className = tagInfo.getTagClassName();
         int lastIndex = className.lastIndexOf('.');
         if (lastIndex != -1) {
-            String pkgName = className.substring(0, lastIndex);
-            genPreamblePackage(pkgName);
+            String packageName = className.substring(0, lastIndex);
+            genPreamblePackage(packageName);
             className = className.substring(lastIndex + 1);
         }
 
@@ -4211,7 +4205,7 @@ class Generator {
         // True if the helper class should be generated.
         private boolean used = false;
 
-        private ArrayList<Fragment> fragments = new ArrayList<>();
+        private List<Fragment> fragments = new ArrayList<>();
 
         private String className;
 
