@@ -86,7 +86,6 @@ public interface Context extends Container, ContextBind {
 
     // ------------------------------------------------------------- Properties
 
-
     /**
      * Returns <code>true</code> if requests mapped to servlets without
      * "multipart config" to parse multipart/form-data requests anyway.
