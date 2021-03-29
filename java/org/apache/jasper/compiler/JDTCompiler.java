@@ -145,7 +145,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     result = new char[buf.length()];
                     buf.getChars(0, result.length, result, 0);
                 } catch (IOException e) {
-                    log.error("Compilation error", e);
+                    log.error(Localizer.getMessage("jsp.error.compilation.source", sourceFile), e);
                 }
                 return result;
             }
@@ -232,7 +232,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                             return new NameEnvironmentAnswer(classFileReader, null);
                         }
                     } catch (IOException | ClassFormatException exc) {
-                        log.error("Compilation error", exc);
+                        log.error(Localizer.getMessage("jsp.error.compilation.dependent", className), exc);
                     }
                     return null;
                 }
@@ -465,7 +465,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                                 (name, pageNodes, new StringBuilder(problem.getMessage()),
                                                         problem.getSourceLineNumber(), ctxt));
                                     } catch (JasperException e) {
-                                        log.error("Error visiting node", e);
+                                        log.error(Localizer.getMessage("jsp.error.compilation.jdtProblemError"), e);
                                     }
                                 }
                             }
@@ -491,7 +491,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                             }
                         }
                     } catch (IOException exc) {
-                        log.error("Compilation error", exc);
+                        log.error(Localizer.getMessage("jsp.error.compilation.jdt"), exc);
                     }
                 }
             };
