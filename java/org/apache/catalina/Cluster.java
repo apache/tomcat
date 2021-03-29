@@ -28,9 +28,7 @@ package org.apache.catalina;
  * @author Bip Thelin
  * @author Remy Maucherat
  */
-public interface Cluster {
-
-    // ------------------------------------------------------------- Properties
+public interface Cluster extends Contained {
 
     /**
      * Return the name of the cluster that this Server is currently
@@ -49,22 +47,6 @@ public interface Cluster {
      */
     public void setClusterName(String clusterName);
 
-    /**
-     * Set the Container associated with our Cluster
-     *
-     * @param container The Container to use
-     */
-    public void setContainer(Container container);
-
-    /**
-     * Get the Container associated with our Cluster
-     *
-     * @return The Container associated with our Cluster
-     */
-    public Container getContainer();
-
-
-    // --------------------------------------------------------- Public Methods
 
     /**
      * Create a new manager which will use this cluster to replicate its
@@ -86,13 +68,12 @@ public interface Cluster {
      */
     public void registerManager(Manager manager);
 
+
     /**
      * Removes a manager from the cluster
      * @param manager Manager
      */
     public void removeManager(Manager manager);
-
-    // --------------------------------------------------------- Cluster Wide Deployments
 
 
     /**

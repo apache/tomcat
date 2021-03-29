@@ -36,7 +36,7 @@ import java.util.Set;
  * @author Craig R. McClanahan
  * @author Peter Donald
  */
-public interface Pipeline {
+public interface Pipeline extends Contained {
 
     /**
      * @return the Valve instance that has been distinguished as the basic
@@ -121,20 +121,6 @@ public interface Pipeline {
      * @return true if all the valves in this pipeline support async, false otherwise
      */
     public boolean isAsyncSupported();
-
-
-    /**
-     * @return the Container with which this Pipeline is associated.
-     */
-    public Container getContainer();
-
-
-    /**
-     * Set the Container with which this Pipeline is associated.
-     *
-     * @param container The new associated container
-     */
-    public void setContainer(Container container);
 
 
     /**
