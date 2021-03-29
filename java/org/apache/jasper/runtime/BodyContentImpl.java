@@ -28,6 +28,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyContent;
 
 import org.apache.jasper.Constants;
+import org.apache.jasper.compiler.Localizer;
 
 /**
  * Write text to a character-output stream, buffering characters so as
@@ -680,7 +681,9 @@ public class BodyContentImpl extends BodyContent {
     }
 
     private void ensureOpen() throws IOException {
-        if (closed) throw new IOException("Stream closed");
+        if (closed) {
+            throw new IOException(Localizer.getMessage("jsp.error.stream.closed"));
+        }
     }
 
     /**

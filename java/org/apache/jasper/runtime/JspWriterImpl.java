@@ -19,15 +19,12 @@ package org.apache.jasper.runtime;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import javax.servlet.ServletResponse;
 import javax.servlet.jsp.JspWriter;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
-import org.apache.jasper.security.SecurityUtil;
 
 /**
  * Write text to a character-output stream, buffering characters so as
@@ -69,7 +66,7 @@ public class JspWriterImpl extends JspWriter {
             boolean autoFlush) {
         super(sz, autoFlush);
         if (sz < 0)
-            throw new IllegalArgumentException("Buffer size <= 0");
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.negativeBufferSize"));
         this.response = response;
         cb = sz == 0 ? null : new char[sz];
         nextChar = 0;
@@ -119,19 +116,6 @@ public class JspWriterImpl extends JspWriter {
         }
     }
 
-    private String getLocalizeMessage(final String message){
-        if (SecurityUtil.isPackageProtectionEnabled()){
-            return AccessController.doPrivileged(new PrivilegedAction<String>(){
-                @Override
-                public String run(){
-                    return Localizer.getMessage(message);
-                }
-            });
-        } else {
-            return Localizer.getMessage(message);
-        }
-    }
-
     /**
      * Discard the output buffer.
      */
@@ -140,10 +124,10 @@ public class JspWriterImpl extends JspWriter {
         if ((bufferSize == 0) && (out != null))
             // clear() is illegal after any unbuffered output (JSP.5.5)
             throw new IllegalStateException(
-                    getLocalizeMessage("jsp.error.ise_on_clear"));
+                    Localizer.getMessage("jsp.error.ise_on_clear"));
         if (flushed)
             throw new IOException(
-                    getLocalizeMessage("jsp.error.attempt_to_clear_flushed_buffer"));
+                    Localizer.getMessage("jsp.error.attempt_to_clear_flushed_buffer"));
         ensureOpen();
         nextChar = 0;
     }
@@ -152,13 +136,13 @@ public class JspWriterImpl extends JspWriter {
     public void clearBuffer() throws IOException {
         if (bufferSize == 0)
             throw new IllegalStateException(
-                    getLocalizeMessage("jsp.error.ise_on_clear"));
+                    Localizer.getMessage("jsp.error.ise_on_clear"));
         ensureOpen();
         nextChar = 0;
     }
 
     private final void bufferOverflow() throws IOException {
-        throw new IOException(getLocalizeMessage("jsp.error.overflow"));
+        throw new IOException(Localizer.getMessage("jsp.error.overflow"));
     }
 
     /**
@@ -200,7 +184,7 @@ public class JspWriterImpl extends JspWriter {
     /** check to make sure that the stream has not been closed */
     private void ensureOpen() throws IOException {
         if (response == null || closed)
-            throw new IOException("Stream closed");
+            throw new IOException(Localizer.getMessage("jsp.error.stream.closed"));
     }
 
 
