@@ -217,7 +217,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
      * Add a new Connector to the set of defined Connectors, and associate it
      * with this Service's Container.
@@ -524,7 +523,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 executor.stop();
             }
         }
-
     }
 
 
