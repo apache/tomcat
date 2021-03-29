@@ -420,8 +420,7 @@ public class JspC extends Task implements Options {
                 setThreadCount(nextArg());
             } else {
                 if (tok.startsWith("-")) {
-                    throw new JasperException("Unrecognized option: " + tok +
-                        ".  Use -help for help.");
+                    throw new JasperException(Localizer.getMessage("jspc.error.unknownOption", tok));
                 }
                 if (!fullstop) {
                     argPos--;
@@ -451,9 +450,6 @@ public class JspC extends Task implements Options {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getTrimSpaces() {
         return trimSpaces;
@@ -979,10 +975,11 @@ public class JspC extends Task implements Options {
                 newThreadCount = Integer.parseInt(threadCount);
             }
         } catch (NumberFormatException e) {
-            throw new BuildException("Couldn't parse thread count: " + threadCount);
+            throw new BuildException(Localizer.getMessage("jspc.error.parseThreadCount", threadCount));
         }
         if (newThreadCount < 1) {
-            throw new BuildException("There must be at least one thread: " + newThreadCount);
+            throw new BuildException(Localizer.getMessage(
+                    "jspc.error.minThreadCount", Integer.valueOf(newThreadCount)));
         }
         this.threadCount = newThreadCount;
     }
@@ -1523,7 +1520,7 @@ public class JspC extends Task implements Options {
                             }
                         } else {
                             errorCount++;
-                            log.error(e.getMessage());
+                            log.error(Localizer.getMessage("jspc.error.compilation"), e);
                         }
                     } catch (InterruptedException e) {
                         // Ignore
@@ -1540,6 +1537,8 @@ public class JspC extends Task implements Options {
             String msg = Localizer.getMessage("jspc.generation.result",
                     Integer.toString(errorCount), Long.toString(time));
             if (failOnError && errorCount > 0) {
+                System.out.println(Localizer.getMessage(
+                        "jspc.errorCount", Integer.valueOf(errorCount)));
                 throw new BuildException(msg);
             } else {
                 log.info(msg);
@@ -1695,7 +1694,7 @@ public class JspC extends Task implements Options {
         }
 
         // Turn the classPath into URLs
-        ArrayList<URL> urls = new ArrayList<>();
+        List<URL> urls = new ArrayList<>();
         StringTokenizer tokenizer = new StringTokenizer(classPath,
                                                         File.pathSeparator);
         while (tokenizer.hasMoreTokens()) {
@@ -1735,8 +1734,7 @@ public class JspC extends Task implements Options {
                         String ext = lib.substring(lib.length() - 4);
                         if (!".jar".equalsIgnoreCase(ext)) {
                             if (".tld".equalsIgnoreCase(ext)) {
-                                log.warn("TLD files should not be placed in "
-                                         + "/WEB-INF/lib");
+                                log.warn(Localizer.getMessage("jspc.warning.tldInWebInfLib"));
                             }
                             continue;
                         }
