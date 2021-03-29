@@ -95,7 +95,6 @@ public final class Globals {
 
 
     /**
-     * The subject under which the AccessControlContext is running.
      * The request attribute that is set to the value of {@code Boolean.TRUE}
      * by the RemoteIpFilter, RemoteIpValve (and other similar components) that identifies
      * a request which been forwarded via one or more proxies.

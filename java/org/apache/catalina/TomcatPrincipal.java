@@ -44,7 +44,6 @@ public interface TomcatPrincipal extends Principal {
      *                   to allow for future expansion of this method to cover
      *                   other logout mechanisms that might throw a different
      *                   exception to LoginContext
-     *
      */
     void logout() throws Exception;
 }
