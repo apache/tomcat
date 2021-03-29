@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -554,7 +555,7 @@ public class StandardWrapper extends ContainerBase
             return DEFAULT_SERVLET_METHODS;
         }
 
-        HashSet<String> allow = new HashSet<>();
+        Set<String> allow = new HashSet<>();
         allow.add("TRACE");
         allow.add("OPTIONS");
 
@@ -576,7 +577,6 @@ public class StandardWrapper extends ContainerBase
 
         String[] methodNames = new String[allow.size()];
         return allow.toArray(methodNames);
-
     }
 
 
@@ -607,7 +607,6 @@ public class StandardWrapper extends ContainerBase
     }
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Execute a periodic task, such as reloading, etc. This method will be
@@ -1004,7 +1003,7 @@ public class StandardWrapper extends ContainerBase
                 jspMonitorON = new ObjectName(oname.toString());
                 Registry.getRegistry(null, null).registerComponent(instance, jspMonitorON, null);
             } catch (Exception ex) {
-                log.warn("Error registering JSP monitoring with jmx " + instance);
+                log.warn(sm.getString("standardWrapper.jspMonitorError", instance));
             }
         }
     }
@@ -1154,7 +1153,7 @@ public class StandardWrapper extends ContainerBase
             throw f;
         } catch (Throwable f) {
             ExceptionUtils.handleThrowable(f);
-            getServletContext().log("StandardWrapper.Throwable", f );
+            getServletContext().log(sm.getString("standardWrapper.initException", getName()), f);
             // If the servlet wanted to be unavailable it would have
             // said so, so do not call unavailable(null).
             throw new ServletException
