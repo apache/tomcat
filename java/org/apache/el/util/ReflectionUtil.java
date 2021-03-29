@@ -158,12 +158,7 @@ public class ReflectionUtil {
             }
 
             Class<?>[] mParamTypes = m.getParameterTypes();
-            int mParamCount;
-            if (mParamTypes == null) {
-                mParamCount = 0;
-            } else {
-                mParamCount = mParamTypes.length;
-            }
+            int mParamCount = mParamTypes.length;
 
             // Check the number of parameters
             // Multiple tests to improve readability
