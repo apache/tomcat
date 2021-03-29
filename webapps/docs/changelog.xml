@@ -134,6 +134,10 @@
         Improvements to Japanese translations. Provided by kfujino and
         Shirayuking. (markt)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.27.
+        (markt)
+      </update>
     </changelog>
   </subsection></section>
 <section name="Tomcat 7.0.108 (violetagg)" rtext="released 2021-02-05">
