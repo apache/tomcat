@@ -1120,7 +1120,7 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.unbindFailed", e));
+            log.error(sm.getString("naming.unbindFailed", name), e);
         }
 
     }
@@ -1136,7 +1136,7 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.unbindFailed", e));
+            log.error(sm.getString("naming.unbindFailed", name), e);
         }
 
     }
@@ -1152,7 +1152,7 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.unbindFailed", e));
+            log.error(sm.getString("naming.unbindFailed", name), e);
         }
 
     }
@@ -1169,7 +1169,7 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.unbindFailed", e));
+            log.error(sm.getString("naming.unbindFailed", name), e);
         }
 
     }
@@ -1185,7 +1185,7 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.unbindFailed", e));
+            log.error(sm.getString("naming.unbindFailed", name), e);
         }
 
     }
@@ -1201,7 +1201,7 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.unbindFailed", e));
+            log.error(sm.getString("naming.unbindFailed", name), e);
         }
 
         ObjectName on = objectNames.get(name);
@@ -1224,7 +1224,7 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.unbindFailed", e));
+            log.error(sm.getString("naming.unbindFailed", name), e);
         }
 
     }
@@ -1240,7 +1240,7 @@ public class NamingContextListener
         try {
             envCtx.unbind(name);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.unbindFailed", e));
+            log.error(sm.getString("naming.unbindFailed", name), e);
         }
 
         ResourceLinkFactory.deregisterGlobalResourceAccess(getGlobalNamingContext(), name);
