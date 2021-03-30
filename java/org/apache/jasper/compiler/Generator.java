@@ -540,8 +540,8 @@ class Generator {
 
         if (isPoolingEnabled) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                                out.printin(tagHandlerPoolNames.elementAt(i));
-                                out.println(".release();");
+                out.printin(tagHandlerPoolNames.elementAt(i));
+                out.println(".release();");
             }
         }
 
