@@ -246,13 +246,11 @@ class Generator {
             @Override
             public void visit(Node.CustomTag n) throws JasperException {
                 if (n.useTagPlugin()) {
-                    if (n.getAtSTag() != null) {
-                        n.getAtSTag().visit(this);
-                    }
+                    // If a custom tag is configured to use a plug-in
+                    // getAtSTag() and  getAtETag() will always be non-null
+                    n.getAtSTag().visit(this);
                     visitBody(n);
-                    if (n.getAtETag() != null) {
-                        n.getAtETag().visit(this);
-                    }
+                    n.getAtETag().visit(this);
                 } else {
                     visitBody(n);
                 }
