@@ -249,4 +249,30 @@ public class TesterBean {
     public void setTesterTypeB(TesterTypeB testerTypeB) {
         this.testerTypeB = testerTypeB;
     }
+
+
+    public static class Inner {
+        private String data;
+
+
+        public String getData() {
+            return data;
+        }
+
+
+        public void setData(String data) {
+            this.data = data;
+        }
+    }
+
+
+    @SuppressWarnings("unused")
+    private static class Inner2 {
+        public Inner2() {
+        }
+    }
+
+
+    public abstract static class Inner4 {
+    }
 }
