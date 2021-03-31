@@ -145,21 +145,19 @@ class Generator {
      */
     static String quote(String s) {
 
-        if (s == null)
+        if (s == null) {
             return "null";
+        }
 
         return '"' + escape(s) + '"';
     }
 
     /**
-     * @param s
-     *            the input string
+     * @param s     the input string - must not be {@code null}
+     *
      * @return escaped string, per Java rule
      */
     static String escape(String s) {
-
-        if (s == null)
-            return "";
 
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
