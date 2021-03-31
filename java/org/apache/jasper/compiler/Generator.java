@@ -849,9 +849,8 @@ class Generator {
          * "no" or "false" - JSP document without a <jsp:root>
          */
         String omitXmlDecl = pageInfo.getOmitXmlDecl();
-        if ((omitXmlDecl != null && !JspUtil.booleanValue(omitXmlDecl))
-                || (omitXmlDecl == null && page.getRoot().isXmlSyntax()
-                        && !pageInfo.hasJspRoot() && !ctxt.isTagFile())) {
+        if ((omitXmlDecl != null && !JspUtil.booleanValue(omitXmlDecl)) ||
+                (omitXmlDecl == null && page.getRoot().isXmlSyntax() && !pageInfo.hasJspRoot() && !ctxt.isTagFile())) {
             String cType = pageInfo.getContentType();
             String charSet = cType.substring(cType.indexOf("charset=") + 8);
             out.printil("out.write(\"<?xml version=\\\"1.0\\\" encoding=\\\""
@@ -1154,8 +1153,7 @@ class Generator {
                 // If the page for jsp:forward was specified via
                 // jsp:attribute, first generate code to evaluate
                 // that body.
-                pageParam = generateNamedAttributeValue(page
-                        .getNamedAttributeNode());
+                pageParam = generateNamedAttributeValue(page.getNamedAttributeNode());
             } else {
                 pageParam = attributeValue(page, false, String.class);
             }
@@ -4015,8 +4013,7 @@ class Generator {
             this.propertyEditorMaps = new Hashtable<>();
 
             try {
-                BeanInfo tagClassInfo = Introspector
-                        .getBeanInfo(tagHandlerClass);
+                BeanInfo tagClassInfo = Introspector.getBeanInfo(tagHandlerClass);
                 PropertyDescriptor[] pd = tagClassInfo.getPropertyDescriptors();
                 for (PropertyDescriptor propertyDescriptor : pd) {
                     /*
@@ -4031,8 +4028,12 @@ class Generator {
                                 .getPropertyEditorClass());
                 }
             } catch (IntrospectionException ie) {
-                err.jspError(n, ie, "jsp.error.introspect.taghandler",
-                        tagHandlerClass.getName());
+                // Likely unreachable code
+                // When last checked (May 2021), current versions of Java only
+                // throw IntrospectionException for the 2-arg version of
+                // getBeanInfo if the stop class is not a super class of the
+                // bean class. That does not apply here.
+                err.jspError(n, ie, "jsp.error.introspect.taghandler", tagHandlerClass.getName());
             }
         }
 
