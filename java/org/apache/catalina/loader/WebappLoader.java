@@ -370,8 +370,9 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
                 ClassFileTransformer transformer = null;
                 try {
                     EESpecProfile profile = EESpecProfile.valueOf(getJakartaConverter());
-                    // FIXME: transformer = new ClassConverter(profile); after 0.2
                     transformer = ClassConverter.class.getConstructor(EESpecProfile.class).newInstance(profile);
+                    // FIXME: after Migration 0.3
+                    //transformer = new ClassConverter(EESpecProfile.valueOf(getJakartaConverter()));
                 } catch (InvocationTargetException | NoSuchMethodException | IllegalArgumentException ignored) {
                     // Use default value with no argument constructor
                     transformer = new ClassConverter();
