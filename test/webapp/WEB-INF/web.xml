@@ -173,6 +173,140 @@
     <url-pattern>/bug53574</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>JSP-x-powered-by</servlet-name>
+    <jsp-file>/jsp/generator/x-powered-by.jsp</jsp-file>
+    <init-param>
+      <param-name>xpoweredBy</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-x-powered-by</servlet-name>
+    <url-pattern>/jsp/generator/x-powered-by.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-usebean-04</servlet-name>
+    <jsp-file>/jsp/generator/usebean-04.jsp</jsp-file>
+    <init-param>
+      <param-name>errorOnUseBeanInvalidClassAttribute</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-usebean-04</servlet-name>
+    <url-pattern>/jsp/generator/usebean-04.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-usebean-07</servlet-name>
+    <jsp-file>/jsp/generator/usebean-07.jsp</jsp-file>
+    <init-param>
+      <param-name>errorOnUseBeanInvalidClassAttribute</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-usebean-07</servlet-name>
+    <url-pattern>/jsp/generator/usebean-07.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-templatetext-01</servlet-name>
+    <jsp-file>/jsp/generator/templatetext-01.jsp</jsp-file>
+    <init-param>
+      <param-name>trimSpaces</param-name>
+      <param-value>extended</param-value>
+    </init-param>
+    <init-param>
+      <param-name>genStringAsCharArray</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-templatetext-01</servlet-name>
+    <url-pattern>/jsp/generator/templatetext-01.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-templatetext-02</servlet-name>
+    <jsp-file>/jsp/generator/templatetext-02.jsp</jsp-file>
+    <init-param>
+      <param-name>mappedfile</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-templatetext-02</servlet-name>
+    <url-pattern>/jsp/generator/templatetext-02.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-jsp-id</servlet-name>
+    <jsp-file>/jsp/generator/jsp-id.jsp</jsp-file>
+    <init-param>
+      <param-name>enablePooling</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>useInstanceManagerForTags</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-jsp-id</servlet-name>
+    <url-pattern>/jsp/generator/jsp-id.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>bug48701-no-strict</servlet-name>
+    <jsp-file>/bug48nnn/bug48701-VI.jsp</jsp-file>
+    <init-param>
+      <param-name>strictGetProperty</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>bug48701-no-strict</servlet-name>
+    <url-pattern>/bug48nnn/bug48701-VI.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>bug58445b</servlet-name>
+    <jsp-file>/bug5nnnn/bug58444b.jsp</jsp-file>
+    <init-param>
+      <param-name>poolTagsWithExtends</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>bug58445b</servlet-name>
+    <url-pattern>/bug5nnnn/bug58444b.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>deferred-method-02</servlet-name>
+    <jsp-file>/jsp/generator/deferred-method-02.jsp</jsp-file>
+    <init-param>
+      <param-name>enablePooling</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>deferred-method-02</servlet-name>
+    <url-pattern>/jsp/generator/deferred-method-02.jsp</url-pattern>
+  </servlet-mapping>
+
   <login-config>
     <auth-method>BASIC</auth-method>
   </login-config>
