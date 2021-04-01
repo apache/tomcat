@@ -26,6 +26,18 @@ Provide-Capability: \
         version:List<Version>="1.1,1";\
         uses:='${packages;NAMED;javax.websocket.*}'
 
+Require-Capability: \
+    osgi.extender;\
+        filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=javax.websocket.ContainerProvider)";\
+        osgi.serviceloader="javax.websocket.ContainerProvider",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=javax.websocket.server.ServerEndpointConfig$Configurator)";\
+        osgi.serviceloader="javax.websocket.server.ServerEndpointConfig$Configurator",\
+    osgi.ee;\
+        filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+
 -namesection: javax/websocket*/;\
     Specification-Title=WebSocket;\
     Specification-Version=1.1;\

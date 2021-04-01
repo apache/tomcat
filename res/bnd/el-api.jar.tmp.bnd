@@ -25,6 +25,15 @@ Provide-Capability: \
         version:List<Version>="3.0,2.2,2.1";\
         uses:='${packages;NAMED;javax.el.*}'
 
+Require-Capability: \
+    osgi.extender;\
+        filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=javax.el.ExpressionFactory)";\
+        osgi.serviceloader="javax.el.ExpressionFactory",\
+    osgi.ee;\
+        filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+
 -namesection: javax/el*/;\
     Specification-Title='Expression Language';\
     Specification-Version=3.0;\
