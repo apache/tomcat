@@ -548,13 +548,12 @@ class Generator {
 
     /**
      * Generate preamble package name (shared by servlet and tag handler
-     * preamble generation)
+     * preamble generation). Package is always non-null as neither Servlets nor
+     * tags can use a default package.
      */
     private void genPreamblePackage(String packageName) {
-        if (packageName != null && !packageName.isEmpty()) {
-            out.printil("package " + packageName + ";");
-            out.println();
-        }
+        out.printil("package " + packageName + ";");
+        out.println();
     }
 
     /**
