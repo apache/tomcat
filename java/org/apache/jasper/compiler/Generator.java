@@ -629,18 +629,16 @@ class Generator {
         out.println();
         out.printil("static {");
         out.pushIndent();
-        if (packages.size() == 0) {
-            out.printin("_jspx_imports_packages = null;");
-            out.println();
-        } else {
-            out.printin("_jspx_imports_packages = new java.util.HashSet<>();");
-            out.println();
-            for (String packageName : packages) {
-                out.printin("_jspx_imports_packages.add(\"");
-                out.print(packageName);
-                out.println("\");");
-            }
+        // Packages is never empty because o.a.j.Constants.STANDARD_IMPORTS
+        // contains 3 packages and is always added to the imports.
+        out.printin("_jspx_imports_packages = new java.util.HashSet<>();");
+        out.println();
+        for (String packageName : packages) {
+            out.printin("_jspx_imports_packages.add(\"");
+            out.print(packageName);
+            out.println("\");");
         }
+        // classes however, may be empty depending on the import declarations
         if (classes.size() == 0) {
             out.printin("_jspx_imports_classes = null;");
             out.println();
