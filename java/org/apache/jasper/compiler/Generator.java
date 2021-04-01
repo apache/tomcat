@@ -607,9 +607,6 @@ class Generator {
         Set<String> packages = new HashSet<>();
         Set<String> classes = new HashSet<>();
         for (String importName : imports) {
-            if (importName == null) {
-                continue;
-            }
             String trimmed = importName.trim();
             if (trimmed.endsWith(".*")) {
                 packages.add(trimmed.substring(0, trimmed.length() - 2));
