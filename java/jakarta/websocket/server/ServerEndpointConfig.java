@@ -29,8 +29,6 @@ import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.Extension;
 import jakarta.websocket.HandshakeResponse;
 
-import aQute.bnd.annotation.spi.ServiceConsumer;
-
 /**
  * Provides configuration information for WebSocket endpoints published to a
  * server. Applications may provide their own implementation or use
@@ -141,7 +139,6 @@ public interface ServerEndpointConfig extends EndpointConfig {
     }
 
 
-    @ServiceConsumer(value=Configurator.class)
     public class Configurator {
 
         private static volatile Configurator defaultImpl = null;

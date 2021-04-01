@@ -26,6 +26,18 @@ Provide-Capability: \
         version:Version=${websocket.spec.version};\
         uses:='${packages;NAMED;jakarta.websocket.*}'
 
+Require-Capability: \
+    osgi.extender;\
+        filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=jakarta.websocket.ContainerProvider)";\
+        osgi.serviceloader="jakarta.websocket.ContainerProvider",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=jakarta.websocket.server.ServerEndpointConfig$Configurator)";\
+        osgi.serviceloader="jakarta.websocket.server.ServerEndpointConfig$Configurator",\
+    osgi.ee;\
+        filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+
 -namesection: jakarta/websocket*/;\
     Specification-Title=Jakarta WebSocket;\
     Specification-Version=${websocket.spec.version};\

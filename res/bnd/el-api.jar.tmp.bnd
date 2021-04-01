@@ -25,6 +25,15 @@ Provide-Capability: \
         version:Version=${el.spec.version};\
         uses:='${packages;NAMED;jakarta.el.*}'
 
+Require-Capability: \
+    osgi.extender;\
+        filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=jakarta.el.ExpressionFactory)";\
+        osgi.serviceloader="jakarta.el.ExpressionFactory",\
+    osgi.ee;\
+        filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+
 -namesection: jakarta/el*/;\
     Specification-Title=Jakarta Expression Language;\
     Specification-Version=${el.spec.version};\

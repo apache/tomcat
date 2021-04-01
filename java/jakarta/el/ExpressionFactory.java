@@ -36,13 +36,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import aQute.bnd.annotation.spi.ServiceConsumer;
-
 /**
  *
  * @since 2.1
  */
-@ServiceConsumer(value=ExpressionFactory.class)
 public abstract class ExpressionFactory {
 
     private static final boolean IS_SECURITY_ENABLED =

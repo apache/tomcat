@@ -19,13 +19,10 @@ package jakarta.websocket;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-import aQute.bnd.annotation.spi.ServiceConsumer;
-
 /**
  * Use the {@link ServiceLoader} mechanism to provide instances of the WebSocket
  * client container.
  */
-@ServiceConsumer(value=ContainerProvider.class)
 public abstract class ContainerProvider {
 
     private static final String DEFAULT_PROVIDER_CLASS_NAME =
