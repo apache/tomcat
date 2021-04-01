@@ -103,10 +103,7 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<<<<<<< HEAD
 <section name="Tomcat 9.0.46 (markt)" rtext="in development">
-=======
-<section name="Tomcat 10.0.6 (markt)" rtext="in development">
   <subsection name="Other">
     <changelog>
       <fix>
@@ -117,7 +114,6 @@
       </fix>
     </changelog>
   </subsection>
->>>>>>> 5651dfad39... Remove Bnd annotation dependency from Jakarta API JARs
 </section>
 <section name="Tomcat 9.0.45 (markt)" rtext="release in progress">
   <subsection name="Catalina">
