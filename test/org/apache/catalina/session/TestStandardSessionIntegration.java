@@ -32,6 +32,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestStandardSessionIntegration extends TomcatBaseTest {
@@ -60,7 +62,9 @@ public class TestStandardSessionIntegration extends TomcatBaseTest {
         ctx.addServletMappingDecoded("/bug56578", "bug56578");
 
         if (useClustering) {
-            tomcat.getEngine().setCluster(new SimpleTcpCluster());
+            SimpleTcpCluster cluster = new SimpleTcpCluster();
+            ((ReceiverBase) ((GroupChannel) cluster.getChannel()).getChannelReceiver()).setHost("localhost");
+            tomcat.getEngine().setCluster(cluster);
             ctx.setDistributable(true);
             ctx.setManager(ctx.getCluster().createManager(""));
         }
