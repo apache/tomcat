@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [ 8, 11, 14, 15-ea ]
+        java: [ 8, 11, 16, 17-ea ]
         os: [ ubuntu-latest ]
         include:
         - os: windows-latest
