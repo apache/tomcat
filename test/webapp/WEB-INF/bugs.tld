@@ -55,15 +55,16 @@
     <name>Bug48701c</name>
     <tag-class>org.apache.jasper.compiler.TestGenerator$Bug48701</tag-class>
     <body-content>empty</body-content>
-    <attribute>
-      <name>beanName</name>
-      <type>java.lang.String</type>
-    </attribute>
     <variable>
       <name-from-attribute>beanName</name-from-attribute>
       <variable-class>org.apache.jasper.compiler.TestGenerator.Bean</variable-class>
       <scope>AT_END</scope>
     </variable>
+    <attribute>
+      <name>beanName</name>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
   </tag>
   <tag>
     <name>Bug56529</name>
