@@ -112,6 +112,10 @@
         <code>aQute.bnd.annotation.spi.ServiceConsumer</code> annotation as this
         triggers TCK failures for downstream consumers of the API JARs. (markt)
       </fix>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.28.
+        (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
