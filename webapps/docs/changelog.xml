@@ -104,6 +104,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.46 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Allow APR connector creation using the listener with the flag and
+        the default <code>HTTP/1.1</code> protocol. (rjung/remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
@@ -116,10 +124,6 @@
         Update the packaged version of the Tomcat Native Library to 1.2.28.
         (markt)
       </update>
-    </changelog>
-  </subsection>
-  <subsection name="Other">
-    <changelog>
       <update>
         Update the OWB module to Apache OpenWebBeans 2.0.22. (remm)
       </update>

@@ -29,6 +29,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
+import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.coyote.AbstractProtocol;
@@ -80,8 +81,8 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     public Connector(String protocol) {
-        boolean apr = AprStatus.isAprAvailable() &&
-            AprStatus.getUseAprConnector();
+        boolean apr = AprStatus.getUseAprConnector() && AprStatus.isInstanceCreated()
+                && AprLifecycleListener.isAprAvailable();
         ProtocolHandler p = null;
         try {
             p = ProtocolHandler.create(protocol, apr);
