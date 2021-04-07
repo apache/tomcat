@@ -114,6 +114,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.22. (remm)
+      </update>
+      <update>
+        Update the CXF module to Apache CXF 3.4.3. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.5 (markt)" rtext="release in progress">
   <subsection name="Catalina">
