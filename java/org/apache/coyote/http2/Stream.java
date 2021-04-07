@@ -1090,8 +1090,19 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
             int written = -1;
 
+            // It is still possible that the stream has been closed and inBuffer
+            // set to null between the call to ensureBuffersExist() above and
+            // the sync below. The checks just before and just inside the sync
+            // ensure we don't get any NPEs reported.
+            ByteBuffer tmpInBuffer = inBuffer;
+            if (tmpInBuffer == null) {
+                return -1;
+            }
             // Ensure that only one thread accesses inBuffer at a time
-            synchronized (inBuffer) {
+            synchronized (tmpInBuffer) {
+                if (inBuffer == null) {
+                    return -1;
+                }
                 boolean canRead = false;
                 while (inBuffer.position() == 0 && (canRead = isActive() && !isInputFinished())) {
                     // Need to block until some data is written
