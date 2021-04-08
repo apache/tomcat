@@ -34,8 +34,8 @@ addons:
 install:
     - ARCH=`uname -p`
     - echo $ARCH
-    - JDK_X64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u242-b08/OpenJDK8U-jdk_x64_linux_hotspot_8u242b08.tar.gz"
-    - JDK_ARM64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u232-b09/OpenJDK8U-jdk_aarch64_linux_hotspot_8u232b09.tar.gz"
+    - JDK_X64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u282-b08/OpenJDK8U-jdk_x64_linux_hotspot_8u282b08.tar.gz"
+    - JDK_ARM64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u282-b08/OpenJDK8U-jdk_aarch64_linux_hotspot_jdk8u282-b08.tar.gz"
     - if test "X$ARCH" = "Xaarch64"; then JDK_URL=$JDK_ARM64; else JDK_URL=$JDK_X64; fi
     - wget -q $JDK_URL && tar xzf OpenJDK*.tar.gz
     - mv jdk8* jdk
@@ -47,7 +47,7 @@ install:
     - ant -version
     - rm -rf $HOME/tmp
     - export CURR_PWD=`pwd`
-    - svn co -q https://svn.apache.org/repos/asf/apr/apr/branches/1.6.x/ $HOME/tmp/apr
+    - git clone -q -b 1.6.x --single-branch https://github.com/apache/apr.git $HOME/tmp/apr
     - cd $HOME/tmp/apr
     - ./buildconf
     - ./configure --prefix=$HOME/tmp/apr-build
