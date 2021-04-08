@@ -1047,7 +1047,6 @@ class Generator {
         @Override
         public void visit(Node.ELExpression n) throws JasperException {
             n.setBeginJavaLine(out.getJavaLine());
-            System.out.println("[" + pageInfo.isELIgnored() + "] [" + n.getEL() + "]");
             out.printil("out.write("
                     + elInterpreter.interpreterCall(ctxt, this.isTagFile,
                             n.getType() + "{" + n.getText() + "}",
