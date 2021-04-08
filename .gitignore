@@ -26,6 +26,7 @@ mvn.properties
 .ant-targets-build.xml
 .checkstyle
 .classpath
+.externalToolBuilders
 .fbprefs
 .project
 .settings
