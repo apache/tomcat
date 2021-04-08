@@ -973,9 +973,6 @@ class Generator {
         private String attributeValue(Node.JspAttribute attr, boolean encode,
                 Class<?> expectedType) {
             String v = attr.getValue();
-            if (!attr.isNamedAttribute() && (v == null))
-                return "";
-
             if (attr.isExpression()) {
                 if (encode) {
                     return "org.apache.jasper.runtime.JspRuntimeLibrary.URLEncode(String.valueOf("
