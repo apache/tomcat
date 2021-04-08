@@ -1100,12 +1100,9 @@ class Generator {
          * a Named Attribute (&lt;jsp:attribute&gt;), generate the code to evaluate
          * those bodies first.
          * <p>
-         * If parent is null, simply returns.
+         * {@code parent} is assumed to be non-null
          */
         private void prepareParams(Node parent) throws JasperException {
-            if (parent == null)
-                return;
-
             Node.Nodes subelements = parent.getBody();
             if (subelements != null) {
                 for (int i = 0; i < subelements.size(); i++) {
