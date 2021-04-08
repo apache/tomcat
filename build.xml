@@ -44,15 +44,19 @@
   <!-- constant to declare a file binary for md5sum -->
   <property name="md5sum.binary-prefix"  value=" *" />
 
-  <!-- Exact spec versions (for the manifests) -->
-  <property name="servlet.revision"      value="FR" />
-  <property name="jsp.revision"          value="FR" />
-  <property name="el.revision"           value="FR" />
-  <property name="websocket.revision"    value="FR" />
-  <!-- MR B but this was first 1.1 release so use FR -->
-  <property name="jaspic.revision"       value="FR" />
-  <!-- MR 2 but this was first 1.2 release so use FR -->
-  <property name="annotation.revision"   value="FR" />
+  <!-- Exact spec versions (for the manifests etc.) -->
+  <property name="servlet.spec.version"    value="3.1" />
+  <property name="servlet.revision"        value="FR" />
+  <property name="jsp.spec.version"        value="2.3" />
+  <property name="jsp.revision"            value="FR" />
+  <property name="el.spec.version"         value="3.0" />
+  <property name="el.revision"             value="FR" />
+  <property name="websocket.spec.version"  value="1.1" />
+  <property name="websocket.revision"      value="FR" />
+  <property name="jaspic.spec.version"     value="1.1" />
+  <property name="jaspic.revision"         value="FR" />
+  <property name="annotation.spec.version" value="1.2" />
+  <property name="annotation.revision"     value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -1904,9 +1908,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/annotationapi"
       version="true"
-      windowtitle="Common Annotations 1.2 API Documentation - Apache Tomcat ${version}"
-      doctitle="Common Annotations 1.2 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;Common Annotations 1.2 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="Common Annotations ${annotation.spec.version} API Documentation - Apache Tomcat ${version}"
+      doctitle="Common Annotations ${annotation.spec.version} API - Apache Tomcat ${version}"
+      header="&lt;b&gt;Common Annotations ${annotation.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -1926,9 +1930,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/servletapi"
       version="true"
-      windowtitle="Servlet 3.1 API Documentation - Apache Tomcat ${version}"
-      doctitle="Servlet 3.1 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;Servlet 3.1 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="Servlet {servlet.spec.version} API Documentation - Apache Tomcat ${version}"
+      doctitle="Servlet {servlet.spec.version} API - Apache Tomcat ${version}"
+      header="&lt;b&gt;Servlet {servlet.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -1948,9 +1952,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/jspapi"
       version="true"
-      windowtitle="JSP 2.3 API Documentation - Apache Tomcat ${version}"
-      doctitle="JSP 2.3 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;JSP 2.3 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="JSP ${jsp.spec.version} API Documentation - Apache Tomcat ${version}"
+      doctitle="JSP ${jsp.spec.version} API - Apache Tomcat ${version}"
+      header="&lt;b&gt;JSP ${jsp.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -1970,9 +1974,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/elapi"
       version="true"
-      windowtitle="EL 3.0 API Documentation - Apache Tomcat ${version}"
-      doctitle="EL 3.0 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;EL 3.0 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="EL ${el.spec.version} API Documentation - Apache Tomcat ${version}"
+      doctitle="EL ${el.spec.version} API - Apache Tomcat ${version}"
+      header="&lt;b&gt;EL ${el.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -1992,9 +1996,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/websocketapi"
       version="true"
-      windowtitle="WebSocket 1.1 API Documentation - Apache Tomcat ${version}"
-      doctitle="WebSocket 1.1 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;WebSocket 1.1 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="WebSocket ${websocket.spec.version} API Documentation - Apache Tomcat ${version}"
+      doctitle="WebSocket ${websocket.spec.version} API - Apache Tomcat ${version}"
+      header="&lt;b&gt;WebSocket ${websocket.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -2014,9 +2018,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/jaspicapi"
       version="true"
-      windowtitle="JASPIC 1.1 API Documentation - Apache Tomcat ${version}"
-      doctitle="JASPIC 1.1 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;JASPIC 1.1 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="JASPIC ${jaspic.spec.version} API Documentation - Apache Tomcat ${version}"
+      doctitle="JASPIC ${jaspic.spec.version} API - Apache Tomcat ${version}"
+      header="&lt;b&gt;JASPIC ${jaspic.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="UTF-8"
       docencoding="UTF-8"
