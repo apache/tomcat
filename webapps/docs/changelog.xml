@@ -125,6 +125,7 @@
       <fix>
         <bug>65218</bug>: Update the version number shown on the left-hand
         banner of the Tomcat installer for Windows to Apache Tomcat 10. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
