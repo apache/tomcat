@@ -26,10 +26,11 @@ mvn.properties
 .ant-targets-build.xml
 .checkstyle
 .classpath
+.externalToolBuilders
 .fbprefs
-.idea
 .project
 .settings
+.idea
 .vscode
 *.iml
 *.ipr

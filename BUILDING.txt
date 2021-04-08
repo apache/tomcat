@@ -184,7 +184,7 @@ each release package has the appropriate line-endings.
 (4) Updating sources and rebuilding
 
 It is recommended that you regularly update the downloaded Tomcat @VERSION_MAJOR_MINOR@
-sources using your SVN client.
+sources using your git client.
 
 For a quick rebuild of only modified code you can use:
 
