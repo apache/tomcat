@@ -283,7 +283,7 @@
     <include name="**/LICENSE"/>
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
-    <include name="**/java.el.ExpressionFactory"/>
+    <include name="**/javax.el.ExpressionFactory"/>
     <include name="**/javax.servlet.ServletContainerInitializer"/>
     <include name="**/javax.websocket.ContainerProvider"/>
     <include name="**/javax.websocket.server.ServerEndpointConfig$Configurator"/>
@@ -1024,7 +1024,7 @@
       manifest="${tomcat.manifests}/annotations-api.jar.manifest"
       addOSGi="true" />
 
-    <!-- Servlet 4.0 Implementation JAR File -->
+    <!-- Servlet Implementation JAR File -->
     <jarIt jarfile="${servlet-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.servlet-api"
@@ -1054,7 +1054,7 @@
       manifest="${tomcat.manifests}/websocket-api.jar.manifest"
       addOSGi="true" />
 
-    <!-- JASPIC 1.1 API JAR File -->
+    <!-- JASPIC API JAR File -->
     <jarIt jarfile="${jaspic-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.jaspic-api"
@@ -2982,13 +2982,13 @@ skip.installer property in build.properties" />
 
     <mkdir dir="${tomcat.src.jars}" />
 
-    <!-- Common Annotations 1.3 JAR File -->
+    <!-- Common Annotations JAR File -->
     <jarIt jarfile="${annotations-api-src.jar}"
       filesDir="java"
       filesId="files.annotations-api"
       manifest="${tomcat.manifests}/annotations-api.jar.manifest" />
 
-    <!-- Servlet 4.0 Implementation JAR File -->
+    <!-- Servlet Implementation JAR File -->
     <jarIt jarfile="${servlet-api-src.jar}"
       filesDir="java"
       filesId="files.servlet-api"
