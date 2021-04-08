@@ -53,17 +53,17 @@
 
   <!-- Exact spec versions (for the manifests etc.) -->
   <property name="servlet.spec.version"    value="5.0" />
-  <property name="servlet.revision"        value="0-M1" />
+  <property name="servlet.revision"        value="0" />
   <property name="jsp.spec.version"        value="3.0" />
-  <property name="jsp.revision"            value="0-M1" />
+  <property name="jsp.revision"            value="0" />
   <property name="el.spec.version"         value="4.0" />
-  <property name="el.revision"             value="0-M1" />
+  <property name="el.revision"             value="0" />
   <property name="websocket.spec.version"  value="2.0" />
-  <property name="websocket.revision"      value="0-M1" />
+  <property name="websocket.revision"      value="0" />
   <property name="jaspic.spec.version"     value="2.0" />
-  <property name="jaspic.revision"         value="0-M1" />
+  <property name="jaspic.revision"         value="0" />
   <property name="annotation.spec.version" value="2.0" />
-  <property name="annotation.revision"     value="0-M1" />
+  <property name="annotation.revision"     value="0" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
