@@ -122,6 +122,9 @@
       <update>
         Update the CXF module to Apache CXF 3.4.3. (remm)
       </update>
+      <fix>
+        <bug>65218</bug>: Update the version number shown on the left-hand
+        banner of the Tomcat installer for Windows to Apache Tomcat 10. (markt)
     </changelog>
   </subsection>
 </section>
