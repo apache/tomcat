@@ -1051,16 +1051,12 @@ class Generator {
         @Override
         public void visit(Node.ELExpression n) throws JasperException {
             n.setBeginJavaLine(out.getJavaLine());
-            if (!pageInfo.isELIgnored() && (n.getEL() != null)) {
-                out.printil("out.write("
-                        + elInterpreter.interpreterCall(ctxt, this.isTagFile,
-                                n.getType() + "{" + n.getText() + "}",
-                                String.class, n.getEL().getMapName()) +
-                        ");");
-            } else {
-                out.printil("out.write("
-                        + quote(n.getType() + "{" + n.getText() + "}") + ");");
-            }
+            System.out.println("[" + pageInfo.isELIgnored() + "] [" + n.getEL() + "]");
+            out.printil("out.write("
+                    + elInterpreter.interpreterCall(ctxt, this.isTagFile,
+                            n.getType() + "{" + n.getText() + "}",
+                            String.class, n.getEL().getMapName()) +
+                    ");");
             n.setEndJavaLine(out.getJavaLine());
         }
 
