@@ -113,8 +113,9 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
         if (result != null) {
             echoResult(attribute,result);
             createProperty(result);
-        } else
+        } else {
             error = "Attribute " + attribute + " is empty";
+        }
         return error;
     }
 }
