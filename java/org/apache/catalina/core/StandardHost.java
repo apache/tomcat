@@ -209,19 +209,12 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * Return the application root for this Host.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     */
     @Override
     public String getAppBase() {
         return this.appBase;
     }
 
 
-    /**
-     * ({@inheritDoc}
-     */
     @Override
     public File getAppBaseFile() {
 
@@ -248,15 +241,8 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
-    /**
-     * Set the application root for this Host.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
-     *
-     * @param appBase The new application root
-     */
     @Override
     public void setAppBase(String appBase) {
-
         if (appBase.trim().equals("")) {
             log.warn(sm.getString("standardHost.problematicAppBase", getName()));
         }
