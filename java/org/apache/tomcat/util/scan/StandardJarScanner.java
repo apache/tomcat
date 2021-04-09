@@ -359,7 +359,7 @@ public class StandardJarScanner implements JarScanner {
         String name = null;
 
         String path = url.getPath();
-        int end = path.indexOf(Constants.JAR_EXT);
+        int end = path.lastIndexOf(Constants.JAR_EXT);
         if (end != -1) {
             int start = path.lastIndexOf('/', end);
             name = path.substring(start + 1, end + 4);

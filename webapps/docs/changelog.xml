@@ -119,6 +119,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.109 (violetagg)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>65226</bug>: Fix extraction of JAR name in some cases in
+        StandardJarScanner. Submitted by Lynx. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
