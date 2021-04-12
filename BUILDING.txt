@@ -467,11 +467,10 @@ as for the property "test.name".
 
         java.net.preferIPv4Stack=true
 
- 9. It is possible to control whether the output of the tests is displayed
-    on the console or not. By default it is displayed and can be disabled
-    by the following property:
+ 9. By default the output of unit tests is sent to the console and can be
+    quite verbose. The output can be disabled by setting the property:
 
-        test.verbose=true
+        test.verbose=false
 
 (8) Source code checks
 
