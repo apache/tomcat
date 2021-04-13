@@ -1969,8 +1969,13 @@ public class JNDIRealm extends RealmBase {
                 Map<String, String> newThisRound = new HashMap<>(); // Stores the groups we find in this iteration
 
                 for (Entry<String, String> group : newGroups.entrySet()) {
-                    filter = connection.roleFormat.format(new String[] { doFilterEscaping(group.getKey()),
-                            group.getValue(), group.getValue() });
+                    // Group key is already value escaped if required
+                    // Group value is not value escaped
+                    // Everything needs to be filter escaped
+                    filter = connection.roleFormat.format(new String[] {
+                            doFilterEscaping(group.getKey()),
+                            doFilterEscaping(doAttributeValueEscaping(group.getValue())),
+                            doFilterEscaping(doAttributeValueEscaping(group.getValue())) });
 
                     if (containerLog.isTraceEnabled()) {
                         containerLog.trace("Perform a nested group search with base "+ roleBase +
