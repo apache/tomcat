@@ -1128,7 +1128,7 @@ on each of deployed web applications will be available.</p>
 
   <subsection name="JMX Get command">
   <p>
-    The JXMProxyServlet also supports a "get" command that you can use to
+    The JMXProxyServlet also supports a "get" command that you can use to
     fetch the value of a specific MBean's attribute. The general form of
     the <code>get</code> command is:
   </p>
