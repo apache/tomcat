@@ -1935,7 +1935,7 @@ public class JNDIRealm extends RealmBase {
                 if (attrs == null) {
                     continue;
                 }
-                String dname = getDistinguishedName(connection.context, roleBase, result);
+                String dname = getDistinguishedName(connection.context, base, result);
                 String name = getAttributeValue(roleName, attrs);
                 if (name != null && dname != null) {
                     groupMap.put(dname, name);
@@ -1982,7 +1982,7 @@ public class JNDIRealm extends RealmBase {
                                 " and filter " + filter);
                     }
 
-                    results = searchAsUser(connection.context, user, roleBase, filter, controls, isRoleSearchAsUser());
+                    results = searchAsUser(connection.context, user, base, filter, controls, isRoleSearchAsUser());
 
                     try {
                         while (results.hasMore()) {
