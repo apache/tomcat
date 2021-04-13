@@ -256,6 +256,7 @@
     <pathelement location="${easymock.jar}"/>
     <pathelement location="${cglib.jar}"/>
     <pathelement location="${objenesis.jar}"/>
+    <pathelement location="${unboundid.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
   </path>
