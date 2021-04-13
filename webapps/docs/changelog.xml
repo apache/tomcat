@@ -110,6 +110,10 @@
         Expand coverage of unit tests for JNDIRealm using the UnboundID LDAP SDK
         for Java. (markt)
       </scode>
+      <fix>
+        <bug>65224</bug>: Ensure the correct escaping of attribute values and
+        search filters in the JNDIRealm. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
