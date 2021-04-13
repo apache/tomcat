@@ -46,24 +46,29 @@ public class TestJNDIRealmIntegration {
     private static final String USER_PATTERN = "cn={0},ou=people,dc=example,dc=com";
     private static final String USER_SEARCH = "cn={0}";
     private static final String USER_BASE = "ou=people,dc=example,dc=com";
+    private static final String ROLE_SEARCH_A = "member={0}";
+    private static final String ROLE_SEARCH_B = "member=cn={1},ou=people,dc=example,dc=com";
 
     private static InMemoryDirectoryServer ldapServer;
 
     @Parameterized.Parameters(name = "{index}: user[{3}], pwd[{4}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        addUsers(USER_PATTERN, null, null, parameterSets);
-        addUsers(null, USER_SEARCH, USER_BASE, parameterSets);
+        for (String roleSearch : new String[] { ROLE_SEARCH_A, ROLE_SEARCH_B }) {
+            addUsers(USER_PATTERN, null, null, roleSearch, parameterSets);
+            addUsers(null, USER_SEARCH, USER_BASE, roleSearch, parameterSets);
+        }
         return parameterSets;
     }
 
 
-    private static void addUsers(String userPattern, String userSearch, String userBase, List<Object[]> parameterSets) {
-        parameterSets.add(new Object[] { userPattern, userSearch, userBase,
+    private static void addUsers(String userPattern, String userSearch, String userBase, String roleSearch,
+            List<Object[]> parameterSets) {
+        parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch,
                 "test", "test", new String[] {"TestGroup"} });
-        parameterSets.add(new Object[] { userPattern, userSearch, userBase,
+        parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch,
                 "t;", "test", new String[] {"TestGroup"} });
-        parameterSets.add(new Object[] { userPattern, userSearch, userBase,
+        parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch,
                 "t*", "test", new String[] {"TestGroup"} });
     }
 
@@ -75,10 +80,12 @@ public class TestJNDIRealmIntegration {
     @Parameter(2)
     public String realmConfigUserBase;
     @Parameter(3)
-    public String username;
+    public String realmConfigRoleSearch;
     @Parameter(4)
-    public String credentials;
+    public String username;
     @Parameter(5)
+    public String credentials;
+    @Parameter(6)
     public String[] groups;
 
     @Test
@@ -90,9 +97,10 @@ public class TestJNDIRealmIntegration {
         realm.setUserPattern(realmConfigUserPattern);
         realm.setUserSearch(realmConfigUserSearch);
         realm.setUserBase(realmConfigUserBase);
+        realm.setUserRoleAttribute("cn");
         realm.setRoleName("cn");
         realm.setRoleBase("ou=people,dc=example,dc=com");
-        realm.setRoleSearch("member={0}");
+        realm.setRoleSearch(realmConfigRoleSearch);
 
         GenericPrincipal p = (GenericPrincipal) realm.authenticate(username, credentials);
 
