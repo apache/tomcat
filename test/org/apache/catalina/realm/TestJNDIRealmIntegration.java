@@ -52,7 +52,7 @@ public class TestJNDIRealmIntegration {
 
     private static InMemoryDirectoryServer ldapServer;
 
-    @Parameterized.Parameters(name = "{index}: user[{3}], pwd[{4}]")
+    @Parameterized.Parameters(name = "{index}: user[{4}], pwd[{5}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
         for (String roleSearch : new String[] { ROLE_SEARCH_A, ROLE_SEARCH_B, ROLE_SEARCH_C }) {
@@ -71,6 +71,8 @@ public class TestJNDIRealmIntegration {
                 "t;", "test", new String[] {"TestGroup"} });
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch,
                 "t*", "test", new String[] {"TestGroup"} });
+        parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch,
+                "t=", "test", new String[] {"Test<Group*2", "Test>Group*3"} });
     }
 
 
@@ -102,6 +104,7 @@ public class TestJNDIRealmIntegration {
         realm.setRoleName("cn");
         realm.setRoleBase("ou=people,dc=example,dc=com");
         realm.setRoleSearch(realmConfigRoleSearch);
+        realm.setRoleNested(true);
 
         GenericPrincipal p = (GenericPrincipal) realm.authenticate(username, credentials);
 
@@ -178,6 +181,17 @@ public class TestJNDIRealmIntegration {
             result = conn.processOperation(addUserTestAsterisk);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
 
+            AddRequest addUserTestEquals = new AddRequest(
+                    "dn: cn=t\\=,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: person",
+                    "objectClass: organizationalPerson",
+                    "cn: t=",
+                    "sn: Tequals",
+                    "userPassword: test");
+            result = conn.processOperation(addUserTestEquals);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
             AddRequest addGroupTest = new AddRequest(
                     "dn: cn=TestGroup,ou=people,dc=example,dc=com",
                     "objectClass: top",
@@ -187,6 +201,24 @@ public class TestJNDIRealmIntegration {
                     "member: cn=t\\;,ou=people,dc=example,dc=com",
                     "member: cn=t\\*,ou=people,dc=example,dc=com");
             result = conn.processOperation(addGroupTest);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            AddRequest addGroupTest2 = new AddRequest(
+                    "dn: cn=Test\\<Group*2,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: groupOfNames",
+                    "cn: Test<Group*2",
+                    "member: cn=t\\=,ou=people,dc=example,dc=com");
+            result = conn.processOperation(addGroupTest2);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            AddRequest addGroupTest3 = new AddRequest(
+                    "dn: cn=Test\\>Group*3,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: groupOfNames",
+                    "cn: Test>Group*3",
+                    "member: cn=Test\\<Group*2,ou=people,dc=example,dc=com");
+            result = conn.processOperation(addGroupTest3);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
         }
     }
