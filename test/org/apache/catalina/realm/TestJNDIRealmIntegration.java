@@ -50,6 +50,7 @@ public class TestJNDIRealmIntegration {
         List<Object[]> parameterSets = new ArrayList<>();
 
         parameterSets.add(new Object[] { "test", "test", new String[] {"TestGroup"} });
+        parameterSets.add(new Object[] { "t;", "test", new String[] {"TestGroup"} });
 
         return parameterSets;
     }
@@ -125,12 +126,24 @@ public class TestJNDIRealmIntegration {
             result = conn.processOperation(addUserTest);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
 
+            AddRequest addUserTestSemicolon = new AddRequest(
+                    "dn: cn=t\\;,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: person",
+                    "objectClass: organizationalPerson",
+                    "cn: test",
+                    "sn: Test",
+                    "userPassword: test");
+            result = conn.processOperation(addUserTestSemicolon);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
             AddRequest addGroupTest = new AddRequest(
                     "dn: cn=TestGroup,ou=people,dc=example,dc=com",
                     "objectClass: top",
                     "objectClass: groupOfNames",
                     "cn: TestGroup",
-                    "member: cn=test,ou=people,dc=example,dc=com");
+                    "member: cn=test,ou=people,dc=example,dc=com",
+                    "member: cn=t\\;,ou=people,dc=example,dc=com");
             result = conn.processOperation(addGroupTest);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
         }
