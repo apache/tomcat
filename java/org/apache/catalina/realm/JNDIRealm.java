@@ -1904,7 +1904,9 @@ public class JNDIRealm extends RealmBase {
             Name name = np.parse(dn);
             String nameParts[] = new String[name.size()];
             for (int i = 0; i < name.size(); i++) {
-                nameParts[i] = name.get(i);
+                // May have been returned with \<char> escaping rather than
+                // \<hex><hex>. Make sure it is \<hex><hex>.
+                nameParts[i] =  convertToHexEscape(name.get(i));
             }
             base = connection.roleBaseFormat.format(nameParts);
         } else {
