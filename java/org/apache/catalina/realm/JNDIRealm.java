@@ -1541,8 +1541,11 @@ public class JNDIRealm extends RealmBase {
             return null;
         }
 
-        // Form the dn from the user pattern
-        String dn = connection.userPatternFormatArray[curUserPattern].format(new String[] { username });
+        // Form the DistinguishedName from the user pattern.
+        // Escape in case username contains a character with special meaning in
+        // an attribute value.
+        String dn = connection.userPatternFormatArray[curUserPattern].format(
+                new String[] { doAttributeValueEscaping(username) });
 
         try {
             user = getUserByPattern(connection.context, username, attrIds, dn);
@@ -2820,6 +2823,78 @@ public class JNDIRealm extends RealmBase {
         } else {
             return name.toString();
         }
+    }
+
+
+    /**
+     * Implements the necessary escaping to represent an attribute value as a
+     * String as per RFC 4514.
+     *
+     * @param input The original attribute value
+     * @return      The string representation of the attribute value
+     */
+    protected String doAttributeValueEscaping(String input) {
+        int len = input.length();
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < len; i++) {
+            char c = input.charAt(i);
+            switch (c) {
+                case ' ': {
+                    if (i == 0 || i == (len -1)) {
+                        result.append("\\20");
+                    } else {
+                        result.append(c);
+                    }
+                    break;
+                }
+                case '#': {
+                    if (i == 0 ) {
+                        result.append("\\23");
+                    } else {
+                        result.append(c);
+                    }
+                    break;
+                }
+                case '\"': {
+                    result.append("\\22");
+                    break;
+                }
+                case '+': {
+                    result.append("\\2B");
+                    break;
+                }
+                case ',': {
+                    result.append("\\2C");
+                    break;
+                }
+                case ';': {
+                    result.append("\\3B");
+                    break;
+                }
+                case '<': {
+                    result.append("\\3C");
+                    break;
+                }
+                case '>': {
+                    result.append("\\3E");
+                    break;
+                }
+                case '\\': {
+                    result.append("\\5C");
+                    break;
+                }
+                case '\u0000': {
+                    result.append("\\00");
+                    break;
+                }
+                default:
+                    result.append(c);
+            }
+
+        }
+
+        return result.toString();
     }
 
 
