@@ -43,24 +43,42 @@ import com.unboundid.ldap.sdk.ResultCode;
 @RunWith(Parameterized.class)
 public class TestJNDIRealmIntegration {
 
+    private static final String USER_PATTERN = "cn={0},ou=people,dc=example,dc=com";
+    private static final String USER_SEARCH = "cn={0}";
+    private static final String USER_BASE = "ou=people,dc=example,dc=com";
+
     private static InMemoryDirectoryServer ldapServer;
 
-    @Parameterized.Parameters(name = "{index}: in[{0}], out[{1}]")
+    @Parameterized.Parameters(name = "{index}: user[{3}], pwd[{4}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-
-        parameterSets.add(new Object[] { "test", "test", new String[] {"TestGroup"} });
-        parameterSets.add(new Object[] { "t;", "test", new String[] {"TestGroup"} });
-
+        addUsers(USER_PATTERN, null, null, parameterSets);
+        addUsers(null, USER_SEARCH, USER_BASE, parameterSets);
         return parameterSets;
     }
 
 
+    private static void addUsers(String userPattern, String userSearch, String userBase, List<Object[]> parameterSets) {
+        parameterSets.add(new Object[] { userPattern, userSearch, userBase,
+                "test", "test", new String[] {"TestGroup"} });
+        parameterSets.add(new Object[] { userPattern, userSearch, userBase,
+                "t;", "test", new String[] {"TestGroup"} });
+        parameterSets.add(new Object[] { userPattern, userSearch, userBase,
+                "t*", "test", new String[] {"TestGroup"} });
+    }
+
+
     @Parameter(0)
-    public String username;
+    public String realmConfigUserPattern;
     @Parameter(1)
-    public String credentials;
+    public String realmConfigUserSearch;
     @Parameter(2)
+    public String realmConfigUserBase;
+    @Parameter(3)
+    public String username;
+    @Parameter(4)
+    public String credentials;
+    @Parameter(5)
     public String[] groups;
 
     @Test
@@ -69,7 +87,9 @@ public class TestJNDIRealmIntegration {
         realm.containerLog = LogFactory.getLog(TestJNDIRealmIntegration.class);
 
         realm.setConnectionURL("ldap://localhost:" + ldapServer.getListenPort());
-        realm.setUserPattern("cn={0},ou=people,dc=example,dc=com");
+        realm.setUserPattern(realmConfigUserPattern);
+        realm.setUserSearch(realmConfigUserSearch);
+        realm.setUserBase(realmConfigUserBase);
         realm.setRoleName("cn");
         realm.setRoleBase("ou=people,dc=example,dc=com");
         realm.setRoleSearch("member={0}");
@@ -131,10 +151,21 @@ public class TestJNDIRealmIntegration {
                     "objectClass: top",
                     "objectClass: person",
                     "objectClass: organizationalPerson",
-                    "cn: test",
-                    "sn: Test",
+                    "cn: t\\;",
+                    "sn: Tsemicolon",
                     "userPassword: test");
             result = conn.processOperation(addUserTestSemicolon);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            AddRequest addUserTestAsterisk = new AddRequest(
+                    "dn: cn=t\\*,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: person",
+                    "objectClass: organizationalPerson",
+                    "cn: t\\*",
+                    "sn: Tasterisk",
+                    "userPassword: test");
+            result = conn.processOperation(addUserTestAsterisk);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
 
             AddRequest addGroupTest = new AddRequest(
@@ -143,7 +174,8 @@ public class TestJNDIRealmIntegration {
                     "objectClass: groupOfNames",
                     "cn: TestGroup",
                     "member: cn=test,ou=people,dc=example,dc=com",
-                    "member: cn=t\\;,ou=people,dc=example,dc=com");
+                    "member: cn=t\\;,ou=people,dc=example,dc=com",
+                    "member: cn=t\\*,ou=people,dc=example,dc=com");
             result = conn.processOperation(addGroupTest);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
         }

@@ -1585,7 +1585,9 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Form the search filter
-        String filter = connection.userSearchFormat.format(new String[] { username });
+        // Escape in case username contains a character with special meaning in
+        // a search filter.
+        String filter = connection.userSearchFormat.format(new String[] { doFilterEscaping(username) });
 
         // Set up the search controls
         SearchControls constraints = new SearchControls();
@@ -1753,6 +1755,8 @@ public class JNDIRealm extends RealmBase {
             return false;
         }
 
+        // This is returned from the directory so will be attribute value
+        // escaped if required
         String dn = user.getDN();
         if (dn == null) {
             return false;
