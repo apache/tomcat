@@ -48,13 +48,14 @@ public class TestJNDIRealmIntegration {
     private static final String USER_BASE = "ou=people,dc=example,dc=com";
     private static final String ROLE_SEARCH_A = "member={0}";
     private static final String ROLE_SEARCH_B = "member=cn={1},ou=people,dc=example,dc=com";
+    private static final String ROLE_SEARCH_C = "member=cn={2},ou=people,dc=example,dc=com";
 
     private static InMemoryDirectoryServer ldapServer;
 
     @Parameterized.Parameters(name = "{index}: user[{3}], pwd[{4}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        for (String roleSearch : new String[] { ROLE_SEARCH_A, ROLE_SEARCH_B }) {
+        for (String roleSearch : new String[] { ROLE_SEARCH_A, ROLE_SEARCH_B, ROLE_SEARCH_C }) {
             addUsers(USER_PATTERN, null, null, roleSearch, parameterSets);
             addUsers(null, USER_SEARCH, USER_BASE, roleSearch, parameterSets);
         }
@@ -128,6 +129,7 @@ public class TestJNDIRealmIntegration {
 
         try (LDAPConnection conn =  ldapServer.getConnection()) {
 
+            // Note: Only the DNs need attribute value escaping
             AddRequest addBase = new AddRequest(
                     "dn: dc=example,dc=com",
                     "objectClass: top",
@@ -159,7 +161,7 @@ public class TestJNDIRealmIntegration {
                     "objectClass: top",
                     "objectClass: person",
                     "objectClass: organizationalPerson",
-                    "cn: t\\;",
+                    "cn: t;",
                     "sn: Tsemicolon",
                     "userPassword: test");
             result = conn.processOperation(addUserTestSemicolon);
@@ -170,7 +172,7 @@ public class TestJNDIRealmIntegration {
                     "objectClass: top",
                     "objectClass: person",
                     "objectClass: organizationalPerson",
-                    "cn: t\\*",
+                    "cn: t*",
                     "sn: Tasterisk",
                     "userPassword: test");
             result = conn.processOperation(addUserTestAsterisk);
