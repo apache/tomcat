@@ -3271,6 +3271,15 @@ skip.installer property in build.properties" />
       <param name="checksum.value" value="${objenesis.checksum.value}"/>
     </antcall>
 
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${unboundid.loc}"/>
+      <param name="destfile" value="${unboundid.jar}"/>
+      <param name="destdir" value="${unboundid.home}"/>
+      <param name="checksum.enabled" value="${unboundid.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${unboundid.checksum.algorithm}"/>
+      <param name="checksum.value" value="${unboundid.checksum.value}"/>
+    </antcall>
+
   </target>
 
   <target name="download-cobertura"
