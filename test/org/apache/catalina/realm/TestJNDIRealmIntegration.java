@@ -60,7 +60,7 @@ public class TestJNDIRealmIntegration {
             addUsers(USER_PATTERN, null, null, roleSearch, ROLE_BASE, parameterSets);
             addUsers(null, USER_SEARCH, USER_BASE, roleSearch, ROLE_BASE, parameterSets);
         }
-        parameterSets.add(new Object[] { "cn={0},ou=sub,ou=people,dc=example,dc=com", null, null, ROLE_SEARCH_A,
+        parameterSets.add(new Object[] { "cn={0},ou=s\\;ub,ou=people,dc=example,dc=com", null, null, ROLE_SEARCH_A,
                 "{3},ou=people,dc=example,dc=com", "testsub", "test", new String[] {"TestGroup4"} });
         return parameterSets;
     }
@@ -227,14 +227,14 @@ public class TestJNDIRealmIntegration {
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
 
             AddRequest addPeopleSub = new AddRequest(
-                    "dn: ou=sub,ou=people,dc=example,dc=com",
+                    "dn: ou=s\\;ub,ou=people,dc=example,dc=com",
                     "objectClass: top",
                     "objectClass: organizationalUnit");
             result = conn.processOperation(addPeopleSub);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
 
             AddRequest addUserTestSub = new AddRequest(
-                    "dn: cn=testsub,ou=sub,ou=people,dc=example,dc=com",
+                    "dn: cn=testsub,ou=s\\;ub,ou=people,dc=example,dc=com",
                     "objectClass: top",
                     "objectClass: person",
                     "objectClass: organizationalPerson",
@@ -245,11 +245,11 @@ public class TestJNDIRealmIntegration {
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
 
             AddRequest addGroupTest4 = new AddRequest(
-                    "dn: cn=TestGroup4,ou=sub,ou=people,dc=example,dc=com",
+                    "dn: cn=TestGroup4,ou=s\\;ub,ou=people,dc=example,dc=com",
                     "objectClass: top",
                     "objectClass: groupOfNames",
                     "cn: TestGroup4",
-                    "member: cn=testsub,ou=sub,ou=people,dc=example,dc=com");
+                    "member: cn=testsub,ou=s\\;ub,ou=people,dc=example,dc=com");
             result = conn.processOperation(addGroupTest4);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
         }
