@@ -110,6 +110,10 @@
         Allow APR connector creation using the listener with the flag and
         the default <code>HTTP/1.1</code> protocol. (rjung/remm)
       </fix>
+      <scode>
+        Expand coverage of unit tests for JNDIRealm using the UnboundID LDAP SDK
+        for Java. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
