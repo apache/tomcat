@@ -254,6 +254,15 @@ objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
+# ----- UnboundID, used by unit tests, version 5.1.4 or later -----
+unboundid.version=5.1.4
+unboundid.checksum.enabled=true
+unboundid.checksum.algorithm=SHA-512
+unboundid.checksum.value=04cf7f59eddebdd5b51e5be55021f9d9c667cca6101eac954e7a8d5b51f4c23372cd8f041640157f082435a166b75d85e79252b516130ede7d966dae6d3eae67
+unboundid.home=${base.path}/unboundid-${unboundid.version}
+unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
+unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
+
 # ----- Checkstyle, version 6.16 or later -----
 # Checkstyle 7 requires Java 8
 # Therefore, use checkstyle-backport-jre6

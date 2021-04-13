@@ -104,6 +104,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.66 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Expand coverage of unit tests for JNDIRealm using the UnboundID LDAP SDK
+        for Java. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <scode>
