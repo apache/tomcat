@@ -1876,7 +1876,7 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Set up parameters for an appropriate search
-        String filter = connection.roleFormat.format(new String[] { doRFC2254Encoding(dn), username, userRoleId });
+        String filter = connection.roleFormat.format(new String[] { doFilterEscaping(dn), username, userRoleId });
         SearchControls controls = new SearchControls();
         if (roleSubtree) {
             controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -1948,7 +1948,7 @@ public class JNDIRealm extends RealmBase {
                 Map<String, String> newThisRound = new HashMap<>(); // Stores the groups we find in this iteration
 
                 for (Entry<String, String> group : newGroups.entrySet()) {
-                    filter = connection.roleFormat.format(new String[] { doRFC2254Encoding(group.getKey()),
+                    filter = connection.roleFormat.format(new String[] { doFilterEscaping(group.getKey()),
                             group.getValue(), group.getValue() });
 
                     if (containerLog.isTraceEnabled()) {
@@ -2739,10 +2739,36 @@ public class JNDIRealm extends RealmBase {
      *     )  -&gt; \29
      *     \  -&gt; \5c
      *     \0 -&gt; \00
+     *
      * @param inString string to escape according to RFC 2254 guidelines
+     *
+     * @return String the escaped/encoded result
+     *
+     * @deprecated Will be removed in Tomcat 10.1.x onwards
+     */
+    @Deprecated
+    protected String doRFC2254Encoding(String inString) {
+        return doFilterEscaping(inString);
+    }
+
+
+    /**
+     * Given an LDAP search string, returns the string with certain characters
+     * escaped according to RFC 2254 guidelines.
+     * The character mapping is as follows:
+     *     char -&gt;  Replacement
+     *    ---------------------------
+     *     *  -&gt; \2a
+     *     (  -&gt; \28
+     *     )  -&gt; \29
+     *     \  -&gt; \5c
+     *     \0 -&gt; \00
+     *
+     * @param inString string to escape according to RFC 2254 guidelines
+     *
      * @return String the escaped/encoded result
      */
-    protected String doRFC2254Encoding(String inString) {
+    protected String doFilterEscaping(String inString) {
         StringBuilder buf = new StringBuilder(inString.length());
         for (int i = 0; i < inString.length(); i++) {
             char c = inString.charAt(i);
