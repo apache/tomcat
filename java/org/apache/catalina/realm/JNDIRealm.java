@@ -1847,7 +1847,11 @@ public class JNDIRealm extends RealmBase {
             return null;
         }
 
+        // This is returned from the directory so will be attribute value
+        // escaped if required
         String dn = user.getDN();
+        // This is the name the user provided to the authentication process so
+        // it will not be escaped
         String username = user.getUserName();
         String userRoleId = user.getUserRoleId();
 
@@ -1880,7 +1884,10 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Set up parameters for an appropriate search
-        String filter = connection.roleFormat.format(new String[] { doFilterEscaping(dn), username, userRoleId });
+        String filter = connection.roleFormat.format(new String[] {
+                doFilterEscaping(dn),
+                doFilterEscaping(doAttributeValueEscaping(username)),
+                userRoleId });
         SearchControls controls = new SearchControls();
         if (roleSubtree) {
             controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
