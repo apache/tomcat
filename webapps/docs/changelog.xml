@@ -122,6 +122,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>65224</bug>: Ensure the correct escaping of attribute values and
+        search filters in the JNDIRealm. (markt)
+      </fix>
+      <fix>
         <bug>65226</bug>: Fix extraction of JAR name in some cases in
         StandardJarScanner. Submitted by Lynx. (remm)
       </fix>
