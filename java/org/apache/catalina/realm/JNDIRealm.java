@@ -1883,11 +1883,13 @@ public class JNDIRealm extends RealmBase {
             return list;
         }
 
-        // Set up parameters for an appropriate search
+        // Set up parameters for an appropriate search filter
+        // The dn is already attribute value escaped but the others are not
+        // This is a filter so all input will require filter escaping
         String filter = connection.roleFormat.format(new String[] {
                 doFilterEscaping(dn),
                 doFilterEscaping(doAttributeValueEscaping(username)),
-                userRoleId });
+                doFilterEscaping(doAttributeValueEscaping(userRoleId)) });
         SearchControls controls = new SearchControls();
         if (roleSubtree) {
             controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
