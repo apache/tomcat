@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.realm;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,6 +36,7 @@ import org.apache.juli.logging.LogFactory;
 
 import com.unboundid.ldap.listener.InMemoryDirectoryServer;
 import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
+import com.unboundid.ldap.listener.InMemoryListenerConfig;
 import com.unboundid.ldap.sdk.AddRequest;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPResult;
@@ -130,6 +132,10 @@ public class TestJNDIRealmIntegration {
     @BeforeClass
     public static void createLDAP() throws Exception {
         InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig("dc=example,dc=com");
+        InetAddress localhost = InetAddress.getByName("localhost");
+        InMemoryListenerConfig listenerConfig =
+                new InMemoryListenerConfig("localListener", localhost, 0, null, null, null);
+        config.setListenerConfigs(listenerConfig);
         config.addAdditionalBindCredentials("cn=admin", "password");
         ldapServer = new InMemoryDirectoryServer(config);
 
