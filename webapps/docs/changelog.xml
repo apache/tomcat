@@ -114,6 +114,10 @@
         <bug>65224</bug>: Ensure the correct escaping of attribute values and
         search filters in the JNDIRealm. (markt)
       </fix>
+      <fix>
+        <bug>65235</bug>: Add missing attributes to the MBean descriptor file
+        for the <code>RemoteIpValve</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -122,6 +126,14 @@
         Review code used to generate Java source from JSPs and tags and remove
         code found to be unnecessary. (markt)
       </scode>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>65235</bug>: Correct name of <code>changeLocalName</code> in the
+        documentation for the <code>RemoteIpValve</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
