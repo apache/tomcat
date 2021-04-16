@@ -1154,7 +1154,7 @@
          specified, the default of <code>443</code> is used.</p>
       </attribute>
 
-      <attribute name="changeLocalHost" required="false">
+      <attribute name="changeLocalName" required="false">
         <p>If <code>true</code>, the value returned by
         <code>ServletRequest.getLocalHost()</code> and
         <code>ServletRequest.getServerHost()</code> is modified by the this
