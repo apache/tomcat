@@ -504,19 +504,31 @@
          type="org.apache.catalina.valves.RemoteIpValve">
 
     <attribute name="asyncSupported"
-               description="Does this valve support async reporting."
+               description="Does this valve support async processing"
+               is="true"
+               type="boolean"/>
+
+    <attribute name="changeLocalName"
+               description="If true the value returned by ServletRequest.getLocalHost() and ServletRequest.getServerHost() is modified by this Valve"
+               is="true"
+               type="boolean"/>
+
+    <attribute name="changeLocalPort"
+               description="If true the value returned by ServletRequest.getLocalPort() and ServletRequest.getServerPort() is modified by this Valve"
                is="true"
                type="boolean"/>
 
     <attribute name="httpServerPort"
                description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates http protocol"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
     <attribute name="httpsServerPort"
                description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates https protocol"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
+
+    <attribute name="hostHeader"
+               description="The host header (e.g. &quot;X-Forwarded-Host&quot;)"
+               type="java.lang.String"/>
 
     <attribute name="info"
                description="Information about this implementation"
@@ -525,28 +537,31 @@
 
     <attribute name="internalProxies"
                description="Regular expression that matches IP addresses of internal proxies"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
+
+    <attribute name="portHeader"
+               description="The protocol header (e.g. &quot;X-Forwarded-Port&quot;)"
+               type="java.lang.String"/>
 
     <attribute name="protocolHeader"
                description="The protocol header (e.g. &quot;X-Forwarded-Proto&quot;)"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
     <attribute name="protocolHeaderHttpsValue"
                description="The value of the protocol header for incoming https request (e.g. &quot;https&quot;)"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
     <attribute name="proxiesHeader"
                description="The proxies header name (e.g. &quot;X-Forwarded-By&quot;)"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
     <attribute name="remoteIpHeader"
                description="The remote IP header name (e.g. &quot;X-Forwarded-For&quot;)"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
+
+    <attribute name="requestAttributesEnabled"
+               description="If true, the Valve will set the request attributes used by AccessLog implementations to override the values returned by the request for remote address, remote host, server port and protocol"
+               type="boolean"/>
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
@@ -555,8 +570,7 @@
 
     <attribute name="trustedProxies"
                description="Regular expression that matches IP addresses of trusted proxies"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
   </mbean>
 

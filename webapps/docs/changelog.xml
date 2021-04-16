@@ -129,6 +129,18 @@
         <bug>65226</bug>: Fix extraction of JAR name in some cases in
         StandardJarScanner. Submitted by Lynx. (remm)
       </fix>
+      <fix>
+        <bug>65235</bug>: Add missing attributes to the MBean descriptor file
+        for the <code>RemoteIpValve</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>65235</bug>: Correct name of <code>changeLocalName</code> in the
+        documentation for the <code>RemoteIpValve</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
