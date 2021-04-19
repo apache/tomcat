@@ -1859,8 +1859,9 @@ class Generator {
             // non-null
             if (infos.length > 0) {
                 for (VariableInfo info : infos) {
-                    if (info != null && info.getVarName() != null)
-                        pageInfo.getVarInfoNames().add(info.getVarName());
+                    // A null variable name will trigger multiple compilation
+                    // failures so assume non-null here
+                    pageInfo.getVarInfoNames().add(info.getVarName());
                 }
             }
             TagVariableInfo[] tagInfos = n.getTagVariableInfos();
