@@ -49,7 +49,7 @@ public final class ClassParser {
     private String[] interfaceNames; // Names of implemented interfaces
     private ConstantPool constantPool; // collection of constants
     private Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
-    private List<Annotations> runtimeVisibleMethodOfFieldAnnotations; // "RuntimeVisibleAnnotations" attribute defined elsewhere
+    private List<Annotations> runtimeVisibleFieldOrMethodAnnotations; // "RuntimeVisibleAnnotations" attribute defined elsewhere
     private static final int BUFSIZE = 8192;
 
     private static final String[] INTERFACES_EMPTY_ARRAY = new String[0];
@@ -99,7 +99,7 @@ public final class ClassParser {
         // Return the information we have gathered in a new object
         return new JavaClass(class_name, superclassName,
                 accessFlags, constantPool, interfaceNames,
-                runtimeVisibleAnnotations, runtimeVisibleMethodOfFieldAnnotations);
+                runtimeVisibleAnnotations, runtimeVisibleFieldOrMethodAnnotations);
     }
 
 
@@ -126,10 +126,10 @@ public final class ClassParser {
             if (name.equals("RuntimeVisibleAnnotations")) {
                 if (fieldOrMethod) {
                     Annotations fieldOrMethodAnnotations = new Annotations(dataInputStream, constantPool);
-                    if (runtimeVisibleMethodOfFieldAnnotations == null) {
-                        runtimeVisibleMethodOfFieldAnnotations = new ArrayList<>();
+                    if (runtimeVisibleFieldOrMethodAnnotations == null) {
+                        runtimeVisibleFieldOrMethodAnnotations = new ArrayList<>();
                     }
-                    runtimeVisibleMethodOfFieldAnnotations.add(fieldOrMethodAnnotations);
+                    runtimeVisibleFieldOrMethodAnnotations.add(fieldOrMethodAnnotations);
                 } else {
                     if (runtimeVisibleAnnotations != null) {
                         throw new ClassFormatException(
