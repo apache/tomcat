@@ -22,6 +22,8 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.tomcat.util.bcel.Const;
 
@@ -47,6 +49,7 @@ public final class ClassParser {
     private String[] interfaceNames; // Names of implemented interfaces
     private ConstantPool constantPool; // collection of constants
     private Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
+    private List<Annotations> runtimeVisibleMethodOfFieldAnnotations; // "RuntimeVisibleAnnotations" attribute defined elsewhere
     private static final int BUFSIZE = 8192;
 
     private static final String[] INTERFACES_EMPTY_ARRAY = new String[0];
@@ -91,41 +94,49 @@ public final class ClassParser {
         // Read class methods, i.e., the functions in the class
         readMethods();
         // Read class attributes
-        readAttributes();
+        readAttributes(false);
 
         // Return the information we have gathered in a new object
         return new JavaClass(class_name, superclassName,
                 accessFlags, constantPool, interfaceNames,
-                runtimeVisibleAnnotations);
+                runtimeVisibleAnnotations, runtimeVisibleMethodOfFieldAnnotations);
     }
 
 
     /**
      * Reads information about the attributes of the class.
+     * @param fieldOrMethod false if processing a class
      * @throws  IOException
      * @throws  ClassFormatException
      */
-    private void readAttributes() throws IOException, ClassFormatException {
+    private void readAttributes(boolean fieldOrMethod) throws IOException, ClassFormatException {
         final int attributes_count = dataInputStream.readUnsignedShort();
         for (int i = 0; i < attributes_count; i++) {
             ConstantUtf8 c;
             String name;
             int name_index;
             int length;
-            // Get class name from constant pool via `name_index' indirection
+            // Get class name from constant pool via 'name_index' indirection
             name_index = dataInputStream.readUnsignedShort();
             c = (ConstantUtf8) constantPool.getConstant(name_index,
                     Const.CONSTANT_Utf8);
             name = c.getBytes();
             // Length of data in bytes
             length = dataInputStream.readInt();
-
             if (name.equals("RuntimeVisibleAnnotations")) {
-                if (runtimeVisibleAnnotations != null) {
-                    throw new ClassFormatException(
-                            "RuntimeVisibleAnnotations attribute is not allowed more than once in a class file");
+                if (fieldOrMethod) {
+                    Annotations fieldOrMethodAnnotations = new Annotations(dataInputStream, constantPool);
+                    if (runtimeVisibleMethodOfFieldAnnotations == null) {
+                        runtimeVisibleMethodOfFieldAnnotations = new ArrayList<>();
+                    }
+                    runtimeVisibleMethodOfFieldAnnotations.add(fieldOrMethodAnnotations);
+                } else {
+                    if (runtimeVisibleAnnotations != null) {
+                        throw new ClassFormatException(
+                                "RuntimeVisibleAnnotations attribute is not allowed more than once in a class file");
+                    }
+                    runtimeVisibleAnnotations = new Annotations(dataInputStream, constantPool);
                 }
-                runtimeVisibleAnnotations = new Annotations(dataInputStream, constantPool);
             } else {
                 // All other attributes are skipped
                 Utility.skipFully(dataInputStream, length);
@@ -183,7 +194,12 @@ public final class ClassParser {
     private void readFields() throws IOException, ClassFormatException {
         final int fields_count = dataInputStream.readUnsignedShort();
         for (int i = 0; i < fields_count; i++) {
-            Utility.swallowFieldOrMethod(dataInputStream);
+            // file.readUnsignedShort(); // Unused access flags
+            // file.readUnsignedShort(); // name index
+            // file.readUnsignedShort(); // signature index
+            Utility.skipFully(dataInputStream, 6);
+
+            readAttributes(true);
         }
     }
 
@@ -229,7 +245,12 @@ public final class ClassParser {
     private void readMethods() throws IOException, ClassFormatException {
         final int methods_count = dataInputStream.readUnsignedShort();
         for (int i = 0; i < methods_count; i++) {
-            Utility.swallowFieldOrMethod(dataInputStream);
+            // file.readUnsignedShort(); // Unused access flags
+            // file.readUnsignedShort(); // name index
+            // file.readUnsignedShort(); // signature index
+            Utility.skipFully(dataInputStream, 6);
+
+            readAttributes(true);
         }
     }
 
