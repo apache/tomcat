@@ -336,7 +336,7 @@ public class StandardWrapper extends ContainerBase
     @Override
     public int getLoadOnStartup() {
 
-        if (isJspServlet && loadOnStartup < 0) {
+        if (isJspServlet && loadOnStartup == -1) {
             /*
              * JspServlet must always be preloaded, because its instance is
              * used during registerJMX (when registering the JSP
