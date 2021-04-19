@@ -73,6 +73,7 @@
         <param-name>strictWhitespace</param-name>
         <param-value>false</param-value>
       </init-param>
+    <load-on-startup>-2</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>bug49297NoSpace</servlet-name>
@@ -165,6 +166,7 @@
   <servlet>
     <servlet-name>Bug53574</servlet-name>
     <jsp-file>/WEB-INF/jsp/bug53574.jsp</jsp-file>
+    <load-on-startup>-2</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>Bug53574</servlet-name>
