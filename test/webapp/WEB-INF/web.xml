@@ -153,6 +153,7 @@
   <servlet>
     <servlet-name>Bug53574</servlet-name>
     <jsp-file>/WEB-INF/jsp/bug53574.jsp</jsp-file>
+    <load-on-startup>-2</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>Bug53574</servlet-name>
