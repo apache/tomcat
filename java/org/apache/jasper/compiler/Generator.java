@@ -1868,7 +1868,9 @@ class Generator {
             // Add the named objects to the list of 'introduced' names to enable
             // a later test as per JSP.5.3
             VariableInfo[] infos = n.getVariableInfos();
-            if (infos != null && infos.length > 0) {
+            // The Validator always calls setTagData() which ensures infos is
+            // non-null
+            if (infos.length > 0) {
                 for (VariableInfo info : infos) {
                     if (info != null && info.getVarName() != null)
                         pageInfo.getVarInfoNames().add(info.getVarName());
