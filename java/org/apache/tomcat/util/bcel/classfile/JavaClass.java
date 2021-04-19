@@ -17,6 +17,9 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Represents a Java class, i.e., the data structures, constant pool,
  * fields, methods and commands contained in a Java .class file.
@@ -32,6 +35,7 @@ public class JavaClass {
     private final String superclassName;
     private final String[] interfaceNames;
     private final Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
+    private final List<Annotations> runtimeVisibleMethodOfFieldAnnotations; // "RuntimeVisibleAnnotations" attribute defined elsewhere
 
     /**
      * Constructor gets all contents as arguments.
@@ -42,12 +46,14 @@ public class JavaClass {
      * @param constant_pool Array of constants
      * @param interfaceNames Implemented interfaces
      * @param runtimeVisibleAnnotations "RuntimeVisibleAnnotations" attribute defined on the Class, or null
+     * @param runtimeVisibleMethodOfFieldAnnotations "RuntimeVisibleAnnotations" attribute defined on the fields or methids, or null
      */
     JavaClass(final String className, final String superclassName,
             final int accessFlags, final ConstantPool constant_pool, final String[] interfaceNames,
-            final Annotations runtimeVisibleAnnotations) {
+            final Annotations runtimeVisibleAnnotations, final List<Annotations> runtimeVisibleMethodOfFieldAnnotations) {
         this.accessFlags = accessFlags;
         this.runtimeVisibleAnnotations = runtimeVisibleAnnotations;
+        this.runtimeVisibleMethodOfFieldAnnotations = runtimeVisibleMethodOfFieldAnnotations;
         this.className = className;
         this.superclassName = superclassName;
         this.interfaceNames = interfaceNames;
@@ -71,6 +77,33 @@ public class JavaClass {
             return runtimeVisibleAnnotations.getAnnotationEntries();
         }
         return null;
+    }
+
+    /**
+     * Return annotations entries from "RuntimeVisibleAnnotations" attribute on
+     * the class, fields or methods if there is any.
+     *
+     * @return An array of entries or {@code null}
+     */
+    public AnnotationEntry[] getAllAnnotationEntries() {
+        HashMap<String, AnnotationEntry> annotationEntries = new HashMap<>();
+        if (runtimeVisibleAnnotations != null) {
+            for (AnnotationEntry annotationEntry : runtimeVisibleAnnotations.getAnnotationEntries()) {
+                annotationEntries.put(annotationEntry.getAnnotationType(), annotationEntry);
+            }
+        }
+        if (runtimeVisibleMethodOfFieldAnnotations != null) {
+            for (Annotations annotations : runtimeVisibleMethodOfFieldAnnotations.toArray(new Annotations[0])) {
+                for (AnnotationEntry annotationEntry : annotations.getAnnotationEntries()) {
+                    annotationEntries.putIfAbsent(annotationEntry.getAnnotationType(), annotationEntry);
+                }
+            }
+        }
+        if (annotationEntries.isEmpty()) {
+            return null;
+        } else {
+            return annotationEntries.values().toArray(new AnnotationEntry[0]);
+        }
     }
 
     /**

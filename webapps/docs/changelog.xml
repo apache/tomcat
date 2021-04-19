@@ -118,6 +118,10 @@
         <bug>65235</bug>: Add missing attributes to the MBean descriptor file
         for the <code>RemoteIpValve</code>. (markt)
       </fix>
+      <fix>
+        <bug>65244</bug>: HandlesTypes should include classes that use
+        the specified annotation types on fields or methods. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
