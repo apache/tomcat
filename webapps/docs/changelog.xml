@@ -126,6 +126,14 @@
         Review code used to generate Java source from JSPs and tags and remove
         code found to be unnecessary. (markt)
       </scode>
+      <update>
+        <code>&lt;servlet&gt;</code> entries in web.xml that include a
+        <code>&lt;jsp-file&gt;</code> element and a negative
+        <code>&lt;load-no-startup&gt;</code> element that is not the default
+        value of <code>-1</code> will no longer be loaded at start-up. This
+        makes it possible to define a <code>&lt;jsp-file&gt;</code> that will
+        not be loaded at start-up. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
