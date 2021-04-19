@@ -1342,8 +1342,10 @@ class Generator {
                     // and (for Java 9+) in an exported module
                     int modifiers = bean.getModifiers();
                     JreCompat jreCompat = JreCompat.getInstance();
+                    // No need to test for being an interface here as the
+                    // getConstructor() call above will have already failed for
+                    // any interfaces.
                     if (!Modifier.isPublic(modifiers) ||
-                            Modifier.isInterface(modifiers) ||
                             Modifier.isAbstract(modifiers) ||
                             !jreCompat.canAccess(null, constructor) ) {
                         throw new Exception(Localizer.getMessage("jsp.error.invalid.bean",
