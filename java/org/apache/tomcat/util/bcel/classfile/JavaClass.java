@@ -35,7 +35,7 @@ public class JavaClass {
     private final String superclassName;
     private final String[] interfaceNames;
     private final Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
-    private final List<Annotations> runtimeVisibleMethodOfFieldAnnotations; // "RuntimeVisibleAnnotations" attribute defined elsewhere
+    private final List<Annotations> runtimeVisibleFieldOrMethodAnnotations; // "RuntimeVisibleAnnotations" attribute defined elsewhere
 
     /**
      * Constructor gets all contents as arguments.
@@ -46,14 +46,14 @@ public class JavaClass {
      * @param constant_pool Array of constants
      * @param interfaceNames Implemented interfaces
      * @param runtimeVisibleAnnotations "RuntimeVisibleAnnotations" attribute defined on the Class, or null
-     * @param runtimeVisibleMethodOfFieldAnnotations "RuntimeVisibleAnnotations" attribute defined on the fields or methids, or null
+     * @param runtimeVisibleFieldOrMethodAnnotations "RuntimeVisibleAnnotations" attribute defined on the fields or methods, or null
      */
     JavaClass(final String className, final String superclassName,
             final int accessFlags, final ConstantPool constant_pool, final String[] interfaceNames,
-            final Annotations runtimeVisibleAnnotations, final List<Annotations> runtimeVisibleMethodOfFieldAnnotations) {
+            final Annotations runtimeVisibleAnnotations, final List<Annotations> runtimeVisibleFieldOrMethodAnnotations) {
         this.accessFlags = accessFlags;
         this.runtimeVisibleAnnotations = runtimeVisibleAnnotations;
-        this.runtimeVisibleMethodOfFieldAnnotations = runtimeVisibleMethodOfFieldAnnotations;
+        this.runtimeVisibleFieldOrMethodAnnotations = runtimeVisibleFieldOrMethodAnnotations;
         this.className = className;
         this.superclassName = superclassName;
         this.interfaceNames = interfaceNames;
@@ -92,8 +92,8 @@ public class JavaClass {
                 annotationEntries.put(annotationEntry.getAnnotationType(), annotationEntry);
             }
         }
-        if (runtimeVisibleMethodOfFieldAnnotations != null) {
-            for (Annotations annotations : runtimeVisibleMethodOfFieldAnnotations.toArray(new Annotations[0])) {
+        if (runtimeVisibleFieldOrMethodAnnotations != null) {
+            for (Annotations annotations : runtimeVisibleFieldOrMethodAnnotations.toArray(new Annotations[0])) {
                 for (AnnotationEntry annotationEntry : annotations.getAnnotationEntries()) {
                     annotationEntries.putIfAbsent(annotationEntry.getAnnotationType(), annotationEntry);
                 }
