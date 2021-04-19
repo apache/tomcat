@@ -123,6 +123,10 @@
         for the <code>RemoteIpValve</code>. (markt)
       </fix>
       <fix>
+        <bug>65244</bug>: HandlesTypes should include classes that use
+        the specified annotation types on fields or methods. (remm)
+      </fix>
+      <fix>
         <bug>65251</bug>: Correct a regression introduced in 9.0.44 that meant
         that the auto-deployment process may attempt a second, concurrent
         deployment of a web application that is being deployed by the Manager

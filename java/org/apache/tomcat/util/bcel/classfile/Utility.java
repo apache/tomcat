@@ -62,19 +62,6 @@ final class Utility {
         }
     }
 
-    static void swallowFieldOrMethod(final DataInput file)
-            throws IOException {
-        // file.readUnsignedShort(); // Unused access flags
-        // file.readUnsignedShort(); // name index
-        // file.readUnsignedShort(); // signature index
-        skipFully(file, 6);
-
-        int attributes_count = file.readUnsignedShort();
-        for (int i = 0; i < attributes_count; i++) {
-            swallowAttribute(file);
-        }
-    }
-
     static void swallowAttribute(final DataInput file)
             throws IOException {
         //file.readUnsignedShort();   // Unused name index
