@@ -2029,14 +2029,16 @@ class Generator {
                     if (omitAttr == null) {
                         omit = "false";
                     } else {
+                        // String literals returned by attributeValue will be
+                        // quoted and escaped.
                         omit = attributeValue(omitAttr, false, boolean.class);
-                        if ("true".equals(omit)) {
+                        if ("\"true\"".equals(omit)) {
                             continue;
                         }
                     }
                     value = generateNamedAttributeValue(
                             attrs[i].getNamedAttributeNode());
-                    if ("false".equals(omit)) {
+                    if ("\"false\"".equals(omit)) {
                         nvp = " + \" " + attrs[i].getName() + "=\\\"\" + " +
                                 value + " + \"\\\"\"";
                     } else {
