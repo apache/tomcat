@@ -118,6 +118,13 @@
         <bug>65235</bug>: Add missing attributes to the MBean descriptor file
         for the <code>RemoteIpValve</code>. (markt)
       </fix>
+      <fix>
+        <bug>65251</bug>: Correct a regression introduced in 8.5.64 that meant
+        that the auto-deployment process may attempt a second, concurrent
+        deployment of a web application that is being deployed by the Manager
+        resulting in one of the deployments failing and errors being reported.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
