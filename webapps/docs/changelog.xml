@@ -129,10 +129,6 @@
         resulting in one of the deployments failing and errors being reported.
         (markt)
       </fix>
-      <fix>
-        <bug>65256</bug>: HandlesTypes class sets should not include
-        interfaces. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
