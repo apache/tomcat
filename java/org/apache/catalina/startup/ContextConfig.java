@@ -2051,9 +2051,10 @@ public class ContextConfig implements LifecycleListener {
             return;
         }
 
-        if ((javaClass.getAccessFlags() &
-                org.apache.tomcat.util.bcel.Const.ACC_ANNOTATION) != 0) {
-            // Skip annotations.
+        if ((javaClass.getAccessFlags()
+                & (org.apache.tomcat.util.bcel.Const.ACC_ANNOTATION
+                        | org.apache.tomcat.util.bcel.Const.ACC_INTERFACE)) != 0) {
+            // Skip annotations or interfaces
             return;
         }
 
