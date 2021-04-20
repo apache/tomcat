@@ -2223,9 +2223,6 @@ class Generator {
                     // add a Smap for this line
                     n.addSmap(srcLine);
                     break;
-                case '\t': // Not sure we need this
-                    sb.append('\\').append('t');
-                    break;
                 default:
                     sb.append(ch);
                 }
