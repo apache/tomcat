@@ -1878,17 +1878,18 @@ class Generator {
                 }
             }
             TagVariableInfo[] tagInfos = n.getTagVariableInfos();
-            if (tagInfos != null && tagInfos.length > 0) {
+            // The way Tomcat constructs the TagInfo, getTagVariableInfos()
+            // will never return null.
+            if (tagInfos.length > 0) {
                 for (TagVariableInfo tagInfo : tagInfos) {
-                    if (tagInfo != null) {
-                        String name = tagInfo.getNameGiven();
-                        if (name == null) {
-                            String nameFromAttribute =
-                                    tagInfo.getNameFromAttribute();
-                            name = n.getAttributeValue(nameFromAttribute);
-                        }
-                        pageInfo.getVarInfoNames().add(name);
+                    // tagInfo is always non-null
+                    String name = tagInfo.getNameGiven();
+                    if (name == null) {
+                        String nameFromAttribute =
+                                tagInfo.getNameFromAttribute();
+                        name = n.getAttributeValue(nameFromAttribute);
                     }
+                    pageInfo.getVarInfoNames().add(name);
                 }
             }
 
