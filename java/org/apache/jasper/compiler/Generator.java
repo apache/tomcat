@@ -2105,7 +2105,7 @@ class Generator {
             String text = n.getText();
             // If the extended option is being used attempt to minimize the
             // frequency of regex operations.
-            if ((ctxt != null) && ctxt.getOptions().getTrimSpaces().equals(TrimSpacesOption.EXTENDED) &&
+            if (ctxt.getOptions().getTrimSpaces().equals(TrimSpacesOption.EXTENDED) &&
                     text.contains("\n")) {
                 // Ensure there are no <pre> or </pre> tags embedded in this
                 // text - if there are, we want to NOT modify the whitespace.
