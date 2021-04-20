@@ -1915,9 +1915,7 @@ class Generator {
 
             if (ci.isScriptless() && !ci.hasScriptingVars()) {
                 // Generate end of method
-                if (methodNesting > 0) {
-                    out.printil("return false;");
-                }
+                out.printil("return false;");
                 out.popIndent();
                 out.printil("}");
                 out.popIndent();
