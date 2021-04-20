@@ -2017,8 +2017,9 @@ class Generator {
             // Compute attribute value string for XML-style and named
             // attributes
             Hashtable<String,String> map = new Hashtable<>();
+            // Validator ensures this is non-null
             Node.JspAttribute[] attrs = n.getJspAttributes();
-            for (int i = 0; attrs != null && i < attrs.length; i++) {
+            for (int i = 0; i < attrs.length; i++) {
                 String value = null;
                 String nvp = null;
                 if (attrs[i].isNamedAttribute()) {
