@@ -145,6 +145,11 @@
         makes it possible to define a <code>&lt;jsp-file&gt;</code> that will
         not be loaded at start-up. (markt)
       </update>
+      <fix>
+        Allow the JSP configuration option
+        <code>useInstanceManagerForTags</code> to be used with Tags that are
+        implemented as inner classes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
