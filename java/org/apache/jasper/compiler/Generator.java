@@ -2342,13 +2342,9 @@ class Generator {
         }
 
         private void generateTagPlugin(Node.CustomTag n) throws JasperException {
-            if (n.getAtSTag() != null) {
-                n.getAtSTag().visit(this);
-            }
+            n.getAtSTag().visit(this);
             visitBody(n);
-            if (n.getAtETag() != null) {
-                n.getAtETag().visit(this);
-            }
+            n.getAtETag().visit(this);
         }
 
         private void generateCustomStart(Node.CustomTag n,
