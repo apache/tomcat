@@ -2695,33 +2695,31 @@ class Generator {
                 return;
             }
 
+            // Note: ScriptingVariabler$ScriptingVariableVisitor will already
+            // have skipped any variables where declare is set to false.
             List<Object> vec = n.getScriptingVars(scope);
             if (vec != null) {
                 for (Object elem : vec) {
                     if (elem instanceof VariableInfo) {
                         VariableInfo varInfo = (VariableInfo) elem;
-                        if (varInfo.getDeclare()) {
-                            out.printin(varInfo.getClassName());
-                            out.print(" ");
-                            out.print(varInfo.getVarName());
-                            out.println(" = null;");
-                        }
+                        out.printin(varInfo.getClassName());
+                        out.print(" ");
+                        out.print(varInfo.getVarName());
+                        out.println(" = null;");
                     } else {
                         TagVariableInfo tagVarInfo = (TagVariableInfo) elem;
-                        if (tagVarInfo.getDeclare()) {
-                            String varName = tagVarInfo.getNameGiven();
-                            if (varName == null) {
-                                varName = n.getTagData().getAttributeString(
-                                        tagVarInfo.getNameFromAttribute());
-                            } else if (tagVarInfo.getNameFromAttribute() != null) {
-                                // alias
-                                continue;
-                            }
-                            out.printin(tagVarInfo.getClassName());
-                            out.print(" ");
-                            out.print(varName);
-                            out.println(" = null;");
+                        String varName = tagVarInfo.getNameGiven();
+                        if (varName == null) {
+                            varName = n.getTagData().getAttributeString(
+                                    tagVarInfo.getNameFromAttribute());
+                        } else if (tagVarInfo.getNameFromAttribute() != null) {
+                            // alias
+                            continue;
                         }
+                        out.printin(tagVarInfo.getClassName());
+                        out.print(" ");
+                        out.print(varName);
+                        out.println(" = null;");
                     }
                 }
             }
