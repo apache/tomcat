@@ -102,8 +102,7 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
      * @param qry The query
      * @return null (no error message to report other than exception)
      */
-    protected String jmxQuery(MBeanServerConnection jmxServerConnection,
-            String qry) {
+    protected String jmxQuery(MBeanServerConnection jmxServerConnection, String qry) {
         String isError = null;
         Set<ObjectName> names = null;
         String resultproperty = getResultproperty();
@@ -113,8 +112,9 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                 setProperty(resultproperty + ".Length",Integer.toString(names.size()));
             }
         } catch (Exception e) {
-            if (isEcho())
+            if (isEcho()) {
                 handleErrorOutput(e.getMessage());
+            }
             return "Can't query mbeans " + qry;
         }
 
@@ -142,28 +142,29 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
             Object value = null;
 
             for (MBeanAttributeInfo attr : attrs) {
-                if (!attr.isReadable())
+                if (!attr.isReadable()) {
                     continue;
+                }
                 String attName = attr.getName();
-                if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0
-                        || attName.indexOf(' ') >= 0) {
+                if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0 || attName.indexOf(' ') >= 0) {
                     continue;
                 }
 
                 try {
-                    value = jmxServerConnection
-                            .getAttribute(oname, attName);
+                    value = jmxServerConnection.getAttribute(oname, attName);
                 } catch (Exception e) {
-                    if (isEcho())
-                        handleErrorOutput("Error getting attribute "
-                                + oname + " " + pname + attName + " "
-                                + e.toString());
+                    if (isEcho()) {
+                        handleErrorOutput(
+                                "Error getting attribute " + oname + " " + pname + attName + " " + e.toString());
+                    }
                     continue;
                 }
-                if (value == null)
+                if (value == null) {
                     continue;
-                if ("modelerType".equals(attName))
+                }
+                if ("modelerType".equals(attName)) {
                     continue;
+                }
                 createProperty(pname + attName, value);
             }
         } catch (Exception e) {
