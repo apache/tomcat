@@ -2783,10 +2783,12 @@ class Generator {
                     if (varName == null) {
                         varName = n.getTagData().getAttributeString(
                                 tagVarInfo.getNameFromAttribute());
-                    } else if (tagVarInfo.getNameFromAttribute() != null) {
-                        // alias
-                        continue;
                     }
+                    // Alias is not possible here.
+                    // Alias can only be configured for tag files. As SimpleTag
+                    // implementations, isFragment will always be true above
+                    // hence execution never reaches this point.
+
                     String tmpVarName = "_jspx_" + varName + "_"
                             + n.getCustomNestingLevel();
                     out.printin(tmpVarName);
@@ -2853,10 +2855,12 @@ class Generator {
                     if (varName == null) {
                         varName = n.getTagData().getAttributeString(
                                 tagVarInfo.getNameFromAttribute());
-                    } else if (tagVarInfo.getNameFromAttribute() != null) {
-                        // alias
-                        continue;
                     }
+                    // Alias is not possible here.
+                    // Alias can only be configured for tag files. As SimpleTag
+                    // implementations, isFragment will always be true above
+                    // hence execution never reaches this point.
+
                     String tmpVarName = "_jspx_" + varName + "_"
                             + n.getCustomNestingLevel();
                     out.printin(varName);
