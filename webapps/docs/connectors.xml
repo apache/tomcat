@@ -46,7 +46,7 @@ hopefully help you make the right choice according to your needs.</p>
 <p>The HTTP connector is setup by default with Tomcat, and is ready to use. This
 connector features the lowest latency and best overall performance.</p>
 
-<p>For clustering, a HTTP load balancer <b>with support for web sessions stickiness</b>
+<p>For clustering, an HTTP load balancer <b>with support for web sessions stickiness</b>
 must be installed to direct the traffic to the Tomcat servers. Tomcat supports mod_proxy
 (on Apache HTTP Server 2.x, and included by default in Apache HTTP Server 2.2) as the load balancer.
 It should be noted that the performance of HTTP proxying is usually lower than the

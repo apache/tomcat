@@ -18,7 +18,7 @@ package org.apache.tomcat.websocket;
 
 import java.util.List;
 
-import javax.websocket.Extension;
+import jakarta.websocket.Extension;
 
 import org.apache.tomcat.util.res.StringManager;
 

@@ -19,7 +19,7 @@ package org.apache.tomcat.util.http.fileupload.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.apache.tomcat.util.http.fileupload.UploadContext;
@@ -47,7 +47,7 @@ public class ServletRequestContext implements UploadContext {
      *
      * @param request The request to which this context applies.
      */
-    public ServletRequestContext(HttpServletRequest request) {
+    public ServletRequestContext(final HttpServletRequest request) {
         this.request = request;
     }
 
@@ -84,7 +84,7 @@ public class ServletRequestContext implements UploadContext {
         long size;
         try {
             size = Long.parseLong(request.getHeader(FileUploadBase.CONTENT_LENGTH));
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             size = request.getContentLength();
         }
         return size;

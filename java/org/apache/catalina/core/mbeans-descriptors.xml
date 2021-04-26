@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean name="ApplicationFilterConfig"
@@ -205,6 +208,10 @@
                description="The name of this Context"
                type="java.lang.String"/>
 
+    <attribute name="parallelAnnotationScanning"
+               description="The parallel annotation scanning flag"
+               type="boolean"/>
+
     <attribute name="parentClassLoader"
                description="Parent class loader."
                type="java.lang.ClassLoader" />
@@ -316,6 +323,10 @@
 
     <attribute name="unpackWAR"
                description="Unpack WAR property"
+               type="boolean"/>
+
+    <attribute name="useBloomFilterForArchives"
+               description="Use a bloom filter for archives lookups"
                type="boolean"/>
 
     <attribute name="useHttpOnly"
@@ -1117,6 +1128,10 @@
                description="The Java class name of the default error reporter implementation class for deployed web applications."
                type="java.lang.String"
                writeable="false" />
+
+    <attribute name="legacyAppBase"
+               description="The legacy (Java EE) application root for this Host"
+               type="java.lang.String"/>
 
     <attribute name="managedResource"
                description="The managed resource this MBean is associated with"

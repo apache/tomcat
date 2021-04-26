@@ -184,6 +184,25 @@
         used.</p>
       </attribute>
 
+      <attribute name="legacyAppBase" required="false">
+        <p>The legacy Application Base directory for this virtual host. This is
+        the pathname of a directory that may contain Java EE web applications to
+        be converted to Jakarta EE before deployment. Java EE applications
+        packaged as WAR files or directories placed in this directory will be
+        converted to Jakarta EE using the Apache Tomcart Migration Tool for
+        Jakarta EE. The conversion will be performed using default settings. The
+        resulting WAR or directory will be placed in the <code>appBase</code>
+        confiugured for this virtual host.</p>
+        <p>If the default settings are not appropriate for the migration of an
+        application, the full range of migration options may be accessed by
+        performing the migration manually. The <code>migrate.[sh|bat]</code>
+        scripts are provided in the <code>$CATALINA_HOME/bin</code> directory
+        for this purpose.</p>
+        <p>You may specify an absolute pathname, or a pathname that is
+        relative to the <code>$CATALINA_BASE</code> directory. If not specified,
+        the default of <code>webapps-javaee</code> will be used.</p>
+      </attribute>
+
       <attribute name="name" required="true">
         <p>Usually the network name of this virtual host, as registered in your
         <em>Domain Name Service</em> server. Regardless of the case used to
@@ -192,10 +211,8 @@
         have a name that matches the <code>defaultHost</code> setting for that
         Engine.  See <a href="#Host_Name_Aliases">Host Name Aliases</a> for
         information on how to assign more than one network name to the same
-        virtual host. If the name takes the form of <code>*.domainname</code>
-        (e.g. <code>*.apache.org</code>) then it will be treated as a match for
-        any host in that domain unless a host that has an exactly matching name
-        is found.</p>
+        virtual host. The name can not contain a wildcard, this is only
+        valid in an Alias.</p>
       </attribute>
 
       <attribute name="startStopThreads" required="false">
@@ -309,7 +326,7 @@
         use of the Host workDir configuration.  This directory will be made
         visible to servlets in the web application by a servlet context
         attribute (of type <code>java.io.File</code>) named
-        <code>javax.servlet.context.tempdir</code> as described in the
+        <code>jakarta.servlet.context.tempdir</code> as described in the
         Servlet Specification.  If not specified, a suitable directory
         underneath <code>$CATALINA_BASE/work</code> will be provided.</p>
       </attribute>
@@ -492,10 +509,9 @@
     involved must be registered in your DNS server to resolve to the
     same computer that is running this instance of Catalina.</p>
 
-    <p>Aliases may also use the wildcard form (<code>*.domainname</code>)
-       permitted for the <strong>name</strong> attribute of a
-       <strong>Host</strong>.</p>
-
+    <p>Aliases may also use the wildcard form (<code>*.domainname</code>),
+    unlike for the <strong>name</strong> attribute of a <strong>Host</strong>.
+    </p>
   </subsection>
 
 

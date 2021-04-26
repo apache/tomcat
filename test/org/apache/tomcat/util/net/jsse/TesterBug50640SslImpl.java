@@ -23,7 +23,6 @@ import org.apache.tomcat.util.net.SSLUtil;
 
 public class TesterBug50640SslImpl extends JSSEImplementation {
 
-    public static final String PROPERTY_NAME = "sslEnabledProtocols";
     public static final String PROPERTY_VALUE = "magic";
 
 

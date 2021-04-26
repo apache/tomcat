@@ -16,6 +16,7 @@
  */
 package org.apache.coyote;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -135,6 +136,19 @@ public interface ProtocolHandler {
 
 
     /**
+     * Wait for the client connections to the server to close gracefully. The
+     * method will return when all of the client connections have closed or the
+     * method has been waiting for {@code waitTimeMillis}.
+     *
+     * @param waitMillis    The maximum time to wait in milliseconds for the
+     *                      client connections to close.
+     *
+     * @return The wait time, if any remaining when the method returned
+     */
+    public long awaitConnectionsClose(long waitMillis);
+
+
+    /**
      * Requires APR/native library
      *
      * @return <code>true</code> if this Protocol Handler requires the
@@ -179,5 +193,57 @@ public interface ProtocolHandler {
      * @return the protocols
      */
     public UpgradeProtocol[] findUpgradeProtocols();
+
+
+    /**
+     * Some protocols, like AJP, have a packet length that
+     * shouldn't be exceeded, and this can be used to adjust the buffering
+     * used by the application layer.
+     * @return the desired buffer size, or -1 if not relevant
+     */
+    public default int getDesiredBufferSize() {
+        return -1;
+    }
+
+
+    /**
+     * The default behavior is to identify connectors uniquely with address
+     * and port. However, certain connectors are not using that and need
+     * some other identifier, which then can be used as a replacement.
+     * @return the id
+     */
+    public default String getId() {
+        return null;
+    }
+
+
+    /**
+     * Create a new ProtocolHandler for the given protocol.
+     * @param protocol the protocol
+     * @return the newly instantiated protocol handler
+     * @throws ClassNotFoundException Specified protocol was not found
+     * @throws InstantiationException Specified protocol could not be instantiated
+     * @throws IllegalAccessException Exception occurred
+     * @throws IllegalArgumentException Exception occurred
+     * @throws InvocationTargetException Exception occurred
+     * @throws NoSuchMethodException Exception occurred
+     * @throws SecurityException Exception occurred
+     */
+    public static ProtocolHandler create(String protocol)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+        if (protocol == null || "HTTP/1.1".equals(protocol)
+                || org.apache.coyote.http11.Http11NioProtocol.class.getName().equals(protocol)) {
+            return new org.apache.coyote.http11.Http11NioProtocol();
+        } else if ("AJP/1.3".equals(protocol)
+                || org.apache.coyote.ajp.AjpNioProtocol.class.getName().equals(protocol)) {
+            return new org.apache.coyote.ajp.AjpNioProtocol();
+        } else {
+            // Instantiate protocol handler
+            Class<?> clazz = Class.forName(protocol);
+            return (ProtocolHandler) clazz.getConstructor().newInstance();
+        }
+    }
+
 
 }

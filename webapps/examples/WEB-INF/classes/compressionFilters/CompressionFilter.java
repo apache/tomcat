@@ -23,16 +23,16 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.GenericFilter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Implementation of <code>javax.servlet.Filter</code> used to compress
+ * Implementation of <code>jakarta.servlet.Filter</code> used to compress
  * the ServletResponse if it is bigger than a threshold.
  *
  * @author Amy Roh
@@ -118,7 +118,7 @@ public class CompressionFilter extends GenericFilter {
 
             if (values.size() > 0) {
                 compressionMimeTypes = values.toArray(
-                        new String[values.size()]);
+                        new String[0]);
             } else {
                 compressionMimeTypes = null;
             }

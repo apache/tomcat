@@ -20,11 +20,17 @@ package org.apache.tomcat.jni;
 /** SSL Socket
  *
  * @author Mladen Turk
+ *
+ * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+ *              10.1.x / Tomcat Native 2.x onwards to only include those
+ *              components required to provide OpenSSL integration with the NIO
+ *              and NIO2 connectors.
  */
+@Deprecated
 public class SSLSocket {
 
     /**
-     * Attach APR socket on a SSL connection.
+     * Attach APR socket on an SSL connection.
      * @param ctx SSLContext to use.
      * @param sock APR Socket that already did physical connect or accept.
      * @return APR_STATUS code.
@@ -34,14 +40,14 @@ public class SSLSocket {
         throws Exception;
 
     /**
-     * Do a SSL handshake.
+     * Do an SSL handshake.
      * @param thesocket The socket to use
      * @return the handshake status
      */
     public static native int handshake(long thesocket);
 
     /**
-     * Do a SSL renegotiation.
+     * Do an SSL renegotiation.
      * SSL supports per-directory re-configuration of SSL parameters.
      * This is implemented by performing an SSL renegotiation of the
      * re-configured parameters after the request is read, but before the

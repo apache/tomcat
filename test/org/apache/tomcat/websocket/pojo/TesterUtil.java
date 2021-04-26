@@ -16,8 +16,8 @@
  */
 package org.apache.tomcat.websocket.pojo;
 
-import javax.websocket.ClientEndpoint;
-import javax.websocket.server.ServerEndpointConfig.Configurator;
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 

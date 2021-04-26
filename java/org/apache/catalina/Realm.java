@@ -25,6 +25,8 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSCredential;
+import org.ietf.jgss.GSSName;
 
 /**
  * A <b>Realm</b> is a read-only facade for an underlying security realm
@@ -117,6 +119,17 @@ public interface Realm extends Contained {
 
 
     /**
+     * Try to authenticate using a {@link GSSName}
+     *
+     * @param gssName The {@link GSSName} of the principal to look up
+     * @param gssCredential The {@link GSSCredential} of the principal, may be
+     *                      {@code null}
+     * @return the associated principal, or {@code null} if there is none
+     */
+    public Principal authenticate(GSSName gssName, GSSCredential gssCredential);
+
+
+    /**
      * Try to authenticate using {@link X509Certificate}s
      *
      * @param certs Array of client certificates, with the first one in
@@ -205,14 +218,6 @@ public interface Realm extends Contained {
      * @param listener The listener to remove
      */
     public void removePropertyChangeListener(PropertyChangeListener listener);
-
-
-    /**
-     * Return roles associated with given principal
-     * @param principal the {@link Principal} to get the roles for.
-     * @return principal roles
-     */
-    public String[] getRoles(Principal principal);
 
 
     /**

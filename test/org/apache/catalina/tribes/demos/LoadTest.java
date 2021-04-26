@@ -136,7 +136,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
                         if ( debug ) log.error("Unable to send message:"+x.getMessage(),x);
                         log.error("Unable to send message:"+x.getMessage());
                         ChannelException.FaultyMember[] faulty = x.getFaultyMembers();
-                        for (int i=0; i<faulty.length; i++ ) log.error("Faulty: "+faulty[i]);
+                        for (ChannelException.FaultyMember faultyMember : faulty) log.error("Faulty: " + faultyMember);
                         --counter;
                         if ( this.breakonChannelException ) throw x;
                     }
@@ -230,8 +230,8 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
 
     public static void printArray(byte[] data) {
         System.out.print("{");
-        for (int i=0; i<data.length; i++ ) {
-            System.out.print(data[i]);
+        for (byte datum : data) {
+            System.out.print(datum);
             System.out.print(",");
         }
         System.out.println("} size:"+data.length);

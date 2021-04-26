@@ -124,7 +124,8 @@ public interface WebResource {
     InputStream getInputStream();
 
     /**
-     * @return the cached binary content of this resource.
+     * @return the binary content of this resource or {@code null} if it is not
+     *         available in a byte[] because, for example, it is too big.
      */
     byte[] getContent();
 

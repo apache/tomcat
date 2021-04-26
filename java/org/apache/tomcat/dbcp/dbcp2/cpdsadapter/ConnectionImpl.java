@@ -242,7 +242,7 @@ class ConnectionImpl extends DelegatingConnection<Connection> {
     }
 
     @Override
-    public PreparedStatement prepareStatement(final String sql, final int columnIndexes[]) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final int[] columnIndexes) throws SQLException {
         checkOpen();
         try {
             return new DelegatingPreparedStatement(this, pooledConnection.prepareStatement(sql, columnIndexes));
@@ -253,7 +253,7 @@ class ConnectionImpl extends DelegatingConnection<Connection> {
     }
 
     @Override
-    public PreparedStatement prepareStatement(final String sql, final String columnNames[]) throws SQLException {
+    public PreparedStatement prepareStatement(final String sql, final String[] columnNames) throws SQLException {
         checkOpen();
         try {
             return new DelegatingPreparedStatement(this, pooledConnection.prepareStatement(sql, columnNames));

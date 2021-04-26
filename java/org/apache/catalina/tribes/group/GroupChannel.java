@@ -166,7 +166,7 @@ public class GroupChannel extends ChannelInterceptorBase
      * <code>channel.addInterceptor(A);</code><br>
      * <code>channel.addInterceptor(C);</code><br>
      * <code>channel.addInterceptor(B);</code><br>
-     * Will result in a interceptor stack like this:<br>
+     * Will result in an interceptor stack like this:<br>
      * <code>A -&gt; C -&gt; B</code><br>
      * The complete stack will look like this:<br>
      * <code>Channel -&gt; A -&gt; C -&gt; B -&gt; ChannelCoordinator</code><br>
@@ -330,14 +330,13 @@ public class GroupChannel extends ChannelInterceptorBase
             Member source = msg.getAddress();
             boolean rx = false;
             boolean delivered = false;
-            for ( int i=0; i<channelListeners.size(); i++ ) {
-                ChannelListener channelListener = channelListeners.get(i);
+            for (ChannelListener channelListener : channelListeners) {
                 if (channelListener != null && channelListener.accept(fwd, source)) {
                     channelListener.messageReceived(fwd, source);
                     delivered = true;
                     //if the message was accepted by an RPC channel, that channel
                     //is responsible for returning the reply, otherwise we send an absence reply
-                    if ( channelListener instanceof RpcChannel ) rx = true;
+                    if (channelListener instanceof RpcChannel) rx = true;
                 }
             }//for
             if ((!rx) && (fwd instanceof RpcMessage)) {
@@ -354,13 +353,13 @@ public class GroupChannel extends ChannelInterceptorBase
             //this could be the channel listener throwing an exception, we should log it
             //as a warning.
             if ( log.isWarnEnabled() ) log.warn(sm.getString("groupChannel.receiving.error"),x);
-            throw new RemoteProcessException("Exception:"+x.getMessage(),x);
+            throw new RemoteProcessException(sm.getString("groupChannel.receiving.error"),x);
         }
     }
 
     /**
      * Sends a <code>NoRpcChannelReply</code> message to a member<br>
-     * This method gets invoked by the channel if a RPC message comes in
+     * This method gets invoked by the channel if an RPC message comes in
      * and no channel listener accepts the message. This avoids timeout
      * @param msg RpcMessage
      * @param destination Member - the destination for the reply
@@ -385,8 +384,7 @@ public class GroupChannel extends ChannelInterceptorBase
     @Override
     public void memberAdded(Member member) {
         //notify upwards
-        for (int i=0; i<membershipListeners.size(); i++ ) {
-            MembershipListener membershipListener = membershipListeners.get(i);
+        for (MembershipListener membershipListener : membershipListeners) {
             if (membershipListener != null) membershipListener.memberAdded(member);
         }
     }
@@ -399,8 +397,7 @@ public class GroupChannel extends ChannelInterceptorBase
     @Override
     public void memberDisappeared(Member member) {
         //notify upwards
-        for (int i=0; i<membershipListeners.size(); i++ ) {
-            MembershipListener membershipListener = membershipListeners.get(i);
+        for (MembershipListener membershipListener : membershipListeners) {
             if (membershipListener != null) membershipListener.memberDisappeared(member);
         }
     }
@@ -438,13 +435,13 @@ public class GroupChannel extends ChannelInterceptorBase
                 while ( next != null ) {
                     int nflag = next.getOptionFlag();
                     if (nflag!=0 && (((flag & nflag) == flag ) || ((flag & nflag) == nflag)) ) {
-                        conflicts.append("[");
+                        conflicts.append('[');
                         conflicts.append(first.getClass().getName());
-                        conflicts.append(":");
+                        conflicts.append(':');
                         conflicts.append(flag);
                         conflicts.append(" == ");
                         conflicts.append(next.getClass().getName());
-                        conflicts.append(":");
+                        conflicts.append(':');
                         conflicts.append(nflag);
                         conflicts.append("] ");
                     }//end if
@@ -479,13 +476,7 @@ public class GroupChannel extends ChannelInterceptorBase
             ownExecutor = true;
         }
         super.start(svc);
-        monitorFuture = utilityExecutor.scheduleWithFixedDelay(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        startHeartbeat();
-                    }
-                }, 0, 60, TimeUnit.SECONDS);
+        monitorFuture = utilityExecutor.scheduleWithFixedDelay(this::startHeartbeat, 0, 60, TimeUnit.SECONDS);
     }
 
     protected void startHeartbeat() {

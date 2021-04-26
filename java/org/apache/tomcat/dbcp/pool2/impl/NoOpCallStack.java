@@ -31,6 +31,9 @@ public class NoOpCallStack implements CallStack {
      */
     public static final CallStack INSTANCE = new NoOpCallStack();
 
+    /**
+     * Constructs the singleton instance.
+     */
     private NoOpCallStack() {
     }
 

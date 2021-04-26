@@ -84,7 +84,7 @@ public final class Constants {
     // Ajp13 specific -  needs refactoring for the new model
 
     /**
-     * Default maximum total byte size for a AJP packet
+     * Default maximum total byte size for an AJP packet
      */
     public static final int MAX_PACKET_SIZE = 8192;
     /**

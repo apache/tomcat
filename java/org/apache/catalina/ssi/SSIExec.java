@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import org.apache.catalina.util.IOTools;
+import org.apache.tomcat.util.res.StringManager;
 /**
  * Implements the Server-side #exec command
  *
@@ -33,6 +34,7 @@ import org.apache.catalina.util.IOTools;
  * @author David Becker
  */
 public class SSIExec implements SSICommand {
+    private static final StringManager sm = StringManager.getManager(SSIExec.class);
     protected final SSIInclude ssiInclude = new SSIInclude();
     protected static final int BUFFER_SIZE = 1024;
 
@@ -68,14 +70,14 @@ public class SSIExec implements SSICommand {
                 proc.waitFor();
                 lastModified = System.currentTimeMillis();
             } catch (InterruptedException e) {
-                ssiMediator.log("Couldn't exec file: " + substitutedValue, e);
+                ssiMediator.log(sm.getString("ssiExec.executeFailed", substitutedValue), e);
                 writer.write(configErrMsg);
             } catch (IOException e) {
                 if (!foundProgram) {
-                    //apache doesn't output an error message if it can't find
+                    // Apache doesn't output an error message if it can't find
                     // a program
                 }
-                ssiMediator.log("Couldn't exec file: " + substitutedValue, e);
+                ssiMediator.log(sm.getString("ssiExec.executeFailed", substitutedValue), e);
             }
         }
         return lastModified;

@@ -136,8 +136,8 @@
       <attribute name="cors.allowed.origins" required="false">
         <p>A list of <a href="https://tools.ietf.org/html/rfc6454">origins</a>
         that are allowed to access the resource. A <code>*</code> can be
-        specified to enable access to resource from any origin. Otherwise, a
-        whitelist of comma separated origins can be provided. Eg: <code>
+        specified to enable access to resource from any origin. Otherwise, an
+        allow list of comma separated origins can be provided. Eg: <code>
         https://www.w3.org, https://www.apache.org</code>.
         <strong>Defaults:</strong> The empty String. (No origin is allowed to
         access the resource).</p>
@@ -508,7 +508,7 @@ HTTP/1.1 200 OK
   <subsection name="Basic configuration sample">
     <p>
     Basic configuration to add '<code>Expires</code>' and '<code>Cache-Control: max-age=</code>'
-    headers to images, css and javascript.
+    headers to images, CSS and JavaScript.
     </p>
 
     <source><![CDATA[<filter>
@@ -1551,6 +1551,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
     <attributes>
 
+      <attribute name="enableLookups" required="false">
+        <p>Should a DNS lookup be performed to provide a host name when calling
+        <code>ServletRequest#getRemoteHost()</code>. If not specified, the
+        default of <code>false</code> is used.</p>
+      </attribute>
+
       <attribute name="remoteIpHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the list of
         traversed IP addresses starting from the requesting client. If not
@@ -1594,6 +1600,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       <attribute name="protocolHeader" required="false">
         <p>Name of the HTTP Header read by this valve that holds the protocol
         used by the client to connect to the proxy. If not specified, the
+        default of <code>X-Forwarded-Proto</code> is used.</p>
+      </attribute>
+
+      <attribute name="hostHeader" required="false">
+        <p>Name of the HTTP Header read by this valve that holds the host
+        used by the client to connect to the proxy. If not specified, the
         default of <code>null</code> is used.</p>
       </attribute>
 
@@ -1621,6 +1633,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         when the <strong>protocolHeader</strong> indicates <code>https</code>
         protocol and no <strong>portHeader</strong> is present. If not
         specified, the default of <code>443</code> is used.</p>
+      </attribute>
+
+      <attribute name="changeLocalName" required="false">
+        <p>If <code>true</code>, the value returned by
+        <code>ServletRequest.getLocalName()</code> and
+        <code>ServletRequest.getServerName()</code> is modified by the this
+        filter. If not specified, the default of <code>false</code> is used.</p>
       </attribute>
 
       <attribute name="changeLocalPort" required="false">
@@ -1707,12 +1726,12 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
 <section name="Session Initializer Filter">
 
   <subsection name="Introduction">
-    <p>The Session Initializer Filter initializes the <code>javax.servlet.http.HttpSession</code>
+    <p>The Session Initializer Filter initializes the <code>jakarta.servlet.http.HttpSession</code>
     before the Request is processed.  This is required for JSR-356 compliant WebSocket implementations,
     if the <code>HttpSession</code> is needed during the HandShake phase.</p>
 
     <p>The Java API for WebSocket does not mandate that an <code>HttpSession</code> would
-    be initialized upon request, and thus <code>javax.servlet.http.HttpServletRequest</code>'s
+    be initialized upon request, and thus <code>jakarta.servlet.http.HttpServletRequest</code>'s
     <code>getSession()</code> returns <code>null</code> if the <code>HttpSession</code> was not
     initialized in advance.</p>
 

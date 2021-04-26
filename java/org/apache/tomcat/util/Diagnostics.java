@@ -235,9 +235,7 @@ public class Diagnostics {
                 try {
                     mbean.setUsageThreshold(threshold);
                     return true;
-                } catch (IllegalArgumentException ex) {
-                    // IGNORE
-                } catch (UnsupportedOperationException ex) {
+                } catch (IllegalArgumentException | UnsupportedOperationException ex) {
                     // IGNORE
                 }
                 return false;
@@ -259,9 +257,7 @@ public class Diagnostics {
                 try {
                     mbean.setCollectionUsageThreshold(threshold);
                     return true;
-                } catch (IllegalArgumentException ex) {
-                    // IGNORE
-                } catch (UnsupportedOperationException ex) {
+                } catch (IllegalArgumentException | UnsupportedOperationException ex) {
                     // IGNORE
                 }
                 return false;
@@ -316,8 +312,8 @@ public class Diagnostics {
         StackTraceElement[] stes = ti.getStackTrace();
         Object[] monitorDepths = new Object[stes.length];
         MonitorInfo[] mis = ti.getLockedMonitors();
-        for (int i = 0; i < mis.length; i++) {
-            monitorDepths[mis[i].getLockedStackDepth()] = mis[i];
+        for (MonitorInfo monitorInfo : mis) {
+            monitorDepths[monitorInfo.getLockedStackDepth()] = monitorInfo;
         }
         for (int i = 0; i < stes.length; i++) {
             StackTraceElement ste = stes[i];
@@ -426,7 +422,7 @@ public class Diagnostics {
         sb.append(CRLF);
 
         sb.append(requestedSm.getString("diagnostics.threadDumpTitle"));
-        sb.append(" ");
+        sb.append(' ');
         sb.append(runtimeMXBean.getVmName());
         sb.append(" (");
         sb.append(runtimeMXBean.getVmVersion());

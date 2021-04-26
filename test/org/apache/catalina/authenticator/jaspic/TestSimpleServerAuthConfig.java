@@ -19,10 +19,10 @@ package org.apache.catalina.authenticator.jaspic;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.security.auth.message.AuthException;
-import javax.security.auth.message.MessageInfo;
-import javax.security.auth.message.config.ServerAuthConfig;
-import javax.security.auth.message.config.ServerAuthContext;
+import jakarta.security.auth.message.AuthException;
+import jakarta.security.auth.message.MessageInfo;
+import jakarta.security.auth.message.config.ServerAuthConfig;
+import jakarta.security.auth.message.config.ServerAuthContext;
 
 import org.junit.Assert;
 import org.junit.Test;

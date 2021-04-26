@@ -17,7 +17,7 @@
 
 package org.apache.tomcat.util.net.openssl.ciphers;
 
-enum KeyExchange {
+public enum KeyExchange {
     EECDH /* SSL_kEECDH - ephemeral ECDH */,
     RSA   /* SSL_kRSA   - RSA key exchange */,
     DHr   /* SSL_kDHr   - DH cert, RSA CA cert */ /* no such ciphersuites supported! */,

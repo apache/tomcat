@@ -18,7 +18,7 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.apache.catalina.Host;
 import org.apache.catalina.connector.Request;
@@ -63,7 +63,11 @@ final class StandardEngineValve extends ValveBase {
         Host host = request.getHost();
         if (host == null) {
             // HTTP 0.9 or HTTP 1.0 request without a host when no default host
-            // is defined. This is handled by the CoyoteAdapter.
+            // is defined.
+            // Don't overwrite an existing error
+            if (!response.isError()) {
+                response.sendError(404);
+            }
             return;
         }
         if (request.isAsyncSupported()) {

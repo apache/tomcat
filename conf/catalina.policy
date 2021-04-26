@@ -39,7 +39,7 @@ grant codeBase "file:${java.home}/jre/lib/ext/-" {
         permission java.security.AllPermission;
 };
 
-// These permissions apply to javac when ${java.home] points at $JAVA_HOME/jre
+// These permissions apply to javac when ${java.home} points at $JAVA_HOME/jre
 grant codeBase "file:${java.home}/../lib/-" {
         permission java.security.AllPermission;
 };

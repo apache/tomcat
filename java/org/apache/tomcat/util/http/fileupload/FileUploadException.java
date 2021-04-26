@@ -16,26 +16,50 @@
  */
 package org.apache.tomcat.util.http.fileupload;
 
+import java.io.IOException;
+
 /**
  * Exception for errors encountered while processing the request.
  */
-public class FileUploadException extends Exception {
+public class FileUploadException extends IOException {
 
     private static final long serialVersionUID = -4222909057964038517L;
 
+    /**
+     * Constructs a new {@code FileUploadException} without message.
+     */
     public FileUploadException() {
         super();
     }
 
-    public FileUploadException(String message, Throwable cause) {
-        super(message, cause);
+    /**
+     * Constructs a new {@code FileUploadException} with specified detail
+     * message.
+     *
+     * @param msg the error message.
+     */
+    public FileUploadException(final String msg) {
+        super(msg);
     }
 
-    public FileUploadException(String message) {
-        super(message);
+    /**
+     * Creates a new {@code FileUploadException} with the given
+     * detail message and cause.
+     *
+     * @param msg The exceptions detail message.
+     * @param cause The exceptions cause.
+     */
+    public FileUploadException(final String msg, final Throwable cause) {
+        super(msg, cause);
     }
 
-    public FileUploadException(Throwable cause) {
+    /**
+     * Creates a new {@code FileUploadException} with the given
+     * cause.
+     *
+     * @param cause The exceptions cause.
+     */
+    public FileUploadException(final Throwable cause) {
         super(cause);
     }
 }

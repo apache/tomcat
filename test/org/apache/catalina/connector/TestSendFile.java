@@ -22,19 +22,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,34 +60,31 @@ public class TestSendFile extends TomcatBaseTest {
         File[] files = new File[ITERATIONS];
         for (int i = 0; i < ITERATIONS; i++) {
             files[i] = generateFile(TEMP_DIR, "-" + i, EXPECTED_CONTENT_LENGTH * (i + 1));
+            addDeleteOnTearDown(files[i]);
         }
-        try {
 
-            for (int i = 0; i < ITERATIONS; i++) {
-                WritingServlet servlet = new WritingServlet(files[i]);
-                Tomcat.addServlet(root, "servlet" + i, servlet);
-                root.addServletMappingDecoded("/servlet" + i, "servlet" + i);
-            }
+        for (int i = 0; i < ITERATIONS; i++) {
+            WritingServlet servlet = new WritingServlet(files[i]);
+            Tomcat.addServlet(root, "servlet" + i, servlet);
+            root.addServletMappingDecoded("/servlet" + i, "servlet" + i);
+        }
 
-            tomcat.start();
+        tomcat.start();
 
-            ByteChunk bc = new ByteChunk();
-            Map<String, List<String>> respHeaders = new HashMap<>();
-            for (int i = 0; i < ITERATIONS; i++) {
-                long start = System.currentTimeMillis();
-                int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null,
-                        respHeaders);
-                Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-                System.out.println("Client received " + bc.getLength() + " bytes in "
-                        + (System.currentTimeMillis() - start) + " ms.");
-                Assert.assertEquals(EXPECTED_CONTENT_LENGTH * (i + 1L), bc.getLength());
+        ByteChunk bc = new ByteChunk();
+        Map<String, List<String>> respHeaders = new HashMap<>();
+        for (int i = 0; i < ITERATIONS; i++) {
+            long start = System.currentTimeMillis();
+            int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null,
+                    respHeaders);
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            System.out.println("Client received " + bc.getLength() + " bytes in "
+                    + (System.currentTimeMillis() - start) + " ms.");
+            Assert.assertEquals("Expected [" + EXPECTED_CONTENT_LENGTH * (i + 1L) +
+                    "], was [" + bc.getLength() + "]",
+                    EXPECTED_CONTENT_LENGTH * (i + 1L), bc.getLength());
 
-                bc.recycle();
-            }
-        } finally {
-            for (File f : files) {
-                Assert.assertTrue("Failed to clean up [" + f + "]", f.delete());
-            }
+            bc.recycle();
         }
     }
 
@@ -170,18 +167,18 @@ public class TestSendFile extends TomcatBaseTest {
                 + "=true", bc, null);
 
         CountDownLatch latch = new CountDownLatch(2);
-        List<Throwable> exceptions = new ArrayList<>();
+        List<Throwable> throwables = new CopyOnWriteArrayList<>();
         new Thread(
-                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, exceptions))
+                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, throwables))
                         .start();
         new Thread(
-                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, exceptions))
+                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, throwables))
                         .start();
 
         latch.await(3000, TimeUnit.MILLISECONDS);
 
-        if (exceptions.size() > 0) {
-            Assert.fail();
+        if (throwables.size() > 0) {
+            Assert.fail("[" + throwables.size() + "] throwables observed");
         }
     }
 

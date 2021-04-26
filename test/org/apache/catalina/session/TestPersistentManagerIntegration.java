@@ -20,15 +20,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -40,28 +38,6 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.PersistentValve;
 
 public class TestPersistentManagerIntegration extends TomcatBaseTest {
-
-    private static final String ACTIVITY_CHECK = "org.apache.catalina.session.StandardSession.ACTIVITY_CHECK";
-
-    private String oldActivityCheck;
-
-    /**
-     * As documented in config/manager.html, the "ACTIVITY_CHECK" property must
-     * be set to "true" for PersistentManager to function correctly.
-     */
-    @Before
-    public void setActivityCheck() {
-        oldActivityCheck = System.setProperty(ACTIVITY_CHECK, "true");
-    }
-
-    @After
-    public void resetActivityCheck() {
-        if (oldActivityCheck != null) {
-            System.setProperty(ACTIVITY_CHECK, oldActivityCheck);
-        } else {
-            System.clearProperty(ACTIVITY_CHECK);
-        }
-    }
 
     /**
      * Wait enough for the system clock to update its value. On some systems
@@ -109,6 +85,7 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
+        manager.setSessionActivityCheck(true);
         ctx.setManager(manager);
         ctx.addValve(new PersistentValve());
         tomcat.start();
@@ -141,6 +118,7 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
+        manager.setSessionActivityCheck(true);
         ctx.setManager(manager);
         ctx.addValve(new PersistentValve());
         tomcat.start();
@@ -173,6 +151,7 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
+        manager.setSessionActivityCheck(true);
         ctx.setManager(manager);
         tomcat.start();
         String sessionId = getUrl("http://localhost:" + getPort() + "/dummy")

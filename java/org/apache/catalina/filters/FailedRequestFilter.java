@@ -18,11 +18,11 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
@@ -35,11 +35,12 @@ import org.apache.tomcat.util.http.Parameters.FailReason;
  * submitted by client are lost.
  *
  * <p>
- * Note that it has side effect that it triggers parameter parsing and thus
- * consumes the body for POST requests. Parameter parsing does check content
- * type of the request, so there should not be problems with addresses that use
- * <code>request.getInputStream()</code> and <code>request.getReader()</code>,
- * if requests parsed by them do not use standard value for content mime-type.
+ * Note that parameter parsing may consume the body of an HTTP request, so
+ * caution is needed if the servlet protected by this filter uses
+ * <code>request.getInputStream()</code> or <code>request.getReader()</code>
+ * calls. In general the risk of breaking a web application by adding this
+ * filter is not so high, because parameter parsing does check content type
+ * of the request before consuming the request body.
  */
 public class FailedRequestFilter extends FilterBase {
 

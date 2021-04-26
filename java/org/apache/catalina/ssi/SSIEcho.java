@@ -18,6 +18,8 @@ package org.apache.catalina.ssi;
 
 
 import java.io.PrintWriter;
+
+import org.apache.tomcat.util.res.StringManager;
 /**
  * Return the result associated with the supplied Server Variable.
  *
@@ -27,7 +29,8 @@ import java.io.PrintWriter;
  * @author David Becker
  */
 public class SSIEcho implements SSICommand {
-    protected static final String DEFAULT_ENCODING = "entity";
+    private static final StringManager sm = StringManager.getManager(SSIEcho.class);
+    protected static final String DEFAULT_ENCODING = SSIMediator.ENCODING_ENTITY;
     protected static final String MISSING_VARIABLE_VALUE = "(none)";
 
 
@@ -49,16 +52,15 @@ public class SSIEcho implements SSICommand {
                 if (isValidEncoding(paramValue)) {
                     encoding = paramValue;
                 } else {
-                    ssiMediator.log("#echo--Invalid encoding: " + paramValue);
-                    writer.write(errorMessage);
+                    ssiMediator.log(sm.getString("ssiEcho.invalidEncoding", paramValue));
+                    writer.write(ssiMediator.encode(errorMessage, SSIMediator.ENCODING_ENTITY));
                 }
             } else {
-                ssiMediator.log("#echo--Invalid attribute: " + paramName);
-                writer.write(errorMessage);
+                ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
+                writer.write(ssiMediator.encode(errorMessage, SSIMediator.ENCODING_ENTITY));
             }
         }
-        String variableValue = ssiMediator.getVariableValue(
-                originalValue, encoding);
+        String variableValue = ssiMediator.getVariableValue(originalValue, encoding);
         if (variableValue == null) {
             variableValue = MISSING_VARIABLE_VALUE;
         }
@@ -68,8 +70,8 @@ public class SSIEcho implements SSICommand {
 
 
     protected boolean isValidEncoding(String encoding) {
-        return encoding.equalsIgnoreCase("url")
-                || encoding.equalsIgnoreCase("entity")
-                || encoding.equalsIgnoreCase("none");
+        return encoding.equalsIgnoreCase(SSIMediator.ENCODING_URL)
+                || encoding.equalsIgnoreCase(SSIMediator.ENCODING_ENTITY)
+                || encoding.equalsIgnoreCase(SSIMediator.ENCODING_NONE);
     }
 }

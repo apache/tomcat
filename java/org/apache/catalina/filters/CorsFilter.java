@@ -18,8 +18,6 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,22 +27,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.GenericFilter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
- * A {@link javax.servlet.Filter} that enable client-side cross-origin requests
+ * A {@link jakarta.servlet.Filter} that enable client-side cross-origin requests
  * by implementing W3C's CORS (<b>C</b>ross-<b>O</b>rigin <b>R</b>esource
  * <b>S</b>haring) specification for resources. Each {@link HttpServletRequest}
  * request is inspected as per specification, and appropriate response headers
@@ -589,9 +588,9 @@ public class CorsFilter extends GenericFilter {
         if (originHeader != null) {
             if (originHeader.isEmpty()) {
                 requestType = CORSRequestType.INVALID_CORS;
-            } else if (!isValidOrigin(originHeader)) {
+            } else if (!RequestUtil.isValidOrigin(originHeader)) {
                 requestType = CORSRequestType.INVALID_CORS;
-            } else if (isLocalOrigin(request, originHeader)) {
+            } else if (RequestUtil.isSameOrigin(request, originHeader)) {
                 return CORSRequestType.NOT_CORS;
             } else {
                 String method = request.getMethod();
@@ -631,36 +630,6 @@ public class CorsFilter extends GenericFilter {
         }
 
         return requestType;
-    }
-
-
-    private boolean isLocalOrigin(HttpServletRequest request, String origin) {
-
-        // Build scheme://host:port from request
-        StringBuilder target = new StringBuilder();
-        String scheme = request.getScheme();
-        if (scheme == null) {
-            return false;
-        } else {
-            scheme = scheme.toLowerCase(Locale.ENGLISH);
-        }
-        target.append(scheme);
-        target.append("://");
-
-        String host = request.getServerName();
-        if (host == null) {
-            return false;
-        }
-        target.append(host);
-
-        int port = request.getServerPort();
-        if ("http".equals(scheme) && port != 80 ||
-                "https".equals(scheme) && port != 443) {
-            target.append(':');
-            target.append(port);
-        }
-
-        return origin.equalsIgnoreCase(target.toString());
     }
 
 
@@ -752,7 +721,7 @@ public class CorsFilter extends GenericFilter {
         this.exposedHeaders.clear();
         this.exposedHeaders.addAll(setExposedHeaders);
 
-        // For any value other then 'true' this will be false.
+        // For any value other than 'true' this will be false.
         this.supportsCredentials = Boolean.parseBoolean(supportsCredentials);
 
         if (this.supportsCredentials && this.anyOriginAllowed) {
@@ -770,7 +739,7 @@ public class CorsFilter extends GenericFilter {
                     sm.getString("corsFilter.invalidPreflightMaxAge"), e);
         }
 
-        // For any value other then 'true' this will be false.
+        // For any value other than 'true' this will be false.
         this.decorateRequest = Boolean.parseBoolean(decorateRequest);
     }
 
@@ -798,48 +767,6 @@ public class CorsFilter extends GenericFilter {
         }
 
         return set;
-    }
-
-
-    /**
-     * Checks if a given origin is valid or not. Criteria:
-     * <ul>
-     * <li>If an encoded character is present in origin, it's not valid.</li>
-     * <li>If origin is "null", it's valid.</li>
-     * <li>Origin should be a valid {@link URI}</li>
-     * </ul>
-     *
-     * @param origin The origin URI
-     * @return <code>true</code> if the origin was valid
-     * @see <a href="http://tools.ietf.org/html/rfc952">RFC952</a>
-     */
-    protected static boolean isValidOrigin(String origin) {
-        // Checks for encoded characters. Helps prevent CRLF injection.
-        if (origin.contains("%")) {
-            return false;
-        }
-
-        // "null" is a valid origin
-        if ("null".equals(origin)) {
-            return true;
-        }
-
-        // RFC6454, section 4. "If uri-scheme is file, the implementation MAY
-        // return an implementation-defined value.". No limits are placed on
-        // that value so treat all file URIs as valid origins.
-        if (origin.startsWith("file://")) {
-            return true;
-        }
-
-        URI originURI;
-        try {
-            originURI = new URI(origin);
-        } catch (URISyntaxException e) {
-            return false;
-        }
-        // If scheme for URI is null, return false. Return true otherwise.
-        return originURI.getScheme() != null;
-
     }
 
 
@@ -978,15 +905,6 @@ public class CorsFilter extends GenericFilter {
     // -------------------------------------------------- CORS Request Headers
 
     /**
-     * The Vary header indicates allows disabling proxy caching by indicating
-     * the the response depends on the origin.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10
-     */
-    @Deprecated
-    public static final String REQUEST_HEADER_VARY = "Vary";
-
-    /**
      * The Origin header indicates where the cross-origin request or preflight
      * request originates from.
      */
@@ -1048,7 +966,7 @@ public class CorsFilter extends GenericFilter {
          */
         SIMPLE,
         /**
-         * A HTTP request that needs to be pre-flighted.
+         * An HTTP request that needs to be pre-flighted.
          */
         ACTUAL,
         /**
@@ -1122,39 +1040,39 @@ public class CorsFilter extends GenericFilter {
 
     // ----------------------------------------Filter Config Init param-name(s)
     /**
-     * Key to retrieve allowed origins from {@link javax.servlet.FilterConfig}.
+     * Key to retrieve allowed origins from {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_ALLOWED_ORIGINS =
             "cors.allowed.origins";
 
     /**
      * Key to retrieve support credentials from
-     * {@link javax.servlet.FilterConfig}.
+     * {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_SUPPORT_CREDENTIALS =
             "cors.support.credentials";
 
     /**
-     * Key to retrieve exposed headers from {@link javax.servlet.FilterConfig}.
+     * Key to retrieve exposed headers from {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_EXPOSED_HEADERS =
             "cors.exposed.headers";
 
     /**
-     * Key to retrieve allowed headers from {@link javax.servlet.FilterConfig}.
+     * Key to retrieve allowed headers from {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_ALLOWED_HEADERS =
             "cors.allowed.headers";
 
     /**
-     * Key to retrieve allowed methods from {@link javax.servlet.FilterConfig}.
+     * Key to retrieve allowed methods from {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_ALLOWED_METHODS =
             "cors.allowed.methods";
 
     /**
      * Key to retrieve preflight max age from
-     * {@link javax.servlet.FilterConfig}.
+     * {@link jakarta.servlet.FilterConfig}.
      */
     public static final String PARAM_CORS_PREFLIGHT_MAXAGE =
             "cors.preflight.maxage";

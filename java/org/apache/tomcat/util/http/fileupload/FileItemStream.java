@@ -21,7 +21,7 @@ import java.io.InputStream;
 
 /**
  * <p> This interface provides access to a file or form item that was
- * received within a <code>multipart/form-data</code> POST request.
+ * received within a {@code multipart/form-data} POST request.
  * The items contents are retrieved by calling {@link #openStream()}.</p>
  * <p>Instances of this class are created by accessing the
  * iterator, returned by
@@ -40,7 +40,7 @@ public interface FileItemStream extends FileItemHeadersSupport {
      * {@link java.util.Iterator#hasNext()} has been invoked on the
      * iterator, which created the {@link FileItemStream}.
      */
-    public static class ItemSkippedException extends IOException {
+    class ItemSkippedException extends IOException {
 
         /**
          * The exceptions serial version UID, which is being used
@@ -64,21 +64,21 @@ public interface FileItemStream extends FileItemHeadersSupport {
     InputStream openStream() throws IOException;
 
     /**
-     * Returns the content type passed by the browser or <code>null</code> if
+     * Returns the content type passed by the browser or {@code null} if
      * not defined.
      *
-     * @return The content type passed by the browser or <code>null</code> if
+     * @return The content type passed by the browser or {@code null} if
      *         not defined.
      */
     String getContentType();
 
     /**
-     * Returns the original filename in the client's filesystem, as provided by
+     * Returns the original file name in the client's file system, as provided by
      * the browser (or other client software). In most cases, this will be the
      * base file name, without path information. However, some clients, such as
      * the Opera browser, do include path information.
      *
-     * @return The original filename in the client's filesystem.
+     * @return The original file name in the client's file system.
      */
     String getName();
 
@@ -91,11 +91,11 @@ public interface FileItemStream extends FileItemHeadersSupport {
     String getFieldName();
 
     /**
-     * Determines whether or not a <code>FileItem</code> instance represents
+     * Determines whether or not a {@code FileItem} instance represents
      * a simple form field.
      *
-     * @return <code>true</code> if the instance represents a simple form
-     *         field; <code>false</code> if it represents an uploaded file.
+     * @return {@code true} if the instance represents a simple form
+     *         field; {@code false} if it represents an uploaded file.
      */
     boolean isFormField();
 

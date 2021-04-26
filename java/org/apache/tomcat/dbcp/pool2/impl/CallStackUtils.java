@@ -25,13 +25,9 @@ import java.security.AccessControlException;
  */
 public final class CallStackUtils {
 
-    private static final boolean CAN_CREATE_SECURITY_MANAGER;
-
-    static {
-        CAN_CREATE_SECURITY_MANAGER = canCreateSecurityManager();
-    }
-
     /**
+     * Returns whether the caller can create a security manager in the current environment.
+     *
      * @return {@code true} if it is able to create a security manager in the current environment, {@code false}
      *         otherwise.
      */
@@ -76,9 +72,9 @@ public final class CallStackUtils {
     public static CallStack newCallStack(final String messageFormat,
                                          final boolean useTimestamp,
                                          final boolean requireFullStackTrace) {
-        return CAN_CREATE_SECURITY_MANAGER && !requireFullStackTrace
-            ? new SecurityManagerCallStack(messageFormat, useTimestamp)
-            : new ThrowableCallStack(messageFormat, useTimestamp);
+        return canCreateSecurityManager() && !requireFullStackTrace ?
+            new SecurityManagerCallStack(messageFormat, useTimestamp) :
+            new ThrowableCallStack(messageFormat, useTimestamp);
     }
 
     /**

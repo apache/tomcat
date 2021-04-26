@@ -21,13 +21,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.net.SSLSessionManager;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
@@ -72,10 +75,22 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     private SSLSession session;
+    private Map<String,List<String>> additionalAttributes;
 
-
+    /**
+     * @param session SSLSession from which information is to be extracted
+     *
+     * @deprecated This will be removed in Tomcat 10.1.x onwards
+     *             Use {@link JSSESupport#JSSESupport(SSLSession, Map)}
+     */
+    @Deprecated
     public JSSESupport(SSLSession session) {
+        this(session, null);
+    }
+
+    public JSSESupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
         this.session = session;
+        this.additionalAttributes = additionalAttributes;
     }
 
     @Override
@@ -84,6 +99,14 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         if (session == null)
             return null;
         return session.getCipherSuite();
+    }
+
+    @Override
+    public X509Certificate[] getLocalCertificateChain() {
+        if (session == null) {
+            return null;
+        }
+        return convertCertificates(session.getLocalCertificates());
     }
 
     @Override
@@ -99,6 +122,12 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
             log.debug(sm.getString("jsseSupport.clientCertError"), t);
             return null;
         }
+
+        return convertCertificates(certs);
+    }
+
+
+    private static java.security.cert.X509Certificate[] convertCertificates(Certificate[] certs) {
         if( certs==null ) return null;
 
         java.security.cert.X509Certificate [] x509Certs =
@@ -157,10 +186,10 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         if ( ssl_session == null)
             return null;
         StringBuilder buf=new StringBuilder();
-        for(int x=0; x<ssl_session.length; x++) {
-            String digit=Integer.toHexString(ssl_session[x]);
-            if (digit.length()<2) buf.append('0');
-            if (digit.length()>2) digit=digit.substring(digit.length()-2);
+        for (byte b : ssl_session) {
+            String digit = Integer.toHexString(b);
+            if (digit.length() < 2) buf.append('0');
+            if (digit.length() > 2) digit = digit.substring(digit.length() - 2);
             buf.append(digit);
         }
         return buf.toString();
@@ -186,6 +215,22 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
            return null;
         }
        return session.getProtocol();
-   }
+    }
+
+    @Override
+    public String getRequestedProtocols() throws IOException {
+        if (additionalAttributes == null) {
+            return null;
+        }
+        return StringUtils.join(additionalAttributes.get(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY));
+    }
+
+    @Override
+    public String getRequestedCiphers() throws IOException {
+        if (additionalAttributes == null) {
+            return null;
+        }
+        return StringUtils.join(additionalAttributes.get(SSLSupport.REQUESTED_CIPHERS_KEY));
+    }
 }
 

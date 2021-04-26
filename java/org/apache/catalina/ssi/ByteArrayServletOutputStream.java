@@ -19,12 +19,12 @@ package org.apache.catalina.ssi;
 
 import java.io.ByteArrayOutputStream;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 
 
 /**
- * Class that extends ServletOuputStream, used as a wrapper from within
+ * Class that extends ServletOutputStream, used as a wrapper from within
  * <code>SsiInclude</code>
  *
  * @author Bip Thelin

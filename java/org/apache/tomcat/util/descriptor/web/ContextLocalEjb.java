@@ -106,7 +106,7 @@ public class ContextLocalEjb extends ResourceBase {
             sb.append(", local=");
             sb.append(local);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

@@ -77,7 +77,7 @@ What it does:
         c2) Starts the services under <Server> which are:
             StandardService -> starts Engine (ContainerBase -> Realm,Cluster etc)
         c3) StandardHost (started by the service)
-                Configures a ErrorReportValvem to do proper HTML output for different HTTP
+                Configures an ErrorReportValve to do proper HTML output for different HTTP
                 errors codes
                 Starts the Valves in the pipeline (at least the ErrorReportValve)
                 Configures the StandardHostValve,

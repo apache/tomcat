@@ -16,6 +16,9 @@
  */
 package org.apache.coyote.ajp;
 
+import java.net.InetAddress;
+import java.util.regex.Pattern;
+
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
@@ -46,6 +49,8 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         setConnectionTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         // AJP does not use Send File
         getEndpoint().setUseSendfile(false);
+        // AJP listens on loopback by default
+        getEndpoint().setAddress(InetAddress.getLoopbackAddress());
         ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
         setHandler(cHandler);
         getEndpoint().setHandler(cHandler);
@@ -139,17 +144,60 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private String requiredSecret = null;
+    private String secret = null;
+    /**
+     * Set the secret that must be included with every request.
+     *
+     * @param secret The required secret
+     */
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+    protected String getSecret() {
+        return secret;
+    }
     /**
      * Set the required secret that must be included with every request.
      *
      * @param requiredSecret The required secret
+     *
+     * @deprecated Replaced by {@link #setSecret(String)}.
+     *             Will be removed in Tomcat 11 onwards
      */
+    @Deprecated
     public void setRequiredSecret(String requiredSecret) {
-        this.requiredSecret = requiredSecret;
+        setSecret(requiredSecret);
     }
+    /**
+     * @return The current secret
+     *
+     * @deprecated Replaced by {@link #getSecret()}.
+     *             Will be removed in Tomcat 11 onwards
+     */
+    @Deprecated
     protected String getRequiredSecret() {
-        return requiredSecret;
+        return getSecret();
+    }
+
+
+    private boolean secretRequired = true;
+    public void setSecretRequired(boolean secretRequired) {
+        this.secretRequired = secretRequired;
+    }
+    public boolean getSecretRequired() {
+        return secretRequired;
+    }
+
+
+    private Pattern allowedRequestAttributesPattern;
+    public void setAllowedRequestAttributesPattern(String allowedRequestAttributesPattern) {
+        this.allowedRequestAttributesPattern = Pattern.compile(allowedRequestAttributesPattern);
+    }
+    public String getAllowedRequestAttributesPattern() {
+        return allowedRequestAttributesPattern.pattern();
+    }
+    protected Pattern getAllowedRequestAttributesPatternInternal() {
+        return allowedRequestAttributesPattern;
     }
 
 
@@ -159,11 +207,17 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     private int packetSize = Constants.MAX_PACKET_SIZE;
     public int getPacketSize() { return packetSize; }
     public void setPacketSize(int packetSize) {
-        if(packetSize < Constants.MAX_PACKET_SIZE) {
+        if (packetSize < Constants.MAX_PACKET_SIZE) {
             this.packetSize = Constants.MAX_PACKET_SIZE;
         } else {
             this.packetSize = packetSize;
         }
+    }
+
+
+    @Override
+    public int getDesiredBufferSize() {
+        return getPacketSize() - Constants.SEND_HEAD_LEN;
     }
 
 
@@ -205,5 +259,17 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
             UpgradeToken upgradeToken) {
         throw new IllegalStateException(sm.getString("ajpprotocol.noUpgradeHandler",
                 upgradeToken.getHttpUpgradeHandler().getClass().getName()));
+    }
+
+
+    @Override
+    public void start() throws Exception {
+        if (getSecretRequired()) {
+            String secret = getSecret();
+            if (secret == null || secret.length() == 0) {
+                throw new IllegalArgumentException(sm.getString("ajpprotocol.noSecret"));
+            }
+        }
+        super.start();
     }
 }

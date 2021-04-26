@@ -23,13 +23,13 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.xml.sax.Attributes;
 
 /**
- * Rule implementation that creates a SSLHostConfigCertificate.
+ * Rule implementation that creates an SSLHostConfigCertificate.
  */
 public class CertificateCreateRule extends Rule {
 
     @Override
     public void begin(String namespace, String name, Attributes attributes) throws Exception {
-        SSLHostConfig sslHostConfig = (SSLHostConfig)digester.peek();
+        SSLHostConfig sslHostConfig = (SSLHostConfig) digester.peek();
 
         Type type;
         String typeValue = attributes.getValue("type");
@@ -42,6 +42,15 @@ public class CertificateCreateRule extends Rule {
         SSLHostConfigCertificate certificate = new SSLHostConfigCertificate(sslHostConfig, type);
 
         digester.push(certificate);
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(SSLHostConfigCertificate.class.getName()).append(' ').append(digester.toVariableName(certificate));
+            code.append(" = new ").append(SSLHostConfigCertificate.class.getName());
+            code.append('(').append(digester.toVariableName(sslHostConfig));
+            code.append(", ").append(Type.class.getName().replace('$', '.')).append('.').append(type).append(");");
+            code.append(System.lineSeparator());
+        }
     }
 
 

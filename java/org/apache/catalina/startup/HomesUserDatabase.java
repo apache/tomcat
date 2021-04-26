@@ -127,11 +127,11 @@ public final class HomesUserDatabase
             return;
         }
 
-        for (int i = 0; i < homeBaseFiles.length; i++) {
-            File homeDir = new File(homeBaseDir, homeBaseFiles[i]);
+        for (String homeBaseFile : homeBaseFiles) {
+            File homeDir = new File(homeBaseDir, homeBaseFile);
             if (!homeDir.isDirectory() || !homeDir.canRead())
                 continue;
-            homes.put(homeBaseFiles[i], homeDir.toString());
+            homes.put(homeBaseFile, homeDir.toString());
         }
     }
 }

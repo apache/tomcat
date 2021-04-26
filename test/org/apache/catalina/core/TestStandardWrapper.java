@@ -18,6 +18,7 @@ package org.apache.catalina.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,19 +29,19 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.servlet.annotation.HttpConstraint;
-import javax.servlet.annotation.HttpMethodConstraint;
-import javax.servlet.annotation.ServletSecurity;
-import javax.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.annotation.HttpConstraint;
+import jakarta.servlet.annotation.HttpMethodConstraint;
+import jakarta.servlet.annotation.ServletSecurity;
+import jakarta.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,6 +49,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.authenticator.BasicAuthenticator;
+import org.apache.catalina.realm.MessageDigestCredentialHandler;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -233,6 +235,88 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         Assert.assertEquals(200, rc);
         Assert.assertTrue(bc.toString().contains("00-OK"));
+    }
+
+    @Test
+    public void testRoleMappingInEngine() throws Exception {
+        doTestRoleMapping("engine");
+    }
+
+    @Test
+    public void testRoleMappingInHost() throws Exception {
+        doTestRoleMapping("host");
+    }
+
+    @Test
+    public void testRoleMappingInContext() throws Exception {
+        doTestRoleMapping("context");
+    }
+
+    private void doTestRoleMapping(String realmContainer)
+            throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addRoleMapping("testRole", "very-complex-role-name");
+
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", RoleAllowServlet.class.getName());
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        ctx.setLoginConfig(new LoginConfig("BASIC", null, null, null));
+        ctx.getPipeline().addValve(new BasicAuthenticator());
+
+        TesterMapRealm realm = new TesterMapRealm();
+        MessageDigestCredentialHandler ch = new MessageDigestCredentialHandler();
+        ch.setAlgorithm("SHA");
+        realm.setCredentialHandler(ch);
+
+        /* Attach the realm to the appropriate container, but role mapping must
+         * always succeed because it is evaluated at context level.
+         */
+        if (realmContainer.equals("engine")) {
+            tomcat.getEngine().setRealm(realm);
+        } else if (realmContainer.equals("host")) {
+            tomcat.getHost().setRealm(realm);
+        } else if (realmContainer.equals("context")) {
+            ctx.setRealm(realm);
+        } else {
+            throw new IllegalArgumentException("realmContainer is invalid");
+        }
+
+        realm.addUser("testUser", ch.mutate("testPwd"));
+        realm.addUserRole("testUser", "testRole1");
+        realm.addUserRole("testUser", "very-complex-role-name");
+        realm.addUserRole("testUser", "another-very-complex-role-name");
+
+        tomcat.start();
+
+        Principal p = realm.authenticate("testUser", "testPwd");
+
+        Assert.assertNotNull(p);
+        Assert.assertEquals("testUser", p.getName());
+        // This one is mapped
+        Assert.assertTrue(realm.hasRole(wrapper, p, "testRole"));
+        Assert.assertTrue(realm.hasRole(wrapper, p, "testRole1"));
+        Assert.assertFalse(realm.hasRole(wrapper, p, "testRole2"));
+        Assert.assertTrue(realm.hasRole(wrapper, p, "very-complex-role-name"));
+        Assert.assertTrue(realm.hasRole(wrapper, p, "another-very-complex-role-name"));
+
+        // This now tests RealmBase#hasResourcePermission() because we need a wrapper
+        // to be passed from an authenticator
+        ByteChunk bc = new ByteChunk();
+        Map<String, List<String>> reqHeaders = new HashMap<>();
+        List<String> authHeaders = new ArrayList<>();
+        // testUser, testPwd
+        authHeaders.add("Basic dGVzdFVzZXI6dGVzdFB3ZA==");
+        reqHeaders.put("Authorization", authHeaders);
+
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, reqHeaders,
+                null);
+
+        Assert.assertEquals("OK", bc.toString());
+        Assert.assertEquals(200, rc);
     }
 
     private void doTestSecurityAnnotationsAddServlet(boolean useCreateServlet)
@@ -531,7 +615,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
      */
     @SuppressWarnings("deprecation")
     public static class Bug51445Servlet extends HttpServlet
-            implements javax.servlet.SingleThreadModel {
+            implements jakarta.servlet.SingleThreadModel {
 
         private static final long serialVersionUID = 1L;
         private static final long LATCH_TIMEOUT = 60;

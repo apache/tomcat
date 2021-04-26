@@ -24,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -98,7 +97,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     /** Description */
     private String description;
 
-    /** Environment that may be used to set up a jndi initial context. */
+    /** Environment that may be used to set up a JNDI initial context. */
     private Properties jndiEnvironment;
 
     /** Login TimeOut in seconds */
@@ -146,6 +145,8 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Throws an IllegalStateException, if a PooledConnection has already been requested.
+     *
+     * @throws IllegalStateException Thrown if a PooledConnection has already been requested.
      */
     protected void assertInitializationAllowed() throws IllegalStateException {
         if (getConnectionCalled) {
@@ -520,8 +521,8 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the value of connectionPoolDataSource. This method will return null, if the backing datasource is being
-     * accessed via jndi.
+     * Gets the value of connectionPoolDataSource. This method will return null, if the backing data source is being
+     * accessed via JNDI.
      *
      * @return value of connectionPoolDataSource.
      */
@@ -530,8 +531,8 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Sets the backend ConnectionPoolDataSource. This property should not be set if using jndi to access the
-     * datasource.
+     * Sets the back end ConnectionPoolDataSource. This property should not be set if using JNDI to access the
+     * data source.
      *
      * @param v
      *            Value to assign to connectionPoolDataSource.
@@ -549,8 +550,8 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Gets the name of the ConnectionPoolDataSource which backs this pool. This name is used to look up the datasource
-     * from a jndi service provider.
+     * Gets the name of the ConnectionPoolDataSource which backs this pool. This name is used to look up the data source
+     * from a JNDI service provider.
      *
      * @return value of dataSourceName.
      */
@@ -559,8 +560,8 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     }
 
     /**
-     * Sets the name of the ConnectionPoolDataSource which backs this pool. This name is used to look up the datasource
-     * from a jndi service provider.
+     * Sets the name of the ConnectionPoolDataSource which backs this pool. This name is used to look up the data source
+     * from a JNDI service provider.
      *
      * @param v
      *            Value to assign to dataSourceName.
@@ -687,7 +688,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Gets the value of jndiEnvironment which is used when instantiating a JNDI InitialContext. This InitialContext is
-     * used to locate the backend ConnectionPoolDataSource.
+     * used to locate the back end ConnectionPoolDataSource.
      *
      * @param key
      *            JNDI environment key.
@@ -703,7 +704,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Sets the value of the given JNDI environment property to be used when instantiating a JNDI InitialContext. This
-     * InitialContext is used to locate the backend ConnectionPoolDataSource.
+     * InitialContext is used to locate the back end ConnectionPoolDataSource.
      *
      * @param key
      *            the JNDI environment property to set.
@@ -719,7 +720,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * Sets the JNDI environment to be used when instantiating a JNDI InitialContext. This InitialContext is used to
-     * locate the backend ConnectionPoolDataSource.
+     * locate the back end ConnectionPoolDataSource.
      *
      * @param properties
      *            the JNDI environment property to set which will overwrite any current settings
@@ -911,13 +912,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         PooledConnectionAndInfo info = null;
         try {
             info = getPooledConnectionAndInfo(userName, userPassword);
-        } catch (final NoSuchElementException e) {
-            closeDueToException(info);
-            throw new SQLException("Cannot borrow connection from pool", e);
-        } catch (final RuntimeException e) {
-            closeDueToException(info);
-            throw e;
-        } catch (final SQLException e) {
+        } catch (final RuntimeException | SQLException e) {
             closeDueToException(info);
             throw e;
         } catch (final Exception e) {
@@ -951,13 +946,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
             for (int i = 0; i < 10; i++) { // Bound the number of retries - only needed if bad instances return
                 try {
                     info = getPooledConnectionAndInfo(userName, userPassword);
-                } catch (final NoSuchElementException e) {
-                    closeDueToException(info);
-                    throw new SQLException("Cannot borrow connection from pool", e);
-                } catch (final RuntimeException e) {
-                    closeDueToException(info);
-                    throw e;
-                } catch (final SQLException e) {
+                } catch (final RuntimeException | SQLException e) {
                     closeDueToException(info);
                     throw e;
                 } catch (final Exception e) {
@@ -1052,5 +1041,80 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
             }
         }
         return cpds;
+    }
+
+    /**
+     * @since 2.6.0
+     */
+    @Override
+    public synchronized String toString() {
+        final StringBuilder builder = new StringBuilder(super.toString());
+        builder.append('[');
+        toStringFields(builder);
+        builder.append(']');
+        return builder.toString();
+    }
+
+    protected void toStringFields(final StringBuilder builder) {
+        builder.append("getConnectionCalled=");
+        builder.append(getConnectionCalled);
+        builder.append(", dataSource=");
+        builder.append(dataSource);
+        builder.append(", dataSourceName=");
+        builder.append(dataSourceName);
+        builder.append(", description=");
+        builder.append(description);
+        builder.append(", jndiEnvironment=");
+        builder.append(jndiEnvironment);
+        builder.append(", loginTimeout=");
+        builder.append(loginTimeout);
+        builder.append(", logWriter=");
+        builder.append(logWriter);
+        builder.append(", instanceKey=");
+        builder.append(instanceKey);
+        builder.append(", defaultBlockWhenExhausted=");
+        builder.append(defaultBlockWhenExhausted);
+        builder.append(", defaultEvictionPolicyClassName=");
+        builder.append(defaultEvictionPolicyClassName);
+        builder.append(", defaultLifo=");
+        builder.append(defaultLifo);
+        builder.append(", defaultMaxIdle=");
+        builder.append(defaultMaxIdle);
+        builder.append(", defaultMaxTotal=");
+        builder.append(defaultMaxTotal);
+        builder.append(", defaultMaxWaitMillis=");
+        builder.append(defaultMaxWaitMillis);
+        builder.append(", defaultMinEvictableIdleTimeMillis=");
+        builder.append(defaultMinEvictableIdleTimeMillis);
+        builder.append(", defaultMinIdle=");
+        builder.append(defaultMinIdle);
+        builder.append(", defaultNumTestsPerEvictionRun=");
+        builder.append(defaultNumTestsPerEvictionRun);
+        builder.append(", defaultSoftMinEvictableIdleTimeMillis=");
+        builder.append(defaultSoftMinEvictableIdleTimeMillis);
+        builder.append(", defaultTestOnCreate=");
+        builder.append(defaultTestOnCreate);
+        builder.append(", defaultTestOnBorrow=");
+        builder.append(defaultTestOnBorrow);
+        builder.append(", defaultTestOnReturn=");
+        builder.append(defaultTestOnReturn);
+        builder.append(", defaultTestWhileIdle=");
+        builder.append(defaultTestWhileIdle);
+        builder.append(", defaultTimeBetweenEvictionRunsMillis=");
+        builder.append(defaultTimeBetweenEvictionRunsMillis);
+        builder.append(", validationQuery=");
+        builder.append(validationQuery);
+        builder.append(", validationQueryTimeoutSeconds=");
+        builder.append(validationQueryTimeoutSeconds);
+        builder.append(", rollbackAfterValidation=");
+        builder.append(rollbackAfterValidation);
+        builder.append(", maxConnLifetimeMillis=");
+        builder.append(maxConnLifetimeMillis);
+        builder.append(", defaultAutoCommit=");
+        builder.append(defaultAutoCommit);
+        builder.append(", defaultTransactionIsolation=");
+        builder.append(defaultTransactionIsolation);
+        builder.append(", defaultReadOnly=");
+        builder.append(defaultReadOnly);
     }
 }

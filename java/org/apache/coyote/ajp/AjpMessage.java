@@ -407,7 +407,7 @@ public class AjpMessage {
             if (!Character.isISOControl((char) buf[i])) {
                 sb.append(Character.valueOf((char) buf[i]));
             } else {
-                sb.append(".");
+                sb.append('.');
             }
         }
         return sb.toString();

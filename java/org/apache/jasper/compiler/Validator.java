@@ -28,18 +28,18 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.el.ELException;
-import javax.el.ExpressionFactory;
-import javax.el.FunctionMapper;
-import javax.servlet.jsp.JspFactory;
-import javax.servlet.jsp.tagext.FunctionInfo;
-import javax.servlet.jsp.tagext.PageData;
-import javax.servlet.jsp.tagext.TagAttributeInfo;
-import javax.servlet.jsp.tagext.TagData;
-import javax.servlet.jsp.tagext.TagExtraInfo;
-import javax.servlet.jsp.tagext.TagInfo;
-import javax.servlet.jsp.tagext.TagLibraryInfo;
-import javax.servlet.jsp.tagext.ValidationMessage;
+import jakarta.el.ELException;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.FunctionMapper;
+import jakarta.servlet.jsp.JspFactory;
+import jakarta.servlet.jsp.tagext.FunctionInfo;
+import jakarta.servlet.jsp.tagext.PageData;
+import jakarta.servlet.jsp.tagext.TagAttributeInfo;
+import jakarta.servlet.jsp.tagext.TagData;
+import jakarta.servlet.jsp.tagext.TagExtraInfo;
+import jakarta.servlet.jsp.tagext.TagInfo;
+import jakarta.servlet.jsp.tagext.TagLibraryInfo;
+import jakarta.servlet.jsp.tagext.ValidationMessage;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.ELNode.Text;
@@ -533,7 +533,7 @@ class Validator {
             String version = n.getTextAttribute("version");
             if (!version.equals("1.2") && !version.equals("2.0") &&
                     !version.equals("2.1") && !version.equals("2.2") &&
-                    !version.equals("2.3")) {
+                    !version.equals("2.3") && !version.equals("3.0")) {
                 err.jspError(n, "jsp.error.jsproot.version.invalid", version);
             }
             visitBody(n);
@@ -855,25 +855,25 @@ class Validator {
             String customActionUri = n.getURI();
             Attributes attrs = n.getAttributes();
             int attrsSize = (attrs == null) ? 0 : attrs.getLength();
-            for (int i = 0; i < tldAttrs.length; i++) {
+            for (TagAttributeInfo tldAttr : tldAttrs) {
                 String attr = null;
                 if (attrs != null) {
-                    attr = attrs.getValue(tldAttrs[i].getName());
+                    attr = attrs.getValue(tldAttr.getName());
                     if (attr == null) {
-                        attr = attrs.getValue(customActionUri, tldAttrs[i]
+                        attr = attrs.getValue(customActionUri, tldAttr
                                 .getName());
                     }
                 }
-                Node.NamedAttribute na = n.getNamedAttributeNode(tldAttrs[i]
+                Node.NamedAttribute na = n.getNamedAttributeNode(tldAttr
                         .getName());
 
-                if (tldAttrs[i].isRequired() && attr == null && na == null) {
-                    err.jspError(n, "jsp.error.missing_attribute", tldAttrs[i]
+                if (tldAttr.isRequired() && attr == null && na == null) {
+                    err.jspError(n, "jsp.error.missing_attribute", tldAttr
                             .getName(), n.getLocalName());
                 }
                 if (attr != null && na != null) {
                     err.jspError(n, "jsp.error.duplicate.name.jspattribute",
-                            tldAttrs[i].getName());
+                            tldAttr.getName());
                 }
             }
 
@@ -1296,7 +1296,7 @@ class Validator {
                 Node.NamedAttribute na = (Node.NamedAttribute) naNodes
                         .getNode(i);
                 boolean found = false;
-                for (int j = 0; j < tldAttrs.length; j++) {
+                for (TagAttributeInfo tldAttr : tldAttrs) {
                     /*
                      * See above comment about namespace matches. For named
                      * attributes, we use the prefix instead of URI as the match
@@ -1306,11 +1306,11 @@ class Validator {
                      * that the prefix of the named attribute's name matches to.
                      */
                     String attrPrefix = na.getPrefix();
-                    if (na.getLocalName().equals(tldAttrs[j].getName())
+                    if (na.getLocalName().equals(tldAttr.getName())
                             && (attrPrefix == null || attrPrefix.length() == 0 || attrPrefix
-                                    .equals(n.getPrefix()))) {
+                            .equals(n.getPrefix()))) {
                         jspAttrs[start + i] = new Node.JspAttribute(na,
-                                tldAttrs[j], false);
+                                tldAttr, false);
                         NamedAttributeVisitor nav = null;
                         if (na.getBody() != null) {
                             nav = new NamedAttributeVisitor();
@@ -1681,7 +1681,7 @@ class Validator {
                     lastArg = true;
                 }
                 String arg = signature.substring(start, p).trim();
-                if (!"".equals(arg)) {
+                if (!arg.isEmpty()) {
                     params.add(arg);
                 }
                 if (lastArg) {
@@ -1689,7 +1689,7 @@ class Validator {
                 }
                 start = p + 1;
             }
-            return params.toArray(new String[params.size()]);
+            return params.toArray(new String[0]);
         }
 
         private FunctionMapper getFunctionMapper(ELNode.Nodes el)
@@ -1795,13 +1795,13 @@ class Validator {
                 errMsg.append(Localizer.getMessage(
                         "jsp.error.tei.invalid.attributes", n.getQName()));
                 errMsg.append("</h3>");
-                for (int i = 0; i < errors.length; i++) {
+                for (ValidationMessage error : errors) {
                     errMsg.append("<p>");
-                    if (errors[i].getId() != null) {
-                        errMsg.append(errors[i].getId());
+                    if (error.getId() != null) {
+                        errMsg.append(error.getId());
                         errMsg.append(": ");
                     }
-                    errMsg.append(errors[i].getMessage());
+                    errMsg.append(error.getMessage());
                     errMsg.append("</p>");
                 }
 
@@ -1883,10 +1883,8 @@ class Validator {
         StringBuilder errMsg = null;
         ErrorDispatcher errDisp = compiler.getErrorDispatcher();
 
-        for (Iterator<TagLibraryInfo> iter =
-            compiler.getPageInfo().getTaglibs().iterator(); iter.hasNext();) {
+        for (Object o : compiler.getPageInfo().getTaglibs()) {
 
-            Object o = iter.next();
             if (!(o instanceof TagLibraryInfoImpl))
                 continue;
             TagLibraryInfoImpl tli = (TagLibraryInfoImpl) o;
@@ -1901,12 +1899,12 @@ class Validator {
                         "jsp.error.tlv.invalid.page", tli.getShortName(),
                         compiler.getPageInfo().getJspFile()));
                 errMsg.append("</h3>");
-                for (int i = 0; i < errors.length; i++) {
-                    if (errors[i] != null) {
+                for (ValidationMessage error : errors) {
+                    if (error != null) {
                         errMsg.append("<p>");
-                        errMsg.append(errors[i].getId());
+                        errMsg.append(error.getId());
                         errMsg.append(": ");
-                        errMsg.append(errors[i].getMessage());
+                        errMsg.append(error.getMessage());
                         errMsg.append("</p>");
                     }
                 }

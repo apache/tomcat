@@ -499,7 +499,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     private boolean hasLongValue=false;
 
     /**
-     * Set the buffer to the representation of an long.
+     * Set the buffer to the representation of a long.
      * @param l The long
      */
     public void setLong(long l) {
@@ -543,7 +543,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // Used for headers conversion
     /**
-     * Convert the buffer to an long, cache the value.
+     * Convert the buffer to a long, cache the value.
      * @return the long value
      */
     public long getLong() {

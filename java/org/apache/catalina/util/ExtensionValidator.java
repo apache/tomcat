@@ -185,7 +185,7 @@ public final class ExtensionValidator {
 
 
     /**
-     * Validates a <code>ArrayList</code> of <code>ManifestResource</code>
+     * Validates an <code>ArrayList</code> of <code>ManifestResource</code>
      * objects. This method requires an application name (which is the
      * context root of the application at runtime).
      *
@@ -344,15 +344,12 @@ public final class ExtensionValidator {
                 if (files == null) {
                     continue;
                 }
-                for (int i = 0; i < files.length; i++) {
-                    if (files[i].getName().toLowerCase(Locale.ENGLISH).endsWith(".jar") &&
-                            files[i].isFile()) {
+                for (File file : files) {
+                    if (file.getName().toLowerCase(Locale.ENGLISH).endsWith(".jar") && file.isFile()) {
                         try {
-                            addSystemResource(files[i]);
+                            addSystemResource(file);
                         } catch (IOException e) {
-                            log.error
-                                (sm.getString
-                                 ("extensionValidator.failload", files[i]), e);
+                            log.error(sm.getString("extensionValidator.failload", file), e);
                         }
                     }
                 }
@@ -360,6 +357,4 @@ public final class ExtensionValidator {
         }
 
     }
-
-
 }

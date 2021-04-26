@@ -112,7 +112,6 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         }
         startLevel = (startLevel & (~level));
         if ( startLevel == 0 ) {
-            executor.shutdownNow();
             running = false;
             if (thread != null) {
                 thread.interrupt();
@@ -142,8 +141,8 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_START, service.getLocalMember(true));
         Response[] resp = rpcChannel.send(members, msg, RpcChannel.ALL_REPLY, sendOptions, rpcTimeout);
         if (resp.length > 0) {
-            for (int i = 0; i < resp.length; i++) {
-                messageReceived(resp[i].getMessage(), resp[i].getSource());
+            for (Response response : resp) {
+                messageReceived(response.getMessage(), response.getSource());
             }
         } else {
             log.warn(sm.getString("staticMembershipProvider.startMembership.noReplies"));
@@ -158,16 +157,13 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
     protected void memberAdded(Member member) {
         Member mbr = setupMember(member);
         if(membership.memberAlive(mbr)) {
-            Runnable r = new Runnable() {
-                @Override
-                public void run(){
-                    String name = Thread.currentThread().getName();
-                    try {
-                        Thread.currentThread().setName("StaticMembership-memberAdded");
-                        membershipListener.memberAdded(mbr);
-                    } finally {
-                        Thread.currentThread().setName(name);
-                    }
+            Runnable r = () -> {
+                String name = Thread.currentThread().getName();
+                try {
+                    Thread.currentThread().setName("StaticMembership-memberAdded");
+                    membershipListener.memberAdded(mbr);
+                } finally {
+                    Thread.currentThread().setName(name);
                 }
             };
             executor.execute(r);
@@ -176,16 +172,13 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
 
     protected void memberDisappeared(Member member) {
         membership.removeMember(member);
-        Runnable r = new Runnable() {
-            @Override
-            public void run(){
-                String name = Thread.currentThread().getName();
-                try {
-                    Thread.currentThread().setName("StaticMembership-memberDisappeared");
-                    membershipListener.memberDisappeared(member);
-                } finally {
-                    Thread.currentThread().setName(name);
-                }
+        Runnable r = () -> {
+            String name = Thread.currentThread().getName();
+            try {
+                Thread.currentThread().setName("StaticMembership-memberDisappeared");
+                membershipListener.memberDisappeared(member);
+            } finally {
+                Thread.currentThread().setName(name);
             }
         };
         executor.execute(r);
@@ -272,7 +265,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
         try {
             if (!useThread) ping();
         } catch (ChannelException e) {
-            log.error(sm.getString("staticMembershipProvider.heartbeat.failed"), e);
+            log.warn(sm.getString("staticMembershipProvider.heartbeat.failed"), e);
         }
     }
 
@@ -283,8 +276,8 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
             try {
                 MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_PING, service.getLocalMember(true));
                 Response[] resp = rpcChannel.send(members, msg, RpcChannel.ALL_REPLY, sendOptions, rpcTimeout);
-                for (int i = 0; i < resp.length; i++) {
-                    messageReceived(resp[i].getMessage(), resp[i].getSource());
+                for (Response response : resp) {
+                    messageReceived(response.getMessage(), response.getSource());
                 }
             } catch (ChannelException ce) {
                 // Handle known failed members
@@ -373,7 +366,7 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
             buf.append(getTypeDesc());
             buf.append("; member=");
             buf.append(member);
-            buf.append("]");
+            buf.append(']');
             return buf.toString();
         }
 

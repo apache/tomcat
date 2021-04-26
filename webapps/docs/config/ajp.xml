@@ -36,6 +36,9 @@
 
 <section name="Introduction">
 
+  <p><strong>Note: The APR/Native AJP Connector is deprecated and will be
+  removed in Tomcat 10.1.x onwards.</strong></p>
+
   <p>The <strong>AJP Connector</strong> element represents a
   <strong>Connector</strong> component that communicates with a web
   connector via the <code>AJP</code> protocol.  This is used for cases
@@ -43,6 +46,13 @@
   Apache installation, and you want Apache to handle the static content
   contained in the web application, and/or utilize Apache's SSL
   processing.</p>
+
+  <p>Use of the AJP protocol requires additional security considerations because
+  it allows greater direct manipulation of Tomcat's internal data structures
+  than the HTTP connectors. Particular attention should be paid to the values
+  used for the <code>address</code>, <code>secret</code>,
+  <code>secretRequired</code> and <code>allowedRequestAttributesPattern</code>
+  attributes.</p>
 
   <p>This connector supports load balancing when used in conjunction with
   the <code>jvmRoute</code> attribute of the
@@ -104,6 +114,17 @@
       to <code>false</code> to skip the DNS lookup and return the IP
       address in String form instead (thereby improving performance).
       By default, DNS lookups are disabled.</p>
+    </attribute>
+
+    <attribute name="encodedSolidusHandling" required="false">
+      <p>When set to <code>reject</code> request paths containing a
+      <code>%2f</code> sequence will be rejected with a 400 response. When set
+      to <code>decode</code> request paths containing a <code>%2f</code>
+      sequence will have that sequence decoded to <code>/</code> at the same
+      time other <code>%nn</code> sequences are decoded. When set to
+      <code>passthrough</code> request paths containing a <code>%2f</code>
+      sequence will be processed with the <code>%2f</code> sequence unchanged.
+      If not specified the default value is <code>reject</code>.</p>
     </attribute>
 
     <attribute name="maxHeaderCount" required="false">
@@ -175,20 +196,14 @@
         an <a href="http.html">HTTP connector</a> rather than an AJP connector
         will be configured.<br/>
         The standard protocol value for an AJP connector is <code>AJP/1.3</code>
-        which uses an auto-switching mechanism to select either a Java NIO based
-        connector or an APR/native based connector. If the
-        <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on most unix
-        systems) environment variables contain the Tomcat native library, the
-        native/APR connector will be used. If the native library cannot be
-        found, the Java NIO based connector will be used.<br/>
-        To use an explicit protocol rather than rely on the auto-switching
-        mechanism described above, the following values may be used:<br/>
+        which uses a Java NIO based connector.<br/>
+        To use an explicit protocol, the following values may be used:<br/>
         <code>org.apache.coyote.ajp.AjpNioProtocol</code>
         - non blocking Java NIO connector.<br/>
         <code>org.apache.coyote.ajp.AjpNio2Protocol</code>
         - non blocking Java NIO2 connector.<br/>
         <code>org.apache.coyote.ajp.AjpAprProtocol</code>
-        - the APR/native connector.<br/>
+        - the APR/native connector (deprecated - will be removed in 10.1.x).<br/>
         Custom implementations may also be used.<br/>
         Take a look at our <a href="#Connector_Comparison">Connector
         Comparison</a> chart.
@@ -232,16 +247,13 @@
       calls to <code>request.isSecure()</code> to return <code>true</code>
       for requests received by this Connector. You would want this on an
       SSL Connector or a non SSL connector that is receiving data from a
-      SSL accelerator, like a crypto card, a SSL appliance or even a webserver.
+      SSL accelerator, like a crypto card, an SSL appliance or even a webserver.
       The default value is <code>false</code>.</p>
     </attribute>
 
     <attribute name="URIEncoding" required="false">
       <p>This specifies the character encoding used to decode the URI bytes,
-      after %xx decoding the URL. If not specified, UTF-8 will be used unless
-      the <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
-      <a href="systemprops.html">system property</a> is set to <code>true</code>
-      in which case ISO-8859-1 will be used.</p>
+      after %xx decoding the URL. The default value is <code>UTF-8</code>.</p>
     </attribute>
 
     <attribute name="useBodyEncodingForURI" required="false">
@@ -306,12 +318,44 @@
     </attribute>
 
     <attribute name="address" required="false">
-      <p>For servers with more than one IP address, this attribute
-      specifies which address will be used for listening on the specified
-      port.  By default, this port will be used on all IP addresses
-      associated with the server. A value of <code>127.0.0.1</code>
-      indicates that the Connector will only listen on the loopback
-      interface.</p>
+      <p>For servers with more than one IP address, this attribute specifies
+      which address will be used for listening on the specified port. By
+      default, the connector will listen on the loopback address. Unless the JVM
+      is configured otherwise using system properties, the Java based connectors
+      (NIO, NIO2) will listen on both IPv4 and IPv6 addresses when configured
+      with either <code>0.0.0.0</code> or <code>::</code>. The APR/native
+      connector will only listen on IPv4 addresses if configured with
+      <code>0.0.0.0</code> and will listen on IPv6 addresses (and optionally
+      IPv4 addresses depending on the setting of <strong>ipv6v6only</strong>) if
+      configured with <code>::</code>.</p>
+    </attribute>
+
+    <attribute name="allowedRequestAttributesPattern" required="false">
+      <p>The AJP protocol passes some information from the reverse proxy to the
+      AJP connector using request attributes. These attributes are:</p>
+      <ul>
+        <li>javax.servlet.request.cipher_suite</li>
+        <li>javax.servlet.request.key_size</li>
+        <li>javax.servlet.request.ssl_session</li>
+        <li>javax.servlet.request.X509Certificate</li>
+        <li>AJP_LOCAL_ADDR</li>
+        <li>AJP_REMOTE_PORT</li>
+        <li>AJP_SSL_PROTOCOL</li>
+        <li>JK_LB_ACTIVATION</li>
+        <li>CERT_ISSUER (IIS only)</li>
+        <li>CERT_SUBJECT (IIS only)</li>
+        <li>CERT_COOKIE (IIS only)</li>
+        <li>HTTPS_SERVER_SUBJECT (IIS only)</li>
+        <li>CERT_FLAGS (IIS only)</li>
+        <li>HTTPS_SECRETKEYSIZE (IIS only)</li>
+        <li>CERT_SERIALNUMBER (IIS only)</li>
+        <li>HTTPS_SERVER_ISSUER (IIS only)</li>
+        <li>HTTPS_KEYSIZE (IIS only)</li>
+      </ul>
+      <p>The AJP protocol supports the passing of arbitrary request attributes.
+      Requests containing arbitrary request attributes will be rejected with a
+      403 response unless the entire attribute name matches this regular
+      expression. If not specified, the default value is <code>null</code>.</p>
     </attribute>
 
     <attribute name="bindOnInit" required="false">
@@ -376,14 +420,10 @@
       falls below <strong>maxConnections</strong> at which point the server will
       start accepting and processing new connections again. Note that once the
       limit has been reached, the operating system may still accept connections
-      based on the <code>acceptCount</code> setting. The default value varies by
-      connector type. For NIO and NIO2 the default is <code>10000</code>.
-      For APR/native, the default is <code>8192</code>.</p>
-      <p>Note that for APR/native on Windows, the configured value will be
-      reduced to the highest multiple of 1024 that is less than or equal to
-      maxConnections. This is done for performance reasons.<br/>
-      If set to a value of -1, the maxConnections feature is disabled
-      and connections are not counted.</p>
+      based on the <code>acceptCount</code> setting. The default value
+      is <code>8192</code>.</p>
+      <p>For NIO/NIO2 only, setting the value to -1, will disable the
+      maxConnections feature and connections will not be counted.</p>
     </attribute>
 
     <attribute name="maxCookieCount" required="false">
@@ -435,9 +475,26 @@
       expected concurrent requests (synchronous and asynchronous).</p>
     </attribute>
 
-    <attribute name="requiredSecret" required="false">
+    <attribute name="secret" required="false">
       <p>Only requests from workers with this secret keyword will be accepted.
-      </p>
+      The default value is <code>null</code>. This attribute must be specified
+      with a non-null, non-zero length value unless
+      <strong>secretRequired</strong> is explicitly configured to be
+      <code>false</code>. If this attribute is configured with a non-null,
+      non-zero length value then the workers <strong>must</strong> provide a
+      matching value else the request will be rejected irrespective of the
+      setting of <strong>secretRequired</strong>.</p>
+    </attribute>
+
+    <attribute name="secretRequired" required="false">
+      <p>If this attribute is <code>true</code>, the AJP Connector will only
+      start if the <strong>secret</strong> attribute is configured with a
+      non-null, non-zero length value. This attribute only controls whether
+      the <strong>secret</strong> attribute is required to be specified for the
+      AJP Connector to start. It <strong>does not</strong> control whether
+      workers are required to provide the secret. The default value is
+      <code>true</code>. This attribute should only be set to <code>false</code>
+      when the Connector is used on a trusted network.</p>
     </attribute>
 
     <attribute name="tcpNoDelay" required="false">
@@ -470,9 +527,11 @@
     <attribute name="tomcatAuthentication" required="false">
       <p>If set to <code>true</code>, the authentication will be done in Tomcat.
       Otherwise, the authenticated principal will be propagated from the native
-      webserver and used for authorization in Tomcat. Note that this principal
-      will have no roles associated with it.
-      The default value is <code>true</code>. If
+      webserver and used for authorization in Tomcat. </p>
+      <p>The web server must send the user principal (username) as a request
+      <i>attribute</i> named <code>REMOTE_USER</code>.</p>
+      <p>Note that this principal will have no roles associated with it.</p>
+      <p>The default value is <code>true</code>. If
       <code>tomcatAuthorization</code> is set to <code>true</code> this
       attribute has no effect.</p>
     </attribute>
@@ -505,7 +564,9 @@
       </attribute>
       <attribute name="socket.txBufSize" required="false">
         <p>(int)The socket send buffer (SO_SNDBUF) size in bytes. JVM default
-        used if not set.</p>
+        used if not set. Care should be taken if explicitly setting this value.
+        Very poor performance has been observed on some JVMs with values less
+        than ~8k.</p>
       </attribute>
       <attribute name="socket.tcpNoDelay" required="false">
         <p>(bool)This is equivalent to standard attribute
@@ -735,10 +796,20 @@
 
   <subsection name="APR/native specific configuration">
 
+    <p><strong>Note: The APR/Native AJP Connector is deprecated and will be
+    removed in Tomcat 10.1.x onwards.</strong></p>
+
     <p>The APR/native implementation supports the following attributes in
     addition to the common Connector and AJP attributes listed above.</p>
 
     <attributes>
+      <attribute name="ipv6v6only" required="false">
+        <p>If listening on an IPv6 address on a dual stack system, should the
+        connector only listen on the IPv6 address? If not specified the default
+        is <code>false</code> and the connector will listen on the IPv6 address
+        and the equivalent IPv4 address if present.</p>
+      </attribute>
+
       <attribute name="pollTime" required="false">
         <p>Duration of a poll call in microseconds. Lowering this value will
         slightly decrease latency of connections being kept alive in some cases
@@ -775,7 +846,7 @@
   directed the original request.</p>
 
   <p>For more information, see the
-  <a href="../proxy-howto.html">Proxy Support HOW-TO</a>.</p>
+  <a href="../proxy-howto.html">Proxy Support How-To</a>.</p>
 
   </subsection>
 
@@ -788,7 +859,7 @@
         <th />
         <th style="text-align: center;">Java Nio Connector<br />NIO</th>
         <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
-        <th style="text-align: center;">APR/native Connector<br />APR</th>
+        <th style="text-align: center;">APR/native Connector<br />APR<br />(deprecated)</th>
       </tr>
       <tr>
         <th>Classname</th>

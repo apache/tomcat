@@ -21,10 +21,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -92,7 +92,7 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
             resp.getWriter().println(
                     "The current thread served " + this + " servlet");
             tpe = new ThreadPoolExecutor(tpSize, tpSize, 50000L,
-                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
             Task[] tasks = new Task[nTasks];
             for (int i = 0; i < nTasks; i++) {

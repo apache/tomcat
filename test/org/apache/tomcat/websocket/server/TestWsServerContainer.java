@@ -21,10 +21,12 @@ import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.ContainerProvider;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerEndpoint;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -106,8 +108,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
     @Test
     public void testSpecExample3() throws Exception {
-        WsServerContainer sc =
-                new WsServerContainer(new TesterServletContext());
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
 
         ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
                 Object.class, "/a/{var}/c").build();
@@ -128,8 +129,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
     @Test
     public void testSpecExample4() throws Exception {
-        WsServerContainer sc =
-                new WsServerContainer(new TesterServletContext());
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
 
         ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
                 Object.class, "/{var1}/d").build();
@@ -143,10 +143,9 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     }
 
 
-    @Test(expected = javax.websocket.DeploymentException.class)
-    public void testDuplicatePaths_01() throws Exception {
-        WsServerContainer sc =
-                new WsServerContainer(new TesterServletContext());
+    @Test(expected = DeploymentException.class)
+    public void testDuplicatePaths01() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
 
         ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
                 Object.class, "/a/b/c").build();
@@ -158,10 +157,9 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     }
 
 
-    @Test(expected = javax.websocket.DeploymentException.class)
-    public void testDuplicatePaths_02() throws Exception {
-        WsServerContainer sc =
-                new WsServerContainer(new TesterServletContext());
+    @Test(expected = DeploymentException.class)
+    public void testDuplicatePaths02() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
 
         ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
                 Object.class, "/a/b/{var}").build();
@@ -173,10 +171,9 @@ public class TestWsServerContainer extends WebSocketBaseTest {
     }
 
 
-    @Test(expected = javax.websocket.DeploymentException.class)
-    public void testDuplicatePaths_03() throws Exception {
-        WsServerContainer sc =
-                new WsServerContainer(new TesterServletContext());
+    @Test(expected = DeploymentException.class)
+    public void testDuplicatePaths03() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
 
         ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
                 Object.class, "/a/b/{var1}").build();
@@ -189,9 +186,8 @@ public class TestWsServerContainer extends WebSocketBaseTest {
 
 
     @Test
-    public void testDuplicatePaths_04() throws Exception {
-        WsServerContainer sc =
-                new WsServerContainer(new TesterServletContext());
+    public void testDuplicatePaths04() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
 
         ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
                 Object.class, "/a/{var1}/{var2}").build();
@@ -204,4 +200,141 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         Assert.assertEquals(configA, sc.findMapping("/a/x/y").getConfig());
         Assert.assertEquals(configB, sc.findMapping("/a/b/y").getConfig());
     }
+
+
+    /*
+     * Simulates a class that gets picked up for extending Endpoint and for
+     * being annotated.
+     */
+    @Test(expected = DeploymentException.class)
+    public void testDuplicatePaths11() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                Pojo.class, "/foo").build();
+
+        sc.addEndpoint(configA, false);
+        sc.addEndpoint(Pojo.class, true);
+    }
+
+
+    /*
+     * POJO auto deployment followed by programmatic duplicate. Keep POJO.
+     */
+    @Test
+    public void testDuplicatePaths12() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                Pojo.class, "/foo").build();
+
+        sc.addEndpoint(Pojo.class, true);
+        sc.addEndpoint(configA);
+
+        Assert.assertNotEquals(configA, sc.findMapping("/foo").getConfig());
+    }
+
+
+    /*
+     * POJO programmatic followed by programmatic duplicate.
+     */
+    @Test(expected = DeploymentException.class)
+    public void testDuplicatePaths13() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                Pojo.class, "/foo").build();
+
+        sc.addEndpoint(Pojo.class);
+        sc.addEndpoint(configA);
+    }
+
+
+    /*
+     * POJO auto deployment followed by programmatic on same path.
+     */
+    @Test(expected = DeploymentException.class)
+    public void testDuplicatePaths14() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                Object.class, "/foo").build();
+
+        sc.addEndpoint(Pojo.class, true);
+        sc.addEndpoint(configA);
+    }
+
+
+    /*
+     * Simulates a class that gets picked up for extending Endpoint and for
+     * being annotated.
+     */
+    @Test(expected = DeploymentException.class)
+    public void testDuplicatePaths21() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                PojoTemplate.class, "/foo/{a}").build();
+
+        sc.addEndpoint(configA, false);
+        sc.addEndpoint(PojoTemplate.class, true);
+    }
+
+
+    /*
+     * POJO auto deployment followed by programmatic duplicate. Keep POJO.
+     */
+    @Test
+    public void testDuplicatePaths22() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                PojoTemplate.class, "/foo/{a}").build();
+
+        sc.addEndpoint(PojoTemplate.class, true);
+        sc.addEndpoint(configA);
+
+        Assert.assertNotEquals(configA, sc.findMapping("/foo/{a}").getConfig());
+    }
+
+
+    /*
+     * POJO programmatic followed by programmatic duplicate.
+     */
+    @Test(expected = DeploymentException.class)
+    public void testDuplicatePaths23() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                PojoTemplate.class, "/foo/{a}").build();
+
+        sc.addEndpoint(PojoTemplate.class);
+        sc.addEndpoint(configA);
+    }
+
+
+    /*
+     * POJO auto deployment followed by programmatic on same path.
+     */
+    @Test(expected = DeploymentException.class)
+    public void testDuplicatePaths24() throws Exception {
+        WsServerContainer sc = new WsServerContainer(new TesterServletContext());
+
+        ServerEndpointConfig configA = ServerEndpointConfig.Builder.create(
+                Object.class, "/foo/{a}").build();
+
+        sc.addEndpoint(PojoTemplate.class, true);
+        sc.addEndpoint(configA);
+    }
+
+
+    @ServerEndpoint("/foo")
+    public static class Pojo {
+    }
+
+
+    @ServerEndpoint("/foo/{a}")
+    public static class PojoTemplate {
+    }
+
 }

@@ -87,20 +87,18 @@ public class TestCipher {
                     cipher.getProtocol().getOpenSSLName());
         }
 
-        Set<String> unavailableCipherSuites = new HashSet<>();
-        unavailableCipherSuites.addAll(expectedCipherSuites);
+        Set<String> unavailableCipherSuites = new HashSet<>(expectedCipherSuites);
         unavailableCipherSuites.removeAll(availableCipherSuites);
-        StringBuilder unavailableList = new StringBuilder();
+        StringBuilder unavailableList = new StringBuilder("Unavailable cipher suites: ");
         for (String cipher : unavailableCipherSuites) {
             unavailableList.append(cipher);
             unavailableList.append(' ');
         }
         Assert.assertEquals(unavailableList.toString(), 0,  unavailableCipherSuites.size());
 
-        Set<String> unexpectedCipherSuites = new HashSet<>();
-        unexpectedCipherSuites.addAll(availableCipherSuites);
+        Set<String> unexpectedCipherSuites = new HashSet<>(availableCipherSuites);
         unexpectedCipherSuites.removeAll(expectedCipherSuites);
-        StringBuilder unexpectedList = new StringBuilder();
+        StringBuilder unexpectedList = new StringBuilder("Unexpected cipher suites: ");
         for (String cipher : unexpectedCipherSuites) {
             unexpectedList.append(cipher);
             unexpectedList.append(' ');
@@ -547,9 +545,7 @@ public class TestCipher {
                 "SSL_KRB5_EXPORT_WITH_DES_CBC_40_MD5",
                 "SSL_RSA_EXPORT_WITH_RC2_CBC_40_MD5"));
 
-        Set<String> allNames = new HashSet<>();
-
-        allNames.addAll(sslNames);
+        Set<String> allNames = new HashSet<>(sslNames);
 
         for (String sslName : sslNames) {
             allNames.add("TLS" + sslName.substring(3));

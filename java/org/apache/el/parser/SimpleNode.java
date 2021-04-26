@@ -20,10 +20,10 @@ package org.apache.el.parser;
 
 import java.util.Arrays;
 
-import javax.el.ELException;
-import javax.el.MethodInfo;
-import javax.el.PropertyNotWritableException;
-import javax.el.ValueReference;
+import jakarta.el.ELException;
+import jakarta.el.MethodInfo;
+import jakarta.el.PropertyNotWritableException;
+import jakarta.el.ValueReference;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
@@ -141,8 +141,8 @@ public abstract class SimpleNode extends ELSupport implements Node {
     public void accept(NodeVisitor visitor) throws Exception {
         visitor.visit(this);
         if (this.children != null && this.children.length > 0) {
-            for (int i = 0; i < this.children.length; i++) {
-                this.children[i].accept(visitor);
+            for (Node child : this.children) {
+                child.accept(visitor);
             }
         }
     }

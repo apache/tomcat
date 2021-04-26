@@ -24,6 +24,7 @@ import javax.management.RuntimeOperationsException;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
@@ -32,6 +33,8 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * @author Amy Roh
  */
 public class ConnectorMBean extends ClassNameMBean<Connector> {
+
+    private static final StringManager sm = StringManager.getManager(ConnectorMBean.class);
 
     /**
      * Obtain and return the value of a specific attribute of this MBean.
@@ -52,8 +55,8 @@ public class ConnectorMBean extends ClassNameMBean<Connector> {
         // Validate the input parameters
         if (name == null) {
             throw new RuntimeOperationsException(
-                    new IllegalArgumentException("Attribute name is null"),
-                    "Attribute name is null");
+                    new IllegalArgumentException(sm.getString("mBean.nullName")),
+                    sm.getString("mBean.nullName"));
         }
 
         Connector connector = doGetManagedResource();
@@ -81,14 +84,14 @@ public class ConnectorMBean extends ClassNameMBean<Connector> {
         // Validate the input parameters
         if (attribute == null) {
             throw new RuntimeOperationsException(new IllegalArgumentException(
-                    "Attribute is null"), "Attribute is null");
+                    sm.getString("mBean.nullAttribute")), sm.getString("mBean.nullAttribute"));
         }
         String name = attribute.getName();
         Object value = attribute.getValue();
         if (name == null) {
             throw new RuntimeOperationsException(
-                    new IllegalArgumentException("Attribute name is null"),
-                    "Attribute name is null");
+                    new IllegalArgumentException(sm.getString("mBean.nullName")),
+                    sm.getString("mBean.nullName"));
         }
 
         Connector connector = doGetManagedResource();

@@ -16,9 +16,6 @@
  */
 package org.apache.jasper.compiler;
 
-import java.util.HashMap;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,8 +23,9 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Tests are duplicated in {@link TestParserNoStrictWhitespace} with the strict
- * whitespace parsing disabled.
+ * Tests that depend on strict whitespace parsing are duplicated in
+ * {@link TestParserNoStrictWhitespace} with the strict whitespace parsing
+ * disabled.
  */
 public class TestParser extends TomcatBaseTest {
 
@@ -100,8 +98,7 @@ public class TestParser extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297NoSpace.jsp", new ByteChunk(),
-                new HashMap<String,List<String>>());
+                "/test/bug49nnn/bug49297NoSpaceStrict.jsp", new ByteChunk(), null);
 
         Assert.assertEquals(500, sc);
     }
@@ -111,8 +108,7 @@ public class TestParser extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297DuplicateAttr.jsp", new ByteChunk(),
-                new HashMap<String,List<String>>());
+                "/test/bug49nnn/bug49297DuplicateAttr.jsp", new ByteChunk(), null);
 
         Assert.assertEquals(500, sc);
     }
@@ -123,8 +119,7 @@ public class TestParser extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297MultipleImport1.jsp", res,
-                new HashMap<String,List<String>>());
+                "/test/bug49nnn/bug49297MultipleImport1.jsp", res, null);
 
         Assert.assertEquals(200, sc);
         assertEcho(res.toString(), "OK");
@@ -136,8 +131,7 @@ public class TestParser extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297MultipleImport2.jsp", res,
-                new HashMap<String,List<String>>());
+                "/test/bug49nnn/bug49297MultipleImport2.jsp", res, null);
 
         Assert.assertEquals(200, sc);
         assertEcho(res.toString(), "OK");
@@ -149,8 +143,7 @@ public class TestParser extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297MultiplePageEncoding1.jsp", res,
-                new HashMap<String,List<String>>());
+                "/test/bug49nnn/bug49297MultiplePageEncoding1.jsp", res, null);
 
         Assert.assertEquals(500, sc);
     }
@@ -161,8 +154,7 @@ public class TestParser extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297MultiplePageEncoding2.jsp", res,
-                new HashMap<String,List<String>>());
+                "/test/bug49nnn/bug49297MultiplePageEncoding2.jsp", res, null);
 
         Assert.assertEquals(500, sc);
     }
@@ -173,8 +165,7 @@ public class TestParser extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297MultiplePageEncoding3.jsp", res,
-                new HashMap<String,List<String>>());
+                "/test/bug49nnn/bug49297MultiplePageEncoding3.jsp", res, null);
 
         Assert.assertEquals(500, sc);
     }
@@ -185,8 +176,7 @@ public class TestParser extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297MultiplePageEncoding4.jsp", res,
-                new HashMap<String,List<String>>());
+                "/test/bug49nnn/bug49297MultiplePageEncoding4.jsp", res, null);
 
         Assert.assertEquals(500, sc);
     }
@@ -197,8 +187,7 @@ public class TestParser extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297Tag.jsp", res,
-                new HashMap<String,List<String>>());
+                "/test/bug49nnn/bug49297Tag.jsp", res, null);
 
         Assert.assertEquals(200, sc);
         assertEcho(res.toString(), "OK");

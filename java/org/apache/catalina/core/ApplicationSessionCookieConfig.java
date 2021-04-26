@@ -17,8 +17,8 @@
 
 package org.apache.catalina.core;
 
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.http.Cookie;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleState;
@@ -197,29 +197,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
             cookie.setHttpOnly(true);
         }
 
-        String contextPath = context.getSessionCookiePath();
-        if (contextPath == null || contextPath.length() == 0) {
-            contextPath = scc.getPath();
-        }
-        if (contextPath == null || contextPath.length() == 0) {
-            contextPath = context.getEncodedPath();
-        }
-        if (context.getSessionCookiePathUsesTrailingSlash()) {
-            // Handle special case of ROOT context where cookies require a path of
-            // '/' but the servlet spec uses an empty string
-            // Also ensure the cookies for a context with a path of /foo don't get
-            // sent for requests with a path of /foobar
-            if (!contextPath.endsWith("/")) {
-                contextPath = contextPath + "/";
-            }
-        } else {
-            // Only handle special case of ROOT context where cookies require a
-            // path of '/' but the servlet spec uses an empty string
-            if (contextPath.length() == 0) {
-                contextPath = "/";
-            }
-        }
-        cookie.setPath(contextPath);
+        cookie.setPath(SessionConfig.getSessionCookiePath(context));
 
         return cookie;
     }

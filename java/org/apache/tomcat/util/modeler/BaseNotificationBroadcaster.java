@@ -20,7 +20,6 @@ package org.apache.tomcat.util.modeler;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
@@ -95,8 +94,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
                             oldFilter.clear();
                         } else {
                             if (oldNames.length != 0) {
-                                for (int i = 0; i < newNames.length; i++)
-                                    oldFilter.addAttribute(newNames[i]);
+                                for (String newName : newNames) oldFilter.addAttribute(newName);
                             }
                         }
                         return;
@@ -136,13 +134,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
         throws ListenerNotFoundException {
 
         synchronized (entries) {
-            Iterator<BaseNotificationBroadcasterEntry> items =
-                entries.iterator();
-            while (items.hasNext()) {
-                BaseNotificationBroadcasterEntry item = items.next();
-                if (item.listener == listener)
-                    items.remove();
-            }
+            entries.removeIf(item -> item.listener == listener);
         }
 
     }

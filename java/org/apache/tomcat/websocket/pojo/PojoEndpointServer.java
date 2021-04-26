@@ -18,16 +18,16 @@ package org.apache.tomcat.websocket.pojo;
 
 import java.util.Map;
 
-import javax.websocket.EndpointConfig;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Wrapper class for instances of POJOs annotated with
- * {@link javax.websocket.server.ServerEndpoint} so they appear as standard
- * {@link javax.websocket.Endpoint} instances.
+ * {@link jakarta.websocket.server.ServerEndpoint} so they appear as standard
+ * {@link jakarta.websocket.Endpoint} instances.
  */
 public class PojoEndpointServer extends PojoEndpointBase {
 

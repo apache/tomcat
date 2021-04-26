@@ -14,5 +14,5 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%><%@ tag %><%@
-attribute name="type" type="javax.servlet.DispatcherType"%><%@
+attribute name="type" type="jakarta.servlet.DispatcherType"%><%@
 tag body-content="empty" %><p>${type}</p>

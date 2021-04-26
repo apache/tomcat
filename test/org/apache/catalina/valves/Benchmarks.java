@@ -461,8 +461,8 @@ public class Benchmarks {
     private static class BenchmarkTest {
         public void doTest(int threadCount, Runnable[] tests) throws Exception {
             for (int iterations = 1000000; iterations < 10000001; iterations += 1000000) {
-                for (int i = 0; i < tests.length; i++) {
-                    doTestInternal(threadCount, iterations, tests[i]);
+                for (Runnable test : tests) {
+                    doTestInternal(threadCount, iterations, test);
                 }
             }
         }

@@ -31,6 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
@@ -72,6 +73,8 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
 
     @Override
     public void start(int svc) throws ChannelException {
+        validateChannelChain();
+
         if(Channel.SND_TX_SEQ == (svc & Channel.SND_TX_SEQ)) {
             try {
                 encryptionManager = createEncryptionManager(getEncryptionAlgorithm(),
@@ -83,6 +86,16 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         }
 
         super.start(svc);
+    }
+
+    private void validateChannelChain() throws ChannelException {
+        ChannelInterceptor interceptor = getPrevious();
+        while(null != interceptor) {
+            if(interceptor instanceof TcpFailureDetector)
+                throw new ChannelConfigException(sm.getString("encryptInterceptor.tcpFailureDetector.ordering"));
+
+            interceptor = interceptor.getPrevious();
+        }
     }
 
     @Override
@@ -336,9 +349,6 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
             return new BaseEncryptionManager(algorithm,
                     new SecretKeySpec(encryptionKey, algorithmName),
                     providerName);
-//        else if("ECB".equalsIgnoreCase(algorithmMode)) {
-            // Note: ECB is not an appropriate mode for secure communications.
-//            return new ECBEncryptionManager(algorithm, new SecretKeySpec(encryptionKey, algorithmName), providerName);
         else
             throw new IllegalArgumentException(sm.getString("encryptInterceptor.algorithm.unsupported-mode", algorithmMode));
     }
@@ -588,29 +598,13 @@ public class EncryptInterceptor extends ChannelInterceptorBase implements Encryp
         }
     }
 
-    @SuppressWarnings("unused")
-    private static class ECBEncryptionManager extends BaseEncryptionManager
+    static class ChannelConfigException
+        extends ChannelException
     {
-        public ECBEncryptionManager(String algorithm, SecretKeySpec secretKey, String providerName)
-                throws NoSuchAlgorithmException, NoSuchPaddingException, NoSuchProviderException {
-            super(algorithm, secretKey, providerName);
-        }
+        private static final long serialVersionUID = 1L;
 
-        private static final byte[] EMPTY_IV = new byte[0];
-
-        @Override
-        protected int getIVSize() {
-            return 0;
-        }
-
-        @Override
-        protected byte[] generateIVBytes() {
-            return EMPTY_IV;
-        }
-
-        @Override
-        protected AlgorithmParameterSpec generateIV(byte[] bytes, int offset, int length) {
-            return null;
+        public ChannelConfigException(String message) {
+            super(message);
         }
     }
 }

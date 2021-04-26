@@ -20,6 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.apache.coyote.http11.upgrade.UpgradeInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -37,13 +38,15 @@ public class WsFrameServer extends WsFrameBase {
     private static final StringManager sm = StringManager.getManager(WsFrameServer.class);
 
     private final SocketWrapperBase<?> socketWrapper;
+    private final UpgradeInfo upgradeInfo;
     private final ClassLoader applicationClassLoader;
 
 
-    public WsFrameServer(SocketWrapperBase<?> socketWrapper, WsSession wsSession,
+    public WsFrameServer(SocketWrapperBase<?> socketWrapper, UpgradeInfo upgradeInfo, WsSession wsSession,
             Transformation transformation, ClassLoader applicationClassLoader) {
         super(wsSession, transformation);
         this.socketWrapper = socketWrapper;
+        this.upgradeInfo = upgradeInfo;
         this.applicationClassLoader = applicationClassLoader;
     }
 
@@ -81,6 +84,13 @@ public class WsFrameServer extends WsFrameBase {
             }
             processInputBuffer();
         }
+    }
+
+
+    @Override
+    protected void updateStats(long payloadLength) {
+        upgradeInfo.addMsgsReceived(1);
+        upgradeInfo.addBytesReceived(payloadLength);
     }
 
 
@@ -140,6 +150,7 @@ public class WsFrameServer extends WsFrameBase {
         socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
     }
 
+
     SocketState notifyDataAvailable() throws IOException {
         while (isOpen()) {
             switch (getReadState()) {
@@ -166,6 +177,7 @@ public class WsFrameServer extends WsFrameBase {
 
         return SocketState.CLOSED;
     }
+
 
     private SocketState doOnDataAvailable() throws IOException {
         onDataAvailable();

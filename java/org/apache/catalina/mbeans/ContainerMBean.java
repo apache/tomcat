@@ -128,19 +128,17 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
         ObjectName oname;
         try {
             oname = new ObjectName(valveName);
-        } catch (MalformedObjectNameException e) {
-            throw new MBeanException(e);
-        } catch (NullPointerException e) {
+        } catch (MalformedObjectNameException | NullPointerException e) {
             throw new MBeanException(e);
         }
 
-        if (container != null){
+        if (container != null) {
             Valve[] valves = container.getPipeline().getValves();
-            for (int i = 0; i < valves.length; i++) {
-                if (valves[i] instanceof JmxEnabled) {
-                    ObjectName voname = ((JmxEnabled) valves[i]).getObjectName();
+            for (Valve valve : valves) {
+                if (valve instanceof JmxEnabled) {
+                    ObjectName voname = ((JmxEnabled) valve).getObjectName();
                     if (voname.equals(oname)) {
-                        container.getPipeline().removeValve(valves[i]);
+                        container.getPipeline().removeValve(valve);
                     }
                 }
             }
@@ -153,7 +151,7 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
      *
      * @param type ClassName of the listener to add
      * @throws MBeanException if adding the listener failed
-    */
+     */
     public void addLifecycleListener(String type) throws MBeanException{
         LifecycleListener listener = (LifecycleListener) newInstance(type);
         Container container = doGetManagedResource();
@@ -195,7 +193,7 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
             result.add(listener.getClass().getName());
         }
 
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
 
@@ -214,6 +212,6 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
             result.add(listener.getClass().getName());
         }
 
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 }

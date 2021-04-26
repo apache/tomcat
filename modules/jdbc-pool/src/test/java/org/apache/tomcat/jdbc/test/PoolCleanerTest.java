@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.test;
 
+import java.sql.Connection;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -95,5 +96,43 @@ public class PoolCleanerTest extends DefaultTestCase {
         Assert.assertEquals("Pool should have 1 idle.", 1, datasource.getIdle());
         Thread.sleep(3000);
         Assert.assertEquals("Pool should have 0 idle.", 0, datasource.getIdle());
+    }
+
+    @Test
+    public void testIdleReconnect() throws Exception {
+        // timeBetweenEvictionRunsMillis > maxAge to test that maxAge setting overrides it
+        datasource.getPoolProperties().setTimeBetweenEvictionRunsMillis(20000);
+        datasource.getPoolProperties().setMaxAge( 1000 );
+        datasource.getPoolProperties().setTestWhileIdle(false);
+        datasource.getPoolProperties().setMaxIdle(1);
+        datasource.getPoolProperties().setInitialSize(0);
+        datasource.getPoolProperties().setMinIdle(1);
+
+        Assert.assertEquals(0,datasource.getPool().getReconnectedCount());
+        datasource.getConnection().close();
+        Assert.assertEquals(0,datasource.getPool().getReconnectedCount());
+        Assert.assertEquals("Pool should have 1 idle.", 1, datasource.getIdle());
+        Thread.sleep(4000);
+        Assert.assertEquals("Pool should have 1 idle.", 1, datasource.getIdle());
+        Assert.assertTrue(datasource.getPool().getReconnectedCount()>0);
+    }
+
+    @Test
+    public void testReconnectOnReturn() throws Exception {
+        datasource.getPoolProperties().setMaxAge( 1500 );
+        datasource.getPoolProperties().setTestWhileIdle(false);
+        datasource.getPoolProperties().setMaxIdle(1);
+        datasource.getPoolProperties().setInitialSize(0);
+        datasource.getPoolProperties().setMinIdle(1);
+
+        Assert.assertEquals(0,datasource.getPool().getReconnectedCount());
+        final Connection con = datasource.getConnection();
+        Assert.assertEquals(0,datasource.getPool().getReconnectedCount());
+        Assert.assertEquals("Pool should have 0 idle.", 0, datasource.getIdle());
+        Thread.sleep(4000);
+        Assert.assertEquals(0,datasource.getPool().getReconnectedCount());
+        con.close();
+        Assert.assertEquals("Pool should have 1 idle.", 1, datasource.getIdle());
+        Assert.assertTrue(datasource.getPool().getReconnectedCount()>0);
     }
 }

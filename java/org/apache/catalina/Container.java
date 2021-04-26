@@ -305,7 +305,7 @@ public interface Container extends Lifecycle {
      * @return the configuration path
      */
     public static String getConfigPath(Container container, String resourceName) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         Container host = null;
         Container engine = null;
         while (container != null) {
@@ -319,6 +319,7 @@ public interface Container extends Lifecycle {
         if (host != null && ((Host) host).getXmlBase() != null) {
             result.append(((Host) host).getXmlBase()).append('/');
         } else {
+            result.append("conf/");
             if (engine != null) {
                 result.append(engine.getName()).append('/');
             }

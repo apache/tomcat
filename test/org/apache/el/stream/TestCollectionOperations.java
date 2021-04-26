@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.el.ELException;
-import javax.el.ELProcessor;
+import jakarta.el.ELException;
+import jakarta.el.ELProcessor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -122,8 +122,6 @@ public class TestCollectionOperations {
         Object result = processor.getValue(
                 "beans.stream().filter(b->b.valLong > 1).map(b->[b.name, b.valLong]).toList()",
                 List.class);
-
-        Assert.assertTrue(result instanceof List);
 
         @SuppressWarnings("unchecked")
         List<List<Object>> list = (List<List<Object>>) result;

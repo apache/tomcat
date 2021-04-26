@@ -32,34 +32,45 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.SocketFactory;
-import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
-import javax.servlet.DispatcherType;
-import javax.servlet.ReadListener;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.BytesStreamer;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.ContainerThreadMarker;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
+
+    private static final Log log = LogFactory.getLog(TestNonBlockingAPI.class);
 
     private static final int CHUNK_SIZE = 1024 * 1024;
     private static final int WRITE_SIZE  = CHUNK_SIZE * 10;
@@ -87,34 +98,48 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingRead() throws Exception {
-        doTestNonBlockingRead(false);
+        doTestNonBlockingRead(false, false);
+    }
+
+
+    @Test
+    public void testNonBlockingReadAsync() throws Exception {
+        doTestNonBlockingRead(false, true);
     }
 
 
     @Test(expected=IOException.class)
     public void testNonBlockingReadIgnoreIsReady() throws Exception {
-        doTestNonBlockingRead(true);
+        doTestNonBlockingRead(true, false);
     }
 
 
-    private void doTestNonBlockingRead(boolean ignoreIsReady) throws Exception {
+    private void doTestNonBlockingRead(boolean ignoreIsReady, boolean async) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
-        NBReadServlet servlet = new NBReadServlet(ignoreIsReady);
+        NBReadServlet servlet = new NBReadServlet(ignoreIsReady, async);
         String servletName = NBReadServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
 
         tomcat.start();
 
-        Map<String, List<String>> resHeaders = new HashMap<>();
-        int rc = postUrl(true, new DataWriter(500), "http://localhost:" +
-                getPort() + "/", new ByteChunk(), resHeaders, null);
+        Map<String, List<String>> reqHeaders = new HashMap<>();
+        int rc = postUrl(true, new DataWriter(async ? 0 : 500, async ? 2000000 : 5),
+                "http://localhost:" + getPort() + "/", new ByteChunk(), reqHeaders, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        if (async) {
+            Assert.assertEquals(2000000 * 8, servlet.listener.body.length());
+            TestAsyncReadListener listener = (TestAsyncReadListener) servlet.listener;
+            Assert.assertTrue(Math.abs(listener.containerThreadCount.get() - listener.notReadyCount.get())  <= 1);
+            Assert.assertEquals(listener.isReadyCount.get(), listener.nonContainerThreadCount.get());
+        } else {
+            Assert.assertEquals(5 * 8, servlet.listener.body.length());
+        }
     }
 
 
@@ -129,15 +154,20 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     private void testNonBlockingWriteInternal(boolean keepAlive) throws Exception {
+        AtomicBoolean asyncContextIsComplete = new AtomicBoolean(false);
+
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
-        NBWriteServlet servlet = new NBWriteServlet();
+        NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete);
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
-        tomcat.getConnector().setProperty("socket.txBufSize", "1024");
+        // Note: Low values of socket.txBufSize can trigger very poor
+        //       performance. Set it just low enough to ensure that the
+        //       non-blocking write servlet will see isReady() == false
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "1048576"));
         tomcat.start();
 
         SocketFactory factory = SocketFactory.getDefault();
@@ -172,11 +202,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int readSinceLastPause = 0;
         while (read != -1) {
             read = is.read(buffer);
+            if (readSinceLastPause == 0) {
+                log.info("Reading data");
+            }
             if (read > 0) {
                 result.append(buffer, 0, read);
             }
             readSinceLastPause += read;
             if (readSinceLastPause > WRITE_SIZE / 16) {
+                log.info("Read " + readSinceLastPause + " bytes, pause 500ms");
                 readSinceLastPause = 0;
                 Thread.sleep(500);
             }
@@ -282,11 +316,25 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
 
         Assert.assertEquals(WRITE_SIZE, totalBodyRead);
+        Assert.assertTrue("AsyncContext should have been completed.", asyncContextIsComplete.get());
     }
 
 
     @Test
-    public void testNonBlockingWriteError() throws Exception {
+    public void testNonBlockingWriteError01ListenerComplete() throws Exception {
+        doTestNonBlockingWriteError01NoListenerComplete(true);
+    }
+
+
+    @Test
+    public void testNonBlockingWriteError01NoListenerComplete() throws Exception {
+        doTestNonBlockingWriteError01NoListenerComplete(false);
+    }
+
+
+    private void doTestNonBlockingWriteError01NoListenerComplete(boolean listenerCompletesOnError) throws Exception {
+        AtomicBoolean asyncContextIsComplete = new AtomicBoolean(false);
+
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -295,11 +343,17 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
 
-        NBWriteServlet servlet = new NBWriteServlet();
+        // Some CI platforms appear to have particularly large write buffers
+        // and appear to ignore the socket.txBufSize below. Therefore, configure
+        // configure the Servlet to keep writing until an error is encountered.
+        NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete, true, listenerCompletesOnError);
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
-        tomcat.getConnector().setProperty("socket.txBufSize", "1024");
+        // Note: Low values of socket.txBufSize can trigger very poor
+        //       performance. Set it just low enough to ensure that the
+        //       non-blocking write servlet will see isReady() == false
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "524228"));
         tomcat.start();
 
         SocketFactory factory = SocketFactory.getDefault();
@@ -350,8 +404,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // Listeners are invoked and access valve entries created on a different
         // thread so give that thread a chance to complete its work.
         int count = 0;
-        while (count < 100 &&
-                !(servlet.wlistener.onErrorInvoked || servlet.rlistener.onErrorInvoked)) {
+        while (count < 100 && !servlet.wlistener.onErrorInvoked) {
+            Thread.sleep(100);
+            count ++;
+        }
+
+        while (count < 100 && !asyncContextIsComplete.get()) {
             Thread.sleep(100);
             count ++;
         }
@@ -361,8 +419,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             count ++;
         }
 
-        Assert.assertTrue("Error listener should have been invoked.",
-                servlet.wlistener.onErrorInvoked || servlet.rlistener.onErrorInvoked);
+        Assert.assertTrue("Error listener should have been invoked.", servlet.wlistener.onErrorInvoked);
+        Assert.assertTrue("Async context should have been completed.", asyncContextIsComplete.get());
 
         // TODO Figure out why non-blocking writes with the NIO connector appear
         // to be slower on Linux
@@ -408,24 +466,25 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     public static class DataWriter implements BytesStreamer {
-        private static final int MAX = 5;
+        int max = 5;
         int count = 0;
         long delay = 0;
         byte[] b = "WANTMORE".getBytes(StandardCharsets.ISO_8859_1);
         byte[] f = "FINISHED".getBytes(StandardCharsets.ISO_8859_1);
 
-        public DataWriter(long delay) {
+        public DataWriter(long delay, int max) {
             this.delay = delay;
+            this.max = max;
         }
 
         @Override
         public int getLength() {
-            return b.length * MAX;
+            return b.length * max;
         }
 
         @Override
         public int available() {
-            if (count < MAX) {
+            if (count < max) {
                 return b.length;
             } else {
                 return 0;
@@ -434,7 +493,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public byte[] next() {
-            if (count < MAX) {
+            if (count < max) {
                 if (count > 0)
                     try {
                         if (delay > 0)
@@ -442,7 +501,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     } catch (Exception x) {
                     }
                 count++;
-                if (count < MAX)
+                if (count < max)
                     return b;
                 else
                     return f;
@@ -454,12 +513,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     @WebServlet(asyncSupported = true)
-    public class NBReadServlet extends TesterServlet {
+    public static class NBReadServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
+        private final boolean async;
         private final boolean ignoreIsReady;
-        public volatile TestReadListener listener;
+        transient TestReadListener listener;
 
-        public NBReadServlet(boolean ignoreIsReady) {
+        public NBReadServlet(boolean ignoreIsReady, boolean async) {
+            this.async = async;
             this.ignoreIsReady = ignoreIsReady;
         }
 
@@ -496,16 +557,34 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             });
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
-            listener = new TestReadListener(actx, false, ignoreIsReady);
+            if (async) {
+                listener = new TestAsyncReadListener(actx, false, ignoreIsReady);
+            } else {
+                listener = new TestReadListener(actx, false, ignoreIsReady);
+            }
             in.setReadListener(listener);
         }
     }
 
     @WebServlet(asyncSupported = true)
-    public class NBWriteServlet extends TesterServlet {
+    public static class NBWriteServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
-        public volatile TestWriteListener wlistener;
-        public volatile TestReadListener rlistener;
+        private final AtomicBoolean asyncContextIsComplete;
+        private final boolean unlimited;
+        private final boolean listenerCompletesOnError;
+        public transient volatile TestWriteListener wlistener;
+
+        public NBWriteServlet(AtomicBoolean asyncContextIsComplete) {
+            this(asyncContextIsComplete, false, true);
+        }
+
+
+        public NBWriteServlet(AtomicBoolean asyncContextIsComplete, boolean unlimited, boolean listenerCompletesOnError) {
+            this.asyncContextIsComplete = asyncContextIsComplete;
+            this.unlimited = unlimited;
+            this.listenerCompletesOnError = listenerCompletesOnError;
+        }
+
 
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -527,20 +606,21 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 @Override
                 public void onError(AsyncEvent event) throws IOException {
                     log.info("AsyncListener.onError");
+                    if (listenerCompletesOnError) {
+                        event.getAsyncContext().complete();
+                    }
                 }
 
                 @Override
                 public void onComplete(AsyncEvent event) throws IOException {
                     log.info("onComplete");
+                    asyncContextIsComplete.set(true);
                 }
             });
             // step 2 - notify on read
-            ServletInputStream in = req.getInputStream();
-            rlistener = new TestReadListener(actx, true, false);
-            in.setReadListener(rlistener);
             ServletOutputStream out = resp.getOutputStream();
             resp.setBufferSize(200 * 1024);
-            wlistener = new TestWriteListener(actx);
+            wlistener = new TestWriteListener(actx, unlimited);
             out.setWriteListener(wlistener);
         }
 
@@ -548,9 +628,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     @WebServlet(asyncSupported = true)
-    public class NBReadWriteServlet extends TesterServlet {
+    public static class NBReadWriteServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
-        public volatile TestReadWriteListener rwlistener;
+        public transient volatile TestReadWriteListener rwlistener;
 
         @Override
         protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -565,12 +645,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
     }
 
-    private class TestReadListener implements ReadListener {
-        private final AsyncContext ctx;
-        private final boolean usingNonBlockingWrite;
-        private final boolean ignoreIsReady;
-        private final StringBuilder body = new StringBuilder();
-        public volatile boolean onErrorInvoked = false;
+    private static class TestReadListener implements ReadListener {
+        protected final AsyncContext ctx;
+        protected final boolean usingNonBlockingWrite;
+        protected final boolean ignoreIsReady;
+        protected final StringBuilder body = new StringBuilder();
 
 
         public TestReadListener(AsyncContext ctx,
@@ -600,7 +679,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onAllDataRead() {
-            log.info("onAllDataRead");
+            log.info("onAllDataRead totalData=" + body.toString().length());
             // If non-blocking writes are being used, don't write here as it
             // will inject unexpected data into the write output.
             if (!usingNonBlockingWrite) {
@@ -621,26 +700,90 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onError(Throwable throwable) {
-            log.info("ReadListener.onError");
+            log.info("ReadListener.onError totalData=" + body.toString().length());
             throwable.printStackTrace();
-            onErrorInvoked = true;
         }
     }
 
-    private class TestWriteListener implements WriteListener {
+    private static class TestAsyncReadListener extends TestReadListener {
+
+        AtomicInteger isReadyCount = new AtomicInteger(0);
+        AtomicInteger notReadyCount = new AtomicInteger(0);
+        AtomicInteger containerThreadCount = new AtomicInteger(0);
+        AtomicInteger nonContainerThreadCount = new AtomicInteger(0);
+
+        public TestAsyncReadListener(AsyncContext ctx,
+                boolean usingNonBlockingWrite, boolean ignoreIsReady) {
+            super(ctx, usingNonBlockingWrite, ignoreIsReady);
+        }
+
+        @Override
+        public void onDataAvailable() throws IOException {
+            if (ContainerThreadMarker.isContainerThread()) {
+                containerThreadCount.incrementAndGet();
+            } else {
+                nonContainerThreadCount.incrementAndGet();
+            }
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        ServletInputStream in = ctx.getRequest().getInputStream();
+                        byte[] b = new byte[1024];
+                        int read = in.read(b);
+                        if (read == -1) {
+                            return;
+                        }
+                        body.append(new String(b, 0, read));
+                        boolean isReady = ignoreIsReady || in.isReady();
+                        if (isReady) {
+                            isReadyCount.incrementAndGet();
+                        } else {
+                            notReadyCount.incrementAndGet();
+                        }
+                        if (isReady) {
+                            onDataAvailable();
+                        }
+                    } catch (IOException e) {
+                        onError(e);
+                    }
+                }
+            }.start();
+        }
+
+        @Override
+        public void onAllDataRead() {
+            super.onAllDataRead();
+            log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount
+                    + " containerThreadCount=" + containerThreadCount
+                    + " nonContainerThreadCount=" + nonContainerThreadCount);
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            super.onError(throwable);
+            log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount
+                    + " containerThreadCount=" + containerThreadCount
+                    + " nonContainerThreadCount=" + nonContainerThreadCount);
+        }
+    }
+
+    private static class TestWriteListener implements WriteListener {
         AsyncContext ctx;
+        private final boolean unlimited;
         int written = 0;
         public volatile boolean onErrorInvoked = false;
 
-        public TestWriteListener(AsyncContext ctx) {
+        public TestWriteListener(AsyncContext ctx, boolean unlimted) {
             this.ctx = ctx;
+            this.unlimited = unlimted;
         }
 
         @Override
         public void onWritePossible() throws IOException {
             long start = System.currentTimeMillis();
             int before = written;
-            while (written < WRITE_SIZE &&
+            while ((written < WRITE_SIZE || unlimited) &&
                     ctx.getResponse().getOutputStream().isReady()) {
                 ctx.getResponse().getOutputStream().write(
                         DATA, written, CHUNK_SIZE);
@@ -671,7 +814,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     }
 
-    private class TestReadWriteListener implements ReadListener {
+    private static class TestReadWriteListener implements ReadListener {
         AsyncContext ctx;
         private final StringBuilder body = new StringBuilder();
 
@@ -933,7 +1076,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         tomcat.start();
 
         Map<String, List<String>> resHeaders = new HashMap<>();
-        int rc = postUrl(true, new DataWriter(500), "http://localhost:" +
+        int rc = postUrl(true, new DataWriter(500, 5), "http://localhost:" +
                 getPort() + "/", new ByteChunk(), resHeaders, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
@@ -941,7 +1084,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     @WebServlet(asyncSupported = true)
-    private final class NBReadWithDispatchServlet extends TesterServlet {
+    private static final class NBReadWithDispatchServlet extends TesterServlet {
 
         private static final long serialVersionUID = 1L;
 
@@ -995,6 +1138,382 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 asyncCtx.dispatch("/error");
             }).start();
 
+        }
+    }
+
+
+    @Test
+    public void testCanceledPostChunked() throws Exception {
+        doTestCanceledPost(new String[] {
+                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + SimpleHttpClient.CRLF +
+                "Transfer-Encoding: Chunked" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "10" + SimpleHttpClient.CRLF +
+                "This is 16 bytes" + SimpleHttpClient.CRLF
+                });
+    }
+
+
+    @Test
+    public void testCanceledPostNoChunking() throws Exception {
+        doTestCanceledPost(new String[] {
+                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + SimpleHttpClient.CRLF +
+                "Content-Length: 100" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "This is 16 bytes"
+                });
+    }
+
+
+    /*
+     * Tests an error on an non-blocking read when the client closes the
+     * connection before fully writing the request body.
+     *
+     * Required sequence is:
+     * - enter Servlet's service() method
+     * - startAsync()
+     * - configure non-blocking read
+     * - read partial body
+     * - close client connection
+     * - error is triggered
+     * - exit Servlet's service() method
+     *
+     * This test makes extensive use of instance fields in the Servlet that
+     * would normally be considered very poor practice. It is only safe in this
+     * test as the Servlet only processes a single request.
+     */
+    private void doTestCanceledPost(String[] request) throws Exception {
+
+        CountDownLatch partialReadLatch = new CountDownLatch(1);
+        CountDownLatch completeLatch = new CountDownLatch(1);
+
+        AtomicBoolean testFailed = new AtomicBoolean(true);
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        PostServlet postServlet = new PostServlet(partialReadLatch, completeLatch, testFailed);
+        Wrapper wrapper = Tomcat.addServlet(ctx, "postServlet", postServlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMappingDecoded("/*", "postServlet");
+
+        tomcat.start();
+
+        ResponseOKClient client = new ResponseOKClient();
+        client.setPort(getPort());
+        client.setRequest(request);
+        client.connect();
+        client.sendRequest();
+
+        // Wait server to read partial request body
+        partialReadLatch.await();
+
+        client.disconnect();
+
+        completeLatch.await();
+
+        Assert.assertFalse(testFailed.get());
+    }
+
+
+    private static final class ResponseOKClient extends SimpleHttpClient {
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return true;
+        }
+    }
+
+
+    private static final class PostServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final transient CountDownLatch partialReadLatch;
+        private final transient CountDownLatch completeLatch;
+        private final AtomicBoolean testFailed;
+
+        public PostServlet(CountDownLatch doPostLatch, CountDownLatch completeLatch, AtomicBoolean testFailed) {
+            this.partialReadLatch = doPostLatch;
+            this.completeLatch = completeLatch;
+            this.testFailed = testFailed;
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            AsyncContext ac = req.startAsync();
+            ac.setTimeout(-1);
+            CanceledPostAsyncListener asyncListener = new CanceledPostAsyncListener(completeLatch);
+            ac.addListener(asyncListener);
+
+            CanceledPostReadListener readListener = new CanceledPostReadListener(ac, partialReadLatch, testFailed);
+            req.getInputStream().setReadListener(readListener);
+        }
+    }
+
+
+    private static final class CanceledPostAsyncListener implements AsyncListener {
+
+        private final transient CountDownLatch completeLatch;
+
+        public CanceledPostAsyncListener(CountDownLatch completeLatch) {
+            this.completeLatch = completeLatch;
+        }
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            System.out.println("complete");
+            completeLatch.countDown();
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            System.out.println("onTimeout");
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+            System.out.println("onError-async");
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            System.out.println("onStartAsync");
+        }
+    }
+
+    private static final class CanceledPostReadListener implements ReadListener {
+
+        private final AsyncContext ac;
+        private final CountDownLatch partialReadLatch;
+        private final AtomicBoolean testFailed;
+        private int totalRead = 0;
+
+        public CanceledPostReadListener(AsyncContext ac, CountDownLatch partialReadLatch, AtomicBoolean testFailed) {
+            this.ac = ac;
+            this.partialReadLatch = partialReadLatch;
+            this.testFailed = testFailed;
+        }
+
+        @Override
+        public void onDataAvailable() throws IOException {
+            ServletInputStream sis = ac.getRequest().getInputStream();
+            boolean isReady;
+
+            byte[] buffer = new byte[32];
+            do {
+                if (partialReadLatch.getCount() == 0) {
+                    System.out.println("debug");
+                }
+                int bytesRead = sis.read(buffer);
+
+                if (bytesRead == -1) {
+                    return;
+                }
+                totalRead += bytesRead;
+                isReady = sis.isReady();
+                System.out.println("Read [" + bytesRead +
+                        "], buffer [" + new String(buffer, 0, bytesRead, StandardCharsets.UTF_8) +
+                        "], total read [" + totalRead +
+                        "], isReady [" + isReady + "]");
+            } while (isReady);
+            if (totalRead == 16) {
+                partialReadLatch.countDown();
+            }
+        }
+
+        @Override
+        public void onAllDataRead() throws IOException {
+            ac.complete();
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            throwable.printStackTrace();
+            // This is the expected behaviour so clear the failed flag.
+            testFailed.set(false);
+            ac.complete();
+        }
+    }
+
+
+    @Test
+    public void testNonBlockingWriteError02NoSwallow() throws Exception {
+        doTestNonBlockingWriteError02(false);
+    }
+
+
+    @Test
+    public void testNonBlockingWriteError02Swallow() throws Exception {
+        doTestNonBlockingWriteError02(true);
+    }
+
+
+    /*
+     * Tests client disconnect in the following scenario:
+     * - async with non-blocking IO
+     * - response has been committed
+     * - no data in buffers
+     * - client disconnects
+     * - server attempts a write
+     */
+    private void doTestNonBlockingWriteError02(boolean swallowIoException) throws Exception {
+        CountDownLatch responseCommitLatch = new CountDownLatch(1);
+        CountDownLatch clientCloseLatch = new CountDownLatch(1);
+        CountDownLatch asyncCompleteLatch = new CountDownLatch(1);
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        NBWriteServlet02 writeServlet =
+                new NBWriteServlet02(responseCommitLatch, clientCloseLatch, asyncCompleteLatch, swallowIoException);
+        Wrapper wrapper = Tomcat.addServlet(ctx, "writeServlet", writeServlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMappingDecoded("/*", "writeServlet");
+
+        tomcat.start();
+
+        ResponseOKClient client = new ResponseOKClient();
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF
+                });
+        client.connect();
+        client.sendRequest();
+
+        responseCommitLatch.await();
+
+        client.disconnect();
+        clientCloseLatch.countDown();
+
+        Assert.assertTrue("Failed to complete async processing", asyncCompleteLatch.await(60, TimeUnit.SECONDS));
+    }
+
+
+    private static class NBWriteServlet02 extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final transient CountDownLatch responseCommitLatch;
+        private final transient CountDownLatch clientCloseLatch;
+        private final transient CountDownLatch asyncCompleteLatch;
+        private final boolean swallowIoException;
+
+        public NBWriteServlet02(CountDownLatch responseCommitLatch, CountDownLatch clientCloseLatch,
+                CountDownLatch asyncCompleteLatch, boolean swallowIoException) {
+            this.responseCommitLatch = responseCommitLatch;
+            this.clientCloseLatch = clientCloseLatch;
+            this.asyncCompleteLatch = asyncCompleteLatch;
+            this.swallowIoException = swallowIoException;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            AsyncContext ac = req.startAsync();
+            ac.addListener(new TestAsyncListener02(asyncCompleteLatch));
+            ac.setTimeout(5000);
+
+            WriteListener writeListener =
+                    new TestWriteListener02(ac, responseCommitLatch, clientCloseLatch, swallowIoException);
+            resp.getOutputStream().setWriteListener(writeListener);
+        }
+    }
+
+
+    private static class TestAsyncListener02 implements AsyncListener {
+
+        private final CountDownLatch asyncCompleteLatch;
+
+        public TestAsyncListener02(CountDownLatch asyncCompleteLatch) {
+            this.asyncCompleteLatch = asyncCompleteLatch;
+        }
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            asyncCompleteLatch.countDown();
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+    }
+
+    private static class TestWriteListener02 implements WriteListener {
+
+        private final AsyncContext ac;
+        private final CountDownLatch responseCommitLatch;
+        private final CountDownLatch clientCloseLatch;
+        private final boolean swallowIoException;
+        private volatile AtomicInteger stage = new AtomicInteger(0);
+
+        public TestWriteListener02(AsyncContext ac, CountDownLatch responseCommitLatch,
+                CountDownLatch clientCloseLatch, boolean swallowIoException) {
+            this.ac = ac;
+            this.responseCommitLatch = responseCommitLatch;
+            this.clientCloseLatch = clientCloseLatch;
+            this.swallowIoException = swallowIoException;
+        }
+
+        @Override
+        public void onWritePossible() throws IOException {
+            try {
+                ServletOutputStream sos = ac.getResponse().getOutputStream();
+                do {
+                    if (stage.get() == 0) {
+                        // Commit the response
+                        ac.getResponse().flushBuffer();
+                        responseCommitLatch.countDown();
+                        stage.incrementAndGet();
+                    } else if (stage.get() == 1) {
+                        // Wait for the client to drop the connection
+                        try {
+                            clientCloseLatch.await();
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
+                        sos.print("TEST");
+                        stage.incrementAndGet();
+                    } else if (stage.get() == 2) {
+                        sos.flush();
+                    }
+                } while (sos.isReady());
+            } catch (IOException ioe) {
+                if (!swallowIoException) {
+                    throw ioe;
+                }
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            // NO-OP
         }
     }
 }

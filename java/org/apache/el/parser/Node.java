@@ -19,9 +19,9 @@
 
 package org.apache.el.parser;
 
-import javax.el.ELException;
-import javax.el.MethodInfo;
-import javax.el.ValueReference;
+import jakarta.el.ELException;
+import jakarta.el.MethodInfo;
+import jakarta.el.ValueReference;
 
 import org.apache.el.lang.EvaluationContext;
 

@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@page import="javax.annotation.PostConstruct"%>
+<%@page import="jakarta.annotation.PostConstruct"%>
 <html>
   <head><title>Annotations test case</title></head>
   <body>

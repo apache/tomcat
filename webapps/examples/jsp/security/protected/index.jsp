@@ -14,6 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
+<%@ page import="java.util.Enumeration" %>
 <%
   if (request.getParameter("logoff") != null) {
     session.invalidate();
@@ -70,6 +71,35 @@ enter it here:
 <input type="text" name="role" value="<%= util.HTMLFilter.filter(role) %>">
 <input type="submit" >
 </form>
+<br><br>
+
+To add some data to the authenticated session, enter it here:
+<form method="GET" action='<%= response.encodeURL("index.jsp") %>'>
+<input type="text" name="dataName">
+<input type="text" name="dataValue">
+<input type="submit" >
+</form>
+<br><br>
+
+<%
+  String dataName = request.getParameter("dataName");
+  if (dataName != null) {
+    session.setAttribute(dataName, request.getParameter("dataValue"));
+  }
+%>
+<p>The authenticated session contains the following attributes:</p>
+<table>
+<tr><th>Name</th><th>Value</th></tr>
+<%
+  Enumeration<String> names = session.getAttributeNames();
+  while (names.hasMoreElements()) {
+    String name = names.nextElement();
+%>
+<tr><td><%= name %></td><td><%= session.getAttribute(name) %></td>
+<%
+  }
+%>
+</table>
 <br><br>
 
 If you have configured this application for form-based authentication, you can

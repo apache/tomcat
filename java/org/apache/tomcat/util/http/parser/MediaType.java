@@ -78,10 +78,6 @@ public class MediaType {
                             continue;
                         }
                         result.append(';');
-                        // Workaround for Adobe Read 9 plug-in on IE bug
-                        // Can be removed after 26 June 2013 (EOL of Reader 9)
-                        // See BZ 53814
-                        result.append(' ');
                         result.append(entry.getKey());
                         result.append('=');
                         result.append(value);
@@ -107,10 +103,6 @@ public class MediaType {
                             continue;
                         }
                         result.append(';');
-                        // Workaround for Adobe Read 9 plug-in on IE bug
-                        // Can be removed after 26 June 2013 (EOL of Reader 9)
-                        // See BZ 53814
-                        result.append(' ');
                         result.append(entry.getKey());
                         result.append('=');
                         result.append(entry.getValue());
@@ -124,7 +116,7 @@ public class MediaType {
     }
 
     /**
-     * Parses a MediaType value, either from a HTTP header or from an application.
+     * Parses a MediaType value, either from an HTTP header or from an application.
      *
      * @param input a reader over the header text
      * @return a MediaType parsed from the input, or null if not valid

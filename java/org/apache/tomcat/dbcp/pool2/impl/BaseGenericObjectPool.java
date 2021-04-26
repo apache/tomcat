@@ -189,11 +189,11 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * Returns whether to block when the <code>borrowObject()</code> method is
+     * Returns whether to block when the {@code borrowObject()} method is
      * invoked when the pool is exhausted (the maximum number of "active"
      * objects has been reached).
      *
-     * @return <code>true</code> if <code>borrowObject()</code> should block
+     * @return {@code true} if {@code borrowObject()} should block
      *         when the pool is exhausted
      *
      * @see #setBlockWhenExhausted
@@ -203,12 +203,12 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * Sets whether to block when the <code>borrowObject()</code> method is
+     * Sets whether to block when the {@code borrowObject()} method is
      * invoked when the pool is exhausted (the maximum number of "active"
      * objects has been reached).
      *
-     * @param blockWhenExhausted    <code>true</code> if
-     *                              <code>borrowObject()</code> should block
+     * @param blockWhenExhausted    {@code true} if
+     *                              {@code borrowObject()} should block
      *                              when the pool is exhausted
      *
      * @see #getBlockWhenExhausted
@@ -217,37 +217,42 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         this.blockWhenExhausted = blockWhenExhausted;
     }
 
-    protected void setConfig(final BaseObjectPoolConfig<T> conf) {
-        setLifo(conf.getLifo());
-        setMaxWaitMillis(conf.getMaxWaitMillis());
-        setBlockWhenExhausted(conf.getBlockWhenExhausted());
-        setTestOnCreate(conf.getTestOnCreate());
-        setTestOnBorrow(conf.getTestOnBorrow());
-        setTestOnReturn(conf.getTestOnReturn());
-        setTestWhileIdle(conf.getTestWhileIdle());
-        setNumTestsPerEvictionRun(conf.getNumTestsPerEvictionRun());
-        setMinEvictableIdleTimeMillis(conf.getMinEvictableIdleTimeMillis());
-        setTimeBetweenEvictionRunsMillis(conf.getTimeBetweenEvictionRunsMillis());
-        setSoftMinEvictableIdleTimeMillis(conf.getSoftMinEvictableIdleTimeMillis());
-        final EvictionPolicy<T> policy = conf.getEvictionPolicy();
+    /**
+     * Initializes the receiver with the given configuration.
+     *
+     * @param config Initialization source.
+     */
+    protected void setConfig(final BaseObjectPoolConfig<T> config) {
+        setLifo(config.getLifo());
+        setMaxWaitMillis(config.getMaxWaitMillis());
+        setBlockWhenExhausted(config.getBlockWhenExhausted());
+        setTestOnCreate(config.getTestOnCreate());
+        setTestOnBorrow(config.getTestOnBorrow());
+        setTestOnReturn(config.getTestOnReturn());
+        setTestWhileIdle(config.getTestWhileIdle());
+        setNumTestsPerEvictionRun(config.getNumTestsPerEvictionRun());
+        setMinEvictableIdleTimeMillis(config.getMinEvictableIdleTimeMillis());
+        setTimeBetweenEvictionRunsMillis(config.getTimeBetweenEvictionRunsMillis());
+        setSoftMinEvictableIdleTimeMillis(config.getSoftMinEvictableIdleTimeMillis());
+        final EvictionPolicy<T> policy = config.getEvictionPolicy();
         if (policy == null) {
             // Use the class name (pre-2.6.0 compatible)
-            setEvictionPolicyClassName(conf.getEvictionPolicyClassName());
+            setEvictionPolicyClassName(config.getEvictionPolicyClassName());
         } else {
             // Otherwise, use the class (2.6.0 feature)
             setEvictionPolicy(policy);
         }
-        setEvictorShutdownTimeoutMillis(conf.getEvictorShutdownTimeoutMillis());
+        setEvictorShutdownTimeoutMillis(config.getEvictorShutdownTimeoutMillis());
     }
 
     /**
      * Returns the maximum amount of time (in milliseconds) the
-     * <code>borrowObject()</code> method should block before throwing an
+     * {@code borrowObject()} method should block before throwing an
      * exception when the pool is exhausted and
      * {@link #getBlockWhenExhausted} is true. When less than 0, the
-     * <code>borrowObject()</code> method may block indefinitely.
+     * {@code borrowObject()} method may block indefinitely.
      *
-     * @return the maximum number of milliseconds <code>borrowObject()</code>
+     * @return the maximum number of milliseconds {@code borrowObject()}
      *         will block.
      *
      * @see #setMaxWaitMillis
@@ -259,13 +264,13 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Sets the maximum amount of time (in milliseconds) the
-     * <code>borrowObject()</code> method should block before throwing an
+     * {@code borrowObject()} method should block before throwing an
      * exception when the pool is exhausted and
      * {@link #getBlockWhenExhausted} is true. When less than 0, the
-     * <code>borrowObject()</code> method may block indefinitely.
+     * {@code borrowObject()} method may block indefinitely.
      *
      * @param maxWaitMillis the maximum number of milliseconds
-     *                      <code>borrowObject()</code> will block or negative
+     *                      {@code borrowObject()} will block or negative
      *                      for indefinitely.
      *
      * @see #getMaxWaitMillis
@@ -276,14 +281,14 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * Returns whether the pool has LIFO (last in, first out) behaviour with
+     * Returns whether the pool has LIFO (last in, first out) behavior with
      * respect to idle objects - always returning the most recently used object
      * from the pool, or as a FIFO (first in, first out) queue, where the pool
      * always returns the oldest object in the idle object pool.
      *
-     * @return <code>true</code> if the pool is configured with LIFO behaviour
-     *         or <code>false</code> if the pool is configured with FIFO
-     *         behaviour
+     * @return {@code true} if the pool is configured with LIFO behavior
+     *         or {@code false} if the pool is configured with FIFO
+     *         behavior
      *
      * @see #setLifo
      */
@@ -295,7 +300,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * Returns whether or not the pool serves threads waiting to borrow objects fairly.
      * True means that waiting threads are served as if waiting in a FIFO queue.
      *
-     * @return <code>true</code> if waiting threads are to be served
+     * @return {@code true} if waiting threads are to be served
      *             by the pool in arrival order
      */
     public final boolean getFairness() {
@@ -303,14 +308,14 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     }
 
     /**
-     * Sets whether the pool has LIFO (last in, first out) behaviour with
+     * Sets whether the pool has LIFO (last in, first out) behavior with
      * respect to idle objects - always returning the most recently used object
      * from the pool, or as a FIFO (first in, first out) queue, where the pool
      * always returns the oldest object in the idle object pool.
      *
-     * @param lifo  <code>true</code> if the pool is to be configured with LIFO
-     *              behaviour or <code>false</code> if the pool is to be
-     *              configured with FIFO behaviour
+     * @param lifo  {@code true} if the pool is to be configured with LIFO
+     *              behavior or {@code false} if the pool is to be
+     *              configured with FIFO behavior
      *
      * @see #getLifo()
      */
@@ -320,13 +325,13 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Returns whether objects created for the pool will be validated before
-     * being returned from the <code>borrowObject()</code> method. Validation is
-     * performed by the <code>validateObject()</code> method of the factory
+     * being returned from the {@code borrowObject()} method. Validation is
+     * performed by the {@code validateObject()} method of the factory
      * associated with the pool. If the object fails to validate, then
-     * <code>borrowObject()</code> will fail.
+     * {@code borrowObject()} will fail.
      *
-     * @return <code>true</code> if newly created objects are validated before
-     *         being returned from the <code>borrowObject()</code> method
+     * @return {@code true} if newly created objects are validated before
+     *         being returned from the {@code borrowObject()} method
      *
      * @see #setTestOnCreate
      *
@@ -338,14 +343,14 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Sets whether objects created for the pool will be validated before
-     * being returned from the <code>borrowObject()</code> method. Validation is
-     * performed by the <code>validateObject()</code> method of the factory
+     * being returned from the {@code borrowObject()} method. Validation is
+     * performed by the {@code validateObject()} method of the factory
      * associated with the pool. If the object fails to validate, then
-     * <code>borrowObject()</code> will fail.
+     * {@code borrowObject()} will fail.
      *
-     * @param testOnCreate  <code>true</code> if newly created objects should be
+     * @param testOnCreate  {@code true} if newly created objects should be
      *                      validated before being returned from the
-     *                      <code>borrowObject()</code> method
+     *                      {@code borrowObject()} method
      *
      * @see #getTestOnCreate
      *
@@ -357,14 +362,14 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Returns whether objects borrowed from the pool will be validated before
-     * being returned from the <code>borrowObject()</code> method. Validation is
-     * performed by the <code>validateObject()</code> method of the factory
+     * being returned from the {@code borrowObject()} method. Validation is
+     * performed by the {@code validateObject()} method of the factory
      * associated with the pool. If the object fails to validate, it will be
      * removed from the pool and destroyed, and a new attempt will be made to
      * borrow an object from the pool.
      *
-     * @return <code>true</code> if objects are validated before being returned
-     *         from the <code>borrowObject()</code> method
+     * @return {@code true} if objects are validated before being returned
+     *         from the {@code borrowObject()} method
      *
      * @see #setTestOnBorrow
      */
@@ -374,15 +379,15 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Sets whether objects borrowed from the pool will be validated before
-     * being returned from the <code>borrowObject()</code> method. Validation is
-     * performed by the <code>validateObject()</code> method of the factory
+     * being returned from the {@code borrowObject()} method. Validation is
+     * performed by the {@code validateObject()} method of the factory
      * associated with the pool. If the object fails to validate, it will be
      * removed from the pool and destroyed, and a new attempt will be made to
      * borrow an object from the pool.
      *
-     * @param testOnBorrow  <code>true</code> if objects should be validated
+     * @param testOnBorrow  {@code true} if objects should be validated
      *                      before being returned from the
-     *                      <code>borrowObject()</code> method
+     *                      {@code borrowObject()} method
      *
      * @see #getTestOnBorrow
      */
@@ -392,13 +397,13 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Returns whether objects borrowed from the pool will be validated when
-     * they are returned to the pool via the <code>returnObject()</code> method.
-     * Validation is performed by the <code>validateObject()</code> method of
+     * they are returned to the pool via the {@code returnObject()} method.
+     * Validation is performed by the {@code validateObject()} method of
      * the factory associated with the pool. Returning objects that fail validation
      * are destroyed rather then being returned the pool.
      *
-     * @return <code>true</code> if objects are validated on return to
-     *         the pool via the <code>returnObject()</code> method
+     * @return {@code true} if objects are validated on return to
+     *         the pool via the {@code returnObject()} method
      *
      * @see #setTestOnReturn
      */
@@ -408,14 +413,14 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Sets whether objects borrowed from the pool will be validated when
-     * they are returned to the pool via the <code>returnObject()</code> method.
-     * Validation is performed by the <code>validateObject()</code> method of
+     * they are returned to the pool via the {@code returnObject()} method.
+     * Validation is performed by the {@code validateObject()} method of
      * the factory associated with the pool. Returning objects that fail validation
      * are destroyed rather then being returned the pool.
      *
-     * @param testOnReturn <code>true</code> if objects are validated on
+     * @param testOnReturn {@code true} if objects are validated on
      *                     return to the pool via the
-     *                     <code>returnObject()</code> method
+     *                     {@code returnObject()} method
      *
      * @see #getTestOnReturn
      */
@@ -427,11 +432,11 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * Returns whether objects sitting idle in the pool will be validated by the
      * idle object evictor (if any - see
      * {@link #setTimeBetweenEvictionRunsMillis(long)}). Validation is performed
-     * by the <code>validateObject()</code> method of the factory associated
+     * by the {@code validateObject()} method of the factory associated
      * with the pool. If the object fails to validate, it will be removed from
      * the pool and destroyed.
      *
-     * @return <code>true</code> if objects will be validated by the evictor
+     * @return {@code true} if objects will be validated by the evictor
      *
      * @see #setTestWhileIdle
      * @see #setTimeBetweenEvictionRunsMillis
@@ -444,14 +449,14 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * Returns whether objects sitting idle in the pool will be validated by the
      * idle object evictor (if any - see
      * {@link #setTimeBetweenEvictionRunsMillis(long)}). Validation is performed
-     * by the <code>validateObject()</code> method of the factory associated
+     * by the {@code validateObject()} method of the factory associated
      * with the pool. If the object fails to validate, it will be removed from
      * the pool and destroyed.  Note that setting this property has no effect
      * unless the idle object evictor is enabled by setting
-     * <code>timeBetweenEvictionRunsMillis</code> to a positive value.
+     * {@code timeBetweenEvictionRunsMillis} to a positive value.
      *
      * @param testWhileIdle
-     *            <code>true</code> so objects will be validated by the evictor
+     *            {@code true} so objects will be validated by the evictor
      *
      * @see #getTestWhileIdle
      * @see #setTimeBetweenEvictionRunsMillis
@@ -498,7 +503,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * number of idle instances in the pool. When negative, the number of tests
      * performed will be <code>ceil({@link #getNumIdle}/
      * abs({@link #getNumTestsPerEvictionRun}))</code> which means that when the
-     * value is <code>-n</code> roughly one nth of the idle objects will be
+     * value is {@code -n} roughly one nth of the idle objects will be
      * tested per run.
      *
      * @return max number of objects to examine during each evictor run
@@ -517,7 +522,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * number of idle instances in the pool. When negative, the number of tests
      * performed will be <code>ceil({@link #getNumIdle}/
      * abs({@link #getNumTestsPerEvictionRun}))</code> which means that when the
-     * value is <code>-n</code> roughly one nth of the idle objects will be
+     * value is {@code -n} roughly one nth of the idle objects will be
      * tested per run.
      *
      * @param numTestsPerEvictionRun
@@ -568,7 +573,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * Returns the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
      * see {@link #setTimeBetweenEvictionRunsMillis(long)}),
-     * with the extra condition that at least <code>minIdle</code> object
+     * with the extra condition that at least {@code minIdle} object
      * instances remain in the pool. This setting is overridden by
      * {@link #getMinEvictableIdleTimeMillis} (that is, if
      * {@link #getMinEvictableIdleTimeMillis} is positive, then
@@ -587,7 +592,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * Sets the minimum amount of time an object may sit idle in the pool
      * before it is eligible for eviction by the idle object evictor (if any -
      * see {@link #setTimeBetweenEvictionRunsMillis(long)}),
-     * with the extra condition that at least <code>minIdle</code> object
+     * with the extra condition that at least {@code minIdle} object
      * instances remain in the pool. This setting is overridden by
      * {@link #getMinEvictableIdleTimeMillis} (that is, if
      * {@link #getMinEvictableIdleTimeMillis} is positive, then
@@ -653,16 +658,22 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
                 setEvictionPolicy(evictionPolicyClassName, epClassLoader);
             }
         } catch (final ClassCastException e) {
-            throw new IllegalArgumentException("Class " + evictionPolicyClassName + " from class loaders ["
-                    + classLoader + ", " + epClassLoader + "] do not implement " + EVICTION_POLICY_TYPE_NAME);
-        } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException
-                | InvocationTargetException | NoSuchMethodException e) {
-            final String exMessage = "Unable to create " + EVICTION_POLICY_TYPE_NAME + " instance of type "
-                    + evictionPolicyClassName;
+            throw new IllegalArgumentException("Class " + evictionPolicyClassName + " from class loaders [" +
+                    classLoader + ", " + epClassLoader + "] do not implement " + EVICTION_POLICY_TYPE_NAME);
+        } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException |
+                InvocationTargetException | NoSuchMethodException e) {
+            final String exMessage = "Unable to create " + EVICTION_POLICY_TYPE_NAME + " instance of type " +
+                    evictionPolicyClassName;
             throw new IllegalArgumentException(exMessage, e);
         }
     }
 
+    /**
+     * Sets the eviction policy.
+     *
+     * @param className Eviction policy class name.
+     * @param classLoader Load the class from this class loader.
+     */
     @SuppressWarnings("unchecked")
     private void setEvictionPolicy(final String className, final ClassLoader classLoader)
             throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -721,18 +732,18 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Has this pool instance been closed.
-     * @return <code>true</code> when this pool has been closed.
+     * @return {@code true} when this pool has been closed.
      */
     public final boolean isClosed() {
         return closed;
     }
 
     /**
-     * <p>Perform <code>numTests</code> idle object eviction tests, evicting
+     * <p>Perform {@code numTests} idle object eviction tests, evicting
      * examined objects that meet the criteria for eviction. If
-     * <code>testWhileIdle</code> is true, examined objects are validated
+     * {@code testWhileIdle} is true, examined objects are validated
      * when visited (and removed if invalid); otherwise only objects that
-     * have been idle for more than <code>minEvicableIdleTimeMillis</code>
+     * have been idle for more than {@code minEvicableIdleTimeMillis}
      * are removed.</p>
      *
      * @throws Exception when there is a problem evicting idle objects.
@@ -772,14 +783,23 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      */
     final void startEvictor(final long delay) {
         synchronized (evictionLock) {
-            if (null != evictor) {
-                EvictionTimer.cancel(evictor, evictorShutdownTimeoutMillis, TimeUnit.MILLISECONDS);
-                evictor = null;
-                evictionIterator = null;
-            }
-            if (delay > 0) {
-                evictor = new Evictor();
-                EvictionTimer.schedule(evictor, delay, delay);
+            if (evictor == null) { // Starting evictor for the first time or after a cancel
+                if (delay > 0) {   // Starting new evictor
+                    evictor = new Evictor();
+                    EvictionTimer.schedule(evictor, delay, delay);
+                }
+            } else {  // Stop or restart of existing evictor
+                if (delay > 0) { // Restart
+                    synchronized (EvictionTimer.class) { // Ensure no cancel can happen between cancel / schedule calls
+                        EvictionTimer.cancel(evictor, evictorShutdownTimeoutMillis, TimeUnit.MILLISECONDS, true);
+                        evictor = null;
+                        evictionIterator = null;
+                        evictor = new Evictor();
+                        EvictionTimer.schedule(evictor, delay, delay);
+                    }
+                } else { // Stopping evictor
+                    EvictionTimer.cancel(evictor, evictorShutdownTimeoutMillis, TimeUnit.MILLISECONDS, false);
+                }
             }
         }
     }
@@ -787,7 +807,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Stops the evictor.
      */
-    void stopEvitor() {
+    void stopEvictor() {
         startEvictor(-1L);
     }
     /**
@@ -802,7 +822,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * Provides the name under which the pool has been registered with the
-     * platform MBean server or <code>null</code> if the pool has not been
+     * platform MBean server or {@code null} if the pool has not been
      * registered.
      * @return the JMX name
      */
@@ -870,7 +890,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     /**
      * The total number of objects destroyed by this pool as a result of failing
-     * validation during <code>borrowObject()</code> over the lifetime of the
+     * validation during {@code borrowObject()} over the lifetime of the
      * pool.
      * @return validation destroyed object count
      */
@@ -926,7 +946,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * The listener used (if any) to receive notifications of exceptions
      * unavoidably swallowed by the pool.
      *
-     * @return The listener or <code>null</code> for no listener
+     * @return The listener or {@code null} for no listener
      */
     public final SwallowedExceptionListener getSwallowedExceptionListener() {
         return swallowedExceptionListener;
@@ -936,7 +956,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
      * The listener used (if any) to receive notifications of exceptions
      * unavoidably swallowed by the pool.
      *
-     * @param swallowedExceptionListener    The listener or <code>null</code>
+     * @param swallowedExceptionListener    The listener or {@code null}
      *                                      for no listener
      */
     public final void setSwallowedExceptionListener(
@@ -1028,7 +1048,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     /**
      * Registers the pool with the platform MBean server.
      * The registered name will be
-     * <code>jmxNameBase + jmxNamePrefix + i</code> where i is the least
+     * {@code jmxNameBase + jmxNamePrefix + i} where i is the least
      * integer greater than or equal to 1 such that the name is not already
      * registered. Swallows MBeanRegistrationException, NotCompliantMBeanException
      * returning null.
@@ -1158,14 +1178,23 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         }
 
 
+        /**
+         * Sets the scheduled future.
+         *
+         * @param scheduledFuture the scheduled future.
+         */
         void setScheduledFuture(final ScheduledFuture<?> scheduledFuture) {
             this.scheduledFuture = scheduledFuture;
         }
 
 
+        /**
+         * Cancels the scheduled future.
+         */
         void cancel() {
             scheduledFuture.cancel(false);
         }
+
     }
 
     /**

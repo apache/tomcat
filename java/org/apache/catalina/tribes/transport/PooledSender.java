@@ -151,8 +151,8 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             DataSender[] list = new DataSender[notinuse.size()];
             notinuse.toArray(list);
             boolean result = false;
-            for (int i=0; i<list.length; i++) {
-                result = result | list[i].keepalive();
+            for (DataSender dataSender : list) {
+                result = result | dataSender.keepalive();
             }
             return result;
         }
@@ -206,12 +206,12 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             isOpen = false;
             Object[] unused = notinuse.toArray();
             Object[] used = inuse.toArray();
-            for (int i = 0; i < unused.length; i++) {
-                DataSender sender = (DataSender) unused[i];
+            for (Object value : unused) {
+                DataSender sender = (DataSender) value;
                 sender.disconnect();
             }//for
-            for (int i = 0; i < used.length; i++) {
-                DataSender sender = (DataSender) used[i];
+            for (Object o : used) {
+                DataSender sender = (DataSender) o;
                 sender.disconnect();
             }//for
             notinuse.clear();

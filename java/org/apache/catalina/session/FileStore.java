@@ -27,12 +27,14 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Concrete implementation of the <b>Store</b> interface that utilizes
@@ -42,6 +44,10 @@ import org.apache.juli.logging.Log;
  * @author Craig R. McClanahan
  */
 public final class FileStore extends StoreBase {
+
+    private static final Log log = LogFactory.getLog(FileStore.class);
+    private static final StringManager sm = StringManager.getManager(FileStore.class);
+
 
     // ----------------------------------------------------- Constants
 
@@ -127,17 +133,17 @@ public final class FileStore extends StoreBase {
     @Override
     public int getSize() throws IOException {
         // Acquire the list of files in our storage directory
-        File file = directory();
-        if (file == null) {
+        File dir = directory();
+        if (dir == null) {
             return 0;
         }
-        String files[] = file.list();
+        String files[] = dir.list();
 
         // Figure out which files are sessions
         int keycount = 0;
         if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].endsWith(FILE_EXT)) {
+            for (String file : files) {
+                if (file.endsWith(FILE_EXT)) {
                     keycount++;
                 }
             }
@@ -156,8 +162,8 @@ public final class FileStore extends StoreBase {
     @Override
     public void clear() throws IOException {
         String[] keys = keys();
-        for (int i = 0; i < keys.length; i++) {
-            remove(keys[i]);
+        for (String key : keys) {
+            remove(key);
         }
     }
 
@@ -172,27 +178,26 @@ public final class FileStore extends StoreBase {
     @Override
     public String[] keys() throws IOException {
         // Acquire the list of files in our storage directory
-        File file = directory();
-        if (file == null) {
+        File dir = directory();
+        if (dir == null) {
             return new String[0];
         }
-
-        String files[] = file.list();
+        String files[] = dir.list();
 
         // Bugzilla 32130
-        if((files == null) || (files.length < 1)) {
+        if (files == null || files.length < 1) {
             return new String[0];
         }
 
         // Build and return the list of session identifiers
         List<String> list = new ArrayList<>();
         int n = FILE_EXT.length();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].endsWith(FILE_EXT)) {
-                list.add(files[i].substring(0, files[i].length() - n));
+        for (String file : files) {
+            if (file.endsWith(FILE_EXT)) {
+                list.add (file.substring(0, file.length() - n));
             }
         }
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
 
@@ -210,11 +215,7 @@ public final class FileStore extends StoreBase {
     public Session load(String id) throws ClassNotFoundException, IOException {
         // Open an input stream to the specified pathname, if any
         File file = file(id);
-        if (file == null) {
-            return null;
-        }
-
-        if (!file.exists()) {
+        if (file == null || !file.exists()) {
             return null;
         }
 
@@ -341,11 +342,20 @@ public final class FileStore extends StoreBase {
      *    used in the file naming.
      */
     private File file(String id) throws IOException {
-        if (this.directory == null) {
+        File storageDir = directory();
+        if (storageDir == null) {
             return null;
         }
+
         String filename = id + FILE_EXT;
-        File file = new File(directory(), filename);
+        File file = new File(storageDir, filename);
+
+        // Check the file is within the storage directory
+        if (!file.getCanonicalFile().toPath().startsWith(storageDir.getCanonicalFile().toPath())) {
+            log.warn(sm.getString("fileStore.invalid", file.getPath(), id));
+            return null;
+        }
+
         return file;
     }
 }

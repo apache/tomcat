@@ -24,7 +24,7 @@
 
     <properties>
         <author email="craigmcc@apache.org">Craig R. McClanahan</author>
-        <title>Manager App HOW-TO</title>
+        <title>Manager App How-To</title>
     </properties>
 
 <body>
@@ -65,19 +65,22 @@ the following functions:</p>
     directory (unless it was deployed from file system).</li>
 </ul>
 
-<p>A default Tomcat installation includes the Manager. To add an instance of the
-Manager web application <code>Context</code> to a new host install the
-<code>manager.xml</code> context configuration file in the
+<p>A default Tomcat installation includes an instance of the Manager application
+configured for the default virtual host. If you create additional virtual hosts,
+you may wish to add an instance of the Manager application to one or more of
+those Hosts. To add an instance of the Manager web application
+<code>Context</code> to a new host install the <code>manager.xml</code> context
+configuration file in the
 <code>$CATALINA_BASE/conf/[enginename]/[hostname]</code> folder. Here is an
 example:</p>
 <source><![CDATA[<Context privileged="true" antiResourceLocking="false"
          docBase="${catalina.home}/webapps/manager">
+  <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
+                   sameSiteCookies="strict" />
   <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         allow="127\.0\.0\.1" />
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
+  <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
 </Context>]]></source>
-
-<p>If you have Tomcat configured to support multiple virtual hosts
-(websites) you would need to configure a Manager for each.</p>
 
 <p>There are three ways to use the <strong>Manager</strong> web application.</p>
 <ul>
@@ -181,7 +184,7 @@ Exactly how the usernames/passwords are configured depends on which
     add the <strong>manager-script</strong> role to the comma-delimited
     <code>roles</code> attribute for one or more existing users, and/or
     create new users with that assigned role.</li>
-<li><em>DataSourceRealm</em> or <em>JDBCRealm</em>
+<li><em>DataSourceRealm</em>
     &#8212; Your user and role information is stored in
     a database accessed via JDBC.  Add the <strong>manager-script</strong> role
     to one or more existing users, and/or create one or more new users
@@ -918,8 +921,6 @@ currently configured for each virtual host.</p>
 <source>OK - Connector / Trusted Certificate information
 Connector[HTTP/1.1-8080]
 SSL is not enabled for this connector
-Connector[AJP/1.3-8009]
-SSL is not enabled for this connector
 Connector[HTTP/1.1-8443]-_default_
 [
 [
@@ -961,8 +962,8 @@ Full thread dump Java HotSpot(TM) Client VM (25.25-b02 mixed mode):
         at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:409)
         at org.apache.catalina.manager.ManagerServlet.threadDump(ManagerServlet.java:557)
         at org.apache.catalina.manager.ManagerServlet.doGet(ManagerServlet.java:371)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:618)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:725)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:618)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:725)
 ...
 ]]></source>
 
@@ -1127,7 +1128,7 @@ on each of deployed web applications will be available.</p>
 
   <subsection name="JMX Get command">
   <p>
-    The JXMProxyServlet also supports a "get" command that you can use to
+    The JMXProxyServlet also supports a "get" command that you can use to
     fetch the value of a specific MBean's attribute. The general form of
     the <code>get</code> command is:
   </p>

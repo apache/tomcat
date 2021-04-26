@@ -41,6 +41,6 @@ public class AuthenticatedUserRealm extends RealmBase {
     protected Principal getPrincipal(String username) {
         // The authentication mechanism has authenticated the user so create
         // the Principal directly
-        return new GenericPrincipal(username, null, null);
+        return new GenericPrincipal(username);
     }
 }

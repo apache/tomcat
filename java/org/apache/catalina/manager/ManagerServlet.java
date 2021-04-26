@@ -38,13 +38,14 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.naming.Binding;
 import javax.naming.NamingEnumeration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
@@ -66,6 +67,8 @@ import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -552,7 +555,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         smClient.getString("managerServlet.findleaksList"));
             }
             for (String result : results) {
-                if ("".equals(result)) {
+                if (result.isEmpty()) {
                     result = "/";
                 }
                 writer.println(result);
@@ -577,6 +580,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     } else {
                         SSLHostConfig[] sslHostConfigs = http11Protoocol.findSslHostConfigs();
                         for (SSLHostConfig sslHostConfig : sslHostConfigs) {
+                            // tlsHostName is as provided by the user so use a case insensitive
+                            // comparison as host names are case insensitive.
                             if (sslHostConfig.getHostName().equalsIgnoreCase(tlsHostName)) {
                                 found = true;
                                 http11Protoocol.reloadSslHostConfig(tlsHostName);
@@ -627,7 +632,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     protected void sslConnectorCiphers(PrintWriter writer, StringManager smClient) {
         writer.println(smClient.getString("managerServlet.sslConnectorCiphers"));
-        Map<String,List<String>> connectorCiphers = getConnectorCiphers();
+        Map<String,List<String>> connectorCiphers = getConnectorCiphers(smClient);
         for (Map.Entry<String,List<String>> entry : connectorCiphers.entrySet()) {
             writer.println(entry.getKey());
             for (String cipher : entry.getValue()) {
@@ -640,7 +645,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     private void sslConnectorCerts(PrintWriter writer, StringManager smClient) {
         writer.println(smClient.getString("managerServlet.sslConnectorCerts"));
-        Map<String,List<String>> connectorCerts = getConnectorCerts();
+        Map<String,List<String>> connectorCerts = getConnectorCerts(smClient);
         for (Map.Entry<String,List<String>> entry : connectorCerts.entrySet()) {
             writer.println(entry.getKey());
             for (String cert : entry.getValue()) {
@@ -652,7 +657,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
     private void sslConnectorTrustedCerts(PrintWriter writer, StringManager smClient) {
         writer.println(smClient.getString("managerServlet.sslConnectorTrustedCerts"));
-        Map<String,List<String>> connectorTrustedCerts = getConnectorTrustedCerts();
+        Map<String,List<String>> connectorTrustedCerts = getConnectorTrustedCerts(smClient);
         for (Map.Entry<String,List<String>> entry : connectorTrustedCerts.entrySet()) {
             writer.println(entry.getKey());
             for (String cert : entry.getValue()) {
@@ -693,7 +698,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 mBeanServer.invoke(storeConfigOname, "storeConfig", null, null);
                 writer.println(smClient.getString("managerServlet.saved"));
             } catch (Exception e) {
-                log("managerServlet.storeConfig", e);
+                log(sm.getString("managerServlet.error.storeConfig"), e);
                 writer.println(smClient.getString("managerServlet.exception",
                         e.toString()));
             }
@@ -709,13 +714,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
             try {
-                mBeanServer.invoke(storeConfigOname, "store",
+                Boolean result = (Boolean) mBeanServer.invoke(storeConfigOname, "store",
                         new Object[] {context},
-                        new String [] { "java.lang.String"});
-                writer.println(smClient.getString("managerServlet.savedContext",
-                        path));
+                        new String [] { "org.apache.catalina.Context"});
+                if (result.booleanValue()) {
+                    writer.println(smClient.getString("managerServlet.savedContext", path));
+                } else {
+                    writer.println(smClient.getString("managerServlet.savedContextFail", path));
+                }
             } catch (Exception e) {
-                log("managerServlet.save[" + path + "]", e);
+                log(sm.getString("managerServlet.error.storeContextConfig", path), e);
                 writer.println(smClient.getString("managerServlet.exception",
                         e.toString()));
             }
@@ -736,10 +744,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param request  Servlet request we are processing
      * @param smClient i18n messages using the locale of the client
      */
-    protected synchronized void deploy
-        (PrintWriter writer, String config, ContextName cn,
-         String tag, boolean update, HttpServletRequest request,
-         StringManager smClient) {
+    protected void deploy(PrintWriter writer, String config, ContextName cn, String tag, boolean update,
+            HttpServletRequest request, StringManager smClient) {
 
         if (config != null && config.length() == 0) {
             config = null;
@@ -806,10 +812,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         try {
-            if (isServiced(name)) {
-                writer.println(smClient.getString("managerServlet.inService", displayPath));
-            } else {
-                addServiced(name);
+            if (tryAddServiced(name)) {
                 try {
                     if (config != null) {
                         if (!configBase.mkdirs() && !configBase.isDirectory()) {
@@ -819,8 +822,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         }
                         if (ExpandWar.copy(new File(config),
                                 new File(configBase, baseName + ".xml")) == false) {
-                            throw new Exception("Could not copy config file from path '" +
-                                    config + "'");
+                            throw new Exception(sm.getString("managerServlet.copyError", config));
                         }
                     }
                     // Upload WAR
@@ -842,14 +844,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         // Copy WAR to the host's appBase
                         ExpandWar.copy(uploadedWar, deployedWar);
                     }
-                    // Perform new deployment
-                    check(name);
                 } finally {
                     removeServiced(name);
                 }
+                // Perform new deployment
+                check(name);
+            } else {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
             }
         } catch (Exception e) {
-            log("managerServlet.check[" + displayPath + "]", e);
+            log(sm.getString("managerServlet.error.deploy", displayPath), e);
             writer.println(smClient.getString("managerServlet.exception",
                     e.toString()));
             return;
@@ -889,10 +893,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         // Copy WAR to appBase
         try {
-            if (isServiced(name)) {
-                writer.println(smClient.getString("managerServlet.inService", displayPath));
-            } else {
-                addServiced(name);
+            if (tryAddServiced(name)) {
                 try {
                     if (!deployedWar.delete()) {
                         writer.println(smClient.getString("managerServlet.deleteFail",
@@ -900,14 +901,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         return;
                     }
                     ExpandWar.copy(localWar, deployedWar);
-                    // Perform new deployment
-                    check(name);
                 } finally {
                     removeServiced(name);
                 }
+                // Perform new deployment
+                check(name);
+            } else {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
             }
         } catch (Exception e) {
-            log("managerServlet.check[" + displayPath + "]", e);
+            log(sm.getString("managerServlet.error.deploy", displayPath), e);
             writer.println(smClient.getString("managerServlet.exception",
                     e.toString()));
             return;
@@ -982,10 +985,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         try {
-            if (isServiced(name)) {
-                writer.println(smClient.getString("managerServlet.inService", displayPath));
-            } else {
-                addServiced(name);
+            if (tryAddServiced(name)) {
                 try {
                     if (config != null) {
                         if (!configBase.mkdirs() && !configBase.isDirectory()) {
@@ -1015,16 +1015,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         }
                         ExpandWar.copy(new File(war), localWar);
                     }
-                    // Perform new deployment
-                    check(name);
                 } finally {
                     removeServiced(name);
                 }
+                // Perform new deployment
+                check(name);
+            } else {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
             }
             writeDeployResult(writer, smClient, name, displayPath);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.install[" + displayPath + "]", t);
+            log(sm.getString("managerServlet.error.deploy", displayPath), t);
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
@@ -1065,25 +1067,27 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         writer.println(smClient.getString("managerServlet.listed",
                                     host.getName()));
         Container[] contexts = host.findChildren();
-        for (int i = 0; i < contexts.length; i++) {
-            Context context = (Context) contexts[i];
-            if (context != null ) {
+        for (Container container : contexts) {
+            Context context = (Context) container;
+            if (context != null) {
                 String displayPath = context.getPath();
-                if( displayPath.equals("") )
+                if (displayPath.equals(""))
                     displayPath = "/";
+                List<String> parts = null;
                 if (context.getState().isAvailable()) {
-                    writer.println(smClient.getString("managerServlet.listitem",
+                    parts = Arrays.asList(
                             displayPath,
                             "running",
                             "" + context.getManager().findSessions().length,
-                            context.getDocBase()));
+                            context.getDocBase());
                 } else {
-                    writer.println(smClient.getString("managerServlet.listitem",
+                    parts = Arrays.asList(
                             displayPath,
                             "stopped",
                             "0",
-                            context.getDocBase()));
+                            context.getDocBase());
                 }
+                writer.println(StringUtils.join(parts, ':'));
             }
         }
     }
@@ -1123,7 +1127,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     cn.getDisplayName()));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.reload[" + cn.getDisplayName() + "]", t);
+            log(sm.getString("managerServlet.error.reload", cn.getDisplayName()), t);
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
@@ -1164,20 +1168,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             writer.println(smClient.getString("managerServlet.resourcesAll"));
         }
 
-        Class<?> clazz = null;
-        try {
-            if (type != null) {
-                clazz = Class.forName(type);
-            }
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.resources[" + type + "]", t);
-            writer.println(smClient.getString("managerServlet.exception",
-                    t.toString()));
-            return;
-        }
-
-        printResources(writer, "", global, type, clazz, smClient);
+        printResources(writer, "", global, type, smClient);
 
     }
 
@@ -1189,27 +1180,23 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param namingContext The naming context for lookups
      * @param type Fully qualified class name of the resource type of interest,
      *  or <code>null</code> to list resources of all types
-     * @param clazz The resource class or <code>null</code> to list
-     *  resources of all types
      * @param smClient i18n support for current client's locale
      */
     protected void printResources(PrintWriter writer, String prefix,
                                   javax.naming.Context namingContext,
-                                  String type, Class<?> clazz,
+                                  String type,
                                   StringManager smClient) {
-
         try {
             NamingEnumeration<Binding> items = namingContext.listBindings("");
             while (items.hasMore()) {
                 Binding item = items.next();
-                if (item.getObject() instanceof javax.naming.Context) {
-                    printResources
-                        (writer, prefix + item.getName() + "/",
-                         (javax.naming.Context) item.getObject(), type, clazz,
-                         smClient);
+                Object obj = item.getObject();
+                if (obj instanceof javax.naming.Context) {
+                    printResources(writer, prefix + item.getName() + "/",
+                            (javax.naming.Context) obj, type, smClient);
                 } else {
-                    if ((clazz != null) &&
-                        (!(clazz.isInstance(item.getObject())))) {
+                    if (type != null && (obj == null ||
+                            !IntrospectionUtils.isInstance(obj.getClass(), type))) {
                         continue;
                     }
                     writer.print(prefix + item.getName());
@@ -1221,11 +1208,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.resources[" + type + "]", t);
+            log(sm.getString("managerServlet.error.resources", type), t);
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
-
     }
 
 
@@ -1238,24 +1224,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (debug >= 1)
             log("serverinfo");
         try {
-            StringBuilder props = new StringBuilder();
-            props.append("OK - Server info");
-            props.append("\nTomcat Version: ");
-            props.append(ServerInfo.getServerInfo());
-            props.append("\nOS Name: ");
-            props.append(System.getProperty("os.name"));
-            props.append("\nOS Version: ");
-            props.append(System.getProperty("os.version"));
-            props.append("\nOS Architecture: ");
-            props.append(System.getProperty("os.arch"));
-            props.append("\nJVM Version: ");
-            props.append(System.getProperty("java.runtime.version"));
-            props.append("\nJVM Vendor: ");
-            props.append(System.getProperty("java.vm.vendor"));
-            writer.println(props.toString());
+            writer.println(smClient.getString("managerServlet.serverInfo", ServerInfo.getServerInfo(),
+                    System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"),
+                    System.getProperty("java.runtime.version"), System.getProperty("java.vm.vendor")));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            getServletContext().log("ManagerServlet.serverinfo",t);
+            log(sm.getString("managerServlet.error.serverInfo"), t);
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
@@ -1322,13 +1296,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             int[] timeout = new int[maxCount + 1];
             int notimeout = 0;
             int expired = 0;
-            for (int i = 0; i < sessions.length; i++) {
-                int time = (int) (sessions[i].getIdleTimeInternal() / 1000L);
-                if (idle >= 0 && time >= idle*60) {
-                    sessions[i].expire();
+            for (Session session : sessions) {
+                int time = (int) (session.getIdleTimeInternal() / 1000L);
+                if (idle >= 0 && time >= idle * 60) {
+                    session.expire();
                     expired++;
                 }
-                time=time/60/histoInterval;
+                time = time / 60 / histoInterval;
                 if (time < 0)
                     notimeout++;
                 else if (time >= maxCount)
@@ -1363,7 +1337,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         ">" + idle,"" + expired));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.sessions[" + displayPath + "]", t);
+            log(sm.getString("managerServlet.error.sessions", displayPath), t);
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
@@ -1387,7 +1361,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             try {
                 idle = Integer.parseInt(idleParam);
             } catch (NumberFormatException e) {
-                log("Could not parse idle parameter to an int: " + idleParam);
+                log(sm.getString("managerServlet.error.idleParam", idleParam));
             }
         }
         sessions(writer, cn, idle, smClient);
@@ -1428,8 +1402,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         displayPath));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            getServletContext().log(sm.getString("managerServlet.startFailed",
-                    displayPath), t);
+            log(sm.getString("managerServlet.error.start", displayPath), t);
             writer.println(smClient.getString("managerServlet.startFailed",
                     displayPath));
             writer.println(smClient.getString("managerServlet.exception",
@@ -1475,7 +1448,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     "managerServlet.stopped", displayPath));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.stop[" + displayPath + "]", t);
+            log(sm.getString("managerServlet.error.stop", displayPath), t);
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
@@ -1520,10 +1493,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
 
-            if (isServiced(name)) {
-                writer.println(smClient.getString("managerServlet.inService", displayPath));
-            } else {
-                addServiced(name);
+            if (tryAddServiced(name)) {
                 try {
                     // Try to stop the context first to be nicer
                     context.stop();
@@ -1547,17 +1517,19 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 "managerServlet.deleteFail", xml));
                         return;
                     }
-                    // Perform new deployment
-                    check(name);
                 } finally {
                     removeServiced(name);
                 }
+                // Perform new deployment
+                check(name);
+            } else {
+                writer.println(smClient.getString("managerServlet.inService", displayPath));
             }
             writer.println(smClient.getString("managerServlet.undeployed",
                     displayPath));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log("ManagerServlet.undeploy[" + displayPath + "]", t);
+            log(sm.getString("managerServlet.error.undeploy", displayPath), t);
             writer.println(smClient.getString("managerServlet.exception",
                     t.toString()));
         }
@@ -1605,7 +1577,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param name The webapp name
      * @return <code>true</code> if a webapp with that name is being serviced
      * @throws Exception Propagate JMX invocation error
+     * @deprecated Unused. Will be removed in Tomcat 10.1.x onwards.
      */
+    @Deprecated
     protected boolean isServiced(String name)
         throws Exception {
         String[] params = { name };
@@ -1621,12 +1595,30 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      *
      * @param name The webapp name
      * @throws Exception Propagate JMX invocation error
+     * @deprecated Unused. Will be removed in Tomcat 10.1.x onwards.
+     *             Use {@link #tryAddServiced}
      */
+    @Deprecated
     protected void addServiced(String name)
         throws Exception {
         String[] params = { name };
         String[] signature = { "java.lang.String" };
         mBeanServer.invoke(oname, "addServiced", params, signature);
+    }
+
+
+    /**
+     * Attempt to mark a context as being serviced
+     * @param name The context name
+     * @return {@code true} if the application was marked as being serviced and
+     *         {@code false} if the application was already marked as being serviced
+     * @throws Exception Error invoking the deployer
+     */
+    protected boolean tryAddServiced(String name) throws Exception {
+        String[] params = { name };
+        String[] signature = { "java.lang.String" };
+        Boolean result = (Boolean) mBeanServer.invoke(oname, "tryAddServiced", params, signature);
+        return result.booleanValue();
     }
 
 
@@ -1678,7 +1670,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
 
     protected static boolean validateContextName(ContextName cn,
-            PrintWriter writer, StringManager sm) {
+            PrintWriter writer, StringManager smClient) {
 
         // ContextName should be non-null with a path that is empty or starts
         // with /
@@ -1691,11 +1683,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (cn != null) {
             path = Escape.htmlElementContent(cn.getPath());
         }
-        writer.println(sm.getString("managerServlet.invalidPath", path));
+        writer.println(smClient.getString("managerServlet.invalidPath", path));
         return false;
     }
 
-    protected Map<String,List<String>> getConnectorCiphers() {
+    protected Map<String,List<String>> getConnectorCiphers(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
         Connector connectors[] = getConnectors();
@@ -1710,7 +1702,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 }
             } else {
                 ArrayList<String> cipherList = new ArrayList<>(1);
-                cipherList.add(sm.getString("managerServlet.notSslConnector"));
+                cipherList.add(smClient.getString("managerServlet.notSslConnector"));
                 result.put(connector.toString(), cipherList);
             }
         }
@@ -1718,7 +1710,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
-    protected Map<String,List<String>> getConnectorCerts() {
+    protected Map<String,List<String>> getConnectorCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
         Connector connectors[] = getConnectors();
@@ -1741,7 +1733,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             }
                             X509Certificate[] certs = sslContext.getCertificateChain(alias);
                             if (certs == null) {
-                                certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                                certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                             } else {
                                 for (Certificate cert : certs) {
                                     certList.add(cert.toString());
@@ -1751,14 +1743,14 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         }
                     } else {
                         List<String> certList = new ArrayList<>();
-                        certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                        certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                         String name = connector.toString() + "-" + sslHostConfig.getHostName();
                         result.put(name, certList);
                     }
                 }
             } else {
                 List<String> certList = new ArrayList<>(1);
-                certList.add(sm.getString("managerServlet.notSslConnector"));
+                certList.add(smClient.getString("managerServlet.notSslConnector"));
                 result.put(connector.toString(), certList);
             }
         }
@@ -1767,7 +1759,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
-    protected Map<String,List<String>> getConnectorTrustedCerts() {
+    protected Map<String,List<String>> getConnectorTrustedCerts(StringManager smClient) {
         Map<String,List<String>> result = new HashMap<>();
 
         Connector connectors[] = getConnectors();
@@ -1783,22 +1775,22 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 sslHostConfig.getCertificates().iterator().next().getSslContext();
                         X509Certificate[] certs = sslContext.getAcceptedIssuers();
                         if (certs == null) {
-                            certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                            certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                         } else if (certs.length == 0) {
-                            certList.add(sm.getString("managerServlet.trustedCertsNotConfigured"));
+                            certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
                         } else {
                             for (Certificate cert : certs) {
                                 certList.add(cert.toString());
                             }
                         }
                     } else {
-                        certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                        certList.add(smClient.getString("managerServlet.certsNotAvailable"));
                     }
                     result.put(name, certList);
                 }
             } else {
                 List<String> certList = new ArrayList<>(1);
-                certList.add(sm.getString("managerServlet.notSslConnector"));
+                certList.add(smClient.getString("managerServlet.notSslConnector"));
                 result.put(connector.toString(), certList);
             }
         }

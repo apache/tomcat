@@ -71,7 +71,7 @@ public class UUIDGenerator {
     }
 
     /**
-     * Same as java.util.Random.nextBytes except this one we dont have to allocate a new byte array
+     * Same as java.util.Random.nextBytes except this one we don't have to allocate a new byte array
      * @param into byte[]
      * @param offset int
      * @param length int

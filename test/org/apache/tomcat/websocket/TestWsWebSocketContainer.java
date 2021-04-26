@@ -29,20 +29,20 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletContextEvent;
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Extension;
-import javax.websocket.MessageHandler;
-import javax.websocket.OnMessage;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerContainer;
-import javax.websocket.server.ServerEndpoint;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Extension;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerContainer;
+import jakarta.websocket.server.ServerEndpoint;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,7 +56,6 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.BasicHandler;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterEndpoint;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
-import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TestWsWebSocketContainer extends WebSocketBaseTest {
@@ -119,7 +118,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
     }
 
 
-    @Test(expected=javax.websocket.DeploymentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testConnectToServerEndpointInvalidScheme() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
@@ -137,7 +136,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
     }
 
 
-    @Test(expected=javax.websocket.DeploymentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testConnectToServerEndpointNoHost() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
@@ -460,7 +459,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
             super.contextInitialized(sce);
             ServerContainer sc =
                     (ServerContainer) sce.getServletContext().getAttribute(
-                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+                            org.apache.tomcat.websocket.server.Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
             try {
                 // Reset blocking state
                 BlockingPojo.resetBlock();
@@ -601,7 +600,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
             super.contextInitialized(sce);
             ServerContainer sc =
                     (ServerContainer) sce.getServletContext().getAttribute(
-                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+                            org.apache.tomcat.websocket.server.Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
             try {
                 sc.addEndpoint(ServerEndpointConfig.Builder.create(
                         ConstantTxEndpoint.class, PATH).build());
@@ -777,6 +776,86 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         }
 
         Assert.assertEquals(0, getOpenCount(setA));
+    }
+
+
+    @Test
+    public void testSessionExpiryOnUserPropertyReadIdleTimeout() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        // Need access to implementation methods for configuring unit tests
+        WsWebSocketContainer wsContainer = (WsWebSocketContainer) ContainerProvider.getWebSocketContainer();
+
+        wsContainer.setDefaultMaxSessionIdleTimeout(90000);
+        wsContainer.setProcessPeriod(1);
+
+        EndpointA endpointA = new EndpointA();
+        Session s1a = connectToEchoServer(wsContainer, endpointA, TesterEchoServer.Config.PATH_BASIC);
+        s1a.setMaxIdleTimeout(90000);
+
+        s1a.getUserProperties().put(Constants.READ_IDLE_TIMEOUT_MS, Long.valueOf(5000));
+
+        // maxIdleTimeout is 90s but the readIdleTimeout is 5s. The session
+        // should get closed after 5 seconds as nothing is read on it.
+
+        // First confirm the session has been opened.
+        Assert.assertEquals(1, s1a.getOpenSessions().size());
+
+        // Now wait for it to close. Allow up to 30s as some CI systems are slow
+        // but that is still well under the 90s configured for the session.
+        int count = 0;
+        while (count < 300 && s1a.isOpen()) {
+            count ++;
+            Thread.sleep(100);
+        }
+        Assert.assertFalse(s1a.isOpen());
+    }
+
+
+    @Test
+    public void testSessionExpiryOnUserPropertyWriteIdleTimeout() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        // Need access to implementation methods for configuring unit tests
+        WsWebSocketContainer wsContainer = (WsWebSocketContainer) ContainerProvider.getWebSocketContainer();
+
+        wsContainer.setDefaultMaxSessionIdleTimeout(90000);
+        wsContainer.setProcessPeriod(1);
+
+        EndpointA endpointA = new EndpointA();
+        Session s1a = connectToEchoServer(wsContainer, endpointA, TesterEchoServer.Config.PATH_BASIC);
+        s1a.setMaxIdleTimeout(90000);
+
+        s1a.getUserProperties().put(Constants.WRITE_IDLE_TIMEOUT_MS, Long.valueOf(5000));
+
+        // maxIdleTimeout is 90s but the writeIdleTimeout is 5s. The session
+        // should get closed after 5 seconds as nothing is written on it.
+
+        // First confirm the session has been opened.
+        Assert.assertEquals(1, s1a.getOpenSessions().size());
+
+        // Now wait for it to close. Allow up to 30s as some CI systems are slow
+        // but that is still well under the 90s configured for the session.
+        int count = 0;
+        while (count < 300 && s1a.isOpen()) {
+            count ++;
+            Thread.sleep(100);
+        }
+        Assert.assertFalse(s1a.isOpen());
     }
 
 

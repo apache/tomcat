@@ -33,7 +33,6 @@ public class ContextEjb extends ResourceBase {
     // ------------------------------------------------------------- Properties
 
 
-
     /**
      * The name of the EJB home implementation class.
      */
@@ -107,7 +106,7 @@ public class ContextEjb extends ResourceBase {
             sb.append(", link=");
             sb.append(link);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
 
     }

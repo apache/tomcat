@@ -43,7 +43,7 @@ public final class If implements TagPlugin {
             }
             ctxt.generateJavaSource("_jspx_page_context.setAttribute(");
             ctxt.generateAttribute("var");
-            ctxt.generateJavaSource(", new Boolean(" + condV + ")," + scope + ");");
+            ctxt.generateJavaSource(", Boolean.valueOf(" + condV + ")," + scope + ");");
         }
         ctxt.generateJavaSource("if (" + condV + "){");
         ctxt.generateBody();

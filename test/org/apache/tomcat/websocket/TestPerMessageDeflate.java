@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.websocket.Extension;
-import javax.websocket.Extension.Parameter;
+import jakarta.websocket.Extension;
+import jakarta.websocket.Extension.Parameter;
 
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class TestPerMessageDeflate {
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=61491
      */
     @Test
-    public void testSendEmptyMessagePartWithContextTakeover() {
+    public void testSendEmptyMessagePartWithContextTakeover() throws IOException {
 
         // Set up the extension using defaults
         List<Parameter> parameters = Collections.emptyList();

@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 
 /**
- * Efficient implementation of an UTF-8 encoder.
+ * Efficient implementation of a UTF-8 encoder.
  * This class is not thread safe - you need one encoder per thread.
  * The encoder will save and recycle the internal objects, avoiding
  * garbage.

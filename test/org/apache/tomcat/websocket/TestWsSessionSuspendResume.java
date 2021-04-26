@@ -23,14 +23,14 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.CloseReason;
-import javax.websocket.ContainerProvider;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,7 +69,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
             latch.countDown();
         });
         for (int i = 0; i < 8; i++) {
-            wsSession.getAsyncRemote().sendText("echo");
+            wsSession.getBasicRemote().sendText("echo");
         }
 
         boolean latchResult = latch.await(30, TimeUnit.SECONDS);
@@ -131,11 +131,13 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
         void addMessage(String message) {
             if (messages.size() == count) {
                 ((WsSession) session).suspend();
-                session.getAsyncRemote().sendText(messages.toString(), result -> {
+                try {
+                    session.getBasicRemote().sendText(messages.toString());
+                    messages.clear();
                     ((WsSession) session).resume();
-                    Assert.assertTrue(result.isOK());
-                });
-                messages.clear();
+                } catch (IOException e) {
+                    Assert.fail();
+                }
             } else {
                 messages.add(message);
             }

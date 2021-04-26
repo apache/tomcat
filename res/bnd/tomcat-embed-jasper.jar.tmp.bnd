@@ -1,0 +1,60 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+-include: build-defaults.bnd
+
+Bundle-Name: tomcat-embed-jasper
+Bundle-SymbolicName: org.apache.tomcat-embed-jasper
+Export-Package: \
+    jakarta.servlet.jsp.*;version=${jsp.spec.version},\
+    org.apache.jasper,\
+    org.apache.jasper.compiler,\
+    org.apache.jasper.compiler.tagplugin,\
+    org.apache.jasper.el,\
+    org.apache.jasper.optimizations,\
+    org.apache.jasper.runtime,\
+    org.apache.jasper.security,\
+    org.apache.jasper.servlet,\
+    org.apache.jasper.tagplugins.jstl,\
+    org.apache.jasper.tagplugins.jstl.core,\
+    org.apache.jasper.util,\
+    org.apache.tomcat.util.descriptor.tld
+
+-includepackage: \
+    org.apache.jasper.resources
+
+-includeresource.meta-inf: /META-INF/=../META-INF/jasper.jar/
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaJSP;\
+        version:Version=${jsp.spec.version};\
+        uses:='${packages;NAMED;jakarta.servlet.jsp.*}'
+
+-namesection: jakarta/servlet/jsp*/;\
+    Specification-Title=Jakarta Server Pages;\
+    Specification-Version=${jsp.spec.version};\
+    Specification-Vendor=Eclipse Foundation;\
+    Implementation-Title=jakarta.servlet.jsp;\
+    Implementation-Version=${jsp.spec.version}.${jsp.revision};\
+    Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=${Bundle-Name}

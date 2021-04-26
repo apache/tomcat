@@ -1,0 +1,144 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+-include: build-defaults.bnd
+
+Bundle-Name: tomcat-embed-core
+Bundle-SymbolicName: org.apache.tomcat-embed-core
+Export-Package: \
+    !jakarta.servlet.jsp.*,\
+    jakarta.security.auth.message.*;version=${jaspic.spec.version},\
+    jakarta.servlet.*;version=${servlet.spec.version},\
+    org.apache.catalina,\
+    org.apache.catalina.authenticator,\
+    org.apache.catalina.authenticator.jaspic,\
+    org.apache.catalina.connector,\
+    org.apache.catalina.core,\
+    org.apache.catalina.deploy,\
+    org.apache.catalina.filters,\
+    org.apache.catalina.loader,\
+    org.apache.catalina.manager,\
+    org.apache.catalina.manager.host,\
+    org.apache.catalina.manager.util,\
+    org.apache.catalina.mapper,\
+    org.apache.catalina.mbeans,\
+    org.apache.catalina.realm,\
+    org.apache.catalina.security,\
+    org.apache.catalina.servlets,\
+    org.apache.catalina.session,\
+    org.apache.catalina.ssi,\
+    org.apache.catalina.startup,\
+    org.apache.catalina.users,\
+    org.apache.catalina.util,\
+    org.apache.catalina.valves,\
+    org.apache.catalina.valves.rewrite,\
+    org.apache.catalina.webresources,\
+    org.apache.catalina.webresources.war,\
+    org.apache.coyote,\
+    org.apache.coyote.ajp,\
+    org.apache.coyote.http11,\
+    org.apache.coyote.http11.filters,\
+    org.apache.coyote.http11.upgrade,\
+    org.apache.coyote.http2,\
+    org.apache.juli,\
+    org.apache.juli.logging,\
+    org.apache.naming,\
+    org.apache.naming.factory,\
+    org.apache.naming.java,\
+    org.apache.tomcat,\
+    org.apache.tomcat.jni,\
+    org.apache.tomcat.util,\
+    org.apache.tomcat.util.bcel.classfile,\
+    org.apache.tomcat.util.buf,\
+    org.apache.tomcat.util.codec.binary,\
+    org.apache.tomcat.util.collections,\
+    org.apache.tomcat.util.compat,\
+    org.apache.tomcat.util.descriptor,\
+    org.apache.tomcat.util.descriptor.tagplugin,\
+    org.apache.tomcat.util.descriptor.web,\
+    org.apache.tomcat.util.digester,\
+    org.apache.tomcat.util.file,\
+    org.apache.tomcat.util.http,\
+    org.apache.tomcat.util.http.fileupload,\
+    org.apache.tomcat.util.http.fileupload.disk,\
+    org.apache.tomcat.util.http.fileupload.impl,\
+    org.apache.tomcat.util.http.fileupload.servlet,\
+    org.apache.tomcat.util.http.fileupload.util,\
+    org.apache.tomcat.util.http.parser,\
+    org.apache.tomcat.util.log,\
+    org.apache.tomcat.util.modeler,\
+    org.apache.tomcat.util.modeler.modules,\
+    org.apache.tomcat.util.net,\
+    org.apache.tomcat.util.net.openssl,\
+    org.apache.tomcat.util.net.openssl.ciphers,\
+    org.apache.tomcat.util.res,\
+    org.apache.tomcat.util.scan,\
+    org.apache.tomcat.util.security,\
+    org.apache.tomcat.util.threads
+
+-includepackage: \
+    org.apache.naming.factory.webservices,\
+    org.apache.tomcat.util.bcel,\
+    org.apache.tomcat.util.http.fileupload.util.mime,\
+    org.apache.tomcat.util.json,\
+    org.apache.tomcat.util.net.jsse,\
+    org.apache.tomcat.util.threads.res
+
+-includeresource.notice2: META-INF/NOTICE;literal="${replace;${cat;../META-INF/servlet-api.jar.notice};@YEAR@;${year}}\n"
+-includeresource.license2: {META-INF/LICENSE=../META-INF/servlet-api.jar.license}
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JavaJASPIC;\
+        version:Version=${jaspic.spec.version};\
+        uses:='${packages;NAMED;jakarta.security.auth.message.*}',\
+    osgi.contract;\
+        osgi.contract=JavaServlet;\
+        version:Version=${servlet.spec.version};\
+        uses:='${packages;NAMED;jakarta.servlet.*;NAMED;!jakarta.servlet.jsp.*}'
+
+-namesection: \
+    jakarta/security/auth/message*/;\
+        Specification-Title=Jakarta Authentication SPI for Containers;\
+        Specification-Version=${jaspic.spec.version};\
+        Specification-Vendor=Eclipse Foundation;\
+        Implementation-Title=jakarta.security.auth.message;\
+        Implementation-Version=${jaspic.spec.version}.${jaspic.revision};\
+        Implementation-Vendor=Apache Software Foundation,\
+    jakarta/servlet*/;\
+        Specification-Title=Jakarta Servlet;\
+        Specification-Version=${servlet.spec.version};\
+        Specification-Vendor=Eclipse Foundation;\
+        Implementation-Title=jakarta.servlet;\
+        Implementation-Version=${servlet.spec.version}.${servlet.revision};\
+        Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version};\
+        modules='\
+            jakarta.ejb-api,\
+            jakarta.mail,\
+            jakarta.persistence-api,\
+            jakarta.xml.rpc-api,\
+            java.xml.ws'
+-jpms-module-info-options: \
+    ${module.name};substitute=tomcat-embed-core,\
+    jakarta.ejb-api;static=true,\
+    jakarta.mail;static=true,\
+    jakarta.persistence-api;static=true,\
+    jakarta.xml.rpc-api;static=true,\
+    java.xml.ws;static=true

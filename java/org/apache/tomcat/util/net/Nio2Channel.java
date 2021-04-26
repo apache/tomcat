@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousByteChannel;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -28,16 +29,16 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Base class for a SocketChannel wrapper used by the endpoint.
- * This way, logic for a SSL socket channel remains the same as for
+ * This way, logic for an SSL socket channel remains the same as for
  * a non SSL, making sure we don't need to code for any exception cases.
  */
 public class Nio2Channel implements AsynchronousByteChannel {
 
     protected static final ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
-    protected AsynchronousSocketChannel sc = null;
-    protected SocketWrapperBase<Nio2Channel> socket = null;
     protected final SocketBufferHandler bufHandler;
+    protected AsynchronousSocketChannel sc = null;
+    protected SocketWrapperBase<Nio2Channel> socketWrapper = null;
 
     public Nio2Channel(SocketBufferHandler bufHandler) {
         this.bufHandler = bufHandler;
@@ -47,14 +48,14 @@ public class Nio2Channel implements AsynchronousByteChannel {
      * Reset the channel.
      *
      * @param channel The new async channel to associate with this NIO2 channel
-     * @param socket  The new socket to associate with this NIO2 channel
+     * @param socketWrapper The new socket to associate with this NIO2 channel
      *
      * @throws IOException If a problem was encountered resetting the channel
      */
-    public void reset(AsynchronousSocketChannel channel, SocketWrapperBase<Nio2Channel> socket)
+    public void reset(AsynchronousSocketChannel channel, SocketWrapperBase<Nio2Channel> socketWrapper)
             throws IOException {
         this.sc = channel;
-        this.socket = socket;
+        this.socketWrapper = socketWrapper;
         bufHandler.reset();
     }
 
@@ -65,8 +66,8 @@ public class Nio2Channel implements AsynchronousByteChannel {
         bufHandler.free();
     }
 
-    public SocketWrapperBase<Nio2Channel> getSocket() {
-        return socket;
+    SocketWrapperBase<Nio2Channel> getSocketWrapper() {
+        return socketWrapper;
     }
 
 
@@ -98,7 +99,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
     /**
      * Tells whether or not this channel is open.
      *
-     * @return <tt>true</tt> if, and only if, this channel is open
+     * @return <code>true</code> if, and only if, this channel is open
      */
     @Override
     public boolean isOpen() {
@@ -135,7 +136,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
 
     @Override
     public String toString() {
-        return super.toString()+":"+this.sc.toString();
+        return super.toString() + ":" + sc.toString();
     }
 
     @Override
@@ -213,7 +214,6 @@ public class Nio2Channel implements AsynchronousByteChannel {
         return DONE;
     }
 
-
     private ApplicationBufferHandler appReadBufHandler;
     public void setAppReadBufHandler(ApplicationBufferHandler handler) {
         this.appReadBufHandler = handler;
@@ -221,4 +221,88 @@ public class Nio2Channel implements AsynchronousByteChannel {
     protected ApplicationBufferHandler getAppReadBufHandler() {
         return appReadBufHandler;
     }
+
+    private static final Future<Integer> DONE_INT = new Future<Integer>() {
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return false;
+        }
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
+        @Override
+        public boolean isDone() {
+            return true;
+        }
+        @Override
+        public Integer get() throws InterruptedException,
+                ExecutionException {
+            return Integer.valueOf(-1);
+        }
+        @Override
+        public Integer get(long timeout, TimeUnit unit)
+                throws InterruptedException, ExecutionException,
+                TimeoutException {
+            return Integer.valueOf(-1);
+        }
+    };
+
+    static final Nio2Channel CLOSED_NIO2_CHANNEL = new Nio2Channel(SocketBufferHandler.EMPTY) {
+        @Override
+        public void close() throws IOException {
+        }
+        @Override
+        public boolean isOpen() {
+            return false;
+        }
+        @Override
+        public void reset(AsynchronousSocketChannel channel, SocketWrapperBase<Nio2Channel> socket) throws IOException {
+        }
+        @Override
+        public void free() {
+        }
+        @Override
+        protected ApplicationBufferHandler getAppReadBufHandler() {
+            return ApplicationBufferHandler.EMPTY;
+        }
+        @Override
+        public void setAppReadBufHandler(ApplicationBufferHandler handler) {
+        }
+        @Override
+        public Future<Integer> read(ByteBuffer dst) {
+            return DONE_INT;
+        }
+        @Override
+        public <A> void read(ByteBuffer dst,
+                long timeout, TimeUnit unit, A attachment,
+                CompletionHandler<Integer, ? super A> handler) {
+            handler.failed(new ClosedChannelException(), attachment);
+        }
+        @Override
+        public <A> void read(ByteBuffer[] dsts,
+                int offset, int length, long timeout, TimeUnit unit,
+                A attachment, CompletionHandler<Long,? super A> handler) {
+            handler.failed(new ClosedChannelException(), attachment);
+        }
+        @Override
+        public Future<Integer> write(ByteBuffer src) {
+            return DONE_INT;
+        }
+        @Override
+        public <A> void write(ByteBuffer src, long timeout, TimeUnit unit, A attachment,
+                CompletionHandler<Integer, ? super A> handler) {
+            handler.failed(new ClosedChannelException(), attachment);
+        }
+        @Override
+        public <A> void write(ByteBuffer[] srcs, int offset, int length,
+                long timeout, TimeUnit unit, A attachment,
+                CompletionHandler<Long,? super A> handler) {
+            handler.failed(new ClosedChannelException(), attachment);
+        }
+        @Override
+        public String toString() {
+            return "Closed Nio2Channel";
+        }
+    };
 }

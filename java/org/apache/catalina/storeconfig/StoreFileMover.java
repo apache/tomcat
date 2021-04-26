@@ -23,12 +23,16 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Move server.xml or context.xml as backup
  *
  * TODO Get Encoding from Registry
  */
 public class StoreFileMover {
+
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     private String filename = "conf/server.xml";
 
@@ -141,7 +145,7 @@ public class StoreFileMover {
         }
         if (!configNew.getParentFile().exists()) {
             if (!configNew.getParentFile().mkdirs()) {
-                throw new IllegalStateException("Cannot create directory " + configNew);
+                throw new IllegalStateException(sm.getString("storeFileMover.directoryCreationError", configNew));
             }
         }
         String sb = getTimeTag();
@@ -160,21 +164,18 @@ public class StoreFileMover {
         if (configOld.renameTo(configSave)) {
             if (!configNew.renameTo(configOld)) {
                 configSave.renameTo(configOld);
-                throw new IOException("Cannot rename "
-                        + configNew.getAbsolutePath() + " to "
-                        + configOld.getAbsolutePath());
+                throw new IOException(sm.getString("storeFileMover.renameError",
+                        configNew.getAbsolutePath(), configOld.getAbsolutePath()));
             }
         } else {
             if (!configOld.exists()) {
                 if (!configNew.renameTo(configOld)) {
-                    throw new IOException("Cannot move "
-                            + configNew.getAbsolutePath() + " to "
-                            + configOld.getAbsolutePath());
+                    throw new IOException(sm.getString("storeFileMover.renameError",
+                            configNew.getAbsolutePath(), configOld.getAbsolutePath()));
                 }
             } else {
-                throw new IOException("Cannot rename "
-                    + configOld.getAbsolutePath() + " to "
-                    + configSave.getAbsolutePath());
+                throw new IOException(sm.getString("storeFileMover.renameError",
+                        configOld.getAbsolutePath(), configSave.getAbsolutePath()));
             }
         }
     }
@@ -199,14 +200,14 @@ public class StoreFileMover {
         String ts = (new Timestamp(System.currentTimeMillis())).toString();
         //        yyyy-mm-dd hh:mm:ss
         //        0123456789012345678
-        StringBuffer sb = new StringBuffer(".");
-        sb.append(ts.substring(0, 10));
+        StringBuilder sb = new StringBuilder(".");
+        sb.append(ts, 0, 10);
         sb.append('.');
-        sb.append(ts.substring(11, 13));
+        sb.append(ts, 11, 13);
         sb.append('-');
-        sb.append(ts.substring(14, 16));
+        sb.append(ts, 14, 16);
         sb.append('-');
-        sb.append(ts.substring(17, 19));
+        sb.append(ts, 17, 19);
         return sb.toString();
     }
 

@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,11 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.HttpConstraintElement;
-import javax.servlet.HttpMethodConstraintElement;
-import javax.servlet.ServletSecurityElement;
-import javax.servlet.annotation.ServletSecurity;
-import javax.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
+import jakarta.servlet.HttpConstraintElement;
+import jakarta.servlet.HttpMethodConstraintElement;
+import jakarta.servlet.ServletSecurityElement;
+import jakarta.servlet.annotation.ServletSecurity;
+import jakarta.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.res.StringManager;
@@ -265,6 +266,15 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
     }
 
 
+    @Override
+    public void setCharset(Charset charset) {
+        super.setCharset(charset);
+        for (SecurityCollection collection : collections) {
+            collection.setCharset(getCharset());
+        }
+    }
+
+
     /**
      * Add a new web resource collection to those protected by this
      * security constraint.
@@ -296,8 +306,8 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
 
         if (role == null)
             return false;
-        for (int i = 0; i < authRoles.length; i++) {
-            if (role.equals(authRoles[i]))
+        for (String authRole : authRoles) {
+            if (role.equals(authRole))
                 return true;
         }
         return false;
@@ -327,9 +337,9 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
     public SecurityCollection findCollection(String name) {
         if (name == null)
             return null;
-        for (int i = 0; i < collections.length; i++) {
-            if (name.equals(collections[i].getName()))
-                return collections[i];
+        for (SecurityCollection collection : collections) {
+            if (name.equals(collection.getName()))
+                return collection;
         }
         return null;
     }
@@ -360,12 +370,12 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
             return false;
 
         // Check all of the collections included in this constraint
-        for (int i = 0; i < collections.length; i++) {
-            if (!collections[i].findMethod(method))
+        for (SecurityCollection collection : collections) {
+            if (!collection.findMethod(method))
                 continue;
-            String patterns[] = collections[i].findPatterns();
-            for (int j = 0; j < patterns.length; j++) {
-                if (matchPattern(uri, patterns[j]))
+            String patterns[] = collection.findPatterns();
+            for (String pattern : patterns) {
+                if (matchPattern(uri, pattern))
                     return true;
             }
         }
@@ -458,7 +468,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                 sb.append(", ");
             sb.append(collections[i].getName());
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -564,7 +574,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
 
         }
 
-        return result.toArray(new SecurityConstraint[result.size()]);
+        return result.toArray(new SecurityConstraint[0]);
     }
 
     private static SecurityConstraint createConstraint(
@@ -621,9 +631,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                 String[] omittedMethods = collection.findOmittedMethods();
                 // Simple case: no methods
                 if (methods.length == 0 && omittedMethods.length == 0) {
-                    for (String pattern : patterns) {
-                        coveredPatterns.add(pattern);
-                    }
+                    coveredPatterns.addAll(Arrays.asList(patterns));
                     continue;
                 }
 
@@ -655,9 +663,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                                 m = new HashSet<>();
                                 urlMethodMap.put(pattern, m);
                             }
-                            for (String method : methods) {
-                                m.add(method);
-                            }
+                            m.addAll(Arrays.asList(methods));
                         }
                     }
                 }
@@ -723,7 +729,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                     newConstraints, log);
         }
 
-        return newConstraints.toArray(new SecurityConstraint[newConstraints.size()]);
+        return newConstraints.toArray(new SecurityConstraint[0]);
     }
 
 

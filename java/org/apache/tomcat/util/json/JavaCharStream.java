@@ -127,9 +127,7 @@ class JavaCharStream
         bufcolumn = newbufcolumn;
 
         bufpos += (bufsize - tokenBegin);
-    }
-    else
-    {
+    } else {
         System.arraycopy(buffer, tokenBegin, newbuffer, 0, bufsize - tokenBegin);
         buffer = newbuffer;
 
@@ -173,9 +171,7 @@ class JavaCharStream
       {
         --bufpos;
         backup(0);
-      }
-      else
-      {
+      } else {
         bufline[bufpos] = line;
         bufcolumn[bufpos] = column;
       }
@@ -357,9 +353,7 @@ class JavaCharStream
         backup(backSlashCnt - 1);
         return '\\';
       }
-    }
-    else
-    {
+    } else {
       UpdateLineColumn(c);
       return c;
     }
@@ -595,9 +589,7 @@ class JavaCharStream
     if (bufpos >= tokenBegin)
     {
       len = bufpos - tokenBegin + inBuf + 1;
-    }
-    else
-    {
+    } else {
       len = bufsize - tokenBegin + bufpos + 1 + inBuf;
     }
 

@@ -157,7 +157,6 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      *            The user name key.
      * @return The user specific value.
      */
-    @SuppressWarnings("resource")
     public int getNumActive(final String userName) {
         final ObjectPool<PooledConnectionAndInfo> pool = getPool(getPoolKey(userName));
         return pool == null ? 0 : pool.getNumActive();
@@ -179,7 +178,6 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      *            The user name key.
      * @return The user specific value.
      */
-    @SuppressWarnings("resource")
     public int getNumIdle(final String userName) {
         final ObjectPool<PooledConnectionAndInfo> pool = getPool(getPoolKey(userName));
         return pool == null ? 0 : pool.getNumIdle();

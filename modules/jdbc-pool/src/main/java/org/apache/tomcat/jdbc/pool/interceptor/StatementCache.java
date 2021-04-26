@@ -346,7 +346,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + Arrays.hashCode(args);
+            result = prime * result + Arrays.deepHashCode(args);
             result = prime * result
                     + ((stmtType == null) ? 0 : stmtType.hashCode());
             return result;
@@ -361,7 +361,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
             if (getClass() != obj.getClass())
                 return false;
             CacheKey other = (CacheKey) obj;
-            if (!Arrays.equals(args, other.args))
+            if (!Arrays.deepEquals(args, other.args))
                 return false;
             if (stmtType == null) {
                 if (other.stmtType != null)

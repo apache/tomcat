@@ -50,9 +50,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
                         + " )");
             storeChildren(aWriter, indent, aElement, elementDesc);
         } else {
-            if (log.isWarnEnabled())
-                log.warn("Descriptor for element" + aElement.getClass()
-                        + " not configured!");
+            log.warn(sm.getString("storeFactory.noDescriptor", aElement.getClass(), "NamingResources"));
         }
     }
 

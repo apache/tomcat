@@ -18,8 +18,8 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
 
 import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
@@ -35,8 +35,8 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
 
     private final InternalHttpUpgradeHandler internalHttpUpgradeHandler;
 
-    public UpgradeProcessorInternal(SocketWrapperBase<?> wrapper,
-            UpgradeToken upgradeToken) {
+    public UpgradeProcessorInternal(SocketWrapperBase<?> wrapper, UpgradeToken upgradeToken,
+            UpgradeGroupInfo upgradeGroupInfo) {
         super(upgradeToken);
         this.internalHttpUpgradeHandler = (InternalHttpUpgradeHandler) upgradeToken.getHttpUpgradeHandler();
         /*
@@ -46,6 +46,12 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
         wrapper.setWriteTimeout(INFINITE_TIMEOUT);
 
         internalHttpUpgradeHandler.setSocketWrapper(wrapper);
+
+        // HTTP/2 uses RequestInfo objects so does not provide upgradeInfo
+        UpgradeInfo upgradeInfo = internalHttpUpgradeHandler.getUpgradeInfo();
+        if (upgradeInfo != null && upgradeGroupInfo != null) {
+            upgradeInfo.setGroupInfo(upgradeGroupInfo);
+        }
     }
 
 
@@ -73,10 +79,25 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
     }
 
 
+    @Override
+    public void timeoutAsync(long now) {
+        internalHttpUpgradeHandler.timeoutAsync(now);
+    }
+
+
+    public boolean hasAsyncIO() {
+        return internalHttpUpgradeHandler.hasAsyncIO();
+    }
+
+
     // --------------------------------------------------- AutoCloseable methods
 
     @Override
     public void close() throws Exception {
+        UpgradeInfo upgradeInfo = internalHttpUpgradeHandler.getUpgradeInfo();
+        if (upgradeInfo != null) {
+            upgradeInfo.setGroupInfo(null);
+        }
         internalHttpUpgradeHandler.destroy();
     }
 

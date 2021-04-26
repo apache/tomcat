@@ -24,7 +24,7 @@
 
     <properties>
       <author email="mturk@apache.org">Mladen Turk</author>
-      <title>Windows service HOW-TO</title>
+      <title>Windows Service How-To</title>
     </properties>
 
 <body>
@@ -346,9 +346,9 @@ script. If necessary, you can use the <code>/user</code> switch to specify
 a user to use for the installation of the service.
 </p>
 <p>
-<strong>NOTE:</strong> On Windows Vista or any later operating system with User
-Account Control (UAC) enabled you will be asked for additional privileges
-when 'Tomcat<version-major/>.exe' is launched by the script.<br/>
+<strong>NOTE:</strong> If User Account Control (UAC) is enabled you will be
+asked for additional privileges when 'Tomcat<version-major/>.exe' is launched by
+the script.<br/>
 If you want to pass additional options to service installer as
 <code>PR_*</code> environment variables, you have to either configure them
 globally in OS, or launch the program that sets them with elevated privileges
@@ -366,6 +366,14 @@ service, as displayed in Windows services.</p>
 
 <source>Install the service named 'MyService'
 C:\> service.bat install MyService</source>
+
+<p>When installing the service with a non-default name,
+tomcat<version-major/>.exe and tomcat<version-major/>w.exe may be renamed to
+match the chosen service name. To do this, use the <code>--rename</code>
+option.</p>
+
+<source>Install the service named 'MyService' with renaming
+C:\> service.bat install MyService --rename</source>
 
 <p>
 If using tomcat<version-major/>.exe, you need to use the <b>//IS//</b> parameter.</p>
@@ -457,22 +465,22 @@ update the port number so as to specify a unique IP/port combination.</p>
 <p>
 To install an instance, first set the CATALINA_HOME environment variable to the
 name of the Tomcat installation directory. Then create a second environment
-variable CATALINA_BASE and point this to the instance folder. Then run "service
-install" command specifying a service name.</p>
+variable CATALINA_BASE and point this to the instance folder. Then run
+"service.bat install" command specifying a service name.</p>
 
 <source>set CATALINA_HOME=c:\tomcat_<version-major/>
 set CATALINA_BASE=c:\tomcat_<version-major/>\instances\instance1
-service install instance1</source>
+service.bat install instance1</source>
 
 <p>
 To modify the service settings, you can run <b>tomcat<version-major/>w //ES//instance1</b>.
 </p>
 <p>
 For additional instances, create additional instance folder, update the
-CATALINA_BASE environment variable, and run the service install again.</p>
+CATALINA_BASE environment variable, and run the "service.bat install" again.</p>
 
 <source>set CATALINA_BASE=c:\tomcat_<version-major/>\instances\instance2
-service install instance2</source>
+service.bat install instance2</source>
 
 </section>
 </body>

@@ -60,9 +60,9 @@
  *   Iterator i = fileItems.iterator();
  *   String comment = ((FileItem)i.next()).getString();
  *   FileItem fi = (FileItem)i.next();
- *   // filename on the client
+ *   // file name on the client
  *   String fileName = fi.getName();
- *   // save comment and filename to database
+ *   // save comment and file name to database
  *   ...
  *   // write the file
  *   fi.write(new File("/www/uploads/", fileName));
@@ -70,7 +70,7 @@
  * </pre>
  * <p>
  * In the example above, the first file is loaded into memory as a
- * <code>String</code>. Before calling the <code>getString</code> method,
+ * {@code String}. Before calling the {@code getString} method,
  * the data may have been in memory or on disk depending on its size. The
  * second file we assume it will be large and therefore never explicitly
  * load it into memory, though if it is less than 4096 bytes it will be

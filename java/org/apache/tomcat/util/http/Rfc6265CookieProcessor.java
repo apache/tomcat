@@ -22,6 +22,8 @@ import java.text.FieldPosition;
 import java.util.BitSet;
 import java.util.Date;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -98,7 +100,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
 
     @Override
-    public String generateHeader(javax.servlet.http.Cookie cookie) {
+    public String generateHeader(jakarta.servlet.http.Cookie cookie, HttpServletRequest request) {
 
         // Can't use StringBuilder due to DateFormat
         StringBuffer header = new StringBuffer();
@@ -162,6 +164,13 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             header.append("; HttpOnly");
         }
 
+        SameSiteCookies sameSiteCookiesValue = getSameSiteCookies();
+
+        if (!sameSiteCookiesValue.equals(SameSiteCookies.UNSET)) {
+            header.append("; SameSite=");
+            header.append(sameSiteCookiesValue.getValue());
+        }
+
         return header.toString();
     }
 
@@ -221,8 +230,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
     private void validatePath(String path) {
         char[] chars = path.toCharArray();
 
-        for (int i = 0; i < chars.length; i++) {
-            char ch = chars[i];
+        for (char ch : chars) {
             if (ch < 0x20 || ch > 0x7E || ch == ';') {
                 throw new IllegalArgumentException(sm.getString(
                         "rfc6265CookieProcessor.invalidPath", path));

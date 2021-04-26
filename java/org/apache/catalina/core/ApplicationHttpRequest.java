@@ -24,22 +24,23 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
-import javax.servlet.http.HttpServletMapping;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.PushBuilder;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestWrapper;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.PushBuilder;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -48,16 +49,18 @@ import org.apache.catalina.Session;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.RequestUtil;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.Parameters;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Wrapper around a <code>javax.servlet.http.HttpServletRequest</code>
+ * Wrapper around a <code>jakarta.servlet.http.HttpServletRequest</code>
  * that transforms an application request object (which might be the original
  * one passed to a servlet, or might be based on the 2.3
- * <code>javax.servlet.http.HttpServletRequestWrapper</code> class)
+ * <code>jakarta.servlet.http.HttpServletRequestWrapper</code> class)
  * back into an internal <code>org.apache.catalina.HttpRequest</code>.
  * <p>
  * <strong>WARNING</strong>:  Due to Java's lack of support for multiple
@@ -70,9 +73,7 @@ import org.apache.tomcat.util.http.Parameters;
  */
 class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
-
-    // ------------------------------------------------------- Static Variables
-
+    private static final StringManager sm = StringManager.getManager(ApplicationHttpRequest.class);
 
     /**
      * The set of attribute names that are special for request dispatchers.
@@ -321,11 +322,20 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (context == null)
             return null;
 
-        // If the path is already context-relative, just pass it through
-        if (path == null)
+        if (path == null) {
             return null;
-        else if (path.startsWith("/"))
+        }
+
+        int fragmentPos = path.indexOf('#');
+        if (fragmentPos > -1) {
+            context.getLogger().warn(sm.getString("applicationHttpRequest.fragmentInDispatchPath", path));
+            path = path.substring(0, fragmentPos);
+        }
+
+        // If the path is already context-relative, just pass it through
+        if (path.startsWith("/")) {
             return context.getServletContext().getRequestDispatcher(path);
+        }
 
         // Convert a request-relative path to a context-relative one
         String servletPath =
@@ -345,10 +355,19 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         int pos = requestPath.lastIndexOf('/');
         String relative = null;
-        if (pos >= 0) {
-            relative = requestPath.substring(0, pos + 1) + path;
+        if (context.getDispatchersUseEncodedPaths()) {
+            if (pos >= 0) {
+                relative = URLEncoder.DEFAULT.encode(
+                        requestPath.substring(0, pos + 1), StandardCharsets.UTF_8) + path;
+            } else {
+                relative = URLEncoder.DEFAULT.encode(requestPath, StandardCharsets.UTF_8) + path;
+            }
         } else {
-            relative = requestPath + path;
+            if (pos >= 0) {
+                relative = requestPath.substring(0, pos + 1) + path;
+            } else {
+                relative = requestPath + path;
+            }
         }
 
         return context.getServletContext().getRequestDispatcher(relative);
@@ -761,8 +780,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     protected boolean isSpecial(String name) {
 
-        for (int i = 0; i < specials.length; i++) {
-            if (specials[i].equals(name))
+        for (String special : specials) {
+            if (special.equals(name))
                 return true;
         }
         return false;
@@ -831,17 +850,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (values1 == null) {
             // Skip - nothing to merge
         } else {
-            for (String value : values1) {
-                results.add(value);
-            }
+            results.addAll(Arrays.asList(values1));
         }
 
         if (values2 == null) {
             // Skip - nothing to merge
         } else {
-            for (String value : values2) {
-                results.add(value);
-            }
+            results.addAll(Arrays.asList(values2));
         }
 
         String values[] = new String[results.size()];

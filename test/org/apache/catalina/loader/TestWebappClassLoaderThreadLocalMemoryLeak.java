@@ -19,7 +19,7 @@ package org.apache.catalina.loader;
 import java.io.InputStream;
 import java.util.concurrent.Executor;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Ignore;

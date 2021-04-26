@@ -22,15 +22,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletMapping;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.MappingMatch;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.MappingMatch;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -538,18 +538,18 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
                 if (type == dispatcherType) {
                     String name = dispatcherType.name().toLowerCase(Locale.ENGLISH);
                     Assert.assertEquals(expectedDispatcherRequestURI,
-                            req.getAttribute("javax.servlet." + name + ".request_uri"));
+                            req.getAttribute("jakarta.servlet." + name + ".request_uri"));
                     Assert.assertEquals(expectedDispatcherContextPath,
-                            req.getAttribute("javax.servlet." + name + ".context_path"));
+                            req.getAttribute("jakarta.servlet." + name + ".context_path"));
                     Assert.assertEquals(expectedDispatcherServletPath,
-                            req.getAttribute("javax.servlet." + name + ".servlet_path"));
+                            req.getAttribute("jakarta.servlet." + name + ".servlet_path"));
                     Assert.assertEquals(expectedDispatcherPathInfo,
-                            req.getAttribute("javax.servlet." + name + ".path_info"));
+                            req.getAttribute("jakarta.servlet." + name + ".path_info"));
                     Assert.assertEquals(expectedDispatcherQueryString,
-                            req.getAttribute("javax.servlet." + name + ".query_string"));
+                            req.getAttribute("jakarta.servlet." + name + ".query_string"));
                     HttpServletMapping dispatcherMapping =
                             (HttpServletMapping) req.getAttribute(
-                                    "javax.servlet." + name + ".mapping");
+                                    "jakarta.servlet." + name + ".mapping");
                     Assert.assertNotNull(dispatcherMapping);
                     Assert.assertEquals(expectedDispatcherMappingMatch,
                             dispatcherMapping.getMappingMatch());
@@ -575,11 +575,11 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
 
 
     private void assertAllNull(HttpServletRequest req, String type) {
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".request_uri"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".context_path"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".servlet_path"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".path_info"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".query_string"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".mapping"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".request_uri"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".context_path"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".servlet_path"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".path_info"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".query_string"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".mapping"));
     }
 }

@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +35,7 @@ import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Standard implementation of a processing <b>Pipeline</b> that will invoke
@@ -52,10 +49,10 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Craig R. McClanahan
  */
-
 public class StandardPipeline extends LifecycleBase implements Pipeline {
 
     private static final Log log = LogFactory.getLog(StandardPipeline.class);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
     // ----------------------------------------------------------- Constructors
 
@@ -266,7 +263,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
                 try {
                     ((Lifecycle) oldBasic).stop();
                 } catch (LifecycleException e) {
-                    log.error("StandardPipeline.setBasic: stop", e);
+                    log.error(sm.getString("standardPipeline.basic.stop"), e);
                 }
             }
             if (oldBasic instanceof Contained) {
@@ -288,7 +285,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
             try {
                 ((Lifecycle) valve).start();
             } catch (LifecycleException e) {
-                log.error("StandardPipeline.setBasic: start", e);
+                log.error(sm.getString("standardPipeline.basic.start"), e);
                 return;
             }
         }
@@ -340,7 +337,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
                 try {
                     ((Lifecycle) valve).start();
                 } catch (LifecycleException e) {
-                    log.error("StandardPipeline.addValve: start: ", e);
+                    log.error(sm.getString("standardPipeline.valve.start"), e);
                 }
             }
         }
@@ -442,13 +439,13 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
                 try {
                     ((Lifecycle) valve).stop();
                 } catch (LifecycleException e) {
-                    log.error("StandardPipeline.removeValve: stop: ", e);
+                    log.error(sm.getString("standardPipeline.valve.stop"), e);
                 }
             }
             try {
                 ((Lifecycle) valve).destroy();
             } catch (LifecycleException e) {
-                log.error("StandardPipeline.removeValve: destroy: ", e);
+                log.error(sm.getString("standardPipeline.valve.destroy"), e);
             }
         }
 

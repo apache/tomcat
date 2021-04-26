@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,18 +39,27 @@ class StreamStateMachine {
     private static final Log log = LogFactory.getLog(StreamStateMachine.class);
     private static final StringManager sm = StringManager.getManager(StreamStateMachine.class);
 
-    private final Stream stream;
+    private final String connectionId;
+    private final String streamId;
+
     private State state;
 
 
-    StreamStateMachine(Stream stream) {
-        this.stream = stream;
+    StreamStateMachine(String connectionId, String streamId) {
+        this.connectionId = connectionId;
+        this.streamId = streamId;
         stateChange(null, State.IDLE);
     }
 
 
     final synchronized void sentPushPromise() {
         stateChange(State.IDLE, State.RESERVED_LOCAL);
+    }
+
+
+    final synchronized void sentHeaders() {
+        // No change if currently OPEN
+        stateChange(State.RESERVED_LOCAL, State.HALF_CLOSED_REMOTE);
     }
 
 
@@ -85,7 +95,7 @@ class StreamStateMachine {
     public synchronized void sendReset() {
         if (state == State.IDLE) {
             throw new IllegalStateException(sm.getString("streamStateMachine.debug.change",
-                    stream.getConnectionId(), stream.getIdentifier(), state));
+                    connectionId, streamId, state));
         }
         if (state.canReset()) {
             stateChange(state, State.CLOSED_RST_TX);
@@ -102,8 +112,8 @@ class StreamStateMachine {
         if (state == oldState) {
             state = newState;
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("streamStateMachine.debug.change", stream.getConnectionId(),
-                        stream.getIdentifier(), oldState, newState));
+                log.debug(sm.getString("streamStateMachine.debug.change", connectionId,
+                        streamId, oldState, newState));
             }
         }
     }
@@ -115,12 +125,12 @@ class StreamStateMachine {
         if (!isFrameTypePermitted(frameType)) {
             if (state.connectionErrorForInvalidFrame) {
                 throw new ConnectionException(sm.getString("streamStateMachine.invalidFrame",
-                        stream.getConnectionId(), stream.getIdentifier(), state, frameType),
+                        connectionId, streamId, state, frameType),
                         state.errorCodeForInvalidFrame);
             } else {
                 throw new StreamException(sm.getString("streamStateMachine.invalidFrame",
-                        stream.getConnectionId(), stream.getIdentifier(), state, frameType),
-                        state.errorCodeForInvalidFrame, stream.getIdentifier().intValue());
+                        connectionId, streamId, state, frameType),
+                        state.errorCodeForInvalidFrame, Integer.parseInt(streamId));
             }
         }
     }
@@ -170,7 +180,7 @@ class StreamStateMachine {
                             Http2Error.PROTOCOL_ERROR, FrameType.PRIORITY,
                                                        FrameType.RST,
                                                        FrameType.WINDOW_UPDATE),
-        RESERVED_REMOTE    (false, false, true,  true,
+        RESERVED_REMOTE    (false,  true, true,  true,
                             Http2Error.PROTOCOL_ERROR, FrameType.HEADERS,
                                                        FrameType.PRIORITY,
                                                        FrameType.RST),
@@ -208,7 +218,7 @@ class StreamStateMachine {
         private final boolean canReset;
         private final boolean connectionErrorForInvalidFrame;
         private final Http2Error errorCodeForInvalidFrame;
-        private final Set<FrameType> frameTypesPermitted = new HashSet<>();
+        private final Set<FrameType> frameTypesPermitted;
 
         private State(boolean canRead, boolean canWrite, boolean canReset,
                 boolean connectionErrorForInvalidFrame, Http2Error errorCode,
@@ -218,9 +228,7 @@ class StreamStateMachine {
             this.canReset = canReset;
             this.connectionErrorForInvalidFrame = connectionErrorForInvalidFrame;
             this.errorCodeForInvalidFrame = errorCode;
-            for (FrameType frameType : frameTypes) {
-                frameTypesPermitted.add(frameType);
-            }
+            frameTypesPermitted = new HashSet<>(Arrays.asList(frameTypes));
         }
 
         public boolean isActive() {

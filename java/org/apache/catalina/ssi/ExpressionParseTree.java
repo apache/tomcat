@@ -23,12 +23,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import org.apache.tomcat.util.res.StringManager;
 /**
  * Represents a parsed expression.
  *
  * @author Paul Speed
  */
 public class ExpressionParseTree {
+    private static final StringManager sm = StringManager.getManager(ExpressionParseTree.class);
     /**
      * Contains the current set of completed nodes. This is a workspace for the
      * parser.
@@ -141,7 +144,7 @@ public class ExpressionParseTree {
                         nodeStack.add(0, currStringNode);
                     } else {
                         // Add to the existing
-                        currStringNode.value.append(" ");
+                        currStringNode.value.append(' ');
                         currStringNode.value.append(et.getTokenValue());
                     }
                     break;
@@ -196,13 +199,13 @@ public class ExpressionParseTree {
         // Finish off the rest of the opps
         resolveGroup();
         if (nodeStack.size() == 0) {
-            throw new ParseException("No nodes created.", et.getIndex());
+            throw new ParseException(sm.getString("expressionParseTree.noNodes"), et.getIndex());
         }
         if (nodeStack.size() > 1) {
-            throw new ParseException("Extra nodes created.", et.getIndex());
+            throw new ParseException(sm.getString("expressionParseTree.extraNodes"), et.getIndex());
         }
         if (oppStack.size() != 0) {
-            throw new ParseException("Unused opp nodes exist.", et.getIndex());
+            throw new ParseException(sm.getString("expressionParseTree.unusedOpCodes"), et.getIndex());
         }
         root = nodeStack.get(0);
     }
@@ -210,7 +213,7 @@ public class ExpressionParseTree {
     /**
      * A node in the expression parse tree.
      */
-    private abstract class Node {
+    private abstract static class Node {
         /**
          * @return {@code true} if the node evaluates to true.
          */
@@ -263,7 +266,7 @@ public class ExpressionParseTree {
     /**
      * A node implementation that represents an operation.
      */
-    private abstract class OppNode extends Node {
+    private abstract static class OppNode extends Node {
         /**
          * The left branch.
          */
@@ -292,7 +295,7 @@ public class ExpressionParseTree {
             left = values.remove(0);
         }
     }
-    private final class NotNode extends OppNode {
+    private static final class NotNode extends OppNode {
         @Override
         public boolean evaluate() {
             return !left.evaluate();
@@ -319,7 +322,7 @@ public class ExpressionParseTree {
             return left + " NOT";
         }
     }
-    private final class AndNode extends OppNode {
+    private static final class AndNode extends OppNode {
         @Override
         public boolean evaluate() {
             if (!left.evaluate()) // Short circuit
@@ -339,7 +342,7 @@ public class ExpressionParseTree {
             return left + " " + right + " AND";
         }
     }
-    private final class OrNode extends OppNode {
+    private static final class OrNode extends OppNode {
         @Override
         public boolean evaluate() {
             if (left.evaluate()) // Short circuit
@@ -382,7 +385,7 @@ public class ExpressionParseTree {
                         return -1;
                     }
                 } catch (PatternSyntaxException pse) {
-                    ssiMediator.log("Invalid expression: " + expr, pse);
+                    ssiMediator.log(sm.getString("expressionParseTree.invalidExpression", expr), pse);
                     return 0;
                 }
             }

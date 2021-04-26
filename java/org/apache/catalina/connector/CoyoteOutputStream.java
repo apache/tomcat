@@ -19,8 +19,8 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 
 import org.apache.tomcat.util.res.StringManager;
 

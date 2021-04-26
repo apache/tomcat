@@ -25,6 +25,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+import jakarta.servlet.http.WebConnection;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolException;
@@ -37,33 +40,37 @@ import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
 public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
     private static final ByteBuffer[] BYTEBUFFER_ARRAY = new ByteBuffer[0];
-    private Throwable error = null;
-    private IOException applicationIOE = null;
+    // Ensures headers are generated and then written for one thread at a time.
+    // Because of the compression used, headers need to be written to the
+    // network in the same order they are generated.
+    private final Object headerWriteLock = new Object();
+    private final AtomicReference<Throwable> error = new AtomicReference<>();
+    private final AtomicReference<IOException> applicationIOE = new AtomicReference<>();
 
     public Http2AsyncUpgradeHandler(Http2Protocol protocol, Adapter adapter,
             Request coyoteRequest) {
-        super (protocol, adapter, coyoteRequest);
+        super(protocol, adapter, coyoteRequest);
     }
 
-    private CompletionHandler<Long, Void> errorCompletion = new CompletionHandler<Long, Void>() {
+    private final CompletionHandler<Long, Void> errorCompletion = new CompletionHandler<Long, Void>() {
         @Override
         public void completed(Long result, Void attachment) {
         }
         @Override
         public void failed(Throwable t, Void attachment) {
-            error = t;
+            error.set(t);
         }
     };
-    private CompletionHandler<Long, Void> applicationErrorCompletion = new CompletionHandler<Long, Void>() {
+    private final CompletionHandler<Long, Void> applicationErrorCompletion = new CompletionHandler<Long, Void>() {
         @Override
         public void completed(Long result, Void attachment) {
         }
         @Override
         public void failed(Throwable t, Void attachment) {
             if (t instanceof IOException) {
-                applicationIOE = (IOException) t;
+                applicationIOE.set((IOException) t);
             }
-            error = t;
+            error.set(t);
         }
     };
 
@@ -78,23 +85,38 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         return new AsyncPingManager();
     }
 
+
     @Override
-    boolean hasAsyncIO() {
+    public boolean hasAsyncIO() {
         return true;
     }
 
+
+    @Override
+    protected void processConnection(WebConnection webConnection,
+            Stream stream) {
+        // The end of the processing will instead be an async callback
+    }
+
+    void processConnectionCallback(WebConnection webConnection,
+            Stream stream) {
+        super.processConnection(webConnection, stream);
+    }
+
+
     @Override
     protected void writeSettings() {
-        // Send the initial settings frame
         socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                 TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                ByteBuffer.wrap(localSettings.getSettingsFrameForPending()));
-        if (error != null) {
+                ByteBuffer.wrap(localSettings.getSettingsFrameForPending()),
+                ByteBuffer.wrap(createWindowUpdateForSettings()));
+        Throwable err = error.get();
+        if (err != null) {
             String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
             if (log.isDebugEnabled()) {
                 log.debug(msg);
             }
-            throw new ProtocolException(msg, error);
+            throw new ProtocolException(msg, err);
         }
     }
 
@@ -103,7 +125,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     void sendStreamReset(StreamException se) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
-                    Integer.toString(se.getStreamId()), se.getError()));
+                    Integer.toString(se.getStreamId()), se.getError(), se.getMessage()));
         }
         // Write a RST frame
         byte[] rstFrame = new byte[13];
@@ -153,8 +175,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     @Override
     void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
             boolean endOfStream, int payloadSize) throws IOException {
-        // This ensures the Stream processing thread has control of the socket.
-        synchronized (socketWrapper) {
+        synchronized (headerWriteLock) {
             AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers)
                     doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
             if (headerFrameBuffers != null) {
@@ -179,8 +200,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     @Override
     void writeBody(Stream stream, ByteBuffer data, int len, boolean finished) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdentifier(),
-                    Integer.toString(len)));
+            log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdAsString(),
+                    Integer.toString(len), Boolean.valueOf(finished)));
         }
         // Need to check this now since sending end of stream will change this.
         boolean writeable = stream.canWrite();
@@ -191,11 +212,11 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             header[4] = FLAG_END_OF_STREAM;
             stream.sentEndOfStream();
             if (!stream.isActive()) {
-                activeRemoteStreamCount.decrementAndGet();
+                setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
             }
         }
         if (writeable) {
-            ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+            ByteUtil.set31Bits(header, 5, stream.getIdAsInt());
             int orgLimit = data.limit();
             data.limit(data.position() + len);
             socketWrapper.write(BlockingMode.BLOCK, protocol.getWriteTimeout(),
@@ -208,25 +229,29 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
 
     @Override
-    void writeWindowUpdate(Stream stream, int increment, boolean applicationInitiated)
+    void writeWindowUpdate(AbstractNonZeroStream stream, int increment, boolean applicationInitiated)
             throws IOException {
-        if (!stream.canWrite()) {
-            return;
-        }
         // Build window update frame for stream 0
         byte[] frame = new byte[13];
         ByteUtil.setThreeBytes(frame, 0,  4);
         frame[3] = FrameType.WINDOW_UPDATE.getIdByte();
         ByteUtil.set31Bits(frame, 9, increment);
-        // Change stream Id
-        byte[] frame2 = new byte[13];
-        ByteUtil.setThreeBytes(frame2, 0,  4);
-        frame2[3] = FrameType.WINDOW_UPDATE.getIdByte();
-        ByteUtil.set31Bits(frame2, 9, increment);
-        ByteUtil.set31Bits(frame2, 5, stream.getIdentifier().intValue());
-        socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                ByteBuffer.wrap(frame), ByteBuffer.wrap(frame2));
+        // No need to send update from closed stream
+        if  (stream instanceof Stream && ((Stream) stream).canWrite()) {
+            // Change stream Id
+            byte[] frame2 = new byte[13];
+            ByteUtil.setThreeBytes(frame2, 0,  4);
+            frame2[3] = FrameType.WINDOW_UPDATE.getIdByte();
+            ByteUtil.set31Bits(frame2, 9, increment);
+            ByteUtil.set31Bits(frame2, 5, stream.getIdAsInt());
+            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
+                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
+                    ByteBuffer.wrap(frame), ByteBuffer.wrap(frame2));
+        } else {
+            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
+                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
+                    ByteBuffer.wrap(frame));
+        }
         handleAsyncException();
     }
 
@@ -236,7 +261,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         if (ack) {
             if (!localSettings.ack()) {
                 // Ack was unexpected
-                log.warn(sm.getString("upgradeHandler.unexpectedAck", connectionId, getIdentifier()));
+                log.warn(sm.getString("upgradeHandler.unexpectedAck", connectionId, getIdAsString()));
             }
         } else {
             socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
@@ -248,25 +273,18 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
 
     private void handleAsyncException() throws IOException {
-        if (applicationIOE != null) {
-            IOException ioe = applicationIOE;
-            applicationIOE = null;
+        IOException ioe = applicationIOE.getAndSet(null);
+        if (ioe != null) {
             handleAppInitiatedIOException(ioe);
-        } else if (error != null) {
-            Throwable error = this.error;
-            this.error = null;
-            if (error instanceof IOException) {
-                throw (IOException) error;
-            } else {
-                throw new IOException(error);
+        } else {
+            Throwable err = this.error.getAndSet(null);
+            if (err != null) {
+                if (err instanceof IOException) {
+                    throw (IOException) err;
+                } else {
+                    throw new IOException(err);
+                }
             }
-        }
-    }
-
-    @Override
-    protected void processWrites() throws IOException {
-        if (socketWrapper.isWritePending()) {
-            socketWrapper.registerWriteInterest();
         }
     }
 
@@ -297,11 +315,11 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 header[4] = FLAG_END_OF_STREAM;
                 sendfile.stream.sentEndOfStream();
                 if (!sendfile.stream.isActive()) {
-                    activeRemoteStreamCount.decrementAndGet();
+                    setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
                 }
             }
             if (writeable) {
-                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdentifier().intValue());
+                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                         TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
@@ -358,11 +376,11 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 header[4] = FLAG_END_OF_STREAM;
                 sendfile.stream.sentEndOfStream();
                 if (!sendfile.stream.isActive()) {
-                    activeRemoteStreamCount.decrementAndGet();
+                    setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
                 }
             }
             if (writeable) {
-                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdentifier().intValue());
+                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                         TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,

@@ -275,7 +275,7 @@
 
       <attribute name="allowMultipleLeadingForwardSlashInPath" required="false">
         <p>Tomcat normalises sequences of multiple <code>/</code> characters in
-        a URI to a single <code>/</code>. This is for consistencuy with the
+        a URI to a single <code>/</code>. This is for consistency with the
         behaviour of file systems as URIs are often translated to file system
         paths. As a result, the return value of
         <code>HttpServletRequest#getContextPath()</code> is expected to start
@@ -295,6 +295,15 @@
         <p>The absolute path to the alternative deployment descriptor for this
         context. This overrides the default deployment descriptor located at
         <code>/WEB-INF/web.xml</code>.</p>
+      </attribute>
+
+      <attribute name="alwaysAccessSession" required="false">
+        <p>If this is <code>true</code>, every request that is associated with a
+        session will cause the session's last accessed time to be updated
+        regardless of whether or not the request explicitly accesses the session.</p>
+        <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+        <code>true</code>, the default of this setting will be <code>true</code>,
+        else the default value will be <code>false</code>.</p>
       </attribute>
 
       <attribute name="backgroundProcessorDelay" required="false">
@@ -328,12 +337,31 @@
         no filtering will be applied.</p>
       </attribute>
 
+      <attribute name="contextGetResourceRequiresSlash" required="false">
+        <p>If this is <code>true</code> then the path passed to
+        <code>ServletContext.getResource()</code> or
+        <code>ServletContext.getResourceAsStream()</code> must start with
+        &quot;/&quot;. If <code>false</code>, code like
+        <code>getResource("myfolder/myresource.txt")</code> will work as Tomcat
+        will prepend &quot;/&quot; to the provided path.</p>
+        <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+        <code>true</code>, the default of this setting will be <code>true</code>,
+        else the default value will be <code>false</code>.</p>
+      </attribute>
+
       <attribute name="cookies" required="false">
         <p>Set to <code>true</code> if you want cookies to be used for
         session identifier communication if supported by the client (this
         is the default).  Set to <code>false</code> if you want to disable
         the use of cookies for session identifier communication, and rely
         only on URL rewriting by the application.</p>
+      </attribute>
+
+      <attribute name="createUploadTargets" required="false">
+        <p>Set to <code>true</code> if Tomcat should attempt to create the
+        temporary upload location specified in the <code>MultipartConfig</code>
+        for a Servlet if the location does not already exist. If not specified,
+        the default value of <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="crossContext" required="false">
@@ -343,6 +371,15 @@
         host.  Set to <code>false</code> (the default) in security
         conscious environments, to make <code>getContext()</code> always
         return <code>null</code>.</p>
+      </attribute>
+
+      <attribute name="dispatcherWrapsSameObject" required="false">
+        <p>If this is <code>true</code> then any wrapped request or response
+        object passed to an application dispatcher will be checked to ensure that
+        it has wrapped the original request or response.</p>
+        <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+        <code>true</code>, the default of this setting will be <code>true</code>,
+        else the default value will be <code>false</code>.</p>
       </attribute>
 
       <attribute name="docBase" required="true">
@@ -367,7 +404,8 @@
         ares expected to be encoded. This affects both how Tomcat handles calls
         to obtain a request dispatcher as well as how Tomcat generates paths
         used to obtain request dispatchers internally. If not specified, the
-        default value of <code>true</code> is used.</p>
+        default value of <code>true</code> is used. When encoding/decoding paths
+        for a request dispatcher, UTF-8 is always used.</p>
       </attribute>
 
       <attribute name="failCtxIfServletStartFails" required="false">
@@ -417,6 +455,14 @@
         or <a href="host.html">Host</a> default contexts.  By default, settings
         from a default context will be used but may be overridden by a setting
         the same attribute explicitly for the Context.</p>
+      </attribute>
+
+      <attribute name="parallelAnnotationScanning" required="false">
+        <p>When set to <code>true</code> annotation scanning will be performed
+        using the utility executor. It will allow processing scanning in
+        parallel which may improve deployment type at the expense of higher
+        server load. If not specified, the default of <code>false</code> is
+        used.</p>
       </attribute>
 
       <attribute name="path" required="false">
@@ -589,6 +635,14 @@
         penalty.</p>
       </attribute>
 
+      <attribute name="useBloomFilterForArchives" required="false">
+        <p>If this is <code>true</code> then a bloom filter will be used to
+        speed up archive lookups. This can be beneficial to the deployment
+        speed to web applications that contain very large amount of JARs.</p>
+        <p>If not specified, the default value of <code>false</code> will be
+        used.</p>
+      </attribute>
+
       <attribute name="useHttpOnly" required="false">
        <p>Should the HttpOnly flag be set on session cookies to prevent client
           side script from accessing the session ID? Defaults to
@@ -598,7 +652,7 @@
       <attribute name="useRelativeRedirects" required="false">
         <p>Controls whether HTTP 1.1 and later location headers generated by a
         call to
-        <code>javax.servlet.http.HttpServletResponse#sendRedirect(String)</code>
+        <code>jakarta.servlet.http.HttpServletResponse#sendRedirect(String)</code>
         will use relative or absolute redirects. Relative redirects are more
         efficient but may not work with reverse proxies that change the context
         path. It should be noted that it is not recommended to use a reverse
@@ -856,7 +910,7 @@
         application.  This directory will be made visible to servlets in the
         web application by a servlet context attribute (of type
         <code>java.io.File</code>) named
-        <code>javax.servlet.context.tempdir</code> as described in the
+        <code>jakarta.servlet.context.tempdir</code> as described in the
         Servlet Specification.  If not specified, a suitable directory
         underneath <code>$CATALINA_BASE/work</code> will be provided.</p>
       </attribute>
@@ -1212,10 +1266,14 @@
         it is no longer required. This is intended to speed up clean-up of
         resources that would otherwise happen as part of garbage collection.
         This attribute is ignored if the <code>singleton</code> attribute is
-        false. If not specified, no default is defined and no close method will
-        be called.</p>
-        <p>For Apache Commons DBCP 2 and Apache Tomcat JDBC connection pools
-        you can use <code>closeMethod="close"</code>.</p>
+        false.</p>
+        <p>For <code>javax.sql.DataSource</code> and
+        <code>javax.sql.XADataSource</code> resources that implement
+        <code>AutoCloseable</code> such as Apache Commons DBCP 2 and the default
+        Apache Tomcat connection pool, this attribute is defaults to
+        <code>close</code>. This may be disabled by setting the attribute to the
+        empty string. For all other resource types no default is defined and no
+        close method will be called by default.</p>
       </attribute>
 
       <attribute name="description" required="false">

@@ -186,11 +186,11 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     public void close() throws SQLException {
         try {
             if (statement != null) {
-                ((AbandonedTrace) statement).removeTrace(this);
+                removeThisTrace(statement);
                 statement = null;
             }
             if (connection != null) {
-                ((AbandonedTrace) connection).removeTrace(this);
+                removeThisTrace(connection);
                 connection = null;
             }
             resultSet.close();
@@ -605,10 +605,9 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
      *
      * @return the innermost delegate.
      */
-    @SuppressWarnings("resource")
     public ResultSet getInnermostDelegate() {
         ResultSet r = resultSet;
-        while (r != null && r instanceof DelegatingResultSet) {
+        while (r instanceof DelegatingResultSet) {
             r = ((DelegatingResultSet) r).getDelegate();
             if (this == r) {
                 return null;
@@ -740,7 +739,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     @Override
     public <T> T getObject(final int columnIndex, final Class<T> type) throws SQLException {
         try {
-            return resultSet.getObject(columnIndex, type);
+            return Jdbc41Bridge.getObject(resultSet, columnIndex, type);
         } catch (final SQLException e) {
             handleException(e);
             return null;
@@ -770,7 +769,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     @Override
     public <T> T getObject(final String columnLabel, final Class<T> type) throws SQLException {
         try {
-            return resultSet.getObject(columnLabel, type);
+            return Jdbc41Bridge.getObject(resultSet, columnLabel, type);
         } catch (final SQLException e) {
             handleException(e);
             return null;
@@ -1047,9 +1046,9 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     }
 
     protected void handleException(final SQLException e) throws SQLException {
-        if (statement != null && statement instanceof DelegatingStatement) {
+        if (statement instanceof DelegatingStatement) {
             ((DelegatingStatement) statement).handleException(e);
-        } else if (connection != null && connection instanceof DelegatingConnection) {
+        } else if (connection instanceof DelegatingConnection) {
             ((DelegatingConnection<?>) connection).handleException(e);
         } else {
             throw e;
@@ -1242,8 +1241,8 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     }
 
     @Override
-    public String toString() {
-        return super.toString() + "[_res=" + resultSet + ", _stmt=" + statement + ", _conn=" + connection + "]";
+    public synchronized String toString() {
+        return super.toString() + "[resultSet=" + resultSet + ", statement=" + statement + ", connection=" + connection + "]";
     }
 
     @Override

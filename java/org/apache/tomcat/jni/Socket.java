@@ -23,7 +23,13 @@ import java.nio.ByteBuffer;
 /** Socket
  *
  * @author Mladen Turk
+ *
+ * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+ *              10.1.x / Tomcat Native 2.x onwards to only include those
+ *              components required to provide OpenSSL integration with the NIO
+ *              and NIO2 connectors.
  */
+@Deprecated
 public class Socket {
 
     /* Standard socket defines */
@@ -79,6 +85,7 @@ public class Socket {
     public static final int APR_UNSPEC = 0;
     public static final int APR_INET   = 1;
     public static final int APR_INET6  = 2;
+    public static final int APR_UNIX   = 3;
 
     public static final int APR_PROTO_TCP  =   6; /** TCP  */
     public static final int APR_PROTO_UDP  =  17; /** UDP  */

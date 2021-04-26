@@ -106,7 +106,7 @@ public class ChunkedOutputFilter implements OutputFilter {
 
         int pos = calculateChunkHeader(result);
 
-        chunkHeader.position(pos + 1).limit(chunkHeader.position() + 9 - pos);
+        chunkHeader.position(pos).limit(10);
         buffer.doWrite(chunkHeader);
 
         buffer.doWrite(chunk);
@@ -120,12 +120,12 @@ public class ChunkedOutputFilter implements OutputFilter {
 
     private int calculateChunkHeader(int len) {
         // Calculate chunk header
-        int pos = 7;
+        int pos = 8;
         int current = len;
         while (current > 0) {
             int digit = current % 16;
             current = current / 16;
-            chunkHeader.put(pos--, HexUtils.getHex(digit));
+            chunkHeader.put(--pos, HexUtils.getHex(digit));
         }
         return pos;
     }

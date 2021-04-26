@@ -29,13 +29,14 @@ import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.Wrapper;
+import org.apache.naming.ContextBindings;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Implementation of {@link org.apache.catalina.Realm} that is based on an
- * implementation of {@link UserDatabase} made available through the global JNDI
+ * implementation of {@link UserDatabase} made available through the JNDI
  * resources configured for this instance of Catalina. Set the
- * <code>resourceName</code> parameter to the global JNDI resources name for the
+ * <code>resourceName</code> parameter to the JNDI resources name for the
  * configured instance of <code>UserDatabase</code> that we should consult.
  *
  * @author Craig R. McClanahan
@@ -49,13 +50,19 @@ public class UserDatabaseRealm extends RealmBase {
      * The <code>UserDatabase</code> we will use to authenticate users and
      * identify associated roles.
      */
-    protected UserDatabase database = null;
+    protected volatile UserDatabase database = null;
+    private final Object databaseLock = new Object();
 
     /**
      * The global JNDI name of the <code>UserDatabase</code> resource we will be
      * utilizing.
      */
     protected String resourceName = "UserDatabase";
+
+    /**
+     * Obtain the UserDatabase from the context (rather than global) JNDI.
+     */
+    private boolean localJndiResource = false;
 
 
     // ------------------------------------------------------------- Properties
@@ -80,6 +87,31 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
+    /**
+     * Determines whether this Realm is configured to obtain the associated
+     * {@link UserDatabase} from the global JNDI context or a local (web
+     * application) JNDI context.
+     *
+     * @return {@code true} if a local JNDI context will be used, {@code false}
+     *         if the the global JNDI context will be used
+     */
+    public boolean getLocalJndiResource() {
+        return localJndiResource;
+    }
+
+
+    /**
+     * Configure whether this Realm obtains the associated {@link UserDatabase}
+     * from the global JNDI context or a local (web application) JNDI context.
+     *
+     * @param localJndiResource {@code true} to use a local JNDI context,
+     *                          {@code false} to use the global JNDI context
+     */
+    public void setLocalJndiResource(boolean localJndiResource) {
+        this.localJndiResource = localJndiResource;
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -94,6 +126,12 @@ public class UserDatabaseRealm extends RealmBase {
      */
     @Override
     public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
+
+        UserDatabase database = getUserDatabase();
+        if (database == null) {
+            return false;
+        }
+
         // Check for a role alias defined in a <security-role-ref> element
         if (wrapper != null) {
             String realRole = wrapper.findSecurityReference(role);
@@ -102,12 +140,14 @@ public class UserDatabaseRealm extends RealmBase {
         }
         if (principal instanceof GenericPrincipal) {
             GenericPrincipal gp = (GenericPrincipal) principal;
-            if (gp.getUserPrincipal() instanceof User) {
-                principal = gp.getUserPrincipal();
+            if (gp.getUserPrincipal() instanceof UserDatabasePrincipal) {
+                principal = database.findUser(gp.getName());
             }
         }
         if (!(principal instanceof User)) {
             // Play nice with SSO and mixed Realms
+            // No need to pass the wrapper here because role mapping has been
+            // performed already a few lines above
             return super.hasRole(null, principal, role);
         }
         if ("*".equals(role)) {
@@ -138,7 +178,10 @@ public class UserDatabaseRealm extends RealmBase {
 
     @Override
     public void backgroundProcess() {
-        database.backgroundProcess();
+        UserDatabase database = getUserDatabase();
+        if (database != null) {
+            database.backgroundProcess();
+        }
     }
 
 
@@ -147,6 +190,11 @@ public class UserDatabaseRealm extends RealmBase {
      */
     @Override
     protected String getPassword(String username) {
+        UserDatabase database = getUserDatabase();
+        if (database == null) {
+            return null;
+        }
+
         User user = database.findUser(username);
 
         if (user == null) {
@@ -162,6 +210,10 @@ public class UserDatabaseRealm extends RealmBase {
      */
     @Override
     protected Principal getPrincipal(String username) {
+        UserDatabase database = getUserDatabase();
+        if (database == null) {
+            return null;
+        }
 
         User user = database.findUser(username);
         if (user == null) {
@@ -183,34 +235,53 @@ public class UserDatabaseRealm extends RealmBase {
                 roles.add(role.getName());
             }
         }
-        return new GenericPrincipal(username, user.getPassword(), roles, user);
+        return new GenericPrincipal(username, roles,
+                new UserDatabasePrincipal(username));
+    }
+
+
+    /*
+     * Can't do this in startInternal() with local JNDI as the local JNDI
+     * context won't be initialised at this point.
+     */
+    private UserDatabase getUserDatabase() {
+        // DCL so database MUST be volatile
+        if (database == null) {
+            synchronized (databaseLock) {
+                if (database == null) {
+                    try {
+                        Context context = null;
+                        if (localJndiResource) {
+                            context = ContextBindings.getClassLoader();
+                            context = (Context) context.lookup("comp/env");
+                        } else {
+                            context = getServer().getGlobalNamingContext();
+                        }
+                        database = (UserDatabase) context.lookup(resourceName);
+                    } catch (Throwable e) {
+                        ExceptionUtils.handleThrowable(e);
+                        containerLog.error(sm.getString("userDatabaseRealm.lookup", resourceName), e);
+                        database = null;
+                    }
+                }
+            }
+        }
+        return database;
     }
 
 
     // ------------------------------------------------------ Lifecycle Methods
 
-    /**
-     * Prepare for the beginning of active use of the public methods of this
-     * component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error
-     *                that prevents this component from being used
-     */
     @Override
     protected void startInternal() throws LifecycleException {
-
-        try {
-            Context context = getServer().getGlobalNamingContext();
-            database = (UserDatabase) context.lookup(resourceName);
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            containerLog.error(sm.getString("userDatabaseRealm.lookup", resourceName), e);
-            database = null;
-        }
-        if (database == null) {
-            throw new LifecycleException(
-                    sm.getString("userDatabaseRealm.noDatabase", resourceName));
+        // If the JNDI resource is global, check it here and fail the context
+        // start if it is not valid. Local JNDI resources can't be validated
+        // this way because the JNDI context isn't available at Realm start.
+        if (!localJndiResource) {
+            UserDatabase database = getUserDatabase();
+            if (database == null) {
+                throw new LifecycleException(sm.getString("userDatabaseRealm.noDatabase", resourceName));
+            }
         }
 
         super.startInternal();
@@ -233,5 +304,17 @@ public class UserDatabaseRealm extends RealmBase {
 
         // Release reference to our user database
         database = null;
+    }
+
+
+    private static class UserDatabasePrincipal implements Principal {
+        private final String name;
+        private UserDatabasePrincipal(String name) {
+            this.name = name;
+        }
+        @Override
+        public String getName() {
+            return name;
+        }
     }
 }

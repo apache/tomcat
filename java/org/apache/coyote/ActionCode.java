@@ -77,6 +77,11 @@ public enum ActionCode {
     REQ_HOST_ADDR_ATTRIBUTE,
 
     /**
+     * Callback for lazy evaluation - extract the connection peer address.
+     */
+    REQ_PEER_ADDR_ATTRIBUTE,
+
+    /**
      * Callback for lazy evaluation - extract the SSL-related attributes
      * including the client certificate if present.
      */
@@ -125,7 +130,7 @@ public enum ActionCode {
 
     /**
      * Callback for an async call to
-     * {@link javax.servlet.AsyncContext#dispatch()}.
+     * {@link jakarta.servlet.AsyncContext#dispatch()}.
      */
     ASYNC_DISPATCH,
 
@@ -137,13 +142,13 @@ public enum ActionCode {
 
     /**
      * Callback for an async call to
-     * {@link javax.servlet.AsyncContext#start(Runnable)}.
+     * {@link jakarta.servlet.AsyncContext#start(Runnable)}.
      */
     ASYNC_RUN,
 
     /**
      * Callback for an async call to
-     * {@link javax.servlet.AsyncContext#complete()}.
+     * {@link jakarta.servlet.AsyncContext#complete()}.
      */
     ASYNC_COMPLETE,
 
@@ -159,7 +164,7 @@ public enum ActionCode {
 
     /**
      * Callback for an async call to
-     * {@link javax.servlet.AsyncContext#setTimeout(long)}
+     * {@link jakarta.servlet.AsyncContext#setTimeout(long)}
      */
     ASYNC_SETTIMEOUT,
 
@@ -265,5 +270,17 @@ public enum ActionCode {
      * once an HTTP/1.1 response has been committed, it will no longer support
      * trailer fields.
      */
-    IS_TRAILER_FIELDS_SUPPORTED
+    IS_TRAILER_FIELDS_SUPPORTED,
+
+    /**
+     * Obtain the connection identifier for the request. Used with multiplexing
+     * protocols such as HTTP/2.
+     */
+    CONNECTION_ID,
+
+    /**
+     * Obtain the stream identifier for the request. Used with multiplexing
+     * protocols such as HTTP/2.
+     */
+    STREAM_ID
 }

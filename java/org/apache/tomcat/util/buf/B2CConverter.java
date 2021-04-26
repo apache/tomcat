@@ -25,9 +25,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -38,23 +36,11 @@ public class B2CConverter {
 
     private static final StringManager sm = StringManager.getManager(B2CConverter.class);
 
-    private static final Map<String, Charset> encodingToCharsetCache =
-            new HashMap<>();
+    private static final CharsetCache charsetCache = new CharsetCache();
+
 
     // Protected so unit tests can use it
     protected static final int LEFTOVER_SIZE = 9;
-
-    static {
-        for (Charset charset: Charset.availableCharsets().values()) {
-            encodingToCharsetCache.put(
-                    charset.name().toLowerCase(Locale.ENGLISH), charset);
-            for (String alias : charset.aliases()) {
-                encodingToCharsetCache.put(
-                        alias.toLowerCase(Locale.ENGLISH), charset);
-            }
-        }
-    }
-
 
     /**
      * Obtain the Charset for the given encoding
@@ -71,7 +57,7 @@ public class B2CConverter {
         // Encoding names should all be ASCII
         String lowerCaseEnc = enc.toLowerCase(Locale.ENGLISH);
 
-        Charset charset = encodingToCharsetCache.get(lowerCaseEnc);
+        Charset charset = charsetCache.getCharset(lowerCaseEnc);
 
         if (charset == null) {
             // Pre-population of the cache means this must be invalid

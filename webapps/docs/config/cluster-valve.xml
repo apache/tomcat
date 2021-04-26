@@ -46,7 +46,7 @@
 </section>
 
 <section name="org.apache.catalina.ha.tcp.ReplicationValve">
-  The <code>ReplicationValve</code> will notify the cluster at the end of a HTTP request
+  The <code>ReplicationValve</code> will notify the cluster at the end of an HTTP request
   so that the cluster can make a decision whether there is data to be replicated or not.
   <subsection name="Attributes">
     <attributes>
@@ -98,7 +98,7 @@
       </attribute>
       <attribute name="sessionIdAttribute" required="false">
         Old sessionid before failover is registered in request attributes with  this attribute.
-        Default attribute name is <code>org.apache.catalina.ha.session.JvmRouteOrignalSessionID</code>.
+        Default attribute name is <code>org.apache.catalina.ha.session.JvmRouteOriginalSessionID</code>.
       </attribute>
     </attributes>
   </subsection>

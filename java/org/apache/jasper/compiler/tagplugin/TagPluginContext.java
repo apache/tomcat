@@ -37,7 +37,7 @@ public interface TagPluginContext {
     boolean isAttributeSpecified(String attribute);
 
     /**
-     * @return An unique temporary variable name that the plugin can use.
+     * @return A unique temporary variable name that the plugin can use.
      */
     String getTemporaryVariableName();
 
@@ -50,7 +50,7 @@ public interface TagPluginContext {
     /**
      * Generate a declaration in the of the generated class.  This can be
      * used to declare an inner class, a method, or a class variable.
-     * @param id An unique ID identifying the declaration.  It is not
+     * @param id A unique ID identifying the declaration.  It is not
      *           part of the declaration, and is used to ensure that the
      *           declaration will only appear once.  If this method is
      *           invoked with the same id more than once in the translation

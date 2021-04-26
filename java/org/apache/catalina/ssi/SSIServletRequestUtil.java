@@ -16,8 +16,8 @@
  */
 package org.apache.catalina.ssi;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.tomcat.util.http.RequestUtil;
 

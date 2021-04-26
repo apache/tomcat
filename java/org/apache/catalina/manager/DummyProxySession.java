@@ -19,7 +19,7 @@ package org.apache.catalina.manager;
 import java.security.Principal;
 import java.util.Iterator;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;

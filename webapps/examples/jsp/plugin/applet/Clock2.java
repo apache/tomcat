@@ -95,8 +95,7 @@ public class Clock2 extends Applet implements Runnable {
             if (d<0) {
                 d=d+2*x+3;
                 x++;
-            }
-            else {
+            } else {
                 d=d+2*(x-y)+5;
                 x++;
                 y--;

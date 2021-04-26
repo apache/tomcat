@@ -170,9 +170,8 @@ public final class URLEncoder implements Cloneable {
                     continue;
                 }
                 byte[] ba = buf.toByteArray();
-                for (int j = 0; j < ba.length; j++) {
+                for (byte toEncode : ba) {
                     // Converting each byte in the buffer
-                    byte toEncode = ba[j];
                     rewrittenPath.append('%');
                     int low = toEncode & 0x0f;
                     int high = (toEncode & 0xf0) >> 4;

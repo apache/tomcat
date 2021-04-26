@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.realm;
 
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -30,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.annotation.ServletSecurity.TransportGuarantee;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.ServletSecurity.TransportGuarantee;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -148,7 +147,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * @return The HTTP status code used when the container needs to issue an
@@ -368,6 +366,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
     }
 
+
     /**
      * Try to authenticate with the specified username, which
      * matches the digest calculated using the given parameters using the
@@ -409,8 +408,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         try {
             valueBytes = serverDigestValue.getBytes(getDigestCharset());
         } catch (UnsupportedEncodingException uee) {
-            log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-            throw new IllegalArgumentException(uee.getMessage());
+            throw new IllegalArgumentException(sm.getString("realmBase.invalidDigestEncoding", getDigestEncoding()), uee);
         }
 
         String serverDigest = MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(valueBytes));
@@ -448,12 +446,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if (log.isDebugEnabled())
             log.debug("Authenticating client certificate chain");
         if (validate) {
-            for (int i = 0; i < certs.length; i++) {
+            for (X509Certificate cert : certs) {
                 if (log.isDebugEnabled())
                     log.debug(" Checking validity for '" +
-                        certs[i].getSubjectDN().getName() + "'");
+                            cert.getSubjectDN().getName() + "'");
                 try {
-                    certs[i].checkValidity();
+                    cert.checkValidity();
                 } catch (Exception e) {
                     if (log.isDebugEnabled())
                         log.debug("  Validity exception", e);
@@ -471,7 +469,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * {@inheritDoc}
      */
     @Override
-    public Principal authenticate(GSSContext gssContext, boolean storeCreds) {
+    public Principal authenticate(GSSContext gssContext, boolean storeCred) {
         if (gssContext.isEstablished()) {
             GSSName gssName = null;
             try {
@@ -481,28 +479,24 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
 
             if (gssName!= null) {
-                String name = gssName.toString();
-
-                if (isStripRealmForGss()) {
-                    int i = name.indexOf('@');
-                    if (i > 0) {
-                        // Zero so we don;t leave a zero length name
-                        name = name.substring(0, i);
-                    }
-                }
                 GSSCredential gssCredential = null;
-                if (storeCreds && gssContext.getCredDelegState()) {
-                    try {
-                        gssCredential = gssContext.getDelegCred();
-                    } catch (GSSException e) {
+                if (storeCred) {
+                    if (gssContext.getCredDelegState()) {
+                        try {
+                            gssCredential = gssContext.getDelegCred();
+                        } catch (GSSException e) {
+                            log.warn(sm.getString(
+                                    "realmBase.delegatedCredentialFail", gssName), e);
+                        }
+                    } else {
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString(
-                                    "realmBase.delegatedCredentialFail", name),
-                                    e);
+                                    "realmBase.credentialNotDelegated", gssName));
                         }
                     }
                 }
-                return getPrincipal(name, gssCredential);
+
+                return getPrincipal(gssName, gssCredential);
             }
         } else {
             log.error(sm.getString("realmBase.gssContextNotEstablished"));
@@ -510,6 +504,19 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         // Fail in all other cases
         return null;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
+        if (gssName == null) {
+            return null;
+        }
+
+        return getPrincipal(gssName, gssCredential);
     }
 
 
@@ -556,11 +563,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         int i;
         boolean found = false;
         for (i = 0; i < constraints.length; i++) {
-            SecurityCollection [] collection = constraints[i].findCollections();
+            SecurityCollection[] collections = constraints[i].findCollections();
 
             // If collection is null, continue to avoid an NPE
             // See Bugzilla 30624
-            if ( collection == null) {
+            if (collections == null) {
                 continue;
             }
 
@@ -570,21 +577,21 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     constraints[i].included(uri, method));
             }
 
-            for(int j=0; j < collection.length; j++){
-                String [] patterns = collection[j].findPatterns();
+            for (SecurityCollection securityCollection : collections) {
+                String[] patterns = securityCollection.findPatterns();
 
                 // If patterns is null, continue to avoid an NPE
                 // See Bugzilla 30624
-                if ( patterns == null) {
+                if (patterns == null) {
                     continue;
                 }
 
-                for(int k=0; k < patterns.length; k++) {
+                for (String pattern : patterns) {
                     // Exact match including special case for the context root.
-                    if(uri.equals(patterns[k]) || patterns[k].length() == 0 && uri.equals("/")) {
+                    if (uri.equals(pattern) || pattern.length() == 0 && uri.equals("/")) {
                         found = true;
-                        if(collection[j].findMethod(method)) {
-                            if(results == null) {
+                        if (securityCollection.findMethod(method)) {
+                            if (results == null) {
                                 results = new ArrayList<>();
                             }
                             results.add(constraints[i]);
@@ -615,46 +622,43 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     constraints[i].included(uri, method));
             }
 
-            for(int j=0; j < collection.length; j++){
-                String [] patterns = collection[j].findPatterns();
+            for (SecurityCollection securityCollection : collection) {
+                String[] patterns = securityCollection.findPatterns();
 
                 // If patterns is null, continue to avoid an NPE
                 // See Bugzilla 30624
-                if ( patterns == null) {
+                if (patterns == null) {
                     continue;
                 }
 
                 boolean matched = false;
                 int length = -1;
-                for(int k=0; k < patterns.length; k++) {
-                    String pattern = patterns[k];
-                    if(pattern.startsWith("/") && pattern.endsWith("/*") &&
-                       pattern.length() >= longest) {
+                for (String pattern : patterns) {
+                    if (pattern.startsWith("/") && pattern.endsWith("/*") &&
+                            pattern.length() >= longest) {
 
-                        if(pattern.length() == 2) {
+                        if (pattern.length() == 2) {
                             matched = true;
                             length = pattern.length();
-                        } else if(pattern.regionMatches(0,uri,0,
-                                                        pattern.length()-1) ||
-                                  (pattern.length()-2 == uri.length() &&
-                                   pattern.regionMatches(0,uri,0,
-                                                        pattern.length()-2))) {
+                        } else if (pattern.regionMatches(0, uri, 0, pattern.length() - 1) ||
+                                (pattern.length() - 2 == uri.length() &&
+                                        pattern.regionMatches(0, uri, 0, pattern.length() - 2))) {
                             matched = true;
                             length = pattern.length();
                         }
                     }
                 }
-                if(matched) {
-                    if(length > longest) {
+                if (matched) {
+                    if (length > longest) {
                         found = false;
-                        if(results != null) {
+                        if (results != null) {
                             results.clear();
                         }
                         longest = length;
                     }
-                    if(collection[j].findMethod(method)) {
+                    if (securityCollection.findMethod(method)) {
                         found = true;
-                        if(results == null) {
+                        if (results == null) {
                             results = new ArrayList<>();
                         }
                         results.add(constraints[i]);
@@ -739,24 +743,24 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     constraints[i].included(uri, method));
             }
 
-            for(int j=0; j < collection.length; j++){
-                String [] patterns = collection[j].findPatterns();
+            for (SecurityCollection securityCollection : collection) {
+                String[] patterns = securityCollection.findPatterns();
 
                 // If patterns is null, continue to avoid an NPE
                 // See Bugzilla 30624
-                if ( patterns == null) {
+                if (patterns == null) {
                     continue;
                 }
 
                 boolean matched = false;
-                for(int k=0; k < patterns.length && !matched; k++) {
-                    String pattern = patterns[k];
-                    if(pattern.equals("/")){
+                for (String pattern : patterns) {
+                    if (pattern.equals("/")) {
                         matched = true;
+                        break;
                     }
                 }
-                if(matched) {
-                    if(results == null) {
+                if (matched) {
+                    if (results == null) {
                         results = new ArrayList<>();
                     }
                     results.add(constraints[i]);
@@ -812,9 +816,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         Principal principal = request.getPrincipal();
         boolean status = false;
         boolean denyfromall = false;
-        for(int i=0; i < constraints.length; i++) {
-            SecurityConstraint constraint = constraints[i];
-
+        for (SecurityConstraint constraint : constraints) {
             String roles[];
             if (constraint.getAllRoles()) {
                 // * means all roles defined in web.xml
@@ -834,31 +836,36 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     log.debug("Passing all authenticated users");
                 }
                 status = true;
-            } else if (roles.length == 0 && !constraint.getAllRoles() &&
+            }
+            else if (roles.length == 0 && !constraint.getAllRoles() &&
                     !constraint.getAuthenticatedUsers()) {
-                if(constraint.getAuthConstraint()) {
-                    if( log.isDebugEnabled() )
+                if (constraint.getAuthConstraint()) {
+                    if (log.isDebugEnabled()) {
                         log.debug("No roles");
+                    }
                     status = false; // No listed roles means no access at all
                     denyfromall = true;
                     break;
                 }
 
-                if(log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("Passing all access");
+                }
                 status = true;
             } else if (principal == null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  No user authenticated, cannot grant access");
+                }
             } else {
-                for (int j = 0; j < roles.length; j++) {
-                    if (hasRole(null, principal, roles[j])) {
+                for (String role : roles) {
+                    if (hasRole(request.getWrapper(), principal, role)) {
                         status = true;
-                        if( log.isDebugEnabled() )
-                            log.debug( "Role found:  " + roles[j]);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Role found:  " + role);
+                        }
+                    } else if (log.isDebugEnabled()) {
+                        log.debug("No role found:  " + role);
                     }
-                    else if( log.isDebugEnabled() )
-                        log.debug( "No role found:  " + roles[j]);
                 }
             }
         }
@@ -869,8 +876,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 log.debug("Checking for all roles mode: " + allRolesMode);
             }
             // Check for an all roles(role-name="*")
-            for (int i = 0; i < constraints.length; i++) {
-                SecurityConstraint constraint = constraints[i];
+            for (SecurityConstraint constraint : constraints) {
                 String roles[];
                 // If the all roles mode exists, sets
                 if (constraint.getAllRoles()) {
@@ -916,7 +922,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      */
     @Override
     public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
-        // Check for a role alias defined in a <security-role-ref> element
+        // Check for a role alias
         if (wrapper != null) {
             String realRole = wrapper.findSecurityReference(role);
             if (realRole != null) {
@@ -994,8 +1000,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 log.debug("  No applicable security constraint defined");
             return true;
         }
-        for(int i=0; i < constraints.length; i++) {
-            SecurityConstraint constraint = constraints[i];
+        for (SecurityConstraint constraint : constraints) {
             String userConstraint = constraint.getUserConstraint();
             if (userConstraint == null) {
                 if (log.isDebugEnabled())
@@ -1036,17 +1041,17 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         file.append(protocol).append("://").append(host);
         // Host with port
         if(redirectPort != 443) {
-            file.append(":").append(redirectPort);
+            file.append(':').append(redirectPort);
         }
         // URI
         file.append(request.getRequestURI());
         String requestedSessionId = request.getRequestedSessionId();
         if ((requestedSessionId != null) &&
             request.isRequestedSessionIdFromURL()) {
-            file.append(";");
+            file.append(';');
             file.append(SessionConfig.getSessionUriParamName(
                     request.getContext()));
-            file.append("=");
+            file.append('=');
             file.append(requestedSessionId);
         }
         String queryString = request.getQueryString();
@@ -1159,8 +1164,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         try {
             valueBytes = digestValue.getBytes(getDigestCharset());
         } catch (UnsupportedEncodingException uee) {
-            log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-            throw new IllegalArgumentException(uee.getMessage());
+            throw new IllegalArgumentException(sm.getString("realmBase.invalidDigestEncoding", getDigestEncoding()), uee);
         }
 
         return MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(valueBytes));
@@ -1217,9 +1221,26 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected abstract Principal getPrincipal(String username);
 
 
-    protected Principal getPrincipal(String username,
+    /**
+     * Get the principal associated with the specified {@link GSSName}.
+     *
+     * @param gssName The GSS name
+     * @param gssCredential the GSS credential of the principal
+     * @return the principal associated with the given user name.
+     */
+    protected Principal getPrincipal(GSSName gssName,
             GSSCredential gssCredential) {
-        Principal p = getPrincipal(username);
+        String name = gssName.toString();
+
+        if (isStripRealmForGss()) {
+            int i = name.indexOf('@');
+            if (i > 0) {
+                // Zero so we don't leave a zero length name
+                name = name.substring(0, i);
+            }
+        }
+
+        Principal p = getPrincipal(name);
 
         if (p instanceof GenericPrincipal) {
             ((GenericPrincipal) p).setGssCredential(gssCredential);
@@ -1227,6 +1248,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         return p;
     }
+
 
     /**
      * Return the Server object that is the ultimate parent for the container
@@ -1458,51 +1480,49 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
          */
         public static final AllRolesMode STRICT_AUTH_ONLY_MODE = new AllRolesMode("strictAuthOnly");
 
-        static AllRolesMode toMode(String name)
-        {
+        static AllRolesMode toMode(String name) {
             AllRolesMode mode;
-            if( name.equalsIgnoreCase(STRICT_MODE.name) )
+            if (name.equalsIgnoreCase(STRICT_MODE.name)) {
                 mode = STRICT_MODE;
-            else if( name.equalsIgnoreCase(AUTH_ONLY_MODE.name) )
+            } else if (name.equalsIgnoreCase(AUTH_ONLY_MODE.name)) {
                 mode = AUTH_ONLY_MODE;
-            else if( name.equalsIgnoreCase(STRICT_AUTH_ONLY_MODE.name) )
+            } else if (name.equalsIgnoreCase(STRICT_AUTH_ONLY_MODE.name)) {
                 mode = STRICT_AUTH_ONLY_MODE;
-            else
-                throw new IllegalStateException("Unknown mode, must be one of: strict, authOnly, strictAuthOnly");
+            } else {
+                throw new IllegalStateException(
+                        sm.getString("realmBase.unknownAllRolesMode", name));
+            }
             return mode;
         }
 
-        private AllRolesMode(String name)
-        {
+        private AllRolesMode(String name) {
             this.name = name;
         }
 
         @Override
-        public boolean equals(Object o)
-        {
+        public boolean equals(Object o) {
             boolean equals = false;
-            if( o instanceof AllRolesMode )
-            {
+            if (o instanceof AllRolesMode) {
                 AllRolesMode mode = (AllRolesMode) o;
                 equals = name.equals(mode.name);
             }
             return equals;
         }
+
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return name.hashCode();
         }
+
         @Override
-        public String toString()
-        {
+        public String toString() {
             return name;
         }
     }
 
     private static X509UsernameRetriever createUsernameRetriever(String className)
         throws LifecycleException {
-        if(null == className || "".equals(className.trim()))
+        if(null == className || className.trim().isEmpty())
             return new X509SubjectDnRetriever();
 
         try {
@@ -1514,16 +1534,5 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         } catch (ClassCastException e) {
             throw new LifecycleException(sm.getString("realmBase.createUsernameRetriever.ClassCastException", className), e);
         }
-    }
-
-
-    @Override
-    public String[] getRoles(Principal principal) {
-        if (principal instanceof GenericPrincipal) {
-            return ((GenericPrincipal) principal).getRoles();
-        }
-
-        String className = principal.getClass().getSimpleName();
-        throw new IllegalStateException(sm.getString("realmBase.cannotGetRoles", className));
     }
 }

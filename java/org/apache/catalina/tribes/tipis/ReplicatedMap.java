@@ -159,7 +159,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                     faulty.add(faultyMember.getMember());
                 }
             }
-            Member[] realFaultyMembers = faulty.toArray(new Member[faulty.size()]);
+            Member[] realFaultyMembers = faulty.toArray(new Member[0]);
             if (realFaultyMembers.length != 0) {
                 backup = excludeFromSet(realFaultyMembers, backup);
                 if (backup.length == 0) {

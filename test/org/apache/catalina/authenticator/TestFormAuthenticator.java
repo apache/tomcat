@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,7 +53,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  *    as a path parameter appended to ALL urls within its response. That is
  *    achievable with servlets, jsps, jstl (all of which which can ask for an
  *    encoded url to be inserted into the dynamic web page). It cannot work
- *    with static html.
+ *    with static HTML.
  *    note: this test class uses the Tomcat sample jsps, which conform.
  *
  * 3. Therefore, any webapp that MIGHT need to authenticate a client that
@@ -338,8 +338,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         String originalSessionId = null;
         if (serverWillUseCookies && clientShouldUseCookies) {
             originalSessionId = client.getSessionId();
-        }
-        else {
+        } else {
             originalSessionId = client.extractPathSessionId(loginUri);
         }
         client.reset();
@@ -372,8 +371,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         String newSessionId = null;
         if (serverWillUseCookies && clientShouldUseCookies) {
             newSessionId = client.getSessionId();
-        }
-        else {
+        } else {
             newSessionId = client.extractPathSessionId(protectedUri);
         }
         boolean sessionIdIsChanged = !(originalSessionId.equals(newSessionId));
@@ -420,7 +418,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
      * Encapsulate the logic needed to run a suitably-configured tomcat
      * instance, send it an HTTP request and process the server response
      */
-    private abstract class FormAuthClientBase extends SimpleHttpClient {
+    private abstract static class FormAuthClientBase extends SimpleHttpClient {
 
         protected static final String LOGIN_PARAM_TAG = "action=";
         protected static final String LOGIN_RESOURCE = "j_security_check";
@@ -470,13 +468,11 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             requestHead.append(method).append(" ");
             if (isFullQualUri) {
                 requestHead.append(resourceUri);
-            }
-            else {
+            } else {
                 if (resourceUri == null) {
                     // the default relative url
                     requestHead.append(PROTECTED_RESOURCE_URL);
-                }
-                else {
+                } else {
                     requestHead.append(PROTECTED_RELATIVE_PATH)
                             .append(resourceUri);
                 }
@@ -538,7 +534,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         }
 
         /*
-         * verify the server response html body is the page we expect,
+         * verify the server response HTML body is the page we expect,
          * based on the dialogue position within doTest.
          */
         @Override
@@ -547,7 +543,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         }
 
         /*
-         * verify the server response html body is the page we expect,
+         * verify the server response HTML body is the page we expect,
          * based on the dialogue position given by the caller.
          */
         public boolean isResponseBodyOK(int testPhase) {
@@ -614,8 +610,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
                         SESSION_PATH_PARAMETER_TAILS);
                 if (parser.hasMoreElements()) {
                     sessionId = parser.nextToken();
-                }
-                else {
+                } else {
                     sessionId = url.substring(iStart);
                 }
             }

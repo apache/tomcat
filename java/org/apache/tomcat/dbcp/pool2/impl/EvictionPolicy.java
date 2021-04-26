@@ -37,8 +37,8 @@ public interface EvictionPolicy<T> {
      * @param underTest The pooled object being tested for eviction
      * @param idleCount The current number of idle objects in the pool including
      *                      the object under test
-     * @return <code>true</code> if the object should be evicted, otherwise
-     *             <code>false</code>
+     * @return {@code true} if the object should be evicted, otherwise
+     *             {@code false}
      */
     boolean evict(EvictionConfig config, PooledObject<T> underTest, int idleCount);
 }

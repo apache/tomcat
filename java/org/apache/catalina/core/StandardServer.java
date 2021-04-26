@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
+import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Context;
@@ -56,6 +57,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.StringCache;
+import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 
@@ -185,7 +187,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * The number of threads available to process utility tasks in this service.
      */
-    protected int utilityThreads = 1;
+    protected int utilityThreads = 2;
 
     /**
      * The utility threads daemon flag.
@@ -416,29 +418,24 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     private static int getUtilityThreadsInternal(int utilityThreads) {
         int result = utilityThreads;
-        if (result > 0) {
-            return result;
-        }
-
-        // Zero == Runtime.getRuntime().availableProcessors() / 2
-        // -ve  == Runtime.getRuntime().availableProcessors() / 2 + value
-        // These two are the same
-        result = (Runtime.getRuntime().availableProcessors() / 2) + result;
-        if (result < 1) {
-            result = 1;
+        if (result <= 0) {
+            result = Runtime.getRuntime().availableProcessors() + result;
+            if (result < 2) {
+                result = 2;
+            }
         }
         return result;
     }
 
+
     @Override
     public void setUtilityThreads(int utilityThreads) {
-        if (getUtilityThreadsInternal(utilityThreads) < getUtilityThreadsInternal(this.utilityThreads)) {
+        // Use local copies to ensure thread safety
+        int oldUtilityThreads = this.utilityThreads;
+        if (getUtilityThreadsInternal(utilityThreads) < getUtilityThreadsInternal(oldUtilityThreads)) {
             return;
         }
-        int oldUtilityThreads = this.utilityThreads;
         this.utilityThreads = utilityThreads;
-
-        // Use local copies to ensure thread safety
         if (oldUtilityThreads != utilityThreads && utilityExecutor != null) {
             reconfigureUtilityExecutor(getUtilityThreadsInternal(utilityThreads));
         }
@@ -619,15 +616,14 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                                 Long.valueOf(System.currentTimeMillis() - acceptStartTime)), ste);
                         continue;
                     } catch (AccessControlException ace) {
-                        log.warn("StandardServer.accept security exception: "
-                                + ace.getMessage(), ace);
+                        log.warn(sm.getString("standardServer.accept.security"), ace);
                         continue;
                     } catch (IOException e) {
                         if (stopAwait) {
                             // Wait was aborted with socket.close()
                             break;
                         }
-                        log.error("StandardServer.await: accept: ", e);
+                        log.error(sm.getString("standardServer.accept.error"), e);
                         break;
                     }
 
@@ -643,7 +639,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         try {
                             ch = stream.read();
                         } catch (IOException e) {
-                            log.warn("StandardServer.await: read: ", e);
+                            log.warn(sm.getString("standardServer.accept.readError"), e);
                             ch = -1;
                         }
                         // Control character or EOF (-1) terminates loop
@@ -670,8 +666,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     log.info(sm.getString("standardServer.shutdownViaPort"));
                     break;
                 } else
-                    log.warn("StandardServer.await: Invalid command '"
-                            + command.toString() + "' received");
+                    log.warn(sm.getString("standardServer.invalidShutdownCommand", command.toString()));
             }
         } finally {
             ServerSocket serverSocket = awaitSocket;
@@ -702,9 +697,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             return null;
         }
         synchronized (servicesLock) {
-            for (int i = 0; i < services.length; i++) {
-                if (name.equals(services[i].getName())) {
-                    return services[i];
+            for (Service service : services) {
+                if (name.equals(service.getName())) {
+                    return service;
                 }
             }
         }
@@ -717,9 +712,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     public Service[] findServices() {
-
         return services;
-
     }
 
     /**
@@ -835,7 +828,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     public String toString() {
         StringBuilder sb = new StringBuilder("StandardServer[");
         sb.append(getPort());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -856,14 +849,15 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         try {
             // Note: Hard-coded domain used since this object is per Server/JVM
             ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
-            if (mserver.isRegistered(sname)) {
-                mserver.invoke(sname, "storeConfig", null, null);
+            MBeanServer server = Registry.getRegistry(null, null).getMBeanServer();
+            if (server.isRegistered(sname)) {
+                server.invoke(sname, "storeConfig", null, null);
             } else {
                 log.error(sm.getString("standardServer.storeConfig.notAvailable", sname));
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(t);
+            log.error(sm.getString("standardServer.storeConfig.error"), t);
         }
     }
 
@@ -885,8 +879,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         try {
             // Note: Hard-coded domain used since this object is per Server/JVM
             ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
-            if (mserver.isRegistered(sname)) {
-                mserver.invoke(sname, "store",
+            MBeanServer server = Registry.getRegistry(null, null).getMBeanServer();
+            if (server.isRegistered(sname)) {
+                server.invoke(sname, "store",
                     new Object[] {context},
                     new String [] { "java.lang.String"});
             } else {
@@ -894,7 +889,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(t);
+            log.error(sm.getString("standardServer.storeConfig.contextError", context.getName()), t);
         }
     }
 
@@ -931,19 +926,14 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         // Start our defined Services
         synchronized (servicesLock) {
-            for (int i = 0; i < services.length; i++) {
-                services[i].start();
+            for (Service service : services) {
+                service.start();
             }
         }
 
         if (periodicEventDelay > 0) {
             monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            startPeriodicLifecycleEvent();
-                        }
-                    }, 0, 60, TimeUnit.SECONDS);
+                    () -> startPeriodicLifecycleEvent(), 0, 60, TimeUnit.SECONDS);
         }
     }
 
@@ -959,12 +949,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 }
             }
             periodicLifecycleEventFuture = getUtilityExecutor().scheduleAtFixedRate(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
-                        }
-                    }, periodicEventDelay, periodicEventDelay, TimeUnit.SECONDS);
+                    () -> fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null), periodicEventDelay, periodicEventDelay, TimeUnit.SECONDS);
         }
     }
 
@@ -993,8 +978,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         fireLifecycleEvent(CONFIGURE_STOP_EVENT, null);
 
         // Stop our defined Services
-        for (int i = 0; i < services.length; i++) {
-            services[i].stop();
+        for (Service service : services) {
+            service.stop();
         }
 
         globalNamingResources.stop();
@@ -1046,9 +1031,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                                         f.getName().endsWith(".jar")) {
                                     ExtensionValidator.addSystemResource(f);
                                 }
-                            } catch (URISyntaxException e) {
-                                // Ignore
-                            } catch (IOException e) {
+                            } catch (URISyntaxException | IOException e) {
                                 // Ignore
                             }
                         }
@@ -1058,16 +1041,16 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             }
         }
         // Initialize our defined Services
-        for (int i = 0; i < services.length; i++) {
-            services[i].init();
+        for (Service service : services) {
+            service.init();
         }
     }
 
     @Override
     protected void destroyInternal() throws LifecycleException {
         // Destroy our defined Services
-        for (int i = 0; i < services.length; i++) {
-            services[i].destroy();
+        for (Service service : services) {
+            service.destroy();
         }
 
         globalNamingResources.destroy();
@@ -1148,5 +1131,4 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     public ScheduledExecutorService getUtilityExecutor() {
         return utilityExecutorWrapper;
     }
-
 }

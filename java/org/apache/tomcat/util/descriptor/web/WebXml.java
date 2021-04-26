@@ -32,12 +32,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletContext;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.descriptor.JspPropertyGroupDescriptor;
-import javax.servlet.descriptor.TaglibDescriptor;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.descriptor.JspPropertyGroupDescriptor;
+import jakarta.servlet.descriptor.TaglibDescriptor;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -77,6 +77,19 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
     public void setOverridable(boolean overridable) {
         this.overridable = overridable;
+    }
+
+    /*
+     * Ideally, fragment names will be unique. If they are not, Tomcat needs
+     * to know as the action that the specification requires (see 8.2.2 1.e and
+     * 2.c) varies depending on the ordering method used.
+     */
+    private boolean duplicated = false;
+    public boolean isDuplicated() {
+        return duplicated;
+    }
+    public void setDuplicated(boolean duplicated) {
+        this.duplicated = duplicated;
     }
 
     /**
@@ -169,6 +182,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 majorVersion = 4;
                 minorVersion = 0;
                 break;
+            case "5.0":
+                majorVersion = 5;
+                minorVersion = 0;
+                break;
             default:
                 log.warn(sm.getString("webXml.version.unknown", version));
         }
@@ -220,8 +237,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
     // Derived major and minor version attributes
-    // Default to 4.0 until we know otherwise
-    private int majorVersion = 4;
+    private int majorVersion = 5;
     private int minorVersion = 0;
     public int getMajorVersion() { return majorVersion; }
     public int getMinorVersion() { return minorVersion; }
@@ -283,6 +299,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private final Set<FilterMap> filterMaps = new LinkedHashSet<>();
     private final Set<String> filterMappingNames = new HashSet<>();
     public void addFilterMapping(FilterMap filterMap) {
+        filterMap.setCharset(getCharset());
         filterMaps.add(filterMap);
         filterMappingNames.add(filterMap.getFilterName());
     }
@@ -384,6 +401,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // error-page
     private final Map<String,ErrorPage> errorPages = new HashMap<>();
     public void addErrorPage(ErrorPage errorPage) {
+        errorPage.setCharset(getCharset());
         errorPages.put(errorPage.getName(), errorPage);
     }
     public Map<String,ErrorPage> getErrorPages() { return errorPages; }
@@ -427,6 +445,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Digester will check there is only one of these
     private LoginConfig loginConfig = null;
     public void setLoginConfig(LoginConfig loginConfig) {
+        loginConfig.setCharset(getCharset());
         this.loginConfig = loginConfig;
     }
     public LoginConfig getLoginConfig() { return loginConfig; }
@@ -741,7 +760,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             sb.append("\"http://www.w3.org/2001/XMLSchema-instance\"\n");
             sb.append("         xsi:schemaLocation=\"");
             sb.append(javaeeNamespace);
-            sb.append(" ");
+            sb.append(' ');
             sb.append(webXmlSchemaLocation);
             sb.append("\"\n");
             sb.append("         version=\"");
@@ -2237,6 +2256,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 }
             }
         } else {
+            // Stage 0. Check there were no fragments with duplicate names
+            for (WebXml fragment : fragments.values()) {
+                if (fragment.isDuplicated()) {
+                    throw new IllegalArgumentException(
+                            sm.getString("webXml.duplicateFragment", fragment.getName()));
+                }
+            }
             // Stage 1. Make all dependencies bi-directional - this makes the
             //          next stage simpler.
             for (WebXml fragment : fragments.values()) {
@@ -2365,13 +2391,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             names.add(fragment.getName());
         }
         for (WebXml fragment : group) {
-            Iterator<String> after = fragment.getAfterOrdering().iterator();
-            while (after.hasNext()) {
-                String entry = after.next();
-                if (!names.contains(entry)) {
-                    after.remove();
-                }
-            }
+            fragment.getAfterOrdering().removeIf(entry -> !names.contains(entry));
         }
     }
     private static void orderFragments(Set<WebXml> orderedFragments,

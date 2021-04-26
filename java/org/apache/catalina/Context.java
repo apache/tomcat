@@ -21,12 +21,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletSecurityElement;
-import javax.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletSecurityElement;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.ContextBind;
@@ -398,14 +398,16 @@ public interface Context extends Container, ContextBind {
     /**
      * Obtain the document root for this Context.
      *
-     * @return An absolute pathname, a relative pathname, or a URL.
+     * @return An absolute pathname or a relative (to the Host's appBase)
+     *         pathname.
      */
     public String getDocBase();
 
 
     /**
-     * Set the document root for this Context.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
+     * Set the document root for this Context. This can be either an absolute
+     * pathname or a relative pathname. Relative pathnames are relative to the
+     * containing Host's appBase.
      *
      * @param docBase The new document root
      */
@@ -759,6 +761,30 @@ public interface Context extends Container, ContextBind {
     public String getContainerSciFilter();
 
 
+    /**
+     * @return the value of the parallel annotation scanning flag.  If true,
+     * it will dispatch scanning to the utility executor.
+     * @deprecated This method will be removed in Tomcat 11 onwards
+     */
+    @Deprecated
+    public default boolean isParallelAnnotationScanning() {
+        return getParallelAnnotationScanning();
+    }
+
+    /**
+     * @return the value of the parallel annotation scanning flag.  If true,
+     * it will dispatch scanning to the utility executor.
+     */
+    public boolean getParallelAnnotationScanning();
+
+    /**
+     * Set the parallel annotation scanning value.
+     *
+     * @param parallelAnnotationScanning new parallel annotation scanning flag
+     */
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning);
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -929,6 +955,14 @@ public interface Context extends Container, ContextBind {
 
 
     /**
+     * Factory method to create and return a new InstanceManager
+     * instance. This can be used for framework integration or easier
+     * configuration with custom Context implementations.
+     * @return the instance manager
+     */
+    public InstanceManager createInstanceManager();
+
+    /**
      * Factory method to create and return a new Wrapper instance, of
      * the Java implementation class appropriate for this Context
      * implementation.  The constructor of the instantiated Wrapper
@@ -966,19 +1000,6 @@ public interface Context extends Container, ContextBind {
      * @param errorCode Error code to look up
      */
     public ErrorPage findErrorPage(int errorCode);
-
-
-    /**
-     * @param exceptionType Exception type to look up
-     *
-     * @return the error page entry for the specified Java exception type,
-     *         if any; otherwise return {@code null}.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     *             Use {@link #findErrorPage(Throwable)} instead.
-     */
-    @Deprecated
-    public ErrorPage findErrorPage(String exceptionType);
 
 
     /**
@@ -1100,31 +1121,6 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the context-relative URI of the error page for the specified
-     * HTTP status code, if any; otherwise return <code>null</code>.
-     *
-     * @param status HTTP status code to look up
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     *             Use {@link #findErrorPage(int)} instead.
-     */
-    @Deprecated
-    public String findStatusPage(int status);
-
-
-    /**
-     * @return the set of HTTP status codes for which error pages have
-     * been specified.  If none are specified, a zero-length array
-     * is returned.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     *             Use {@link #findErrorPages()} instead.
-     */
-    @Deprecated
-    public int[] findStatusPages();
-
-
-    /**
      * @return the associated ThreadBindingListener.
      */
     public ThreadBindingListener getThreadBindingListener();
@@ -1177,7 +1173,7 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * Notify all {@link javax.servlet.ServletRequestListener}s that a request
+     * Notify all {@link jakarta.servlet.ServletRequestListener}s that a request
      * has started.
      *
      * @param request The request object that will be passed to the listener
@@ -1187,7 +1183,7 @@ public interface Context extends Container, ContextBind {
     public boolean fireRequestInitEvent(ServletRequest request);
 
     /**
-     * Notify all {@link javax.servlet.ServletRequestListener}s that a request
+     * Notify all {@link jakarta.servlet.ServletRequestListener}s that a request
      * has ended.
      *
      * @param request The request object that will be passed to the listener
@@ -1383,6 +1379,7 @@ public interface Context extends Container, ContextBind {
      */
     public JspConfigDescriptor getJspConfigDescriptor();
 
+
     /**
      * Set the JspConfigDescriptor for this context.
      * A null value indicates there is not JSP configuration.
@@ -1390,6 +1387,7 @@ public interface Context extends Container, ContextBind {
      * @param descriptor the new JSP configuration
      */
     public void setJspConfigDescriptor(JspConfigDescriptor descriptor);
+
 
     /**
      * Add a ServletContainerInitializer instance to this web application.
@@ -1400,6 +1398,7 @@ public interface Context extends Container, ContextBind {
      */
     public void addServletContainerInitializer(
             ServletContainerInitializer sci, Set<Class<?>> classes);
+
 
     /**
      * Is this Context paused whilst it is reloaded?
@@ -1416,9 +1415,10 @@ public interface Context extends Container, ContextBind {
      */
     boolean isServlet22();
 
+
     /**
      * Notification that Servlet security has been dynamically set in a
-     * {@link javax.servlet.ServletRegistration.Dynamic}
+     * {@link jakarta.servlet.ServletRegistration.Dynamic}
      * @param registration Servlet security was modified for
      * @param servletSecurityElement new security constraints for this Servlet
      * @return urls currently mapped to this registration that are already
@@ -1471,7 +1471,7 @@ public interface Context extends Container, ContextBind {
     /**
      * @return The version of this web application, used to differentiate
      * different versions of the same web application when using parallel
-     * deployment.
+     * deployment. If not specified, defaults to the empty string.
      */
     public String getWebappVersion();
 
@@ -1764,7 +1764,7 @@ public interface Context extends Container, ContextBind {
 
     /**
      * Controls whether HTTP 1.1 and later location headers generated by a call
-     * to {@link javax.servlet.http.HttpServletResponse#sendRedirect(String)}
+     * to {@link jakarta.servlet.http.HttpServletResponse#sendRedirect(String)}
      * will use relative or absolute redirects.
      * <p>
      * Relative redirects are more efficient but may not work with reverse
@@ -1784,7 +1784,7 @@ public interface Context extends Container, ContextBind {
 
     /**
      * Will HTTP 1.1 and later location headers generated by a call to
-     * {@link javax.servlet.http.HttpServletResponse#sendRedirect(String)} use
+     * {@link jakarta.servlet.http.HttpServletResponse#sendRedirect(String)} use
      * relative or absolute redirects.
      *
      * @return {@code true} if relative redirects will be used {@code false} if
@@ -1846,7 +1846,7 @@ public interface Context extends Container, ContextBind {
 
     /**
      * Configure if, when returning a context path from {@link
-     * javax.servlet.http.HttpServletRequest#getContextPath()}, the return value
+     * jakarta.servlet.http.HttpServletRequest#getContextPath()}, the return value
      * is allowed to contain multiple leading '/' characters.
      *
      * @param allowMultipleLeadingForwardSlashInPath The new value for the flag
@@ -1856,11 +1856,116 @@ public interface Context extends Container, ContextBind {
 
     /**
      * When returning a context path from {@link
-     * javax.servlet.http.HttpServletRequest#getContextPath()}, is it allowed to
+     * jakarta.servlet.http.HttpServletRequest#getContextPath()}, is it allowed to
      * contain multiple leading '/' characters?
      *
      * @return <code>true</code> if multiple leading '/' characters are allowed,
      *         otherwise <code>false</code>
      */
     public boolean getAllowMultipleLeadingForwardSlashInPath();
+
+
+    public void incrementInProgressAsyncCount();
+
+
+    public void decrementInProgressAsyncCount();
+
+
+    /**
+     * Configure whether Tomcat will attempt to create an upload target used by
+     * this web application if it does not exist when the web application
+     * attempts to use it.
+     *
+     * @param createUploadTargets {@code true} if Tomcat should attempt to
+     *          create the upload target, otherwise {@code false}
+     */
+    public void setCreateUploadTargets(boolean createUploadTargets);
+
+
+    /**
+     * Will Tomcat attempt to create an upload target used by this web
+     * application if it does not exist when the web application attempts to use
+     * it?
+     *
+     * @return {@code true} if Tomcat will attempt to create an upload target
+     *         otherwise {@code false}
+     */
+    public boolean getCreateUploadTargets();
+
+
+    /**
+     * If this is <code>true</code>, every request that is associated with a
+     * session will cause the session's last accessed time to be updated
+     * regardless of whether or not the request explicitly accesses the session.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public boolean getAlwaysAccessSession();
+
+
+    /**
+     * Set the session access behavior.
+     * @param alwaysAccessSession the new flag value
+     */
+    public void setAlwaysAccessSession(boolean alwaysAccessSession);
+
+
+    /**
+     * If this is <code>true</code> then the path passed to
+     * <code>ServletContext.getResource()</code> or
+     * <code>ServletContext.getResourceAsStream()</code> must start with
+     * &quot;/&quot;. If <code>false</code>, code like
+     * <code>getResource("myfolder/myresource.txt")</code> will work as Tomcat
+     * will prepend &quot;/&quot; to the provided path.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public boolean getContextGetResourceRequiresSlash();
+
+
+    /**
+     * Allow using <code>ServletContext.getResource()</code> or
+     * <code>ServletContext.getResourceAsStream()</code> without
+     * a leading &quot;/&quot;.
+     * @param contextGetResourceRequiresSlash the new flag value
+     */
+    public void setContextGetResourceRequiresSlash(boolean contextGetResourceRequiresSlash);
+
+
+    /**
+     * If this is <code>true</code> then any wrapped request or response
+     * object passed to an application dispatcher will be checked to ensure that
+     * it has wrapped the original request or response.
+     * If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+     * <code>true</code>, the default of this setting will be <code>true</code>,
+     * else the default value will be <code>false</code>.
+     * @return the flag value
+     */
+    public boolean getDispatcherWrapsSameObject();
+
+
+    /**
+     * Allow disabling the object wrap check in the request dispatcher.
+     * @param dispatcherWrapsSameObject the new flag value
+     */
+    public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject);
+
+
+    /**
+     * @return <code>true</code> if the resources archive lookup will
+     * use a bloom filter.
+     */
+    public boolean getUseBloomFilterForArchives();
+
+    /**
+     * Set bloom filter flag value.
+     *
+     * @param useBloomFilterForArchives The new fast class path scan flag
+     */
+    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives);
+
 }

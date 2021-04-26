@@ -19,12 +19,12 @@ package org.apache.tomcat.websocket;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.websocket.EncodeException;
-import javax.websocket.Encoder;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Extension;
-import javax.websocket.Extension.Parameter;
-import javax.websocket.MessageHandler;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.Encoder;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Extension;
+import jakarta.websocket.Extension.Parameter;
+import jakarta.websocket.MessageHandler;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -459,11 +459,11 @@ public class TestUtil {
 
     @Test(expected=IllegalArgumentException.class)
     public void testParseExtensionHeaderInvalid01() {
-        Util.parseExtensionHeader(new ArrayList<Extension>(), "ext;a=\"1;b=2");
+        Util.parseExtensionHeader(new ArrayList<>(), "ext;a=\"1;b=2");
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testParseExtensionHeaderInvalid02() {
-        Util.parseExtensionHeader(new ArrayList<Extension>(), "ext;a=1\";b=2");
+        Util.parseExtensionHeader(new ArrayList<>(), "ext;a=1\";b=2");
     }
 }

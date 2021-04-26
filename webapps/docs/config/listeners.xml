@@ -126,14 +126,6 @@
         <p>The default value is <code>off</code>.</p>
       </attribute>
 
-      <attribute name="useAprConnector" required="false">
-        <p>This attribute controls the auto-selection of the connector
-        implementation. When the <strong>protocol</strong> is specified as
-        <code>HTTP/1.1</code> or <code>AJP/1.3</code> then if this attribute is
-        <code>true</code> the APR/native connector will be used but if this
-        attribute is false the NIO connector will be used.</p>
-      </attribute>
-
       <attribute name="useOpenSSL" required="false">
         <p>This attribute controls the auto-selection of the OpenSSL JSSE
         implementation. The default is <code>true</code> which will use OpenSSL
@@ -331,11 +323,7 @@
     <p>The <strong>Security Lifecycle Listener</strong> performs a number of
     security checks when Tomcat starts and prevents Tomcat from starting if they
     fail. The listener is not enabled by default. To enabled it uncomment the
-    listener in $CATALINA_BASE/conf/server.xml. For Tomcat versions before 9.0.7,
-    if the operating system supports umask then the line in
-    $CATALINA_HOME/bin/catalina.sh that obtains the umask also needs to be
-    uncommented. For Tomcat 9.0.7 and later, the umask is automatically
-    passed-into Tomcat.</p>
+    listener in $CATALINA_BASE/conf/server.xml.</p>
 
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
@@ -504,108 +492,6 @@
 
   </subsection>
 
-</section>
-
-<section name="Additional Implementations">
-
-  <subsection name="JMX Remote Lifecycle Listener - org.apache.catalina.mbeans.JmxRemoteLifecycleListener">
-
-    <p>This listener requires <code>catalina-jmx-remote.jar</code> to be placed
-    in <code>$CATALINA_HOME/lib</code>. This jar may be found in the extras
-    directory of the binary download area.</p>
-
-    <p>The <strong>JMX Remote Lifecycle Listener</strong> fixes the ports used by
-    the JMX/RMI Server making things much simpler if you need to connect
-    jconsole or a similar tool to a remote Tomcat instance that is running
-    behind a firewall. Only these ports are configured via the listener. The
-    remainder of the configuration is via the standard system properties for
-    configuring JMX. For further information on configuring JMX see
-    <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/management/agent.html">
-    Monitoring and Management Using JMX</a> included with the Java SDK
-    documentation.</p>
-
-    <p>This listener must only be nested within a <a href="server.html">Server</a>
-    element.</p>
-
-    <p>The following additional attributes are supported by the <strong>JMX Remote
-    Lifecycle Listener</strong>:</p>
-
-    <attributes>
-
-      <attribute name="rmiRegistryPortPlatform" required="true">
-        <p>The port to be used by the JMX/RMI registry for the Platform MBeans.
-        This replaces the use of the
-        <code>com.sun.management.jmxremote.port</code> system property that
-        should not be set when using this listener.</p>
-      </attribute>
-
-      <attribute name="rmiServerPortPlatform" required="true">
-        <p>The port to be used by the Platform JMX/RMI server.</p>
-      </attribute>
-
-      <attribute name="rmiBindAddress" required="false">
-        <p>The address of the interface to be used by JMX/RMI server.</p>
-      </attribute>
-
-      <attribute name="useLocalPorts" required="false">
-        <p>Should any clients using these ports be forced to use local ports to
-        connect to the JMX/RMI server. This is useful when tunnelling
-        connections over SSH or similar. Defaults to <code>false</code>.</p>
-      </attribute>
-
-    </attributes>
-
-    <h3>Using file-based Authentication and Authorisation</h3>
-
-    <p>If this listener was configured in server.xml as:</p>
-  <source><![CDATA[  <Listener className="org.apache.catalina.mbeans.JmxRemoteLifecycleListener"
-          rmiRegistryPortPlatform="10001" rmiServerPortPlatform="10002" />]]></source>
-    <p>with the following system properties set (e.g. in setenv.sh):</p>
-  <source>  -Dcom.sun.management.jmxremote.password.file=$CATALINA_BASE/conf/jmxremote.password
-  -Dcom.sun.management.jmxremote.access.file=$CATALINA_BASE/conf/jmxremote.access
-  -Dcom.sun.management.jmxremote.ssl=false</source>
-    <p>$CATALINA_BASE/conf/jmxremote.password containing:</p>
-  <source>admin letmein</source>
-    <p>$CATALINA_BASE/conf/jmxremote.access containing:</p>
-  <source>admin readwrite</source>
-    <p>then opening ports 10001 (RMI Registry) and 10002 (JMX/RMI Server) in your
-    firewall would enable jconsole to connect to a Tomcat instance running
-    behind a firewall using a connection string of the form:</p>
-  <source>service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrmi</source>
-    <p>
-    with a user name of <code>admin</code> and a password of
-    <code>letmein</code>.
-    </p>
-
-    <h3>Using JAAS</h3>
-
-    <p>If we use the following system properties instead:</p>
-  <source>  -Dcom.sun.management.jmxremote.login.config=Tomcat
-  -Djava.security.auth.login.config=$CATALINA_BASE/conf/login.config
-  -Dcom.sun.management.jmxremote.access.file=$CATALINA_BASE/conf/jmxremote.access
-  -Dcom.sun.management.jmxremote.ssl=false</source>
-    <p>$CATALINA_BASE/conf/login.config containing your choice of JAAS LoginModule implementation, for example:</p>
-  <source>  Tomcat { /* should match to the com.sun.management.jmxremote.login.config property */
-
-    /* for illustration purposes only */
-    com.sun.security.auth.module.LdapLoginModule REQUIRED
-      userProvider="ldap://ldap-svr/ou=people,dc=example,dc=com"
-      userFilter="(&amp;(uid={USERNAME})(objectClass=inetOrgPerson))"
-      authzIdentity="admin"
-      debug=true;
-  };</source>
-    <p>$CATALINA_BASE/conf/jmxremote.access containing:</p>
-  <source>admin readwrite</source>
-    <p>
-    then we would need to provide LDAP credentials instead.
-    </p>
-
-    <p><strong>Note that the examples above do not use SSL. JMX access should
-    be considered equivalent to administrative access and secured accordingly.
-    </strong></p>
-
-  </subsection>
-
   <subsection name="HTTPD mod_heartmonitor Listener - org.apache.catalina.ha.backend.HeartbeatListener">
 
     <p>The <strong>HTTPD mod_heartmonitor Listener</strong> allows tomcat to send heart beat message to
@@ -636,20 +522,19 @@
       </attribute>
 
       <attribute name="Group" required="false">
-        <p>Group is the Multicast IP to boardcast messages to HTTPD, default 224.0.1.105</p>
+        <p>Group is the Multicast IP to broadcast messages to HTTPD, default 224.0.1.105</p>
       </attribute>
 
       <attribute name="Multiport" required="false">
-        <p>Multiport is the Multicast port to boardcast messages to HTTPD, default 23364</p>
+        <p>Multiport is the Multicast port to broadcast messages to HTTPD, default 23364</p>
       </attribute>
 
       <attribute name="Ttl" required="false">
-        <p>Ttl is the TTL for the boardcast messages, default 16</p>
+        <p>Ttl is the TTL for the broadcast messages, default 16</p>
       </attribute>
 
     </attributes>
   </subsection>
-
 </section>
 
 </body>

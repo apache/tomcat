@@ -52,7 +52,7 @@ public final class Room {
      * The number (single char) will be prefixed to the string when sending
      * the message.
      */
-    public static enum MessageType {
+    public enum MessageType {
         /**
          * '0': Error: contains error message.
          */
@@ -341,7 +341,7 @@ public final class Room {
      * Note that if a runnable recursively calls invokeAndWait() with another
      * runnable on this Room, it will not be executed recursively, but instead
      * cached until the original runnable is finished, to keep the behavior of
-     * using a Executor.
+     * using an Executor.
      *
      * @param task The task to be executed
      */
@@ -371,9 +371,9 @@ public final class Room {
 
                 // Run the cached runnables.
                 if (cachedRunnables != null) {
-                    for (int i = 0; i < cachedRunnables.size(); i++) {
+                    for (Runnable cachedRunnable : cachedRunnables) {
                         if (!closed) {
-                            cachedRunnables.get(i).run();
+                            cachedRunnable.run();
                         }
                     }
                     cachedRunnables = null;

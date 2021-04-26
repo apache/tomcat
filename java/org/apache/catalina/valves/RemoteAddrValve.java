@@ -19,7 +19,7 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -44,11 +44,14 @@ public final class RemoteAddrValve extends RequestFilterValve {
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         String property;
-        if (getAddConnectorPort()) {
-            property = request.getRequest().getRemoteAddr() + ";" +
-                    request.getConnector().getPortWithOffset();
+        if (getUsePeerAddress()) {
+            property = request.getPeerAddr();
         } else {
             property = request.getRequest().getRemoteAddr();
+        }
+        if (getAddConnectorPort()) {
+            property = property + ";" +
+                request.getConnector().getPortWithOffset();
         }
         process(property, request, response);
     }

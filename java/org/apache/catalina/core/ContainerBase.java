@@ -91,33 +91,33 @@ import org.apache.tomcat.util.threads.InlineExecutorService;
  *     <th>Description</th>
  *   </tr>
  *   <tr>
- *     <td align=center><code>addChild</code></td>
- *     <td align=center><code>Container</code></td>
+ *     <td><code>addChild</code></td>
+ *     <td><code>Container</code></td>
  *     <td>Child container added to this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>{@link #getPipeline() pipeline}.addValve</code></td>
- *     <td align=center><code>Valve</code></td>
+ *     <td><code>{@link #getPipeline() pipeline}.addValve</code></td>
+ *     <td><code>Valve</code></td>
  *     <td>Valve added to this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>removeChild</code></td>
- *     <td align=center><code>Container</code></td>
+ *     <td><code>removeChild</code></td>
+ *     <td><code>Container</code></td>
  *     <td>Child container removed from this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>{@link #getPipeline() pipeline}.removeValve</code></td>
- *     <td align=center><code>Valve</code></td>
+ *     <td><code>{@link #getPipeline() pipeline}.removeValve</code></td>
+ *     <td><code>Valve</code></td>
  *     <td>Valve removed from this Container.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>start</code></td>
- *     <td align=center><code>null</code></td>
+ *     <td><code>start</code></td>
+ *     <td><code>null</code></td>
  *     <td>Container was started.</td>
  *   </tr>
  *   <tr>
- *     <td align=center><code>stop</code></td>
- *     <td align=center><code>null</code></td>
+ *     <td><code>stop</code></td>
+ *     <td><code>null</code></td>
  *     <td>Container was stopped.</td>
  *   </tr>
  * </table>
@@ -421,7 +421,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) oldCluster).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setCluster: stop: ", e);
+                    log.error(sm.getString("containerBase.cluster.stop"), e);
                 }
             }
 
@@ -434,7 +434,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) cluster).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setCluster: start: ", e);
+                    log.error(sm.getString("containerBase.cluster.start"), e);
                 }
             }
         } finally {
@@ -635,7 +635,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) oldRealm).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setRealm: stop: ", e);
+                    log.error(sm.getString("containerBase.realm.stop"), e);
                 }
             }
 
@@ -647,7 +647,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) realm).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setRealm: start: ", e);
+                    log.error(sm.getString("containerBase.realm.start"), e);
                 }
             }
 
@@ -693,16 +693,19 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     private void addChildInternal(Container child) {
 
-        if( log.isDebugEnabled() )
+        if (log.isDebugEnabled()) {
             log.debug("Add child " + child + " " + this);
+        }
+
         synchronized(children) {
             if (children.get(child.getName()) != null)
-                throw new IllegalArgumentException("addChild:  Child name '" +
-                                                   child.getName() +
-                                                   "' is not unique");
+                throw new IllegalArgumentException(
+                        sm.getString("containerBase.child.notUnique", child.getName()));
             child.setParent(this);  // May throw IAE
             children.put(child.getName(), child);
         }
+
+        fireContainerEvent(ADD_CHILD_EVENT, child);
 
         // Start child
         // Don't do this inside sync block - start can be a slow process and
@@ -714,10 +717,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 child.start();
             }
         } catch (LifecycleException e) {
-            log.error("ContainerBase.addChild: start: ", e);
-            throw new IllegalStateException("ContainerBase.addChild: start: " + e);
-        } finally {
-            fireContainerEvent(ADD_CHILD_EVENT, child);
+            throw new IllegalStateException(sm.getString("containerBase.child.start"), e);
         }
     }
 
@@ -805,18 +805,24 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 child.stop();
             }
         } catch (LifecycleException e) {
-            log.error("ContainerBase.removeChild: stop: ", e);
+            log.error(sm.getString("containerBase.child.stop"), e);
         }
 
+        boolean destroy = false;
         try {
             // child.destroy() may have already been called which would have
             // triggered this call. If that is the case, no need to destroy the
             // child again.
             if (!LifecycleState.DESTROYING.equals(child.getState())) {
                 child.destroy();
+                destroy = true;
             }
         } catch (LifecycleException e) {
-            log.error("ContainerBase.removeChild: destroy: ", e);
+            log.error(sm.getString("containerBase.child.destroy"), e);
+        }
+
+        if (!destroy) {
+            fireContainerEvent(REMOVE_CHILD_EVENT, child);
         }
 
         synchronized(children) {
@@ -825,7 +831,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             children.remove(child.getName());
         }
 
-        fireContainerEvent(REMOVE_CHILD_EVENT, child);
     }
 
 
@@ -860,11 +865,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
-    /*
-     * Implementation note: If there is a demand for more control than this then
-     * it is likely that the best solution will be to reference an external
-     * executor.
-     */
     private void reconfigureStartStopExecutor(int threads) {
         if (threads == 1) {
             // Use a fake executor
@@ -905,8 +905,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Start our child containers, if any
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
-        for (int i = 0; i < children.length; i++) {
-            results.add(startStopExecutor.submit(new StartChild(children[i])));
+        for (Container child : children) {
+            results.add(startStopExecutor.submit(new StartChild(child)));
         }
 
         MultiThrowable multiThrowable = null;
@@ -972,8 +972,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Stop our child containers, if any
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
-        for (int i = 0; i < children.length; i++) {
-            results.add(startStopExecutor.submit(new StopChild(children[i])));
+        for (Container child : children) {
+            results.add(startStopExecutor.submit(new StopChild(child)));
         }
 
         boolean fail = false;
@@ -1256,7 +1256,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 names.add(next.getObjectName());
             }
         }
-        return names.toArray(new ObjectName[names.size()]);
+        return names.toArray(new ObjectName[0]);
     }
 
 
@@ -1352,9 +1352,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 }
                 container.backgroundProcess();
                 Container[] children = container.findChildren();
-                for (int i = 0; i < children.length; i++) {
-                    if (children[i].getBackgroundProcessorDelay() <= 0) {
-                        processChildren(children[i]);
+                for (Container child : children) {
+                    if (child.getBackgroundProcessorDelay() <= 0) {
+                        processChildren(child);
                     }
                 }
             } catch (Throwable t) {

@@ -18,8 +18,8 @@ package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.Method;
 
-import javax.websocket.PongMessage;
-import javax.websocket.Session;
+import jakarta.websocket.PongMessage;
+import jakarta.websocket.Session;
 
 /**
  * PongMessage specific concrete implementation for handling whole messages.

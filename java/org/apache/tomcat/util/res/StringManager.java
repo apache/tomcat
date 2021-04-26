@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
 /**
  * An internationalization / localization helper class which reduces
  * the bother of handling ResourceBundles and takes care of the
- * common cases of message formating which otherwise require the
+ * common cases of message formatting which otherwise require the
  * creation of Object arrays and such.
  *
  * <p>The StringManager operates on a package basis. One StringManager
@@ -72,6 +72,13 @@ public class StringManager {
         String bundleName = packageName + ".LocalStrings";
         ResourceBundle bnd = null;
         try {
+            // The ROOT Locale uses English. If English is requested, force the
+            // use of the ROOT Locale else incorrect results may be obtained if
+            // the system default locale is not English and translations are
+            // available for the system default locale.
+            if (locale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+                locale = Locale.ROOT;
+            }
             bnd = ResourceBundle.getBundle(bundleName, locale);
         } catch (MissingResourceException ex) {
             // Try from the current loader (that's the case for trusted apps)

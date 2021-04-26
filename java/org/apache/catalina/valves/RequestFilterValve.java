@@ -20,8 +20,8 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -138,6 +138,13 @@ public abstract class RequestFilterValve extends ValveBase {
      * using a ";" as a separator.
      */
     private volatile boolean addConnectorPort = false;
+
+    /**
+     * Flag deciding whether we use the connection peer address
+     * or the remote address. This makes a dfifference when
+     * using AJP or the RemoteIpValve.
+     */
+    private volatile boolean usePeerAddress = false;
 
     // ------------------------------------------------------------- Properties
 
@@ -286,6 +293,29 @@ public abstract class RequestFilterValve extends ValveBase {
      */
     public void setAddConnectorPort(boolean addConnectorPort) {
         this.addConnectorPort = addConnectorPort;
+    }
+
+
+    /**
+     * Get the flag deciding whether we use the connection peer address
+     * or the remote address. This makes a dfifference when
+     * using AJP or the RemoteIpValve.
+     * @return <code>true</code> if we use the connection peer address
+     */
+    public boolean getUsePeerAddress() {
+        return usePeerAddress;
+    }
+
+
+    /**
+     * Set the flag deciding whether we use the connection peer address
+     * or the remote address. This makes a dfifference when
+     * using AJP or the RemoteIpValve.
+     *
+     * @param usePeerAddress The new flag
+     */
+    public void setUsePeerAddress(boolean usePeerAddress) {
+        this.usePeerAddress = usePeerAddress;
     }
 
     // --------------------------------------------------------- Public Methods

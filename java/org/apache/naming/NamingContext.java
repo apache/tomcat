@@ -39,6 +39,7 @@ import javax.naming.OperationNotSupportedException;
 import javax.naming.Reference;
 import javax.naming.Referenceable;
 import javax.naming.spi.NamingManager;
+import javax.naming.spi.ObjectFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -73,7 +74,7 @@ public class NamingContext implements Context {
      * @param name The name of the associated Catalina Context
      */
     public NamingContext(Hashtable<String,Object> env, String name) {
-        this(env, name, new HashMap<String,NamingEntry>());
+        this(env, name, new HashMap<>());
     }
 
 
@@ -791,6 +792,21 @@ public class NamingContext implements Context {
     // ------------------------------------------------------ Protected Methods
 
 
+    private static final boolean GRAAL;
+
+    static {
+        boolean result = false;
+        try {
+            Class<?> nativeImageClazz = Class.forName("org.graalvm.nativeimage.ImageInfo");
+            result = Boolean.TRUE.equals(nativeImageClazz.getMethod("inImageCode").invoke(null));
+        } catch (ClassNotFoundException e) {
+            // Must be Graal
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            // Should never happen
+        }
+        GRAAL = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
+    }
+
     /**
      * Retrieves the named object.
      *
@@ -836,9 +852,19 @@ public class NamingContext implements Context {
                 }
             } else if (entry.type == NamingEntry.REFERENCE) {
                 try {
-                    Object obj = NamingManager.getObjectInstance
-                        (entry.value, name, this, env);
-                    if(entry.value instanceof ResourceRef) {
+                    Object obj = null;
+                    if (!GRAAL) {
+                        obj = NamingManager.getObjectInstance(entry.value, name, this, env);
+                    } else {
+                        // NamingManager.getObjectInstance would simply return the reference here
+                        // Use the configured object factory to resolve it directly if possible
+                        // Note: This may need manual constructor reflection configuration
+                        Reference reference = (Reference) entry.value;
+                        Class<?> factoryClass = getClass().getClassLoader().loadClass(reference.getFactoryClassName());
+                        ObjectFactory factory = (ObjectFactory) factoryClass.newInstance();
+                        obj = factory.getObjectInstance(entry.value, name, this, env);
+                    }
+                    if (entry.value instanceof ResourceRef) {
                         boolean singleton = Boolean.parseBoolean(
                                     (String) ((ResourceRef) entry.value).get(
                                         "singleton").getContent());
@@ -846,6 +872,9 @@ public class NamingContext implements Context {
                             entry.type = NamingEntry.ENTRY;
                             entry.value = obj;
                         }
+                    }
+                    if (obj == null) {
+                        throw new NamingException(sm.getString("namingContext.failResolvingReference"));
                     }
                     return obj;
                 } catch (NamingException e) {

@@ -21,8 +21,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.descriptor.JspPropertyGroupDescriptor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class TestJspCServletContext {
         File appDir = new File("test/webapp");
         JspCServletContext context = new JspCServletContext(
                 null, appDir.toURI().toURL(), null, false, false);
-        Assert.assertEquals(4, context.getEffectiveMajorVersion());
+        Assert.assertEquals(5, context.getEffectiveMajorVersion());
         Assert.assertEquals(0, context.getEffectiveMinorVersion());
         JspConfigDescriptor jspConfigDescriptor =
                 context.getJspConfigDescriptor();
@@ -123,13 +123,22 @@ public class TestJspCServletContext {
         Assert.assertEquals(0, context.getEffectiveMinorVersion());
     }
 
+    @Test
+    public void testWebapp_5_0() throws Exception {
+        File appDir = new File("test/webapp-5.0");
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
+        Assert.assertEquals(5, context.getEffectiveMajorVersion());
+        Assert.assertEquals(0, context.getEffectiveMinorVersion());
+    }
+
 
     @Test
     public void testWebresources() throws Exception {
         File appDir = new File("test/webresources/dir1");
         JspCServletContext context = new JspCServletContext(
                 null, appDir.toURI().toURL(), null, false, false);
-        Assert.assertEquals(4, context.getEffectiveMajorVersion());
+        Assert.assertEquals(5, context.getEffectiveMajorVersion());
         Assert.assertEquals(0, context.getEffectiveMinorVersion());
     }
 
@@ -141,7 +150,7 @@ public class TestJspCServletContext {
                 null, appDir.toURI().toURL(), null, false, false);
 
         Set<String> paths = context.getResourcePaths("/");
-        Assert.assertEquals(paths.size(), 10);
+        Assert.assertEquals(10, paths.size());
         Assert.assertTrue(paths.contains("/WEB-INF/"));
         Assert.assertTrue(paths.contains("/folder/"));
         Assert.assertTrue(paths.contains("/'singlequote.jsp"));
@@ -152,5 +161,11 @@ public class TestJspCServletContext {
         Assert.assertTrue(paths.contains("/resourceB.jsp"));
         Assert.assertTrue(paths.contains("/resourceF.jsp"));
         Assert.assertTrue(paths.contains("/warDirContext.jsp"));
+
+        paths = context.getResourcePaths("/folder/");
+        Assert.assertEquals(3, paths.size());
+        Assert.assertTrue(paths.contains("/folder/resourceC.jsp"));
+        Assert.assertTrue(paths.contains("/folder/resourceD.jsp"));
+        Assert.assertTrue(paths.contains("/folder/resourceE.jsp"));
     }
 }

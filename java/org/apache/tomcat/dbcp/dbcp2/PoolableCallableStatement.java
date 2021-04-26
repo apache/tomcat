@@ -21,6 +21,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
@@ -67,9 +68,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
 
         // Remove from trace now because this statement will be
         // added by the activate method.
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().removeTrace(this);
-        }
+        removeThisTrace(getConnectionInternal());
     }
 
     /**
@@ -81,9 +80,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
         if (!isClosed()) {
             try {
                 pool.returnObject(key, this);
-            } catch (final SQLException e) {
-                throw e;
-            } catch (final RuntimeException e) {
+            } catch (final SQLException | RuntimeException e) {
                 throw e;
             } catch (final Exception e) {
                 throw new SQLException("Cannot close CallableStatement (return to pool failed)", e);
@@ -115,21 +112,29 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
     @Override
     public void passivate() throws SQLException {
         setClosedInternal(true);
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().removeTrace(this);
-        }
+        removeThisTrace(getConnectionInternal());
 
         // The JDBC spec requires that a statement close any open
         // ResultSet's when it is closed.
         // FIXME The PreparedStatement we're wrapping should handle this for us.
         // See DBCP-10 for what could happen when ResultSets are closed twice.
-        final List<AbandonedTrace> resultSets = getTrace();
-        if (resultSets != null) {
-            final ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
-            for (final ResultSet element : set) {
-                element.close();
+        final List<AbandonedTrace> resultSetList = getTrace();
+        if (resultSetList != null) {
+            final List<Exception> thrownList = new ArrayList<>();
+            final ResultSet[] resultSets = resultSetList.toArray(Utils.EMPTY_RESULT_SET_ARRAY);
+            for (final ResultSet resultSet : resultSets) {
+                if (resultSet != null) {
+                    try {
+                        resultSet.close();
+                    } catch (final Exception e) {
+                        thrownList.add(e);
+                    }
+                }
             }
             clearTrace();
+            if (!thrownList.isEmpty()) {
+                throw new SQLExceptionList(thrownList);
+            }
         }
 
         super.passivate();

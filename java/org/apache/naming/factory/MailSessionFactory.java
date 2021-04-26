@@ -23,14 +23,15 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
+
+import jakarta.mail.Authenticator;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
 
 /**
  * <p>Factory class that creates a JNDI named JavaMail Session factory,
@@ -49,7 +50,7 @@ import javax.naming.spi.ObjectFactory;
  * configuration file.  An example of factory configuration is:</p>
  * <pre>
  * &lt;Resource name="mail/smtp" auth="CONTAINER"
- *           type="javax.mail.Session"/&gt;
+ *           type="jakarta.mail.Session"/&gt;
  * &lt;ResourceParams name="mail/smtp"&gt;
  *   &lt;parameter&gt;
  *     &lt;name&gt;factory&lt;/name&gt;
@@ -70,7 +71,7 @@ public class MailSessionFactory implements ObjectFactory {
     /**
      * The Java type for which this factory knows how to create objects.
      */
-    protected static final String factoryType = "javax.mail.Session";
+    protected static final String factoryType = "jakarta.mail.Session";
 
 
     /**
@@ -101,55 +102,52 @@ public class MailSessionFactory implements ObjectFactory {
         // exceptions.
         //
         // Bugzilla 31288, 33077: add support for authentication.
-        return AccessController.doPrivileged(new PrivilegedAction<Session>() {
-                @Override
-                public Session run() {
+        return AccessController.doPrivileged((PrivilegedAction<Session>) () -> {
 
-                    // Create the JavaMail properties we will use
-                    Properties props = new Properties();
-                    props.put("mail.transport.protocol", "smtp");
-                    props.put("mail.smtp.host", "localhost");
+            // Create the JavaMail properties we will use
+            Properties props = new Properties();
+            props.put("mail.transport.protocol", "smtp");
+            props.put("mail.smtp.host", "localhost");
 
-                    String password = null;
+            String password = null;
 
-                    Enumeration<RefAddr> attrs = ref.getAll();
-                    while (attrs.hasMoreElements()) {
-                        RefAddr attr = attrs.nextElement();
-                        if ("factory".equals(attr.getType())) {
-                            continue;
-                        }
-
-                        if ("password".equals(attr.getType())) {
-                            password = (String) attr.getContent();
-                            continue;
-                        }
-
-                        props.put(attr.getType(), attr.getContent());
-                    }
-
-                    Authenticator auth = null;
-                    if (password != null) {
-                        String user = props.getProperty("mail.smtp.user");
-                        if(user == null) {
-                            user = props.getProperty("mail.user");
-                        }
-
-                        if(user != null) {
-                            final PasswordAuthentication pa = new PasswordAuthentication(user, password);
-                            auth = new Authenticator() {
-                                    @Override
-                                    protected PasswordAuthentication getPasswordAuthentication() {
-                                        return pa;
-                                    }
-                                };
-                        }
-                    }
-
-                    // Create and return the new Session object
-                    Session session = Session.getInstance(props, auth);
-                    return session;
-
+            Enumeration<RefAddr> attrs = ref.getAll();
+            while (attrs.hasMoreElements()) {
+                RefAddr attr = attrs.nextElement();
+                if ("factory".equals(attr.getType())) {
+                    continue;
                 }
-        } );
+
+                if ("password".equals(attr.getType())) {
+                    password = (String) attr.getContent();
+                    continue;
+                }
+
+                props.put(attr.getType(), attr.getContent());
+            }
+
+            Authenticator auth = null;
+            if (password != null) {
+                String user = props.getProperty("mail.smtp.user");
+                if(user == null) {
+                    user = props.getProperty("mail.user");
+                }
+
+                if(user != null) {
+                    final PasswordAuthentication pa = new PasswordAuthentication(user, password);
+                    auth = new Authenticator() {
+                            @Override
+                            protected PasswordAuthentication getPasswordAuthentication() {
+                                return pa;
+                            }
+                        };
+                }
+            }
+
+            // Create and return the new Session object
+            Session session = Session.getInstance(props, auth);
+            return session;
+
+        });
     }
 }

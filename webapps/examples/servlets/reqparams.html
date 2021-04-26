@@ -27,8 +27,8 @@
 <font color="#0000FF"></font>
 <pre><font color="#0000FF">import</font> java.io.*;
 <font color="#0000FF">import</font> java.util.*;
-<font color="#0000FF">import</font> javax.servlet.*;
-<font color="#0000FF">import</font> javax.servlet.http.*;
+<font color="#0000FF">import</font> jakarta.servlet.*;
+<font color="#0000FF">import</font> jakarta.servlet.http.*;
 
 <font color="#0000FF">public class</font> RequestParamExample <font color="#0000FF">extends</font> HttpServlet {
 
@@ -44,6 +44,10 @@
         out.println(&quot;<font color="#009900">&lt;body&gt;</font>&quot;);
         out.println(&quot;<font color="#009900">&lt;h3&gt;Request Parameters Example&lt;/h3&gt;</font>&quot;);
         out.println(&quot;<font color="#009900">Parameters in this request:&lt;br&gt;</font>&quot;);
+
+        String firstName = request.getParameter("firstname");
+        String lastName = request.getParameter("lastname");
+
         if (firstName != null || lastName != null) {
             out.println(&quot;<font color="#009900">First Name:</font>&quot;);
             out.println(&quot;<font color="#009900"> = </font>&quot; + HTMLFilter.filter(firstName) + &quot;<font color="#009900">&lt;br&gt;</font>&quot;);

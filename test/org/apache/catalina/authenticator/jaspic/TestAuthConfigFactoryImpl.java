@@ -23,9 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.security.auth.message.config.AuthConfigFactory;
-import javax.security.auth.message.config.AuthConfigProvider;
-import javax.security.auth.message.config.RegistrationListener;
+import jakarta.security.auth.message.config.AuthConfigFactory;
+import jakarta.security.auth.message.config.AuthConfigProvider;
+import jakarta.security.auth.message.config.RegistrationListener;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -41,19 +41,19 @@ public class TestAuthConfigFactoryImpl {
 
     @Test
     public void testRegistrationNullLayer() {
-        doTestResistration(null,  "AC_1",  ":AC_1");
+        doTestRegistration(null,  "AC_1",  ":AC_1");
     }
 
 
     @Test
     public void testRegistrationNullAppContext() {
-        doTestResistration("L_1",  null,  "L_1:");
+        doTestRegistration("L_1",  null,  "L_1:");
     }
 
 
     @Test
     public void testRegistrationNullLayerAndNullAppContext() {
-        doTestResistration(null,  null,  ":");
+        doTestRegistration(null,  null,  ":");
     }
 
 
@@ -151,7 +151,7 @@ public class TestAuthConfigFactoryImpl {
     }
 
 
-    private void doTestResistration(String layer, String appContext, String expectedRegId) {
+    private void doTestRegistration(String layer, String appContext, String expectedRegId) {
         AuthConfigFactory factory = new AuthConfigFactoryImpl();
         AuthConfigProvider acp1 = new SimpleAuthConfigProvider(null, null);
         SimpleRegistrationListener listener = new SimpleRegistrationListener(layer, appContext);

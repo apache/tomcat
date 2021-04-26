@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * The simplest possible servlet.
@@ -56,7 +56,7 @@ public class HelloWorldExample extends HttpServlet {
 
         // note that all links are created to be relative. this
         // ensures that we can move the web application that this
-        // servlet belongs to to a different place in the url
+        // servlet belongs to a different place in the url
         // tree and not have any harmful side effects.
 
         // XXX

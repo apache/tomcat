@@ -19,12 +19,9 @@ package org.apache.catalina.core;
 
 import java.util.concurrent.Executor;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
-import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
@@ -52,8 +49,7 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * This listener must be declared in server.xml to be active.
  *
  */
-public class ThreadLocalLeakPreventionListener implements LifecycleListener,
-        ContainerListener {
+public class ThreadLocalLeakPreventionListener extends FrameworkListener {
 
     private static final Log log =
         LogFactory.getLog(ThreadLocalLeakPreventionListener.class);
@@ -73,17 +69,9 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         try {
-            Lifecycle lifecycle = event.getLifecycle();
-            if (Lifecycle.AFTER_START_EVENT.equals(event.getType()) &&
-                    lifecycle instanceof Server) {
-                // when the server starts, we register ourself as listener for
-                // all context
-                // as well as container event listener so that we know when new
-                // Context are deployed
-                Server server = (Server) lifecycle;
-                registerListenersForServer(server);
-            }
+            super.lifecycleEvent(event);
 
+            Lifecycle lifecycle = event.getLifecycle();
             if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType()) &&
                     lifecycle instanceof Server) {
                 // Server is shutting down, so thread pools will be shut down so
@@ -107,14 +95,7 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
     @Override
     public void containerEvent(ContainerEvent event) {
         try {
-            String type = event.getType();
-            if (Container.ADD_CHILD_EVENT.equals(type)) {
-                processContainerAddChild(event.getContainer(),
-                    (Container) event.getData());
-            } else if (Container.REMOVE_CHILD_EVENT.equals(type)) {
-                processContainerRemoveChild(event.getContainer(),
-                    (Container) event.getData());
-            }
+            super.containerEvent(event);
         } catch (Exception e) {
             String msg =
                 sm.getString(
@@ -123,66 +104,6 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
             log.error(msg, e);
         }
 
-    }
-
-    private void registerListenersForServer(Server server) {
-        for (Service service : server.findServices()) {
-            Engine engine = service.getContainer();
-            if (engine != null) {
-                engine.addContainerListener(this);
-                registerListenersForEngine(engine);
-            }
-        }
-
-    }
-
-    private void registerListenersForEngine(Engine engine) {
-        for (Container hostContainer : engine.findChildren()) {
-            Host host = (Host) hostContainer;
-            host.addContainerListener(this);
-            registerListenersForHost(host);
-        }
-    }
-
-    private void registerListenersForHost(Host host) {
-        for (Container contextContainer : host.findChildren()) {
-            Context context = (Context) contextContainer;
-            registerContextListener(context);
-        }
-    }
-
-    private void registerContextListener(Context context) {
-        context.addLifecycleListener(this);
-    }
-
-    protected void processContainerAddChild(Container parent, Container child) {
-        if (log.isDebugEnabled())
-            log.debug("Process addChild[parent=" + parent + ",child=" + child +
-                "]");
-
-        if (child instanceof Context) {
-            registerContextListener((Context) child);
-        } else if (child instanceof Engine) {
-            registerListenersForEngine((Engine) child);
-        } else if (child instanceof Host) {
-            registerListenersForHost((Host) child);
-        }
-
-    }
-
-    protected void processContainerRemoveChild(Container parent,
-        Container child) {
-
-        if (log.isDebugEnabled())
-            log.debug("Process removeChild[parent=" + parent + ",child=" +
-                child + "]");
-
-        if (child instanceof Context) {
-            Context context = (Context) child;
-            context.removeLifecycleListener(this);
-        } else if (child instanceof Host || child instanceof Engine) {
-            child.removeContainerListener(this);
-        }
     }
 
     /**
@@ -226,5 +147,10 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
 
             }
         }
+    }
+
+    @Override
+    protected LifecycleListener createLifecycleListener(Context context) {
+        return this;
     }
 }

@@ -16,9 +16,10 @@
  */
 package org.apache.tomcat.websocket;
 
-import javax.websocket.ContainerProvider;
-import javax.websocket.WebSocketContainer;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.WebSocketContainer;
 
+@aQute.bnd.annotation.spi.ServiceProvider(value=ContainerProvider.class)
 public class WsContainerProvider extends ContainerProvider {
 
     @Override

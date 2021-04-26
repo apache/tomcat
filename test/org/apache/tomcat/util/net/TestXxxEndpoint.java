@@ -19,19 +19,21 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Error;
 import org.apache.tomcat.jni.Library;
-import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Pool;
-import org.apache.tomcat.jni.Socket;
+import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Test case for the Endpoint implementations. The testing framework will ensure
@@ -50,6 +52,12 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         }
     }
 
+    /*
+     * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+     *              10.1.x onwards to only those components required to provide
+     *              OpenSSL integration with the NIO and NIO2 connectors.
+     */
+    @Deprecated
     private long createAprSocket(int port, long pool)
                  throws Exception {
         /**
@@ -60,32 +68,34 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         String address = InetAddress.getByName("localhost").getHostAddress();
 
         // Create the APR address that will be bound
-        int family = Socket.APR_INET;
+        int family = org.apache.tomcat.jni.Socket.APR_INET;
         if (Library.APR_HAVE_IPV6) {
-            if (!OS.IS_BSD && !OS.IS_WIN32 && !OS.IS_WIN64)
-                family = Socket.APR_UNSPEC;
+            if (!org.apache.tomcat.jni.OS.IS_BSD && !org.apache.tomcat.jni.OS.IS_WIN32 &&
+                    !org.apache.tomcat.jni.OS.IS_WIN64) {
+                family = org.apache.tomcat.jni.Socket.APR_UNSPEC;
+            }
          }
 
         long inetAddress = 0;
         try {
-            inetAddress = Address.info(address, family,
+            inetAddress = org.apache.tomcat.jni.Address.info(address, family,
                                        port, 0, pool);
             // Create the APR server socket
-            serverSock = Socket.create(Address.getInfo(inetAddress).family,
-                                       Socket.SOCK_STREAM,
-                                       Socket.APR_PROTO_TCP, pool);
+            serverSock = org.apache.tomcat.jni.Socket.create(org.apache.tomcat.jni.Address.getInfo(inetAddress).family,
+                    org.apache.tomcat.jni.Socket.SOCK_STREAM,
+                    org.apache.tomcat.jni.Socket.APR_PROTO_TCP, pool);
         } catch (Exception ex) {
             log.error("Could not create socket for address '" + address + "'");
             return 0;
         }
 
-        if (OS.IS_UNIX) {
-            Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
+        if (org.apache.tomcat.jni.OS.IS_UNIX) {
+            org.apache.tomcat.jni.Socket.optSet(serverSock, org.apache.tomcat.jni.Socket.APR_SO_REUSEADDR, 1);
         }
         // Deal with the firewalls that tend to drop the inactive sockets
-        Socket.optSet(serverSock, Socket.APR_SO_KEEPALIVE, 1);
+        org.apache.tomcat.jni.Socket.optSet(serverSock, org.apache.tomcat.jni.Socket.APR_SO_KEEPALIVE, 1);
         // Bind the server socket
-        int ret = Socket.bind(serverSock, inetAddress);
+        int ret = org.apache.tomcat.jni.Socket.bind(serverSock, inetAddress);
         if (ret != 0) {
             log.error("Could not bind: " + Error.strerror(ret));
             throw (new Exception(Error.strerror(ret)));
@@ -93,11 +103,17 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         return serverSock;
     }
 
+    /*
+     * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+     *              10.1.x onwards to only those components required to provide
+     *              OpenSSL integration with the NIO and NIO2 connectors.
+     */
+    @Deprecated
     private void destroyAprSocket(long serverSock, long pool) {
         if (serverSock != 0) {
-            Socket.shutdown(serverSock, Socket.APR_SHUTDOWN_READWRITE);
-            Socket.close(serverSock);
-            Socket.destroy(serverSock);
+            org.apache.tomcat.jni.Socket.shutdown(serverSock, org.apache.tomcat.jni.Socket.APR_SHUTDOWN_READWRITE);
+            org.apache.tomcat.jni.Socket.close(serverSock);
+            org.apache.tomcat.jni.Socket.destroy(serverSock);
         }
 
         if (pool != 0) {
@@ -155,7 +171,7 @@ public class TestXxxEndpoint extends TomcatBaseTest {
     public void testStartStopBindOnStart() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Connector c = tomcat.getConnector();
-        c.setProperty("bindOnInit", "false");
+        Assert.assertTrue(c.setProperty("bindOnInit", "false"));
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
@@ -194,5 +210,28 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         }
         Assert.assertNull(e);
         tomcat.getConnector().start();
+    }
+
+    @Test
+    public void testUnixDomainSocket() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Connector c = tomcat.getConnector();
+        Assume.assumeTrue("NIO Unix domain sockets have to be supported for this test",
+                c.getProtocolHandlerClassName().contains("NioProtocol")
+                && JreCompat.isJre16Available());
+
+        final String unixDomainSocketPath = "/tmp/testUnixDomainSocket";
+        Assert.assertTrue(c.setProperty("unixDomainSocketPath", unixDomainSocketPath));
+        tomcat.start();
+
+        SocketAddress sa = JreCompat.getInstance().getUnixDomainSocketAddress(unixDomainSocketPath);
+        ByteBuffer response = ByteBuffer.allocate(1024);
+        try (SocketChannel socket = JreCompat.getInstance().openUnixDomainSocketChannel()) {
+            socket.connect(sa);
+            socket.write(ByteBuffer.wrap("OPTIONS * HTTP/1.0\r\n\r\n".getBytes()));
+            socket.read(response);
+        }
+
+        Assert.assertTrue((new String(response.array(), 0, response.position()).startsWith("HTTP/1.1 200")));
     }
 }

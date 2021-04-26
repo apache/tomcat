@@ -20,20 +20,38 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionBindingListener;
 
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.session.StandardManager;
+import org.apache.catalina.session.StandardSession;
 import org.easymock.EasyMock;
 import org.easymock.IExpectationSetters;
 
 public class TestCrawlerSessionManagerValve {
+
+    private static final Manager TEST_MANAGER;
+
+    static {
+        TEST_MANAGER = new StandardManager();
+        TEST_MANAGER.setContext(new StandardContext());
+    }
+
+
 
     @Test
     public void testCrawlerIpsPositive() throws Exception {
@@ -79,11 +97,62 @@ public class TestCrawlerSessionManagerValve {
         verifyCrawlingLocalhost(valve, "example.invalid");
     }
 
+    @Test
+    public void testCrawlerMultipleContextsContextAware() throws Exception {
+        CrawlerSessionManagerValve valve = new CrawlerSessionManagerValve();
+        valve.setCrawlerUserAgents(valve.getCrawlerUserAgents());
+        valve.setHostAware(true);
+        valve.setContextAware(true);
+        valve.setNext(EasyMock.createMock(Valve.class));
+
+        verifyCrawlingContext(valve, "/examples");
+        verifyCrawlingContext(valve, null);
+    }
+
+    @Test
+    public void testCrawlersSessionIdIsRemovedAfterSessionExpiry() throws IOException, ServletException {
+        CrawlerSessionManagerValve valve = new CrawlerSessionManagerValve();
+        valve.setCrawlerIps("216\\.58\\.206\\.174");
+        valve.setCrawlerUserAgents(valve.getCrawlerUserAgents());
+        valve.setNext(EasyMock.createMock(Valve.class));
+        valve.setSessionInactiveInterval(0);
+        StandardSession session = new StandardSession(TEST_MANAGER);
+        session.setId("id");
+        session.setValid(true);
+
+        Request request = createRequestExpectations("216.58.206.174", session, true);
+
+        EasyMock.replay(request);
+
+        valve.invoke(request, EasyMock.createMock(Response.class));
+
+        EasyMock.verify(request);
+
+        MatcherAssert.assertThat(valve.getClientIpSessionId().values(), CoreMatchers.hasItem("id"));
+
+        session.expire();
+
+        Assert.assertEquals(0, valve.getClientIpSessionId().values().size());
+    }
+
 
     private void verifyCrawlingLocalhost(CrawlerSessionManagerValve valve, String hostname)
             throws IOException, ServletException {
         HttpSession session = createSessionExpectations(valve, true);
-        Request request = createRequestExpectations("127.0.0.1", session, true, hostname, "tomcatBot 1.0");
+        Request request = createRequestExpectations("127.0.0.1", session, true, hostname, "/examples", "tomcatBot 1.0");
+
+        EasyMock.replay(request, session);
+
+        valve.invoke(request, EasyMock.createMock(Response.class));
+
+        EasyMock.verify(request, session);
+    }
+
+
+    private void verifyCrawlingContext(CrawlerSessionManagerValve valve, String contextPath)
+            throws IOException, ServletException {
+        HttpSession session = createSessionExpectations(valve, true);
+        Request request = createRequestExpectations("127.0.0.1", session, true, "localhost", contextPath, "tomcatBot 1.0");
 
         EasyMock.replay(request, session);
 
@@ -97,7 +166,7 @@ public class TestCrawlerSessionManagerValve {
         HttpSession session = EasyMock.createMock(HttpSession.class);
         if (isBot) {
             EasyMock.expect(session.getId()).andReturn("id").times(2);
-            session.setAttribute(valve.getClass().getName(), valve);
+            session.setAttribute(EasyMock.eq(valve.getClass().getName()), EasyMock.anyObject(HttpSessionBindingListener.class));
             EasyMock.expectLastCall();
             session.setMaxInactiveInterval(60);
             EasyMock.expectLastCall();
@@ -107,14 +176,15 @@ public class TestCrawlerSessionManagerValve {
 
 
     private Request createRequestExpectations(String ip, HttpSession session, boolean isBot) {
-        return createRequestExpectations(ip, session, isBot, "localhost", "something 1.0");
+        return createRequestExpectations(ip, session, isBot, "localhost", "/examples", "something 1.0");
     }
 
-    private Request createRequestExpectations(String ip, HttpSession session, boolean isBot, String hostname, String userAgent) {
+    private Request createRequestExpectations(String ip, HttpSession session, boolean isBot, String hostname,
+            String contextPath, String userAgent) {
         Request request = EasyMock.createMock(Request.class);
         EasyMock.expect(request.getRemoteAddr()).andReturn(ip);
         EasyMock.expect(request.getHost()).andReturn(simpleHostWithName(hostname));
-        EasyMock.expect(request.getContext()).andReturn(simpleContextWithName());
+        EasyMock.expect(request.getContext()).andReturn(simpleContextWithName(contextPath));
         IExpectationSetters<HttpSession> setter = EasyMock.expect(request.getSession(false))
                 .andReturn(null);
         if (isBot) {
@@ -131,9 +201,12 @@ public class TestCrawlerSessionManagerValve {
         return host;
     }
 
-    private Context simpleContextWithName() {
+    private Context simpleContextWithName(String contextPath) {
+        if (contextPath == null) {
+            return null;
+        }
         Context context = EasyMock.createMock(Context.class);
-        EasyMock.expect(context.getName()).andReturn("/examples");
+        EasyMock.expect(context.getName()).andReturn(contextPath);
         EasyMock.replay(context);
         return context;
     }

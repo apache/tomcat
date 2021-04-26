@@ -94,6 +94,33 @@ public class ObjectCreateRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes)
             throws Exception {
 
+        String realClassName = getRealClassName(attributes);
+
+        if (realClassName == null) {
+            throw new NullPointerException(sm.getString("rule.noClassName", namespace, name));
+        }
+
+        // Instantiate the new object and push it on the context stack
+        Class<?> clazz = digester.getClassLoader().loadClass(realClassName);
+        Object instance = clazz.getConstructor().newInstance();
+        digester.push(instance);
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(System.lineSeparator());
+            code.append(System.lineSeparator());
+            code.append(realClassName).append(' ').append(digester.toVariableName(instance)).append(" = new ");
+            code.append(realClassName).append("();").append(System.lineSeparator());
+        }
+    }
+
+
+    /**
+     * Return the actual class name of the class to be instantiated.
+     * @param attributes The attribute list for this element
+     * @return the class name
+     */
+    protected String getRealClassName(Attributes attributes) {
         // Identify the name of the class to instantiate
         String realClassName = className;
         if (attributeName != null) {
@@ -102,20 +129,7 @@ public class ObjectCreateRule extends Rule {
                 realClassName = value;
             }
         }
-        if (digester.log.isDebugEnabled()) {
-            digester.log.debug("[ObjectCreateRule]{" + digester.match +
-                    "}New " + realClassName);
-        }
-
-        if (realClassName == null) {
-            throw new NullPointerException("No class name specified for " +
-                    namespace + " " + name);
-        }
-
-        // Instantiate the new object and push it on the context stack
-        Class<?> clazz = digester.getClassLoader().loadClass(realClassName);
-        Object instance = clazz.getConstructor().newInstance();
-        digester.push(instance);
+        return realClassName;
     }
 
 
@@ -150,7 +164,7 @@ public class ObjectCreateRule extends Rule {
         sb.append(className);
         sb.append(", attributeName=");
         sb.append(attributeName);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

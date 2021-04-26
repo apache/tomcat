@@ -16,7 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
-import javax.websocket.MessageHandler;
+import jakarta.websocket.MessageHandler;
 
 public class MessageHandlerResult {
 

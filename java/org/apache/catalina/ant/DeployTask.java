@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.channels.FileChannel;
 import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
@@ -139,10 +140,11 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     throw new BuildException(e);
                 }
             } else {
-                FileInputStream fsInput = null;
+                FileInputStream fsInput= null;
                 try {
                     fsInput = new FileInputStream(war);
-                    contentLength = fsInput.getChannel().size();
+                    FileChannel fsChannel = fsInput.getChannel();
+                    contentLength = fsChannel.size();
                     stream = new BufferedInputStream(fsInput, 1024);
                 } catch (IOException e) {
                     if (fsInput != null) {

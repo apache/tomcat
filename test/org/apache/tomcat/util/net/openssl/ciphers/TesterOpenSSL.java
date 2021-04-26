@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,10 +49,10 @@ public class TesterOpenSSL {
         } catch (IOException e) {
             versionString = "";
         }
-        if (versionString.startsWith("OpenSSL 1.1.2")) {
+        if (versionString.startsWith("OpenSSL 3.0.0")) {
             // Note: Gump currently tests 9.0.x with OpenSSL master
-            //       (a.k.a 1.1.2-dev)
-            VERSION = 10102;
+            //       (a.k.a 3.0.0-dev)
+            VERSION = 30000;
         } else if (versionString.startsWith("OpenSSL 1.1.1")) {
             // LTS
             // Supported until at least 2023-09-11
@@ -307,6 +308,30 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384);
         }
 
+        if (VERSION < 30000) {
+            // No new ciphers in 3.0.0 so far
+        } else {
+            // These were moved to the legacy provided in 3.0.0 so won't be
+            // available from that version onwards.
+            unimplemented.add(Cipher.TLS_RSA_WITH_IDEA_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_anon_WITH_SEED_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_SEED_CBC_SHA);
+            unimplemented.add(Cipher.TLS_RSA_WITH_SEED_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_SEED_CBC_SHA);
+        }
+
+        String skipCiphers = System.getProperty("tomcat.test.openssl.unimplemented", "");
+        if (!skipCiphers.isEmpty()) {
+            String[] skip = skipCiphers.split(",");
+            for (Cipher c : Cipher.values()) {
+                for (String s : skip) {
+                    if (c.toString().contains(s)) {
+                        unimplemented.add(c);
+                    }
+                }
+            }
+        }
+
         OPENSSL_UNIMPLEMENTED_CIPHERS = Collections.unmodifiableSet(unimplemented);
 
         Map<String,String> renamed = new HashMap<>();
@@ -341,12 +366,8 @@ public class TesterOpenSSL {
 
     public static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
         String[] ciphers = getOpenSSLCiphersAsExpression(specification).trim().split(":");
-        Set<String> result = new HashSet<>(ciphers.length);
-        for (String cipher : ciphers) {
-            result.add(cipher);
-        }
+        Set<String> result = new HashSet<>(Arrays.asList(ciphers));
         return result;
-
     }
 
 
@@ -356,6 +377,14 @@ public class TesterOpenSSL {
         // Standard command to list the ciphers
         args.add("ciphers");
         args.add("-v");
+        if (VERSION < 10100) {
+            // Need to exclude the GOST ciphers
+            if (specification == null) {
+                specification = "DEFAULT:!aGOST";
+            } else {
+                specification = "!aGOST:" + specification;
+            }
+        }
         if (VERSION >= 10101) {
             // Need to exclude the TLSv1.3 ciphers
             args.add("-ciphersuites");
@@ -366,7 +395,7 @@ public class TesterOpenSSL {
             args.add(specification);
         }
 
-        String stdout = executeOpenSSLCommand(args.toArray(new String[args.size()]));
+        String stdout = executeOpenSSLCommand(args.toArray(new String[0]));
 
         if (stdout.length() == 0) {
             return stdout;
@@ -438,11 +467,9 @@ public class TesterOpenSSL {
         }
         List<String> cmd = new ArrayList<>();
         cmd.add(openSSLPath);
-        for (String arg : args) {
-            cmd.add(arg);
-        }
+        cmd.addAll(Arrays.asList(args));
 
-        ProcessBuilder pb = new ProcessBuilder(cmd.toArray(new String[cmd.size()]));
+        ProcessBuilder pb = new ProcessBuilder(cmd.toArray(new String[0]));
 
         if (openSSLLibPath != null) {
             Map<String,String> env = pb.environment();

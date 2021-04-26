@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.servlet.Servlet;
+import jakarta.servlet.Servlet;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -99,7 +99,7 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
         client.connect();
         client.processRequest();
 
-        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
         Set<String> allowed = client.getAllowedMethods();
 
         client.disconnect();
@@ -152,8 +152,7 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
             for (int i = 0; i < values.length; i++) {
                 values[i] = values[i].trim();
             }
-            Set<String> allowed = new HashSet<>();
-            allowed.addAll(Arrays.asList(values));
+            Set<String> allowed = new HashSet<>(Arrays.asList(values));
 
             return allowed;
         }

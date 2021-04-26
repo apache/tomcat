@@ -18,10 +18,10 @@ package org.apache.jasper.el;
 
 import java.util.Locale;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.FunctionMapper;
-import javax.el.VariableMapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
+import jakarta.el.FunctionMapper;
+import jakarta.el.VariableMapper;
 
 /**
  * Simple ELContextWrapper for runtime evaluation of EL w/ dynamic FunctionMappers
@@ -55,7 +55,7 @@ public final class ELContextWrapper extends ELContext {
     }
 
     @Override
-    public Object getContext(@SuppressWarnings("rawtypes") Class key) {
+    public Object getContext(Class<?> key) {
         return this.target.getContext(key);
     }
 
@@ -70,8 +70,7 @@ public final class ELContextWrapper extends ELContext {
     }
 
     @Override
-    public void putContext(@SuppressWarnings("rawtypes") Class key,
-            Object contextObject) throws NullPointerException {
+    public void putContext(Class<?> key, Object contextObject) throws NullPointerException {
         this.target.putContext(key, contextObject);
     }
 

@@ -46,13 +46,15 @@ public class SmapStratum {
 
         public void setInputStartLine(int inputStartLine) {
             if (inputStartLine < 0)
-                throw new IllegalArgumentException("" + inputStartLine);
+                throw new IllegalArgumentException(Localizer.getMessage(
+                        "jsp.error.negativeParameter", Integer.valueOf(inputStartLine)));
             this.inputStartLine = inputStartLine;
         }
 
         public void setOutputStartLine(int outputStartLine) {
             if (outputStartLine < 0)
-                throw new IllegalArgumentException("" + outputStartLine);
+                throw new IllegalArgumentException(Localizer.getMessage(
+                        "jsp.error.negativeParameter", Integer.valueOf(outputStartLine)));
             this.outputStartLine = outputStartLine;
         }
 
@@ -60,26 +62,29 @@ public class SmapStratum {
          * Sets lineFileID.  Should be called only when different from
          * that of prior LineInfo object (in any given context) or 0
          * if the current LineInfo has no (logical) predecessor.
-         * <tt>LineInfo</tt> will print this file number no matter what.
+         * <code>LineInfo</code> will print this file number no matter what.
          *
          * @param lineFileID The new line file ID
          */
         public void setLineFileID(int lineFileID) {
             if (lineFileID < 0)
-                throw new IllegalArgumentException("" + lineFileID);
+                throw new IllegalArgumentException(Localizer.getMessage(
+                        "jsp.error.negativeParameter", Integer.valueOf(lineFileID)));
             this.lineFileID = lineFileID;
             this.lineFileIDSet = true;
         }
 
         public void setInputLineCount(int inputLineCount) {
             if (inputLineCount < 0)
-                throw new IllegalArgumentException("" + inputLineCount);
+                throw new IllegalArgumentException(Localizer.getMessage(
+                        "jsp.error.negativeParameter", Integer.valueOf(inputLineCount)));
             this.inputLineCount = inputLineCount;
         }
 
         public void setOutputLineIncrement(int outputLineIncrement) {
             if (outputLineIncrement < 0)
-                throw new IllegalArgumentException("" + outputLineIncrement);
+                throw new IllegalArgumentException(Localizer.getMessage(
+                        "jsp.error.negativeParameter", Integer.valueOf(outputLineIncrement)));
             this.outputLineIncrement = outputLineIncrement;
         }
 
@@ -217,19 +222,19 @@ public class SmapStratum {
      * later.)
      *
      * @param inputStartLine starting line in the source file
-     *        (SMAP <tt>InputStartLine</tt>)
+     *        (SMAP <code>InputStartLine</code>)
      * @param inputFileName the filepath (or name) from which the input comes
-     *        (yields SMAP <tt>LineFileID</tt>)  Use unqualified names
+     *        (yields SMAP <code>LineFileID</code>)  Use unqualified names
      *        carefully, and only when they uniquely identify a file.
      * @param inputLineCount the number of lines in the input to map
-     *        (SMAP <tt>LineFileCount</tt>)
+     *        (SMAP <code>LineFileCount</code>)
      * @param outputStartLine starting line in the output file
-     *        (SMAP <tt>OutputStartLine</tt>)
+     *        (SMAP <code>OutputStartLine</code>)
      * @param outputLineIncrement number of output lines to map to each
-     *        input line (SMAP <tt>OutputLineIncrement</tt>).  <i>Given the
+     *        input line (SMAP <code>OutputLineIncrement</code>).  <i>Given the
      *        fact that the name starts with "output", I continuously have
      *        the subconscious urge to call this field
-     *        <tt>OutputLineExcrement</tt>.</i>
+     *        <code>OutputLineExcrement</code>.</i>
      */
     public void addLineData(
         int inputStartLine,

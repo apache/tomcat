@@ -18,15 +18,15 @@
 
 package org.apache.el.parser;
 
-import javax.el.ELClass;
-import javax.el.ELException;
-import javax.el.MethodExpression;
-import javax.el.MethodInfo;
-import javax.el.MethodNotFoundException;
-import javax.el.PropertyNotFoundException;
-import javax.el.ValueExpression;
-import javax.el.ValueReference;
-import javax.el.VariableMapper;
+import jakarta.el.ELClass;
+import jakarta.el.ELException;
+import jakarta.el.MethodExpression;
+import jakarta.el.MethodInfo;
+import jakarta.el.MethodNotFoundException;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.ValueExpression;
+import jakarta.el.ValueReference;
+import jakarta.el.VariableMapper;
 
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
@@ -225,14 +225,9 @@ public final class AstIdentifier extends SimpleNode {
         if (obj instanceof MethodExpression) {
             return (MethodExpression) obj;
         } else if (obj == null) {
-            throw new MethodNotFoundException("Identity '" + this.image
-                    + "' was null and was unable to invoke");
+            throw new MethodNotFoundException(MessageFactory.get("error.identifier.noMethod", this.image));
         } else {
-            throw new ELException(
-                    "Identity '"
-                            + this.image
-                            + "' does not reference a MethodExpression instance, returned type: "
-                            + obj.getClass().getName());
+            throw new ELException(MessageFactory.get("error.identifier.notMethodExpression", this.image, obj.getClass().getName()));
         }
     }
 }

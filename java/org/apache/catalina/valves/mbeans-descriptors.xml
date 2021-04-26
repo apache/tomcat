@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean name="AccessLogValve"
@@ -454,6 +457,69 @@
     </operation>
   </mbean>
 
+  <mbean name="RemoteCIDRValve"
+         description="Concrete implementation of RequestFilterValve that filters based on the string representation of the remote client's network address in CIDR format"
+         domain="Catalina"
+         group="Valve"
+         type="org.apache.catalina.valves.RemoteCIDRValve">
+
+    <attribute name="addConnectorPort"
+               description="Append the server connector port to the client network CIDR separated by a semicolon"
+               type="boolean"/>
+
+    <attribute name="allow"
+               description="The allow expression"
+               type="java.lang.String"/>
+
+    <attribute name="allowValid"
+               description="Becomes false if assigned value of allow expression is not syntactically correct"
+               is="true"
+               type="boolean"
+               writeable="false"/>
+
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               is="true"
+               type="boolean"/>
+
+    <attribute name="className"
+               description="Fully qualified class name of the managed object"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="deny"
+               description="The deny expression"
+               type="java.lang.String"/>
+
+    <attribute name="denyStatus"
+               description="HTTP response status code that is used when rejecting denied request"
+               type="int"/>
+
+    <attribute name="denyValid"
+               description="Becomes false if assigned value of deny expression is not syntactically correct"
+               is="true"
+               type="boolean"
+               writeable="false"/>
+
+    <attribute name="invalidAuthenticationWhenDeny"
+               description="Send an invalid authentication header instead of deny"
+               type="boolean"/>
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <operation name="isAllowed"
+               description="Tests whether a client with this host name is allowed access by the current valve configuration"
+               impact="INFO"
+               returnType="boolean">
+      <parameter name="hostName"
+          description="host name to be tested"
+                 type="java.lang.String"/>
+    </operation>
+  </mbean>
+
   <mbean name="RemoteIpValve"
          description="Valve that sets client information (eg IP address) based on data from a trusted proxy"
          domain="Catalina"
@@ -461,44 +527,59 @@
          type="org.apache.catalina.valves.RemoteIpValve">
 
     <attribute name="asyncSupported"
-               description="Does this valve support async reporting."
+               description="Does this valve support async processing"
+               is="true"
+               type="boolean"/>
+
+    <attribute name="changeLocalName"
+               description="If true the value returned by ServletRequest.getLocalHost() and ServletRequest.getServerHost() is modified by this Valve"
+               is="true"
+               type="boolean"/>
+
+    <attribute name="changeLocalPort"
+               description="If true the value returned by ServletRequest.getLocalPort() and ServletRequest.getServerPort() is modified by this Valve"
                is="true"
                type="boolean"/>
 
     <attribute name="httpServerPort"
                description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates http protocol"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
     <attribute name="httpsServerPort"
                description="Value returned by ServletRequest.getServerPort() when the protocolHeader indicates https protocol"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
+
+    <attribute name="hostHeader"
+               description="The host header (e.g. &quot;X-Forwarded-Host&quot;)"
+               type="java.lang.String"/>
 
     <attribute name="internalProxies"
                description="Regular expression that matches IP addresses of internal proxies"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
+
+    <attribute name="portHeader"
+               description="The protocol header (e.g. &quot;X-Forwarded-Port&quot;)"
+               type="java.lang.String"/>
 
     <attribute name="protocolHeader"
                description="The protocol header (e.g. &quot;X-Forwarded-Proto&quot;)"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
     <attribute name="protocolHeaderHttpsValue"
                description="The value of the protocol header for incoming https request (e.g. &quot;https&quot;)"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
     <attribute name="proxiesHeader"
                description="The proxies header name (e.g. &quot;X-Forwarded-By&quot;)"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
     <attribute name="remoteIpHeader"
                description="The remote IP header name (e.g. &quot;X-Forwarded-For&quot;)"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
+
+    <attribute name="requestAttributesEnabled"
+               description="If true, the Valve will set the request attributes used by AccessLog implementations to override the values returned by the request for remote address, remote host, server port and protocol"
+               type="boolean"/>
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
@@ -507,8 +588,7 @@
 
     <attribute name="trustedProxies"
                description="Regular expression that matches IP addresses of trusted proxies"
-               type="java.lang.String"
-               writeable="false" />
+               type="java.lang.String"/>
 
   </mbean>
 
@@ -551,6 +631,34 @@
     <attribute name="threshold"
                description="Duration in seconds after which a request is considered as stuck"
                type="int"/>
+
+  </mbean>
+
+  <mbean name="PersistentValve"
+         description="Valve that implements per-request session persistence"
+         domain="Catalina"
+         group="Valve"
+         type="org.apache.catalina.valves.PersistentValve">
+
+    <attribute name="asyncSupported"
+               description="Does this valve support async reporting."
+               is="true"
+               type="boolean"/>
+
+    <attribute name="className"
+               description="Fully qualified class name of the managed object"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="stateName"
+               description="The name of the LifecycleState that this component is currently in"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute
+               name="filter"
+               description="filter to disable session persistence"
+               type="java.lang.String"/>
 
   </mbean>
 </mbeans-descriptors>

@@ -23,6 +23,8 @@ public class Constants {
 
     public static final String Package = "org.apache.catalina.manager.host";
 
+    public static final String REL_EXTERNAL = org.apache.catalina.manager.Constants.REL_EXTERNAL;
+
     public static final String MESSAGE_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         " <tr>\n" +
@@ -41,8 +43,8 @@ public class Constants {
         "</tr>\n" +
         " <tr>\n" +
         "  <td class=\"row-left\"><a href=\"{1}\">{2}</a></td>\n" +
-        "  <td class=\"row-center\"><a href=\"{3}\">{4}</a></td>\n" +
-        "  <td class=\"row-center\"><a href=\"{5}\">{6}</a></td>\n" +
+        "  <td class=\"row-center\"><a href=\"{3}\" " + REL_EXTERNAL + ">{4}</a></td>\n" +
+        "  <td class=\"row-center\"><a href=\"{5}\" " + REL_EXTERNAL + ">{6}</a></td>\n" +
         "  <td class=\"row-right\"><a href=\"{7}\">{8}</a></td>\n" +
         " </tr>\n" +
         "</table>\n" +
@@ -79,12 +81,11 @@ public class Constants {
     public static final String HTML_TAIL_SECTION =
         "<hr size=\"1\" noshade=\"noshade\">\n" +
         "<center><font size=\"-1\" color=\"#525D76\">\n" +
-        " <em>Copyright &copy; 1999-2018, Apache Software Foundation</em>" +
+        " <em>Copyright &copy; 1999-2021, Apache Software Foundation</em>" +
         "</font></center>\n" +
         "\n" +
         "</body>\n" +
         "</html>";
     public static final String CHARSET="utf-8";
-
 }
 

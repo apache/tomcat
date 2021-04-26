@@ -53,7 +53,7 @@ public final class TesterMapRealm extends RealmBase {
 
     @Override
     protected Principal getPrincipal(String username) {
-        return new GenericPrincipal(username, getPassword(username),
+        return new GenericPrincipal(username,
                 roles.get(username));
     }
 

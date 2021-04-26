@@ -16,8 +16,8 @@
   limitations under the License.
 -->
 <!DOCTYPE mbeans-descriptors PUBLIC
-"-//Apache Software Foundation//DTD Model MBeans Configuration File"
-"http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
   <mbean
     name="JvmRouteBinderValve"
@@ -80,8 +80,8 @@
       type="java.lang.String"
       writeable="false"/>
     <attribute
-      name="counterNoStateTransfered"
-      description="Count the failed session transfers noStateTransfered"
+      name="counterNoStateTransferred"
+      description="Count the failed session transfers noStateTransferred"
       type="int"
       writeable="false"/>
     <attribute
@@ -258,7 +258,7 @@
       type="java.lang.String"
       writeable="false"/>
     <attribute
-      name="stateTransfered"
+      name="stateTransferred"
       description="Is session state transferred complete? "
       type="boolean"/>
     <attribute

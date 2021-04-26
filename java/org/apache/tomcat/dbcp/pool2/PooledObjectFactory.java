@@ -54,7 +54,7 @@ package org.apache.tomcat.dbcp.pool2;
  * </ol>
  * {@link PooledObjectFactory} must be thread-safe. The only promise
  * an {@link ObjectPool} makes is that the same instance of an object will not
- * be passed to more than one method of a <code>PoolableObjectFactory</code>
+ * be passed to more than one method of a {@code PoolableObjectFactory}
  * at a time.
  * <p>
  * While clients of a {@link KeyedObjectPool} borrow and return instances of
@@ -84,10 +84,11 @@ public interface PooledObjectFactory<T> {
   PooledObject<T> makeObject() throws Exception;
 
   /**
-   * Destroys an instance no longer needed by the pool.
+   * Destroys an instance no longer needed by the pool, using the default (NORMAL)
+   * DestroyMode.
    * <p>
    * It is important for implementations of this method to be aware that there
-   * is no guarantee about what state <code>obj</code> will be in and the
+   * is no guarantee about what state {@code obj} will be in and the
    * implementation should be prepared to handle unexpected errors.
    * </p>
    * <p>
@@ -106,12 +107,32 @@ public interface PooledObjectFactory<T> {
   void destroyObject(PooledObject<T> p) throws Exception;
 
   /**
+   * Destroys an instance no longer needed by the pool, using the provided
+   * DestroyMode.
+   *
+   * @param p a {@code PooledObject} wrapping the instance to be destroyed
+   * @param mode DestroyMode providing context to the factory
+   *
+   * @throws Exception should be avoided as it may be swallowed by
+   *    the pool implementation.
+   *
+   * @see #validateObject
+   * @see ObjectPool#invalidateObject
+   * @see #destroyObject(PooledObject)
+   * @see DestroyMode
+   * @since 2.9.0
+   */
+  default void destroyObject(final PooledObject<T> p, final DestroyMode mode) throws Exception {
+      destroyObject(p);
+  }
+
+  /**
    * Ensures that the instance is safe to be returned by the pool.
    *
    * @param p a {@code PooledObject} wrapping the instance to be validated
    *
-   * @return <code>false</code> if <code>obj</code> is not valid and should
-   *         be dropped from the pool, <code>true</code> otherwise.
+   * @return {@code false} if {@code obj} is not valid and should
+   *         be dropped from the pool, {@code true} otherwise.
    */
   boolean validateObject(PooledObject<T> p);
 
@@ -120,7 +141,7 @@ public interface PooledObjectFactory<T> {
    *
    * @param p a {@code PooledObject} wrapping the instance to be activated
    *
-   * @throws Exception if there is a problem activating <code>obj</code>,
+   * @throws Exception if there is a problem activating {@code obj},
    *    this exception may be swallowed by the pool.
    *
    * @see #destroyObject
@@ -132,7 +153,7 @@ public interface PooledObjectFactory<T> {
    *
    * @param p a {@code PooledObject} wrapping the instance to be passivated
    *
-   * @throws Exception if there is a problem passivating <code>obj</code>,
+   * @throws Exception if there is a problem passivating {@code obj},
    *    this exception may be swallowed by the pool.
    *
    * @see #destroyObject

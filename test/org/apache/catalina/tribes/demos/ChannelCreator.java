@@ -17,7 +17,6 @@
 package org.apache.catalina.tribes.demos;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.catalina.tribes.Channel;
@@ -192,10 +191,9 @@ public class ChannelCreator {
         sender.setRxBufSize(43800);
         sender.setTxBufSize(25188);
 
-        Iterator<Object> i = transportProperties.keySet().iterator();
-        while ( i.hasNext() ) {
-            String key = (String)i.next();
-            IntrospectionUtils.setProperty(sender,key,transportProperties.getProperty(key));
+        for (Object o : transportProperties.keySet()) {
+            String key = (String) o;
+            IntrospectionUtils.setProperty(sender, key, transportProperties.getProperty(key));
         }
         ps.setTransport(sender);
 
@@ -237,8 +235,8 @@ public class ChannelCreator {
         }
         if ( staticMembers.size() > 0 ) {
             StaticMembershipInterceptor smi = new StaticMembershipInterceptor();
-            for (int x=0; x<staticMembers.size(); x++ ) {
-                smi.addStaticMember(staticMembers.get(x));
+            for (Member staticMember : staticMembers) {
+                smi.addStaticMember(staticMember);
             }
             channel.addInterceptor(smi);
         }

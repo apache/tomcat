@@ -32,7 +32,6 @@ import org.junit.Test;
 public class TestGenericPrincipal {
 
     private static final String USER = "user";
-    private static final String PASSWORD = "pwd";
     private static final List<String> ROLES = Collections.unmodifiableList(
             Arrays.asList(new String[] { "ROLE1", "ROLE2" }));
     private static final TesterPrincipal PRINCIPAL = new TesterPrincipal("Principal");
@@ -41,19 +40,19 @@ public class TestGenericPrincipal {
 
     @Test
     public void testSerialize01() throws ClassNotFoundException, IOException {
-        GenericPrincipal gpIn = new GenericPrincipal(USER, PASSWORD, ROLES);
+        GenericPrincipal gpIn = new GenericPrincipal(USER, ROLES);
         doTest(gpIn);
     }
 
     @Test
     public void testSerialize02() throws ClassNotFoundException, IOException {
-        GenericPrincipal gpIn = new GenericPrincipal(USER, PASSWORD, ROLES, PRINCIPAL);
+        GenericPrincipal gpIn = new GenericPrincipal(USER, ROLES, PRINCIPAL);
         doTest(gpIn);
     }
 
     @Test
     public void testSerialize03() throws ClassNotFoundException, IOException {
-        GenericPrincipal gpIn = new GenericPrincipal(USER, PASSWORD, ROLES, PRINCIPAL_NON_SERIALIZABLE);
+        GenericPrincipal gpIn = new GenericPrincipal(USER, ROLES, PRINCIPAL_NON_SERIALIZABLE);
         doTest(gpIn);
     }
 
@@ -63,7 +62,6 @@ public class TestGenericPrincipal {
 
         Assert.assertNull(gpOut.getGssCredential());
         Assert.assertEquals(gpIn.getName(), gpOut.getName());
-        Assert.assertEquals(gpIn.getPassword(), gpOut.getPassword());
         Assert.assertArrayEquals(gpIn.getRoles(), gpOut.getRoles());
         if (gpIn == gpIn.getUserPrincipal()) {
             Assert.assertEquals(gpOut, gpOut.getUserPrincipal());

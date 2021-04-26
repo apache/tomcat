@@ -22,14 +22,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 
-import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.GenericFilter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -57,13 +57,7 @@ public class RequestDumperFilter extends GenericFilter {
     private static final String NON_HTTP_RES_MSG =
         "Not available. Non-http response.";
 
-    private static final ThreadLocal<Timestamp> timestamp =
-            new ThreadLocal<Timestamp>() {
-        @Override
-        protected Timestamp initialValue() {
-            return new Timestamp();
-        }
-    };
+    private static final ThreadLocal<Timestamp> timestamp = ThreadLocal.withInitial(Timestamp::new);
 
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
@@ -120,9 +114,9 @@ public class RequestDumperFilter extends GenericFilter {
             doLog("       contextPath", hRequest.getContextPath());
             Cookie cookies[] = hRequest.getCookies();
             if (cookies != null) {
-                for (int i = 0; i < cookies.length; i++) {
-                    doLog("            cookie", cookies[i].getName() +
-                            "=" + cookies[i].getValue());
+                for (Cookie cookie : cookies) {
+                    doLog("            cookie", cookie.getName() +
+                            "=" + cookie.getValue());
                 }
             }
             Enumeration<String> hnames = hRequest.getHeaderNames();

@@ -23,16 +23,25 @@
 # -----------------------------------------------------------------------------
 
 # ----- Version Control Flags -----
-version.major=9
+version.major=10
 version.minor=0
-version.build=14
+version.build=6
 version.patch=0
 version.suffix=-dev
 
+# ----- Reproducible builds -----
+# Uncomment and set to current time for reproducible builds
+#2021-03-18T06:00:00Z
+#ant.tstamp.now=1616047200
+
+# ----- Source control flags -----
+git.branch=master
+
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
-ant.version.required=1.9.8
+ant.version.required=1.9.10
 execute.validate=false
+execute.download=true
 execute.test.nio=true
 execute.test.nio2=true
 # Still requires APR/native library to be present
@@ -69,12 +78,8 @@ gpg.exec=/path/to/gpg
 
 # Code signing of Windows installer
 do.codesigning=false
-codesigning.user=request-via-pmc
-codesigning.pwd=request-via-pmc
-codesigning.partnercode=request-via-pmc
-codesigning.keyStore=request-via-pmc
-codesigning.keyStorePassword=request-via-pmc
-codesigning.service=Microsoft Windows Signing
+codesigning.exec=signtool.exe
+codesigning.certificate.thumbprint=5a606116432aba614c246d15e792f9e4bcf19cbf
 
 # ----- Settings to use when downloading files -----
 trydownload.httpusecaches=true
@@ -90,13 +95,14 @@ compile.debug=true
 # Do not pass -deprecation (-Xlint:deprecation) flag to javac
 compile.deprecation=false
 
-base-apache.loc.1=http://www.apache.org/dyn/closer.lua?action=download&filename=
+base-apache.loc.1=https://www.apache.org/dyn/closer.lua?action=download&filename=
 base-apache.loc.2=https://archive.apache.org/dist
 base-commons.loc.1=${base-apache.loc.1}/commons
 base-commons.loc.2=${base-apache.loc.2}/commons
 base-tomcat.loc.1=${base-apache.loc.1}/tomcat
 base-tomcat.loc.2=${base-apache.loc.2}/tomcat
 
+base-gh.loc=https://github.com
 base-sf.loc=https://downloads.sourceforge.net
 # repo.maven.apache.org is the same as repo2.maven.org
 base-maven.loc=https://repo.maven.apache.org/maven2
@@ -123,17 +129,17 @@ wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
 wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${wsdl4j-lib.version}.jar
 
 # ----- Eclipse JDT, version 4.7 or later -----#
-# See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
+# See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
-# Checksum is from "SHA512 Checksums for 4.9" link at
-# http://download.eclipse.org/eclipse/downloads/drops4/R-4.9-201809060745/
-# http://download.eclipse.org/eclipse/downloads/drops4/R-4.9-201809060745/checksum/eclipse-4.9-SUMSSHA512
+# Checksum is from "SHA512 Checksums for 4.18" link at
+# https://download.eclipse.org/eclipse/downloads/drops4/R-4.18-202012021800/
+# https://download.eclipse.org/eclipse/downloads/drops4/R-4.18-202012021800/checksum/eclipse-4.18-SUMSSHA512
 #
-jdt.version=4.9
-jdt.release=R-4.9-201809060745
+jdt.version=4.18
+jdt.release=R-4.18-202012021800
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=c4ddf476e161758a0ba5d336052cb5eb7109686b97dd0b62df6e33b417f7c18f210b81edba009bc765bb9122bd5831520a10291a0ff76ee223624bbcfd12ee2f
+jdt.checksum.value=d63891e8da5dd4d26a48bbc9c1ddb8f2ba9a13c9a8a05a5b5e31eb2e72f79fbedccaad501fc92ca622701052a519051c31dd232dcdf6bf504478fbfd08a840e8
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
@@ -141,25 +147,25 @@ jdt.loc.1=http://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj
 jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 
 # ----- Tomcat native library -----
-tomcat-native.version=1.2.18
+tomcat-native.version=1.2.28
 tomcat-native.src.checksum.enabled=true
 tomcat-native.src.checksum.algorithm=SHA-512
-tomcat-native.src.checksum.value=66481c1f36dc7ea909bf8d55075a232bf6dea3300b56d36415b13da4aefbee16cb52456f3d44b4a2b09b43cd8c7df628145a0623b9cdfa322bc2432e6c44827f
+tomcat-native.src.checksum.value=16b8659dcd228ea153d05c9ae19e3d97add944315f3b8b42905162d0e4e8a28fd51a172d59d7da8508271ecad0b8ac025a386895565acaf8e2ba11fba77492bb
 tomcat-native.win.checksum.enabled=true
 tomcat-native.win.checksum.algorithm=SHA-512
-tomcat-native.win.checksum.value=979158411b696360fd7efee1df51f4349215fb94df34bae73c7ce98afc45ad3937829c58b7ecf4785d587a90f90d50ec438a96bb166f407a7c831903d953ad55
+tomcat-native.win.checksum.value=a0a7c05ca1b2b873456e2331232f9752b52af23a205e61d14905e0779f4c517563438b45fc36b1a81803f67d47b39e77009e4a4e892a3fd0e548398ed9a69dc3
 tomcat-native.home=${base.path}/tomcat-native-${tomcat-native.version}
 tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
 tomcat-native.loc.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
 tomcat-native.loc.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
-tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1-win32-bin.zip
-tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1-win32-bin.zip
+tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1k-win32-bin.zip
+tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-openssl-1.1.1k-win32-bin.zip
 
 # ----- NSIS, version 3.0 or later -----
-nsis.version=3.03
+nsis.version=3.06.1
 nsis.checksum.enabled=true
 nsis.checksum.algorithm=MD5|SHA-1
-nsis.checksum.value=d4919dc089ec256a7264e97ada299b64|ea69aa8d538916c9e8630dfd0106b063f7bb5d46
+nsis.checksum.value=15a0bb6e74be90ef4f11fa7befd0399a|f188416fe435cad991adbdc2e3eedc482a68fa75
 nsis.home=${base.path}/nsis-${nsis.version}
 nsis.exe=${nsis.home}/makensis.exe
 nsis.arch.dir=x86-unicode/
@@ -170,21 +176,21 @@ nsis.system.dll=${nsis.home}/Plugins/${nsis.arch.dir}System.dll
 nsis.nsdialogs.dll=${nsis.home}/Plugins/${nsis.arch.dir}nsDialogs.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 
-# ----- Commons Daemon, version 1.1.0 or later -----
-commons-daemon.version=1.1.0
+# ----- Commons Daemon, version 1.2.0 or later -----
+commons-daemon.version=1.2.4
 
-# checksum for commons-daemon-1.1.0-bin.tar.gz
+# checksum for commons-daemon-1.2.4-bin.tar.gz
 commons-daemon.bin.checksum.enabled=true
 commons-daemon.bin.checksum.algorithm=SHA-512
-commons-daemon.bin.checksum.value=43c33e52e0be11e73370083500592ee9df0431c3166dbc7ed95794cabb462ac2a140e3eb4bbe2a0b99882bb93d9244ff534f13e4933c13e7a31a37e58e0c8e1d
+commons-daemon.bin.checksum.value=66c33091fa51b6845ce45f326708419ef20ecd4a60bc175b94620a708f398843d9d53cfa8bfd2f5ab924c30b7034af602cb65e3e1cf164a5f687353f755919fe
 
-# checksums for commons-daemon-1.1.0-native-src.tar.gz, commons-daemon-1.1.0-bin-windows.zip
+# checksums for commons-daemon-1.2.4-native-src.tar.gz, commons-daemon-1.2.4-bin-windows.zip
 commons-daemon.native.src.checksum.enabled=true
 commons-daemon.native.src.checksum.algorithm=SHA-512
-commons-daemon.native.src.checksum.value=3443f1c95a4b267c4387a9ac7c79315422a51e896c0bcea48fbe959bc301094770aa8065b2388a84760a3e07e5d1753c2b351336fb2d3a8c996ee14d32088f6e
+commons-daemon.native.src.checksum.value=655f5b106238f6ac7f6e42dd32acfc553b302aa2c248b839528abdc9872bad5c80da3ef15399a7ff8c414427aafea9c4e9656b2887d98be4584f3926ac02ca23
 commons-daemon.native.win.checksum.enabled=true
 commons-daemon.native.win.checksum.algorithm=SHA-512
-commons-daemon.native.win.checksum.value=10cda04d9a44286cb67107fdb9d20958013f075cad4accba048801f3677765c334dc16f6901e1d2e4a9df5a2c702797370de63393568df6fceb9e7902421f9ea
+commons-daemon.native.win.checksum.value=9c2bc010828826acbde5613aaf2de303471b33f2cb655b0ac91574e27123b8bcbe59e987d9e47d5835c171a5db31922b1458ed2e4fef840fd06c048f61f1e62b
 
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
@@ -200,59 +206,67 @@ commons-daemon.native.win.loc.1=${base-commons.loc.1}/daemon/binaries/windows/co
 commons-daemon.native.win.loc.2=${base-commons.loc.2}/daemon/binaries/windows/commons-daemon-${commons-daemon.version}-bin-windows.zip
 
 # ----- JUnit Unit Test Suite, version 4.11 or later -----
-junit.version=4.12
+junit.version=4.13
 junit.checksum.enabled=true
 junit.checksum.algorithm=MD5|SHA-1
-junit.checksum.value=5b38c40c97fbd0adee29f91e60405584|2973d150c0dc1fefe998f834810d68f278ea58ec
+junit.checksum.value=5da6445d7b80aba2623e73d4561dcfde|e49ccba652b735c93bd6e6f59760d8254cf597dd
 junit.home=${base.path}/junit-${junit.version}
 junit.jar=${junit.home}/junit-${junit.version}.jar
 junit.loc=${base-maven.loc}/junit/junit/${junit.version}/junit-${junit.version}.jar
 
 # ----- Hamcrest Library, used by JUnit, version 1.3 or later ----
-hamcrest.version=1.3
+hamcrest.version=2.2
 hamcrest.checksum.enabled=true
-hamcrest.checksum.algorithm=MD5|SHA-1
-hamcrest.checksum.value=6393363b47ddcbba82321110c3e07519|42a25dc3219429f0e5d060061f71acb49bf010a0
+hamcrest.checksum.algorithm=SHA-512
+hamcrest.checksum.value=6b1141329b83224f69f074cb913dbff6921d6b8693ede8d2599acb626481255dae63de42eb123cbd5f59a261ac32faae012be64e8e90406ae9215543fbca5546
 hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
-hamcrest.jar=${hamcrest.home}/hamcrest-core-${hamcrest.version}.jar
-hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest-core/${hamcrest.version}/hamcrest-core-${hamcrest.version}.jar
+hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
+hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest/${hamcrest.version}/hamcrest-${hamcrest.version}.jar
 
 # ----- EasyMock, version 3.2 or later -----
-easymock.version=3.2
+easymock.version=4.2
 easymock.checksum.enabled=true
-easymock.checksum.algorithm=MD5|SHA-1
-easymock.checksum.value=0da4291328e18798621c36fdf8bc4c3a|00c82f7fa3ef377d8954b1db25123944b5af2ba4
+easymock.checksum.algorithm=SHA-512
+easymock.checksum.value=6fbc3080c9f12aa8dcd1db8aa74e1621caa1d437c0fa64c70a3fe0d46ff74ac2d8d87ac544550487b7aaae98844d4d9d114c724bfc6d9a8873136353f87d8f2e
 easymock.home=${base.path}/easymock-${easymock.version}
 easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
 easymock.loc=${base-maven.loc}/org/easymock/easymock/${easymock.version}/easymock-${easymock.version}.jar
 
 # ----- cglib, used by EasyMock, version 2.2 or later -----
-cglib.version=2.2.2
+cglib.version=3.3.0
 cglib.checksum.enabled=true
-cglib.checksum.algorithm=MD5|SHA-1
-cglib.checksum.value=af93e373d7ddf35db0e9612480d9ed13|00d456bb230c70c0b95c76fb28e429d42f275941
+cglib.checksum.algorithm=SHA-512
+cglib.checksum.value=faa1d2121e87ae69e179e3aae217accd0834e0da716b91a029fd526e192612e71675f2740bedf48e23ef1edc45f672a2be1b3e78bbfb1ad59c96dd3d2feeedba
 cglib.home=${base.path}/cglib-${cglib.version}
 cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
 
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
-objenesis.version=1.2
+objenesis.version=3.1
 objenesis.checksum.enabled=true
-objenesis.checksum.algorithm=MD5|SHA-1
-objenesis.checksum.value=bee117291d50b41b8e8cf0ac5435df1d|bfcb0539a071a4c5a30690388903ac48c0667f2a
+objenesis.checksum.algorithm=SHA-512
+objenesis.checksum.value=4dcfc065d6ccc1e0cb716fc86d844e81a347591d06f99b1840157c51c58a842bdebe86f6bcacee65996b64468d21bdf3bcf463a7f4ae5261440c8f0f6fac8ab3
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
+# ----- UnboundID, used by unit tests, version 5.1.4 or later -----
+unboundid.version=5.1.4
+unboundid.checksum.enabled=true
+unboundid.checksum.algorithm=SHA-512
+unboundid.checksum.value=04cf7f59eddebdd5b51e5be55021f9d9c667cca6101eac954e7a8d5b51f4c23372cd8f041640157f082435a166b75d85e79252b516130ede7d966dae6d3eae67
+unboundid.home=${base.path}/unboundid-${unboundid.version}
+unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
+unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
+
 # ----- Checkstyle, version 6.16 or later -----
-# Checksums are available at https://sourceforge.net/projects/checkstyle/files/OldFiles/6.17/
-checkstyle.version=6.17
+checkstyle.version=8.22
 checkstyle.checksum.enabled=true
-checkstyle.checksum.algorithm=MD5|SHA-1
-checkstyle.checksum.value=9180ab8b8219b262bfe88f26fd95d26d|11a02d7b0374f8a82fbd76361a69756faa6aefa0
+checkstyle.checksum.algorithm=SHA-512
+checkstyle.checksum.value=d595e284ec440e20367b93a1835357f1c4c2cf77af4589caafdaa995aa9e8a341716ad59f5222fff484275f23c11beb71ad58792cc6cdbdb261e320724b9418f
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
-checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
+checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- Cobertura code coverage tool -----
 cobertura.version=2.1.1
@@ -261,45 +275,51 @@ cobertura.checksum.algorithm=MD5|SHA-1
 cobertura.checksum.value=4f46638aa8e4d89565c038092398ea06|99cb44d36555feedcedc46263c23c2f5394ef342
 cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
-cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.1.1-bin.tar.gz
+cobertura.loc=${base-sf.loc}/cobertura/cobertura-${cobertura.version}-bin.tar.gz
 
 # ----- Findbugs -----
-findbugs.version=3.0.1
+findbugs.version=3.1.12
 findbugs.checksum.enabled=true
 findbugs.checksum.algorithm=MD5|SHA-1
-findbugs.checksum.value=dec8828de8657910fcb258ce5383c168|59a24064ca6869e483ce9a04d3c50d14a227d5e6
-findbugs.home=${base.path}/findbugs-${findbugs.version}
-findbugs.jar=${findbugs.home}/lib/findbugs-ant.jar
-findbugs.loc=${base-sf.loc}/project/findbugs/findbugs/${findbugs.version}/findbugs-${findbugs.version}.tar.gz
+findbugs.checksum.value=8c54502a8e1b78ea6b173a186ce6f379|95114d9aaeeba7bd4ea5a3d6a2167cd6c87bb943
+findbugs.home=${base.path}/spotbugs-${findbugs.version}
+findbugs.jar=${findbugs.home}/lib/spotbugs-ant.jar
+findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/spotbugs-${findbugs.version}.tgz
 
-# ----- SAAJ API, used by Code Signing for releases -----
-# ----- No longer part of JRE from Java 11 onwards  -----
-# ----- CDDL Licensed                               -----
-saaj-api.version=1.3.5
-saaj-api.checksum.enabled=true
-saaj-api.checksum.algorithm=MD5|SHA-1
-saaj-api.checksum.value=caae8b4bf2c551155815331e9e96256f|1c399a7fea4d0262a6a39750e419c24f0c769586
-saaj-api.home=${base.path}/saaj-api-${saaj-api.version}
-saaj-api.jar=${saaj-api.home}/saaj-api-${saaj-api.version}.jar
-saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-api-${saaj-api.version}.jar
-
-# ----- bnd & bndlib, version 4.0.0 or later  -----
+# ----- bnd, version 5.3.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
-bnd.version=4.0.0
+bnd.version=5.3.0
 
-# checksums for biz.aQute.bnd-4.0.0.jar, biz.aQute.bndlib-4.0.0.jar
+# checksums for biz.aQute.bnd-5.3.0.jar
 bnd.checksum.enabled=true
 bnd.checksum.algorithm=MD5|SHA-1
-bnd.checksum.value=ddf578a4413ffa0eb6dc5b9476318fe2|fa7746eb710852498ce1afe5227be3fbfddaf09e
-
-bndlib.checksum.enabled=true
-bndlib.checksum.algorithm=MD5|SHA-1
-bndlib.checksum.value=7aa264bf3b6b32a11eea4a6cf43a9aaa|21e1d6fd1874d9bc201f2de1d0a48e84bff4149d
+bnd.checksum.value=7cba73481ee6e72b182ba5c13801aafe|10ec0974db02f810e9345b218f4de4abe898ab04
 
 bnd.home=${base.path}/bnd-${bnd.version}
 bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
 bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
 
-bndlib.home=${base.path}/bndlib-${bnd.version}
-bndlib.jar=${bndlib.home}/biz.aQute.bndlib-${bnd.version}.jar
-bndlib.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bndlib/${bnd.version}/biz.aQute.bndlib-${bnd.version}.jar
+# ----- OSGi annotations bundle, version 1.0.0 or later            -----
+# ----- required to avoid Javadoc error when using bnd annotations -----
+osgi-annotations.version=1.0.0
+
+# checksums for OSGi annotations, version 1.0.0
+osgi-annotations.checksum.enabled=true
+osgi-annotations.checksum.algorithm=MD5|SHA-1
+osgi-annotations.checksum.value=153054f987534244f95a399539b11375|b6e802bceba0682353466abf8fadbbd662b2f7f8
+
+osgi-annotations.home=${base.path}/osgi-annotations-${osgi-annotations.version}
+osgi-annotations.jar=${osgi-annotations.home}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar
+osgi-annotations.loc=${base-maven.loc}/org/osgi/org.osgi.annotation.bundle/${osgi-annotations.version}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar
+
+# ----- Tomcat Migration Tool for Jakarta EE -----
+migration-lib.version=0.2.0
+
+# checksums for jakartaee-migration-0.2.0-shaded.jar
+migration-lib.checksum.enabled=true
+migration-lib.checksum.algorithm=MD5|SHA-1
+migration-lib.checksum.value=c7dc838f46901157722ac2f49af854c8|73f53ba52e443f0e992a2aa57d42927d884709eb
+
+migration-lib.home=${base.path}/migration-${migration-lib.version}
+migration-lib.jar=${migration-lib.home}/jakartaee-migration-${migration-lib.version}-shaded.jar
+migration-lib.loc=${base-maven.loc}/org/apache/tomcat/jakartaee-migration/${migration-lib.version}/jakartaee-migration-${migration-lib.version}-shaded.jar

@@ -27,6 +27,8 @@ public interface CloudMembershipServiceMBean {
 
     public int getReadTimeout();
 
+    public long getExpirationTime();
+
     // Operation
     public Properties getProperties();
 

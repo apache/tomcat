@@ -17,7 +17,7 @@
 
 package org.apache.coyote;
 
-import javax.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.HttpUpgradeHandler;
 
 import org.apache.tomcat.ContextBind;
 import org.apache.tomcat.InstanceManager;
@@ -30,12 +30,14 @@ public final class UpgradeToken {
     private final ContextBind contextBind;
     private final HttpUpgradeHandler httpUpgradeHandler;
     private final InstanceManager instanceManager;
+    private final String protocol;
 
-    public UpgradeToken(HttpUpgradeHandler httpUpgradeHandler,
-            ContextBind contextBind, InstanceManager instanceManager) {
+    public UpgradeToken(HttpUpgradeHandler httpUpgradeHandler, ContextBind contextBind, InstanceManager instanceManager,
+            String protocol) {
         this.contextBind = contextBind;
         this.httpUpgradeHandler = httpUpgradeHandler;
         this.instanceManager = instanceManager;
+        this.protocol = protocol;
     }
 
     public final ContextBind getContextBind() {
@@ -50,4 +52,7 @@ public final class UpgradeToken {
         return instanceManager;
     }
 
+    public final String getProtocol() {
+        return protocol;
+    }
 }

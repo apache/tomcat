@@ -319,7 +319,9 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         hconn.connect();
 
         // Swallow response message
-        IOTools.flow(hconn.getInputStream(), null);
+        try (InputStream is = hconn.getInputStream()) {
+            IOTools.flow(is, null);
+        }
     }
 
 

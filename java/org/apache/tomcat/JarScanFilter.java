@@ -28,4 +28,13 @@ public interface JarScanFilter {
      *             <code>false</code> if it should be excluded
      */
     boolean check(JarScanType jarScanType, String jarName);
+
+    /**
+     *
+     * @return <code>true</code> if all of the scans should be skipped which
+     * can improve startup performance. The default is <code>false</code>.
+     */
+    default boolean isSkipAll() {
+        return false;
+    }
 }

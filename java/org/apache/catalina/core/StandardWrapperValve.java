@@ -22,13 +22,14 @@ package org.apache.catalina.core;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
@@ -36,6 +37,7 @@ import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.coyote.CloseNowException;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.log.SystemLogHandler;
@@ -173,6 +175,7 @@ final class StandardWrapperValve
 
         // Call the filter chain for this request
         // NOTE: This also calls the servlet's service() method
+        Container container = this.container;
         try {
             if ((servlet != null) && (filterChain != null)) {
                 // Swallow output if needed
@@ -201,7 +204,12 @@ final class StandardWrapperValve
                 }
 
             }
-        } catch (ClientAbortException e) {
+        } catch (ClientAbortException | CloseNowException e) {
+            if (container.getLogger().isDebugEnabled()) {
+                container.getLogger().debug(sm.getString(
+                        "standardWrapper.serviceException", wrapper.getName(),
+                        context.getName()), e);
+            }
             throwable = e;
             exception(request, response, e);
         } catch (IOException e) {
@@ -247,51 +255,49 @@ final class StandardWrapperValve
                     context.getName()), e);
             throwable = e;
             exception(request, response, e);
-        }
-
-        // Release the filter chain (if any) for this request
-        if (filterChain != null) {
-            filterChain.release();
-        }
-
-        // Deallocate the allocated servlet instance
-        try {
-            if (servlet != null) {
-                wrapper.deallocate(servlet);
+        } finally {
+            // Release the filter chain (if any) for this request
+            if (filterChain != null) {
+                filterChain.release();
             }
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            container.getLogger().error(sm.getString("standardWrapper.deallocateException",
-                             wrapper.getName()), e);
-            if (throwable == null) {
-                throwable = e;
-                exception(request, response, e);
+
+            // Deallocate the allocated servlet instance
+            try {
+                if (servlet != null) {
+                    wrapper.deallocate(servlet);
+                }
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                container.getLogger().error(sm.getString("standardWrapper.deallocateException",
+                                 wrapper.getName()), e);
+                if (throwable == null) {
+                    throwable = e;
+                    exception(request, response, e);
+                }
             }
+
+            // If this servlet has been marked permanently unavailable,
+            // unload it and release this instance
+            try {
+                if ((servlet != null) &&
+                    (wrapper.getAvailable() == Long.MAX_VALUE)) {
+                    wrapper.unload();
+                }
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                container.getLogger().error(sm.getString("standardWrapper.unloadException",
+                                 wrapper.getName()), e);
+                if (throwable == null) {
+                    exception(request, response, e);
+                }
+            }
+            long t2=System.currentTimeMillis();
+
+            long time=t2-t1;
+            processingTime += time;
+            if( time > maxTime) maxTime=time;
+            if( time < minTime) minTime=time;
         }
-
-        // If this servlet has been marked permanently unavailable,
-        // unload it and release this instance
-        try {
-            if ((servlet != null) &&
-                (wrapper.getAvailable() == Long.MAX_VALUE)) {
-                wrapper.unload();
-            }
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            container.getLogger().error(sm.getString("standardWrapper.unloadException",
-                             wrapper.getName()), e);
-            if (throwable == null) {
-                throwable = e;
-                exception(request, response, e);
-            }
-        }
-        long t2=System.currentTimeMillis();
-
-        long time=t2-t1;
-        processingTime += time;
-        if( time > maxTime) maxTime=time;
-        if( time < minTime) minTime=time;
-
     }
 
 

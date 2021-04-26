@@ -30,21 +30,22 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCode;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.DeploymentException;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Extension;
-import javax.websocket.MessageHandler;
-import javax.websocket.MessageHandler.Partial;
-import javax.websocket.MessageHandler.Whole;
-import javax.websocket.PongMessage;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.SendResult;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCode;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Extension;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.MessageHandler.Partial;
+import jakarta.websocket.MessageHandler.Whole;
+import jakarta.websocket.PongMessage;
+import jakarta.websocket.RemoteEndpoint;
+import jakarta.websocket.SendResult;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -96,7 +97,8 @@ public class WsSession implements Session {
     private volatile int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
-    private volatile long lastActive = System.currentTimeMillis();
+    private volatile long lastActiveRead = System.currentTimeMillis();
+    private volatile long lastActiveWrite = System.currentTimeMillis();
     private Map<FutureToSendHandler, FutureToSendHandler> futures = new ConcurrentHashMap<>();
 
     /**
@@ -416,7 +418,7 @@ public class WsSession implements Session {
     @Override
     public Set<Session> getOpenSessions() {
         checkState();
-        return webSocketContainer.getOpenSessions(localEndpoint);
+        return webSocketContainer.getOpenSessions(getSessionMapKey());
     }
 
 
@@ -455,6 +457,22 @@ public class WsSession implements Session {
      * @param closeReasonLocal   The close reason to pass to the local endpoint
      */
     public void doClose(CloseReason closeReasonMessage, CloseReason closeReasonLocal) {
+        doClose(closeReasonMessage, closeReasonLocal, false);
+    }
+
+
+    /**
+     * WebSocket 1.0. Section 2.1.5.
+     * Need internal close method as spec requires that the local endpoint
+     * receives a 1006 on timeout.
+     *
+     * @param closeReasonMessage The close reason to pass to the remote endpoint
+     * @param closeReasonLocal   The close reason to pass to the local endpoint
+     * @param closeSocket        Should the socket be closed immediately rather than waiting
+     *                           for the server to respond
+     */
+    public void doClose(CloseReason closeReasonMessage, CloseReason closeReasonLocal,
+            boolean closeSocket) {
         // Double-checked locking. OK because state is volatile
         if (state != State.OPEN) {
             return;
@@ -478,6 +496,9 @@ public class WsSession implements Session {
             state = State.OUTPUT_CLOSED;
 
             sendCloseMessage(closeReasonMessage);
+            if (closeSocket) {
+                wsRemoteEndpoint.close();
+            }
             fireEndpointOnClose(closeReasonLocal);
         }
 
@@ -605,10 +626,20 @@ public class WsSession implements Session {
                 localEndpoint.onError(this, e);
             }
         } finally {
-            webSocketContainer.unregisterSession(localEndpoint, this);
+            webSocketContainer.unregisterSession(getSessionMapKey(), this);
         }
     }
 
+
+    private Object getSessionMapKey() {
+        if (endpointConfig instanceof ServerEndpointConfig) {
+            // Server
+            return ((ServerEndpointConfig) endpointConfig).getPath();
+        } else {
+            // Client
+            return localEndpoint;
+        }
+    }
 
     /**
      * Use protected so unit tests can access this method directly.
@@ -775,25 +806,59 @@ public class WsSession implements Session {
     }
 
 
-    protected void updateLastActive() {
-        lastActive = System.currentTimeMillis();
+    protected void updateLastActiveRead() {
+        lastActiveRead = System.currentTimeMillis();
+    }
+
+
+    protected void updateLastActiveWrite() {
+        lastActiveWrite = System.currentTimeMillis();
     }
 
 
     protected void checkExpiration() {
+        // Local copies to ensure consistent behaviour during method execution
         long timeout = maxIdleTimeout;
-        if (timeout < 1) {
-            return;
+        long timeoutRead = getMaxIdleTimeoutRead();
+        long timeoutWrite = getMaxIdleTimeoutWrite();
+
+        long currentTime = System.currentTimeMillis();
+        String key = null;
+
+        if (timeoutRead > 0 && (currentTime - lastActiveRead) > timeoutRead) {
+            key = "wsSession.timeoutRead";
+        } else if (timeoutWrite > 0 && (currentTime - lastActiveWrite) > timeoutRead) {
+            key = "wsSession.timeoutWrite";
+        } else if (timeout > 0 && (currentTime - lastActiveRead) > timeout &&
+                (currentTime - lastActiveWrite) > timeout) {
+            key = "wsSession.timeout";
         }
 
-        if (System.currentTimeMillis() - lastActive > timeout) {
-            String msg = sm.getString("wsSession.timeout", getId());
+        if (key != null) {
+            String msg = sm.getString(key, getId());
             if (log.isDebugEnabled()) {
                 log.debug(msg);
             }
-            doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
-                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+            doClose(new CloseReason(CloseCodes.GOING_AWAY, msg), new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
         }
+    }
+
+
+    private long getMaxIdleTimeoutRead() {
+        Object timeout = userProperties.get(Constants.READ_IDLE_TIMEOUT_MS);
+        if (timeout instanceof Long) {
+            return ((Long) timeout).longValue();
+        }
+        return 0;
+    }
+
+
+    private long getMaxIdleTimeoutWrite() {
+        Object timeout = userProperties.get(Constants.WRITE_IDLE_TIMEOUT_MS);
+        if (timeout instanceof Long) {
+            return ((Long) timeout).longValue();
+        }
+        return 0;
     }
 
 

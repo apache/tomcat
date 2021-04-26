@@ -28,7 +28,11 @@ import org.apache.tomcat.jni.SSL;
  * <p>
  * TODO: Add a mechanism (or figure out how to use what we already have) to
  *       invalidate the session.
+ *
+ * @deprecated  The APR/Native Connector will be removed in Tomcat 10.1.x
+ *              onwards.
  */
+@Deprecated
 public class AprSSLSupport implements SSLSupport {
 
     private final AprEndpoint.AprSocketWrapper socketWrapper;
@@ -104,6 +108,7 @@ public class AprSSLSupport implements SSLSupport {
         }
     }
 
+
     @Override
     public String getProtocol() throws IOException {
         try {
@@ -112,4 +117,16 @@ public class AprSSLSupport implements SSLSupport {
             throw new IOException(e);
         }
    }
+
+
+    @Override
+    public String getRequestedProtocols() throws IOException {
+        return null;
+    }
+
+
+    @Override
+    public String getRequestedCiphers() throws IOException {
+        return null;
+    }
 }

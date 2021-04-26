@@ -20,9 +20,9 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.tagext.TagSupport;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -216,6 +216,32 @@ public class TestValidator extends TomcatBaseTest {
         Assert.assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+    }
+
+    @Test
+    public void testTldVersions50() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir =
+            new File("test/webapp-5.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/tld-versions.jsp");
+
+        String result = res.toString();
+
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>07-hello world</p>") > 0);
     }
 
     public static class Echo extends TagSupport {

@@ -126,7 +126,7 @@ public class LimitLatch {
         long result = getCount();
         if (log.isDebugEnabled()) {
             log.debug("Counting down["+Thread.currentThread().getName()+"] latch="+result);
-    }
+        }
         return result;
     }
 

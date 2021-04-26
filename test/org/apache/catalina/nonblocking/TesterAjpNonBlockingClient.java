@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.net.SocketFactory;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,7 +49,7 @@ public class TesterAjpNonBlockingClient extends TomcatBaseTest {
 
         Map<String, List<String>> resHeaders = new HashMap<>();
         ByteChunk out = new ByteChunk();
-        int rc = postUrl(true, new DataWriter(2000), "http://localhost" +
+        int rc = postUrl(true, new DataWriter(2000, 5), "http://localhost" +
                 "/examples/servlets/nonblocking/bytecounter",
                 out, resHeaders, null);
 

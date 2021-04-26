@@ -36,7 +36,7 @@
 directives that can be included in a <code>conf/server.xml</code> file to
 configure the behavior of the Tomcat Servlet/JSP container.  It does not
 attempt to describe which configuration directives should be used to perform
-specific tasks - for that, see the various <em>HOW-TO</em> documents on the
+specific tasks - for that, see the various <em>How-To</em> documents on the
 main index page.</p>
 
 <p>Tomcat configuration files are formatted as schemaless XML; elements and

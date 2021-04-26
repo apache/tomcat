@@ -23,7 +23,7 @@
 
   - *.html files in documentation are generated from XML sources
 
-  - *.md5, *.sha/*.sha1 files are generated and cannot contain license
+  - *.sha512 files are generated and cannot contain license
 
   - *.manifest, MANIFEST.MF JAR manifest files cannot contain license
 
@@ -55,6 +55,8 @@
 
   - Temporary cache files used by Checkstle
 
+  - Configuration files for third party Continuous Integration systems like Travis CI
+
 
 output/build/logs/*
 output/test-tmp/**
@@ -63,8 +65,7 @@ output/build/webapps/docs/**/*.html
 output/dist/webapps/docs/**/*.html
 output/deployer/deployer-howto.html
 
-**/*.md5
-**/*.sha1
+**/*.sha512
 
 **/MANIFEST.MF
 **/*.manifest
@@ -109,69 +110,92 @@ output/dist/confinstall/tomcat-users_2.xml
 output/dist/src/res/confinstall/tomcat-users_2.xml
 res/confinstall/tomcat-users_2.xml
 
-java/javax/servlet/resources/javaee_5.xsd
-java/javax/servlet/resources/javaee_6.xsd
-java/javax/servlet/resources/javaee_7.xsd
-java/javax/servlet/resources/javaee_8.xsd
-java/javax/servlet/resources/javaee_web_services_1_2.xsd
-java/javax/servlet/resources/javaee_web_services_1_3.xsd
-java/javax/servlet/resources/javaee_web_services_1_4.xsd
-java/javax/servlet/resources/javaee_web_services_client_1_2.xsd
-java/javax/servlet/resources/javaee_web_services_client_1_3.xsd
-java/javax/servlet/resources/javaee_web_services_client_1_4.xsd
-java/javax/servlet/resources/jsp_2_2.xsd
-java/javax/servlet/resources/jsp_2_3.xsd
-java/javax/servlet/resources/web-app_3_0.xsd
-java/javax/servlet/resources/web-app_3_1.xsd
-java/javax/servlet/resources/web-app_4_0.xsd
-java/javax/servlet/resources/web-common_3_0.xsd
-java/javax/servlet/resources/web-common_3_1.xsd
-java/javax/servlet/resources/web-common_4_0.xsd
-java/javax/servlet/resources/web-fragment_3_0.xsd
-java/javax/servlet/resources/web-fragment_3_1.xsd
-java/javax/servlet/resources/web-fragment_4_0.xsd
-output/classes/javax/servlet/resources/javaee_5.xsd
-output/classes/javax/servlet/resources/javaee_6.xsd
-output/classes/javax/servlet/resources/javaee_7.xsd
-output/classes/javax/servlet/resources/javaee_8.xsd
-output/classes/javax/servlet/resources/javaee_web_services_1_2.xsd
-output/classes/javax/servlet/resources/javaee_web_services_1_3.xsd
-output/classes/javax/servlet/resources/javaee_web_services_1_4.xsd
-output/classes/javax/servlet/resources/javaee_web_services_client_1_2.xsd
-output/classes/javax/servlet/resources/javaee_web_services_client_1_3.xsd
-output/classes/javax/servlet/resources/javaee_web_services_client_1_4.xsd
-output/classes/javax/servlet/resources/jsp_2_2.xsd
-output/classes/javax/servlet/resources/jsp_2_3.xsd
-output/classes/javax/servlet/resources/web-app_3_0.xsd
-output/classes/javax/servlet/resources/web-app_3_1.xsd
-output/classes/javax/servlet/resources/web-app_4_0.xsd
-output/classes/javax/servlet/resources/web-common_3_0.xsd
-output/classes/javax/servlet/resources/web-common_3_1.xsd
-output/classes/javax/servlet/resources/web-common_4_0.xsd
-output/classes/javax/servlet/resources/web-fragment_3_0.xsd
-output/classes/javax/servlet/resources/web-fragment_3_1.xsd
-output/classes/javax/servlet/resources/web-fragment_4_0.xsd
-output/dist/src/java/javax/servlet/resources/javaee_5.xsd
-output/dist/src/java/javax/servlet/resources/javaee_6.xsd
-output/dist/src/java/javax/servlet/resources/javaee_7.xsd
-output/dist/src/java/javax/servlet/resources/javaee_8.xsd
-output/dist/src/java/javax/servlet/resources/javaee_web_services_1_2.xsd
-output/dist/src/java/javax/servlet/resources/javaee_web_services_1_3.xsd
-output/dist/src/java/javax/servlet/resources/javaee_web_services_1_4.xsd
-output/dist/src/java/javax/servlet/resources/javaee_web_services_client_1_2.xsd
-output/dist/src/java/javax/servlet/resources/javaee_web_services_client_1_3.xsd
-output/dist/src/java/javax/servlet/resources/javaee_web_services_client_1_4.xsd
-output/dist/src/java/javax/servlet/resources/jsp_2_2.xsd
-output/dist/src/java/javax/servlet/resources/jsp_2_3.xsd
-output/dist/src/java/javax/servlet/resources/web-app_3_0.xsd
-output/dist/src/java/javax/servlet/resources/web-app_3_1.xsd
-output/dist/src/java/javax/servlet/resources/web-app_4_0.xsd
-output/dist/src/java/javax/servlet/resources/web-common_3_0.xsd
-output/dist/src/java/javax/servlet/resources/web-common_3_1.xsd
-output/dist/src/java/javax/servlet/resources/web-common_4_0.xsd
-output/dist/src/java/javax/servlet/resources/web-fragment_3_0.xsd
-output/dist/src/java/javax/servlet/resources/web-fragment_3_1.xsd
-output/dist/src/java/javax/servlet/resources/web-fragment_4_0.xsd
+java/jakarta/servlet/resources/javaee_5.xsd
+java/jakarta/servlet/resources/javaee_6.xsd
+java/jakarta/servlet/resources/javaee_7.xsd
+java/jakarta/servlet/resources/javaee_8.xsd
+java/jakarta/servlet/resources/jakartaee_9.xsd
+java/jakarta/servlet/resources/javaee_web_services_1_2.xsd
+java/jakarta/servlet/resources/javaee_web_services_1_3.xsd
+java/jakarta/servlet/resources/javaee_web_services_1_4.xsd
+java/jakarta/servlet/resources/jakartaee_web_services_2_0.xsd
+java/jakarta/servlet/resources/javaee_web_services_client_1_2.xsd
+java/jakarta/servlet/resources/javaee_web_services_client_1_3.xsd
+java/jakarta/servlet/resources/javaee_web_services_client_1_4.xsd
+java/jakarta/servlet/resources/jakartaee_web_services_client_2_0.xsd
+java/jakarta/servlet/resources/jsp_2_2.xsd
+java/jakarta/servlet/resources/jsp_2_3.xsd
+java/jakarta/servlet/resources/jsp_3_0.xsd
+java/jakarta/servlet/resources/web-app_3_0.xsd
+java/jakarta/servlet/resources/web-app_3_1.xsd
+java/jakarta/servlet/resources/web-app_4_0.xsd
+java/jakarta/servlet/resources/web-app_5_0.xsd
+java/jakarta/servlet/resources/web-common_3_0.xsd
+java/jakarta/servlet/resources/web-common_3_1.xsd
+java/jakarta/servlet/resources/web-common_4_0.xsd
+java/jakarta/servlet/resources/web-common_5_0.xsd
+java/jakarta/servlet/resources/web-fragment_3_0.xsd
+java/jakarta/servlet/resources/web-fragment_3_1.xsd
+java/jakarta/servlet/resources/web-fragment_4_0.xsd
+java/jakarta/servlet/resources/web-fragment_5_0.xsd
+java/jakarta/servlet/resources/web-jsptaglibrary_3_0.xsd
+output/classes/jakarta/servlet/resources/javaee_5.xsd
+output/classes/jakarta/servlet/resources/javaee_6.xsd
+output/classes/jakarta/servlet/resources/javaee_7.xsd
+output/classes/jakarta/servlet/resources/javaee_8.xsd
+output/classes/jakarta/servlet/resources/jakartaee_9.xsd
+output/classes/jakarta/servlet/resources/javaee_web_services_1_2.xsd
+output/classes/jakarta/servlet/resources/javaee_web_services_1_3.xsd
+output/classes/jakarta/servlet/resources/javaee_web_services_1_4.xsd
+output/classes/jakarta/servlet/resources/jakartaee_web_services_2_0.xsd
+output/classes/jakarta/servlet/resources/javaee_web_services_client_1_2.xsd
+output/classes/jakarta/servlet/resources/javaee_web_services_client_1_3.xsd
+output/classes/jakarta/servlet/resources/javaee_web_services_client_1_4.xsd
+output/classes/jakarta/servlet/resources/jakartaee_web_services_client_1_4.xsd
+output/classes/jakarta/servlet/resources/jsp_2_2.xsd
+output/classes/jakarta/servlet/resources/jsp_2_3.xsd
+output/classes/jakarta/servlet/resources/jsp_3_0.xsd
+output/classes/jakarta/servlet/resources/web-app_3_0.xsd
+output/classes/jakarta/servlet/resources/web-app_3_1.xsd
+output/classes/jakarta/servlet/resources/web-app_4_0.xsd
+output/classes/jakarta/servlet/resources/web-app_5_0.xsd
+output/classes/jakarta/servlet/resources/web-common_3_0.xsd
+output/classes/jakarta/servlet/resources/web-common_3_1.xsd
+output/classes/jakarta/servlet/resources/web-common_4_0.xsd
+output/classes/jakarta/servlet/resources/web-fragment_3_0.xsd
+output/classes/jakarta/servlet/resources/web-fragment_3_1.xsd
+output/classes/jakarta/servlet/resources/web-fragment_4_0.xsd
+output/classes/jakarta/servlet/resources/web-fragment_5_0.xsd
+output/classes/jakarta/servlet/resources/web-jsptaglibrary_3_0.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_5.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_6.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_7.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_8.xsd
+output/dist/src/java/jakarta/servlet/resources/jakartaee_9.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_web_services_1_2.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_web_services_1_3.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_web_services_1_4.xsd
+output/dist/src/java/jakarta/servlet/resources/jakartaee_web_services_2_0.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_web_services_client_1_2.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_web_services_client_1_3.xsd
+output/dist/src/java/jakarta/servlet/resources/javaee_web_services_client_1_4.xsd
+output/dist/src/java/jakarta/servlet/resources/jakartaee_web_services_client_2_0.xsd
+output/dist/src/java/jakarta/servlet/resources/jsp_2_2.xsd
+output/dist/src/java/jakarta/servlet/resources/jsp_2_3.xsd
+output/dist/src/java/jakarta/servlet/resources/jsp_3_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-app_3_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-app_3_1.xsd
+output/dist/src/java/jakarta/servlet/resources/web-app_4_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-app_5_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-common_3_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-common_3_1.xsd
+output/dist/src/java/jakarta/servlet/resources/web-common_4_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-common_5_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-fragment_3_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-fragment_3_1.xsd
+output/dist/src/java/jakarta/servlet/resources/web-fragment_4_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-fragment_5_0.xsd
+output/dist/src/java/jakarta/servlet/resources/web-jsptaglibrary_3_0.xsd
 
 output/dist/src/res/checkstyle/header-al2.txt
 res/checkstyle/header-al2.txt
@@ -185,3 +209,4 @@ output/dist/temp/safeToDelete.tmp
 **/*.md
 
 output/res/checkstyle/*
+

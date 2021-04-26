@@ -72,8 +72,6 @@ public class HpackDecoder {
     private volatile boolean countedCookie;
     private volatile int headerSize = 0;
 
-    private final StringBuilder stringBuilder = new StringBuilder();
-
     HpackDecoder(int maxMemorySize) {
         this.maxMemorySizeHard = maxMemorySize;
         this.maxMemorySizeSoft = maxMemorySize;
@@ -155,7 +153,7 @@ public class HpackDecoder {
                     return;
                 }
             } else {
-                throw new RuntimeException("Not yet implemented");
+                throw new RuntimeException(sm.getString("hpackdecoder.notImplemented"));
             }
         }
     }
@@ -171,7 +169,8 @@ public class HpackDecoder {
             return false;
         }
         if (size > maxMemorySizeHard) {
-            throw new HpackException();
+            throw new HpackException(sm.getString("hpackdecoder.maxMemorySizeExceeded",
+                    Integer.valueOf(size), Integer.valueOf(maxMemorySizeHard)));
         }
         maxMemorySizeSoft = size;
         if (currentMemorySize > maxMemorySizeSoft) {
@@ -221,19 +220,17 @@ public class HpackDecoder {
         if (huffman) {
             return readHuffmanString(length, buffer);
         }
+        StringBuilder stringBuilder = new StringBuilder(length);
         for (int i = 0; i < length; ++i) {
             stringBuilder.append((char) buffer.get());
         }
-        String ret = stringBuilder.toString();
-        stringBuilder.setLength(0);
-        return ret;
+        return stringBuilder.toString();
     }
 
     private String readHuffmanString(int length, ByteBuffer buffer) throws HpackException {
+        StringBuilder stringBuilder = new StringBuilder(length);
         HPackHuffman.decode(buffer, length, stringBuilder);
-        String ret = stringBuilder.toString();
-        stringBuilder.setLength(0);
-        return ret;
+        return stringBuilder.toString();
     }
 
     private String handleIndexedHeaderName(int index) throws HpackException {
@@ -249,7 +246,7 @@ public class HpackDecoder {
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
             Hpack.HeaderField res = headerTable[adjustedIndex];
             if (res == null) {
-                throw new HpackException();
+                throw new HpackException(sm.getString("hpackdecoder.nullHeader", Integer.valueOf(index)));
             }
             return res.name;
         }

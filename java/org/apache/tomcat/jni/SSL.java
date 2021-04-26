@@ -140,7 +140,7 @@ public final class SSL {
     /* Set on servers to choose the cipher according to the server's
      * preferences */
     public static final int SSL_OP_CIPHER_SERVER_PREFERENCE         = 0x00400000;
-    /* If set, a server will allow a client to issue a SSLv3.0 version number
+    /* If set, a server will allow a client to issue an SSLv3.0 version number
      * as latest version supported in the premaster secret, even when TLSv1.0
      * (version 3.1) was announced in the client hello. Normally this is
      * forbidden to prevent version rollback attacks. */
@@ -647,7 +647,7 @@ public final class SSL {
      * Authentication. Notice that this directive can be used both in per-server
      * and per-directory context. In per-server context it applies to the client
      * authentication process used in the standard SSL handshake when a connection
-     * is established. In per-directory context it forces a SSL renegotiation with
+     * is established. In per-directory context it forces an SSL renegotiation with
      * the reconfigured client verification level after the HTTP request was read
      * but before the HTTP response is sent.
      * <br>
@@ -704,7 +704,7 @@ public final class SSL {
      * is permitted to negotiate in the SSL handshake phase. Notice that this
      * directive can be used both in per-server and per-directory context.
      * In per-server context it applies to the standard SSL handshake when a
-     * connection is established. In per-directory context it forces a SSL
+     * connection is established. In per-directory context it forces an SSL
      * renegotiation with the reconfigured Cipher Suite after the HTTP request
      * was read but before the HTTP response is sent.
      * @param ssl the SSL instance (SSL *)

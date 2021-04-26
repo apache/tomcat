@@ -70,7 +70,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      * Protect against the memory leak caused when the first call to
      * <code>sun.awt.AppContext.getAppContext()</code> is triggered by a web
      * application. Defaults to <code>false</code> since Tomcat code no longer
-     * triggers this althoguh application code may.
+     * triggers this although application code may.
      */
     private boolean appContextProtection = false;
     public boolean isAppContextProtection() { return appContextProtection; }

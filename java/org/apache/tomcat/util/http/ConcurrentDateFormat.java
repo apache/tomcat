@@ -36,8 +36,7 @@ public class ConcurrentDateFormat {
     private final TimeZone timezone;
     private final Queue<SimpleDateFormat> queue = new ConcurrentLinkedQueue<>();
 
-    public ConcurrentDateFormat(String format, Locale locale,
-            TimeZone timezone) {
+    public ConcurrentDateFormat(String format, Locale locale, TimeZone timezone) {
         this.format = format;
         this.locale = locale;
         this.timezone = timezone;
@@ -61,6 +60,7 @@ public class ConcurrentDateFormat {
             sdf = createInstance();
         }
         Date result = sdf.parse(source);
+        sdf.setTimeZone(timezone);
         queue.add(sdf);
         return result;
     }

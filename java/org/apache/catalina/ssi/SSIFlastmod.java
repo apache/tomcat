@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.apache.catalina.util.Strftime;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implements the Server-side #flastmod command
@@ -32,6 +33,7 @@ import org.apache.catalina.util.Strftime;
  * @author David Becker
  */
 public final class SSIFlastmod implements SSICommand {
+    private static final StringManager sm = StringManager.getManager(SSIFlastmod.class);
     /**
      * @see SSICommand
      */
@@ -55,14 +57,11 @@ public final class SSIFlastmod implements SSICommand {
                     String configTimeFmt = ssiMediator.getConfigTimeFmt();
                     writer.write(formatDate(date, configTimeFmt));
                 } else {
-                    ssiMediator.log("#flastmod--Invalid attribute: "
-                            + paramName);
+                    ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                     writer.write(configErrMsg);
                 }
             } catch (IOException e) {
-                ssiMediator.log(
-                        "#flastmod--Couldn't get last modified for file: "
-                                + substitutedValue, e);
+                ssiMediator.log(sm.getString("ssiFlastmod.noLastModified", substitutedValue), e);
                 writer.write(configErrMsg);
             }
         }

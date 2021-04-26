@@ -55,6 +55,7 @@ public class TestVirtualContext extends TomcatBaseTest {
 
     @Test
     public void testVirtualClassLoader() throws Exception {
+
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp-virtual-webapp/src/main/webapp");
@@ -321,7 +322,10 @@ public class TestVirtualContext extends TomcatBaseTest {
         //       root cause of this is the frequent poor IO performance of the
         //       VM running the buildbot instance. Increasing this to 10s should
         //       avoid these failures.
-        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 10000,
+        //       With the additional of Travis CI, failures continued to
+        //       observed with a 10s timeout. It was therefore increased to 20s
+        //       and then 30s.
+        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 30000,
                 null, null);
 
         Assert.assertEquals(expectedStatus, sc);

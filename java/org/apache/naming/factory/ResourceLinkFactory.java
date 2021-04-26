@@ -40,7 +40,7 @@ public class ResourceLinkFactory implements ObjectFactory {
 
     // ------------------------------------------------------- Static Variables
 
-    private static final StringManager sm = StringManager.getManager(ResourceLinkFactory.class);
+    protected static final StringManager sm = StringManager.getManager(ResourceLinkFactory.class);
 
     /**
      * Global naming context.
@@ -102,7 +102,7 @@ public class ResourceLinkFactory implements ObjectFactory {
     private static void validateGlobalContext(Context globalContext) {
         if (ResourceLinkFactory.globalContext != null &&
                 ResourceLinkFactory.globalContext != globalContext) {
-            throw new SecurityException("Caller provided invalid global context");
+            throw new SecurityException(sm.getString("resourceLinkFactory.invalidGlobalContext"));
         }
     }
 

@@ -22,16 +22,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.SingleThreadModel;
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.tagext.TagInfo;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.SingleThreadModel;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.jsp.tagext.TagInfo;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -281,6 +281,7 @@ public class JspServletWrapper {
                 synchronized (this) {
                     if (getReloadInternal() || tagHandlerClass == null) {
                         tagHandlerClass = ctxt.load();
+                        // Volatile 'reload' forces in order write of 'tagHandlerClass'
                         reload = false;
                     }
                 }
@@ -326,7 +327,7 @@ public class JspServletWrapper {
                         }
                     }
                 }
-                target = tagHandlerClass.newInstance();
+                target = tagHandlerClass.getConstructor().newInstance();
             } else {
                 target = getServlet();
             }
@@ -417,20 +418,10 @@ public class JspServletWrapper {
                 return;
             }
 
-        } catch (ServletException ex) {
-            if (options.getDevelopment()) {
-                throw handleJspException(ex);
-            }
-            throw ex;
         } catch (FileNotFoundException fnfe) {
             // File has been removed. Let caller handle this.
             throw fnfe;
-        } catch (IOException ex) {
-            if (options.getDevelopment()) {
-                throw handleJspException(ex);
-            }
-            throw ex;
-        } catch (IllegalStateException ex) {
+        } catch (ServletException | IOException | IllegalStateException ex) {
             if (options.getDevelopment()) {
                 throw handleJspException(ex);
             }
@@ -494,7 +485,7 @@ public class JspServletWrapper {
             response.sendError
                 (HttpServletResponse.SC_SERVICE_UNAVAILABLE,
                  ex.getMessage());
-        } catch (ServletException ex) {
+        } catch (ServletException | IllegalStateException ex) {
             if(options.getDevelopment()) {
                 throw handleJspException(ex);
             }
@@ -502,11 +493,6 @@ public class JspServletWrapper {
         } catch (IOException ex) {
             if (options.getDevelopment()) {
                 throw new IOException(handleJspException(ex).getMessage(), ex);
-            }
-            throw ex;
-        } catch (IllegalStateException ex) {
-            if(options.getDevelopment()) {
-                throw handleJspException(ex);
             }
             throw ex;
         } catch (Exception ex) {

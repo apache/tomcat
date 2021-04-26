@@ -329,7 +329,7 @@ b = Boolean.FALSE;
     case NUMBER_DECIMAL:{
       t = jj_consume_token(NUMBER_DECIMAL);
 if (nativeNumbers) {
-                {if ("" != null) return new Long(t.image);}
+                {if ("" != null) return Long.valueOf(t.image);}
             } else {
                 {if ("" != null) return new java.math.BigDecimal(t.image);}
             }
@@ -338,7 +338,7 @@ if (nativeNumbers) {
     case NUMBER_INTEGER:{
       t = jj_consume_token(NUMBER_INTEGER);
 if (nativeNumbers) {
-                {if ("" != null) return new Double(t.image);}
+                {if ("" != null) return Double.valueOf(t.image);}
             } else {
                 {if ("" != null) return new java.math.BigInteger(substringBefore(t.image, '.'));}
             }

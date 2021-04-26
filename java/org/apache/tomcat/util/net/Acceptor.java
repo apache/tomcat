@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Error;
@@ -32,6 +35,13 @@ public class Acceptor<U> implements Runnable {
 
     private final AbstractEndpoint<?,U> endpoint;
     private String threadName;
+    /*
+     * Tracked separately rather than using endpoint.isRunning() as calls to
+     * endpoint.stop() and endpoint.start() in quick succession can cause the
+     * acceptor to continue running when it should terminate.
+     */
+    private volatile boolean stopCalled = false;
+    private final CountDownLatch stopLatch = new CountDownLatch(1);
     protected volatile AcceptorState state = AcceptorState.NEW;
 
 
@@ -60,85 +70,125 @@ public class Acceptor<U> implements Runnable {
 
         int errorDelay = 0;
 
-        // Loop until we receive a shutdown command
-        while (endpoint.isRunning()) {
+        try {
+            // Loop until we receive a shutdown command
+            while (!stopCalled) {
 
-            // Loop if endpoint is paused
-            while (endpoint.isPaused() && endpoint.isRunning()) {
-                state = AcceptorState.PAUSED;
+                // Loop if endpoint is paused
+                while (endpoint.isPaused() && !stopCalled) {
+                    state = AcceptorState.PAUSED;
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                }
+
+                if (stopCalled) {
+                    break;
+                }
+                state = AcceptorState.RUNNING;
+
                 try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-            }
+                    //if we have reached max connections, wait
+                    endpoint.countUpOrAwaitConnection();
 
-            if (!endpoint.isRunning()) {
-                break;
-            }
-            state = AcceptorState.RUNNING;
+                    // Endpoint might have been paused while waiting for latch
+                    // If that is the case, don't accept new connections
+                    if (endpoint.isPaused()) {
+                        continue;
+                    }
 
-            try {
-                //if we have reached max connections, wait
-                endpoint.countUpOrAwaitConnection();
+                    U socket = null;
+                    try {
+                        // Accept the next incoming connection from the server
+                        // socket
+                        socket = endpoint.serverSocketAccept();
+                    } catch (Exception ioe) {
+                        // We didn't get a socket
+                        endpoint.countDownConnection();
+                        if (endpoint.isRunning()) {
+                            // Introduce delay if necessary
+                            errorDelay = handleExceptionWithDelay(errorDelay);
+                            // re-throw
+                            throw ioe;
+                        } else {
+                            break;
+                        }
+                    }
+                    // Successful accept, reset the error delay
+                    errorDelay = 0;
 
-                // Endpoint might have been paused while waiting for latch
-                // If that is the case, don't accept new connections
-                if (endpoint.isPaused()) {
-                    continue;
-                }
-
-                U socket = null;
-                try {
-                    // Accept the next incoming connection from the server
-                    // socket
-                    socket = endpoint.serverSocketAccept();
-                } catch (Exception ioe) {
-                    // We didn't get a socket
-                    endpoint.countDownConnection();
-                    if (endpoint.isRunning()) {
-                        // Introduce delay if necessary
-                        errorDelay = handleExceptionWithDelay(errorDelay);
-                        // re-throw
-                        throw ioe;
+                    // Configure the socket
+                    if (!stopCalled && !endpoint.isPaused()) {
+                        // setSocketOptions() will hand the socket off to
+                        // an appropriate processor if successful
+                        if (!endpoint.setSocketOptions(socket)) {
+                            endpoint.closeSocket(socket);
+                        }
                     } else {
-                        break;
+                        endpoint.destroySocket(socket);
                     }
-                }
-                // Successful accept, reset the error delay
-                errorDelay = 0;
-
-                // Configure the socket
-                if (endpoint.isRunning() && !endpoint.isPaused()) {
-                    // setSocketOptions() will hand the socket off to
-                    // an appropriate processor if successful
-                    if (!endpoint.setSocketOptions(socket)) {
-                        endpoint.closeSocket(socket);
-                    }
-                } else {
-                    endpoint.destroySocket(socket);
-                }
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                String msg = sm.getString("endpoint.accept.fail");
-                // APR specific.
-                // Could push this down but not sure it is worth the trouble.
-                if (t instanceof Error) {
-                    Error e = (Error) t;
-                    if (e.getError() == 233) {
-                        // Not an error on HP-UX so log as a warning
-                        // so it can be filtered out on that platform
-                        // See bug 50273
-                        log.warn(msg, t);
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    String msg = sm.getString("endpoint.accept.fail");
+                    // APR specific.
+                    // Could push this down but not sure it is worth the trouble.
+                    if (t instanceof Error) {
+                        Error e = (Error) t;
+                        if (e.getError() == 233) {
+                            // Not an error on HP-UX so log as a warning
+                            // so it can be filtered out on that platform
+                            // See bug 50273
+                            log.warn(msg, t);
+                        } else {
+                            log.error(msg, t);
+                        }
                     } else {
-                        log.error(msg, t);
+                            log.error(msg, t);
                     }
-                } else {
-                        log.error(msg, t);
                 }
             }
+        } finally {
+            stopLatch.countDown();
         }
         state = AcceptorState.ENDED;
+    }
+
+
+    /**
+     * Signals the Acceptor to stop, waiting at most 10 seconds for the stop to
+     * complete before returning. If the stop does not complete in that time a
+     * warning will be logged.
+     *
+     * @deprecated This method will be removed in Tomcat 10.1.x onwards.
+     *             Use {@link #stop(int)} instead.
+     */
+    @Deprecated
+    public void stop() {
+        stop(10);
+    }
+
+
+    /**
+     * Signals the Acceptor to stop, optionally waiting for that stop process
+     * to complete before returning. If a wait is requested and the stop does
+     * not complete in that time a warning will be logged.
+     *
+     * @param waitSeconds The time to wait in seconds. Use a value less than
+     *                    zero for no wait.
+     */
+    public void stop(int waitSeconds) {
+        stopCalled = true;
+        if (waitSeconds > 0) {
+            try {
+                if (!stopLatch.await(waitSeconds, TimeUnit.SECONDS)) {
+                   log.warn(sm.getString("acceptor.stop.fail", getThreadName()));
+                }
+            } catch (InterruptedException e) {
+                log.warn(sm.getString("acceptor.stop.interrupted", getThreadName()), e);
+            }
+        }
     }
 
 

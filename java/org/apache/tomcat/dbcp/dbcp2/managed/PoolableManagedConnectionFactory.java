@@ -57,6 +57,14 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
     }
 
     /**
+     * @return The transaction registry.
+     * @since 2.6.0
+     */
+    public TransactionRegistry getTransactionRegistry() {
+        return transactionRegistry;
+    }
+
+    /**
      * Uses the configured XAConnectionFactory to create a {@link PoolableManagedConnection}. Throws
      * <code>IllegalStateException</code> if the connection factory returns null. Also initializes the connection using
      * configured initialization SQL (if provided) and sets up a prepared statement pool associated with the
@@ -82,7 +90,7 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
             if (dataSourceJmxName != null) {
                 final StringBuilder base = new StringBuilder(dataSourceJmxName.toString());
                 base.append(Constants.JMX_CONNECTION_BASE_EXT);
-                base.append(Long.toString(connIndex));
+                base.append(connIndex);
                 config.setJmxNameBase(base.toString());
                 config.setJmxNamePrefix(Constants.JMX_STATEMENT_POOL_PREFIX);
             } else {

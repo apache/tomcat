@@ -55,21 +55,16 @@ public class GlobalNamingResourcesSF extends StoreFactoryBase {
                     resourcesdesc.getStoreFactory().store(aWriter, indent + 2,
                             resources);
                 } else {
-                    if(log.isWarnEnabled())
-                        log.warn("Can't find NamingResources Store Factory!");
+                    log.warn(sm.getString("globalNamingResourcesSF.noFactory"));
                 }
 
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printCloseTag(aWriter, elementDesc);
             } else {
-                if (log.isWarnEnabled())
-                    log.warn("Descriptor for element" + aElement.getClass()
-                            + " not configured!");
+                log.warn(sm.getString("storeFactory.noDescriptor", aElement.getClass(), "GlobalNamingResources"));
             }
         } else {
-            if (log.isWarnEnabled())
-                log.warn("wrong element " + aElement.getClass());
-
+            log.warn(sm.getString("globalNamingResourcesSF.wrongElement", aElement.getClass()));
         }
     }
 }

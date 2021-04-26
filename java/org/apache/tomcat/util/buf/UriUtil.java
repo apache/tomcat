@@ -46,12 +46,11 @@ public final class UriUtil {
         } else {
             WAR_SEPARATOR = custom + "/";
             PATTERN_CUSTOM = Pattern.compile(Pattern.quote(WAR_SEPARATOR));
-            StringBuffer sb = new StringBuffer(custom.length() * 3);
+            StringBuilder sb = new StringBuilder(custom.length() * 3);
             // Deliberately use the platform's default encoding
             byte[] ba = custom.getBytes();
-            for (int j = 0; j < ba.length; j++) {
+            for (byte toEncode : ba) {
                 // Converting each byte in the buffer
-                byte toEncode = ba[j];
                 sb.append('%');
                 int low = toEncode & 0x0f;
                 int high = (toEncode & 0xf0) >> 4;
@@ -193,5 +192,40 @@ public final class UriUtil {
 
     public static String getWarSeparator() {
         return WAR_SEPARATOR;
+    }
+
+
+    /**
+     * Does the provided path start with <code>file:/</code> or
+     * <code>&lt;protocol&gt;://</code>.
+     *
+     * @param path The path to test
+     *
+     * @return {@code} if the supplied path starts with once of the recognised
+     *         sequences.
+     */
+    public static boolean isAbsoluteURI(String path) {
+        // Special case as only a single /
+        if (path.startsWith("file:/")) {
+            return true;
+        }
+
+        // Start at the beginning of the path and skip over any valid protocol
+        // characters
+        int i = 0;
+        while (i < path.length() && isSchemeChar(path.charAt(i))) {
+            i++;
+        }
+        // Need at least one protocol character. False positives with Windows
+        // drives such as C:/... will be caught by the later test for "://"
+        if (i == 0) {
+            return false;
+        }
+        // path starts with something that might be a protocol. Look for a
+        // following "://"
+        if (i + 2 < path.length() && path.charAt(i++) == ':' && path.charAt(i++) == '/' && path.charAt(i) == '/') {
+            return true;
+        }
+        return false;
     }
 }

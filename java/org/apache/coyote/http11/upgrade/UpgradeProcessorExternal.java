@@ -18,8 +18,8 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletOutputStream;
 
 import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
@@ -37,13 +37,15 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
 
     private final UpgradeServletInputStream upgradeServletInputStream;
     private final UpgradeServletOutputStream upgradeServletOutputStream;
+    private final UpgradeInfo upgradeInfo;
 
-
-    public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper,
-            UpgradeToken upgradeToken) {
+    public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, UpgradeToken upgradeToken,
+            UpgradeGroupInfo upgradeGroupInfo) {
         super(upgradeToken);
-        this.upgradeServletInputStream = new UpgradeServletInputStream(this, wrapper);
-        this.upgradeServletOutputStream = new UpgradeServletOutputStream(this, wrapper);
+        this.upgradeInfo = new UpgradeInfo();
+        upgradeGroupInfo.addUpgradeInfo(upgradeInfo);
+        this.upgradeServletInputStream = new UpgradeServletInputStream(this, wrapper, upgradeInfo);
+        this.upgradeServletOutputStream = new UpgradeServletOutputStream(this, wrapper, upgradeInfo);
 
         /*
          * Leave timeouts in the hands of the upgraded protocol.
@@ -65,6 +67,8 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     public void close() throws Exception {
         upgradeServletInputStream.close();
         upgradeServletOutputStream.close();
+        // Triggers update of stats from UpgradeInfo to UpgradeGroupInfo
+        upgradeInfo.setGroupInfo(null);
     }
 
 
@@ -134,6 +138,6 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
 
     @Override
     public void pause() {
-        // NOOP for AJP
+        // NOOP
     }
 }

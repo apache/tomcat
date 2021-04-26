@@ -60,5 +60,14 @@ public enum SocketEvent {
      *     during Servlet 3.0 asynchronous processing.</li>
      * </ul>
      */
-    ERROR
+    ERROR,
+
+    /**
+     * A client attempted to establish a connection but failed. Examples of
+     * where this is used include:
+     * <ul>
+     * <li>TLS handshake failures</li>
+     * </ul>
+     */
+    CONNECT_FAIL
 }

@@ -257,7 +257,7 @@ public class CallMethodRule extends Rule {
             throws Exception {
 
         if (paramCount == 0) {
-            this.bodyText = bodyText.trim();
+            this.bodyText = bodyText.trim().intern();
         }
 
     }
@@ -348,7 +348,7 @@ public class CallMethodRule extends Rule {
             sb.append(targetOffset);
             sb.append(",stackdepth=");
             sb.append(digester.getCount());
-            sb.append(")");
+            sb.append(')');
             throw new org.xml.sax.SAXException(sb.toString());
         }
 
@@ -358,31 +358,55 @@ public class CallMethodRule extends Rule {
             sb.append(digester.match);
             sb.append("} Call ");
             sb.append(target.getClass().getName());
-            sb.append(".");
+            sb.append('.');
             sb.append(methodName);
-            sb.append("(");
+            sb.append('(');
             for (int i = 0; i < paramValues.length; i++) {
                 if (i > 0) {
-                    sb.append(",");
+                    sb.append(',');
                 }
                 if (paramValues[i] == null) {
                     sb.append("null");
                 } else {
                     sb.append(paramValues[i].toString());
                 }
-                sb.append("/");
+                sb.append('/');
                 if (paramTypes[i] == null) {
                     sb.append("null");
                 } else {
                     sb.append(paramTypes[i].getName());
                 }
             }
-            sb.append(")");
+            sb.append(')');
             digester.log.debug(sb.toString());
         }
         Object result = IntrospectionUtils.callMethodN(target, methodName,
                 paramValues, paramTypes);
         processMethodCallResult(result);
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(digester.toVariableName(target)).append('.').append(methodName);
+            code.append('(');
+            for (int i = 0; i < paramValues.length; i++) {
+                if (i > 0) {
+                    code.append(", ");
+                }
+                if (bodyText != null) {
+                    StringBuilder bodyTextParam = new StringBuilder();
+                    for (String bodyPart : bodyText.split("\n")) {
+                        bodyTextParam.append(bodyPart.trim()).append(' ');
+                    }
+                    code.append("\"").append(bodyTextParam.toString().trim().replace("\"", "\\\"")).append("\"");
+                } else if (paramValues[i] instanceof String) {
+                    code.append("\"").append(paramValues[i].toString()).append("\"");
+                } else {
+                    code.append(digester.toVariableName(paramValues[i]));
+                }
+            }
+            code.append(");");
+            code.append(System.lineSeparator());
+        }
     }
 
 
@@ -425,8 +449,8 @@ public class CallMethodRule extends Rule {
                 sb.append(paramTypes[i].getName());
             }
         }
-        sb.append("}");
-        sb.append("]");
+        sb.append('}');
+        sb.append(']');
         return sb.toString();
     }
 }

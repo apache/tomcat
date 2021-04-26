@@ -89,23 +89,6 @@
         parent class loaders to find requested classes or resources.</p>
       </attribute>
 
-      <attribute name="reloadable" required="false">
-        <p>Set to <code>true</code> if you want Catalina to monitor classes in
-        <code>/WEB-INF/classes/</code> and <code>/WEB-INF/lib</code> for
-        changes, and automatically reload the web application if a change
-        is detected.  This feature is very useful during application
-        development, but it requires significant runtime overhead and is
-        not recommended for use on deployed production applications.  You
-        can use the <a href="../manager-howto.html">Manager</a> web
-        application, however, to trigger reloads of deployed applications
-        on demand.</p>
-
-        <p><strong>NOTE</strong> - The value for this property will be
-        inherited from the <code>reloadable</code> attribute you set on
-        the surrounding <a href="context.html">Context</a> component,
-        and any value you explicitly set here will be replaced.</p>
-      </attribute>
-
     </attributes>
 
   </subsection>
@@ -119,6 +102,17 @@
     common attributes listed above):</p>
 
     <attributes>
+
+      <attribute name="jakartaConverter" required="false">
+        <p>If the Tomcat JakartaEE Migration Tool JAR is placed in the Catalina
+        <code>lib</code> folder, this attribute allows using it. The value of
+        the attribute should be the desired profile name for the conversion.
+        If an invalid value is specified, the <code>TOMCAT</code> profile will
+        be used, which includes all javax classes which are used by Tomcat.
+        Only classes will be converted, classloader resources (loaded using
+        <code>getResource</code> or <code>getResourceAsStream</code> will not
+        be processed).</p>
+      </attribute>
 
       <attribute name="loaderClass" required="false">
         <p>Java class name of the <code>java.lang.ClassLoader</code>

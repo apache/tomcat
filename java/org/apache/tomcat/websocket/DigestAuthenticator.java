@@ -116,19 +116,19 @@ public class DigestAuthenticator extends Authenticator {
         String A2 = "GET:" + requestUri;
 
         preDigest.append(encodeMD5(A1));
-        preDigest.append(":");
+        preDigest.append(':');
         preDigest.append(nonce);
 
         if (qop.toLowerCase().contains("auth")) {
-            preDigest.append(":");
+            preDigest.append(':');
             preDigest.append(String.format("%08X", Integer.valueOf(nonceCount)));
-            preDigest.append(":");
+            preDigest.append(':');
             preDigest.append(String.valueOf(cNonce));
-            preDigest.append(":");
+            preDigest.append(':');
             preDigest.append(qop);
         }
 
-        preDigest.append(":");
+        preDigest.append(':');
         preDigest.append(encodeMD5(A2));
 
         return encodeMD5(preDigest.toString());

@@ -85,17 +85,12 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
             Class<?> clazz = Class.forName(getStoreConfigClass(), true, this
                     .getClass().getClassLoader());
             storeConfig = (IStoreConfig) clazz.getConstructor().newInstance();
-            if (null == getStoreRegistry())
-                // default Loading
-                loader.load();
-            else
-                // load a special file registry (url)
-                loader.load(getStoreRegistry());
+            loader.load(getStoreRegistry());
             // use the loader Registry
             storeConfig.setRegistry(loader.getRegistry());
             storeConfig.setServer(server);
         } catch (Exception e) {
-            log.error("createMBean load", e);
+            log.error(sm.getString("storeConfigListener.loadError"), e);
             return;
         }
         try {
@@ -103,7 +98,7 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
             oname = new ObjectName("Catalina:type=StoreConfig" );
             registry.registerComponent(storeConfig, oname, "StoreConfig");
         } catch (Exception ex) {
-            log.error("createMBean register MBean", ex);
+            log.error(sm.getString("storeConfigListener.registerError"), ex);
         }
     }
 

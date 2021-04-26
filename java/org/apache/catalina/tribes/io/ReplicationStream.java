@@ -150,11 +150,11 @@ public final class ReplicationStream extends ObjectInputStream {
 
     public Class<?> findExternalClass(String name) throws ClassNotFoundException  {
         ClassNotFoundException cnfe = null;
-        for (int i=0; i<classLoaders.length; i++ ) {
+        for (ClassLoader classLoader : classLoaders) {
             try {
-                Class<?> clazz = Class.forName(name, false, classLoaders[i]);
+                Class<?> clazz = Class.forName(name, false, classLoader);
                 return clazz;
-            } catch ( ClassNotFoundException x ) {
+            } catch (ClassNotFoundException x) {
                 cnfe = x;
             }
         }

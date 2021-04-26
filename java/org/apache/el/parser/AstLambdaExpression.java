@@ -20,8 +20,8 @@ package org.apache.el.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.el.ELException;
-import javax.el.LambdaExpression;
+import jakarta.el.ELException;
+import jakarta.el.LambdaExpression;
 
 import org.apache.el.ValueExpressionImpl;
 import org.apache.el.lang.EvaluationContext;
@@ -120,7 +120,7 @@ public class AstLambdaExpression extends SimpleNode {
     private void setNestedState(NestedState nestedState) {
         if (this.nestedState != null) {
             // Should never happen
-            throw new IllegalStateException("nestedState may only be set once");
+            throw new IllegalStateException(MessageFactory.get("error.lambda.wrongNestedState"));
         }
         this.nestedState = nestedState;
 

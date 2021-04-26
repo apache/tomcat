@@ -18,9 +18,12 @@ package org.apache.jasper.compiler;
 
 import java.io.File;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,10 +56,9 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
 
         ServletContext context = ctx.getServletContext();
 
-        ELInterpreter interpreter =
-                ELInterpreterFactory.getELInterpreter(context);
+        ELInterpreter interpreter = ELInterpreterFactory.getELInterpreter(context);
         Assert.assertNotNull(interpreter);
-        Assert.assertTrue(interpreter instanceof DefaultELInterpreter);
+        assertThat(interpreter, instanceOf(DefaultELInterpreter.class));
 
         context.removeAttribute(ELInterpreter.class.getName());
 
@@ -64,7 +66,7 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
                 SimpleELInterpreter.class.getName());
         interpreter = ELInterpreterFactory.getELInterpreter(context);
         Assert.assertNotNull(interpreter);
-        Assert.assertTrue(interpreter instanceof SimpleELInterpreter);
+        assertThat(interpreter, instanceOf(SimpleELInterpreter.class));
 
         context.removeAttribute(ELInterpreter.class.getName());
 
@@ -72,7 +74,7 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
         context.setAttribute(ELInterpreter.class.getName(), simpleInterpreter);
         interpreter = ELInterpreterFactory.getELInterpreter(context);
         Assert.assertNotNull(interpreter);
-        Assert.assertTrue(interpreter instanceof SimpleELInterpreter);
+        assertThat(interpreter, instanceOf(SimpleELInterpreter.class));
         Assert.assertTrue(interpreter == simpleInterpreter);
 
         context.removeAttribute(ELInterpreter.class.getName());
@@ -83,7 +85,7 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
 
         interpreter = ELInterpreterFactory.getELInterpreter(ctx.getServletContext());
         Assert.assertNotNull(interpreter);
-        Assert.assertTrue(interpreter instanceof SimpleELInterpreter);
+        assertThat(interpreter, instanceOf(SimpleELInterpreter.class));
     }
 
     public static class Bug54239Listener implements ServletContextListener {

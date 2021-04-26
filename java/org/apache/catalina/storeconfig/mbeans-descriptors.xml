@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean         name="StoreConfig"
@@ -31,8 +34,7 @@
                impact="ACTION" returnType="void" >
          <parameter name="objectname"
                  description="Objectname from Server"
-                 type="java.lang.String"
-                 default="Catalina:type=Server"/>
+                 type="java.lang.String"/>
          <parameter name="backup"
                  description="store Context with backup"
                  type="boolean"/>
@@ -70,7 +72,7 @@
                impact="ACTION" returnType="void" >
           <parameter name="context"
                  description="Context"
-                 type="org.apache.catalina.context"/>
+                 type="org.apache.catalina.Context"/>
     </operation>
     <operation name="store"
                description="Store Host"

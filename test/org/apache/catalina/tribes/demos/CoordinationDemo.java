@@ -132,7 +132,7 @@ public class CoordinationDemo {
                 args = tokenize(l);
             }
         }
-        for ( int i=0; i<status.length; i++ ) status[i].stop();
+        for (Status value : status) value.stop();
     }
 
     private void cmdStop(String[] args) {
@@ -317,7 +317,7 @@ public class CoordinationDemo {
                 synchronized (System.err) {
                     System.err.println("Start failed:");
                     StackTraceElement[] els = x.getStackTrace();
-                    for (int i = 0; i < els.length; i++) System.err.println(els[i].toString());
+                    for (StackTraceElement el : els) System.err.println(el.toString());
                 }
                 status = "Start failed:"+x.getMessage();
                 error = x;
@@ -342,7 +342,7 @@ public class CoordinationDemo {
                 synchronized (System.err) {
                     System.err.println("Stop failed:");
                     StackTraceElement[] els = x.getStackTrace();
-                    for (int i = 0; i < els.length; i++) System.err.println(els[i].toString());
+                    for (StackTraceElement el : els) System.err.println(el.toString());
                 }
 
                 status = "Stop failed:"+x.getMessage();

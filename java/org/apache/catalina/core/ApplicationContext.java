@@ -34,28 +34,29 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.naming.NamingException;
-import javax.servlet.Filter;
-import javax.servlet.FilterRegistration;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextAttributeEvent;
-import javax.servlet.ServletContextAttributeListener;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.servlet.ServletRegistration.Dynamic;
-import javax.servlet.ServletRequestAttributeListener;
-import javax.servlet.ServletRequestListener;
-import javax.servlet.ServletSecurityElement;
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.annotation.ServletSecurity;
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.http.HttpServletMapping;
-import javax.servlet.http.HttpSessionAttributeListener;
-import javax.servlet.http.HttpSessionIdListener;
-import javax.servlet.http.HttpSessionListener;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextAttributeEvent;
+import jakarta.servlet.ServletContextAttributeListener;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.ServletRegistration.Dynamic;
+import jakarta.servlet.ServletRequestAttributeListener;
+import jakarta.servlet.ServletRequestListener;
+import jakarta.servlet.ServletSecurityElement;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.annotation.ServletSecurity;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.HttpSessionAttributeListener;
+import jakarta.servlet.http.HttpSessionIdListener;
+import jakarta.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -89,22 +90,6 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ApplicationContext implements ServletContext {
 
-    protected static final boolean STRICT_SERVLET_COMPLIANCE;
-
-    protected static final boolean GET_RESOURCE_REQUIRE_SLASH;
-
-
-    static {
-        STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
-
-        String requireSlash = System.getProperty(
-                "org.apache.catalina.core.ApplicationContext.GET_RESOURCE_REQUIRE_SLASH");
-        if (requireSlash == null) {
-            GET_RESOURCE_REQUIRE_SLASH = STRICT_SERVLET_COMPLIANCE;
-        } else {
-            GET_RESOURCE_REQUIRE_SLASH = Boolean.parseBoolean(requireSlash);
-        }
-    }
 
     // ----------------------------------------------------------- Constructors
 
@@ -180,8 +165,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-      StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     /**
@@ -220,8 +204,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public Enumeration<String> getAttributeNames() {
-        Set<String> names = new HashSet<>();
-        names.addAll(attributes.keySet());
+        Set<String> names = new HashSet<>(attributes.keySet());
         return Collections.enumeration(names);
     }
 
@@ -262,7 +245,7 @@ public class ApplicationContext implements ServletContext {
                 pathMB.setString(uri);
 
                 MappingData mappingData = new MappingData();
-                ((Engine) host.getParent()).getService().getMapper().map(hostMB, pathMB, null, mappingData);
+                service.getMapper().map(hostMB, pathMB, null, mappingData);
                 child = mappingData.context;
             }
         } catch (Throwable t) {
@@ -313,8 +296,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public Enumeration<String> getInitParameterNames() {
-        Set<String> names = new HashSet<>();
-        names.addAll(parameters.keySet());
+        Set<String> names = new HashSet<>(parameters.keySet());
         // Special handling for XML settings as these attributes will always be
         // available if they have been set on the context
         if (context.getTldValidation()) {
@@ -429,7 +411,7 @@ public class ApplicationContext implements ServletContext {
 
         if (getContext().getDispatchersUseEncodedPaths()) {
             // Decode
-            String decodedUri = UDecoder.URLDecode(normalizedUri);
+            String decodedUri = UDecoder.URLDecode(normalizedUri, StandardCharsets.UTF_8);
 
             // Security check to catch attempts to encode /../ sequences
             normalizedUri = RequestUtil.normalize(decodedUri);
@@ -457,10 +439,8 @@ public class ApplicationContext implements ServletContext {
             dispatchData.set(dd);
         }
 
-        MessageBytes uriMB = dd.uriMB;
-        uriMB.recycle();
-
         // Use the thread local mapping data
+        MessageBytes uriMB = dd.uriMB;
         MappingData mappingData = dd.mappingData;
 
         try {
@@ -490,7 +470,11 @@ public class ApplicationContext implements ServletContext {
         } finally {
             // Recycle thread local data at the end of the request so references
             // are not held to a completed request as there is potential for
-            // that to trigger a memory leak if a context is unloaded.
+            // that to trigger a memory leak if a context is unloaded. Not
+            // strictly necessary here for uriMB but it needs to be recycled at
+            // some point so do it here for consistency with mappingData which
+            // must be recycled here.
+            uriMB.recycle();
             mappingData.recycle();
         }
     }
@@ -527,7 +511,7 @@ public class ApplicationContext implements ServletContext {
     @Override
     public URL getResource(String path) throws MalformedURLException {
 
-        String validatedPath = validateResourcePath(path, false);
+        String validatedPath = validateResourcePath(path, !context.getContextGetResourceRequiresSlash());
 
         if (validatedPath == null) {
             throw new MalformedURLException(
@@ -546,7 +530,7 @@ public class ApplicationContext implements ServletContext {
     @Override
     public InputStream getResourceAsStream(String path) {
 
-        String validatedPath = validateResourcePath(path, false);
+        String validatedPath = validateResourcePath(path, !context.getContextGetResourceRequiresSlash());
 
         if (validatedPath == null) {
             return null;
@@ -565,20 +549,16 @@ public class ApplicationContext implements ServletContext {
      * Returns null if the input path is not valid or a path that will be
      * acceptable to resources.getResource().
      */
-    private String validateResourcePath(String path, boolean allowEmptyPath) {
+    private String validateResourcePath(String path, boolean addMissingInitialSlash) {
         if (path == null) {
             return null;
         }
 
-        if (path.length() == 0 && allowEmptyPath) {
-            return path;
-        }
-
         if (!path.startsWith("/")) {
-            if (GET_RESOURCE_REQUIRE_SLASH) {
-                return null;
-            } else {
+            if (addMissingInitialSlash) {
                 return "/" + path;
+            } else {
+                return null;
             }
         }
 
@@ -594,8 +574,7 @@ public class ApplicationContext implements ServletContext {
             return null;
         }
         if (!path.startsWith("/")) {
-            throw new IllegalArgumentException
-                (sm.getString("applicationContext.resourcePaths.iae", path));
+            throw new IllegalArgumentException (sm.getString("applicationContext.resourcePaths.iae", path));
         }
 
         WebResourceRoot resources = context.getResources();
@@ -676,26 +655,23 @@ public class ApplicationContext implements ServletContext {
 
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
-        if ((listeners == null) || (listeners.length == 0))
+        if ((listeners == null) || (listeners.length == 0)) {
             return;
-        ServletContextAttributeEvent event =
-          new ServletContextAttributeEvent(context.getServletContext(),
-                                            name, value);
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof ServletContextAttributeListener))
+        }
+        ServletContextAttributeEvent event = new ServletContextAttributeEvent(
+                context.getServletContext(), name, value);
+        for (Object obj : listeners) {
+            if (!(obj instanceof ServletContextAttributeListener)) {
                 continue;
-            ServletContextAttributeListener listener =
-                (ServletContextAttributeListener) listeners[i];
+            }
+            ServletContextAttributeListener listener = (ServletContextAttributeListener) obj;
             try {
-                context.fireContainerEvent("beforeContextAttributeRemoved",
-                                           listener);
+                context.fireContainerEvent("beforeContextAttributeRemoved", listener);
                 listener.attributeRemoved(event);
-                context.fireContainerEvent("afterContextAttributeRemoved",
-                                           listener);
+                context.fireContainerEvent("afterContextAttributeRemoved", listener);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                context.fireContainerEvent("afterContextAttributeRemoved",
-                                           listener);
+                context.fireContainerEvent("afterContextAttributeRemoved", listener);
                 // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
@@ -707,8 +683,7 @@ public class ApplicationContext implements ServletContext {
     public void setAttribute(String name, Object value) {
         // Name cannot be null
         if (name == null) {
-            throw new NullPointerException
-                (sm.getString("applicationContext.setAttribute.namenull"));
+            throw new NullPointerException(sm.getString("applicationContext.setAttribute.namenull"));
         }
 
         // Null value is the same as removeAttribute()
@@ -719,53 +694,47 @@ public class ApplicationContext implements ServletContext {
 
         // Add or replace the specified attribute
         // Check for read only attribute
-        if (readOnlyAttributes.containsKey(name))
+        if (readOnlyAttributes.containsKey(name)) {
             return;
+        }
 
         Object oldValue = attributes.put(name, value);
         boolean replaced = oldValue != null;
 
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
-        if ((listeners == null) || (listeners.length == 0))
+        if ((listeners == null) || (listeners.length == 0)) {
             return;
+        }
         ServletContextAttributeEvent event = null;
-        if (replaced)
-            event =
-                new ServletContextAttributeEvent(context.getServletContext(),
-                                                 name, oldValue);
-        else
-            event =
-                new ServletContextAttributeEvent(context.getServletContext(),
-                                                 name, value);
+        if (replaced) {
+            event = new ServletContextAttributeEvent(context.getServletContext(), name, oldValue);
+        } else {
+            event = new ServletContextAttributeEvent(context.getServletContext(), name, value);
+        }
 
-        for (int i = 0; i < listeners.length; i++) {
-            if (!(listeners[i] instanceof ServletContextAttributeListener))
+        for (Object obj : listeners) {
+            if (!(obj instanceof ServletContextAttributeListener)) {
                 continue;
-            ServletContextAttributeListener listener =
-                (ServletContextAttributeListener) listeners[i];
+            }
+            ServletContextAttributeListener listener = (ServletContextAttributeListener) obj;
             try {
                 if (replaced) {
-                    context.fireContainerEvent
-                        ("beforeContextAttributeReplaced", listener);
+                    context.fireContainerEvent("beforeContextAttributeReplaced", listener);
                     listener.attributeReplaced(event);
-                    context.fireContainerEvent("afterContextAttributeReplaced",
-                                               listener);
+                    context.fireContainerEvent("afterContextAttributeReplaced", listener);
                 } else {
-                    context.fireContainerEvent("beforeContextAttributeAdded",
-                                               listener);
+                    context.fireContainerEvent("beforeContextAttributeAdded", listener);
                     listener.attributeAdded(event);
-                    context.fireContainerEvent("afterContextAttributeAdded",
-                                               listener);
+                    context.fireContainerEvent("afterContextAttributeAdded", listener);
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                if (replaced)
-                    context.fireContainerEvent("afterContextAttributeReplaced",
-                                               listener);
-                else
-                    context.fireContainerEvent("afterContextAttributeAdded",
-                                               listener);
+                if (replaced) {
+                    context.fireContainerEvent("afterContextAttributeReplaced", listener);
+                } else {
+                    context.fireContainerEvent("afterContextAttributeAdded", listener);
+                }
                 // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
@@ -978,8 +947,7 @@ public class ApplicationContext implements ServletContext {
 
 
     @Override
-    public <T extends Servlet> T createServlet(Class<T> c)
-    throws ServletException {
+    public <T extends Servlet> T createServlet(Class<T> c) throws ServletException {
         try {
             @SuppressWarnings("unchecked")
             T servlet = (T) context.getInstanceManager().newInstance(c.getName());
@@ -1023,11 +991,10 @@ public class ApplicationContext implements ServletContext {
 
         // SSL not enabled by default as it can only used on its own
         // Context > Host > Engine > Service
-        Service s = ((Engine) context.getParent().getParent()).getService();
-        Connector[] connectors = s.findConnectors();
+        Connector[] connectors = service.findConnectors();
         // Need at least one SSL enabled connector to use the SSL session ID.
         for (Connector connector : connectors) {
-            if (Boolean.TRUE.equals(connector.getAttribute("SSLEnabled"))) {
+            if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 supportedSessionTrackingModes.add(SessionTrackingMode.SSL);
                 break;
             }
@@ -1085,8 +1052,7 @@ public class ApplicationContext implements ServletContext {
     public boolean setInitParameter(String name, String value) {
         // Name cannot be null
         if (name == null) {
-            throw new NullPointerException
-                (sm.getString("applicationContext.setAttribute.namenull"));
+            throw new NullPointerException(sm.getString("applicationContext.setAttribute.namenull"));
         }
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(
@@ -1160,9 +1126,8 @@ public class ApplicationContext implements ServletContext {
             match = true;
         }
 
-        if (t instanceof HttpSessionListener
-                || (t instanceof ServletContextListener &&
-                        newServletContextListenerAllowed)) {
+        if (t instanceof HttpSessionListener ||
+                (t instanceof ServletContextListener && newServletContextListenerAllowed)) {
             // Add listener directly to the list of instances rather than to
             // the list of class names.
             context.addApplicationLifecycleListener(t);
@@ -1188,8 +1153,7 @@ public class ApplicationContext implements ServletContext {
             throws ServletException {
         try {
             @SuppressWarnings("unchecked")
-            T listener =
-                (T) context.getInstanceManager().newInstance(c);
+            T listener = (T) context.getInstanceManager().newInstance(c);
             if (listener instanceof ServletContextListener ||
                     listener instanceof ServletContextAttributeListener ||
                     listener instanceof ServletRequestListener ||
@@ -1228,7 +1192,7 @@ public class ApplicationContext implements ServletContext {
         }
 
         for (String role : roleNames) {
-            if (role == null || "".equals(role)) {
+            if (role == null || role.isEmpty()) {
                 throw new IllegalArgumentException(
                         sm.getString("applicationContext.role.iae",
                                 getContextPath()));
@@ -1381,10 +1345,7 @@ public class ApplicationContext implements ServletContext {
     protected void clearAttributes() {
 
         // Create list of attributes to be removed
-        List<String> list = new ArrayList<>();
-        for (String s : attributes.keySet()) {
-            list.add(s);
-        }
+        List<String> list = new ArrayList<>(attributes.keySet());
 
         // Remove application originated attributes
         // (read only attributes will be left in place)

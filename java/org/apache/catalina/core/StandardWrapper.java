@@ -36,14 +36,15 @@ import javax.management.NotificationEmitter;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.SingleThreadModel;
-import javax.servlet.UnavailableException;
-import javax.servlet.annotation.MultipartConfig;
+
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.SingleThreadModel;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.annotation.MultipartConfig;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
@@ -335,7 +336,7 @@ public class StandardWrapper extends ContainerBase
     @Override
     public int getLoadOnStartup() {
 
-        if (isJspServlet && loadOnStartup < 0) {
+        if (isJspServlet && loadOnStartup == -1) {
             /*
              * JspServlet must always be preloaded, because its instance is
              * used during registerJMX (when registering the JSP
@@ -550,7 +551,7 @@ public class StandardWrapper extends ContainerBase
         instance = loadServlet();
 
         Class<? extends Servlet> servletClazz = instance.getClass();
-        if (!javax.servlet.http.HttpServlet.class.isAssignableFrom(
+        if (!jakarta.servlet.http.HttpServlet.class.isAssignableFrom(
                                                         servletClazz)) {
             return DEFAULT_SERVLET_METHODS;
         }
@@ -904,7 +905,7 @@ public class StandardWrapper extends ContainerBase
 
         mappingsLock.readLock().lock();
         try {
-            return mappings.toArray(new String[mappings.size()]);
+            return mappings.toArray(new String[0]);
         } finally {
             mappingsLock.readLock().unlock();
         }
@@ -920,14 +921,26 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public String findSecurityReference(String name) {
+        String reference = null;
 
         referencesLock.readLock().lock();
         try {
-            return references.get(name);
+            reference = references.get(name);
         } finally {
             referencesLock.readLock().unlock();
         }
 
+        // If not specified on the Wrapper, check the Context
+        if (getParent() instanceof Context) {
+            Context context = (Context) getParent();
+            if (reference != null) {
+                reference = context.findRoleMapping(reference);
+            } else {
+                reference = context.findRoleMapping(name);
+            }
+        }
+
+        return reference;
     }
 
 
@@ -988,11 +1001,9 @@ public class StandardWrapper extends ContainerBase
 
             try {
                 jspMonitorON = new ObjectName(oname.toString());
-                Registry.getRegistry(null, null)
-                    .registerComponent(instance, jspMonitorON, null);
-            } catch( Exception ex ) {
-                log.info("Error registering JSP monitoring with jmx " +
-                         instance);
+                Registry.getRegistry(null, null).registerComponent(instance, jspMonitorON, null);
+            } catch (Exception ex) {
+                log.warn(sm.getString("standardWrapper.jspMonitorError", instance));
             }
         }
     }
@@ -1134,7 +1145,7 @@ public class StandardWrapper extends ContainerBase
             throw f;
         } catch (Throwable f) {
             ExceptionUtils.handleThrowable(f);
-            getServletContext().log("StandardWrapper.Throwable", f );
+            getServletContext().log(sm.getString("standardWrapper.initException", getName()), f);
             // If the servlet wanted to be unavailable it would have
             // said so, so do not call unavailable(null).
             throw new ServletException
@@ -1494,7 +1505,7 @@ public class StandardWrapper extends ContainerBase
 
     protected Method[] getAllDeclaredMethods(Class<?> c) {
 
-        if (c.equals(javax.servlet.http.HttpServlet.class)) {
+        if (c.equals(jakarta.servlet.http.HttpServlet.class)) {
             return null;
         }
 
@@ -1685,47 +1696,36 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * Get JMX Broadcaster Info
-     * FIXME: This two events we not send j2ee.state.failed and j2ee.attribute.changed!
      * @see javax.management.NotificationBroadcaster#getNotificationInfo()
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-
-        if(notificationInfo == null) {
-            notificationInfo = new MBeanNotificationInfo[]{
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.object.created"},
-                    Notification.class.getName(),
-                    "servlet is created"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.state.starting"},
-                    Notification.class.getName(),
-                    "servlet is starting"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.state.running"},
-                    Notification.class.getName(),
-                    "servlet is running"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.state.stopped"},
-                    Notification.class.getName(),
-                    "servlet start to stopped"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.object.stopped"},
-                    Notification.class.getName(),
-                    "servlet is stopped"
-                    ),
-                    new MBeanNotificationInfo(new String[] {
-                    "j2ee.object.deleted"},
-                    Notification.class.getName(),
-                    "servlet is deleted"
-                    )
-            };
+        // FIXME: we not send j2ee.state.failed
+        // FIXME: we not send j2ee.attribute.changed
+        if (notificationInfo == null) {
+            notificationInfo = new MBeanNotificationInfo[] {
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.created" },
+                            Notification.class.getName(), "servlet is created"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.state.starting" },
+                            Notification.class.getName(),
+                            "servlet is starting"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.state.running" },
+                            Notification.class.getName(), "servlet is running"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.state.stopped" },
+                            Notification.class.getName(),
+                            "servlet start to stopped"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.stopped" },
+                            Notification.class.getName(), "servlet is stopped"),
+                    new MBeanNotificationInfo(
+                            new String[] { "j2ee.object.deleted" },
+                            Notification.class.getName(),
+                            "servlet is deleted") };
         }
-
         return notificationInfo;
     }
 

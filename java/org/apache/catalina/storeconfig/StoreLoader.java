@@ -16,23 +16,20 @@
  */
 package org.apache.catalina.storeconfig;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
-import org.xml.sax.SAXException;
+import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.file.ConfigurationSource.Resource;
 
 /**
  * <b>XML Format </b>
  *
  * <pre>
  * {@code
- *       <Registry name="" encoding="UTF8" >
+ *       <Registry name="" encoding="UTF-8" >
  *         <Description
  *             tag="Server"
  *             standard="true"
@@ -73,7 +70,6 @@ import org.xml.sax.SAXException;
  * </ul>
  */
 public class StoreLoader {
-    private static Log log = LogFactory.getLog(StoreLoader.class);
 
     /**
      * The <code>Digester</code> instance used to parse registry descriptors.
@@ -105,7 +101,6 @@ public class StoreLoader {
      * @return the XML digester that will be used to parse the configuration
      */
     protected static Digester createDigester() {
-        long t1 = System.currentTimeMillis();
         // Initialize the digester
         Digester digester = new Digester();
         digester.setValidating(false);
@@ -115,8 +110,7 @@ public class StoreLoader {
         digester.addObjectCreate("Registry",
                 "org.apache.catalina.storeconfig.StoreRegistry", "className");
         digester.addSetProperties("Registry");
-        digester
-                .addObjectCreate("Registry/Description",
+        digester.addObjectCreate("Registry/Description",
                         "org.apache.catalina.storeconfig.StoreDescription",
                         "className");
         digester.addSetProperties("Registry/Description");
@@ -132,147 +126,41 @@ public class StoreLoader {
         digester.addCallMethod("Registry/Description/TransientChild",
                 "addTransientChild", 0);
 
-        long t2 = System.currentTimeMillis();
-        if (log.isDebugEnabled())
-            log.debug("Digester for server-registry.xml created " + (t2 - t1));
         return digester;
 
     }
 
     /**
-     * Find main configuration file.
-     * @param aFile File name, absolute or relative
-     *  to <code>${catalina.base}/conf</code>, if not specified
-     *  <code>server-registry.xml</code> is used
-     * @return The file
-     */
-    protected File serverFile(String aFile) {
-
-        if (aFile == null || aFile.length() < 1)
-            aFile = "server-registry.xml";
-        File file = new File(aFile);
-        if (!file.isAbsolute())
-            file = new File(System.getProperty("catalina.base") + "/conf",
-                    aFile);
-        try {
-            file = file.getCanonicalFile();
-        } catch (IOException e) {
-            log.error(e);
-        }
-        return file;
-    }
-
-    /**
-     * Load main configuration file from external source.
+     * Load registry configuration.
      *
-     * @param aURL URL to the configuration file
+     * @param path Path to the configuration file, may be null to use the default
+     *  name server-registry.xml
+     * @throws Exception when the configuration file isn't found or a parse error occurs
      */
-    public void load(String aURL) {
-        synchronized (digester) {
-            File aRegistryFile = serverFile(aURL);
-            try {
-                registry = (StoreRegistry) digester.parse(aRegistryFile);
-                registryResource = aRegistryFile.toURI().toURL();
-            } catch (IOException e) {
-                log.error(e);
-            } catch (SAXException e) {
-                log.error(e);
+    public void load(String path) throws Exception {
+        try (Resource resource = (path == null) ?
+                ConfigFileLoader.getSource().getConfResource("server-registry.xml")
+                : ConfigFileLoader.getSource().getResource(path);
+                InputStream is = resource.getInputStream()) {
+            registryResource = resource.getURI().toURL();
+            synchronized (digester) {
+                registry = (StoreRegistry) digester.parse(is);
             }
-        }
-
-    }
-
-    /**
-     * Load from defaults
-     * <ul>
-     * <li>System Property URL catalina.storeregistry</li>
-     * <li>File ${catalina.base}/conf/server-registry.xml</li>
-     * <li>class resource org/apache/catalina/storeconfig/server-registry.xml
-     * </li>
-     * </ul>
-     */
-    public void load() {
-
-        InputStream is = null;
-        registryResource = null ;
-        try {
-            String configUrl = getConfigUrl();
-            if (configUrl != null) {
-                is = (new URL(configUrl)).openStream();
-                if (log.isInfoEnabled())
-                    log.info("Find registry server-registry.xml from system property at url "
-                            + configUrl);
-                registryResource = new URL(configUrl);
-            }
-        } catch (Throwable t) {
-            // Ignore
-        }
-        if (is == null) {
-            try {
-                File home = new File(getCatalinaBase());
-                File conf = new File(home, "conf");
-                File reg = new File(conf, "server-registry.xml");
-                is = new FileInputStream(reg);
-                if (log.isInfoEnabled())
-                    log.info("Find registry server-registry.xml at file "
-                            + reg.getCanonicalPath());
-                registryResource = reg.toURI().toURL();
-            } catch (Throwable t) {
-                // Ignore
-            }
-        }
-        if (is == null) {
-            try {
-                is = StoreLoader.class
-                        .getResourceAsStream("/org/apache/catalina/storeconfig/server-registry.xml");
-                if (log.isDebugEnabled())
-                    log.debug("Find registry server-registry.xml at classpath resource");
-                registryResource = StoreLoader.class
-                    .getResource("/org/apache/catalina/storeconfig/server-registry.xml");
-
-            } catch (Throwable t) {
-                // Ignore
-            }
-        }
-        if (is != null) {
-            try {
-                synchronized (digester) {
-                    registry = (StoreRegistry) digester.parse(is);
-                }
-            } catch (Throwable t) {
-                log.error(t);
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException e) {
+        } catch (IOException e) {
+            // Try default classloader location
+            try (InputStream is = StoreLoader.class
+                    .getResourceAsStream("/org/apache/catalina/storeconfig/server-registry.xml")) {
+                if (is != null) {
+                    registryResource = StoreLoader.class
+                            .getResource("/org/apache/catalina/storeconfig/server-registry.xml");
+                    synchronized (digester) {
+                        registry = (StoreRegistry) digester.parse(is);
+                    }
+                } else {
+                    throw e;
                 }
             }
         }
-        if (is == null) {
-            log.error("Failed to load server-registry.xml");
-        }
-    }
-
-    /**
-     * @return the catalina.home environment variable.
-     */
-    private static String getCatalinaHome() {
-        return System.getProperty("catalina.home", System
-                .getProperty("user.dir"));
-    }
-
-    /**
-     * @return the catalina.base environment variable.
-     */
-    private static String getCatalinaBase() {
-        return System.getProperty("catalina.base", getCatalinaHome());
-    }
-
-    /**
-     * @return the configuration URL.
-     */
-    private static String getConfigUrl() {
-        return System.getProperty("catalina.storeconfig");
     }
 
     /**

@@ -19,10 +19,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import util.HTMLFilter;
 
@@ -36,13 +36,13 @@ public class RequestInfoExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ResourceBundle RB = ResourceBundle.getBundle("LocalStrings");
-
     @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException
     {
+        ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",request.getLocale());
+
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
 
@@ -51,12 +51,12 @@ public class RequestInfoExample extends HttpServlet {
         out.println("<head>");
         out.println("<meta charset=\"UTF-8\" />");
 
-        String title = RB.getString("requestinfo.title");
+        String title = rb.getString("requestinfo.title");
         out.println("<title>" + title + "</title>");
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
 
-        // img stuff not req'd for source code html showing
+        // img stuff not req'd for source code HTML showing
         // all links relative!
 
         // XXX
@@ -72,29 +72,29 @@ public class RequestInfoExample extends HttpServlet {
 
         out.println("<h3>" + title + "</h3>");
         out.println("<table border=0><tr><td>");
-        out.println(RB.getString("requestinfo.label.method"));
+        out.println(rb.getString("requestinfo.label.method"));
         out.println("</td><td>");
         out.println(HTMLFilter.filter(request.getMethod()));
         out.println("</td></tr><tr><td>");
-        out.println(RB.getString("requestinfo.label.requesturi"));
+        out.println(rb.getString("requestinfo.label.requesturi"));
         out.println("</td><td>");
         out.println(HTMLFilter.filter(request.getRequestURI()));
         out.println("</td></tr><tr><td>");
-        out.println(RB.getString("requestinfo.label.protocol"));
+        out.println(rb.getString("requestinfo.label.protocol"));
         out.println("</td><td>");
         out.println(HTMLFilter.filter(request.getProtocol()));
         out.println("</td></tr><tr><td>");
-        out.println(RB.getString("requestinfo.label.pathinfo"));
+        out.println(rb.getString("requestinfo.label.pathinfo"));
         out.println("</td><td>");
         out.println(HTMLFilter.filter(request.getPathInfo()));
         out.println("</td></tr><tr><td>");
-        out.println(RB.getString("requestinfo.label.remoteaddr"));
+        out.println(rb.getString("requestinfo.label.remoteaddr"));
         out.println("</td><td>");
         out.println(HTMLFilter.filter(request.getRemoteAddr()));
         out.println("</td></tr>");
 
         String cipherSuite=
-                (String)request.getAttribute("javax.servlet.request.cipher_suite");
+                (String)request.getAttribute("jakarta.servlet.request.cipher_suite");
         if(cipherSuite!=null){
             out.println("<tr><td>");
             out.println("SSLCipherSuite:");

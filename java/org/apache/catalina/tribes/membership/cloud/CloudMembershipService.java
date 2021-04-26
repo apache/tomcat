@@ -25,23 +25,59 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipProvider;
 import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.jmx.JmxRegistry;
-import org.apache.catalina.tribes.membership.Constants;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.MembershipServiceBase;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * A {@link org.apache.catalina.tribes.MembershipService} that uses Kubernetes API(default) or DNS to retrieve
+ * the members of a cluster.<br>
+ * <p>
+ * The default implementation of the MembershipProvider component is the {@link KubernetesMembershipProvider}.
+ * The MembershipProvider can be configured by the <code>membershipProviderClassName</code> property.
+ * Possible shortcuts are {@code kubernetes} and {@code dns}. For dns look at the {@link DNSMembershipProvider}.
+ * </p>
+ * <p>
+ * <strong>Configuration example</strong>
+ * </p>
+ *
+ * {@code server.xml }
+ *
+ * <pre>
+ * {@code
+ * <Server ...
+ *
+ *   <Service ...
+ *
+ *     <Engine ...
+ *
+ *       <Host ...
+ *
+ *         <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster">
+ *           <Channel className="org.apache.catalina.tribes.group.GroupChannel">
+ *             <Membership className="org.apache.catalina.tribes.membership.cloud.CloudMembershipService"/>
+ *           </Channel>
+ *         </Cluster>
+ *         ...
+ *  }
+ *  </pre>
+ *
+ */
+
 public class CloudMembershipService extends MembershipServiceBase
         implements CloudMembershipServiceMBean {
 
     private static final Log log = LogFactory.getLog(CloudMembershipService.class);
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(CloudMembershipService.class);
 
     public static final String MEMBERSHIP_PROVIDER_CLASS_NAME = "membershipProviderClassName";
     private static final String KUBE = "kubernetes";
+    private static final String DNS = "dns";
     private static final String KUBE_PROVIDER_CLASS = "org.apache.catalina.tribes.membership.cloud.KubernetesMembershipProvider";
-    static final byte[] INITIAL_ID = new byte[16];
+    private static final String DNS_PROVIDER_CLASS = "org.apache.catalina.tribes.membership.cloud.DNSMembershipProvider";
+    protected static final byte[] INITIAL_ID = new byte[16];
 
     private MembershipProvider membershipProvider;
     private MemberImpl localMember;
@@ -102,6 +138,8 @@ public class CloudMembershipService extends MembershipServiceBase
             String provider = getMembershipProviderClassName();
             if (provider == null || KUBE.equals(provider)) {
                 provider = KUBE_PROVIDER_CLASS;
+            } else if (DNS.equals(provider)) {
+                provider = DNS_PROVIDER_CLASS;
             }
             if (log.isDebugEnabled()) {
                 log.debug("Using membershipProvider: " + provider);
@@ -148,7 +186,7 @@ public class CloudMembershipService extends MembershipServiceBase
     public void setLocalMemberProperties(String listenHost, int listenPort, int securePort, int udpPort) {
         if (log.isDebugEnabled()) {
             log.debug(String.format("setLocalMemberProperties(%s, %d, %d, %d)", listenHost,
-                    Integer.toString(listenPort), Integer.toString(securePort), Integer.toString(udpPort)));
+                    Integer.valueOf(listenPort), Integer.valueOf(securePort), Integer.valueOf(udpPort)));
         }
         properties.setProperty("tcpListenHost", listenHost);
         properties.setProperty("tcpListenPort", String.valueOf(listenPort));
@@ -210,8 +248,7 @@ public class CloudMembershipService extends MembershipServiceBase
 
     @Override
     public int getConnectTimeout() {
-        String connectTimeout = properties.getProperty("connectTimeout");
-        return Integer.parseInt(connectTimeout);
+        return Integer.parseInt(properties.getProperty("connectTimeout", "1000"));
     }
 
     public void setConnectTimeout(int connectTimeout) {
@@ -220,11 +257,19 @@ public class CloudMembershipService extends MembershipServiceBase
 
     @Override
     public int getReadTimeout() {
-        String readTimeout = properties.getProperty("readTimeout");
-        return Integer.parseInt(readTimeout);
+        return Integer.parseInt(properties.getProperty("readTimeout", "1000"));
     }
 
     public void setReadTimeout(int readTimeout) {
         properties.setProperty("readTimeout", String.valueOf(readTimeout));
+    }
+
+    @Override
+    public long getExpirationTime() {
+        return Long.parseLong(properties.getProperty("expirationTime", "5000"));
+    }
+
+    public void setExpirationTime(long expirationTime) {
+        properties.setProperty("expirationTime", String.valueOf(expirationTime));
     }
 }

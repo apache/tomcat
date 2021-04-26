@@ -23,12 +23,16 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * A thread safe wrapper around {@link MessageDigest} that does not make use
  * of ThreadLocal and - broadly - only creates enough MessageDigest objects
  * to satisfy the concurrency requirements.
  */
 public class ConcurrentMessageDigest {
+
+    private static final StringManager sm = StringManager.getManager(ConcurrentMessageDigest.class);
 
     private static final String MD5 = "MD5";
     private static final String SHA1 = "SHA-1";
@@ -47,7 +51,7 @@ public class ConcurrentMessageDigest {
             init(MD5);
             init(SHA1);
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException(sm.getString("concurrentMessageDigest.noDigest"), e);
         }
     }
 
@@ -64,11 +68,11 @@ public class ConcurrentMessageDigest {
     }
 
 
-    public static byte[] digest(String algorithm, int rounds, byte[]... input) {
+    public static byte[] digest(String algorithm, int iterations, byte[]... input) {
 
         Queue<MessageDigest> queue = queues.get(algorithm);
         if (queue == null) {
-            throw new IllegalStateException("Must call init() first");
+            throw new IllegalStateException(sm.getString("concurrentMessageDigest.noDigest"));
         }
 
         MessageDigest md = queue.poll();
@@ -78,7 +82,7 @@ public class ConcurrentMessageDigest {
             } catch (NoSuchAlgorithmException e) {
                 // Ignore. Impossible if init() has been successfully called
                 // first.
-                throw new IllegalStateException("Must call init() first");
+                throw new IllegalStateException(sm.getString("concurrentMessageDigest.noDigest"), e);
             }
         }
 
@@ -89,8 +93,8 @@ public class ConcurrentMessageDigest {
         byte[] result = md.digest();
 
         // Subsequent rounds
-        if (rounds > 1) {
-            for (int i = 1; i < rounds; i++) {
+        if (iterations > 1) {
+            for (int i = 1; i < iterations; i++) {
                 md.update(result);
                 result = md.digest();
             }

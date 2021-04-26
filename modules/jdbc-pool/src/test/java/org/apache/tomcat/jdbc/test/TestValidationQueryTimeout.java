@@ -137,7 +137,7 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
         this.datasource.setInitialSize(1);
         this.datasource.setTestOnConnect(true);
         this.datasource.setValidationInterval(-1);
-        this.datasource.setValidationQuery("SELECT");
+        this.datasource.setValidationQuery("SELEC"); // 'SELECT' and 'SELECT 1' are valid queries
         this.datasource.setValidationQueryTimeout(1);
 
         this.datasource.getConnection();

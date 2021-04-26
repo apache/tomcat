@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.websocket.Extension;
+import jakarta.websocket.Extension;
 
 /**
  * Internal implementation constants.
@@ -114,6 +114,12 @@ public class Constants {
     // Milliseconds so this is 20 seconds
     public static final long DEFAULT_BLOCKING_SEND_TIMEOUT = 20 * 1000;
 
+    // Configuration for read idle timeout on WebSocket session
+    public static final String READ_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.READ_IDLE_TIMEOUT_MS";
+
+    // Configuration for write idle timeout on WebSocket session
+    public static final String WRITE_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS";
+
     // Configuration for background processing checks intervals
     static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
             "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
@@ -133,10 +139,6 @@ public class Constants {
     static final boolean ALLOW_UNSUPPORTED_EXTENSIONS =
             Boolean.getBoolean("org.apache.tomcat.websocket.ALLOW_UNSUPPORTED_EXTENSIONS");
 
-    // Configuration for stream behavior
-    static final boolean STREAMS_DROP_EMPTY_MESSAGES =
-            Boolean.getBoolean("org.apache.tomcat.websocket.STREAMS_DROP_EMPTY_MESSAGES");
-
     public static final boolean STRICT_SPEC_COMPLIANCE =
             Boolean.getBoolean("org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
 
@@ -144,7 +146,7 @@ public class Constants {
 
     static {
         if (DISABLE_BUILTIN_EXTENSIONS) {
-            INSTALLED_EXTENSIONS = Collections.unmodifiableList(new ArrayList<Extension>());
+            INSTALLED_EXTENSIONS = Collections.unmodifiableList(new ArrayList<>());
         } else {
             List<Extension> installed = new ArrayList<>(1);
             installed.add(new WsExtension("permessage-deflate"));

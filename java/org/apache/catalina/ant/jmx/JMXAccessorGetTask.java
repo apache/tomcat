@@ -35,7 +35,7 @@ import org.apache.tools.ant.BuildException;
  * <p>
  * Examples:
  * <br>
- * Get a Mbean IDataSender attribute nrOfRequests and create a new ant property <em>IDataSender.9025.nrOfRequests</em>
+ * Get an Mbean IDataSender attribute nrOfRequests and create a new ant property <em>IDataSender.9025.nrOfRequests</em>
  * </p>
  * <pre>
  *   &lt;jmx:get
@@ -113,8 +113,9 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
         if (result != null) {
             echoResult(attribute,result);
             createProperty(result);
-        } else
+        } else {
             error = "Attribute " + attribute + " is empty";
+        }
         return error;
     }
 }

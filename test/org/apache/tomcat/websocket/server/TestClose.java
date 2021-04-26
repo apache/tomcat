@@ -17,30 +17,27 @@
 package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCode;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCode;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.servlets.DefaultServlet;
-import org.apache.catalina.startup.Tomcat;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.websocket.WebSocketBaseTest;
@@ -89,10 +86,7 @@ public class TestClose extends WebSocketBaseTest {
 
 
     public static void awaitOnClose(CloseCode... codes) {
-        Set<CloseCode> set = new HashSet<>();
-        for (CloseCode code : codes) {
-            set.add(code);
-        }
+        Set<CloseCode> set = new HashSet<>(Arrays.asList(codes));
         awaitOnClose(set);
     }
 
@@ -127,7 +121,7 @@ public class TestClose extends WebSocketBaseTest {
 
         startServer(TestEndpointConfig.class);
 
-        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
+        TesterWsClient client = new TesterWsClient("localhost", getPort());
         client.httpUpgrade(BaseEndpointConfig.PATH);
         client.closeSocket();
 
@@ -139,7 +133,7 @@ public class TestClose extends WebSocketBaseTest {
     public void testTcpReset() throws Exception {
         startServer(TestEndpointConfig.class);
 
-        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
+        TesterWsClient client = new TesterWsClient("localhost", getPort());
         client.httpUpgrade(BaseEndpointConfig.PATH);
         client.forceCloseSocket();
 
@@ -153,7 +147,7 @@ public class TestClose extends WebSocketBaseTest {
     public void testWsCloseThenTcpClose() throws Exception {
         startServer(TestEndpointConfig.class);
 
-        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
+        TesterWsClient client = new TesterWsClient("localhost", getPort());
         client.httpUpgrade(BaseEndpointConfig.PATH);
         client.sendCloseFrame(CloseCodes.GOING_AWAY);
         client.closeSocket();
@@ -166,7 +160,7 @@ public class TestClose extends WebSocketBaseTest {
     public void testWsCloseThenTcpReset() throws Exception {
         startServer(TestEndpointConfig.class);
 
-        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
+        TesterWsClient client = new TesterWsClient("localhost", getPort());
         client.httpUpgrade(BaseEndpointConfig.PATH);
         client.sendCloseFrame(CloseCodes.GOING_AWAY);
         client.forceCloseSocket();
@@ -190,9 +184,9 @@ public class TestClose extends WebSocketBaseTest {
 
         startServer(TestEndpointConfig.class);
 
-        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
+        TesterWsClient client = new TesterWsClient("localhost", getPort());
         client.httpUpgrade(BaseEndpointConfig.PATH);
-        client.sendMessage("Test");
+        client.sendTextMessage("Test");
         awaitLatch(events.onMessageCalled, "onMessage not called");
 
         client.closeSocket();
@@ -206,9 +200,9 @@ public class TestClose extends WebSocketBaseTest {
     public void testTcpResetInOnMessage() throws Exception {
         startServer(TestEndpointConfig.class);
 
-        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
+        TesterWsClient client = new TesterWsClient("localhost", getPort());
         client.httpUpgrade(BaseEndpointConfig.PATH);
-        client.sendMessage("Test");
+        client.sendTextMessage("Test");
         awaitLatch(events.onMessageCalled, "onMessage not called");
 
         client.forceCloseSocket();
@@ -239,9 +233,9 @@ public class TestClose extends WebSocketBaseTest {
 
         startServer(TestEndpointConfig.class);
 
-        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
+        TesterWsClient client = new TesterWsClient("localhost", getPort());
         client.httpUpgrade(BaseEndpointConfig.PATH);
-        client.sendMessage("Test");
+        client.sendTextMessage("Test");
         awaitLatch(events.onMessageCalled, "onMessage not called");
 
         client.sendCloseFrame(CloseCodes.NORMAL_CLOSURE);
@@ -258,9 +252,9 @@ public class TestClose extends WebSocketBaseTest {
 
         startServer(TestEndpointConfig.class);
 
-        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
+        TesterWsClient client = new TesterWsClient("localhost", getPort());
         client.httpUpgrade(BaseEndpointConfig.PATH);
-        client.sendMessage("Test");
+        client.sendTextMessage("Test");
         awaitLatch(events.onMessageCalled, "onMessage not called");
 
         client.sendCloseFrame(CloseCodes.NORMAL_CLOSURE);
@@ -328,22 +322,6 @@ public class TestClose extends WebSocketBaseTest {
             return TestEndpoint.class;
         }
 
-    }
-
-
-    private Tomcat startServer(
-            final Class<? extends WsContextListener> configClass)
-            throws LifecycleException {
-
-        Tomcat tomcat = getTomcatInstance();
-        // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(configClass.getName());
-        Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
-
-        tomcat.start();
-        return tomcat;
     }
 
 

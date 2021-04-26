@@ -22,9 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.Vector;
+import java.util.ArrayList;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.tomcat.Jar;
@@ -129,12 +128,12 @@ public class JspUtil {
 
         // AttributesImpl.removeAttribute is broken, so we do this...
         int tempLength = (attrs == null) ? 0 : attrs.getLength();
-        Vector<String> temp = new Vector<>(tempLength, 1);
+        ArrayList<String> temp = new ArrayList<>(tempLength);
         for (int i = 0; i < tempLength; i++) {
             @SuppressWarnings("null")  // If attrs==null, tempLength == 0
             String qName = attrs.getQName(i);
             if ((!qName.equals("xmlns")) && (!qName.startsWith("xmlns:"))) {
-                temp.addElement(qName);
+                temp.add(qName);
             }
         }
 
@@ -146,7 +145,7 @@ public class JspUtil {
                 Node node = tagBody.getNode(i);
                 if (node instanceof Node.NamedAttribute) {
                     String attrName = node.getAttributeValue("name");
-                    temp.addElement(attrName);
+                    temp.add(attrName);
                     // Check if this value appear in the attribute of the node
                     if (n.getAttributeValue(attrName) != null) {
                         err.jspError(n,
@@ -168,16 +167,16 @@ public class JspUtil {
          */
         String missingAttribute = null;
 
-        for (int i = 0; i < validAttributes.length; i++) {
+        for (ValidAttribute validAttribute : validAttributes) {
             int attrPos;
-            if (validAttributes[i].mandatory) {
-                attrPos = temp.indexOf(validAttributes[i].name);
+            if (validAttribute.mandatory) {
+                attrPos = temp.indexOf(validAttribute.name);
                 if (attrPos != -1) {
                     temp.remove(attrPos);
                     valid = true;
                 } else {
                     valid = false;
-                    missingAttribute = validAttributes[i].name;
+                    missingAttribute = validAttribute.name;
                     break;
                 }
             }
@@ -196,13 +195,10 @@ public class JspUtil {
         }
 
         // Now check to see if the rest of the attributes are valid too.
-        String attribute = null;
-
-        for (int j = 0; j < attrLeftLength; j++) {
+        for(String attribute : temp) {
             valid = false;
-            attribute = temp.elementAt(j);
-            for (int i = 0; i < validAttributes.length; i++) {
-                if (attribute.equals(validAttributes[i].name)) {
+            for (ValidAttribute validAttribute : validAttributes) {
+                if (attribute.equals(validAttribute.name)) {
                     valid = true;
                     break;
                 }
@@ -252,14 +248,15 @@ public class JspUtil {
     }
 
     /**
-     * Returns the <tt>Class</tt> object associated with the class or
+     * Returns the <code>Class</code> object associated with the class or
      * interface with the given string name.
      *
      * <p>
-     * The <tt>Class</tt> object is determined by passing the given string
-     * name to the <tt>Class.forName()</tt> method, unless the given string
+     * The <code>Class</code> object is determined by passing the given string
+     * name to the <code>Class.forName()</code> method, unless the given string
      * name represents a primitive type, in which case it is converted to a
-     * <tt>Class</tt> object by appending ".class" to it (e.g., "int.class").
+     * <code>Class</code> object by appending ".class" to it (e.g.,
+     * "int.class").
      * @param type The class name, array or primitive type
      * @param loader The class loader
      * @return the loaded class
@@ -299,7 +296,7 @@ public class JspUtil {
             c = double.class;
         } else if ("void".equals(type)) {
             c = void.class;
-        } else if (type.indexOf('[') < 0) {
+        } else {
             c = loader.loadClass(type);
         }
 
@@ -396,7 +393,7 @@ public class JspUtil {
                         + ") "
                         + "org.apache.jasper.runtime.PageContextImpl.proprietaryEvaluate"
                         + "(" + Generator.quote(expression) + ", " + targetType
-                        + ".class, " + "(javax.servlet.jsp.PageContext)" + jspCtxt + ", "
+                        + ".class, " + "(jakarta.servlet.jsp.PageContext)" + jspCtxt + ", "
                         + fnmapvar + ")");
 
         /*
@@ -674,6 +671,7 @@ public class JspUtil {
      * the given tag file path.
      *
      * @param path Tag file path
+     * @param packageName The package name
      * @param urn The tag identifier
      * @param err Error dispatcher
      *
@@ -681,7 +679,7 @@ public class JspUtil {
      *         the given tag file path
      * @throws JasperException Failed to generate a class name for the tag
      */
-    public static String getTagHandlerClassName(String path, String urn,
+    public static String getTagHandlerClassName(String path, String packageName, String urn,
             ErrorDispatcher err) throws JasperException {
 
 
@@ -706,12 +704,12 @@ public class JspUtil {
 
         index = path.indexOf(WEB_INF_TAGS);
         if (index != -1) {
-            className = Constants.TAG_FILE_PACKAGE_NAME + ".web.";
+            className = packageName + ".web.";
             begin = index + WEB_INF_TAGS.length();
         } else {
             index = path.indexOf(META_INF_TAGS);
             if (index != -1) {
-                className = getClassNameBase(urn);
+                className = getClassNameBase(packageName, urn);
                 begin = index + META_INF_TAGS.length();
             } else {
                 err.jspError("jsp.error.tagfile.illegalPath", path);
@@ -723,9 +721,9 @@ public class JspUtil {
         return className;
     }
 
-    private static String getClassNameBase(String urn) {
+    private static String getClassNameBase(String packageName, String urn) {
         StringBuilder base =
-                new StringBuilder(Constants.TAG_FILE_PACKAGE_NAME + ".meta.");
+                new StringBuilder(packageName + ".meta.");
         if (urn != null) {
             base.append(makeJavaPackage(urn));
             base.append('.');
@@ -742,46 +740,17 @@ public class JspUtil {
      * @return Java package corresponding to the given path
      */
     public static final String makeJavaPackage(String path) {
-        String classNameComponents[] = split(path, "/");
+        String classNameComponents[] = path.split("/");
         StringBuilder legalClassNames = new StringBuilder();
-        for (int i = 0; i < classNameComponents.length; i++) {
-            legalClassNames.append(makeJavaIdentifier(classNameComponents[i]));
-            if (i < classNameComponents.length - 1) {
-                legalClassNames.append('.');
+        for (String classNameComponent : classNameComponents) {
+            if (classNameComponent.length() > 0) {
+                if (legalClassNames.length() > 0) {
+                    legalClassNames.append('.');
+                }
+                legalClassNames.append(makeJavaIdentifier(classNameComponent));
             }
         }
         return legalClassNames.toString();
-    }
-
-    /**
-     * Splits a string into it's components.
-     *
-     * @param path
-     *            String to split
-     * @param pat
-     *            Pattern to split at
-     * @return the components of the path
-     */
-    private static final String[] split(String path, String pat) {
-        Vector<String> comps = new Vector<>();
-        int pos = path.indexOf(pat);
-        int start = 0;
-        while (pos >= 0) {
-            if (pos > start) {
-                String comp = path.substring(start, pos);
-                comps.add(comp);
-            }
-            start = pos + pat.length();
-            pos = path.indexOf(pat, start);
-        }
-        if (start < path.length()) {
-            comps.add(path.substring(start));
-        }
-        String[] result = new String[comps.size()];
-        for (int i = 0; i < comps.size(); i++) {
-            result[i] = comps.elementAt(i);
-        }
-        return result;
     }
 
     /**
@@ -891,8 +860,17 @@ public class JspUtil {
 
         InputStreamReader reader = null;
         InputStream in = getInputStream(fname, jar, ctxt);
-        for (int i = 0; i < skip; i++) {
-            in.read();
+        try {
+            for (int i = 0; i < skip; i++) {
+                in.read();
+            }
+        } catch (IOException ioe) {
+            try {
+                in.close();
+            } catch (IOException e) {
+                // Ignore
+            }
+            throw ioe;
         }
         try {
             reader = new InputStreamReader(in, encoding);
@@ -954,8 +932,7 @@ public class JspUtil {
 
         if (t == null) {
             // Should never happen
-            throw new IllegalArgumentException("Unable to extract type from [" +
-                    type + "]");
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.unable.getType", type));
         }
 
         StringBuilder resultType = new StringBuilder(t);

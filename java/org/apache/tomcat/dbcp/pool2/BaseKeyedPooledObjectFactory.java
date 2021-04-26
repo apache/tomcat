@@ -17,11 +17,13 @@
 package org.apache.tomcat.dbcp.pool2;
 
 /**
- * A base implementation of <code>KeyedPooledObjectFactory</code>.
+ * A base implementation of {@code KeyedPooledObjectFactory}.
  * <p>
  * All operations defined here are essentially no-op's.
  * </p>
+ * <p>
  * This class is immutable, and therefore thread-safe.
+ * </p>
  *
  * @see KeyedPooledObjectFactory
  *
@@ -83,7 +85,7 @@ public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
      *
      * @param key the key used when selecting the object
      * @param p a {@code PooledObject} wrapping the instance to be validated
-     * @return always <code>true</code> in the default implementation
+     * @return always {@code true} in the default implementation
      */
     @Override
     public boolean validateObject(final K key, final PooledObject<V> p) {

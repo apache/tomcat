@@ -75,9 +75,16 @@ public class TestClientCertTls13 extends TomcatBaseTest {
 
         TesterSupport.configureClientCertContext(tomcat);
         // Need to override some of the previous settings
-        tomcat.getConnector().setProperty("sslEnabledProtocols", Constants.SSL_PROTO_TLSv1_3);
+        SSLHostConfig[] sslHostConfigs = connector.findSslHostConfigs();
+        Assert.assertNotNull(sslHostConfigs);
+        Assert.assertEquals(1, sslHostConfigs.length);
+
+        SSLHostConfig sslHostConfig = sslHostConfigs[0];
+
+        // TLS 1.3 support
+        sslHostConfig.setProtocols(Constants.SSL_PROTO_TLSv1_3);
         // And add force authentication to occur on the initial handshake
-        tomcat.getConnector().setProperty("clientAuth", "required");
+        sslHostConfig.setCertificateVerification("required");
 
         TesterSupport.configureClientSsl();
     }

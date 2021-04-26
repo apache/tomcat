@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.HandshakeRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.websocket.server.HandshakeRequest;
 
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
@@ -69,9 +69,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
                             Arrays.asList(entry.getValue())));
         }
         for (Entry<String,String> entry : pathParams.entrySet()) {
-            newParameters.put(entry.getKey(),
-                    Collections.unmodifiableList(
-                            Collections.singletonList(entry.getValue())));
+            newParameters.put(entry.getKey(), Collections.singletonList(entry.getValue()));
         }
         parameterMap = Collections.unmodifiableMap(newParameters);
 
@@ -146,7 +144,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
      */
     private static URI buildRequestUri(HttpServletRequest req) {
 
-        StringBuffer uri = new StringBuffer();
+        StringBuilder uri = new StringBuilder();
         String scheme = req.getScheme();
         int port = req.getServerPort();
         if (port < 0) {
@@ -158,6 +156,8 @@ public class WsHandshakeRequest implements HandshakeRequest {
             uri.append("ws");
         } else if ("https".equals(scheme)) {
             uri.append("wss");
+        } else if ("wss".equals(scheme) || "ws".equals(scheme)) {
+            uri.append(scheme);
         } else {
             // Should never happen
             throw new IllegalArgumentException(
@@ -168,6 +168,8 @@ public class WsHandshakeRequest implements HandshakeRequest {
         uri.append(req.getServerName());
 
         if ((scheme.equals("http") && (port != 80))
+            || (scheme.equals("ws") && (port != 80))
+            || (scheme.equals("wss") && (port != 443))
             || (scheme.equals("https") && (port != 443))) {
             uri.append(':');
             uri.append(port);
@@ -176,7 +178,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
         uri.append(req.getRequestURI());
 
         if (req.getQueryString() != null) {
-            uri.append("?");
+            uri.append('?');
             uri.append(req.getQueryString());
         }
 

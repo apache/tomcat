@@ -48,7 +48,7 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
      * @param pSizeMax The limit; no more than this number of bytes
      *   shall be returned by the source stream.
      */
-    public LimitedInputStream(InputStream inputStream, long pSizeMax) {
+    public LimitedInputStream(final InputStream inputStream, final long pSizeMax) {
         super(inputStream);
         sizeMax = pSizeMax;
     }
@@ -79,24 +79,24 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
 
     /**
      * Reads the next byte of data from this input stream. The value
-     * byte is returned as an <code>int</code> in the range
-     * <code>0</code> to <code>255</code>. If no byte is available
+     * byte is returned as an {@code int} in the range
+     * {@code 0} to {@code 255}. If no byte is available
      * because the end of the stream has been reached, the value
-     * <code>-1</code> is returned. This method blocks until input data
+     * {@code -1} is returned. This method blocks until input data
      * is available, the end of the stream is detected, or an exception
      * is thrown.
      * <p>
      * This method
-     * simply performs <code>in.read()</code> and returns the result.
+     * simply performs {@code in.read()} and returns the result.
      *
-     * @return     the next byte of data, or <code>-1</code> if the end of the
+     * @return     the next byte of data, or {@code -1} if the end of the
      *             stream is reached.
      * @throws  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#in
      */
     @Override
     public int read() throws IOException {
-        int res = super.read();
+        final int res = super.read();
         if (res != -1) {
             count++;
             checkLimit();
@@ -105,31 +105,31 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
     }
 
     /**
-     * Reads up to <code>len</code> bytes of data from this input stream
-     * into an array of bytes. If <code>len</code> is not zero, the method
+     * Reads up to {@code len} bytes of data from this input stream
+     * into an array of bytes. If {@code len} is not zero, the method
      * blocks until some input is available; otherwise, no
-     * bytes are read and <code>0</code> is returned.
+     * bytes are read and {@code 0} is returned.
      * <p>
-     * This method simply performs <code>in.read(b, off, len)</code>
+     * This method simply performs {@code in.read(b, off, len)}
      * and returns the result.
      *
      * @param      b     the buffer into which the data is read.
      * @param      off   The start offset in the destination array
-     *                   <code>b</code>.
+     *                   {@code b}.
      * @param      len   the maximum number of bytes read.
      * @return     the total number of bytes read into the buffer, or
-     *             <code>-1</code> if there is no more data because the end of
+     *             {@code -1} if there is no more data because the end of
      *             the stream has been reached.
-     * @throws  NullPointerException If <code>b</code> is <code>null</code>.
-     * @throws  IndexOutOfBoundsException If <code>off</code> is negative,
-     * <code>len</code> is negative, or <code>len</code> is greater than
-     * <code>b.length - off</code>
+     * @throws  NullPointerException If {@code b} is {@code null}.
+     * @throws  IndexOutOfBoundsException If {@code off} is negative,
+     * {@code len} is negative, or {@code len} is greater than
+     * {@code b.length - off}
      * @throws  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#in
      */
     @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        int res = super.read(b, off, len);
+    public int read(final byte[] b, final int off, final int len) throws IOException {
+        final int res = super.read(b, off, len);
         if (res > 0) {
             count += res;
             checkLimit();
@@ -152,7 +152,7 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
      * Closes this input stream and releases any system resources
      * associated with the stream.
      * This
-     * method simply performs <code>in.close()</code>.
+     * method simply performs {@code in.close()}.
      *
      * @throws  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#in

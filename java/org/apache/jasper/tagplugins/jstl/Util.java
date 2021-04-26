@@ -25,16 +25,16 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspTagException;
-import javax.servlet.jsp.PageContext;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.JspTagException;
+import jakarta.servlet.jsp.PageContext;
 
-import org.apache.jasper.Constants;
+import org.apache.jasper.compiler.Localizer;
 
 /**
  * Util contains some often used consts, static methods and embedded class
@@ -90,11 +90,11 @@ public class Util {
     }
 
     /**
-     * Returns <tt>true</tt> if our current URL is absolute,
-     * <tt>false</tt> otherwise.
+     * Returns <code>true</code> if our current URL is absolute,
+     * <code>false</code> otherwise.
      * taken from org.apache.taglibs.standard.tag.common.core.ImportSupport
      * @param url The URL
-     * @return <tt>true</tt> if the URL is absolute
+     * @return <code>true</code> if the URL is absolute
      */
     public static boolean isAbsoluteUrl(String url){
         if(url == null){
@@ -147,31 +147,6 @@ public class Util {
         }
         return input.substring(begin, end).trim();
     }
-
-    /**
-     * Strips a servlet session ID from <tt>url</tt>.  The session ID
-     * is encoded as a URL "path parameter" beginning with "jsessionid=".
-     * We thus remove anything we find between ";jsessionid=" (inclusive)
-     * and either EOS or a subsequent ';' (exclusive).
-     *
-     * taken from org.apache.taglibs.standard.tag.common.core.ImportSupport
-     * @param url The URL
-     * @return the URL without a user submitted session id parameter
-     */
-    public static String stripSession(String url) {
-        StringBuilder u = new StringBuilder(url);
-        int sessionStart;
-        while ((sessionStart = u.toString().indexOf(";" + Constants.SESSION_PARAMETER_NAME + "=")) != -1) {
-            int sessionEnd = u.toString().indexOf(';', sessionStart + 1);
-            if (sessionEnd == -1)
-                sessionEnd = u.toString().indexOf('?', sessionStart + 1);
-            if (sessionEnd == -1) // still
-                sessionEnd = u.length();
-            u.delete(sessionStart, sessionEnd);
-        }
-        return u.toString();
-    }
-
 
     /**
      * Performs the following substring replacements
@@ -259,8 +234,7 @@ public class Util {
                 return url;
         } else {
             if (!context.startsWith("/") || !url.startsWith("/")) {
-                throw new JspTagException(
-                "In URL tags, when the \"context\" attribute is specified, values of both \"context\" and \"url\" must start with \"/\".");
+                throw new JspTagException(Localizer.getMessage("jstl.urlMustStartWithSlash"));
             }
             if (context.equals("/")) {
                 // Don't produce string starting with '//', many
@@ -313,8 +287,7 @@ public class Util {
         @Override
         public PrintWriter getWriter() {
             if (isStreamUsed)
-                throw new IllegalStateException("Unexpected internal error during &lt;import&gt: " +
-                "Target servlet called getWriter(), then getOutputStream()");
+                throw new IllegalStateException(Localizer.getMessage("jstl.writerAfterOS"));
             isWriterUsed = true;
             return new PrintWriter(sw);
         }
@@ -322,8 +295,7 @@ public class Util {
         @Override
         public ServletOutputStream getOutputStream() {
             if (isWriterUsed)
-                throw new IllegalStateException("Unexpected internal error during &lt;import&gt: " +
-                "Target servlet called getOutputStream(), then getWriter()");
+                throw new IllegalStateException(Localizer.getMessage("jstl.OSAfterWriter"));
             isStreamUsed = true;
             return sos;
         }

@@ -94,11 +94,14 @@ a img {
     min-width: 720px;
     max-width: 1000px;
 }
+
 .curved {
     border-radius: 10px;
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    -khtml-border-radius: 10px;
+}
+
+#tomcat-logo {
+    width: 150px;
+    height: 106px;
 }
 
 #navigation {

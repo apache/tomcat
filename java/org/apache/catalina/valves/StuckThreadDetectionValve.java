@@ -28,7 +28,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
@@ -195,7 +195,7 @@ public class StuckThreadDetectionValve extends ValveBase {
         Long key = Long.valueOf(Thread.currentThread().getId());
         StringBuffer requestUrl = request.getRequestURL();
         if(request.getQueryString()!=null) {
-            requestUrl.append("?");
+            requestUrl.append('?');
             requestUrl.append(request.getQueryString());
         }
         MonitoredThread monitoredThread = new MonitoredThread(Thread.currentThread(),
@@ -271,7 +271,7 @@ public class StuckThreadDetectionValve extends ValveBase {
                 nameList.add(monitoredThread.getThread().getName());
             }
         }
-        return nameList.toArray(new String[nameList.size()]);
+        return nameList.toArray(new String[0]);
     }
 
     public long getInterruptedThreadsCount() {

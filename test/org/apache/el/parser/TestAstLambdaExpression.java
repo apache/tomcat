@@ -16,8 +16,8 @@
  */
 package org.apache.el.parser;
 
-import javax.el.ELException;
-import javax.el.ELProcessor;
+import jakarta.el.ELException;
+import jakarta.el.ELProcessor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -225,7 +225,7 @@ public class TestAstLambdaExpression {
     }
 
 
-    @Test(expected=javax.el.ELException.class)
+    @Test(expected=jakarta.el.ELException.class)
     public void testLambdaAsFunction08() {
         // Using a name space for the function is not allowed
         ELProcessor processor = new ELProcessor();

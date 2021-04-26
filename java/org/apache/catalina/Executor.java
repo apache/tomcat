@@ -25,7 +25,7 @@ public interface Executor extends java.util.concurrent.Executor, Lifecycle {
     /**
      * Executes the given command at some time in the future.  The command
      * may execute in a new thread, in a pooled thread, or in the calling
-     * thread, at the discretion of the <tt>Executor</tt> implementation.
+     * thread, at the discretion of the <code>Executor</code> implementation.
      * If no threads are available, it will be added to the work queue.
      * If the work queue is full, the system will wait for the specified
      * time until it throws a RejectedExecutionException

@@ -35,7 +35,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 /*
  * Implementation note:
  *
- * A number of these tests involve the rewrite valve returning a HTTP Location
+ * A number of these tests involve the rewrite valve returning an HTTP Location
  * header that include un-encoded UTF-8 bytes. How the HTTP client handles these
  * depends on the default character encoding configured for the JVM running the
  * test. The tests expect the client to be configured with UTF-8 as the default
@@ -104,6 +104,18 @@ public class TestRewriteValve extends TomcatBaseTest {
     public void testRewriteMap06() throws Exception {
         doTestRewrite("RewriteMap mapa org.apache.catalina.valves.rewrite.TesterRewriteMapA\n" +
                 "RewriteRule /b/.* /c/${mapa:${mapa:a}}", "/b/a.html", "/c/aaaa");
+    }
+
+    @Test
+    public void testRewriteMap07() throws Exception {
+        doTestRewrite("RewriteMap mapa org.apache.catalina.valves.rewrite.TesterRewriteMapA foo bar\n" +
+                "RewriteRule /b/.* /c/${mapa:${mapa:a}}", "/b/a.html", "/c/aaaa");
+    }
+
+    @Test
+    public void testRewriteMap08() throws Exception {
+        doTestRewrite("RewriteMap lc int:tolower\n" +
+                "RewriteRule ^(.*) ${lc:$1}", "/C/AaA", "/c/aaa");
     }
 
     @Test
@@ -581,6 +593,39 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite("RewriteRule ^/b/(rest)?$ /c/$1", "/b/", "/c/");
     }
 
+
+    @Test
+    public void testNegativePattern01() throws Exception {
+        doTestRewrite("RewriteRule !^/b/.* /c/", "/b", "/c/");
+    }
+
+
+    @Test
+    public void testNegativePattern02() throws Exception {
+        doTestRewrite("RewriteRule !^/b/.* /c/", "/d/e/f", "/c/");
+    }
+
+
+    @Test
+    public void testNegativePattern03() throws Exception {
+        doTestRewrite("RewriteRule !^/c/.* /b/", "/c/", "/c/");
+    }
+
+
+    @Test
+    public void testNegativePattern04() throws Exception {
+        doTestRewrite("RewriteRule !^/c/.* /b/", "/c/d", "/c/d");
+    }
+
+    @Test
+    public void testMultiLine001() throws Exception {
+        doTestRewrite("RewriteRule /dummy /anotherDummy [L]\nRewriteRule ^/a /c [L]", "/a", "/c");
+    }
+
+    @Test
+    public void testMultiLine002() throws Exception {
+        doTestRewrite("RewriteRule /dummy /a\nRewriteRule /a /c [L]", "/dummy", "/c");
+    }
 
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         doTestRewrite(config, request, expectedURI, null);

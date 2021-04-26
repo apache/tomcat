@@ -19,9 +19,10 @@
             Building The Apache Tomcat @VERSION_MAJOR_MINOR@ Servlet/JSP Container
             ====================================================
 
-This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
-implements the Servlet 4.0, JSP 2.3, EL 3.0, WebSocket 1.1 and JASPIC 1.1
-specifications from the Java Community Process <https://www.jcp.org/>.
+This project contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
+implements the Jakarta Servlet 5.0, JSP 3.0, EL 4.0, WebSocket 2.0 and
+Authentication 2.0 specifications from the Jakarta EE project at Eclipse
+<https://jakarta.ee//>.
 
 Note: If you just need to run Apache Tomcat, it is not necessary to build
 it. You may simply download a binary distribution. It is cross-platform.
@@ -64,9 +65,9 @@ source distribution, do the following:
     into which you installed the JDK release.
 
 
-(2) Install Apache Ant version 1.9.8 or later on your computer.
+(2) Install Apache Ant version 1.9.10 or later on your computer.
 
- 1. If Apache Ant version 1.9.8 or later is already installed on your
+ 1. If Apache Ant version 1.9.10 or later is already installed on your
     computer, skip to (3).
 
  2. Download a binary distribution of Ant from:
@@ -93,13 +94,13 @@ source distribution, do the following:
 
 (3.1) Checkout or obtain the source code for Tomcat @VERSION_MAJOR_MINOR@
 
-Checkout the source using SVN, selecting a tag for released version or
-trunk for the current development code, or download and unpack a source
+Clone the source using git, then checkout a specific major branch or
+master for the latest code development, or download and unpack a source
 package.
 
- *  Tomcat SVN repository URL:
+ *  Tomcat GitHub repository URL:
 
-        https://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/trunk/
+        https://github.com/apache/tomcat
 
  *  Source packages can be downloaded from:
 
@@ -184,7 +185,7 @@ each release package has the appropriate line-endings.
 (4) Updating sources and rebuilding
 
 It is recommended that you regularly update the downloaded Tomcat @VERSION_MAJOR_MINOR@
-sources using your SVN client.
+sources using your git client.
 
 For a quick rebuild of only modified code you can use:
 
@@ -481,11 +482,10 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
         java.net.preferIPv4Stack=true
 
- 10. It is possible to control whether the output of the tests is displayed
-     on the console or not. By default it is displayed and can be disabled
-     by the following property:
+ 10. By default the output of unit tests is sent to the console and can be
+     quite verbose. The output can be disabled by setting the property:
 
-        test.verbose=true
+        test.verbose=false
 
 (8) Source code checks
 
@@ -523,7 +523,7 @@ target. The command is:
 NOTE: FindBugs is licensed under LGPL. Using Findbugs during Tomcat build is
       optional and is off by default.
 
-      See http://findbugs.sourceforge.net/ for more information.
+      See https://spotbugs.github.io/ for more information.
 
 To enable FindBugs, add the following property to build.properties file:
 
@@ -545,15 +545,12 @@ The report file by default is written to
 You usually would not need to run this check. You can skip this section.
 
 Apache Tomcat project has convention that all of its textual source files,
-stored in Subversion repository, are marked with Subversion property
-"svn:eol-style" with value of "native". This convention makes the editing
-of source code on different platforms easier.
+stored in the Git repository, use Unix style LF line endings.
 
 This test is used by developers to check that the source code adheres to
 this convention. It verifies that the ends of lines in textual files are
-appropriate for the operating system where it is run. The idea is to run
-this check regularly on two different platforms and notify developers when
-an inconsistency is detected.
+appropriate. The idea is to run this check regularly and notify developers
+when an inconsistency is detected.
 
 The command to run this test is:
 

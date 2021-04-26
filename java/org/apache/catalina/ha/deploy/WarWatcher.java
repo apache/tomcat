@@ -78,12 +78,12 @@ public class WarWatcher {
             list = new File[0];
         }
         //first make sure all the files are listed in our current status
-        for (int i = 0; i < list.length; i++) {
-            if(!list[i].exists())
+        for (File file : list) {
+            if (!file.exists())
                 log.warn(sm.getString("warWatcher.listedFileDoesNotExist",
-                                      list[i], watchDir));
+                        file, watchDir));
 
-            addWarInfo(list[i]);
+            addWarInfo(file);
         }
 
         // Check all the status codes and update the FarmDeployer

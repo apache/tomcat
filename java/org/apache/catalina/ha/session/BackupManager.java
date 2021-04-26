@@ -53,7 +53,7 @@ public class BackupManager extends ClusterManagerBase
     protected String name;
 
     /**
-     *
+     * Flag for how this map sends messages.
      */
     private int mapSendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK;
 
@@ -269,12 +269,8 @@ public class BackupManager extends ClusterManagerBase
 
     @Override
     public Set<String> getSessionIdsFull() {
-        Set<String> sessionIds = new HashSet<>();
-        LazyReplicatedMap<String,Session> map =
-                (LazyReplicatedMap<String,Session>)sessions;
-        for (String id : map.keySetFull()) {
-            sessionIds.add(id);
-        }
+        LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>)sessions;
+        Set<String> sessionIds = new HashSet<>(map.keySetFull());
         return sessionIds;
     }
 

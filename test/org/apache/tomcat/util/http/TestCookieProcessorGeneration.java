@@ -16,7 +16,7 @@
  */
 package org.apache.tomcat.util.http;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -254,6 +254,67 @@ public class TestCookieProcessorGeneration {
         doV1TestPath("exa\tmple", "foo=bar; Version=1; Path=\"exa\tmple\"", null);
     }
 
+    @Test
+    public void testSameSiteCookies() {
+        LegacyCookieProcessor legacy = new LegacyCookieProcessor();
+        Rfc6265CookieProcessor rfc6265 = new Rfc6265CookieProcessor();
+
+        Cookie cookie = new Cookie("foo", "bar");
+
+        Assert.assertEquals("foo=bar", legacy.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar", rfc6265.generateHeader(cookie, null));
+
+        legacy.setSameSiteCookies("unset");
+        rfc6265.setSameSiteCookies("unset");
+
+        Assert.assertEquals("foo=bar", legacy.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar", rfc6265.generateHeader(cookie, null));
+
+        legacy.setSameSiteCookies("none");
+        rfc6265.setSameSiteCookies("none");
+
+        Assert.assertEquals("foo=bar; SameSite=None", legacy.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar; SameSite=None", rfc6265.generateHeader(cookie, null));
+
+        legacy.setSameSiteCookies("lax");
+        rfc6265.setSameSiteCookies("lax");
+
+        Assert.assertEquals("foo=bar; SameSite=Lax", legacy.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar; SameSite=Lax", rfc6265.generateHeader(cookie, null));
+
+        legacy.setSameSiteCookies("strict");
+        rfc6265.setSameSiteCookies("strict");
+
+        Assert.assertEquals("foo=bar; SameSite=Strict", legacy.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar; SameSite=Strict", rfc6265.generateHeader(cookie, null));
+
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+
+        legacy.setSameSiteCookies("unset");
+        rfc6265.setSameSiteCookies("unset");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly", legacy.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar; Secure; HttpOnly", rfc6265.generateHeader(cookie, null));
+
+        legacy.setSameSiteCookies("none");
+        rfc6265.setSameSiteCookies("none");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=None", legacy.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=None", rfc6265.generateHeader(cookie, null));
+
+        legacy.setSameSiteCookies("lax");
+        rfc6265.setSameSiteCookies("lax");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=Lax", legacy.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=Lax", rfc6265.generateHeader(cookie, null));
+
+        legacy.setSameSiteCookies("strict");
+        rfc6265.setSameSiteCookies("strict");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=Strict", legacy.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; SameSite=Strict", rfc6265.generateHeader(cookie, null));
+    }
 
     private void doTest(Cookie cookie, String expected) {
         doTest(cookie, expected, expected);
@@ -297,7 +358,7 @@ public class TestCookieProcessorGeneration {
         if (expected == null) {
             IllegalArgumentException e = null;
             try {
-                cookieProcessor.generateHeader(cookie);
+                cookieProcessor.generateHeader(cookie, null);
             } catch (IllegalArgumentException iae) {
                 e = iae;
             }
@@ -307,9 +368,9 @@ public class TestCookieProcessorGeneration {
                     cookie.getMaxAge() > 0) {
                 // Expires attribute will depend on time cookie is generated so
                 // use a modified test
-                Assert.assertTrue(cookieProcessor.generateHeader(cookie).startsWith(expected));
+                Assert.assertTrue(cookieProcessor.generateHeader(cookie, null).startsWith(expected));
             } else {
-                Assert.assertEquals(expected, cookieProcessor.generateHeader(cookie));
+                Assert.assertEquals(expected, cookieProcessor.generateHeader(cookie, null));
             }
         }
     }

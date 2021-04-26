@@ -17,14 +17,15 @@
 
 package org.apache.catalina.core;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.FilterRegistration;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.util.ParameterMap;
@@ -119,9 +120,7 @@ public class ApplicationFilterRegistration
 
         for (FilterMap filterMap : filterMaps) {
             if (filterMap.getFilterName().equals(filterDef.getFilterName())) {
-                for (String servletName : filterMap.getServletNames()) {
-                    result.add(servletName);
-                }
+                result.addAll(Arrays.asList(filterMap.getServletNames()));
             }
         }
         return result;
@@ -135,9 +134,7 @@ public class ApplicationFilterRegistration
 
         for (FilterMap filterMap : filterMaps) {
             if (filterMap.getFilterName().equals(filterDef.getFilterName())) {
-                for (String urlPattern : filterMap.getURLPatterns()) {
-                    result.add(urlPattern);
-                }
+                result.addAll(Arrays.asList(filterMap.getURLPatterns()));
             }
         }
         return result;

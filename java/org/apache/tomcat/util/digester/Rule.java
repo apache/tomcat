@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.digester;
 
+import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
 /**
@@ -23,6 +24,8 @@ import org.xml.sax.Attributes;
  * a corresponding nested pattern of XML elements has been matched.
  */
 public abstract class Rule {
+
+    protected static final StringManager sm = StringManager.getManager(Rule.class);
 
     // ----------------------------------------------------------- Constructors
 

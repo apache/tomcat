@@ -22,12 +22,12 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.el.ELException;
-import javax.el.ELResolver;
-import javax.el.LambdaExpression;
-import javax.el.MethodInfo;
-import javax.el.PropertyNotFoundException;
-import javax.el.ValueReference;
+import jakarta.el.ELException;
+import jakarta.el.ELResolver;
+import jakarta.el.LambdaExpression;
+import jakarta.el.MethodInfo;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.ValueReference;
 
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
@@ -245,10 +245,8 @@ public final class AstValue extends SimpleNode {
         Object result = null;
         try {
             result = m.invoke(t.base, values);
-        } catch (IllegalAccessException iae) {
-            throw new ELException(iae);
-        } catch (IllegalArgumentException iae) {
-            throw new ELException(iae);
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            throw new ELException(e);
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
             if (cause instanceof ThreadDeath) {

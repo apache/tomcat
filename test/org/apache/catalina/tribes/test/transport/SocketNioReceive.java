@@ -35,6 +35,7 @@ public class SocketNioReceive {
     static DecimalFormat df = new DecimalFormat("##.00");
     static double seconds = 0;
 
+    protected static final Object mutex = new Object();
     public static void main(String[] args) throws Exception {
         Member mbr = new MemberImpl("localhost", 9999, 0);
         ChannelData data = new ChannelData();

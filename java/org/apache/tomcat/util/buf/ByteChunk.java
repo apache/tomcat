@@ -389,29 +389,11 @@ public final class ByteChunk extends AbstractChunk {
 
     // -------------------- Removing data from the buffer --------------------
 
-    /*
-     * @deprecated Use {@link #subtract()}.
-     *             This method will be removed in Tomcat 10
-     */
-    @Deprecated
-    public int substract() throws IOException {
-        return subtract();
-    }
-
     public int subtract() throws IOException {
         if (checkEof()) {
             return -1;
         }
         return buff[start++] & 0xFF;
-    }
-
-    /*
-     * @deprecated Use {@link #subtractB()}.
-     *             This method will be removed in Tomcat 10
-     */
-    @Deprecated
-    public byte substractB() throws IOException {
-        return subtractB();
     }
 
     public byte subtractB() throws IOException {
@@ -421,15 +403,6 @@ public final class ByteChunk extends AbstractChunk {
         return buff[start++];
     }
 
-
-    /*
-     * @deprecated Use {@link #subtract(byte[],int,int)}.
-     *             This method will be removed in Tomcat 10
-     */
-    @Deprecated
-    public int substract(byte dest[], int off, int len) throws IOException {
-        return subtract(dest, off, len);
-    }
 
     public int subtract(byte dest[], int off, int len) throws IOException {
         if (checkEof()) {
@@ -449,27 +422,7 @@ public final class ByteChunk extends AbstractChunk {
      * Transfers bytes from the buffer to the specified ByteBuffer. After the
      * operation the position of the ByteBuffer will be returned to the one
      * before the operation, the limit will be the position incremented by the
-     * number of the transfered bytes.
-     *
-     * @param to the ByteBuffer into which bytes are to be written.
-     * @return an integer specifying the actual number of bytes read, or -1 if
-     *         the end of the stream is reached
-     * @throws IOException if an input or output exception has occurred
-     *
-     * @deprecated Use {@link #subtract(ByteBuffer)}.
-     *             This method will be removed in Tomcat 10
-     */
-    @Deprecated
-    public int substract(ByteBuffer to) throws IOException {
-        return subtract(to);
-    }
-
-
-    /**
-     * Transfers bytes from the buffer to the specified ByteBuffer. After the
-     * operation the position of the ByteBuffer will be returned to the one
-     * before the operation, the limit will be the position incremented by the
-     * number of the transfered bytes.
+     * number of the transferred bytes.
      *
      * @param to the ByteBuffer into which bytes are to be written.
      * @return an integer specifying the actual number of bytes read, or -1 if
@@ -512,7 +465,8 @@ public final class ByteChunk extends AbstractChunk {
     public void flushBuffer() throws IOException {
         // assert out!=null
         if (out == null) {
-            throw new IOException("Buffer overflow, no sink " + getLimit() + " " + buff.length);
+            throw new IOException(sm.getString(
+                    "chunk.overflow", Integer.valueOf(getLimit()), Integer.valueOf(buff.length)));
         }
         out.realWriteBytes(buff, start, end - start);
         end = start;
@@ -849,11 +803,10 @@ public final class ByteChunk extends AbstractChunk {
      *         is not found.
      */
     public static int findBytes(byte bytes[], int start, int end, byte b[]) {
-        int blen = b.length;
         int offset = start;
         while (offset < end) {
-            for (int i = 0; i < blen; i++) {
-                if (bytes[offset] == b[i]) {
+            for (byte value : b) {
+                if (bytes[offset] == value) {
                     return offset;
                 }
             }

@@ -128,7 +128,7 @@ public class ManifestResource {
             case WAR : sb.append(", resourceType=WAR"); break;
             case APPLICATION : sb.append(", resourceType=APPLICATION"); break;
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

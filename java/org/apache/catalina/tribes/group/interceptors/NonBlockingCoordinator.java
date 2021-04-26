@@ -46,7 +46,7 @@ import org.apache.juli.logging.LogFactory;
  * <p>Title: Auto merging leader election algorithm</p>
  *
  * <p>Description: Implementation of a simple coordinator algorithm that not only selects a coordinator,
- *    it also merges groups automatically when members are discovered that werent part of the
+ *    it also merges groups automatically when members are discovered that weren't part of the
  *    </p>
  * <p>This algorithm is non blocking meaning it allows for transactions while the coordination phase is going on
  * </p>
@@ -304,9 +304,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             InetSocketAddress addr = new InetSocketAddress(ia, mbr.getPort());
             socket.connect(addr, (int) conTimeout);
             return true;
-        } catch (SocketTimeoutException sx) {
-            //do nothing, we couldn't connect
-        } catch (ConnectException cx) {
+        } catch (SocketTimeoutException | ConnectException x) {
             //do nothing, we couldn't connect
         } catch (Exception x) {
             log.error(sm.getString("nonBlockingCoordinator.memberAlive.failed"),x);
@@ -321,9 +319,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         Arrays.fill(merged,msg.getMembers());
         Arrays.fill(merged,getMembers());
         Member[] diff = Arrays.diff(merged,membership,local);
-        for ( int i=0; i<diff.length; i++ ) {
-            if (!alive(diff[i])) merged.removeMember(diff[i]);
-            else memberAdded(diff[i],false);
+        for (Member member : diff) {
+            if (!alive(member)) merged.removeMember(member);
+            else memberAdded(member, false);
         }
         fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_POST_MERGE,this,"Post merge"));
         return merged;
@@ -749,10 +747,10 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             src = null;
             //view
             buf.append(view.length);
-            for (int i=0; i<view.length; i++ ) {
-                byte[] mbr = view[i].getData(false,false);
+            for (Member member : view) {
+                byte[] mbr = member.getData(false, false);
                 buf.append(mbr.length);
-                buf.append(mbr,0,mbr.length);
+                buf.append(mbr, 0, mbr.length);
             }
             //id
             buf.append(id.getBytes(),0,id.getBytes().length);
@@ -762,9 +760,15 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
     @Override
     public void fireInterceptorEvent(InterceptorEvent event) {
-        if (event instanceof CoordinationEvent &&
-            ((CoordinationEvent)event).type == CoordinationEvent.EVT_CONF_RX)
-            log.info(event);
+        if (event instanceof CoordinationEvent) {
+            if (((CoordinationEvent) event).type == CoordinationEvent.EVT_CONF_RX) {
+                log.info(event);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(event);
+                }
+            }
+        }
     }
 
     public static class CoordinationEvent implements InterceptorEvent {
@@ -831,16 +835,13 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
         @Override
         public String toString() {
-            StringBuilder buf = new StringBuilder("CoordinationEvent[type=");
-            buf.append(type).append("\n\tLocal:");
             Member local = interceptor.getLocalMember(false);
-            buf.append(local!=null?local.getName():"").append("\n\tCoord:");
-            buf.append(coord!=null?coord.getName():"").append("\n\tView:");
-            buf.append(Arrays.toNameString(view!=null?view.getMembers():null)).append("\n\tSuggested View:");
-            buf.append(Arrays.toNameString(suggestedView!=null?suggestedView.getMembers():null)).append("\n\tMembers:");
-            buf.append(Arrays.toNameString(mbrs)).append("\n\tInfo:");
-            buf.append(info).append("]");
-            return buf.toString();
+            return sm.getString("nonBlockingCoordinator.report", Integer.valueOf(type),
+                    (local != null ? local.getName() : ""),
+                    (coord != null ? coord.getName() : ""),
+                    Arrays.toNameString(view != null ? view.getMembers() : null),
+                    Arrays.toNameString(suggestedView != null ? suggestedView.getMembers() : null),
+                    Arrays.toNameString(mbrs), info);
         }
     }
 

@@ -28,13 +28,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 import javax.net.SocketFactory;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -45,23 +47,33 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
+import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.compat.JrePlatform;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.TesterSupport;
 
 /**
  * Tests for compliance with the <a href="https://tools.ietf.org/html/rfc7540">
  * HTTP/2 specification</a>.
  */
+@org.junit.runner.RunWith(org.junit.runners.Parameterized.class)
 public abstract class Http2TestBase extends TomcatBaseTest {
+
+    @org.junit.runners.Parameterized.Parameters
+    public static Object[][] data() {
+        return new Object[Integer.getInteger("tomcat.test.http2.loopCount", 1).intValue()][0];
+    }
 
     // Nothing special about this date apart from it being the date I ran the
     // test that demonstrated that most HTTP/2 tests were failing because the
     // response now included a date header
     protected static final String DEFAULT_DATE = "Wed, 11 Nov 2015 19:18:42 GMT";
+    protected static final long DEFAULT_TIME = FastHttpDateFormat.parseDate(DEFAULT_DATE);
 
     private static final String HEADER_IGNORED = "x-ignore";
 
@@ -72,18 +84,22 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     static {
         byte[] empty = new byte[0];
-        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
+        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64URLSafeString(empty) + "\r\n";
     }
 
     protected static final String TRAILER_HEADER_NAME = "x-trailertest";
     protected static final String TRAILER_HEADER_VALUE = "test";
 
+    // Client
     private Socket s;
     protected HpackEncoder hpackEncoder;
     protected Input input;
     protected TestOutput output;
     protected Http2Parser parser;
     protected OutputStream os;
+
+    // Server
+    protected Http2Protocol http2Protocol;
 
     private long pingAckDelayMillis = 0;
 
@@ -97,9 +113,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
      * that the first response is correctly received.
      */
     protected void http2Connect() throws Exception {
-        enableHttp2();
+        http2Connect(false);
+    }
+
+    protected void http2Connect(boolean tls) throws Exception {
+        enableHttp2(tls);
         configureAndStartWebApplication();
-        openClientConnection();
+        openClientConnection(tls);
         doHttpUpgrade();
         sendClientPreface();
         validateHttp2InitialResponse();
@@ -302,6 +322,24 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    protected void sendParameterPostRequest(int streamId, byte[] padding, String body,
+            long contentLength, boolean useExpectation) throws IOException {
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(128);
+
+        buildPostRequest(headersFrameHeader, headersPayload, useExpectation,
+                "application/x-www-form-urlencoded", contentLength, "/parameter", dataFrameHeader,
+                dataPayload, padding, null, null, streamId);
+        writeFrame(headersFrameHeader, headersPayload);
+        if (body != null) {
+            dataPayload.put(body.getBytes(StandardCharsets.ISO_8859_1));
+            writeFrame(dataFrameHeader, dataPayload);
+        }
+    }
+
+
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
             boolean useExpectation, byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding,
             int streamId) {
@@ -312,13 +350,28 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
             boolean useExpectation, byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding,
             byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
+        buildPostRequest(headersFrameHeader, headersPayload, useExpectation, null, -1, "/simple",
+                dataFrameHeader, dataPayload, padding, trailersFrameHeader, trailersPayload, streamId);
+    }
+
+    protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
+            boolean useExpectation, String contentType, long contentLength, String path,
+            byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding,
+            byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
+
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("POST");
         headers.addValue(":scheme").setString("http");
-        headers.addValue(":path").setString("/simple");
+        headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
         if (useExpectation) {
             headers.addValue("expect").setString("100-continue");
+        }
+        if (contentType != null) {
+            headers.addValue("content-type").setString(contentType);
+        }
+        if (contentLength > -1) {
+            headers.addValue("content-length").setLong(contentLength);
         }
         hpackEncoder.encode(headers, headersPayload);
 
@@ -415,19 +468,35 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void readSimplePostResponse(boolean padding) throws Http2Exception, IOException {
-        if (padding) {
-            // Window updates for padding
-            parser.readFrame(true);
-            parser.readFrame(true);
-        }
+        /*
+         * If there is padding there will always be a window update for the
+         * connection and, depending on timing, there may be an update for the
+         * stream. The Window updates for padding (if present) may appear at any
+         * time. The comments in the code below are only indicative of what the
+         * frames are likely to contain. Actual frame order with padding may be
+         * different.
+         */
+
         // Connection window update after reading request body
         parser.readFrame(true);
         // Stream window update after reading request body
         parser.readFrame(true);
         // Headers
         parser.readFrame(true);
-        // Body
+        // Body (includes end of stream)
         parser.readFrame(true);
+
+        if (padding) {
+            // Connection window update for padding
+            parser.readFrame(true);
+
+            // If EndOfStream has not been received then the stream window
+            // update must have been received so a further frame needs to be
+            // read for EndOfStream.
+            if (!output.getTrace().contains("EndOfStream")) {
+                parser.readFrame(true);
+            }
+        }
     }
 
 
@@ -442,25 +511,41 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected String getCookieResponseTrace(int streamId, int cookieCount) {
-        return getResponseBodyFrameTrace(streamId, "text/plain;charset=UTF-8",
-                "Cookie count: " + cookieCount);
+        return getResponseBodyFrameTrace(streamId, 200, "text/plain;charset=UTF-8", null,
+                "Cookie count: " + cookieCount, null);
     }
 
 
-    private String getResponseBodyFrameTrace(int streamId, String body) {
-        return getResponseBodyFrameTrace(streamId, "application/octet-stream", body);
+    protected String getResponseBodyFrameTrace(int streamId, String body) {
+        return getResponseBodyFrameTrace(streamId, 200, "application/octet-stream", null, body, body);
     }
 
-    private String getResponseBodyFrameTrace(int streamId, String contentType, String body) {
+
+    protected String getResponseBodyFrameTrace(int streamId, int status, String contentType,
+            String contentLanguage, String body, String cl) {
         StringBuilder result = new StringBuilder();
         result.append(streamId);
         result.append("-HeadersStart\n");
         result.append(streamId);
-        result.append("-Header-[:status]-[200]\n");
+        result.append("-Header-[:status]-[");
+        result.append(status);
+        result.append("]\n");
         result.append(streamId);
         result.append("-Header-[content-type]-[");
         result.append(contentType);
         result.append("]\n");
+        if (contentLanguage != null) {
+            result.append(streamId);
+            result.append("-Header-[content-language]-[");
+            result.append(contentLanguage);
+            result.append("]\n");
+        }
+        if (cl != null) {
+            result.append(streamId);
+            result.append("-Header-[content-length]-[");
+            result.append(cl);
+            result.append("]\n");
+        }
         result.append(streamId);
         result.append("-Header-[date]-[");
         result.append(DEFAULT_DATE);
@@ -483,16 +568,38 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
     protected void enableHttp2(long maxConcurrentStreams) {
-        Connector connector = getTomcatInstance().getConnector();
-        Http2Protocol http2Protocol = new Http2Protocol();
-        // Short timeouts for now. May need to increase these for CI systems.
-        http2Protocol.setReadTimeout(2000);
-        http2Protocol.setKeepAliveTimeout(5000);
-        http2Protocol.setWriteTimeout(2000);
-        http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
-        connector.addUpgradeProtocol(http2Protocol);
+        enableHttp2(maxConcurrentStreams, false);
     }
 
+    protected void enableHttp2(boolean tls) {
+        enableHttp2(200, tls);
+    }
+
+    protected void enableHttp2(long maxConcurrentStreams, boolean tls) {
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+        http2Protocol = new UpgradableHttp2Protocol();
+        // Short timeouts for now. May need to increase these for CI systems.
+        http2Protocol.setReadTimeout(10000);
+        http2Protocol.setWriteTimeout(10000);
+        http2Protocol.setKeepAliveTimeout(25000);
+        http2Protocol.setStreamReadTimeout(5000);
+        http2Protocol.setStreamWriteTimeout(5000);
+        http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
+        http2Protocol.setHttp11Protocol(new Http11NioProtocol());
+        connector.addUpgradeProtocol(http2Protocol);
+        if (tls) {
+            // Enable TLS
+            TesterSupport.initSsl(tomcat);
+        }
+    }
+
+    private static class UpgradableHttp2Protocol extends Http2Protocol {
+        @Override
+        public String getHttpUpgradeName(boolean isSSLEnabled) {
+            return "h2c";
+        }
+    }
 
     protected void configureAndStartWebApplication() throws LifecycleException {
         Tomcat tomcat = getTomcatInstance();
@@ -506,14 +613,21 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ctxt.addServletMappingDecoded("/large", "large");
         Tomcat.addServlet(ctxt, "cookie", new CookieServlet());
         ctxt.addServletMappingDecoded("/cookie", "cookie");
+        Tomcat.addServlet(ctxt, "parameter", new ParameterServlet());
+        ctxt.addServletMappingDecoded("/parameter", "parameter");
 
         tomcat.start();
     }
 
 
     protected void openClientConnection() throws IOException {
+        openClientConnection(false);
+    }
+
+    protected void openClientConnection(boolean tls) throws IOException {
+        SocketFactory socketFactory = tls ? TesterSupport.configureClientSsl() : SocketFactory.getDefault();
         // Open a connection
-        s = SocketFactory.getDefault().createSocket("localhost", getPort());
+        s = socketFactory.createSocket("localhost", getPort());
         s.setSoTimeout(30000);
 
         os = s.getOutputStream();
@@ -699,14 +813,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    void sendGoaway(int streamId, int lastStreamId, long errorCode, byte[] debug)
-            throws IOException {
+    byte[] buildGoaway(int streamId, int lastStreamId, long errorCode) {
         byte[] goawayFrame = new byte[17];
-        int len = 8;
-        if (debug != null) {
-            len += debug.length;
-        }
-        ByteUtil.setThreeBytes(goawayFrame, 0, len);
+        ByteUtil.setThreeBytes(goawayFrame, 0, 8);
         // Type
         goawayFrame[3] = FrameType.GOAWAY.getIdByte();
         // No flags
@@ -715,10 +824,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         // Last stream
         ByteUtil.set31Bits(goawayFrame, 9, lastStreamId);
         ByteUtil.setFourBytes(goawayFrame, 13, errorCode);
+        return goawayFrame;
+    }
+
+
+    void sendGoaway(int streamId, int lastStreamId, long errorCode) throws IOException {
+        byte[] goawayFrame = buildGoaway(streamId, lastStreamId, errorCode);
         os.write(goawayFrame);
-        if (debug != null && debug.length > 0) {
-            os.write(debug);
-        }
         os.flush();
     }
 
@@ -905,7 +1017,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) {
+        public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) {
             lastStreamId = Integer.toString(streamId);
             bytesRead += payloadSize;
             if (traceBody) {
@@ -919,7 +1031,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void endRequestBodyFrame(int streamId) throws Http2Exception {
+        public void endRequestBodyFrame(int streamId, int dataLength) throws Http2Exception {
             if (bodyBuffer != null) {
                 if (bodyBuffer.limit() > 0) {
                     trace.append(lastStreamId + "-Body-");
@@ -958,9 +1070,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         @Override
         public void emitHeader(String name, String value) {
-            // Date headers will always change so use a hard-coded default
             if ("date".equals(name)) {
+                // Date headers will always change so use a hard-coded default
                 value = DEFAULT_DATE;
+            } else if ("etag".equals(name) && value.startsWith("W/\"")) {
+                // etag headers will vary depending on when the source was
+                // checked out, unpacked, copied etc so use the same default as
+                // for date headers
+                int startOfTime = value.indexOf('-');
+                value = value.substring(0, startOfTime + 1) + DEFAULT_TIME + "\"";
             }
             // Some header values vary so ignore them
             if (HEADER_IGNORED.equals(name)) {
@@ -980,6 +1098,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         public void setHeaderException(StreamException streamException) {
             // NO-OP: Accept anything the server sends for the unit tests
+        }
+
+
+        @Override
+        public void headersContinue(int payloadSize, boolean endOfHeaders) {
+            // NO-OP: Logging occurs per header
         }
 
 
@@ -1048,10 +1172,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void swallowed(int streamId, FrameType frameType, int flags, int size) {
+        public void onSwallowedUnknownFrame(int streamId, int frameTypeId, int flags, int size) {
             trace.append(streamId);
             trace.append(",");
-            trace.append(frameType);
+            trace.append(frameTypeId);
             trace.append(",");
             trace.append(flags);
             trace.append(",");
@@ -1061,11 +1185,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void swallowedPadding(int streamId, int paddingLength) {
-            trace.append(streamId);
-            trace.append("-SwallowedPadding-[");
-            trace.append(paddingLength);
-            trace.append("]\n");
+        public void onSwallowedDataFramePayload(int streamId, int swallowedDataBytesCount) {
+            // NO-OP
+            // Many tests swallow request bodies which triggers this
+            // notification. It is added to the trace to reduce noise.
         }
 
 
@@ -1211,6 +1334,24 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             }
             resp.setHeader(HEADER_IGNORED, headerValue.toString());
             resp.getWriter().print("OK");
+        }
+    }
+
+
+    static class ParameterServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            Map<String,String[]> params = req.getParameterMap();
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            resp.getWriter().print(params.size());
         }
     }
 

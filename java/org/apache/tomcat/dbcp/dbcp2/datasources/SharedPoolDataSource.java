@@ -235,4 +235,11 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
             throw new IOException("NamingException: " + e);
         }
     }
+
+    @Override
+    protected void toStringFields(final StringBuilder builder) {
+        super.toStringFields(builder);
+        builder.append(", maxTotal=");
+        builder.append(maxTotal);
+    }
 }

@@ -17,7 +17,7 @@
 
 package org.apache.tomcat.util.net.openssl.ciphers;
 
-enum MessageDigest {
+public enum MessageDigest {
     MD5,
     SHA1,
     GOST94,

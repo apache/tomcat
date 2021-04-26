@@ -18,11 +18,11 @@ package org.apache.catalina.startup;
 
 import java.util.Set;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.ServletException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,8 +40,8 @@ public class TestListener extends TomcatBaseTest {
     public void testServletContainerInitializer() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context context = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context context = tomcat.addContext("", null);
 
         context.addServletContainerInitializer(new SCI(), null);
         tomcat.start();
@@ -57,15 +57,15 @@ public class TestListener extends TomcatBaseTest {
     public void testServletContextListener() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context context = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context context = tomcat.addContext("", null);
 
         // SCL2 pretends to be in web.xml, and tries to install a
-        // ServletContextInitializer.
+        // ServletContainerInitializer.
         context.addApplicationListener(SCL2.class.getName());
         tomcat.start();
 
-        //check that the ServletContextInitializer wasn't initialized.
+        //check that the ServletContainerInitializer wasn't initialized.
         Assert.assertFalse(SCL3.initialized);
     }
 

@@ -29,7 +29,7 @@ public class Constants {
             "org.apache.tomcat.websocket.noAddAfterHandshake";
 
     public static final String SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE =
-            "javax.websocket.server.ServerContainer";
+            "jakarta.websocket.server.ServerContainer";
 
 
     private Constants() {

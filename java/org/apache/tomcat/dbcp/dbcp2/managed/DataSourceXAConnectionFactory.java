@@ -1,19 +1,19 @@
-/**
- *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+/*
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
  */
 package org.apache.tomcat.dbcp.dbcp2.managed;
 
@@ -26,9 +26,10 @@ import javax.sql.ConnectionEventListener;
 import javax.sql.PooledConnection;
 import javax.sql.XAConnection;
 import javax.sql.XADataSource;
-import javax.transaction.TransactionManager;
-import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.xa.XAResource;
+
+import jakarta.transaction.TransactionManager;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 
 import org.apache.tomcat.dbcp.dbcp2.Utils;
 
@@ -42,21 +43,6 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
     private final XADataSource xaDataSource;
     private String userName;
     private char[] userPassword;
-
-    /**
-     * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database connections.
-     * The connections are enlisted into transactions using the specified transaction manager.
-     *
-     * @param transactionManager
-     *            the transaction manager in which connections will be enlisted
-     * @param xaDataSource
-     *            the data source from which connections will be retrieved
-     * @param transactionSynchronizationRegistry
-     *            register with this TransactionSynchronizationRegistry
-     */
-    public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource, final TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
-        this(transactionManager, xaDataSource, null, (char[]) null, transactionSynchronizationRegistry);
-    }
 
     /**
      * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database connections.
@@ -138,54 +124,24 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
     }
 
     /**
-     * Gets the user name used to authenticate new connections.
+     * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database connections.
+     * The connections are enlisted into transactions using the specified transaction manager.
      *
-     * @return the user name or null if unauthenticated connections are used
+     * @param transactionManager
+     *            the transaction manager in which connections will be enlisted
+     * @param xaDataSource
+     *            the data source from which connections will be retrieved
+     * @param transactionSynchronizationRegistry
+     *            register with this TransactionSynchronizationRegistry
      */
-    public String getUsername() {
-        return userName;
-    }
-
-    /**
-     * Sets the user name used to authenticate new connections.
-     *
-     * @param userName
-     *            the user name used for authenticating the connection or null for unauthenticated
-     */
-    public void setUsername(final String userName) {
-        this.userName = userName;
-    }
-
-    /**
-     * Sets the password used to authenticate new connections.
-     *
-     * @param userPassword
-     *            the password used for authenticating the connection or null for unauthenticated.
-     * @since 2.4.0
-     */
-    public void setPassword(final char[] userPassword) {
-        this.userPassword = userPassword;
-    }
-
-    /**
-     * Sets the password used to authenticate new connections.
-     *
-     * @param userPassword
-     *            the password used for authenticating the connection or null for unauthenticated
-     */
-    public void setPassword(final String userPassword) {
-        this.userPassword = Utils.toCharArray(userPassword);
-    }
-
-    @Override
-    public TransactionRegistry getTransactionRegistry() {
-        return transactionRegistry;
+    public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource, final TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
+        this(transactionManager, xaDataSource, null, (char[]) null, transactionSynchronizationRegistry);
     }
 
     @Override
     public Connection createConnection() throws SQLException {
         // create a new XAConnection
-        XAConnection xaConnection;
+        final XAConnection xaConnection;
         if (userName == null) {
             xaConnection = xaDataSource.getXAConnection();
         } else {
@@ -223,5 +179,70 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
         });
 
         return connection;
+    }
+
+    @Override
+    public TransactionRegistry getTransactionRegistry() {
+        return transactionRegistry;
+    }
+
+    /**
+     * Gets the user name used to authenticate new connections.
+     *
+     * @return the user name or null if unauthenticated connections are used
+     * @deprecated Use {@link #getUserName()}.
+     */
+    @Deprecated
+    public String getUsername() {
+        return userName;
+    }
+
+    /**
+     * Gets the user name used to authenticate new connections.
+     *
+     * @return the user name or null if unauthenticated connections are used
+     * @since 2.6.0
+     */
+    public String getUserName() {
+        return userName;
+    }
+
+    public char[] getUserPassword() {
+        return userPassword;
+    }
+
+    public XADataSource getXaDataSource() {
+        return xaDataSource;
+    }
+
+    /**
+     * Sets the password used to authenticate new connections.
+     *
+     * @param userPassword
+     *            the password used for authenticating the connection or null for unauthenticated.
+     * @since 2.4.0
+     */
+    public void setPassword(final char[] userPassword) {
+        this.userPassword = userPassword;
+    }
+
+    /**
+     * Sets the password used to authenticate new connections.
+     *
+     * @param userPassword
+     *            the password used for authenticating the connection or null for unauthenticated
+     */
+    public void setPassword(final String userPassword) {
+        this.userPassword = Utils.toCharArray(userPassword);
+    }
+
+    /**
+     * Sets the user name used to authenticate new connections.
+     *
+     * @param userName
+     *            the user name used for authenticating the connection or null for unauthenticated
+     */
+    public void setUsername(final String userName) {
+        this.userName = userName;
     }
 }

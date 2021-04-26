@@ -38,7 +38,7 @@ CONTENTS:
 ===================
 Dependency Changes:
 ===================
-Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java SE 8 and later.
+Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java @MIN_JAVA_VERSION@ and later.
 
 
 ==============
@@ -47,7 +47,7 @@ API Stability:
 
 The public interfaces for the following classes are fixed and will not be
 changed at all during the remaining lifetime of the @VERSION_MAJOR@.x series:
-- All classes in the javax namespace
+- All classes in the jakarta namespace
 
 The public interfaces for the following classes may be added to in order to
 resolve bugs and/or add new features. No existing interface method will be
@@ -70,22 +70,23 @@ for use by web applications (by placing them in "lib"):
 * catalina.jar (Tomcat Catalina implementation)
 * catalina-ant.jar (Tomcat Catalina Ant tasks)
 * catalina-ha.jar (High availability package)
+* catalina-ssi.jar (Server-side Includes module)
 * catalina-storeconfig.jar (Generation of XML configuration from current state)
 * catalina-tribes.jar (Group communication)
 * ecj-@JDT_VERSION@.jar (Eclipse JDT Java compiler)
-* el-api.jar (EL 3.0 API)
+* el-api.jar (EL 4.0 API)
 * jasper.jar (Jasper 2 Compiler and Runtime)
 * jasper-el.jar (Jasper 2 EL implementation)
-* jsp-api.jar (JSP 2.3 API)
-* servlet-api.jar (Servlet 4.0 API)
+* jsp-api.jar (JSP 3.0 API)
+* servlet-api.jar (Servlet 5.0 API)
 * tomcat-api.jar (Interfaces shared by Catalina and Jasper)
 * tomcat-coyote.jar (Tomcat connectors and utility classes)
 * tomcat-dbcp.jar (package renamed database connection pool based on Commons DBCP 2)
 * tomcat-jdbc.jar (Tomcat's database connection pooling solution)
 * tomcat-jni.jar (Interface to the native component of the APR/native connector)
 * tomcat-util.jar (Various utilities)
-* tomcat-websocket.jar (WebSocket 1.1 implementation)
-* websocket-api.jar (WebSocket 1.1 API)
+* tomcat-websocket.jar (WebSocket 2.0 implementation)
+* websocket-api.jar (WebSocket 2.0 API)
 
 You can make additional APIs available to all of your web applications by
 putting unpacked classes into a "classes" directory (not created by default),
@@ -115,7 +116,7 @@ and putting them in the shared classloader instead (JARs should be put in the
 Security manager URLs:
 ======================
 In order to grant security permissions to JARs located inside the
-web application repository, use URLs of of the following format
+web application repository, use URLs of the following format
 in your policy file:
 
 file:${catalina.base}/webapps/examples/WEB-INF/lib/driver.jar

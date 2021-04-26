@@ -18,18 +18,17 @@ package async;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -76,9 +75,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
 
     @Override
     public void tick(Stock stock) {
-        Iterator<AsyncContext> it = clients.iterator();
-        while (it.hasNext()) {
-            AsyncContext actx = it.next();
+        for (AsyncContext actx : clients) {
             try {
                 writeStock(actx, stock);
             } catch (Exception e) {
@@ -109,9 +106,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
     public void shutdown() {
         // The web application is shutting down. Complete any AsyncContexts
         // associated with an active client.
-        Iterator<AsyncContext> it = clients.iterator();
-        while (it.hasNext()) {
-            AsyncContext actx = it.next();
+        for (AsyncContext actx : clients) {
             try {
                 actx.complete();
             } catch (Exception e) {

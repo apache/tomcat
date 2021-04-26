@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.CloseNowException;
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -49,6 +50,9 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
      * Associated Coyote response.
      */
     protected final Response response;
+
+
+    private volatile boolean ackSent = false;
 
 
     /**
@@ -271,6 +275,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
         // Reset pointers
         headerBuffer.position(0).limit(headerBuffer.capacity());
         lastActiveFilter = -1;
+        ackSent = false;
         responseFinished = false;
         byteCount = 0;
     }
@@ -282,7 +287,11 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
 
     public void sendAck() throws IOException {
-        if (!response.isCommitted()) {
+        // It possible that the protocol configuration is changed between the
+        // request being received and the first read of the body. That could led
+        // to multiple calls to this method so ensure the ACK is only sent once.
+        if (!response.isCommitted() && !ackSent) {
+            ackSent = true;
             socketWrapper.write(isBlocking(), Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
             if (flushBuffer(true)) {
                 throw new IOException(sm.getString("iob.failedwrite.ack"));
@@ -303,7 +312,12 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
             // Sending the response header buffer
             headerBuffer.flip();
             try {
-                socketWrapper.write(isBlocking(), headerBuffer);
+                SocketWrapperBase<?> socketWrapper = this.socketWrapper;
+                if (socketWrapper != null) {
+                    socketWrapper.write(isBlocking(), headerBuffer);
+                } else {
+                    throw new CloseNowException(sm.getString("iob.failedwrite"));
+                }
             } finally {
                 headerBuffer.position(0).limit(headerBuffer.capacity());
             }
@@ -527,7 +541,12 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
         public int doWrite(ByteBuffer chunk) throws IOException {
             try {
                 int len = chunk.remaining();
-                socketWrapper.write(isBlocking(), chunk);
+                SocketWrapperBase<?> socketWrapper = Http11OutputBuffer.this.socketWrapper;
+                if (socketWrapper != null) {
+                    socketWrapper.write(isBlocking(), chunk);
+                } else {
+                    throw new CloseNowException(sm.getString("iob.failedwrite"));
+                }
                 len -= chunk.remaining();
                 byteCount += len;
                 return len;

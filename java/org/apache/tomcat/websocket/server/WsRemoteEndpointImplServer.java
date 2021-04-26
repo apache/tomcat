@@ -21,13 +21,13 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
-import java.nio.channels.InterruptedByTimeoutException;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
 
+import org.apache.coyote.http11.upgrade.UpgradeInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -37,7 +37,7 @@ import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
 
 /**
- * This is the server side {@link javax.websocket.RemoteEndpoint} implementation
+ * This is the server side {@link jakarta.websocket.RemoteEndpoint} implementation
  * - i.e. what the server uses to send data to the client.
  */
 public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
@@ -47,16 +47,17 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private final Log log = LogFactory.getLog(WsRemoteEndpointImplServer.class); // must not be static
 
     private final SocketWrapperBase<?> socketWrapper;
+    private final UpgradeInfo upgradeInfo;
     private final WsWriteTimeout wsWriteTimeout;
     private volatile SendHandler handler = null;
     private volatile ByteBuffer[] buffers = null;
 
     private volatile long timeoutExpiry = -1;
-    private volatile boolean close;
 
-    public WsRemoteEndpointImplServer(SocketWrapperBase<?> socketWrapper,
+    public WsRemoteEndpointImplServer(SocketWrapperBase<?> socketWrapper, UpgradeInfo upgradeInfo,
             WsServerContainer serverContainer) {
         this.socketWrapper = socketWrapper;
+        this.upgradeInfo = upgradeInfo;
         this.wsWriteTimeout = serverContainer.getTimeout();
     }
 
@@ -65,6 +66,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     protected final boolean isMasked() {
         return false;
     }
+
 
     @Override
     protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry,
@@ -81,12 +83,12 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
             } else {
                 this.handler = handler;
+                timeout = getSendTimeout();
                 if (timeout > 0) {
                     // Register with timeout thread
                     timeoutExpiry = timeout + System.currentTimeMillis();
                     wsWriteTimeout.register(this);
                 }
-                timeout = getSendTimeout();
             }
             socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout,
                     TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
@@ -103,16 +105,10 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                             } else {
                                 wsWriteTimeout.unregister(WsRemoteEndpointImplServer.this);
                                 clearHandler(null, true);
-                                if (close) {
-                                    close();
-                                }
                             }
                         }
                         @Override
                         public void failed(Throwable exc, Void attachment) {
-                            if (exc instanceof InterruptedByTimeoutException) {
-                                exc = new SocketTimeoutException();
-                            }
                             if (block) {
                                 SendResult sr = new SendResult(exc);
                                 handler.onResult(sr);
@@ -161,6 +157,13 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     }
 
 
+    @Override
+    protected void updateStats(long payloadLength) {
+        upgradeInfo.addMsgsSent(1);
+        upgradeInfo.addBytesSent(payloadLength);
+    }
+
+
     public void onWritePossible(boolean useDispatch) {
         // Note: Unused for async IO
         ByteBuffer[] buffers = this.buffers;
@@ -188,9 +191,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     if (complete) {
                         wsWriteTimeout.unregister(this);
                         clearHandler(null, useDispatch);
-                        if (close) {
-                            close();
-                        }
                     }
                     break;
                 }
@@ -224,7 +224,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         }
         try {
             socketWrapper.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);
             }
@@ -267,7 +267,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      * @param useDispatch   Should {@link SendHandler#onResult(SendResult)} be
      *                      called from a new thread, keeping in mind the
      *                      requirements of
-     *                      {@link javax.websocket.RemoteEndpoint.Async}
+     *                      {@link jakarta.websocket.RemoteEndpoint.Async}
      */
     private void clearHandler(Throwable t, boolean useDispatch) {
         // Setting the result marks this (partial) message as

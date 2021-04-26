@@ -19,11 +19,11 @@ package compressionFilters;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Very Simple test servlet to test compression filter
@@ -46,8 +46,7 @@ public class CompressionFilterTestServlet extends HttpServlet {
             out.println(name);
             if (name.indexOf("gzip") != -1) {
                 out.println("gzip supported -- able to compress");
-            }
-            else {
+            } else {
                 out.println("gzip not supported");
             }
         }

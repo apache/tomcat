@@ -277,7 +277,7 @@
                     this.y2 = y2;
 
                     function ellipse(ctx, x, y, w, h) {
-                        /* Drawing a ellipse cannot be done directly in a
+                        /* Drawing an ellipse cannot be done directly in a
                          * CanvasRenderingContext2D - we need to use drawArc()
                          * in conjunction with scaling the context so that we
                          * get the needed proportion.
@@ -326,7 +326,7 @@
                                     ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
                                 }
                             } else if (type == 4) {
-                                // Draw a ellipse.
+                                // Draw an ellipse.
                                 ellipse(ctx, x1, y1, x2 - x1, y2 - y1);
                                 ctx.closePath();
                                 ctx.stroke();
@@ -858,8 +858,8 @@
     ]]></script>
 </head>
 <body>
-    <div class="noscript"><div style="color: #ff0000; font-size: 16pt;">Seems your browser doesn't support Javascript! Websockets rely on Javascript being enabled. Please enable
-    Javascript and reload this page!</div></div>
+    <div class="noscript"><div style="color: #ff0000; font-size: 16pt;">Seems your browser doesn't support JavaScript! Websockets rely on JavaScript being enabled. Please enable
+    JavaScript and reload this page!</div></div>
     <div id="labelContainer"/>
     <div id="drawContainer"/>
     <div id="console-container"/>

@@ -27,7 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.Part;
+import jakarta.servlet.http.Part;
 
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.ParameterParser;

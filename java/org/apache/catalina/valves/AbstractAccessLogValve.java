@@ -30,12 +30,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
@@ -51,6 +52,7 @@ import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.IPv6Utils;
 
@@ -66,31 +68,31 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * following replacement strings, for which the corresponding information
  * from the specified Response is substituted:</p>
  * <ul>
- * <li><b>%a</b> - Remote IP address
- * <li><b>%A</b> - Local IP address
- * <li><b>%b</b> - Bytes sent, excluding HTTP headers, or '-' if no bytes
+ * <li><b><code>%a</code></b> - Remote IP address
+ * <li><b><code>%A</code></b> - Local IP address
+ * <li><b><code>%b</code></b> - Bytes sent, excluding HTTP headers, or '-' if no bytes
  *     were sent
- * <li><b>%B</b> - Bytes sent, excluding HTTP headers
- * <li><b>%h</b> - Remote host name (or IP address if
+ * <li><b><code>%B</code></b> - Bytes sent, excluding HTTP headers
+ * <li><b><code>%h</code></b> - Remote host name (or IP address if
  * <code>enableLookups</code> for the connector is false)
- * <li><b>%H</b> - Request protocol
- * <li><b>%l</b> - Remote logical username from identd (always returns '-')
- * <li><b>%m</b> - Request method
- * <li><b>%p</b> - Local port
- * <li><b>%q</b> - Query string (prepended with a '?' if it exists, otherwise
+ * <li><b><code>%H</code></b> - Request protocol
+ * <li><b><code>%l</code></b> - Remote logical username from identd (always returns '-')
+ * <li><b><code>%m</code></b> - Request method
+ * <li><b><code>%p</code></b> - Local port
+ * <li><b><code>%q</code></b> - Query string (prepended with a '?' if it exists, otherwise
  *     an empty string
- * <li><b>%r</b> - First line of the request
- * <li><b>%s</b> - HTTP status code of the response
- * <li><b>%S</b> - User session ID
- * <li><b>%t</b> - Date and time, in Common Log Format format
- * <li><b>%u</b> - Remote user that was authenticated
- * <li><b>%U</b> - Requested URL path
- * <li><b>%v</b> - Local server name
- * <li><b>%D</b> - Time taken to process the request, in millis
- * <li><b>%T</b> - Time taken to process the request, in seconds
- * <li><b>%F</b> - Time taken to commit the response, in millis
- * <li><b>%I</b> - current Request thread name (can compare later with stacktraces)
- * <li><b>%X</b> - Connection status when response is completed:
+ * <li><b><code>%r</code></b> - First line of the request
+ * <li><b><code>%s</code></b> - HTTP status code of the response
+ * <li><b><code>%S</code></b> - User session ID
+ * <li><b><code>%t</code></b> - Date and time, in Common Log Format format
+ * <li><b><code>%u</code></b> - Remote user that was authenticated
+ * <li><b><code>%U</code></b> - Requested URL path
+ * <li><b><code>%v</code></b> - Local server name
+ * <li><b><code>%D</code></b> - Time taken to process the request, in microseconds
+ * <li><b><code>%T</code></b> - Time taken to process the request, in seconds
+ * <li><b><code>%F</code></b> - Time taken to commit the response, in milliseconds
+ * <li><b><code>%I</code></b> - current Request thread name (can compare later with stacktraces)
+ * <li><b><code>%X</code></b> - Connection status when response is completed:
  *   <ul>
  *   <li><code>X</code> = Connection aborted before the response completed.</li>
  *   <li><code>+</code> = Connection may be kept alive after the response is sent.</li>
@@ -119,6 +121,8 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * <li><code>%{xxx}s</code> xxx is an attribute in the HttpSession
  * <li><code>%{xxx}t</code> xxx is an enhanced SimpleDateFormat pattern
  * (see Configuration Reference document for details on supported time patterns)
+ * <li><code>%{xxx}T</code> xxx is the unit for the time taken to process the request
+ * (see Configuration Reference document for details on supported units)
  * </ul>
  *
  * <p>
@@ -160,6 +164,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      */
     private enum PortType {
         LOCAL, REMOTE
+    }
+
+    /**
+     * The list of our ip address types.
+     */
+    private enum RemoteAddressType {
+        REMOTE, PEER
     }
 
     //------------------------------------------------------ Constructor
@@ -405,25 +416,14 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Thread local date format cache.
      */
     private static final ThreadLocal<DateFormatCache> localDateCache =
-            new ThreadLocal<DateFormatCache>() {
-        @Override
-        protected DateFormatCache initialValue() {
-            return new DateFormatCache(localCacheSize, Locale.getDefault(), globalDateCache);
-        }
-    };
+            ThreadLocal.withInitial(() -> new DateFormatCache(localCacheSize, Locale.getDefault(), globalDateCache));
 
 
     /**
      * The system time when we last updated the Date that this valve
      * uses for log lines.
      */
-    private static final ThreadLocal<Date> localDate =
-            new ThreadLocal<Date>() {
-        @Override
-        protected Date initialValue() {
-            return new Date();
-        }
-    };
+    private static final ThreadLocal<Date> localDate = ThreadLocal.withInitial(Date::new);
 
     /**
      * Are we doing conditional logging. default null.
@@ -456,7 +456,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     protected AccessLogElement[] logElements = null;
 
     /**
-     * Should this valve set request attributes for IP address, hostname,
+     * Array of elements where the value needs to be cached at the start of the
+     * request.
+     */
+    protected CachedElement[] cachedElements = null;
+
+    /**
+     * Should this valve use request attributes for IP address, hostname,
      * protocol and port used for the request.
      * Default is <code>false</code>.
      * @see #setRequestAttributesEnabled(boolean)
@@ -485,6 +491,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
 
     // ------------------------------------------------------------- Properties
+
+    public int getMaxLogMessageBufferSize() {
+        return maxLogMessageBufferSize;
+    }
+
+
+    public void setMaxLogMessageBufferSize(int maxLogMessageBufferSize) {
+        this.maxLogMessageBufferSize = maxLogMessageBufferSize;
+    }
+
 
     public boolean getIpv6Canonical() {
         return ipv6Canonical;
@@ -553,6 +569,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             this.pattern = pattern;
         }
         logElements = createLogElements();
+        cachedElements = createCachedElements(logElements);
     }
 
     /**
@@ -665,6 +682,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             // to be cached in the request.
             request.getAttribute(Globals.CERTIFICATES_ATTR);
         }
+        if (cachedElements != null) {
+            for (CachedElement element : cachedElements) {
+                element.cache(request);
+            }
+        }
         getNext().invoke(request, response);
     }
 
@@ -679,22 +701,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return;
         }
 
-        /**
-         * XXX This is a bit silly, but we want to have start and stop time and
-         * duration consistent. It would be better to keep start and stop
-         * simply in the request and/or response object and remove time
-         * (duration) from the interface.
-         */
-        long start = request.getCoyoteRequest().getStartTime();
-        Date date = getDate(start + time);
+        // Date for access log should be the beginning of the request
+        Date date = getDate(request.getCoyoteRequest().getStartTime());
 
         CharArrayWriter result = charArrayWriters.pop();
         if (result == null) {
             result = new CharArrayWriter(128);
         }
 
-        for (int i = 0; i < logElements.length; i++) {
-            logElements[i].addElement(result, date, request, response, time);
+        for (AccessLogElement logElement : logElements) {
+            logElement.addElement(result, date, request, response, time);
         }
 
         log(result);
@@ -787,7 +803,20 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     protected interface AccessLogElement {
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time);
+    }
 
+    /**
+     * Marks an AccessLogElement as needing to be have the value cached at the
+     * start of the request rather than just recorded at the end as the source
+     * data for the element may not be available at the end of the request. This
+     * typically occurs for remote network information, such as ports, IP
+     * addresses etc. when the connection is closed unexpectedly. These elements
+     * take advantage of these values being cached elsewhere on first request
+     * and do not cache the value in the element since the elements are
+     * state-less.
+     */
+    protected interface CachedElement {
+        public void cache(Request request);
     }
 
     /**
@@ -801,7 +830,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if(info != null) {
                 buf.append(info.getWorkerThreadName());
             } else {
-                buf.append("-");
+                buf.append('-');
             }
         }
     }
@@ -839,20 +868,51 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * write remote IP address - %a
      */
-    protected class RemoteAddrElement implements AccessLogElement {
+    protected class RemoteAddrElement implements AccessLogElement, CachedElement {
+        /**
+         * Type of address to log
+         */
+        private static final String remoteAddress = "remote";
+        private static final String peerAddress = "peer";
+
+        private final RemoteAddressType remoteAddressType;
+
+        public RemoteAddrElement() {
+            remoteAddressType = RemoteAddressType.REMOTE;
+        }
+
+        public RemoteAddrElement(String type) {
+            switch (type) {
+            case remoteAddress:
+                remoteAddressType = RemoteAddressType.REMOTE;
+                break;
+            case peerAddress:
+                remoteAddressType = RemoteAddressType.PEER;
+                break;
+            default:
+                log.error(sm.getString("accessLogValve.invalidRemoteAddressType", type));
+                remoteAddressType = RemoteAddressType.REMOTE;
+                break;
+            }
+        }
+
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             String value = null;
-            if (requestAttributesEnabled) {
-                Object addr = request.getAttribute(REMOTE_ADDR_ATTRIBUTE);
-                if (addr == null) {
-                    value = request.getRemoteAddr();
-                } else {
-                    value = addr.toString();
-                }
+            if (remoteAddressType == RemoteAddressType.PEER) {
+                value = request.getPeerAddr();
             } else {
-                value = request.getRemoteAddr();
+                if (requestAttributesEnabled) {
+                    Object addr = request.getAttribute(REMOTE_ADDR_ATTRIBUTE);
+                    if (addr == null) {
+                        value = request.getRemoteAddr();
+                    } else {
+                        value = addr.toString();
+                    }
+                } else {
+                    value = request.getRemoteAddr();
+                }
             }
 
             if (ipv6Canonical) {
@@ -860,12 +920,23 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
             buf.append(value);
         }
+
+        @Override
+        public void cache(Request request) {
+            if (!requestAttributesEnabled) {
+                if (remoteAddressType == RemoteAddressType.PEER) {
+                    request.getPeerAddr();
+                } else {
+                    request.getRemoteAddr();
+                }
+            }
+        }
     }
 
     /**
      * write remote host name - %h
      */
-    protected class HostElement implements AccessLogElement {
+    protected class HostElement implements AccessLogElement, CachedElement {
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
@@ -887,6 +958,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 value = IPv6Utils.canonize(value);
             }
             buf.append(value);
+        }
+
+        @Override
+        public void cache(Request request) {
+            if (!requestAttributesEnabled) {
+                request.getRemoteHost();
+            }
         }
     }
 
@@ -931,7 +1009,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (request != null) {
                 String value = request.getRemoteUser();
                 if (value != null) {
-                    buf.append(value);
+                    escapeAndAppend(value, buf);
                 } else {
                     buf.append('-');
                 }
@@ -981,7 +1059,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
          * formatting of SimpleDateFormat by our own handling
          */
         private static final String msecPattern = "{#}";
-        private static final String trippleMsecPattern =
+        private static final String tripleMsecPattern =
             msecPattern + msecPattern + msecPattern;
 
         /* Our format description string, null if CLF */
@@ -1066,8 +1144,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 Response response, long time) {
             long timestamp = date.getTime();
             long frac;
-            if (usesBegin) {
-                timestamp -= time;
+            if (!usesBegin) {
+                timestamp += TimeUnit.NANOSECONDS.toMillis(time);
             }
             /*  Implementation note: This is deliberately not implemented using
              *  switch. If a switch is used the compiler (at least the Oracle
@@ -1100,17 +1178,17 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 String temp = localDateCache.get().getFormat(format, locale, timestamp);
                 if (usesMsecs) {
                     frac = timestamp % 1000;
-                    StringBuilder trippleMsec = new StringBuilder(4);
+                    StringBuilder tripleMsec = new StringBuilder(4);
                     if (frac < 100) {
                         if (frac < 10) {
-                            trippleMsec.append('0');
-                            trippleMsec.append('0');
+                            tripleMsec.append('0');
+                            tripleMsec.append('0');
                         } else {
-                            trippleMsec.append('0');
+                            tripleMsec.append('0');
                         }
                     }
-                    trippleMsec.append(frac);
-                    temp = temp.replace(trippleMsecPattern, trippleMsec);
+                    tripleMsec.append(frac);
+                    temp = temp.replace(tripleMsecPattern, tripleMsec);
                     temp = temp.replace(msecPattern, Long.toString(frac));
                 }
                 buf.append(temp);
@@ -1173,7 +1251,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * write local or remote port for request connection - %p and %{xxx}p
      */
-    protected class PortElement implements AccessLogElement {
+    protected class PortElement implements AccessLogElement, CachedElement {
 
         /**
          * Type of port to log
@@ -1218,6 +1296,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 } else {
                     buf.append(Integer.toString(request.getRemotePort()));
                 }
+            }
+        }
+
+        @Override
+        public void cache(Request request) {
+            if (portType == PortType.REMOTE) {
+                request.getRemotePort();
             }
         }
     }
@@ -1280,30 +1365,29 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * write time taken to process the request - %D, %T
      */
     protected static class ElapsedTimeElement implements AccessLogElement {
+        private final boolean micros;
         private final boolean millis;
 
         /**
-         * @param millis <code>true</code>, write time in millis - %D,
-         * if <code>false</code>, write time in seconds - %T
+         * @param micros <code>true</code>, write time in microseconds - %D
+         * @param millis <code>true</code>, write time in milliseconds,
+         * if both arguments are <code>false</code>, write time in seconds - %T
          */
-        public ElapsedTimeElement(boolean millis) {
+        public ElapsedTimeElement(boolean micros, boolean millis) {
+            this.micros = micros;
             this.millis = millis;
         }
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
-            if (millis) {
-                buf.append(Long.toString(time));
+            if (micros) {
+                buf.append(Long.toString(TimeUnit.NANOSECONDS.toMicros(time)));
+            } else if (millis) {
+                buf.append(Long.toString(TimeUnit.NANOSECONDS.toMillis(time)));
             } else {
                 // second
-                buf.append(Long.toString(time / 1000));
-                buf.append('.');
-                int remains = (int) (time % 1000);
-                buf.append(Long.toString(remains / 100));
-                remains = remains % 100;
-                buf.append(Long.toString(remains / 10));
-                buf.append(Long.toString(remains % 10));
+                buf.append(Long.toString(TimeUnit.NANOSECONDS.toSeconds(time)));
             }
         }
     }
@@ -1314,12 +1398,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     protected static class FirstByteTimeElement implements AccessLogElement {
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            long commitTime = response.getCoyoteResponse().getCommitTime();
+            long commitTime = response.getCoyoteResponse().getCommitTimeNanos();
             if (commitTime == -1) {
                 buf.append('-');
             } else {
-                long delta = commitTime - request.getCoyoteRequest().getStartTime();
-                buf.append(Long.toString(delta));
+                long delta = commitTime - request.getCoyoteRequest().getStartTimeNanos();
+                buf.append(Long.toString(TimeUnit.NANOSECONDS.toMillis(delta)));
             }
         }
     }
@@ -1384,11 +1468,24 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
-            if (ipv6Canonical) {
-                buf.append(IPv6Utils.canonize(request.getServerName()));
-            } else {
-                buf.append(request.getServerName());
+            String value = null;
+            if (requestAttributesEnabled) {
+                Object serverName = request.getAttribute(SERVER_NAME_ATTRIBUTE);
+                if (serverName != null) {
+                    value = serverName.toString();
+                }
             }
+            if (value == null || value.length() == 0) {
+                value = request.getServerName();
+            }
+            if (value == null || value.length() == 0) {
+                value = "-";
+            }
+
+            if (ipv6Canonical) {
+                value = IPv6Utils.canonize(value);
+            }
+            buf.append(value);
         }
     }
 
@@ -1424,9 +1521,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 Response response, long time) {
             Enumeration<String> iter = request.getHeaders(header);
             if (iter.hasMoreElements()) {
-                buf.append(iter.nextElement());
+                escapeAndAppend(iter.nextElement(), buf);
                 while (iter.hasMoreElements()) {
-                    buf.append(',').append(iter.nextElement());
+                    buf.append(',');
+                    escapeAndAppend(iter.nextElement(), buf);
                 }
                 return;
             }
@@ -1448,16 +1546,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
             String value = "-";
-            Cookie[] c = request.getCookies();
-            if (c != null) {
-                for (int i = 0; i < c.length; i++) {
-                    if (header.equals(c[i].getName())) {
-                        value = c[i].getValue();
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (header.equals(cookie.getName())) {
+                        value = cookie.getValue();
                         break;
                     }
                 }
             }
-            buf.append(value);
+            escapeAndAppend(value, buf);
         }
     }
 
@@ -1477,9 +1575,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (null != response) {
                 Iterator<String> iter = response.getHeaders(header).iterator();
                 if (iter.hasNext()) {
-                    buf.append(iter.next());
+                    escapeAndAppend(iter.next(), buf);
                     while (iter.hasNext()) {
-                        buf.append(',').append(iter.next());
+                        buf.append(',');
+                        escapeAndAppend(iter.next(), buf);
                     }
                     return;
                 }
@@ -1509,9 +1608,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
             if (value != null) {
                 if (value instanceof String) {
-                    buf.append((String) value);
+                    escapeAndAppend((String) value, buf);
                 } else {
-                    buf.append(value.toString());
+                    escapeAndAppend(value.toString(), buf);
                 }
             } else {
                 buf.append('-');
@@ -1543,9 +1642,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
             if (value != null) {
                 if (value instanceof String) {
-                    buf.append((String) value);
+                    escapeAndAppend((String) value, buf);
                 } else {
-                    buf.append(value.toString());
+                    escapeAndAppend(value.toString(), buf);
                 }
             } else {
                 buf.append('-');
@@ -1645,6 +1744,18 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         return list.toArray(new AccessLogElement[0]);
     }
 
+
+    private CachedElement[] createCachedElements(AccessLogElement[] elements) {
+        List<CachedElement> list = new ArrayList<>();
+        for (AccessLogElement element : elements) {
+            if (element instanceof CachedElement) {
+                list.add((CachedElement) element);
+            }
+        }
+        return list.toArray(new CachedElement[0]);
+    }
+
+
     /**
      * Create an AccessLogElement implementation which needs an element name.
      * @param name Header name
@@ -1659,6 +1770,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return new CookieElement(name);
         case 'o':
             return new ResponseHeaderElement(name);
+        case 'a':
+            return new RemoteAddrElement(name);
         case 'p':
             return new PortElement(name);
         case 'r':
@@ -1670,6 +1783,15 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return new SessionAttributeElement(name);
         case 't':
             return new DateAndTimeElement(name);
+        case 'T':
+            // ms for milliseconds, us for microseconds, and s for seconds
+            if ("ms".equals(name)) {
+                return new ElapsedTimeElement(false, true);
+            } else if ("us".equals(name)) {
+                return new ElapsedTimeElement(true, false);
+            } else {
+                return new ElapsedTimeElement(false, false);
+            }
         default:
             return new StringElement("???");
         }
@@ -1691,7 +1813,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         case 'B':
             return new ByteSentElement(false);
         case 'D':
-            return new ElapsedTimeElement(true);
+            return new ElapsedTimeElement(true, false);
         case 'F':
             return new FirstByteTimeElement();
         case 'h':
@@ -1715,7 +1837,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         case 't':
             return new DateAndTimeElement();
         case 'T':
-            return new ElapsedTimeElement(false);
+            return new ElapsedTimeElement(false, false);
         case 'u':
             return new UserElement();
         case 'U':
@@ -1728,6 +1850,101 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return new ConnectionStatusElement();
         default:
             return new StringElement("???" + pattern + "???");
+        }
+    }
+
+
+    /*
+     * This method is intended to mimic the escaping performed by httpd and
+     * mod_log_config. mod_log_config escapes more elements than indicated by the
+     * documentation. See:
+     * https://github.com/apache/httpd/blob/trunk/modules/loggers/mod_log_config.c
+     *
+     * The following escaped elements are not supported by Tomcat:
+     * - %C   cookie value (see %{}c below)
+     * - %e   environment variable
+     * - %f   filename
+     * - %l   remote logname (always logs "-")
+     * - %n   note
+     * - %R   handler
+     * - %ti  trailer request header
+     * - %to  trailer response header
+     * - %V   server name per UseCanonicalName setting
+     *
+     * The following escaped elements are not escaped in Tomcat because values
+     * that would require escaping are rejected before they reach the
+     * AccessLogValve:
+     * - %h   remote host
+     * - %H   request protocol
+     * - %m   request method
+     * - %q   query string
+     * - %r   request line
+     * - %U   request URI
+     * - %v   canonical server name
+     *
+     * The following escaped elements are supported by Tomcat:
+     * - %{}i request header
+     * - %{}o response header
+     * - %u   remote user
+     *
+     * The following additional Tomcat elements are escaped for consistency:
+     * - %{}c cookie value
+     * - %{}r request attribute
+     * - %{}s session attribute
+     *
+     * giving a total of 6 elements that are escaped in Tomcat.
+     *
+     *  Quoting from the httpd docs:
+     * "...non-printable and other special characters in %r, %i and %o are
+     *  escaped using \xhh sequences, where hh stands for the hexadecimal
+     *  representation of the raw byte. Exceptions from this rule are " and \,
+     *  which are escaped by prepending a backslash, and all whitespace
+     *  characters, which are written in their C-style notation (\n, \t, etc)."
+     *
+     *  Reviewing the httpd code, characters with the high bit set are escaped.
+     *  The httpd is assuming a single byte encoding which may not be true for
+     *  Tomcat so Tomcat uses the Java \\uXXXX encoding.
+     */
+    protected static void escapeAndAppend(String input, CharArrayWriter dest) {
+        if (input == null || input.isEmpty()) {
+            dest.append('-');
+            return;
+        }
+
+        for (char c : input.toCharArray()) {
+            switch (c) {
+            // " and \
+            case '\\':
+                dest.append("\\\\");
+                break;
+            case '\"':
+                dest.append("\\\"");
+                break;
+            // Standard C escapes for whitespace (not all standard C escapes)
+            case '\f':
+                dest.append("\\f");
+                break;
+            case '\n':
+                dest.append("\\n");
+                break;
+            case '\r':
+                dest.append("\\r");
+                break;
+            case '\t':
+                dest.append("\\t");
+                break;
+            case '\u000b':
+                dest.append("\\v");
+                break;
+            default:
+                // Control, delete (127) or above 127
+                if (c < 32 || c > 126) {
+                    dest.append("\\u");
+                    dest.append(HexUtils.toHexString(c));
+                } else {
+                    dest.append(c);
+                }
+            }
         }
     }
 }

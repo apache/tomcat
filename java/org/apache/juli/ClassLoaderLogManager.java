@@ -30,7 +30,6 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -53,12 +52,7 @@ public class ClassLoaderLogManager extends LogManager {
 
     private static final boolean isJava9;
 
-    private static ThreadLocal<Boolean> addingLocalRootLogger = new ThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-            return Boolean.FALSE;
-        }
-    };
+    private static ThreadLocal<Boolean> addingLocalRootLogger = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     public static final String DEBUG_PROPERTY =
             ClassLoaderLogManager.class.getName() + ".debug";
@@ -163,12 +157,9 @@ public class ClassLoaderLogManager extends LogManager {
         final String levelString = getProperty(loggerName + ".level");
         if (levelString != null) {
             try {
-                AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                    @Override
-                    public Void run() {
-                        logger.setLevel(Level.parse(levelString.trim()));
-                        return null;
-                    }
+                AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                    logger.setLevel(Level.parse(levelString.trim()));
+                    return null;
                 });
             } catch (IllegalArgumentException e) {
                 // Leave level set to null
@@ -423,16 +414,13 @@ public class ClassLoaderLogManager extends LogManager {
         ClassLoaderLogInfo info = classLoaderLoggers.get(classLoader);
         if (info == null) {
             final ClassLoader classLoaderParam = classLoader;
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                @Override
-                public Void run() {
-                    try {
-                        readConfiguration(classLoaderParam);
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                    return null;
+            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                try {
+                    readConfiguration(classLoaderParam);
+                } catch (IOException e) {
+                    // Ignore
                 }
+                return null;
             });
             info = classLoaderLoggers.get(classLoader);
         }
@@ -485,8 +473,7 @@ public class ClassLoaderLogManager extends LogManager {
                     Permission perm = ace.getPermission();
                     if (perm instanceof FilePermission && perm.getActions().equals("read")) {
                         log.warning("Reading " + perm.getName() + " is not permitted. See \"per context logging\" in the default catalina.policy file.");
-                    }
-                    else {
+                    } else {
                         log.warning("Reading logging.properties is not permitted in some context. See \"per context logging\" in the default catalina.policy file.");
                         log.warning("Original error was: " + ace.getMessage());
                     }
@@ -628,12 +615,9 @@ public class ClassLoaderLogManager extends LogManager {
      */
     protected static void doSetParentLogger(final Logger logger,
             final Logger parent) {
-        AccessController.doPrivileged(new PrivilegedAction<Void>() {
-            @Override
-            public Void run() {
-                logger.setParent(parent);
-                return null;
-            }
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            logger.setParent(parent);
+            return null;
         });
     }
 
@@ -751,9 +735,7 @@ public class ClassLoaderLogManager extends LogManager {
         }
 
         void setParentLogger(final Logger parent) {
-            for (final Iterator<LogNode> iter =
-                children.values().iterator(); iter.hasNext();) {
-                final LogNode childNode = iter.next();
+            for (final LogNode childNode : children.values()) {
                 if (childNode.logger == null) {
                     childNode.setParentLogger(parent);
                 } else {

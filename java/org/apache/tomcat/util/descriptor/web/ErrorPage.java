@@ -27,12 +27,12 @@ import org.apache.tomcat.util.buf.UDecoder;
  *
  * @author Craig R. McClanahan
  */
-public class ErrorPage implements Serializable {
+public class ErrorPage extends XmlEncodingBase implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The error (status) code for which this error page is active. Note that
@@ -125,7 +125,7 @@ public class ErrorPage implements Serializable {
         //        if ((location == null) || !location.startsWith("/"))
         //            throw new IllegalArgumentException
         //                ("Error Page Location must start with a '/'");
-        this.location = UDecoder.URLDecode(location);
+        this.location = UDecoder.URLDecode(location, getCharset());
 
     }
 
@@ -148,7 +148,7 @@ public class ErrorPage implements Serializable {
         }
         sb.append(", location=");
         sb.append(location);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

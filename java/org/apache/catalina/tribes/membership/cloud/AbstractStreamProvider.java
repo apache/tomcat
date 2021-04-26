@@ -25,9 +25,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -36,14 +38,13 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import org.apache.catalina.tribes.membership.Constants;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 public abstract class AbstractStreamProvider implements StreamProvider {
     private static final Log log = LogFactory.getLog(AbstractStreamProvider.class);
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(AbstractStreamProvider.class);
 
     protected static final TrustManager[] INSECURE_TRUST_MANAGERS = new TrustManager[] {
             new X509TrustManager() {
@@ -114,13 +115,16 @@ public abstract class AbstractStreamProvider implements StreamProvider {
         if (caCertFile != null) {
             try (InputStream pemInputStream = new BufferedInputStream(new FileInputStream(caCertFile))) {
                 CertificateFactory certFactory = CertificateFactory.getInstance("X509");
-                X509Certificate cert = (X509Certificate)certFactory.generateCertificate(pemInputStream);
 
                 KeyStore trustStore = KeyStore.getInstance("JKS");
                 trustStore.load(null);
 
-                String alias = cert.getSubjectX500Principal().getName();
-                trustStore.setCertificateEntry(alias, cert);
+                Collection<? extends Certificate> c = certFactory.generateCertificates(pemInputStream);
+                for (Certificate certificate : c) {
+                    X509Certificate cert = (X509Certificate) certificate;
+                    String alias = cert.getSubjectX500Principal().getName();
+                    trustStore.setCertificateEntry(alias, cert);
+                }
 
                 TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(trustStore);

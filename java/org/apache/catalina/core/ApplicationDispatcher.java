@@ -22,20 +22,20 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
-import javax.servlet.ServletResponse;
-import javax.servlet.ServletResponseWrapper;
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServletMapping;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestWrapper;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.ServletResponseWrapper;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AsyncDispatcher;
 import org.apache.catalina.Context;
@@ -56,30 +56,12 @@ import org.apache.tomcat.util.res.StringManager;
  * from this resource.  This implementation allows application level servlets
  * to wrap the request and/or response objects that are passed on to the
  * called resource, as long as the wrapping classes extend
- * <code>javax.servlet.ServletRequestWrapper</code> and
- * <code>javax.servlet.ServletResponseWrapper</code>.
+ * <code>jakarta.servlet.ServletRequestWrapper</code> and
+ * <code>jakarta.servlet.ServletResponseWrapper</code>.
  *
  * @author Craig R. McClanahan
  */
 final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher {
-
-    static final boolean STRICT_SERVLET_COMPLIANCE;
-
-    static final boolean WRAP_SAME_OBJECT;
-
-
-    static {
-        STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
-
-        String wrapSameObject = System.getProperty(
-                "org.apache.catalina.core.ApplicationDispatcher.WRAP_SAME_OBJECT");
-        if (wrapSameObject == null) {
-            WRAP_SAME_OBJECT = STRICT_SERVLET_COMPLIANCE;
-        } else {
-            WRAP_SAME_OBJECT = Boolean.parseBoolean(wrapSameObject);
-        }
-    }
-
 
     protected class PrivilegedForward
             implements PrivilegedExceptionAction<Void> {
@@ -331,7 +313,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         // Set up to handle the specified request and response
         State state = new State(request, response, false);
 
-        if (WRAP_SAME_OBJECT) {
+        if (context.getDispatcherWrapsSameObject()) {
             // Check SRV.8.2 / SRV.14.2.5.1 compliance
             checkSameObjects(request, response);
         }
@@ -371,7 +353,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 wrequest.setAttribute(RequestDispatcher.FORWARD_MAPPING, hrequest.getHttpServletMapping());
             }
 
-            wrequest.setContextPath(context.getPath());
+            wrequest.setContextPath(context.getEncodedPath());
             wrequest.setRequestURI(requestURI);
             wrequest.setServletPath(servletPath);
             wrequest.setPathInfo(pathInfo);
@@ -412,9 +394,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 try {
                     ServletOutputStream stream = response.getOutputStream();
                     stream.close();
-                } catch (IllegalStateException f) {
-                    // Ignore
-                } catch (IOException f) {
+                } catch (IllegalStateException | IOException f) {
                     // Ignore
                 }
             } catch (IOException e) {
@@ -523,7 +503,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         // Set up to handle the specified request and response
         State state = new State(request, response, true);
 
-        if (WRAP_SAME_OBJECT) {
+        if (context.getDispatcherWrapsSameObject()) {
             // Check SRV.8.2 / SRV.14.2.5.1 compliance
             checkSameObjects(request, response);
         }
@@ -618,7 +598,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR, getCombinedPath());
         wrequest.setAttribute(AsyncContext.ASYNC_MAPPING, hrequest.getHttpServletMapping());
 
-        wrequest.setContextPath(context.getPath());
+        wrequest.setContextPath(context.getEncodedPath());
         wrequest.setRequestURI(requestURI);
         wrequest.setServletPath(servletPath);
         wrequest.setPathInfo(pathInfo);
@@ -737,14 +717,8 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         }
 
         // Release the filter chain (if any) for this request
-        try {
-            if (filterChain != null)
-                filterChain.release();
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            wrapper.getLogger().error(sm.getString("standardWrapper.releaseFilters",
-                             wrapper.getName()), e);
-            // FIXME: Exception handling needs to be similar to what is in the StandardWrapperValue
+        if (filterChain != null) {
+            filterChain.release();
         }
 
         // Deallocate the allocated servlet instance
@@ -1043,6 +1017,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
     private void recycleRequestWrapper(State state) {
         if (state.wrapRequest instanceof ApplicationHttpRequest) {
-            ((ApplicationHttpRequest) state.wrapRequest).recycle();        }
+            ((ApplicationHttpRequest) state.wrapRequest).recycle();
+        }
     }
 }

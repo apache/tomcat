@@ -187,7 +187,7 @@ public class MemoryGroup extends AbstractGroup {
         synchronized (roles) {
             if (roles.size() > 0) {
                 sb.append(" roles=\"");
-                StringUtils.join(roles, ',', (x) -> x.getRolename(), sb);
+                StringUtils.join(roles, ',', Role::getRolename, sb);
                 sb.append("\"");
             }
         }

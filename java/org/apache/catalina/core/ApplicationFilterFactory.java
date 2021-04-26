@@ -16,9 +16,9 @@
  */
 package org.apache.catalina.core;
 
-import javax.servlet.DispatcherType;
-import javax.servlet.Servlet;
-import javax.servlet.ServletRequest;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletRequest;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
@@ -81,6 +81,7 @@ public final class ApplicationFilterFactory {
 
         // Acquire the filter mappings for this Context
         StandardContext context = (StandardContext) wrapper.getParent();
+        filterChain.setDispatcherWrapsSameObject(context.getDispatcherWrapsSameObject());
         FilterMap filterMaps[] = context.findFilterMaps();
 
         // If there are no filter mappings, we are done
@@ -100,14 +101,14 @@ public final class ApplicationFilterFactory {
         String servletName = wrapper.getName();
 
         // Add the relevant path-mapped filters to this filter chain
-        for (int i = 0; i < filterMaps.length; i++) {
-            if (!matchDispatcher(filterMaps[i] ,dispatcher)) {
+        for (FilterMap filterMap : filterMaps) {
+            if (!matchDispatcher(filterMap, dispatcher)) {
                 continue;
             }
-            if (!matchFiltersURL(filterMaps[i], requestPath))
+            if (!matchFiltersURL(filterMap, requestPath))
                 continue;
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
-                context.findFilterConfig(filterMaps[i].getFilterName());
+                    context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
                 // FIXME - log configuration problem
                 continue;
@@ -116,14 +117,14 @@ public final class ApplicationFilterFactory {
         }
 
         // Add filters that match on servlet name second
-        for (int i = 0; i < filterMaps.length; i++) {
-            if (!matchDispatcher(filterMaps[i] ,dispatcher)) {
+        for (FilterMap filterMap : filterMaps) {
+            if (!matchDispatcher(filterMap, dispatcher)) {
                 continue;
             }
-            if (!matchFiltersServlet(filterMaps[i], servletName))
+            if (!matchFiltersServlet(filterMap, servletName))
                 continue;
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
-                context.findFilterConfig(filterMaps[i].getFilterName());
+                    context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
                 // FIXME - log configuration problem
                 continue;
@@ -160,8 +161,8 @@ public final class ApplicationFilterFactory {
         // Match on context relative request path
         String[] testPaths = filterMap.getURLPatterns();
 
-        for (int i = 0; i < testPaths.length; i++) {
-            if (matchFiltersURL(testPaths[i], requestPath)) {
+        for (String testPath : testPaths) {
+            if (matchFiltersURL(testPath, requestPath)) {
                 return true;
             }
         }
@@ -242,8 +243,8 @@ public final class ApplicationFilterFactory {
             return true;
         } else {
             String[] servletNames = filterMap.getServletNames();
-            for (int i = 0; i < servletNames.length; i++) {
-                if (servletName.equals(servletNames[i])) {
+            for (String name : servletNames) {
+                if (servletName.equals(name)) {
                     return true;
                 }
             }

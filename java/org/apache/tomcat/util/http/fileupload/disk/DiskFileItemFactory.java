@@ -36,7 +36,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * <ul>
  *   <li>Size threshold is 10KB.</li>
  *   <li>Repository is the system default temp directory, as returned by
- *       <code>System.getProperty("java.io.tmpdir")</code>.</li>
+ *       {@code System.getProperty("java.io.tmpdir")}.</li>
  * </ul>
  * <p>
  * <b>NOTE</b>: Files are created in the system default temp directory with
@@ -47,7 +47,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * implementation in an environment with local, untrusted users,
  * {@link #setRepository(File)} MUST be used to configure a repository location
  * that is not publicly writable. In a Servlet container the location identified
- * by the ServletContext attribute <code>javax.servlet.context.tempdir</code>
+ * by the ServletContext attribute {@code jakarta.servlet.context.tempdir}
  * may be used.
  * </p>
  *
@@ -103,7 +103,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      *                      which files will be created, should the item size
      *                      exceed the threshold.
      */
-    public DiskFileItemFactory(int sizeThreshold, File repository) {
+    public DiskFileItemFactory(final int sizeThreshold, final File repository) {
         this.sizeThreshold = sizeThreshold;
         this.repository = repository;
     }
@@ -132,7 +132,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      * @see #getRepository()
      *
      */
-    public void setRepository(File repository) {
+    public void setRepository(final File repository) {
         this.repository = repository;
     }
 
@@ -156,7 +156,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      * @see #getSizeThreshold()
      *
      */
-    public void setSizeThreshold(int sizeThreshold) {
+    public void setSizeThreshold(final int sizeThreshold) {
         this.sizeThreshold = sizeThreshold;
     }
 
@@ -169,17 +169,17 @@ public class DiskFileItemFactory implements FileItemFactory {
      *
      * @param fieldName   The name of the form field.
      * @param contentType The content type of the form field.
-     * @param isFormField <code>true</code> if this is a plain form field;
-     *                    <code>false</code> otherwise.
+     * @param isFormField {@code true} if this is a plain form field;
+     *                    {@code false} otherwise.
      * @param fileName    The name of the uploaded file, if any, as supplied
      *                    by the browser or other client.
      *
      * @return The newly created file item.
      */
     @Override
-    public FileItem createItem(String fieldName, String contentType,
-            boolean isFormField, String fileName) {
-        DiskFileItem result = new DiskFileItem(fieldName, contentType,
+    public FileItem createItem(final String fieldName, final String contentType,
+                final boolean isFormField, final String fileName) {
+        final DiskFileItem result = new DiskFileItem(fieldName, contentType,
                 isFormField, fileName, sizeThreshold, repository);
         result.setDefaultCharset(defaultCharset);
         return result;
@@ -199,7 +199,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      * parameter is provided by the sender.
      * @param pCharset the default charset
      */
-    public void setDefaultCharset(String pCharset) {
+    public void setDefaultCharset(final String pCharset) {
         defaultCharset = pCharset;
     }
 }

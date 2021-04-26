@@ -148,7 +148,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
 
     /**
      * The default value for the base name to use to name JMX enabled pools
-     * created with a configuration instance. The default is <code>null</code>
+     * created with a configuration instance. The default is {@code null}
      * which means the pool will provide the base name to use.
      * @see GenericObjectPool#getJmxName()
      * @see GenericKeyedObjectPool#getJmxName()
@@ -665,7 +665,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     /**
      * Gets the value of the JMX name base that will be used as part of the
      * name assigned to JMX enabled pools created with this configuration
-     * instance. A value of <code>null</code> means that the pool will define
+     * instance. A value of {@code null} means that the pool will define
      * the JMX name base.
      *
      * @return  The current setting of {@code jmxNameBase} for this
@@ -678,7 +678,7 @@ public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Clon
     /**
      * Sets the value of the JMX name base that will be used as part of the
      * name assigned to JMX enabled pools created with this configuration
-     * instance. A value of <code>null</code> means that the pool will define
+     * instance. A value of {@code null} means that the pool will define
      * the JMX name base.
      *
      * @param jmxNameBase The new setting of {@code jmxNameBase}

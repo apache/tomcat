@@ -258,7 +258,7 @@ public class ContextService extends ResourceBase {
             sb.append(", handler=");
             sb.append(handlers);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

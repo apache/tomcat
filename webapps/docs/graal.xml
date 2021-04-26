@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="graal.html">
+
+    &project;
+
+  <properties>
+    <title>Ahead of Time compilation support</title>
+  </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc/>
+</section>
+
+  <section name="Introduction">
+
+  <p>
+    Tomcat supports using the GraalVM/Mandrel Native Image tool to produce
+    a native binary including the container. This documentation page
+    describes the build process of such an image.
+  </p>
+
+  </section>
+
+  <section name="Setup">
+
+  <p>
+    The native image tool is much easier to use with single JARs, as a result
+    the process will use the Maven shade plugin JAR packaging (fat JAR). The
+    idea is to produce a single JAR that contains all necessary classes from
+    Tomcat, the webapps and all additional dependencies. Although Tomcat has
+    received compatibility fixes to support native images, any library
+    may not be compatible and may require replacement code (the GraalVM
+    documentation has more details about this).
+  </p>
+
+  <p>
+    Download and install GraalVM or Mandrel.
+  </p>
+
+  <p>
+   If using GraalVM, the first step is then to add the Native Image tool.
+   <source>export JAVA_HOME=/absolute...path...to/graalvm-ce-javaX-x.y.z
+cd $JAVA_HOME/bin
+./gu install native-image</source>
+   Mandrel already includes the Native Image tool ready to use, so this
+   step can be skipped. Only JAVA_HOME must be set to the folder which
+   contains the bin folder with the JVM binaries, such as:
+   <source>export JAVA_HOME=/absolute...path...to/mandrel-javaXX-platform-x.x.x.x/mandrelJDK</source>
+  </p>
+
+  <p>
+    Download the Tomcat Stuffed module from
+    https://github.com/apache/tomcat/tree/master/modules/stuffed and place
+    all the files in a folder <code>stuffed</code> in this documentation.
+    <source>export TOMCAT_STUFFED=/absolute...path...to/stuffed</source>
+    The build process now requires both Ant and Maven.
+  </p>
+
+  </section>
+
+  <section name="Packaging and Building">
+
+  <p>
+    Inside the tomcat-stuffed folder, the directory structure is the same as for
+    regular Tomcat. The main configuration files are placed in the conf folder,
+    and if using the default server.xml the webapps are placed in the webapps
+    folder.
+  </p>
+
+  <p>
+    The first step is to build the fat Tomcat JAR with all dependencies.
+    Any JSP in the webapp must all be precompiled and packaged.
+    <source>cd $TOMCAT_STUFFED
+mvn package
+ant -Dwebapp.name=somewebapp -f webapp-jspc.ant.xml</source>
+    Dependencies for the webapp should now be added to the main pom.xml,
+    following with building the complete fat JAR.
+    <source>mvn package</source>
+  </p>
+
+  <p>
+    As it is best to avoid using reflection whenever possible with Ahead of
+    Time compilation, it can be a good idea to generate and compile Tomcat
+    Embedded code out of the main server.xml configuration as well as the
+    context.xml files used to configure the contexts.
+    <source>$JAVA_HOME/bin/java\
+        -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties\
+        -jar target/tomcat-stuffed-1.0.jar --catalina -generateCode src/main/java
+mvn package</source>
+    The rest of the process described here will assume this step was done and
+    the <code>--catalina -useGeneratedCode</code> arguments are added to the
+    command lines. If this was not the case, they should be removed.
+  </p>
+
+  </section>
+
+  <section name="Native image configuration">
+
+  <p>
+    Native images do not support any form of dynamic classloading or
+    reflection unless it is defined explicitly in descriptors. Generating
+    them uses a tracing agent from the GraalVM, and needs additional manual
+    configuration in some cases.
+  </p>
+
+  <p>
+    Run the GraalVM substrate VM using the trace agent:
+    <source>$JAVA_HOME/bin/java\
+        -agentlib:native-image-agent=config-output-dir=$TOMCAT_STUFFED/target/\
+        -Dorg.graalvm.nativeimage.imagecode=agent\
+        -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties\
+        -jar target/tomcat-stuffed-1.0.jar --catalina -useGeneratedCode</source>
+  </p>
+
+  <p>
+    Now all paths from the webapp that lead to dynamic classloading
+    (ex: Servlet access, websockets, etc) need to be accessed using a script
+    that will exercise the webapp. Servlets may be loaded on startup
+    instead of needing an actual access. Listeners may also be used to load
+    additional classes on startup.
+  </p>
+
+  <p>
+    The descriptors have now been generated in the agent output directory.
+    At this point, further configuration must be made to add items that are
+    not traced, including: base interfaces, resource bundles, BeanInfo based
+    reflection, etc. Please refer to the Graal documentation for more
+    information on this process.
+  </p>
+
+  </section>
+
+  <section name="Building the native image">
+
+  <p>
+    If everything has been done properly, the native image can now be built
+    using the native-image tool.
+    <source>$JAVA_HOME/bin/native-image --no-server\
+        --allow-incomplete-classpath --enable-https\
+        --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,jakarta.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl\
+        -H:+JNI -H:+ReportUnsupportedElementsAtRuntime\
+        -H:+ReportExceptionStackTraces -H:EnableURLProtocols=http,https,jar,jrt\
+        -H:ConfigurationFileDirectories=$TOMCAT_STUFFED/target/\
+        -H:ReflectionConfigurationFiles=$TOMCAT_STUFFED/tomcat-reflection.json\
+        -H:ResourceConfigurationFiles=$TOMCAT_STUFFED/tomcat-resource.json\
+        -H:JNIConfigurationFiles=$TOMCAT_STUFFED/tomcat-jni.json\
+        -jar $TOMCAT_STUFFED/target/tomcat-stuffed-1.0.jar</source>
+    The additional <code>--static</code> parameter enables static linking of
+    glibc, zlib and libstd++ in the generated binary.
+  </p>
+
+  <p>
+    Running the native image is then:
+    <source>./tomcat-stuffed-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties --catalina -useGeneratedCode</source>
+  </p>
+
+  </section>
+
+  <section name="Compatibility">
+
+  <p>
+    Servlets, JSPs, EL, websockets, the Tomcat container, tomcat-native, HTTP/2
+    are all supported out of the box in a native image.
+  </p>
+
+  <p>
+    At the time of writing this documentation, JULI is not supported as the
+    log manager configuration property is not supported by Graal, in addition
+    to some static initializer problems, and the regular java.util.logging
+    loggers and implementation should be used instead.
+  </p>
+
+  <p>
+    If using the default server.xml file, some Server listeners have
+    to be removed from the configuration as they are not compatible with native
+    images, such as a JMX listener (JMX is unsupported) and leak prevention
+    listeners (use of internal code that does not exist in Graal).
+  </p>
+
+  <p>
+    Missing items for better Tomcat functionality:
+    <ul>
+      <li><a href="https://github.com/oracle/graal/issues/2103">JMX</a>:
+        The usual monitoring and management is not usable</li>
+      <li>java.util.logging LogManager: Configuration through a system property
+        is not implemented, so standard java.util.logging must be used instead
+        of JULI</li>
+      <li>Static linking configuration: tomcat-native cannot be statically
+        linked</li>
+    </ul>
+  </p>
+
+  </section>
+
+</body>
+</document>

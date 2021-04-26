@@ -18,9 +18,10 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -35,9 +36,6 @@ import org.apache.catalina.util.SessionConfig;
  * any ";jsessionid" parameter should be removed from the request URI,
  * and the client should be redirected to the same URI. This will cause the
  * load-balanced to re-balance the client to another server.</p>
- *
- * <p>A request parameter is added to the redirect URI in order to avoid
- * repeated redirects in the event of an error or misconfiguration.</p>
  *
  * <p>All this work is required because when the activation state of a node is
  * DISABLED, the load-balancer will still send requests to the node if they
@@ -59,9 +57,8 @@ import org.apache.catalina.util.SessionConfig;
  * @see <a href="https://tomcat.apache.org/connectors-doc/generic_howto/loadbalancers.html">Load
  *      balancer documentation</a>
  */
-public class LoadBalancerDrainingValve
-    extends ValveBase
-{
+public class LoadBalancerDrainingValve extends ValveBase {
+
     /**
      * The request attribute key where the load-balancer's activation state
      * can be found.
@@ -90,7 +87,7 @@ public class LoadBalancerDrainingValve
      * The value of the cookie which can be set to ignore the "draining" action
      * of this Filter. This will allow a client to contact the server without
      * being re-balanced to another server. The expected cookie name can be set
-     * in the {@link #_ignoreCookieValue}. The cookie name and value must match
+     * in the {@link #_ignoreCookieName}. The cookie name and value must match
      * to avoid being re-balanced.
      */
     private String _ignoreCookieValue;
@@ -175,45 +172,45 @@ public class LoadBalancerDrainingValve
 
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
-        if("DIS".equals(request.getAttribute(ATTRIBUTE_KEY_JK_LB_ACTIVATION))
-           && !request.isRequestedSessionIdValid()) {
+        if  ("DIS".equals(request.getAttribute(ATTRIBUTE_KEY_JK_LB_ACTIVATION)) &&
+                !request.isRequestedSessionIdValid()) {
 
-            if(containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug("Load-balancer is in DISABLED state; draining this node");
+            }
 
-            boolean ignoreRebalance = false; // Allow certain clients
+            boolean ignoreRebalance = false;
             Cookie sessionCookie = null;
 
-            // Kill any session cookie present
             final Cookie[] cookies = request.getCookies();
 
-            final String sessionCookieName = request.getServletContext().getSessionCookieConfig().getName();
+            final String sessionCookieName = SessionConfig.getSessionCookieName(request.getContext());
 
-            // Kill any session cookie present
-            if(null != cookies) {
-                for(Cookie cookie : cookies) {
+            if (null != cookies) {
+                for (Cookie cookie : cookies) {
                     final String cookieName = cookie.getName();
-                    if(containerLog.isTraceEnabled())
+                    if (containerLog.isTraceEnabled()) {
                         containerLog.trace("Checking cookie " + cookieName + "=" + cookie.getValue());
+                    }
 
-                    if(sessionCookieName.equals(cookieName)
-                       && request.getRequestedSessionId().equals(cookie.getValue())) {
+                    if (sessionCookieName.equals(cookieName) &&
+                            request.getRequestedSessionId().equals(cookie.getValue())) {
                         sessionCookie = cookie;
-                    } else
-                    // Is the client presenting a valid ignore-cookie value?
-                    if(null != _ignoreCookieName
-                            && _ignoreCookieName.equals(cookieName)
-                            && null != _ignoreCookieValue
-                            && _ignoreCookieValue.equals(cookie.getValue())) {
+                    } else if (null != _ignoreCookieName &&
+                            _ignoreCookieName.equals(cookieName) &&
+                            null != _ignoreCookieValue &&
+                            _ignoreCookieValue.equals(cookie.getValue())) {
+                        // The client presenting a valid ignore-cookie value?
                         ignoreRebalance = true;
                     }
                 }
             }
 
-            if(ignoreRebalance) {
-                if(containerLog.isDebugEnabled())
-                    containerLog.debug("Client is presenting a valid " + _ignoreCookieName
-                                 + " cookie, re-balancing is being skipped");
+            if (ignoreRebalance) {
+                if (containerLog.isDebugEnabled()) {
+                    containerLog.debug("Client is presenting a valid " + _ignoreCookieName +
+                            " cookie, re-balancing is being skipped");
+                }
 
                 getNext().invoke(request, response);
 
@@ -222,41 +219,35 @@ public class LoadBalancerDrainingValve
 
             // Kill any session cookie that was found
             // TODO: Consider implications of SSO cookies
-            if(null != sessionCookie) {
-                String cookiePath = request.getServletContext().getSessionCookieConfig().getPath();
-
-                if(request.getContext().getSessionCookiePathUsesTrailingSlash()) {
-                    // Handle special case of ROOT context where cookies require a path of
-                    // '/' but the servlet spec uses an empty string
-                    // Also ensure the cookies for a context with a path of /foo don't get
-                    // sent for requests with a path of /foobar
-                    if (!cookiePath.endsWith("/"))
-                        cookiePath = cookiePath + "/";
-
-                    sessionCookie.setPath(cookiePath);
-                    sessionCookie.setMaxAge(0); // Delete
-                    sessionCookie.setValue(""); // Purge the cookie's value
-                    response.addCookie(sessionCookie);
-                }
+            if (null != sessionCookie) {
+                sessionCookie.setPath(SessionConfig.getSessionCookiePath(request.getContext()));
+                sessionCookie.setMaxAge(0); // Delete
+                sessionCookie.setValue(""); // Purge the cookie's value
+                // Replicate logic used to set secure attribute for session cookies
+                SessionCookieConfig sessionCookieConfig = request.getContext().getServletContext().getSessionCookieConfig();
+                sessionCookie.setSecure(request.isSecure() || sessionCookieConfig.isSecure());
+                response.addCookie(sessionCookie);
             }
 
             // Re-write the URI if it contains a ;jsessionid parameter
             String uri = request.getRequestURI();
             String sessionURIParamName = SessionConfig.getSessionUriParamName(request.getContext());
-            if(uri.contains(";" + sessionURIParamName + "="))
+            if (uri.contains(";" + sessionURIParamName + "=")) {
                 uri = uri.replaceFirst(";" + sessionURIParamName + "=[^&?]*", "");
+            }
 
             String queryString = request.getQueryString();
 
-            if(null != queryString)
+            if (null != queryString) {
                 uri = uri + "?" + queryString;
+            }
 
             // NOTE: Do not call response.encodeRedirectURL or the bad
             // sessionid will be restored
             response.setHeader("Location", uri);
             response.setStatus(_redirectStatusCode);
-        }
-        else
+        } else {
             getNext().invoke(request, response);
+        }
     }
 }

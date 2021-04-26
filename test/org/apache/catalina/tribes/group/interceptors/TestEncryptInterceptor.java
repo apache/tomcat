@@ -19,14 +19,22 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.crypto.Cipher;
+
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsEqual;
 import org.hamcrest.core.IsNot;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,12 +59,29 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestEncryptInterceptor {
+    private static final String MESSAGE_FILE = "message.bin";
+
     private static final String encryptionKey128 = "cafebabedeadbeefbeefcafecafebabe";
     private static final String encryptionKey192 = "cafebabedeadbeefbeefcafecafebabedeadbeefbeefcafe";
     private static final String encryptionKey256 = "cafebabedeadbeefcafebabedeadbeefcafebabedeadbeefcafebabedeadbeef";
 
     EncryptInterceptor src;
     EncryptInterceptor dest;
+
+
+    @BeforeClass
+    public static void setupClass() {
+        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        Security.setProperty("crypto.policy", "unlimited"); // For Java 9+
+    }
+
+    @AfterClass
+    public static void cleanup() {
+        File f = new File(MESSAGE_FILE);
+        if (f.isFile()) {
+            Assert.assertTrue(f.delete());
+        }
+    }
 
     @Before
     public void setup() {
@@ -163,6 +188,9 @@ public class TestEncryptInterceptor {
 
     @Test
     public void test192BitKey() throws Exception {
+        Assume.assumeTrue("Skipping test192BitKey because the JVM does not support it",
+                192 <= Cipher.getMaxAllowedKeyLength("AES"));
+
         src.setEncryptionKey(encryptionKey192);
         dest.setEncryptionKey(encryptionKey192);
         src.start(Channel.SND_TX_SEQ);
@@ -177,6 +205,9 @@ public class TestEncryptInterceptor {
 
     @Test
     public void test256BitKey() throws Exception {
+        Assume.assumeTrue("Skipping test256BitKey because the JVM does not support it",
+                256 <= Cipher.getMaxAllowedKeyLength("AES"));
+
         src.setEncryptionKey(encryptionKey256);
         dest.setEncryptionKey(encryptionKey256);
         src.start(Channel.SND_TX_SEQ);
@@ -212,7 +243,7 @@ public class TestEncryptInterceptor {
     }
 
     @Test
-    @Ignore("ECB mode isn't because it's insecure")
+    @Ignore("ECB mode isn't implemented because it's insecure")
     public void testECB() throws Exception {
         src.setEncryptionAlgorithm("AES/ECB/PKCS5Padding");
         src.start(Channel.SND_TX_SEQ);
@@ -256,10 +287,18 @@ public class TestEncryptInterceptor {
 
     @Test
     public void testGCM() throws Exception {
-        src.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
-        src.start(Channel.SND_TX_SEQ);
-        dest.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
-        dest.start(Channel.SND_TX_SEQ);
+        try {
+            src.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
+            src.start(Channel.SND_TX_SEQ);
+            dest.setEncryptionAlgorithm("AES/GCM/PKCS5Padding");
+            dest.start(Channel.SND_TX_SEQ);
+        } catch (ChannelException ce) {
+            Assume.assumeFalse("Skipping testGCM due to lack of JVM support",
+                    ce.getCause() instanceof NoSuchAlgorithmException
+                    && ce.getCause().getMessage().contains("GCM"));
+
+            throw ce;
+        }
 
         String testInput = "The quick brown fox jumps over the lazy dog.";
 
@@ -294,7 +333,7 @@ public class TestEncryptInterceptor {
 
         byte[] bytes = ((ValueCaptureInterceptor)src.getNext()).getValue();
 
-        try (FileOutputStream out = new FileOutputStream("message.bin")) {
+        try (FileOutputStream out = new FileOutputStream(MESSAGE_FILE)) {
             out.write(bytes);
         }
 
@@ -303,7 +342,7 @@ public class TestEncryptInterceptor {
         bytes = new byte[8192];
         int read;
 
-        try (FileInputStream in = new FileInputStream("message.bin")) {
+        try (FileInputStream in = new FileInputStream(MESSAGE_FILE)) {
             read = in.read(bytes);
         }
 
@@ -333,13 +372,13 @@ public class TestEncryptInterceptor {
 
         byte[] cipherText2 = ((ValueCaptureInterceptor)src.getNext()).getValue();
 
-        Assert.assertThat("Two identical cleartexts encrypt to the same ciphertext",
+        MatcherAssert.assertThat("Two identical cleartexts encrypt to the same ciphertext",
                 cipherText1, IsNot.not(IsEqual.equalTo(cipherText2)));
     }
 
     @Test
     public void testPickup() throws Exception {
-        File file = new File("message.bin");
+        File file = new File(MESSAGE_FILE);
         if(!file.exists()) {
             System.err.println("File message.bin does not exist. Skipping test.");
             return;
@@ -350,7 +389,7 @@ public class TestEncryptInterceptor {
         byte[] bytes = new byte[8192];
         int read;
 
-        try (FileInputStream in = new FileInputStream("message.bin")) {
+        try (FileInputStream in = new FileInputStream(file)) {
             read = in.read(bytes);
         }
 
@@ -415,6 +454,23 @@ public class TestEncryptInterceptor {
 
         for(byte[] message : messages)
             Assert.assertArrayEquals("Message is corrupted", message, bytes);
+    }
+
+    @Test
+    public void testTcpFailureDetectorDetection() {
+        src.setPrevious(new TcpFailureDetector());
+
+        try {
+            src.start(Channel.SND_TX_SEQ);
+            Assert.fail("EncryptInterceptor should detect TcpFailureDetector and throw an error");
+        } catch (EncryptInterceptor.ChannelConfigException cce) {
+            // Expected behavior
+        } catch (AssertionError ae) {
+            // This is the junit assertion being thrown
+            throw ae;
+        } catch (Throwable t) {
+            Assert.fail("EncryptionInterceptor should throw ChannelConfigException, not " + t.getClass().getName());
+        }
     }
 
     /**

@@ -24,13 +24,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Provides basic CSRF protection for REST APIs. The filter assumes that the
@@ -89,6 +90,17 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     private String pathsDelimiter = ",";
 
     @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Set the parameters
+        super.init(filterConfig);
+
+        // Put the expected request header name into the application scope
+        filterConfig.getServletContext().setAttribute(
+                Constants.CSRF_REST_NONCE_HEADER_NAME_KEY,
+                Constants.CSRF_REST_NONCE_HEADER_NAME);
+    }
+
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
@@ -117,16 +129,13 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     private static interface RestCsrfPreventionStrategy {
-        static final NonceSupplier<HttpServletRequest, String> nonceFromRequestHeader = (r, k) -> r
-                .getHeader(k);
-        static final NonceSupplier<HttpServletRequest, String[]> nonceFromRequestParams = (r, k) -> r
-                .getParameterValues(k);
+        static final NonceSupplier<HttpServletRequest, String> nonceFromRequestHeader = HttpServletRequest::getHeader;
+        static final NonceSupplier<HttpServletRequest, String[]> nonceFromRequestParams = ServletRequest::getParameterValues;
         static final NonceSupplier<HttpSession, String> nonceFromSession = (s, k) -> Objects
                 .isNull(s) ? null : (String) s.getAttribute(k);
 
-        static final NonceConsumer<HttpServletResponse> nonceToResponse = (r, k, v) -> r.setHeader(
-                k, v);
-        static final NonceConsumer<HttpSession> nonceToSession = (s, k, v) -> s.setAttribute(k, v);
+        static final NonceConsumer<HttpServletResponse> nonceToResponse = HttpServletResponse::setHeader;
+        static final NonceConsumer<HttpSession> nonceToSession = HttpSession::setAttribute;
 
         boolean apply(HttpServletRequest request, HttpServletResponse response) throws IOException;
     }
@@ -182,8 +191,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     private class FetchRequest implements RestCsrfPreventionStrategy {
-        private final Predicate<String> fetchRequest = s -> Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE
-                .equalsIgnoreCase(s);
+        private final Predicate<String> fetchRequest = Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE::equalsIgnoreCase;
 
         @Override
         public boolean apply(HttpServletRequest request, HttpServletResponse response) {

@@ -24,11 +24,11 @@ import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ClientEndpointConfig.Configurator;
-import javax.websocket.ContainerProvider;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.ClientEndpointConfig.Configurator;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(TesterFirehoseServer.Config.class.getName());
+        ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
@@ -78,7 +78,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
                 new URI("ws://localhost:" + getPort() +
-                        TesterFirehoseServer.Config.PATH));
+                        TesterFirehoseServer.PATH));
         CountDownLatch latch =
                 new CountDownLatch(TesterFirehoseServer.MESSAGE_COUNT);
         BasicText handler = new BasicText(latch);
@@ -117,6 +117,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
         echoTester("",null);
         echoTester("/",null);
+        // This will trigger a redirect so there will be 5 requests logged
         echoTester("/foo",null);
         echoTester("/foo/",null);
     }
@@ -128,6 +129,10 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         if (clientEndpointConfig == null) {
             clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
         }
+        // Increase default timeout from 5s to 10s to try and reduce errors on
+        // CI systems.
+        clientEndpointConfig.getUserProperties().put(Constants.IO_TIMEOUT_MS_PROPERTY, "10000");
+
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 clientEndpointConfig, new URI("ws://localhost:" + getPort() + path));
         CountDownLatch latch = new CountDownLatch(1);
@@ -182,7 +187,6 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PASSWORD, utf8Pass);
 
         echoTester(URI_PROTECTED, clientEndpointConfig);
-
     }
 
     @Test
@@ -219,7 +223,5 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PASSWORD,PWD);
 
         echoTester(URI_PROTECTED, clientEndpointConfig);
-
     }
-
 }

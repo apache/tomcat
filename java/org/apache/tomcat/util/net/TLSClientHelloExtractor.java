@@ -22,9 +22,11 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
@@ -40,20 +42,23 @@ public class TLSClientHelloExtractor {
 
     private final ExtractorResult result;
     private final List<Cipher> clientRequestedCiphers;
+    private final List<String> clientRequestedCipherNames;
     private final String sniValue;
     private final List<String> clientRequestedApplicationProtocols;
+    private final List<String> clientRequestedProtocols;
 
     private static final int TLS_RECORD_HEADER_LEN = 5;
 
     private static final int TLS_EXTENSION_SERVER_NAME = 0;
     private static final int TLS_EXTENSION_ALPN = 16;
+    private static final int TLS_EXTENSION_SUPPORTED_VERSION = 43;
 
     public static byte[] USE_TLS_RESPONSE = ("HTTP/1.1 400 \r\n" +
-            "Content-Type: text/plain;charset=ISO-8859-1\r\n" +
+            "Content-Type: text/plain;charset=UTF-8\r\n" +
             "Connection: close\r\n" +
             "\r\n" +
             "Bad Request\r\n" +
-            "This combination of host and port requires TLS.\r\n").getBytes(StandardCharsets.ISO_8859_1);
+            "This combination of host and port requires TLS.\r\n").getBytes(StandardCharsets.UTF_8);
 
 
     /**
@@ -72,7 +77,9 @@ public class TLSClientHelloExtractor {
         int limit = netInBuffer.limit();
         ExtractorResult result = ExtractorResult.NOT_PRESENT;
         List<Cipher> clientRequestedCiphers = new ArrayList<>();
+        List<String> clientRequestedCipherNames = new ArrayList<>();
         List<String> clientRequestedApplicationProtocols = new ArrayList<>();
+        List<String> clientRequestedProtocols = new ArrayList<>();
         String sniValue = null;
         try {
             // Switch to read mode.
@@ -110,7 +117,7 @@ public class TLSClientHelloExtractor {
             }
 
             // Protocol Version
-            skipBytes(netInBuffer, 2);
+            String legacyVersion = readProtocol(netInBuffer);
             // Random
             skipBytes(netInBuffer, 32);
             // Session ID (single byte for length)
@@ -120,8 +127,15 @@ public class TLSClientHelloExtractor {
             // (2 bytes for length, each cipher ID is 2 bytes)
             int cipherCount = netInBuffer.getChar() / 2;
             for (int i = 0; i < cipherCount; i++) {
-                int cipherId = netInBuffer.getChar();
-                clientRequestedCiphers.add(Cipher.valueOf(cipherId));
+                char cipherId = netInBuffer.getChar();
+                Cipher c = Cipher.valueOf(cipherId);
+                // Some clients transmit grease values (see RFC 8701)
+                if (c == null) {
+                    clientRequestedCipherNames.add("Unknown(0x" + HexUtils.toHexString(cipherId) + ")");
+                } else {
+                    clientRequestedCiphers.add(c);
+                    clientRequestedCipherNames.add(c.name());
+                }
             }
 
             // Compression methods (single byte for length)
@@ -136,8 +150,8 @@ public class TLSClientHelloExtractor {
             skipBytes(netInBuffer, 2);
             // Read the extensions until we run out of data or find the data
             // we need
-            while (netInBuffer.hasRemaining() &&
-                    (sniValue == null || clientRequestedApplicationProtocols.size() == 0)) {
+            while (netInBuffer.hasRemaining() && (sniValue == null ||
+                    clientRequestedApplicationProtocols.isEmpty() || clientRequestedProtocols.isEmpty())) {
                 // Extension type is two byte
                 char extensionType = netInBuffer.getChar();
                 // Extension size is another two bytes
@@ -150,10 +164,16 @@ public class TLSClientHelloExtractor {
                 case TLS_EXTENSION_ALPN:
                     readAlpnExtension(netInBuffer, clientRequestedApplicationProtocols);
                     break;
+                case TLS_EXTENSION_SUPPORTED_VERSION:
+                    readSupportedVersions(netInBuffer, clientRequestedProtocols);
+                    break;
                 default: {
                     skipBytes(netInBuffer, extensionDataSize);
                 }
                 }
+            }
+            if (clientRequestedProtocols.isEmpty()) {
+                clientRequestedProtocols.add(legacyVersion);
             }
             result = ExtractorResult.COMPLETE;
         } catch (BufferUnderflowException | IllegalArgumentException e) {
@@ -161,8 +181,10 @@ public class TLSClientHelloExtractor {
         } finally {
             this.result = result;
             this.clientRequestedCiphers = clientRequestedCiphers;
+            this.clientRequestedCipherNames = clientRequestedCipherNames;
             this.clientRequestedApplicationProtocols = clientRequestedApplicationProtocols;
             this.sniValue = sniValue;
+            this.clientRequestedProtocols = clientRequestedProtocols;
             // Whatever happens, return the buffer to its original state
             netInBuffer.limit(limit);
             netInBuffer.position(pos);
@@ -175,11 +197,15 @@ public class TLSClientHelloExtractor {
     }
 
 
+    /**
+     * @return The SNI value provided by the client converted to lower case if
+     *         not already lower case.
+     */
     public String getSNIValue() {
         if (result == ExtractorResult.COMPLETE) {
             return sniValue;
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
         }
     }
 
@@ -188,7 +214,16 @@ public class TLSClientHelloExtractor {
         if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientRequestedCiphers;
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
+        }
+    }
+
+
+    public List<String> getClientRequestedCipherNames() {
+        if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
+            return clientRequestedCipherNames;
+        } else {
+            throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
         }
     }
 
@@ -197,7 +232,16 @@ public class TLSClientHelloExtractor {
         if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientRequestedApplicationProtocols;
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
+        }
+    }
+
+
+    public List<String> getClientRequestedProtocols() {
+        if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
+            return clientRequestedProtocols;
+        } else {
+            throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
         }
     }
 
@@ -328,6 +372,30 @@ public class TLSClientHelloExtractor {
     }
 
 
+    private static String readProtocol(ByteBuffer bb) {
+        char protocol = bb.getChar();
+        switch (protocol) {
+            case 0x0300: {
+                return Constants.SSL_PROTO_SSLv3;
+            }
+            case 0x0301: {
+                return Constants.SSL_PROTO_TLSv1_0;
+            }
+            case 0x0302: {
+                return Constants.SSL_PROTO_TLSv1_1;
+            }
+            case 0x0303: {
+                return Constants.SSL_PROTO_TLSv1_2;
+            }
+            case 0x0304: {
+                return Constants.SSL_PROTO_TLSv1_3;
+            }
+            default:
+                return "Unknown(0x" + HexUtils.toHexString(protocol) + ")";
+        }
+    }
+
+
     private static String readSniExtension(ByteBuffer bb) {
         // First 2 bytes are size of server name list (only expecting one)
         // Next byte is type (0 for hostname)
@@ -336,7 +404,7 @@ public class TLSClientHelloExtractor {
         char serverNameSize = bb.getChar();
         byte[] serverNameBytes = new byte[serverNameSize];
         bb.get(serverNameBytes);
-        return new String(serverNameBytes, StandardCharsets.UTF_8);
+        return new String(serverNameBytes, StandardCharsets.UTF_8).toLowerCase(Locale.ENGLISH);
     }
 
 
@@ -352,6 +420,16 @@ public class TLSClientHelloExtractor {
             protocolNames.add(new String(inputBuffer, 0, len, StandardCharsets.UTF_8));
             toRead--;
             toRead -= len;
+        }
+    }
+
+
+    private static void readSupportedVersions(ByteBuffer bb, List<String> protocolNames) {
+        // First byte is the size of the list in bytes
+        int count = (bb.get() & 0xFF) / 2;
+        // Then the list of protocols
+        for (int i = 0; i < count; i++) {
+            protocolNames.add(readProtocol(bb));
         }
     }
 

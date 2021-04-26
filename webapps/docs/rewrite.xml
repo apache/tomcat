@@ -17,6 +17,7 @@
 -->
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
+  <!ENTITY ndash  "&#x02013;">
 ]>
 <document url="index.html">
 
@@ -98,7 +99,7 @@
           <strong>RewriteMap expansions</strong>: These are
           expansions of the form <strong><code
           >${mapname:key|default}</code></strong>.
-          See <a href="#mapfunc">the documentation for
+          See <a href="#RewriteMap">the documentation for
           RewriteMap</a> for more details.
         </li>
         <li>
@@ -244,7 +245,17 @@
         <li>
         <code>%{SSL:variable}</code>, where <em>variable</em> is the
         name of an SSL environment
-        variable, are not implemented yet.  Example:
+        variable, are implemented, except
+        <code>SSL_SESSION_RESUMED</code>, <code>SSL_SECURE_RENEG</code>,
+        <code>SSL_COMPRESS_METHOD</code>, <code>SSL_TLS_SNI</code>,
+        <code>SSL_SRP_USER</code>, <code>SSL_SRP_USERINFO</code>,
+        <code>SSL_CLIENT_VERIFY</code>,
+        <code>SSL_CLIENT_SAN_OTHER_msUPN_n</code>,
+        <code>SSL_CLIENT_CERT_RFC4523_CEA</code>,
+        <code>SSL_SERVER_SAN_OTHER_dnsSRV_n</code>.
+        When OpenSSL is used, the variables related to the server
+        certificate, prefixed by <code>SSL_SERVER_</code> are not available.
+        Example:
         <code>%{SSL:SSL_CIPHER_USEKEYSIZE}</code> may expand to
         <code>128</code>.</li>
 
@@ -254,7 +265,7 @@
         value of a header sent in the HTTP request.
         Example: <code>%{HTTP:Proxy-Connection}</code> is
         the value of the HTTP header
-        ``<code>Proxy-Connection:</code>''.</li>
+        '<code>Proxy-Connection:</code>'.</li>
 
       </ol>
 
@@ -366,7 +377,7 @@ RewriteRule ...some special stuff for any of these hosts...</source>
       <p><strong>Example:</strong></p>
 
        <p>To rewrite the Homepage of a site according to the
-        ``<code>User-Agent:</code>'' header of the request, you can
+        '<code>User-Agent:</code>' header of the request, you can
         use the following: </p>
 
 <source>RewriteCond  %{HTTP_USER_AGENT}  ^Mozilla.*
@@ -394,16 +405,75 @@ RewriteRule  ^/$                 /homepage.std.html  [L]</source>
 
     <p>Syntax: <code>RewriteMap name rewriteMapClassName optionalParameters</code></p>
 
+    <p>The <code>rewriteMapClassName</code> value also allows special values:
+    <ul>
+    <li><code>int:toupper</code>: Special map converting passed values to upper case</li>
+    <li><code>int:tolower</code>: Special map converting passed values to lower case</li>
+    <li><code>int:escape</code>: URL escape the passed value</li>
+    <li><code>int:unescape</code>: URL unescape the passed value</li>
+    </ul>
+    </p>
+
     <p>The maps are implemented using an interface that users must implement. Its class
     name is <code>org.apache.catalina.valves.rewrite.RewriteMap</code>, and its code is:</p>
 
 <source><![CDATA[package org.apache.catalina.valves.rewrite;
 
 public interface RewriteMap {
+    default String setParameters(String params...); // calls setParameters(String) with the first parameter if there is only one
     public String setParameters(String params);
     public String lookup(String key);
 }]]></source>
 
+    <p>The referenced implementation of such a class &ndash; in our example <code>rewriteMapClassName</code> &ndash;
+    will be instantiated and initialized with the optional parameter &ndash; <code>optionalParameters</code> from above
+    (be careful with whitespace) &ndash; by calling <code>setParameters(String)</code>. That instance
+    will then be registered under the name given as the first parameter of <code>RewriteMap</code> rule.</p>
+
+    <p>Note: You can use more than one parameter. These have to be separated by spaces. Parameters
+    can be quoted with &quot;. This enables space characters inside parameters.</p>
+
+    <p>That map instance will be given the the lookup value that is configured in the corresponding <code>RewriteRule</code> by
+    calling <code>lookup(String)</code>. Your implementation is free to return <code>null</code> to indicate,
+    that the given default should be used, or to return a replacement value.</p>
+
+    <p>Say, you want to implement a rewrite map function that converts all lookup keys to uppercase. You
+    would start by implementing a class that implements the <code>RewriteMap</code> interface.</p>
+
+<source><![CDATA[package example.maps;
+
+import org.apache.catalina.valves.rewrite.RewriteMap;
+
+public class UpperCaseMap implements RewriteMap {
+
+  @Override
+  public String setParameters(String params) {
+    // nothing to be done here
+    return null;
+  }
+
+  @Override
+  public String lookup(String key) {
+    if (key == null) {
+      return null;
+    }
+    return key.toUpperCase();
+  }
+
+}]]></source>
+
+    <p>Compile this class, put it into a jar and place that jar in <code>${CATALINA_BASE}/lib</code>.</p>
+
+    <p>Having done that, you can now define a map with the <code>RewriteMap</code> directive
+    and further on use that map in a <code>RewriteRule</code>.</p>
+
+<source>RewriteMap uc example.maps.UpperCaseMap
+
+RewriteRule ^/(.*)$ ${uc:$1}
+</source>
+
+    <p>With this setup a request to the url path <code>/index.html</code> would get routed
+    to <code>/INDEX.HTML</code>.</p>
   </subsection>
 
   <subsection name="RewriteRule">
@@ -418,10 +488,20 @@ public interface RewriteMap {
 
       <p>Pattern is a perl compatible regular
       expression, which is applied to the current URL.
-      ``Current'' means the value of the URL when this rule is
+      'Current' means the value of the URL when this rule is
       applied. This may not be the originally requested URL,
       which may already have matched a previous rule, and have been
       altered.</p>
+
+      <p><strong>Security warning:</strong> Due to the way Java's
+      regex matching is done, poorly formed regex patterns are vulnerable
+      to "catastrophic backtracking", also known as "regular expression
+      denial of service" or ReDoS. Therefore, extra caution should be used
+      for RewriteRule patterns. In general it is difficult to automatically
+      detect such vulnerable regex, and so a good defense is to read a bit
+      on the subject of catastrophic backtracking. A good reference is the
+      <a href="https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS">
+      OWASP ReDoS guide</a>.</p>
 
       <p>Some hints on the syntax of regular
       expressions:</p>
@@ -430,8 +510,8 @@ public interface RewriteMap {
 <pre>
 <strong>Text:</strong>
   <strong><code>.</code></strong>           Any single character
-  <strong><code>[</code></strong>chars<strong><code>]</code></strong>     Character class: Any character of the class ``chars''
-  <strong><code>[^</code></strong>chars<strong><code>]</code></strong>    Character class: Not a character of the class ``chars''
+  <strong><code>[</code></strong>chars<strong><code>]</code></strong>     Character class: Any character of the class 'chars'
+  <strong><code>[^</code></strong>chars<strong><code>]</code></strong>    Character class: Not a character of the class 'chars'
   text1<strong><code>|</code></strong>text2 Alternative: text1 or text2
 
 <strong>Quantifiers:</strong>
@@ -471,8 +551,8 @@ public interface RewriteMap {
       <p>In the rules, the NOT character
        ('<code>!</code>') is also available as a possible pattern
       prefix. This enables you to negate a pattern; to say, for instance:
-      ``<em>if the current URL does <strong>NOT</strong> match this
-      pattern</em>''. This can be used for exceptional cases, where
+      '<em>if the current URL does <strong>NOT</strong> match this
+      pattern</em>'. This can be used for exceptional cases, where
       it is easier to match the negative pattern, or as a last
       default rule.</p>
 
@@ -499,7 +579,7 @@ cannot use <code>$N</code> in the substitution string!
         <li>server-variables as in rule condition test-strings
         (<code>%{VARNAME}</code>)</li>
 
-        <li><a href="#mapfunc">mapping-function</a> calls
+        <li><a href="#RewriteMap">mapping-function</a> calls
         (<code>${mapname:key|default}</code>)</li>
       </ol>
       <p>Back-references are identifiers of the form
@@ -555,9 +635,9 @@ cannot use <code>$N</code> in the substitution string!
         the flag has no effect. If the rule does
         <strong>not</strong> match, then all following chained
         rules are skipped. For instance, it can be used to remove the
-        ``<code>.www</code>'' part, inside a per-directory rule set,
+        '<code>.www</code>' part, inside a per-directory rule set,
         when you let an external redirect happen (where the
-        ``<code>.www</code>'' part should not occur!).</li>
+        '<code>.www</code>' part should not occur!).</li>
 
         <li>
         '<strong><code>cookie|CO=</code></strong><em>NAME</em>:<em>VAL</em>:<em>domain</em>[:<em>lifetime</em>[:<em>path</em>]]'
@@ -581,7 +661,7 @@ cannot use <code>$N</code> in the substitution string!
         <li>'<strong><code>forbidden|F</code></strong>' (force URL
         to be <strong>f</strong>orbidden)<br />
         This forces the current URL to be forbidden - it immediately
-        sends back a HTTP response of 403 (FORBIDDEN).
+        sends back an HTTP response of 403 (FORBIDDEN).
         Use this flag in conjunction with
         appropriate RewriteConds to conditionally block some
         URLs.</li>
@@ -589,7 +669,7 @@ cannot use <code>$N</code> in the substitution string!
         <li>'<strong><code>gone|G</code></strong>' (force URL to be
         <strong>g</strong>one)<br />
         This forces the current URL to be gone - it
-        immediately sends back a HTTP response of 410 (GONE). Use
+        immediately sends back an HTTP response of 410 (GONE). Use
         this flag to mark pages which no longer exist as gone.</li>
 
         <li>
@@ -680,16 +760,16 @@ cannot use <code>$N</code> in the substitution string!
           <strong>r</strong>edirect</span>)<br />
           Prefix <em>Substitution</em> with
           <code>http://thishost[:thisport]/</code> (which makes the
-          new URL a URI) to force a external redirection. If no
-          <em>code</em> is given, a HTTP response of 302 (FOUND, previously MOVED
+          new URL a URI) to force an external redirection. If no
+          <em>code</em> is given, an HTTP response of 302 (FOUND, previously MOVED
           TEMPORARILY) will be returned. If you want to use other response
           codes in the range 300-399, simply specify the appropriate number
           or use one of the following symbolic names:
           <code>temp</code> (default), <code>permanent</code>,
           <code>seeother</code>. Use this for rules to
           canonicalize the URL and return it to the client - to
-          translate ``<code>/~</code>'' into
-          ``<code>/u/</code>'', or to always append a slash to
+          translate '<code>/~</code>' into
+          '<code>/u/</code>', or to always append a slash to
           <code>/u/</code><em>user</em>, etc.<br />
           <strong>Note:</strong> When you use this flag, make
           sure that the substitution field is a valid URL! Otherwise,

@@ -258,7 +258,6 @@ public class TestMapper extends LoggingBaseTest {
         Assert.assertEquals("blah7", mappingData.host.getName());
         Assert.assertEquals("context2", mappingData.context.getName());
         Assert.assertEquals("wrapper5", mappingData.wrapper.getName());
-        Assert.assertEquals("/foo/bar", mappingData.contextPath.toString());
         Assert.assertEquals("/blah/bobou", mappingData.wrapperPath.toString());
         Assert.assertEquals("/foo", mappingData.pathInfo.toString());
         Assert.assertTrue(mappingData.redirectPath.isNull());
@@ -272,7 +271,6 @@ public class TestMapper extends LoggingBaseTest {
         Assert.assertEquals("blah7", mappingData.host.getName());
         Assert.assertEquals("context3", mappingData.context.getName());
         Assert.assertEquals("wrapper7", mappingData.wrapper.getName());
-        Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
         Assert.assertEquals("/bobou", mappingData.wrapperPath.toString());
         Assert.assertEquals("/foo", mappingData.pathInfo.toString());
         Assert.assertTrue(mappingData.redirectPath.isNull());
@@ -286,7 +284,6 @@ public class TestMapper extends LoggingBaseTest {
         Assert.assertEquals("blah16", mappingData.host.getName());
         Assert.assertEquals("context4", mappingData.context.getName());
         Assert.assertEquals("context4-defaultWrapper", mappingData.wrapper.getName());
-        Assert.assertEquals("", mappingData.contextPath.toString());
         Assert.assertEquals("/foo/bar/bla/bobou/foo", mappingData.wrapperPath.toString());
         Assert.assertTrue(mappingData.pathInfo.isNull());
         Assert.assertTrue(mappingData.redirectPath.isNull());
@@ -299,7 +296,6 @@ public class TestMapper extends LoggingBaseTest {
         Assert.assertEquals("blah7", mappingData.host.getName());
         Assert.assertEquals("context3", mappingData.context.getName());
         Assert.assertEquals("wrapper7", mappingData.wrapper.getName());
-        Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
         Assert.assertEquals("/bobou", mappingData.wrapperPath.toString());
         Assert.assertEquals("/foo", mappingData.pathInfo.toString());
         Assert.assertTrue(mappingData.redirectPath.isNull());
@@ -539,24 +535,24 @@ public class TestMapper extends LoggingBaseTest {
         uriMB.setChars(uri, 0, uri.length);
 
         mapper.map(hostMB, uriMB, null, mappingData);
-        Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+        Assert.assertEquals(context3, mappingData.context);
 
         mappingData.recycle();
         uriMB.setChars(uri, 0, uri.length);
         mapper.map(aliasMB, uriMB, null, mappingData);
-        Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+        Assert.assertEquals(context3, mappingData.context);
 
         t.start();
         while (running.get()) {
             mappingData.recycle();
             uriMB.setChars(uri, 0, uri.length);
             mapper.map(hostMB, uriMB, null, mappingData);
-            Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+            Assert.assertEquals(context3, mappingData.context);
 
             mappingData.recycle();
             uriMB.setChars(uri, 0, uri.length);
             mapper.map(aliasMB, uriMB, null, mappingData);
-            Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+            Assert.assertEquals(context3, mappingData.context);
         }
     }
 }

@@ -28,32 +28,32 @@ public interface SSLSupport {
      * The Request attribute key for the cipher suite.
      */
     public static final String CIPHER_SUITE_KEY =
-            "javax.servlet.request.cipher_suite";
+            "jakarta.servlet.request.cipher_suite";
 
     /**
      * The Request attribute key for the key size.
      */
-    public static final String KEY_SIZE_KEY = "javax.servlet.request.key_size";
+    public static final String KEY_SIZE_KEY = "jakarta.servlet.request.key_size";
 
     /**
      * The Request attribute key for the client certificate chain.
      */
     public static final String CERTIFICATE_KEY =
-            "javax.servlet.request.X509Certificate";
+            "jakarta.servlet.request.X509Certificate";
 
     /**
      * The Request attribute key for the session id.
      * This one is a Tomcat extension to the Servlet spec.
      */
     public static final String SESSION_ID_KEY =
-            "javax.servlet.request.ssl_session_id";
+            "jakarta.servlet.request.ssl_session_id";
 
     /**
      * The request attribute key for the session manager.
      * This one is a Tomcat extension to the Servlet spec.
      */
     public static final String SESSION_MGR =
-            "javax.servlet.request.ssl_session_mgr";
+            "jakarta.servlet.request.ssl_session_mgr";
 
     /**
      * The request attribute key under which the String indicating the protocol
@@ -61,6 +61,20 @@ public interface SSLSupport {
      */
     public static final String PROTOCOL_VERSION_KEY =
             "org.apache.tomcat.util.net.secure_protocol_version";
+
+    /**
+     * The request attribute key under which the String indicating the ciphers
+     * requested by the client are recorded.
+     */
+    public static final String REQUESTED_CIPHERS_KEY =
+            "org.apache.tomcat.util.net.secure_requested_ciphers";
+
+    /**
+     * The request attribute key under which the String indicating the protocols
+     * requested by the client are recorded.
+     */
+    public static final String REQUESTED_PROTOCOL_VERSIONS_KEY =
+            "org.apache.tomcat.util.net.secure_requested_protocol_versions";
 
     /**
      * The cipher suite being used on this connection.
@@ -83,6 +97,17 @@ public interface SSLSupport {
      *                     chain
      */
     public X509Certificate[] getPeerCertificateChain() throws IOException;
+
+    /**
+     * The server certificate chain (if any) that were sent to the peer.
+     *
+     * @return The certificate chain sent with the server
+     *         certificate first, followed by those of any certificate
+     *         authorities
+     */
+    public default X509Certificate[] getLocalCertificateChain() {
+        return null;
+    }
 
     /**
      * Get the keysize.
@@ -121,5 +146,22 @@ public interface SSLSupport {
      *   information from the socket
      */
     public String getProtocol() throws IOException;
-}
 
+    /**
+     *
+     * @return the list of SSL/TLS protocol versions requested by the client
+     *
+     * @throws IOException If an error occurs trying to obtain the client
+     *   requested protocol information from the socket
+     */
+    public String getRequestedProtocols() throws IOException;
+
+    /**
+    *
+    * @return the list of SSL/TLS ciphers requested by the client
+    *
+     * @throws IOException If an error occurs trying to obtain the client
+     *   request cipher information from the socket
+    */
+   public String getRequestedCiphers() throws IOException;
+}

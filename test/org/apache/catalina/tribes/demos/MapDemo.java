@@ -231,8 +231,8 @@ public class MapDemo implements ChannelListener, MembershipListener{
             public StringBuilder getMemberNames(Member[] members){
                 StringBuilder buf = new StringBuilder();
                 if ( members!=null ) {
-                    for (int i=0;i<members.length; i++ ) {
-                        buf.append(members[i].getName());
+                    for (Member member : members) {
+                        buf.append(member.getName());
                         buf.append("; ");
                     }
                 }

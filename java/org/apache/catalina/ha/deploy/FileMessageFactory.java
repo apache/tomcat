@@ -193,8 +193,8 @@ public class FileMessageFactory {
      * If EOF is reached, the factory returns null, and closes itself, otherwise
      * the same message is returned as was passed in. This makes sure that not
      * more memory is ever used. To remember, neither the file message or the
-     * factory are thread safe. dont hand off the message to one thread and read
-     * the same with another.
+     * factory are thread safe. Don't hand off the message to one thread and
+     * read the same with another.
      *
      * @param f
      *            FileMessage - the message to be populated with file data
@@ -235,36 +235,26 @@ public class FileMessageFactory {
      */
     public boolean writeMessage(FileMessage msg)
             throws IllegalArgumentException, IOException {
-        if (!openForWrite)
-            throw new IllegalArgumentException(
-                    "Can't write message, this factory is reading.");
+        if (!openForWrite) {
+            throw new IllegalArgumentException(sm.getString("fileMessageFactory.cannotWrite"));
+        }
         if (log.isDebugEnabled())
             log.debug("Message " + msg + " data " + HexUtils.toHexString(msg.getData())
                     + " data length " + msg.getDataLength() + " out " + out);
 
         if (msg.getMessageNumber() <= lastMessageProcessed.get()) {
             // Duplicate of message already processed
-            log.warn("Receive Message again -- Sender ActTimeout too short [ name: "
-                    + msg.getContextName()
-                    + " war: "
-                    + msg.getFileName()
-                    + " data: "
-                    + HexUtils.toHexString(msg.getData())
-                    + " data length: " + msg.getDataLength() + " ]");
+            log.warn(sm.getString("fileMessageFactory.duplicateMessage", msg.getContextName(), msg.getFileName(),
+                    HexUtils.toHexString(msg.getData()), Integer.valueOf(msg.getDataLength())));
             return false;
         }
 
         FileMessage previous =
             msgBuffer.put(Long.valueOf(msg.getMessageNumber()), msg);
-        if (previous !=null) {
+        if (previous != null) {
             // Duplicate of message not yet processed
-            log.warn("Receive Message again -- Sender ActTimeout too short [ name: "
-                    + msg.getContextName()
-                    + " war: "
-                    + msg.getFileName()
-                    + " data: "
-                    + HexUtils.toHexString(msg.getData())
-                    + " data length: " + msg.getDataLength() + " ]");
+            log.warn(sm.getString("fileMessageFactory.duplicateMessage", msg.getContextName(), msg.getFileName(),
+                    HexUtils.toHexString(msg.getData()), Integer.valueOf(msg.getDataLength())));
             return false;
         }
 
@@ -340,51 +330,17 @@ public class FileMessageFactory {
             throws IllegalArgumentException {
         if (this.openForWrite != openForWrite) {
             cleanup();
-            if (openForWrite)
-                throw new IllegalArgumentException(
-                        "Can't write message, this factory is reading.");
-            else
-                throw new IllegalArgumentException(
-                        "Can't read message, this factory is writing.");
+            if (openForWrite) {
+                throw new IllegalArgumentException(sm.getString("fileMessageFactory.cannotWrite"));
+            } else {
+                throw new IllegalArgumentException(sm.getString("fileMessageFactory.cannotRead"));
+            }
         }
         if (this.closed) {
             cleanup();
-            throw new IllegalArgumentException("Factory has been closed.");
+            throw new IllegalArgumentException(sm.getString("fileMessageFactory.closed"));
         }
     }
-
-    /**
-     * Example usage.
-     *
-     * @param args
-     *            String[], args[0] - read from filename, args[1] write to
-     *            filename
-     * @throws Exception An error occurred
-     */
-    public static void main(String[] args) throws Exception {
-
-        System.out
-                .println("Usage: FileMessageFactory fileToBeRead fileToBeWritten");
-        System.out
-                .println("Usage: This will make a copy of the file on the local file system");
-        FileMessageFactory read = getInstance(new File(args[0]), false);
-        FileMessageFactory write = getInstance(new File(args[1]), true);
-        FileMessage msg = new FileMessage(null, args[0], args[0]);
-        msg = read.readMessage(msg);
-        if (msg == null) {
-            System.out.println("Empty input file : " + args[0]);
-            return;
-        }
-        System.out.println("Expecting to write " + msg.getTotalNrOfMsgs()
-                + " messages.");
-        int cnt = 0;
-        while (msg != null) {
-            write.writeMessage(msg);
-            cnt++;
-            msg = read.readMessage(msg);
-        }//while
-        System.out.println("Actually wrote " + cnt + " messages.");
-    }///main
 
     public File getFile() {
         return file;

@@ -19,12 +19,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import util.CookieFilter;
 import util.HTMLFilter;
@@ -39,13 +39,12 @@ public class CookieExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final ResourceBundle RB = ResourceBundle.getBundle("LocalStrings");
-
     @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException
     {
+        ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",request.getLocale());
 
         String cookieName = request.getParameter("cookiename");
         String cookieValue = request.getParameter("cookievalue");
@@ -64,7 +63,7 @@ public class CookieExample extends HttpServlet {
         out.println("<head>");
         out.println("<meta charset=\"UTF-8\" />");
 
-        String title = RB.getString("cookies.title");
+        String title = rb.getString("cookies.title");
         out.println("<title>" + title + "</title>");
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
@@ -91,36 +90,35 @@ public class CookieExample extends HttpServlet {
             if (session != null) {
                 sessionId = session.getId();
             }
-            out.println(RB.getString("cookies.cookies") + "<br>");
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            out.println(rb.getString("cookies.cookies") + "<br>");
+            for (Cookie cookie : cookies) {
                 String cName = cookie.getName();
                 String cValue = cookie.getValue();
                 out.print("Cookie Name: " + HTMLFilter.filter(cName) + "<br>");
                 out.println("  Cookie Value: "
-                            + HTMLFilter.filter(CookieFilter.filter(cName, cValue, sessionId))
-                            + "<br><br>");
+                        + HTMLFilter.filter(CookieFilter.filter(cName, cValue, sessionId))
+                        + "<br><br>");
             }
         } else {
-            out.println(RB.getString("cookies.no-cookies"));
+            out.println(rb.getString("cookies.no-cookies"));
         }
 
         if (aCookie != null) {
             out.println("<P>");
-            out.println(RB.getString("cookies.set") + "<br>");
-            out.print(RB.getString("cookies.name") + "  "
+            out.println(rb.getString("cookies.set") + "<br>");
+            out.print(rb.getString("cookies.name") + "  "
                       + HTMLFilter.filter(cookieName) + "<br>");
-            out.print(RB.getString("cookies.value") + "  "
+            out.print(rb.getString("cookies.value") + "  "
                       + HTMLFilter.filter(cookieValue));
         }
 
         out.println("<P>");
-        out.println(RB.getString("cookies.make-cookie") + "<br>");
+        out.println(rb.getString("cookies.make-cookie") + "<br>");
         out.print("<form action=\"");
         out.println("CookieExample\" method=POST>");
-        out.print(RB.getString("cookies.name") + "  ");
+        out.print(rb.getString("cookies.name") + "  ");
         out.println("<input type=text length=20 name=cookiename><br>");
-        out.print(RB.getString("cookies.value") + "  ");
+        out.print(rb.getString("cookies.value") + "  ");
         out.println("<input type=text length=20 name=cookievalue><br>");
         out.println("<input type=submit></form>");
 

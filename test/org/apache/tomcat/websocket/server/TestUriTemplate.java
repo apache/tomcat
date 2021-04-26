@@ -44,35 +44,35 @@ public class TestUriTemplate {
     }
 
 
-    @Test(expected=java.lang.IllegalArgumentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testBasicPrefix() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/x{a}/y{b}");
     }
 
 
-    @Test(expected=java.lang.IllegalArgumentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testPrefixOneOfTwo() throws Exception {
         UriTemplate t = new UriTemplate("/x{a}/y{b}");
         t.match(new UriTemplate("/xfoo"));
     }
 
 
-    @Test(expected=java.lang.IllegalArgumentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testPrefixTwoOfTwo() throws Exception {
         UriTemplate t = new UriTemplate("/x{a}/y{b}");
         t.match(new UriTemplate("/ybar"));
     }
 
 
-    @Test(expected=java.lang.IllegalArgumentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testQuote1() throws Exception {
         UriTemplate t = new UriTemplate("/.{a}");
         t.match(new UriTemplate("/yfoo"));
     }
 
 
-    @Test(expected=java.lang.IllegalArgumentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testQuote2() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/.{a}");
@@ -153,7 +153,7 @@ public class TestUriTemplate {
     }
 
 
-    @Test(expected=java.lang.IllegalArgumentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testDuplicate01() throws Exception {
         @SuppressWarnings("unused")
         UriTemplate t = new UriTemplate("/{var}/{var}");
@@ -196,7 +196,7 @@ public class TestUriTemplate {
     }
 
 
-    @Test(expected=java.lang.IllegalArgumentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testEgMailingList04() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var1}/{var2}");
         @SuppressWarnings("unused")
@@ -204,10 +204,31 @@ public class TestUriTemplate {
     }
 
 
-    @Test(expected=java.lang.IllegalArgumentException.class)
+    @Test(expected=jakarta.websocket.DeploymentException.class)
     public void testEgMailingList05() throws Exception {
         UriTemplate t = new UriTemplate("/a/{var}/");
         @SuppressWarnings("unused")
         Map<String,String> result = t.match(new UriTemplate("/a/b/"));
+    }
+
+
+    @Test(expected=jakarta.websocket.DeploymentException.class)
+    public void testSpecIssue194a() throws Exception {
+        @SuppressWarnings("unused")
+        UriTemplate t = new UriTemplate("/a/../b");
+    }
+
+
+    @Test(expected=jakarta.websocket.DeploymentException.class)
+    public void testSpecIssue194b() throws Exception {
+        @SuppressWarnings("unused")
+        UriTemplate t = new UriTemplate("/./b");
+    }
+
+
+    @Test(expected=jakarta.websocket.DeploymentException.class)
+    public void testSpecIssue194c() throws Exception {
+        @SuppressWarnings("unused")
+        UriTemplate t = new UriTemplate("//b");
     }
 }

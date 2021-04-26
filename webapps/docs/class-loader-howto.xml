@@ -25,7 +25,7 @@
     <properties>
         <author email="craigmcc@apache.org">Craig R. McClanahan</author>
         <author email="yoavs@apache.org">Yoav Shapira</author>
-        <title>Class Loader HOW-TO</title>
+        <title>Class Loader How-To</title>
     </properties>
 
 <body>
@@ -130,20 +130,21 @@ loaders as it is initialized:</p>
     </ul>
     <p>By default, this includes the following:</p>
     <ul>
-    <li><em>annotations-api.jar</em> &#8212; JavaEE annotations classes.</li>
+    <li><em>annotations-api.jar</em> &#8212; Jakarta Annotations 2.0 classes.</li>
     <li><em>catalina.jar</em> &#8212; Implementation of the Catalina servlet
         container portion of Tomcat.</li>
     <li><em>catalina-ant.jar</em> &#8212; Tomcat Catalina Ant tasks.</li>
     <li><em>catalina-ha.jar</em> &#8212; High availability package.</li>
+    <li><em>catalina-ssi.jar</em> &#8212; Server-side Includes module.</li>
     <li><em>catalina-storeconfig.jar</em> &#8212; Generation of XML
         configuration files from current state</li>
     <li><em>catalina-tribes.jar</em> &#8212; Group communication package.</li>
     <li><em>ecj-*.jar</em> &#8212; Eclipse JDT Java compiler.</li>
-    <li><em>el-api.jar</em> &#8212; EL 3.0 API.</li>
+    <li><em>el-api.jar</em> &#8212; EL 4.0 API.</li>
     <li><em>jasper.jar</em> &#8212; Tomcat Jasper JSP Compiler and Runtime.</li>
     <li><em>jasper-el.jar</em> &#8212; Tomcat Jasper EL implementation.</li>
-    <li><em>jsp-api.jar</em> &#8212; JSP 2.3 API.</li>
-    <li><em>servlet-api.jar</em> &#8212; Servlet 4.0 API.</li>
+    <li><em>jsp-api.jar</em> &#8212; JSP 3.0 API.</li>
+    <li><em>servlet-api.jar</em> &#8212; Servlet 5.0 API.</li>
     <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.</li>
     <li><em>tomcat-coyote.jar</em> &#8212; Tomcat connectors and utility classes.</li>
     <li><em>tomcat-dbcp.jar</em> &#8212; Database connection pool
@@ -158,8 +159,8 @@ loaders as it is initialized:</p>
         <a href="jdbc-pool.html">documentation</a> for more details.</li>
     <li><em>tomcat-util.jar</em> &#8212; Common classes used by various components of
         Apache Tomcat.</li>
-    <li><em>tomcat-websocket.jar</em> &#8212; WebSocket 1.1 implementation</li>
-    <li><em>websocket-api.jar</em> &#8212; WebSocket 1.1 API</li>
+    <li><em>tomcat-websocket.jar</em> &#8212; WebSocket 2.0 implementation</li>
+    <li><em>websocket-api.jar</em> &#8212; WebSocket 2.0 API</li>
     </ul></li>
 <li><p><strong>WebappX</strong> &#8212; A class loader is created for each web
     application that is deployed in a single Tomcat instance.  All unpacked
@@ -253,7 +254,7 @@ is a risk that Tomcat and/or the deployed application will experience errors.</p
 
 <p>When running under a security manager the locations from which classes
 are permitted to be loaded will also depend on the contents of your policy
-file. See <a href="security-manager-howto.html">Security Manager HOW-TO</a>
+file. See <a href="security-manager-howto.html">Security Manager How-To</a>
 for further information.</p>
 
 </section>
@@ -262,7 +263,7 @@ for further information.</p>
 
 <p>A more complex class loader hierarchy may also be configured. See the diagram
 below. By default, the <strong>Server</strong> and <strong>Shared</strong>
-class loaders are not defined and the simplifed hierarchy shown above is used.
+class loaders are not defined and the simplified hierarchy shown above is used.
 This more complex hierarchy may be use by defining values for the
 <code>server.loader</code> and/or <code>shared.loader</code> properties in
 <code>conf/catalina.properties</code>.</p>

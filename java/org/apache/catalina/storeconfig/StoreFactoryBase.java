@@ -176,7 +176,7 @@ public class StoreFactoryBase implements IStoreFactory {
     }
 
     /**
-     * Save a array of elements.
+     * Save an array of elements.
      * @param aWriter Current output writer
      * @param indent Indentation level
      * @param elements Array of elements
@@ -185,9 +185,9 @@ public class StoreFactoryBase implements IStoreFactory {
     protected void storeElementArray(PrintWriter aWriter, int indent,
             Object[] elements) throws Exception {
         if (elements != null) {
-            for (int i = 0; i < elements.length; i++) {
+            for (Object element : elements) {
                 try {
-                    storeElement(aWriter, indent, elements[i]);
+                    storeElement(aWriter, indent, element);
                 } catch (IOException ioe) {
                     // ignore children report error them self!
                     // see StandardContext.storeWithBackup()

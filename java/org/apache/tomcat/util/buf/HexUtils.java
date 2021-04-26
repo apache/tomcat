@@ -74,6 +74,20 @@ public final class HexUtils {
     }
 
 
+    public static String toHexString(char c) {
+        // 2 bytes / 4 hex digits
+        StringBuilder sb = new StringBuilder(4);
+
+        sb.append(hex[(c & 0xf000) >> 12]);
+        sb.append(hex[(c & 0x0f00) >> 8]);
+
+        sb.append(hex[(c & 0xf0) >> 4]);
+        sb.append(hex[(c & 0x0f)]);
+
+        return sb.toString();
+    }
+
+
     public static String toHexString(byte[] bytes) {
         if (null == bytes) {
             return null;
@@ -81,10 +95,10 @@ public final class HexUtils {
 
         StringBuilder sb = new StringBuilder(bytes.length << 1);
 
-        for(int i = 0; i < bytes.length; ++i) {
-            sb.append(hex[(bytes[i] & 0xf0) >> 4])
-                .append(hex[(bytes[i] & 0x0f)])
-                ;
+        for (byte aByte : bytes) {
+            sb.append(hex[(aByte & 0xf0) >> 4])
+                    .append(hex[(aByte & 0x0f)])
+            ;
         }
 
         return sb.toString();

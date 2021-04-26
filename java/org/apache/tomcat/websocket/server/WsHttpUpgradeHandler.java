@@ -20,16 +20,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.WebConnection;
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.DeploymentException;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Extension;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.WebConnection;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.Extension;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
+import org.apache.coyote.http11.upgrade.UpgradeInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -52,9 +53,10 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     private final ClassLoader applicationClassLoader;
 
     private SocketWrapperBase<?> socketWrapper;
+    private UpgradeInfo upgradeInfo = new UpgradeInfo();
 
     private Endpoint ep;
-    private EndpointConfig endpointConfig;
+    private ServerEndpointConfig serverEndpointConfig;
     private WsServerContainer webSocketContainer;
     private WsHandshakeRequest handshakeRequest;
     private List<Extension> negotiatedExtensions;
@@ -80,13 +82,13 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     }
 
 
-    public void preInit(Endpoint ep, EndpointConfig endpointConfig,
+    public void preInit(Endpoint ep, ServerEndpointConfig serverEndpointConfig,
             WsServerContainer wsc, WsHandshakeRequest handshakeRequest,
             List<Extension> negotiatedExtensionsPhase2, String subProtocol,
             Transformation transformation, Map<String,String> pathParameters,
             boolean secure) {
         this.ep = ep;
-        this.endpointConfig = endpointConfig;
+        this.serverEndpointConfig = serverEndpointConfig;
         this.webSocketContainer = wsc;
         this.handshakeRequest = handshakeRequest;
         this.negotiatedExtensions = negotiatedExtensionsPhase2;
@@ -117,26 +119,32 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            wsRemoteEndpointServer = new WsRemoteEndpointImplServer(socketWrapper, webSocketContainer);
+            wsRemoteEndpointServer = new WsRemoteEndpointImplServer(socketWrapper, upgradeInfo, webSocketContainer);
             wsSession = new WsSession(ep, wsRemoteEndpointServer,
                     webSocketContainer, handshakeRequest.getRequestURI(),
                     handshakeRequest.getParameterMap(),
                     handshakeRequest.getQueryString(),
                     handshakeRequest.getUserPrincipal(), httpSessionId,
                     negotiatedExtensions, subProtocol, pathParameters, secure,
-                    endpointConfig);
-            wsFrame = new WsFrameServer(socketWrapper, wsSession, transformation,
+                    serverEndpointConfig);
+            wsFrame = new WsFrameServer(socketWrapper, upgradeInfo, wsSession, transformation,
                     applicationClassLoader);
             // WsFrame adds the necessary final transformations. Copy the
             // completed transformation chain to the remote end point.
             wsRemoteEndpointServer.setTransformation(wsFrame.getTransformation());
-            ep.onOpen(wsSession, endpointConfig);
-            webSocketContainer.registerSession(ep, wsSession);
+            ep.onOpen(wsSession, serverEndpointConfig);
+            webSocketContainer.registerSession(serverEndpointConfig.getPath(), wsSession);
         } catch (DeploymentException e) {
             throw new IllegalArgumentException(e);
         } finally {
             t.setContextClassLoader(cl);
         }
+    }
+
+
+    @Override
+    public UpgradeInfo getUpgradeInfo() {
+        return upgradeInfo;
     }
 
 
@@ -178,6 +186,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 //$FALL-THROUGH$
             case DISCONNECT:
             case TIMEOUT:
+            case CONNECT_FAIL:
                 return SocketState.CLOSED;
 
         }
@@ -186,6 +195,12 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         } else {
             return SocketState.CLOSED;
         }
+    }
+
+
+    @Override
+    public void timeoutAsync(long now) {
+        // NO-OP
     }
 
 

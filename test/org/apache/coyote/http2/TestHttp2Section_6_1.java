@@ -16,6 +16,9 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,6 +42,7 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
                 "3-WindowSize-[128]\n" +
                 "3-HeadersStart\n" +
                 "3-Header-[:status]-[200]\n" +
+                "3-Header-[content-length]-[128]\n" +
                 "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                 "3-HeadersEnd\n" +
                 "3-Body-128\n" +
@@ -48,30 +52,44 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
 
     @Test
     public void testDataFrameWithPadding() throws Exception {
-        http2Connect();
+        LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
+        LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
+        try {
+            http2Connect();
 
-        byte[] padding = new byte[8];
+            byte[] padding = new byte[8];
 
-        sendSimplePostRequest(3, padding);
-        readSimplePostResponse(true);
+            sendSimplePostRequest(3, padding);
+            readSimplePostResponse(true);
 
+            // The window updates for padding could occur anywhere since they
+            // happen on a different thread to the response.
+            // The connection window update is always present if there is
+            // padding.
+            String trace = output.getTrace();
+            String paddingWindowUpdate = "0-WindowSize-[9]\n";
+            Assert.assertTrue(trace, trace.contains(paddingWindowUpdate));
+            trace = trace.replace(paddingWindowUpdate, "");
 
-        // The window update for the padding could occur anywhere since it
-        // happens on a different thead to the response.
-        String trace = output.getTrace();
-        String paddingWindowUpdate = "0-WindowSize-[9]\n3-WindowSize-[9]\n";
+            // The stream window update may or may not be present depending on
+            //  timing. Remove it if present.
+            if (trace.contains("3-WindowSize-[9]\n")) {
+                trace = trace.replace("3-WindowSize-[9]\n", "");
+            }
 
-        Assert.assertTrue(trace, trace.contains(paddingWindowUpdate));
-        trace = trace.replace(paddingWindowUpdate, "");
-
-        Assert.assertEquals("0-WindowSize-[119]\n" +
-                "3-WindowSize-[119]\n" +
-                "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" +
-                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
-                "3-HeadersEnd\n" +
-                "3-Body-119\n" +
-                "3-EndOfStream\n", trace);
+            Assert.assertEquals("0-WindowSize-[119]\n" +
+                    "3-WindowSize-[119]\n" +
+                    "3-HeadersStart\n" +
+                    "3-Header-[:status]-[200]\n" +
+                    "3-Header-[content-length]-[119]\n" +
+                    "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
+                    "3-HeadersEnd\n" +
+                    "3-Body-119\n" +
+                    "3-EndOfStream\n", trace);
+        } finally {
+            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.INFO);
+            LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.INFO);
+        }
     }
 
 
@@ -144,16 +162,32 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         byte[] padding = new byte[0];
 
         sendSimplePostRequest(3, padding);
-        // Since padding is zero length, response looks like there is none.
-        readSimplePostResponse(false);
+        readSimplePostResponse(true);
+
+        // The window updates for padding could occur anywhere since they
+        // happen on a different thread to the response.
+        // The connection window update is always present if there is
+        // padding.
+        String trace = output.getTrace();
+        String paddingWindowUpdate = "0-WindowSize-[1]\n";
+        Assert.assertTrue(trace, trace.contains(paddingWindowUpdate));
+        trace = trace.replace(paddingWindowUpdate, "");
+
+        // The stream window update may or may not be present depending on
+        //  timing. Remove it if present.
+        paddingWindowUpdate = "3-WindowSize-[1]\n";
+        if (trace.contains(paddingWindowUpdate)) {
+            trace = trace.replace(paddingWindowUpdate, "");
+        }
 
         Assert.assertEquals("0-WindowSize-[127]\n" +
                 "3-WindowSize-[127]\n" +
                 "3-HeadersStart\n" +
                 "3-Header-[:status]-[200]\n" +
+                "3-Header-[content-length]-[127]\n" +
                 "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                 "3-HeadersEnd\n" +
                 "3-Body-127\n" +
-                "3-EndOfStream\n", output.getTrace());
+                "3-EndOfStream\n", trace);
     }
 }

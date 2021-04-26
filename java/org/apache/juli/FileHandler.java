@@ -177,7 +177,6 @@ public class FileHandler extends Handler {
         this.rotatable = rotatable;
         this.bufferSize = bufferSize;
         configure();
-        openWriter();
         clean();
     }
 
@@ -186,10 +185,10 @@ public class FileHandler extends Handler {
 
 
     /**
-     * The as-of date for the currently open log file, or a zero-length
-     * string if there is no open log file.
+     * The as-of date for the currently open log file, or null if there is no
+     * open log file.
      */
-    private volatile String date = "";
+    private volatile String date = null;
 
 
     /**
@@ -251,7 +250,7 @@ public class FileHandler extends Handler {
 
 
     /**
-     * Format and publish a <tt>LogRecord</tt>.
+     * Format and publish a <code>LogRecord</code>.
      *
      * @param  record  description of the log event
      */
@@ -262,20 +261,25 @@ public class FileHandler extends Handler {
             return;
         }
 
-        // Construct the timestamp we will use, if requested
-        Timestamp ts = new Timestamp(System.currentTimeMillis());
-        String tsDate = ts.toString().substring(0, 10);
+        final String tsDate;
+        if (rotatable.booleanValue()) {
+            // Construct the timestamp we will use
+            Timestamp ts = new Timestamp(System.currentTimeMillis());
+            tsDate = ts.toString().substring(0, 10);
+        } else {
+            tsDate = "";
+        }
 
         writerLock.readLock().lock();
         try {
             // If the date has changed, switch log files
-            if (rotatable.booleanValue() && !date.equals(tsDate)) {
+            if (!tsDate.equals(date)) {
                 // Upgrade to writeLock before we switch
                 writerLock.readLock().unlock();
                 writerLock.writeLock().lock();
                 try {
                     // Make sure another thread hasn't already done this
-                    if (!date.equals(tsDate)) {
+                    if (!tsDate.equals(date)) {
                         closeWriter();
                         date = tsDate;
                         openWriter();
@@ -338,7 +342,7 @@ public class FileHandler extends Handler {
             writer.flush();
             writer.close();
             writer = null;
-            date = "";
+            date = null;
         } catch (Exception e) {
             reportError(null, e, ErrorManager.CLOSE_FAILURE);
         } finally {
@@ -372,9 +376,6 @@ public class FileHandler extends Handler {
      * Configure from <code>LogManager</code> properties.
      */
     private void configure() {
-
-        Timestamp ts = new Timestamp(System.currentTimeMillis());
-        date = ts.toString().substring(0, 10);
 
         String className = this.getClass().getName(); //allow classes to override
 
@@ -482,7 +483,7 @@ public class FileHandler extends Handler {
     /**
      * Open the new log file for the date specified by <code>date</code>.
      */
-    protected void open() {
+    public void open() {
         openWriter();
     }
 

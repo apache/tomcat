@@ -18,13 +18,11 @@ package org.apache.catalina.mapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -186,14 +184,11 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
         tomcat.start();
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/welcome-files", bc, new HashMap<String,List<String>>());
+        int rc = getUrl("http://localhost:" + getPort() + "/test/welcome-files", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(bc.toString().contains("JSP"));
 
-        rc = getUrl("http://localhost:" + getPort() +
-                "/test/welcome-files/sub", bc,
-                new HashMap<String,List<String>>());
+        rc = getUrl("http://localhost:" + getPort() + "/test/welcome-files/sub", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(bc.toString().contains("Servlet"));
     }
@@ -217,14 +212,11 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
         tomcat.start();
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/welcome-files", bc, new HashMap<String,List<String>>());
+        int rc = getUrl("http://localhost:" + getPort() + "/test/welcome-files", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(bc.toString().contains("JSP"));
 
-        rc = getUrl("http://localhost:" + getPort() +
-                "/test/welcome-files/sub", bc,
-                new HashMap<String,List<String>>());
+        rc = getUrl("http://localhost:" + getPort() + "/test/welcome-files/sub", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
     }
 

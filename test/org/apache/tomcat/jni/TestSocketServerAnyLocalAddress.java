@@ -30,7 +30,12 @@ import org.junit.Test;
 
 /**
  * Tests for server-side sockets using any local address (0.0.0.0 or ::).
+ *
+ * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+ *              10.1.x onwards to only those components required to provide
+ *              OpenSSL integration with the NIO and NIO2 connectors.
  */
+@Deprecated
 public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
 
     // Excessive but allows for slow systems
@@ -43,8 +48,13 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
     @Before
     public void init() throws Exception {
         long serverPool = Pool.create(0);
-        long inetAddress = Address.info(null, Socket.APR_UNSPEC,
-                                        0, 0, serverPool);
+        int family;
+        if (Boolean.getBoolean("java.net.preferIPv4Stack")) {
+            family = Socket.APR_INET;
+        } else {
+            family = Socket.APR_UNSPEC;
+        }
+        long inetAddress = Address.info(null, family, 0, 0, serverPool);
         serverSocket = Socket.create(Address.getInfo(inetAddress).family, Socket.SOCK_STREAM,
                                    Socket.APR_PROTO_TCP, serverPool);
         if (OS.IS_UNIX) {
@@ -124,6 +134,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
 
             try {
                 InetSocketAddress connectAddress = getConnectAddress(serverSocket);
+                System.out.println("Client attempting to connect to [" + connectAddress + "]");
                 java.net.Socket sock = new java.net.Socket();
                 sock.connect(connectAddress, TIMEOUT_MICROSECONDS);
                 sock.setSoTimeout(TIMEOUT_MICROSECONDS);
@@ -146,6 +157,9 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
                 sock.close();
             } catch (Exception e) {
                 e.printStackTrace();
+                // Prevent the test from hanging on Socket.accept(serverSocket)
+                // if the client fails
+                Socket.shutdown(serverSocket, Socket.APR_SHUTDOWN_READWRITE);
             }
         }
 
@@ -162,6 +176,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             } else {
                 localAddress = new InetSocketAddress("0.0.0.0", addr.port);
             }
+            System.out.println("Server is listening at [" + localAddress + "]");
 
             // Need a local address of the same type (IPv4 or IPV6) as the
             // configured bind address since the connector may be configured
@@ -172,21 +187,23 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (localAddress.getAddress().getClass().isAssignableFrom(inetAddress.getClass())) {
-                        if (inetAddress.isLoopbackAddress()) {
-                            if (loopbackConnectAddress == null) {
-                                loopbackConnectAddress = inetAddress;
+                if (networkInterface.isUp()) {
+                    Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                    while (inetAddresses.hasMoreElements()) {
+                        InetAddress inetAddress = inetAddresses.nextElement();
+                        if (localAddress.getAddress().getClass().isAssignableFrom(inetAddress.getClass())) {
+                            if (inetAddress.isLoopbackAddress()) {
+                                if (loopbackConnectAddress == null) {
+                                    loopbackConnectAddress = inetAddress;
+                                }
+                            } else if (inetAddress.isLinkLocalAddress()) {
+                                if (linkLocalConnectAddress == null) {
+                                    linkLocalConnectAddress = inetAddress;
+                                }
+                            } else {
+                                // Use a non-link local, non-loop back address by default
+                                return new InetSocketAddress(inetAddress, localAddress.getPort());
                             }
-                        } else if (inetAddress.isLinkLocalAddress()) {
-                            if (linkLocalConnectAddress == null) {
-                                linkLocalConnectAddress = inetAddress;
-                            }
-                        } else {
-                            // Use a non-link local, non-loop back address by default
-                            return new InetSocketAddress(inetAddress, localAddress.getPort());
                         }
                     }
                 }

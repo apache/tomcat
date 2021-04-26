@@ -198,7 +198,7 @@ public class CallParamRule extends Rule {
         sb.append(attributeName);
         sb.append(", from stack=");
         sb.append(fromStack);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

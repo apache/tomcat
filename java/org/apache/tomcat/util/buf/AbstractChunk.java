@@ -18,12 +18,15 @@ package org.apache.tomcat.util.buf;
 
 import java.io.Serializable;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Base class for the *Chunk implementation to reduce duplication.
  */
 public abstract class AbstractChunk implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
+    protected static final StringManager sm = StringManager.getManager(AbstractChunk.class);
 
     /*
      * JVMs may limit the maximum array size to slightly less than

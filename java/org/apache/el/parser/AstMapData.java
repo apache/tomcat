@@ -20,7 +20,7 @@ package org.apache.el.parser;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.el.ELException;
+import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 

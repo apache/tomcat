@@ -128,6 +128,12 @@ public class LifecycleListenerRule extends Rule {
 
         // Add this LifecycleListener to our associated component
         c.addLifecycleListener(listener);
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(digester.toVariableName(c)).append(".addLifecycleListener(");
+            code.append("new ").append(className).append("());").append(System.lineSeparator());
+        }
     }
 
 

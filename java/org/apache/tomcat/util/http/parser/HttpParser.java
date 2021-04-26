@@ -317,6 +317,17 @@ public class HttpParser {
     }
 
 
+    public static boolean isControl(int c) {
+        // Fast for valid control characters, slower for some incorrect
+        // ones
+        try {
+            return IS_CONTROL[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+
     // Skip any LWS and position to read the next character. The next character
     // is returned as being able to 'peek()' it allows a small optimisation in
     // some cases.
@@ -382,6 +393,43 @@ public class HttpParser {
         } else {
             return result.toString();
         }
+    }
+
+    /**
+     * @return  the digits if any were found, the empty string if no data was
+     *          found or if data other than digits was found
+     */
+    static String readDigits(Reader input) throws IOException {
+        StringBuilder result = new StringBuilder();
+
+        skipLws(input);
+        input.mark(1);
+        int c = input.read();
+
+        while (c != -1 && isNumeric(c)) {
+            result.append((char) c);
+            input.mark(1);
+            c = input.read();
+        }
+        // Use mark(1)/reset() rather than skip(-1) since skip() is a NOP
+        // once the end of the String has been reached.
+        input.reset();
+
+        return result.toString();
+    }
+
+    /**
+     * @return  the number if digits were found, -1 if no data was found
+     *          or if data other than digits was found
+     */
+    static long readLong(Reader input) throws IOException {
+        String digits = readDigits(input);
+
+        if (digits.length() == 0) {
+            return -1;
+        }
+
+        return Long.parseLong(digits);
     }
 
     /**
@@ -890,7 +938,14 @@ public class HttpParser {
         }
 
         public DomainParseState next(int c) {
-            if (HttpParser.isAlpha(c)) {
+            if (c == -1) {
+                if (allowsEnd) {
+                    return END;
+                } else {
+                    throw new IllegalArgumentException(
+                            sm.getString("http.invalidSegmentEndState", this.name()));
+                }
+            } else if (HttpParser.isAlpha(c)) {
                 return ALPHA;
             } else if (HttpParser.isNumeric(c)) {
                 return NUMERIC;
@@ -907,13 +962,6 @@ public class HttpParser {
                 } else {
                     throw new IllegalArgumentException(sm.getString(errorMsg,
                             Character.toString((char) c)));
-                }
-            } else if (c == -1) {
-                if (allowsEnd) {
-                    return END;
-                } else {
-                    throw new IllegalArgumentException(
-                            sm.getString("http.invalidSegmentEndState", this.name()));
                 }
             } else if (c == '-') {
                 if (allowsHyphen) {

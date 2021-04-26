@@ -72,9 +72,9 @@ public class StandardEngineSF extends StoreFactoryBase {
             Valve valves[] = engine.getPipeline().getValves();
             if(valves != null && valves.length > 0 ) {
                 List<Valve> engineValves = new ArrayList<>() ;
-                for(int i = 0 ; i < valves.length ; i++ ) {
-                    if(!( valves[i] instanceof ClusterValve))
-                        engineValves.add(valves[i]);
+                for (Valve valve : valves) {
+                    if (!(valve instanceof ClusterValve))
+                        engineValves.add(valve);
                 }
                 storeElementArray(aWriter, indent, engineValves.toArray());
             }

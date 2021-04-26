@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean         name="DataSourceRealm"
@@ -134,77 +137,6 @@
     <operation name="destroy" description="Destroy" impact="ACTION" returnType="void" />
   </mbean>
 
-
-  <mbean         name="JDBCRealm"
-          description="Implementation of Realm that works with any JDBC supported database"
-               domain="Catalina"
-                group="Realm"
-                 type="org.apache.catalina.realm.JDBCRealm">
-
-    <attribute   name="allRolesMode"
-          description="The all roles mode."
-                 type="java.lang.String"/>
-
-    <attribute   name="className"
-          description="Fully qualified class name of the managed object"
-                 type="java.lang.String"
-            writeable="false"/>
-
-    <attribute   name="connectionName"
-          description="The connection username to use when trying to connect to the database"
-                 type="java.lang.String"/>
-
-    <attribute   name="connectionPassword"
-          description="The connection password to use when trying to connect to the database"
-                 type="java.lang.String"/>
-
-    <attribute   name="connectionURL"
-          description="The connection URL to use when trying to connect to the database"
-                 type="java.lang.String"/>
-
-    <attribute   name="driverName"
-          description="The JDBC driver to use"
-                 type="java.lang.String"/>
-
-    <attribute   name="roleNameCol"
-          description="The column in the user role table that names a role"
-                 type="java.lang.String"/>
-
-    <attribute   name="realmPath"
-          description="The realm path"
-                 type="java.lang.String"/>
-
-    <attribute   name="stateName"
-          description="The name of the LifecycleState that this component is currently in"
-                 type="java.lang.String"
-                 writeable="false"/>
-
-    <attribute   name="userCredCol"
-          description="The column in the user table that holds the user's credentials"
-                 type="java.lang.String"/>
-
-    <attribute   name="userNameCol"
-          description="The column in the user table that holds the user's username"
-                 type="java.lang.String"/>
-
-    <attribute   name="userRoleTable"
-          description="The table that holds the relation between user's and roles"
-                 type="java.lang.String"/>
-
-    <attribute   name="userTable"
-          description="The table that holds user data"
-                 type="java.lang.String"/>
-
-    <attribute   name="validate"
-          description="The 'validate certificate chains' flag."
-                 type="boolean"/>
-
-
-    <operation name="start" description="Start" impact="ACTION" returnType="void" />
-    <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
-    <operation name="init" description="Init" impact="ACTION" returnType="void" />
-    <operation name="destroy" description="Destroy" impact="ACTION" returnType="void" />
-  </mbean>
 
   <mbean         name="JNDIRealm"
           description="Implementation of Realm that works with a directory server accessed via the Java Naming and Directory Interface (JNDI) APIs"
@@ -396,6 +328,10 @@
     <attribute   name="resourceName"
           description="The global JNDI name of the UserDatabase resource to use"
                  type="java.lang.String"/>
+
+    <attribute   name="localJndiResource"
+          description="Configures if the UserDatabase JNDI definition is local to the webapp"
+                 type="boolean"/>
 
     <attribute   name="realmPath"
           description="The realm path"

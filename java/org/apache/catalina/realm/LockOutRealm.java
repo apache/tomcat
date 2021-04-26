@@ -27,6 +27,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSName;
 
@@ -198,6 +199,18 @@ public class LockOutRealm extends CombinedRealm {
 
         // Fail in all other cases
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
+        String username = gssName.toString();
+
+        Principal authenticatedUser = super.authenticate(gssName, gssCredential);
+
+        return filterLockedAccounts(username, authenticatedUser);
     }
 
 

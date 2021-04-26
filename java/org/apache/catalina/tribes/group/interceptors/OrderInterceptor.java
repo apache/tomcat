@@ -73,24 +73,24 @@ public class OrderInterceptor extends ChannelInterceptorBase {
             return;
         }
         ChannelException cx = null;
-        for (int i=0; i<destination.length; i++ ) {
+        for (Member member : destination) {
             try {
                 int nr = 0;
                 outLock.writeLock().lock();
                 try {
-                    nr = incCounter(destination[i]);
+                    nr = incCounter(member);
                 } finally {
                     outLock.writeLock().unlock();
                 }
                 //reduce byte copy
                 msg.getMessage().append(nr);
                 try {
-                    getNext().sendMessage(new Member[] {destination[i]}, msg, payload);
+                    getNext().sendMessage(new Member[]{member}, msg, payload);
                 } finally {
                     msg.getMessage().trim(4);
                 }
-            }catch ( ChannelException x ) {
-                if ( cx == null ) cx = x;
+            } catch (ChannelException x) {
+                if (cx == null) cx = x;
                 cx.addFaultyMember(x.getFaultyMembers());
             }
         }//for

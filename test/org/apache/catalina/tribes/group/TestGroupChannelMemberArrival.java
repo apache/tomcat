@@ -64,11 +64,11 @@ public class TestGroupChannelMemberArrival {
             };
             threads[i] = t;
         }
-        for (int i = 0; i < threads.length; i++) {
-            threads[i].start();
+        for (Thread thread : threads) {
+            thread.start();
         }
-        for (int i = 0; i < threads.length; i++) {
-            threads[i].join();
+        for (Thread thread : threads) {
+            thread.join();
         }
         Thread.sleep(5000);
         System.out.println(System.currentTimeMillis()
@@ -99,9 +99,9 @@ public class TestGroupChannelMemberArrival {
     @After
     public void tearDown() throws Exception {
 
-        for (int i = 0; i < channels.length; i++) {
+        for (ManagedChannel channel : channels) {
             try {
-                channels[i].stop(Channel.DEFAULT);
+                channel.stop(Channel.DEFAULT);
             } catch (Exception ignore) {
                 // Ignore
             }

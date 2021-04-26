@@ -35,15 +35,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
-import javax.ejb.EJB;
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
-import javax.xml.ws.WebServiceRef;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.Resource;
+import jakarta.ejb.EJB;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceUnit;
+import jakarta.xml.ws.WebServiceRef;
 
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
@@ -74,7 +75,7 @@ public class DefaultInstanceManager implements InstanceManager {
     static {
         Class<?> clazz = null;
         try {
-            clazz = Class.forName("javax.ejb.EJB");
+            clazz = Class.forName("jakarta.ejb.EJB");
         } catch (ClassNotFoundException cnfe) {
             // Expected
         }
@@ -82,7 +83,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         clazz = null;
         try {
-            clazz = Class.forName("javax.persistence.PersistenceContext");
+            clazz = Class.forName("jakarta.persistence.PersistenceContext");
         } catch (ClassNotFoundException cnfe) {
             // Expected
         }
@@ -90,7 +91,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         clazz = null;
         try {
-            clazz = Class.forName("javax.xml.ws.WebServiceRef");
+            clazz = Class.forName("jakarta.xml.ws.WebServiceRef");
         } catch (ClassNotFoundException cnfe) {
             // Expected
         }
@@ -383,9 +384,8 @@ public class DefaultInstanceManager implements InstanceManager {
                             postConstruct.getParameterTypes(), null,
                             AnnotationCacheEntryType.POST_CONSTRUCT));
                 } else if (postConstructFromXml != null) {
-                    throw new IllegalArgumentException("Post construct method "
-                        + postConstructFromXml + " for class " + clazz.getName()
-                        + " is declared in deployment descriptor but cannot be found.");
+                    throw new IllegalArgumentException(sm.getString("defaultInstanceManager.postConstructNotFound",
+                        postConstructFromXml, clazz.getName()));
                 }
                 if (preDestroy != null) {
                     annotations.add(new AnnotationCacheEntry(
@@ -393,9 +393,8 @@ public class DefaultInstanceManager implements InstanceManager {
                             preDestroy.getParameterTypes(), null,
                             AnnotationCacheEntryType.PRE_DESTROY));
                 } else if (preDestroyFromXml != null) {
-                    throw new IllegalArgumentException("Pre destroy method "
-                        + preDestroyFromXml + " for class " + clazz.getName()
-                        + " is declared in deployment descriptor but cannot be found.");
+                    throw new IllegalArgumentException(sm.getString("defaultInstanceManager.preDestroyNotFound",
+                        preDestroyFromXml, clazz.getName()));
                 }
 
                 if (context != null) {
@@ -445,8 +444,7 @@ public class DefaultInstanceManager implements InstanceManager {
                     // Use common object to save memory
                     annotationsArray = ANNOTATIONS_EMPTY;
                 } else {
-                    annotationsArray = annotations.toArray(
-                            new AnnotationCacheEntry[annotations.size()]);
+                    annotationsArray = annotations.toArray(new AnnotationCacheEntry[0]);
                 }
                 synchronized (annotationCache) {
                     annotationCache.put(clazz, annotationsArray);

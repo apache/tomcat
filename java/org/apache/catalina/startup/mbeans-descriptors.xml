@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean name="ContextConfig"
@@ -39,7 +42,7 @@
   </mbean>
 
   <mbean name="EngineConfig"
-         description="Startup event listener for a Engine that configures the properties of that Engine, and the associated defined contexts"
+         description="Startup event listener for an Engine that configures the properties of that Engine, and the associated defined contexts"
          domain="Catalina"
          group="Listener"
          type="org.apache.catalina.startup.EngineConfig">
@@ -87,8 +90,17 @@
                is="true"
                type="boolean"/>
 
+    <operation name="tryAddServiced"
+               description="Add a web application to the serviced list to show it is being serviced by another component returning true if the application was added and false if the application was already being serviced"
+               impact="ACTION"
+               returnType="boolean">
+      <parameter name="name"
+                 description="Application name"
+                 type="java.lang.String"/>
+    </operation>
+
     <operation name="addServiced"
-               description="Add a web application to the serviced list to show it gets serviced by another component"
+               description="DEPRECATED: Add a web application to the serviced list to show it is being serviced by another component"
                impact="ACTION"
                returnType="void">
       <parameter name="name"
@@ -130,7 +142,7 @@
     </operation>
 
     <operation name="isServiced"
-               description="Is a web application serviced by another component"
+               description="DEPRECATED: Is a web application serviced by another component"
                impact="ACTION"
                returnType="boolean">
       <parameter name="name"

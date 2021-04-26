@@ -88,23 +88,6 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
      * @param exceptionType Exception type to look up
      * @return a string representation of the error page
      * @throws MBeanException propagated from the managed resource access
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     *             Use {@link #findErrorPage(Throwable)} instead.
-     */
-    @Deprecated
-    public String findErrorPage(String exceptionType) throws MBeanException {
-        Context context = doGetManagedResource();
-        return context.findErrorPage(exceptionType).toString();
-    }
-
-
-    /**
-     * Return the error page entry for the specified Java exception type,
-     * if any; otherwise return <code>null</code>.
-     *
-     * @param exceptionType Exception type to look up
-     * @return a string representation of the error page
-     * @throws MBeanException propagated from the managed resource access
      */
     public String findErrorPage(Throwable exceptionType) throws MBeanException {
         Context context = doGetManagedResource();

@@ -22,7 +22,7 @@ import javax.management.ObjectName;
 import org.apache.tools.ant.BuildException;
 
 /**
- * unregister a MBean at <em>JMX</em> JSR 160 MBeans Server.
+ * unregister an MBean at <em>JMX</em> JSR 160 MBeans Server.
  * <ul>
  * <li>unregister Mbeans</li>
  * </ul>

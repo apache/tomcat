@@ -18,6 +18,8 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -27,16 +29,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.PushBuilder;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.GenericFilter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletRequestWrapper;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.PushBuilder;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
@@ -45,6 +47,8 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.parser.Host;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
@@ -77,10 +81,12 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
  * <li>otherwise, the ip/host is declared to be the remote ip and looping is stopped.</li>
  * </ul>
  * </li>
- * <li>If the request http header named <code>$protocolHeader</code> (e.g. <code>x-forwarded-for</code>) equals to the value of
+ * <li>If the request http header named <code>$protocolHeader</code> (e.g. <code>x-forwarded-proto</code>) consists only of forwards that match
  * <code>protocolHeaderHttpsValue</code> configuration parameter (default <code>https</code>) then <code>request.isSecure = true</code>,
  * <code>request.scheme = https</code> and <code>request.serverPort = 443</code>. Note that 443 can be overwritten with the
  * <code>$httpsServerPort</code> configuration parameter.</li>
+ * <li>Mark the request with the attribute {@link Globals#REQUEST_FORWARDED_ATTRIBUTE} and value {@code Boolean.TRUE} to indicate
+ * that this request has been forwarded by one or more proxies.</li>
  * </ul>
  * <table border="1">
  * <caption>Configuration parameters</caption>
@@ -161,6 +167,13 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
  * <td>N/A</td>
  * <td>integer</td>
  * <td>443</td>
+ * </tr>
+ * <tr>
+ * <td>enableLookups</td>
+ * <td>Should a DNS lookup be performed to provide a host name when calling {@link ServletRequest#getRemoteHost()}</td>
+ * <td>N/A</td>
+ * <td>boolean</td>
+ * <td>false</td>
  * </tr>
  * </table>
  * <p>
@@ -445,6 +458,8 @@ public class RemoteIpFilter extends GenericFilter {
 
         protected final Map<String, List<String>> headers;
 
+        protected String localName;
+
         protected int localPort;
 
         protected String remoteAddr;
@@ -455,15 +470,19 @@ public class RemoteIpFilter extends GenericFilter {
 
         protected boolean secure;
 
+        protected String serverName;
+
         protected int serverPort;
 
         public XForwardedRequest(HttpServletRequest request) {
             super(request);
+            this.localName = request.getLocalName();
             this.localPort = request.getLocalPort();
             this.remoteAddr = request.getRemoteAddr();
             this.remoteHost = request.getRemoteHost();
             this.scheme = request.getScheme();
             this.secure = request.isSecure();
+            this.serverName = request.getServerName();
             this.serverPort = request.getServerPort();
 
             headers = new HashMap<>();
@@ -528,6 +547,11 @@ public class RemoteIpFilter extends GenericFilter {
         }
 
         @Override
+        public String getLocalName() {
+            return localName;
+        }
+
+        @Override
         public int getLocalPort() {
             return localPort;
         }
@@ -545,6 +569,11 @@ public class RemoteIpFilter extends GenericFilter {
         @Override
         public String getScheme() {
             return scheme;
+        }
+
+        @Override
+        public String getServerName() {
+            return serverName;
         }
 
         @Override
@@ -575,6 +604,10 @@ public class RemoteIpFilter extends GenericFilter {
 
         }
 
+        public void setLocalName(String localName) {
+            this.localName = localName;
+        }
+
         public void setLocalPort(int localPort) {
             this.localPort = localPort;
         }
@@ -593,6 +626,10 @@ public class RemoteIpFilter extends GenericFilter {
 
         public void setSecure(boolean secure) {
             this.secure = secure;
+        }
+
+        public void setServerName(String serverName) {
+            this.serverName = serverName;
         }
 
         public void setServerPort(int serverPort) {
@@ -633,12 +670,17 @@ public class RemoteIpFilter extends GenericFilter {
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
     private transient Log log = LogFactory.getLog(RemoteIpFilter.class);
+    protected static final StringManager sm = StringManager.getManager(RemoteIpFilter.class);
 
     protected static final String PROTOCOL_HEADER_PARAMETER = "protocolHeader";
 
     protected static final String PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER = "protocolHeaderHttpsValue";
 
+    protected static final String HOST_HEADER_PARAMETER = "hostHeader";
+
     protected static final String PORT_HEADER_PARAMETER = "portHeader";
+
+    protected static final String CHANGE_LOCAL_NAME_PARAMETER = "changeLocalName";
 
     protected static final String CHANGE_LOCAL_PORT_PARAMETER = "changeLocalPort";
 
@@ -647,6 +689,8 @@ public class RemoteIpFilter extends GenericFilter {
     protected static final String REMOTE_IP_HEADER_PARAMETER = "remoteIpHeader";
 
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
+
+    protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
 
     /**
      * Convert a given comma delimited list of regular expressions into an array of String
@@ -708,9 +752,13 @@ public class RemoteIpFilter extends GenericFilter {
     /**
      * @see #setProtocolHeader(String)
      */
-    private String protocolHeader = null;
+    private String protocolHeader = "X-Forwarded-Proto";
 
     private String protocolHeaderHttpsValue = "https";
+
+    private String hostHeader = null;
+
+    private boolean changeLocalName = false;
 
     private String portHeader = null;
 
@@ -735,6 +783,8 @@ public class RemoteIpFilter extends GenericFilter {
      * @see #setTrustedProxies(String)
      */
     private Pattern trustedProxies = null;
+
+    private boolean enableLookups;
 
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
@@ -786,7 +836,22 @@ public class RemoteIpFilter extends GenericFilter {
             if (remoteIp != null) {
 
                 xRequest.setRemoteAddr(remoteIp);
-                xRequest.setRemoteHost(remoteIp);
+                if (getEnableLookups()) {
+                    // This isn't a lazy lookup but that would be a little more
+                    // invasive - mainly in XForwardedRequest - and if
+                    // enableLookups is true is seems reasonable that the
+                    // hostname will be required so look it up here.
+                    try {
+                        InetAddress inetAddress = InetAddress.getByName(remoteIp);
+                        // We know we need a DNS look up so use getCanonicalHostName()
+                        xRequest.setRemoteHost(inetAddress.getCanonicalHostName());
+                    } catch (UnknownHostException e) {
+                        log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), e);
+                        xRequest.setRemoteHost(remoteIp);
+                    }
+                } else {
+                    xRequest.setRemoteHost(remoteIp);
+                }
 
                 if (proxiesHeaderValue.size() == 0) {
                     xRequest.removeHeader(proxiesHeader);
@@ -805,8 +870,9 @@ public class RemoteIpFilter extends GenericFilter {
             if (protocolHeader != null) {
                 String protocolHeaderValue = request.getHeader(protocolHeader);
                 if (protocolHeaderValue == null) {
-                    // don't modify the secure,scheme and serverPort attributes of the request
-                } else if (protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue)) {
+                    // Don't modify the secure, scheme and serverPort attributes
+                    // of the request
+                } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
                     xRequest.setSecure(true);
                     xRequest.setScheme("https");
                     setPorts(xRequest, httpsServerPort);
@@ -817,15 +883,37 @@ public class RemoteIpFilter extends GenericFilter {
                 }
             }
 
+            if (hostHeader != null) {
+                String hostHeaderValue = request.getHeader(hostHeader);
+                if (hostHeaderValue != null) {
+                    try {
+                        int portIndex = Host.parse(hostHeaderValue);
+                        if (portIndex > -1) {
+                            log.debug(sm.getString("remoteIpFilter.invalidHostWithPort", hostHeaderValue, hostHeader));
+                            hostHeaderValue = hostHeaderValue.substring(0, portIndex);
+                        }
+
+                        xRequest.setServerName(hostHeaderValue);
+                        if (isChangeLocalName()) {
+                            xRequest.setLocalName(hostHeaderValue);
+                        }
+
+                    } catch (IllegalArgumentException iae) {
+                        log.debug(sm.getString("remoteIpFilter.invalidHostHeader", hostHeaderValue, hostHeader));
+                    }
+                }
+            }
+            request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
+
             if (log.isDebugEnabled()) {
-                log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr '" + request.getRemoteAddr()
-                        + "', originalRemoteHost='" + request.getRemoteHost() + "', originalSecure='" + request.isSecure()
-                        + "', originalScheme='" + request.getScheme() + "', original[" + remoteIpHeader + "]='"
-                        + concatRemoteIpHeaderValue + "', original[" + protocolHeader + "]='"
-                        + (protocolHeader == null ? null : request.getHeader(protocolHeader)) + "' will be seen as newRemoteAddr='"
-                        + xRequest.getRemoteAddr() + "', newRemoteHost='" + xRequest.getRemoteHost() + "', newScheme='"
-                        + xRequest.getScheme() + "', newSecure='" + xRequest.isSecure() + "', new[" + remoteIpHeader + "]='"
-                        + xRequest.getHeader(remoteIpHeader) + "', new[" + proxiesHeader + "]='" + xRequest.getHeader(proxiesHeader) + "'");
+                log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr [" + request.getRemoteAddr() +
+                        "], originalRemoteHost=[" + request.getRemoteHost() + "], originalSecure=[" + request.isSecure() +
+                        "], originalScheme=[" + request.getScheme() + "], originalServerName=[" + request.getServerName() +
+                        "], originalServerPort=[" + request.getServerPort() +
+                        "] will be seen as newRemoteAddr=[" + xRequest.getRemoteAddr() +
+                        "], newRemoteHost=[" + xRequest.getRemoteHost() + "], newSecure=[" + xRequest.isSecure() +
+                        "], newScheme=[" + xRequest.getScheme() + "], newServerName=[" + xRequest.getServerName() +
+                        "], newServerPort=[" + xRequest.getServerPort() + "]");
             }
             if (requestAttributesEnabled) {
                 request.setAttribute(AccessLog.REMOTE_ADDR_ATTRIBUTE,
@@ -836,6 +924,8 @@ public class RemoteIpFilter extends GenericFilter {
                         xRequest.getRemoteHost());
                 request.setAttribute(AccessLog.PROTOCOL_ATTRIBUTE,
                         xRequest.getProtocol());
+                request.setAttribute(AccessLog.SERVER_NAME_ATTRIBUTE,
+                        xRequest.getServerName());
                 request.setAttribute(AccessLog.SERVER_PORT_ATTRIBUTE,
                         Integer.valueOf(xRequest.getServerPort()));
             }
@@ -848,6 +938,26 @@ public class RemoteIpFilter extends GenericFilter {
             chain.doFilter(request, response);
         }
 
+    }
+
+    /*
+     * Considers the value to be secure if it exclusively holds forwards for
+     * {@link #protocolHeaderHttpsValue}.
+     */
+    private boolean isForwardedProtoHeaderValueSecure(String protocolHeaderValue) {
+        if (!protocolHeaderValue.contains(",")) {
+            return protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue);
+        }
+        String[] forwardedProtocols = commaDelimitedListToStringArray(protocolHeaderValue);
+        if (forwardedProtocols.length == 0) {
+            return false;
+        }
+        for (String forwardedProtocol : forwardedProtocols) {
+            if (!protocolHeaderHttpsValue.equalsIgnoreCase(forwardedProtocol)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void setPorts(XForwardedRequest xrequest, int defaultPort) {
@@ -880,6 +990,10 @@ public class RemoteIpFilter extends GenericFilter {
         } else {
             chain.doFilter(request, response);
         }
+    }
+
+    public boolean isChangeLocalName() {
+        return changeLocalName;
     }
 
     public boolean isChangeLocalPort() {
@@ -927,6 +1041,10 @@ public class RemoteIpFilter extends GenericFilter {
         return trustedProxies;
     }
 
+    public boolean getEnableLookups() {
+        return enableLookups;
+    }
+
     @Override
     public void init() throws ServletException {
         if (getInitParameter(INTERNAL_PROXIES_PARAMETER) != null) {
@@ -941,8 +1059,16 @@ public class RemoteIpFilter extends GenericFilter {
             setProtocolHeaderHttpsValue(getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER));
         }
 
+        if (getInitParameter(HOST_HEADER_PARAMETER) != null) {
+            setHostHeader(getInitParameter(HOST_HEADER_PARAMETER));
+        }
+
         if (getInitParameter(PORT_HEADER_PARAMETER) != null) {
             setPortHeader(getInitParameter(PORT_HEADER_PARAMETER));
+        }
+
+        if (getInitParameter(CHANGE_LOCAL_NAME_PARAMETER) != null) {
+            setChangeLocalName(Boolean.parseBoolean(getInitParameter(CHANGE_LOCAL_NAME_PARAMETER)));
         }
 
         if (getInitParameter(CHANGE_LOCAL_PORT_PARAMETER) != null) {
@@ -965,7 +1091,7 @@ public class RemoteIpFilter extends GenericFilter {
             try {
                 setHttpServerPort(Integer.parseInt(getInitParameter(HTTP_SERVER_PORT_PARAMETER)));
             } catch (NumberFormatException e) {
-                throw new NumberFormatException("Illegal " + HTTP_SERVER_PORT_PARAMETER + " : " + e.getMessage());
+                throw new NumberFormatException(sm.getString("remoteIpFilter.invalidNumber", HTTP_SERVER_PORT_PARAMETER, e.getLocalizedMessage()));
             }
         }
 
@@ -973,9 +1099,29 @@ public class RemoteIpFilter extends GenericFilter {
             try {
                 setHttpsServerPort(Integer.parseInt(getInitParameter(HTTPS_SERVER_PORT_PARAMETER)));
             } catch (NumberFormatException e) {
-                throw new NumberFormatException("Illegal " + HTTPS_SERVER_PORT_PARAMETER + " : " + e.getMessage());
+                throw new NumberFormatException(sm.getString("remoteIpFilter.invalidNumber", HTTPS_SERVER_PORT_PARAMETER, e.getLocalizedMessage()));
             }
         }
+
+        if (getInitParameter(ENABLE_LOOKUPS_PARAMETER) != null) {
+            setEnableLookups(Boolean.parseBoolean(getInitParameter(ENABLE_LOOKUPS_PARAMETER)));
+        }
+    }
+
+    /**
+     * <p>
+     * If <code>true</code>, the return values for both {@link
+     * ServletRequest#getLocalName()} and {@link ServletRequest#getServerName()}
+     * will be modified by this Filter rather than just
+     * {@link ServletRequest#getServerName()}.
+     * </p>
+     * <p>
+     * Default value : <code>false</code>
+     * </p>
+     * @param changeLocalName The new flag value
+     */
+    public void setChangeLocalName(boolean changeLocalName) {
+        this.changeLocalName = changeLocalName;
     }
 
     /**
@@ -1036,6 +1182,20 @@ public class RemoteIpFilter extends GenericFilter {
         } else {
             this.internalProxies = Pattern.compile(internalProxies);
         }
+    }
+
+    /**
+     * <p>
+     * Header that holds the incoming host, usually named
+     * <code>X-Forwarded-HOst</code>.
+     * </p>
+     * <p>
+     * Default value : <code>null</code>
+     * </p>
+     * @param hostHeader The header name
+     */
+    public void setHostHeader(String hostHeader) {
+        this.hostHeader = hostHeader;
     }
 
     /**
@@ -1158,6 +1318,9 @@ public class RemoteIpFilter extends GenericFilter {
         }
     }
 
+    public void setEnableLookups(boolean enableLookups) {
+        this.enableLookups = enableLookups;
+    }
 
     /*
      * Log objects are not Serializable but this Filter is because it extends

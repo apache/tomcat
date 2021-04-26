@@ -246,17 +246,47 @@
     </subsection>
 
     <subsection name="Connectors">
-      <p>By default, an HTTP and an AJP connector are configured. Connectors
-      that will not be used should be removed from server.xml.</p>
+      <p>By default, a non-TLS, HTTP/1.1 connector is configured on port 8080.
+      Connectors that will not be used should be removed from server.xml.</p>
+
+      <p>AJP Connectors should only be used on trusted networks or be
+      appropriately secured with a suitable <code>secret</code> attribute.</p>
+
+      <p>AJP Connectors block forwarded requests with unknown request
+      attributes. Known safe and/or expected attributes may be allowed by
+      configuration an appropriate regular expression for the
+      <code>allowedRequestAttributesPattern</code> attribute.</p>
 
       <p>The <strong>address</strong> attribute may be used to control which IP
-      address the connector listens on for connections. By default, the
-      connector listens on all configured IP addresses.</p>
+      address a connector listens on for connections. By default, a connector
+      listens on all configured IP addresses.</p>
+
+      <p>The <strong>allowBackslash</strong> attribute allows non-standard
+      parsing of the request URI. Setting this attribute to a non-default value
+      when behind a reverse proxy may enable an attacker to bypass any security
+      constraints enforced by the proxy.</p>
 
       <p>The <strong>allowTrace</strong> attribute may be used to enable TRACE
       requests which can be useful for debugging. Due to the way some browsers
       handle the response from a TRACE request (which exposes the browser to an
       XSS attack), support for TRACE requests is disabled by default.</p>
+
+      <p>The <strong>discardFacades</strong> attribute set to <code>true</code>
+      will cause a new facade object to be created for each request. This is
+      the default value, and this reduces the chances of a bug in an
+      application exposing data from one request to another.</p>
+
+      <p>The <strong>encodedSolidusHandling</strong> attribute allows
+      non-standard parsing of the request URI. Setting this attribute to a
+      non-default value when behind a reverse proxy may enable an attacker to
+      bypass any security constraints enforced by the proxy.</p>
+
+      <p>The <strong>enforceEncodingInGetWriter</strong> attribute has security
+      implications if set to <code>false</code>. Many user agents, in breach of
+      RFC 7230, try to guess the character encoding of text media types when the
+      specification-mandated default of ISO-8859-1 should be used. Some browsers
+      will interpret as UTF-7 a response containing characters that are safe for
+      ISO-8859-1 but trigger an XSS vulnerability if interpreted as UTF-7.</p>
 
       <p>The <strong>maxPostSize</strong> attribute controls the maximum size
       of a POST request that will be parsed for parameters. The parameters are
@@ -286,8 +316,9 @@
 
       <p>The <strong>server</strong> attribute controls the value of the Server
       HTTP header. The default value of this header for Tomcat 4.1.x to
-      <version-major-minor/>.x is Apache-Coyote/1.1. This header can provide
-      limited information to both legitimate clients and attackers.</p>
+      8.0.x is Apache-Coyote/1.1. From 8.5.x onwards this header is not set by
+      default. This header can provide limited information to both legitimate
+      clients and attackers.</p>
 
       <p>The <strong>SSLEnabled</strong>, <strong>scheme</strong> and
       <strong>secure</strong> attributes may all be independently set. These are
@@ -399,15 +430,15 @@
       handling can be configured within each web application. Alternatively, you
       can explicitly configure an <a href="config/valve.html">ErrorReportValve</a>
       and set its <strong>showReport</strong> attribute to <code>false</code>.</p>
+
+      <p>The RewriteValve uses regular expressions and poorly formed regex
+      patterns may be vulnerable to "catastrophic backtracking" or "ReDoS". See
+      <a href="rewrite.html">Rewrite docs</a> for more details.</p>
     </subsection>
 
     <subsection name="Realms">
       <p>The MemoryRealm is not intended for production use as any changes to
       tomcat-users.xml require a restart of Tomcat to take effect.</p>
-
-      <p>The JDBCRealm is not recommended for production use as it is single
-      threaded for all authentication and authorization options. Use the
-      DataSourceRealm instead.</p>
 
       <p>The UserDatabaseRealm is not intended for large-scale installations. It
       is intended for small-scale, relatively static environments.</p>
@@ -429,36 +460,28 @@
 
       <p>The length of the session ID may be changed with the
       <strong>sessionIdLength</strong> attribute.</p>
+
+      <p>The <strong>persistAuthentication</strong> controls whether the
+      authenticated Principal associated with the session (if any) is included
+      when the session is persisted during a restart or to a Store.</p>
+
+      <p>When using the <strong>JDBCStore</strong>, the session store should be
+      secured (dedicated credentials, appropriate permissions) such that only
+      the <strong>JDBCStore</strong> is able to access the persisted session
+      data. In particular, the <strong>JDBCStore</strong> should not be
+      accessible via any credentials available to a web application.</p>
     </subsection>
 
     <subsection name="Cluster">
       <p>The cluster implementation is written on the basis that a secure,
       trusted network is used for all of the cluster related network traffic. It
       is not safe to run a cluster on a insecure, untrusted network.</p>
+
+      <p>If you are operating on an untrusted network or would prefer to
+      exercise an over-abundance of caution, you can use the
+      <a href="config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
+      to encrypt traffic between nodes.</p>
     </subsection>
-  </section>
-
-  <section name="System Properties">
-    <p>Setting <strong>org.apache.catalina.connector.RECYCLE_FACADES</strong>
-    system property to <code>true</code> will cause a new facade object to be
-    created for each request. This reduces the chances of a bug in an
-    application exposing data from one request to another.</p>
-
-    <p>The <strong>
-    org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH</strong> and
-    <strong>org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH</strong>
-    system properties allow non-standard parsing of the request URI. Using
-    these options when behind a reverse proxy may enable an attacker to bypass
-    any security constraints enforced by the proxy.</p>
-
-    <p>The <strong>
-    org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER
-    </strong> system property has security implications if disabled. Many user
-    agents, in breach of RFC2616, try to guess the character encoding of text
-    media types when the specification-mandated default of ISO-8859-1 should be
-    used. Some browsers will interpret as UTF-7 a response containing characters
-    that are safe for ISO-8859-1 but trigger an XSS vulnerability if interpreted
-    as UTF-7.</p>
   </section>
 
   <section name="web.xml">
@@ -497,6 +520,14 @@
     <p>The CGI Servlet is disabled by default. If enabled, the debug
     initialisation parameter should not be set to <code>10</code> or higher on a
     production system because the debug page is not secure.</p>
+
+    <p>When using the CGI Servlet on Windows with
+    <code>enableCmdLineArguments</code> enabled, review the setting of
+    <code>cmdLineArgumentsDecoded</code> carefully and ensure that it is
+    appropriate for your environment. The default value is secure. Insecure
+    configurations may expose the server to remote code execution. Further
+    information on the potential risks and mitigations may be found by
+    following the links in the <a href="cgi-howto.html">CGI How To</a>.</p>
 
     <p><a href="config/filter.html">FailedRequestFilter</a>
     can be configured and used to reject requests that had errors during

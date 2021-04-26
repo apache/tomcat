@@ -17,6 +17,7 @@
 package org.apache.tomcat.dbcp.pool2;
 
 import java.io.Closeable;
+import java.util.Collection;
 import java.util.NoSuchElementException;
 
 /**
@@ -66,8 +67,76 @@ import java.util.NoSuchElementException;
  * @since 2.0
  */
 public interface KeyedObjectPool<K, V> extends Closeable {
+
     /**
-     * Obtains an instance from this pool for the specified <code>key</code>.
+     * Create an object using the {@link KeyedPooledObjectFactory factory} or
+     * other implementation dependent mechanism, passivate it, and then place it
+     * in the idle object pool. {@code addObject} is useful for
+     * "pre-loading" a pool with idle objects (Optional operation).
+     *
+     * @param key the key a new instance should be added to
+     *
+     * @throws Exception
+     *              when {@link KeyedPooledObjectFactory#makeObject} fails.
+     * @throws IllegalStateException
+     *              after {@link #close} has been called on this pool.
+     * @throws UnsupportedOperationException
+     *              when this pool cannot add new idle objects.
+     */
+    void addObject(K key) throws Exception, IllegalStateException,
+            UnsupportedOperationException;
+
+    /**
+     * Calls {@link KeyedObjectPool#addObject(Object)} with each
+     * key in {@code keys} for {@code count} number of times. This has
+     * the same effect as calling {@link #addObjects(Object, int)}
+     * for each key in the {@code keys} collection.
+     *
+     * @param keys
+     *            {@link Collection} of keys to add objects for.
+     * @param count
+     *            the number of idle objects to add for each {@code key}.
+     * @throws Exception
+     *             when {@link KeyedObjectPool#addObject(Object)} fails.
+     * @throws IllegalArgumentException
+     *             when {@code keyedPool}, {@code keys}, or any value
+     *             in {@code keys} is {@code null}.
+     * @see #addObjects(Object, int)
+     */
+    default void addObjects(final Collection<K> keys, final int count) throws Exception, IllegalArgumentException {
+        if (keys == null) {
+            throw new IllegalArgumentException(PoolUtils.MSG_NULL_KEYS);
+        }
+        for (K key : keys) {
+            addObjects(key, count);
+        }
+    }
+
+    /**
+     * Calls {@link KeyedObjectPool#addObject(Object)}
+     * {@code key} {@code count} number of times.
+     *
+     * @param key
+     *            the key to add objects for.
+     * @param count
+     *            the number of idle objects to add for {@code key}.
+     * @throws Exception
+     *             when {@link KeyedObjectPool#addObject(Object)} fails.
+     * @throws IllegalArgumentException
+     *             when {@code key} is {@code null}.
+     * @since 2.8.0
+     */
+    default void addObjects(final K key, final int count) throws Exception, IllegalArgumentException {
+        if (key == null) {
+            throw new IllegalArgumentException(PoolUtils.MSG_NULL_KEY);
+        }
+        for (int i = 0; i < count; i++) {
+            addObject(key);
+        }
+    }
+
+    /**
+     * Obtains an instance from this pool for the specified {@code key}.
      * <p>
      * Instances returned from this method will have been either newly created
      * with {@link KeyedPooledObjectFactory#makeObject makeObject} or will be
@@ -80,12 +149,12 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      * By contract, clients <strong>must</strong> return the borrowed object
      * using {@link #returnObject returnObject},
      * {@link #invalidateObject invalidateObject}, or a related method as
-     * defined in an implementation or sub-interface, using a <code>key</code>
+     * defined in an implementation or sub-interface, using a {@code key}
      * that is {@link Object#equals equivalent} to the one used to borrow the
      * instance in the first place.
      * </p>
      * <p>
-     * The behaviour of this method when the pool has been exhausted is not
+     * The behavior of this method when the pool has been exhausted is not
      * strictly specified (although it may be specified by implementations).
      * </p>
      *
@@ -105,104 +174,6 @@ public interface KeyedObjectPool<K, V> extends Closeable {
     V borrowObject(K key) throws Exception, NoSuchElementException, IllegalStateException;
 
     /**
-     * Return an instance to the pool. By contract, <code>obj</code>
-     * <strong>must</strong> have been obtained using
-     * {@link #borrowObject borrowObject} or a related method as defined in an
-     * implementation or sub-interface using a <code>key</code> that is
-     * equivalent to the one used to borrow the instance in the first place.
-     *
-     * @param key the key used to obtain the object
-     * @param obj a {@link #borrowObject borrowed} instance to be returned.
-     *
-     * @throws IllegalStateException
-     *              if an attempt is made to return an object to the pool that
-     *              is in any state other than allocated (i.e. borrowed).
-     *              Attempting to return an object more than once or attempting
-     *              to return an object that was never borrowed from the pool
-     *              will trigger this exception.
-     *
-     * @throws Exception if an instance cannot be returned to the pool
-     */
-    void returnObject(K key, V obj) throws Exception;
-
-    /**
-     * Invalidates an object from the pool.
-     * <p>
-     * By contract, <code>obj</code> <strong>must</strong> have been obtained
-     * using {@link #borrowObject borrowObject} or a related method as defined
-     * in an implementation or sub-interface using a <code>key</code> that is
-     * equivalent to the one used to borrow the <code>Object</code> in the first
-     * place.
-     * </p>
-     * <p>
-     * This method should be used when an object that has been borrowed is
-     * determined (due to an exception or other problem) to be invalid.
-     * </p>
-     *
-     * @param key the key used to obtain the object
-     * @param obj a {@link #borrowObject borrowed} instance to be returned.
-     *
-     * @throws Exception if the instance cannot be invalidated
-     */
-    void invalidateObject(K key, V obj) throws Exception;
-
-    /**
-     * Create an object using the {@link KeyedPooledObjectFactory factory} or
-     * other implementation dependent mechanism, passivate it, and then place it
-     * in the idle object pool. <code>addObject</code> is useful for
-     * "pre-loading" a pool with idle objects (Optional operation).
-     *
-     * @param key the key a new instance should be added to
-     *
-     * @throws Exception
-     *              when {@link KeyedPooledObjectFactory#makeObject} fails.
-     * @throws IllegalStateException
-     *              after {@link #close} has been called on this pool.
-     * @throws UnsupportedOperationException
-     *              when this pool cannot add new idle objects.
-     */
-    void addObject(K key) throws Exception, IllegalStateException,
-            UnsupportedOperationException;
-
-    /**
-     * Returns the number of instances corresponding to the given
-     * <code>key</code> currently idle in this pool. Returns a negative value if
-     * this information is not available.
-     *
-     * @param key the key to query
-     * @return the number of instances corresponding to the given
-     * <code>key</code> currently idle in this pool.
-     */
-    int getNumIdle(K key);
-
-    /**
-     * Returns the number of instances currently borrowed from but not yet
-     * returned to the pool corresponding to the given <code>key</code>.
-     * Returns a negative value if this information is not available.
-     *
-     * @param key the key to query
-     * @return the number of instances currently borrowed from but not yet
-     * returned to the pool corresponding to the given <code>key</code>.
-     */
-    int getNumActive(K key);
-
-    /**
-     * Returns the total number of instances currently idle in this pool.
-     * Returns a negative value if this information is not available.
-     * @return the total number of instances currently idle in this pool.
-     */
-    int getNumIdle();
-
-    /**
-     * Returns the total number of instances currently borrowed from this pool but
-     * not yet returned. Returns a negative value if this information is not
-     * available.
-     * @return the total number of instances currently borrowed from this pool but
-     * not yet returned.
-     */
-    int getNumActive();
-
-    /**
      * Clears the pool, removing all pooled instances (optional operation).
      *
      * @throws UnsupportedOperationException when this implementation doesn't
@@ -214,7 +185,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
 
     /**
      * Clears the specified pool, removing all pooled instances corresponding to
-     * the given <code>key</code> (optional operation).
+     * the given {@code key} (optional operation).
      *
      * @param key the key to clear
      *
@@ -238,4 +209,111 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      */
     @Override
     void close();
+
+    /**
+     * Returns the total number of instances currently borrowed from this pool but
+     * not yet returned. Returns a negative value if this information is not
+     * available.
+     * @return the total number of instances currently borrowed from this pool but
+     * not yet returned.
+     */
+    int getNumActive();
+
+    /**
+     * Returns the number of instances currently borrowed from but not yet
+     * returned to the pool corresponding to the given {@code key}.
+     * Returns a negative value if this information is not available.
+     *
+     * @param key the key to query
+     * @return the number of instances currently borrowed from but not yet
+     * returned to the pool corresponding to the given {@code key}.
+     */
+    int getNumActive(K key);
+
+    /**
+     * Returns the total number of instances currently idle in this pool.
+     * Returns a negative value if this information is not available.
+     * @return the total number of instances currently idle in this pool.
+     */
+    int getNumIdle();
+
+    /**
+     * Returns the number of instances corresponding to the given
+     * {@code key} currently idle in this pool. Returns a negative value if
+     * this information is not available.
+     *
+     * @param key the key to query
+     * @return the number of instances corresponding to the given
+     * {@code key} currently idle in this pool.
+     */
+    int getNumIdle(K key);
+
+    /**
+     * Invalidates an object from the pool.
+     * <p>
+     * By contract, {@code obj} <strong>must</strong> have been obtained
+     * using {@link #borrowObject borrowObject} or a related method as defined
+     * in an implementation or sub-interface using a {@code key} that is
+     * equivalent to the one used to borrow the {@code Object} in the first
+     * place.
+     * </p>
+     * <p>
+     * This method should be used when an object that has been borrowed is
+     * determined (due to an exception or other problem) to be invalid.
+     * </p>
+     *
+     * @param key the key used to obtain the object
+     * @param obj a {@link #borrowObject borrowed} instance to be returned.
+     *
+     * @throws Exception if the instance cannot be invalidated
+     */
+    void invalidateObject(K key, V obj) throws Exception;
+
+
+    /**
+     * Invalidates an object from the pool, using the provided
+     * {@link DestroyMode}.
+     * <p>
+     * By contract, {@code obj} <strong>must</strong> have been obtained
+     * using {@link #borrowObject borrowObject} or a related method as defined
+     * in an implementation or sub-interface using a {@code key} that is
+     * equivalent to the one used to borrow the {@code Object} in the first
+     * place.
+     * </p>
+     * <p>
+     * This method should be used when an object that has been borrowed is
+     * determined (due to an exception or other problem) to be invalid.
+     * </p>
+     *
+     * @param key the key used to obtain the object
+     * @param obj a {@link #borrowObject borrowed} instance to be returned.
+     * @param mode destroy activation context provided to the factory
+     *
+     * @throws Exception if the instance cannot be invalidated
+     * @since 2.9.0
+     */
+    default void invalidateObject(final K key, final V obj, final DestroyMode mode) throws Exception {
+        invalidateObject(key, obj);
+    }
+
+    /**
+     * Return an instance to the pool. By contract, {@code obj}
+     * <strong>must</strong> have been obtained using
+     * {@link #borrowObject borrowObject} or a related method as defined in an
+     * implementation or sub-interface using a {@code key} that is
+     * equivalent to the one used to borrow the instance in the first place.
+     *
+     * @param key the key used to obtain the object
+     * @param obj a {@link #borrowObject borrowed} instance to be returned.
+     *
+     * @throws IllegalStateException
+     *              if an attempt is made to return an object to the pool that
+     *              is in any state other than allocated (i.e. borrowed).
+     *              Attempting to return an object more than once or attempting
+     *              to return an object that was never borrowed from the pool
+     *              will trigger this exception.
+     *
+     * @throws Exception if an instance cannot be returned to the pool
+     */
+    void returnObject(K key, V obj) throws Exception;
 }

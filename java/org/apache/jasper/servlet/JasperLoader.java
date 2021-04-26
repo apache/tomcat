@@ -24,8 +24,6 @@ import java.net.URLClassLoader;
 import java.security.CodeSource;
 import java.security.PermissionCollection;
 
-import org.apache.jasper.Constants;
-
 /**
  * Class loader for loading servlet class files (corresponding to JSP files)
  * and tag handler class files (corresponding to tag files).
@@ -37,12 +35,14 @@ public class JasperLoader extends URLClassLoader {
 
     private final PermissionCollection permissionCollection;
     private final SecurityManager securityManager;
+    private final String packageName;
 
     public JasperLoader(URL[] urls, ClassLoader parent,
-                        PermissionCollection permissionCollection) {
+            String packageName, PermissionCollection permissionCollection) {
         super(urls, parent);
         this.permissionCollection = permissionCollection;
         this.securityManager = System.getSecurityManager();
+        this.packageName = packageName;
     }
 
     /**
@@ -116,7 +116,7 @@ public class JasperLoader extends URLClassLoader {
             }
         }
 
-        if( !name.startsWith(Constants.JSP_PACKAGE_NAME + '.') ) {
+        if( !name.startsWith(packageName + '.') ) {
             // Class is not in org.apache.jsp, therefore, have our
             // parent load it
             clazz = getParent().loadClass(name);

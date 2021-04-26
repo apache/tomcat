@@ -165,8 +165,8 @@ class Collector {
                 scriptingElementSeen = true;
 
             Node.JspAttribute[] attrs = n.getJspAttributes();
-            for (int i = 0; i < attrs.length; i++) {
-                if (attrs[i].isExpression()) {
+            for (Node.JspAttribute attr : attrs) {
+                if (attr.isExpression()) {
                     scriptingElementSeen = true;
                     break;
                 }

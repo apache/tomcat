@@ -29,8 +29,8 @@ public interface FileItemFactory {
      *
      * @param fieldName   The name of the form field.
      * @param contentType The content type of the form field.
-     * @param isFormField <code>true</code> if this is a plain form field;
-     *                    <code>false</code> otherwise.
+     * @param isFormField {@code true} if this is a plain form field;
+     *                    {@code false} otherwise.
      * @param fileName    The name of the uploaded file, if any, as supplied
      *                    by the browser or other client.
      *

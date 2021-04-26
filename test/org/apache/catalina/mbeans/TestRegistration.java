@@ -135,9 +135,8 @@ public class TestRegistration extends TomcatBaseTest {
                 + ObjectName.quote(ADDRESS),
         "Tomcat:type=ThreadPool,name="
                 + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
-        "Tomcat:type=ThreadPool,name="
-                + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port) +
-                ",subType=SocketProperties",
+        "Tomcat:type=SocketProperties,name="
+                + ObjectName.quote("http-" + type + "-" + ADDRESS + "-" + port),
         };
     }
 
@@ -213,6 +212,11 @@ public class TestRegistration extends TomcatBaseTest {
         List<String> additional = found;
         additional.removeAll(expected);
         Assert.assertTrue("Unexpected Tomcat MBeans: " + additional, additional.isEmpty());
+
+        // Check a known attribute
+        String connectorName = Arrays.asList(connectorMBeanNames("auto-" + index, protocol)).get(0);
+        // This should normally return "http", but any non null non exception is good enough
+        Assert.assertNotNull(mbeanServer.getAttribute(new ObjectName(connectorName), "scheme"));
 
         tomcat.stop();
 

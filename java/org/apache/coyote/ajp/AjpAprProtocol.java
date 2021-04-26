@@ -23,7 +23,11 @@ import org.apache.tomcat.util.net.AprEndpoint;
 
 /**
  * This the APR/native based protocol handler implementation for AJP.
+ *
+ * @deprecated  The APR/Native Connector will be removed in Tomcat 10.1.x
+ *              onwards.
  */
+@Deprecated
 public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
     private static final Log log = LogFactory.getLog(AjpAprProtocol.class);

@@ -15,14 +15,14 @@
   limitations under the License.
 -->
 <html><body>
-<H1>Buffers and Encodings</h1>
+<H2>Buffers and Encodings</h2>
 
 This package contains buffers and utils to perform encoding/decoding of buffers. That includes byte to char
 conversions, URL encodings, etc.
 
 <p>
 Encoding is a critical operation for performance. There are few tricks in this package - the C2B and
-B2C converters are caching a ISReader/OSWriter and keep everything allocated to do the conversions
+B2C converters are caching an ISReader/OSWriter and keep everything allocated to do the conversions
 in any VM without any garbage.
 
 <p>

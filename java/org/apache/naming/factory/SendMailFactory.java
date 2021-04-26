@@ -23,15 +23,16 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimePartDataSource;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
+
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimePartDataSource;
 
 /**
  * Factory class that creates a JNDI named javamail MimePartDataSource
@@ -43,7 +44,7 @@ import javax.naming.spi.ObjectFactory;
  * Example:
  * <pre>
  * &lt;Resource name="mail/send" auth="CONTAINER"
- *           type="javax.mail.internet.MimePartDataSource"/&gt;
+ *           type="jakarta.mail.internet.MimePartDataSource"/&gt;
  * &lt;ResourceParams name="mail/send"&gt;
  *   &lt;parameter&gt;&lt;name&gt;factory&lt;/name&gt;
  *     &lt;value&gt;org.apache.naming.factory.SendMailFactory&lt;/value&gt;
@@ -76,7 +77,7 @@ public class SendMailFactory implements ObjectFactory
 {
     // The class name for the javamail MimeMessageDataSource
     protected static final String DataSourceClassName =
-        "javax.mail.internet.MimePartDataSource";
+        "jakarta.mail.internet.MimePartDataSource";
 
     @Override
     public Object getObjectInstance(Object refObj, Name name, Context ctx,
@@ -88,44 +89,39 @@ public class SendMailFactory implements ObjectFactory
         // throwing Security Exceptions
         if (ref.getClassName().equals(DataSourceClassName)) {
             return AccessController.doPrivileged(
-                    new PrivilegedAction<MimePartDataSource>()
-            {
-                @Override
-                public MimePartDataSource run() {
-                    // set up the smtp session that will send the message
-                    Properties props = new Properties();
-                    // enumeration of all refaddr
-                    Enumeration<RefAddr> list = ref.getAll();
-                    // current refaddr to be set
-                    RefAddr refaddr;
-                    // set transport to smtp
-                    props.put("mail.transport.protocol", "smtp");
+                    (PrivilegedAction<MimePartDataSource>) () -> {
+                        // set up the smtp session that will send the message
+                        Properties props = new Properties();
+                        // enumeration of all refaddr
+                        Enumeration<RefAddr> list = ref.getAll();
+                        // current refaddr to be set
+                        RefAddr refaddr;
+                        // set transport to smtp
+                        props.put("mail.transport.protocol", "smtp");
 
-                    while (list.hasMoreElements()) {
-                        refaddr = list.nextElement();
+                        while (list.hasMoreElements()) {
+                            refaddr = list.nextElement();
 
-                        // set property
-                        props.put(refaddr.getType(), refaddr.getContent());
-                    }
-                    MimeMessage message = new MimeMessage(
-                        Session.getInstance(props));
-                    try {
-                        RefAddr fromAddr = ref.get("mail.from");
-                        String from = null;
-                        if (fromAddr != null) {
-                            from = (String)ref.get("mail.from").getContent();
+                            // set property
+                            props.put(refaddr.getType(), refaddr.getContent());
                         }
-                        if (from != null) {
-                            message.setFrom(new InternetAddress(from));
-                        }
-                        message.setSubject("");
-                    } catch (Exception e) {/*Ignore*/}
-                    MimePartDataSource mds = new MimePartDataSource(message);
-                    return mds;
-                }
-            } );
-        }
-        else { // We can't create an instance of the DataSource
+                        MimeMessage message = new MimeMessage(
+                            Session.getInstance(props));
+                        try {
+                            RefAddr fromAddr = ref.get("mail.from");
+                            String from = null;
+                            if (fromAddr != null) {
+                                from = (String)ref.get("mail.from").getContent();
+                            }
+                            if (from != null) {
+                                message.setFrom(new InternetAddress(from));
+                            }
+                            message.setSubject("");
+                        } catch (Exception e) {/*Ignore*/}
+                        MimePartDataSource mds = new MimePartDataSource(message);
+                        return mds;
+                    });
+        } else { // We can't create an instance of the DataSource
             return null;
         }
     }

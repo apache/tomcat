@@ -51,6 +51,13 @@ public class ImplicitTldRuleSet implements RuleSet {
             public void begin(String namespace, String name, Attributes attributes) {
                 TaglibXml taglibXml = (TaglibXml) digester.peek();
                 taglibXml.setJspVersion(attributes.getValue("version"));
+
+                StringBuilder code = digester.getGeneratedCode();
+                if (code != null) {
+                    code.append(digester.toVariableName(taglibXml)).append(".setJspVersion(\"");
+                    code.append(attributes.getValue("version")).append("\");");
+                    code.append(System.lineSeparator());
+                }
             }
         });
         digester.addCallMethod(PREFIX + "/shortname", "setShortName", 0);
@@ -73,7 +80,7 @@ public class ImplicitTldRuleSet implements RuleSet {
         @Override
         public void begin(String namespace, String name, Attributes attributes) throws Exception {
             throw new IllegalArgumentException(
-                    sm.getString("implicitTldRule.elementNotAllowed", name));
+                    ImplicitTldRuleSet.sm.getString("implicitTldRule.elementNotAllowed", name));
         }
     }
 }

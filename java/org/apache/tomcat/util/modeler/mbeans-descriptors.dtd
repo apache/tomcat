@@ -30,7 +30,9 @@
 
 
 <!-- ========== Defined Types ============================================= -->
-
+<!-- This DTD has been modified not to use these entities as their use can  -->
+<!-- trigger errors when entity expansion is limited or disabled.           -->
+<!-- See https://bz.apache.org/bugzilla/show_bug.cgi?id=64541               -->
 
 <!-- A "Boolean" is the string representation of a boolean (true or false)
      variable.
@@ -99,16 +101,16 @@
                       By default, this is set to "true".
 -->
 <!ELEMENT attribute (descriptor?)>
-<!ATTLIST attribute         id           ID             #IMPLIED>
-<!ATTLIST attribute         description  CDATA          #IMPLIED>
-<!ATTLIST attribute         displayName  CDATA          #IMPLIED>
-<!ATTLIST attribute         getMethod    %MethodName;   #IMPLIED>
-<!ATTLIST attribute         is           %Boolean;      #IMPLIED>
-<!ATTLIST attribute         name         %VariableName; #IMPLIED>
-<!ATTLIST attribute         readable     %Boolean;      #IMPLIED>
-<!ATTLIST attribute         setMethod    %MethodName;   #IMPLIED>
-<!ATTLIST attribute         type         %ClassName;    #IMPLIED>
-<!ATTLIST attribute         writeable    %Boolean;      #IMPLIED>
+<!ATTLIST attribute         id           ID                   #IMPLIED>
+<!ATTLIST attribute         description  CDATA                #IMPLIED>
+<!ATTLIST attribute         displayName  CDATA                #IMPLIED>
+<!ATTLIST attribute         getMethod    CDATA                #IMPLIED> <!-- %MethodName;   -->
+<!ATTLIST attribute         is           (true|false|yes|no)  #IMPLIED> <!-- %Boolean;      -->
+<!ATTLIST attribute         name         CDATA                #IMPLIED> <!-- %VariableName; -->
+<!ATTLIST attribute         readable     (true|false|yes|no)  #IMPLIED> <!-- %Boolean;      -->
+<!ATTLIST attribute         setMethod    CDATA                #IMPLIED> <!-- %MethodName;   -->
+<!ATTLIST attribute         type         CDATA                #IMPLIED> <!-- %ClassName;    -->
+<!ATTLIST attribute         writeable    (true|false|yes|no)  #IMPLIED> <!-- %Boolean;      -->
 
 
 <!-- The "constructor" element describes a public constructor for the
@@ -122,9 +124,9 @@
                       be the same as the base class name).
 -->
 <!ELEMENT constructor (descriptor?, parameter*)>
-<!ATTLIST constructor       id           ID             #IMPLIED>
-<!ATTLIST constructor       displayName  CDATA          #IMPLIED>
-<!ATTLIST constructor       name         %VariableName; #IMPLIED>
+<!ATTLIST constructor       id           ID                   #IMPLIED>
+<!ATTLIST constructor       displayName  CDATA                #IMPLIED>
+<!ATTLIST constructor       name         CDATA                #IMPLIED> <!-- %VariableName; -->
 
 
 <!-- The "descriptor" element groups a set of descriptor fields whose
@@ -132,7 +134,7 @@
      metadata info classes.
 -->
 <!ELEMENT descriptor (field*)>
-<!ATTLIST descriptor        id           ID             #IMPLIED>
+<!ATTLIST descriptor        id           ID                   #IMPLIED>
 
 
 <!-- The "field" element represents a single name/value pair that will
@@ -145,9 +147,9 @@
                       (will be stored as a String)
 -->
 <!ELEMENT field EMPTY>
-<!ATTLIST field             id           ID             #IMPLIED>
-<!ATTLIST field             name         CDATA          #REQUIRED>
-<!ATTLIST field             value        CDATA          #REQUIRED>
+<!ATTLIST field             id           ID                   #IMPLIED>
+<!ATTLIST field             name         CDATA                #REQUIRED>
+<!ATTLIST field             value        CDATA                #REQUIRED>
 
 
 
@@ -176,13 +178,13 @@
                       managed resource implementation class.
 -->
 <!ELEMENT mbean (descriptor?, attribute*, constructor*, notification*, operation*)>
-<!ATTLIST mbean             id           ID             #IMPLIED>
-<!ATTLIST mbean             className    %ClassName;    #IMPLIED>
-<!ATTLIST mbean             description  CDATA          #IMPLIED>
-<!ATTLIST mbean             domain       CDATA          #IMPLIED>
-<!ATTLIST mbean             group        CDATA          #IMPLIED>
-<!ATTLIST mbean             name         %MethodName;   #IMPLIED>
-<!ATTLIST mbean             type         %ClassName;    #IMPLIED>
+<!ATTLIST mbean             id           ID                   #IMPLIED>
+<!ATTLIST mbean             className    CDATA                #IMPLIED> <!-- %ClassName;    -->
+<!ATTLIST mbean             description  CDATA                #IMPLIED>
+<!ATTLIST mbean             domain       CDATA                #IMPLIED>
+<!ATTLIST mbean             group        CDATA                #IMPLIED>
+<!ATTLIST mbean             name         CDATA                #IMPLIED> <!-- %MethodName;    -->
+<!ATTLIST mbean             type         CDATA                #IMPLIED> <!-- %ClassName;     -->
 
 
 <!-- The "notification" element describes the notification types that are
@@ -194,16 +196,16 @@
      name             Name of this set of notification event types.
 -->
 <!ELEMENT notification (descriptor?, notification-type*)>
-<!ATTLIST notification      id           ID             #IMPLIED>
-<!ATTLIST notification      description  CDATA          #IMPLIED>
-<!ATTLIST notification      name         %VariableName; #IMPLIED>
+<!ATTLIST notification      id           ID                   #IMPLIED>
+<!ATTLIST notification      description  CDATA                #IMPLIED>
+<!ATTLIST notification      name         CDATA                #IMPLIED> <!-- %VariableName; -->
 
 
 <!-- The nested content of the "notification-type" element is the event string
      of an event that can be emitted by this MBean.
 -->
 <!ELEMENT notification-type (#PCDATA)>
-<!ATTLIST notification-type id           ID             #IMPLIED>
+<!ATTLIST notification-type id           ID                   #IMPLIED>
 
 
 <!-- The "operation" element describes a the signature of a public method
@@ -222,11 +224,11 @@
                       type of this method.
 -->
 <!ELEMENT operation   (descriptor?, parameter*)>
-<!ATTLIST operation         id           ID             #IMPLIED>
-<!ATTLIST operation         description  CDATA          #IMPLIED>
-<!ATTLIST operation         impact       CDATA          #IMPLIED>
-<!ATTLIST operation         name         %VariableName; #IMPLIED>
-<!ATTLIST operation         returnType   %ClassName;    #IMPLIED>
+<!ATTLIST operation         id           ID                   #IMPLIED>
+<!ATTLIST operation         description  CDATA                #IMPLIED>
+<!ATTLIST operation         impact       CDATA                #IMPLIED>
+<!ATTLIST operation         name         CDATA                #IMPLIED> <!-- %VariableName; -->
+<!ATTLIST operation         returnType   CDATA                #IMPLIED> <!-- %ClassName;    -->
 
 
 <!-- The "parameter" element describes a single argument that will be passed
@@ -239,9 +241,7 @@
      type             Fully qualified Java class name of this parameter.
 -->
 <!ELEMENT parameter EMPTY>
-<!ATTLIST parameter         id           ID             #IMPLIED>
-<!ATTLIST parameter         description  CDATA          #IMPLIED>
-<!ATTLIST parameter         name         %VariableName; #IMPLIED>
-<!ATTLIST parameter         type         %ClassName;    #IMPLIED>
-
-
+<!ATTLIST parameter         id           ID                   #IMPLIED>
+<!ATTLIST parameter         description  CDATA                #IMPLIED>
+<!ATTLIST parameter         name         CDATA                #IMPLIED> <!-- %VariableName; -->
+<!ATTLIST parameter         type         CDATA                #IMPLIED> <!-- %ClassName;    -->

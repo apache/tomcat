@@ -20,6 +20,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
@@ -31,115 +33,102 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * <pre>
  * The internal states that are used are:
  * DISPATCHED       - Standard request. Not in Async mode.
- * STARTING         - ServletRequest.startAsync() has been called but the
- *                    request in which that call was made has not finished
- *                    processing.
- * STARTED          - ServletRequest.startAsync() has been called and the
- *                    request in which that call was made has finished
- *                    processing.
+ * STARTING         - ServletRequest.startAsync() has been called from
+ *                    Servlet.service() but service() has not exited.
+ * STARTED          - ServletRequest.startAsync() has been called from
+ *                    Servlet.service() and service() has exited.
  * READ_WRITE_OP    - Performing an asynchronous read or write.
  * MUST_COMPLETE    - ServletRequest.startAsync() followed by complete() have
  *                    been called during a single Servlet.service() method. The
- *                    complete() will be processed as soon as the request
- *                    finishes.
- * COMPLETE_PENDING - ServletRequest.startAsync() has been called and before the
- *                    request in which that call was had finished processing,
- *                    complete() was called for a non-container thread. The
- *                    complete() will be processed as soon as the request
- *                    finishes. This is different to MUST_COMPLETE because of
- *                    differences required to avoid race conditions during error
- *                    handling.
+ *                    complete() will be processed as soon as Servlet.service()
+ *                    exits.
+ * COMPLETE_PENDING - ServletRequest.startAsync() has been called from
+ *                    Servlet.service() but, before service() exited, complete()
+ *                    was called from another thread. The complete() will
+ *                    be processed as soon as Servlet.service() exits.
  * COMPLETING       - The call to complete() was made once the request was in
- *                    the STARTED state. May or may not be triggered by a
- *                    container thread - depends if start(Runnable) was used.
+ *                    the STARTED state.
  * TIMING_OUT       - The async request has timed out and is waiting for a call
- *                    to complete(). If that isn't made, the error state will
- *                    entered.
+ *                    to complete() or dispatch(). If that isn't made, the error
+ *                    state will be entered.
  * MUST_DISPATCH    - ServletRequest.startAsync() followed by dispatch() have
  *                    been called during a single Servlet.service() method. The
- *                    dispatch() will be processed as soon as the request
- *                    finishes.
- * DISPATCH_PENDING - ServletRequest.startAsync() has been called and before the
- *                    request in which that call was had finished processing,
- *                    dispatch() was called for a non-container thread. The
- *                    dispatch() will be processed as soon as the request
- *                    finishes. This is different to MUST_DISPATCH because of
- *                    differences required to avoid race conditions during error
- *                    handling.
+ *                    dispatch() will be processed as soon as Servlet.service()
+ *                    exits.
+ * DISPATCH_PENDING - ServletRequest.startAsync() has been called from
+ *                    Servlet.service() but, before service() exited, dispatch()
+ *                    was called from another thread. The dispatch() will
+ *                    be processed as soon as Servlet.service() exits.
  * DISPATCHING      - The dispatch is being processed.
- * MUST_ERROR       - ServletRequest.startAsync() has been called followed by an
- *                    I/O error on a non-container thread. The main purpose of
- *                    this state is to prevent additional async actions
- *                    (complete(), dispatch() etc.) on the non-container thread.
- *                    The container will perform the necessary error handling,
- *                    including ensuring that the AsyncLister.onError() method
- *                    is called.
+ * MUST_ERROR       - ServletRequest.startAsync() has been called from
+ *                    Servlet.service() but, before service() exited, an I/O
+ *                    error occurred on another thread. The container will
+ *                    perform the necessary error handling when
+ *                    Servlet.service() exits.
  * ERROR            - Something went wrong.
  *
- *                           |-----«-------------------------------«------------------------------|
- *                           |                                                                    |
- *                           |      error()                                                       |
- * |-----------------»---|   |  |--«--------MUST_ERROR---------------«------------------------|   |
- * |                    \|/ \|/\|/                                                            |   |
- * |   |----------«-----E R R O R--«-----------------------«-------------------------------|  |   |
- * |   |      complete() /|\/|\\ \-«--------------------------------«-------|              |  |   |
- * |   |                  |  |  \                                           |              |  |   |
- * |   |    |-----»-------|  |   \-----------»----------|                   |              |  |   |
- * |   |    |                |                          |dispatch()         |              |  ^   |
- * |   |    |                |                         \|/                  ^              |  |   |
- * |   |    |                |          |--|timeout()   |                   |              |  |   |
- * |   |    |     post()     |          | \|/           |     post()        |              |  |   |
- * |   |    |    |---------- | --»DISPATCHED«---------- | --------------COMPLETING«-----|  |  |   |
- * |   |    |    |           |   /|\/|\ |               |                | /|\ /|\      |  |  |   |
- * |   |    |    |    |---»- | ---|  |  |startAsync()   |       timeout()|--|   |       |  |  |   |
- * |   |    ^    ^    |      |       |  |               |                       |       |  ^  |   |
- * |   |    |    |    |   |-- \ -----|  |   complete()  |                       |post() |  |  |   |
- * |   |    |    |    |   |    \        |     /--»----- | ---COMPLETE_PENDING-»-|       ^  |  |   |
- * |   |    |    |    |   |     \       |    /          |                               |  |  |   |
- * |   |    |    |    |   ^      \      |   /           |                    complete() |  |  |   |
- * |  \|/   |    |    |   |       \    \|/ /   post()   |                     /---»-----|  |  ^   |
- * | MUST_COMPLETE-«- | - | --«----STARTING--»--------- | ------------|      /             |  |   |
- * |  /|\    /|\      |   |  complete()  | \            |             |     /   error()    |  |   ^
- * |   |      |       |   |              |  \           |             |    //---»----------|  |   |
- * |   |      |       ^   |    dispatch()|   \          |    post()   |   //                  |   |
- * |   |      |       |   |              |    \         |    |-----|  |  //   nct-io-error    |   |
- * |   |      |       |   |              |     \        |    |     |  | ///---»---------------|   |
- * |   |      |       |   |             \|/     \       |    |    \|/\| |||                       |
- * |   |      |       |   |--«--MUST_DISPATCH-----«-----|    |--«--STARTED«---------«---------|   |
- * |   |      |       | dispatched() /|\   |      \               / |   |        post()       |   |
- * |   |      |       |               |    |       \             /  |   |                     |   |
- * |   |      |       |               |    |        \           /   |   |                     |   |
- * |   |      |       |               |    |post()  |           |   |   |                     ^   |
- * ^   |      ^       |               |    |       \|/          |   |   |asyncOperation()     |   |
- * |   |      |       ^               |    |  DISPATCH_PENDING  |   |   |                     |   |
- * |   |      |       |               |    |  |post()           |   |   |                     |   |
- * |   |      |       |               |    |  |      |----------|   |   |»-READ_WRITE_OP--»---|   |
- * |   |      |       |               |    |  |      |  dispatch()  |            |  |  |          |
- * |   |      |       |               |    |  |      |              |            |  |  |          |
- * |   |      |       |post()         |    |  |      |     timeout()|            |  |  |   error()|
- * |   |      |       |dispatched()   |   \|/\|/    \|/             |  dispatch()|  |  |-»--------|
- * |   |      |       |---«---------- | ---DISPATCHING«-----«------ | ------«----|  |
- * |   |      |                       |     |    ^                  |               |
- * |   |      |                       |     |----|                  |               |
- * |   |      |                       |    timeout()                |               |
- * |   |      |                       |                             |               |
- * |   |      |                       |       dispatch()           \|/              |
- * |   |      |                       |-----------«-----------TIMING_OUT            |
- * |   |      |                                                 |   |               |
- * |   |      |-------«----------------------------------«------|   |               |
- * |   |                          complete()                        |               |
- * |   |                                                            |               |
- * |«- | ----«-------------------«-------------------------------«--|               |
- *     |                           error()                                          |
- *     |                                                  complete()                |
- *     |----------------------------------------------------------------------------|
+ *
+ * The valid state transitions are:
+ *
+ *                  post()                                        dispatched()
+ *    |-------»------------------»---------|    |-------«-----------------------«-----|
+ *    |                                    |    |                                     |
+ *    |                                    |    |        post()                       |
+ *    |               post()              \|/  \|/       dispatched()                 |
+ *    |           |-----»----------------»DISPATCHED«-------------«-------------|     |
+ *    |           |                          | /|\ |                            |     |
+ *    |           |              startAsync()|  |--|timeout()                   |     |
+ *    ^           |                          |                                  |     |
+ *    |           |        complete()        |                  dispatch()      ^     |
+ *    |           |   |--«---------------«-- | ---«--MUST_ERROR--»-----|        |     |
+ *    |           |   |                      |         /|\             |        |     |
+ *    |           ^   |                      |          |              |        |     |
+ *    |           |   |                      |    /-----|error()       |        |     |
+ *    |           |   |                      |   /                     |        ^     |
+ *    |           |  \|/  ST-complete()     \|/ /   ST-dispatch()     \|/       |     |
+ *    |    MUST_COMPLETE«--------«--------STARTING--------»---------»MUST_DISPATCH    |
+ *    |                                    / | \                                      |
+ *    |                                   /  |  \                                     |
+ *    |                    OT-complete() /   |   \    OT-dispatch()                   |
+ *    |   COMPLETE_PENDING«------«------/    |    \-------»---------»DISPATCH_PENDING |
+ *    |        |      /|\                    |                       /|\ |            |
+ *    |        |       |                     |                        |  |post()      |
+ *    |        |       |OT-complete()        |           OT-dispatch()|  |            |
+ *    |        |       |---------«-------«---|---«--\                 |  |            |
+ *    |        |                             |       \                |  |            |
+ *    |        |         /-------«-------«-- | --«---READ_WRITE--»----|  |            |
+ *    |        |        / ST-complete()      |        /  /|\  \          |            |
+ *    |        |       /                     | post()/   /     \         |            |
+ *    |        |      /                      |      /   /       \        |            |
+ *    |        |     /                       |     /   /         \       |            |
+ *    |        |    /                        |    /   /           \      |            |
+ *    |        |   /                         |   |   /             \     |            |
+ *    |        |  /                          |   |  /  ST-dispatch()\    |            |
+ *    |        |  |                          |   | |                 \   |            |
+ *    |  post()|  |  timeout()         post()|   | |asyncOperation()  \  |  timeout() |
+ *    |        |  |  |--|                    |   | |                  |  |    |--|    |
+ *    |       \|/\|/\|/ |     complete()    \|/ \|/|   dispatch()    \|/\|/  \|/ |    |
+ *    |--«-----COMPLETING«--------«----------STARTED--------»---------»DISPATCHING----|
+ *            /|\  /|\                       | /|\ |                       /|\ /|\
+ *             |    |                        |  |--|                        |   |
+ *             |    |               timeout()|  post()                      |   |
+ *             |    |                        |                              |   |
+ *             |    |       complete()      \|/         dispatch()          |   |
+ *             |    |------------«-------TIMING_OUT--------»----------------|   |
+ *             |                                                                |
+ *             |            complete()                     dispatch()           |
+ *             |---------------«-----------ERROR--------------»-----------------|
+ *
+ *
+ * Notes: * For clarity, the transitions to ERROR which are valid from every state apart from
+ *          STARTING are not shown.
+ *        * All transitions may happen on either the Servlet.service() thread (ST) or on any
+ *          other thread (OT) unless explicitly marked.
  * </pre>
  */
 class AsyncStateMachine {
 
-    /**
-     * The string manager for this package.
-     */
+    private static final Log log = LogFactory.getLog(AsyncStateMachine.class);
     private static final StringManager sm = StringManager.getManager(AsyncStateMachine.class);
 
     private enum AsyncState {
@@ -251,7 +240,10 @@ class AsyncStateMachine {
     synchronized void asyncStart(AsyncContextCallback asyncCtxt) {
         if (state == AsyncState.DISPATCHED) {
             generation.incrementAndGet();
-            state = AsyncState.STARTING;
+            updateState(AsyncState.STARTING);
+            // Note: In this instance, caller is responsible for calling
+            // asyncCtxt.incrementInProgressAsyncCount() as that allows simpler
+            // error handling.
             this.asyncCtxt = asyncCtxt;
             lastAsyncStart = System.currentTimeMillis();
         } else {
@@ -263,7 +255,7 @@ class AsyncStateMachine {
 
     synchronized void asyncOperation() {
         if (state==AsyncState.STARTED) {
-            state = AsyncState.READ_WRITE_OP;
+            updateState(AsyncState.READ_WRITE_OP);
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
@@ -278,23 +270,27 @@ class AsyncStateMachine {
      */
     synchronized SocketState asyncPostProcess() {
         if (state == AsyncState.COMPLETE_PENDING) {
-            doComplete();
+            clearNonBlockingListeners();
+            updateState(AsyncState.COMPLETING);
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCH_PENDING) {
-            doDispatch();
+            clearNonBlockingListeners();
+            updateState(AsyncState.DISPATCHING);
             return SocketState.ASYNC_END;
         } else  if (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP) {
-            state = AsyncState.STARTED;
+            updateState(AsyncState.STARTED);
             return SocketState.LONG;
         } else if (state == AsyncState.MUST_COMPLETE || state == AsyncState.COMPLETING) {
             asyncCtxt.fireOnComplete();
-            state = AsyncState.DISPATCHED;
+            updateState(AsyncState.DISPATCHED);
+            asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.MUST_DISPATCH) {
-            state = AsyncState.DISPATCHING;
+            updateState(AsyncState.DISPATCHING);
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCHING) {
-            state = AsyncState.DISPATCHED;
+            updateState(AsyncState.DISPATCHED);
+            asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.STARTED) {
             // This can occur if an async listener does a dispatch to an async
@@ -309,36 +305,52 @@ class AsyncStateMachine {
 
 
     synchronized boolean asyncComplete() {
-        if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
-            state = AsyncState.COMPLETE_PENDING;
+        if (!ContainerThreadMarker.isContainerThread() &&
+                (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP)) {
+            updateState(AsyncState.COMPLETE_PENDING);
             return false;
-        } else {
-            return doComplete();
         }
-    }
 
-
-    private synchronized boolean doComplete() {
         clearNonBlockingListeners();
-        boolean doComplete = false;
-        if (state == AsyncState.STARTING || state == AsyncState.TIMING_OUT ||
-                state == AsyncState.ERROR || state == AsyncState.READ_WRITE_OP) {
-            state = AsyncState.MUST_COMPLETE;
-        } else if (state == AsyncState.STARTED || state == AsyncState.COMPLETE_PENDING) {
-            state = AsyncState.COMPLETING;
-            doComplete = true;
+        boolean triggerDispatch = false;
+        if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
+            // Processing is on a container thread so no need to transfer
+            // processing to a new container thread
+            updateState(AsyncState.MUST_COMPLETE);
+        } else if (state == AsyncState.STARTED) {
+            updateState(AsyncState.COMPLETING);
+            // A dispatch to a container thread is always required.
+            // If on a non-container thread, need to get back onto a container
+            // thread to complete the processing.
+            // If on a container thread the current request/response are not the
+            // request/response associated with the AsyncContext so need a new
+            // container thread to process the different request/response.
+            triggerDispatch = true;
+        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT ||
+                state == AsyncState.ERROR) {
+            // Read/write operations can happen on or off a container thread but
+            // while in this state the call to listener that triggers the
+            // read/write will be in progress on a container thread.
+            // Processing of timeouts and errors can happen on or off a
+            // container thread (on is much more likely) but while in this state
+            // the call that triggers the timeout will be in progress on a
+            // container thread.
+            // The socket will be added to the poller when the container thread
+            // exits the AbstractConnectionHandler.process() method so don't do
+            // a dispatch here which would add it to the poller a second time.
+            updateState(AsyncState.COMPLETING);
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
                             "asyncComplete()", state));
         }
-        return doComplete;
+        return triggerDispatch;
     }
 
 
     synchronized boolean asyncTimeout() {
         if (state == AsyncState.STARTED) {
-            state = AsyncState.TIMING_OUT;
+            updateState(AsyncState.TIMING_OUT);
             return true;
         } else if (state == AsyncState.COMPLETING ||
                 state == AsyncState.DISPATCHING ||
@@ -355,55 +367,54 @@ class AsyncStateMachine {
 
 
     synchronized boolean asyncDispatch() {
-        if (!ContainerThreadMarker.isContainerThread() && state == AsyncState.STARTING) {
-            state = AsyncState.DISPATCH_PENDING;
+        if (!ContainerThreadMarker.isContainerThread() &&
+                (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP)) {
+            updateState(AsyncState.DISPATCH_PENDING);
             return false;
-        } else {
-            return doDispatch();
         }
-    }
 
-
-    private synchronized boolean doDispatch() {
         clearNonBlockingListeners();
-        boolean doDispatch = false;
-        if (state == AsyncState.STARTING ||
-                state == AsyncState.TIMING_OUT ||
-                state == AsyncState.ERROR) {
-            // In these three cases processing is on a container thread so no
-            // need to transfer processing to a new container thread
-            state = AsyncState.MUST_DISPATCH;
-        } else if (state == AsyncState.STARTED || state == AsyncState.DISPATCH_PENDING) {
-            state = AsyncState.DISPATCHING;
-            // A dispatch is always required.
+        boolean triggerDispatch = false;
+        if (state == AsyncState.STARTING || state == AsyncState.MUST_ERROR) {
+            // Processing is on a container thread so no need to transfer
+            // processing to a new container thread
+            updateState(AsyncState.MUST_DISPATCH);
+        } else if (state == AsyncState.STARTED) {
+            updateState(AsyncState.DISPATCHING);
+            // A dispatch to a container thread is always required.
             // If on a non-container thread, need to get back onto a container
             // thread to complete the processing.
             // If on a container thread the current request/response are not the
             // request/response associated with the AsyncContext so need a new
             // container thread to process the different request/response.
-            doDispatch = true;
-        } else if (state == AsyncState.READ_WRITE_OP) {
-            state = AsyncState.DISPATCHING;
-            // If on a container thread then the socket will be added to the
-            // poller poller when the thread exits the
-            // AbstractConnectionHandler.process() method so don't do a dispatch
-            // here which would add it to the poller a second time.
-            if (!ContainerThreadMarker.isContainerThread()) {
-                doDispatch = true;
-            }
+            triggerDispatch = true;
+        } else if (state == AsyncState.READ_WRITE_OP || state == AsyncState.TIMING_OUT ||
+                state == AsyncState.ERROR) {
+            // Read/write operations can happen on or off a container thread but
+            // while in this state the call to listener that triggers the
+            // read/write will be in progress on a container thread.
+            // Processing of timeouts and errors can happen on or off a
+            // container thread (on is much more likely) but while in this state
+            // the call that triggers the timeout will be in progress on a
+            // container thread.
+            // The socket will be added to the poller when the container thread
+            // exits the AbstractConnectionHandler.process() method so don't do
+            // a dispatch here which would add it to the poller a second time.
+            updateState(AsyncState.DISPATCHING);
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
                             "asyncDispatch()", state));
         }
-        return doDispatch;
+        return triggerDispatch;
     }
 
 
     synchronized void asyncDispatched() {
         if (state == AsyncState.DISPATCHING ||
                 state == AsyncState.MUST_DISPATCH) {
-            state = AsyncState.DISPATCHED;
+            updateState(AsyncState.DISPATCHED);
+            asyncCtxt.decrementInProgressAsyncCount();
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
@@ -412,35 +423,22 @@ class AsyncStateMachine {
     }
 
 
-    synchronized void asyncMustError() {
-        if (state == AsyncState.STARTED) {
-            clearNonBlockingListeners();
-            state = AsyncState.MUST_ERROR;
+    synchronized boolean asyncError() {
+        clearNonBlockingListeners();
+        if (state == AsyncState.STARTING) {
+            updateState(AsyncState.MUST_ERROR);
+        } else if (state == AsyncState.DISPATCHED) {
+            // Async error handling has moved processing back into an async
+            // state. Need to increment in progress count as it will decrement
+            // when the async state is exited again.
+            asyncCtxt.incrementInProgressAsyncCount();
+            updateState(AsyncState.ERROR);
         } else {
-            throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncMustError()", state));
+            updateState(AsyncState.ERROR);
         }
+        return !ContainerThreadMarker.isContainerThread();
     }
 
-
-    synchronized void asyncError() {
-        if (state == AsyncState.STARTING ||
-                state == AsyncState.STARTED ||
-                state == AsyncState.DISPATCHED ||
-                state == AsyncState.TIMING_OUT ||
-                state == AsyncState.MUST_COMPLETE ||
-                state == AsyncState.READ_WRITE_OP ||
-                state == AsyncState.COMPLETING ||
-                state == AsyncState.MUST_ERROR) {
-            clearNonBlockingListeners();
-            state = AsyncState.ERROR;
-        } else {
-            throw new IllegalStateException(
-                    sm.getString("asyncStateMachine.invalidAsyncState",
-                            "asyncError()", state));
-        }
-    }
 
     synchronized void asyncRun(Runnable runnable) {
         if (state == AsyncState.STARTING || state ==  AsyncState.STARTED ||
@@ -483,6 +481,16 @@ class AsyncStateMachine {
     }
 
 
+    synchronized boolean isAvailable() {
+        if (asyncCtxt == null) {
+            // Async processing has probably been completed in another thread.
+            // Trigger a timeout to make sure the Processor is cleaned up.
+            return false;
+        }
+        return asyncCtxt.isAvailable();
+    }
+
+
     synchronized void recycle() {
         // Use lastAsyncStart to determine if this instance has been used since
         // it was last recycled. If it hasn't there is no need to recycle again
@@ -502,5 +510,13 @@ class AsyncStateMachine {
     private void clearNonBlockingListeners() {
         processor.getRequest().listener = null;
         processor.getRequest().getResponse().listener = null;
+    }
+
+
+    private synchronized void updateState(AsyncState newState) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("asyncStateMachine.stateChange", state, newState));
+        }
+        state = newState;
     }
 }

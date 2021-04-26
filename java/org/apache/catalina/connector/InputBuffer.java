@@ -27,9 +27,8 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.ReadListener;
+import jakarta.servlet.ReadListener;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
@@ -238,22 +237,6 @@ public class InputBuffer extends Reader
 
     public void setReadListener(ReadListener listener) {
         coyoteRequest.setReadListener(listener);
-
-        // The container is responsible for the first call to
-        // listener.onDataAvailable(). If isReady() returns true, the container
-        // needs to call listener.onDataAvailable() from a new thread. If
-        // isReady() returns false, the socket will be registered for read and
-        // the container will call listener.onDataAvailable() once data arrives.
-        // Must call isFinished() first as a call to isReady() if the request
-        // has been finished will register the socket for read interest and that
-        // is not required.
-        if (!coyoteRequest.isFinished() && isReady()) {
-            coyoteRequest.action(ActionCode.DISPATCH_READ, null);
-            if (!ContainerThreadMarker.isContainerThread()) {
-                // Not on a container thread so need to execute the dispatch
-                coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
-            }
-        }
     }
 
 
@@ -301,9 +284,7 @@ public class InputBuffer extends Reader
             return true;
         }
 
-        AtomicBoolean result = new AtomicBoolean();
-        coyoteRequest.action(ActionCode.NB_READ_INTEREST, result);
-        return result.get();
+        return coyoteRequest.isReady();
     }
 
 
@@ -332,16 +313,19 @@ public class InputBuffer extends Reader
             state = BYTE_STATE;
         }
 
-        int result = coyoteRequest.doRead(this);
-
-        return result;
+        try {
+            return coyoteRequest.doRead(this);
+        } catch (IOException ioe) {
+            coyoteRequest.setErrorException(ioe);
+            // An IOException on a read is almost always due to
+            // the remote client aborting the request.
+            throw new ClientAbortException(ioe);
+        }
     }
 
 
     public int readByte() throws IOException {
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
+        throwIfClosed();
 
         if (checkByteBufferEof()) {
             return -1;
@@ -351,9 +335,7 @@ public class InputBuffer extends Reader
 
 
     public int read(byte[] b, int off, int len) throws IOException {
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
+        throwIfClosed();
 
         if (checkByteBufferEof()) {
             return -1;
@@ -376,9 +358,7 @@ public class InputBuffer extends Reader
      * @throws IOException if an input or output exception has occurred
      */
     public int read(ByteBuffer to) throws IOException {
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
+        throwIfClosed();
 
         if (checkByteBufferEof()) {
             return -1;
@@ -432,10 +412,7 @@ public class InputBuffer extends Reader
 
     @Override
     public int read() throws IOException {
-
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
+        throwIfClosed();
 
         if (checkCharBufferEof()) {
             return -1;
@@ -446,21 +423,14 @@ public class InputBuffer extends Reader
 
     @Override
     public int read(char[] cbuf) throws IOException {
-
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
-
+        throwIfClosed();
         return read(cbuf, 0, cbuf.length);
     }
 
 
     @Override
     public int read(char[] cbuf, int off, int len) throws IOException {
-
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
+        throwIfClosed();
 
         if (checkCharBufferEof()) {
             return -1;
@@ -473,9 +443,7 @@ public class InputBuffer extends Reader
 
     @Override
     public long skip(long n) throws IOException {
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
+        throwIfClosed();
 
         if (n < 0) {
             throw new IllegalArgumentException();
@@ -501,9 +469,7 @@ public class InputBuffer extends Reader
 
     @Override
     public boolean ready() throws IOException {
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
+        throwIfClosed();
         if (state == INITIAL_STATE) {
             state = CHAR_STATE;
         }
@@ -520,9 +486,7 @@ public class InputBuffer extends Reader
     @Override
     public void mark(int readAheadLimit) throws IOException {
 
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
+        throwIfClosed();
 
         if (cb.remaining() <= 0) {
             clear(cb);
@@ -540,15 +504,15 @@ public class InputBuffer extends Reader
     @Override
     public void reset() throws IOException {
 
-        if (closed) {
-            throw new IOException(sm.getString("inputBuffer.streamClosed"));
-        }
+        throwIfClosed();
 
         if (state == CHAR_STATE) {
             if (markPos < 0) {
                 clear(cb);
                 markPos = -1;
-                throw new IOException();
+                IOException ioe = new IOException();
+                coyoteRequest.setErrorException(ioe);
+                throw ioe;
             } else {
                 cb.position(markPos);
             }
@@ -557,6 +521,14 @@ public class InputBuffer extends Reader
         }
     }
 
+
+    private void throwIfClosed() throws IOException {
+        if (closed) {
+            IOException ioe = new IOException(sm.getString("inputBuffer.streamClosed"));
+            coyoteRequest.setErrorException(ioe);
+            throw ioe;
+        }
+    }
 
     public void checkConverter() throws IOException {
         if (conv != null) {

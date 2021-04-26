@@ -36,12 +36,11 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
     private URL baseUrl;
     private String baseUrlString;
-
     private JarFile archive = null;
     protected Map<String,JarEntry> archiveEntries = null;
     protected final Object archiveLock = new Object();
     private long archiveUseCount = 0;
-
+    private JarContents jarContents;
 
     protected final void setBaseUrl(URL baseUrl) {
         this.baseUrl = baseUrl;
@@ -109,7 +108,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 }
             }
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     @Override
@@ -212,6 +211,14 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         WebResourceRoot root = getRoot();
 
         /*
+         * If jarContents reports that this resource definitely does not contain
+         * the path, we can end this method and move on to the next jar.
+         */
+        if (jarContents != null && !jarContents.mightContainResource(path, webAppMount)) {
+            return new EmptyResource(root, path);
+        }
+
+        /*
          * Implementation notes
          *
          * The path parameter passed into this method always starts with '/'.
@@ -305,6 +312,10 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         synchronized (archiveLock) {
             if (archive == null) {
                 archive = JreCompat.getInstance().jarFileNewInstance(getBase());
+                WebResourceRoot root = getRoot();
+                if ((root.getContext() != null) && root.getContext().getUseBloomFilterForArchives()) {
+                    jarContents = new JarContents(archive);
+                }
             }
             archiveUseCount++;
             return archive;
@@ -328,6 +339,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 }
                 archive = null;
                 archiveEntries = null;
+                jarContents = null;
             }
         }
     }

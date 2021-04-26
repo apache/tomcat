@@ -22,8 +22,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
 
 public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
 
@@ -53,7 +53,7 @@ public class WsRemoteEndpointImplClient extends WsRemoteEndpointImplBase {
             } else {
                 timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                 if (timeout < 0) {
-                    SendResult sr = new SendResult(new IOException("Blocking write timeout"));
+                    SendResult sr = new SendResult(new IOException(sm.getString("wsRemoteEndpoint.writeTimeout")));
                     handler.onResult(sr);
                 }
             }

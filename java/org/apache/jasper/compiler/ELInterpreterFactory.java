@@ -16,7 +16,7 @@
  */
 package org.apache.jasper.compiler;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.jasper.JspCompilationContext;
 

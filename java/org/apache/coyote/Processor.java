@@ -65,13 +65,17 @@ public interface Processor {
     boolean isAsync();
 
     /**
-     * Check this processor to see if the async timeout has expired and process
-     * a timeout if that is that case.
+     * Check this processor to see if the timeout has expired and process a
+     * timeout if that is that case.
+     * <p>
+     * Note: The name of this method originated with the Servlet 3.0
+     * asynchronous processing but evolved over time to represent a timeout that
+     * is triggered independently of the socket read/write timeouts.
      *
      * @param now The time (as returned by {@link System#currentTimeMillis()} to
-     *            use as the current time to determine whether the async timeout
-     *            has expired. If negative, the timeout will always be treated
-     *            as if it has expired.
+     *            use as the current time to determine whether the timeout has
+     *            expired. If negative, the timeout will always be treated as ifq
+     *            it has expired.
      */
     void timeoutAsync(long now);
 

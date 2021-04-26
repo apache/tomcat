@@ -35,12 +35,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -83,11 +83,15 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     @SuppressWarnings("unused")
     private static final boolean ignored = TesterSupport.OPENSSL_AVAILABLE;
 
-    private Tomcat tomcat;
-    private boolean accessLogEnabled = false;
+    // Used by parameterized tests. Defined here to reduce duplication.
+    protected static final Boolean[] booleans = new Boolean[] { Boolean.FALSE, Boolean.TRUE };
+
     protected static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
+
+    private Tomcat tomcat;
+    private boolean accessLogEnabled = false;
 
     /**
      * Make the Tomcat instance available to sub-classes.
@@ -166,12 +170,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         String protocol = getProtocol();
         Connector connector = new Connector(protocol);
         // Listen only on localhost
-        connector.setAttribute("address",
-                InetAddress.getByName("localhost").getHostAddress());
+        Assert.assertTrue(connector.setProperty("address", InetAddress.getByName("localhost").getHostAddress()));
         // Use random free port
         connector.setPort(0);
         // Mainly set to reduce timeouts during async tests
-        connector.setAttribute("connectionTimeout", "3000");
+        Assert.assertTrue(connector.setProperty("connectionTimeout", "3000"));
         tomcat.getService().addConnector(connector);
         tomcat.setConnector(connector);
 
@@ -181,7 +184,6 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             AprLifecycleListener listener = new AprLifecycleListener();
             listener.setSSLRandomSeed("/dev/urandom");
             server.addLifecycleListener(listener);
-            connector.setAttribute("pollerThreadCount", Integer.valueOf(1));
         }
 
         File catalinaBase = getTemporaryDirectory();
@@ -689,8 +691,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         connection.connect();
         int rc = connection.getResponseCode();
         if (resHead != null) {
-            Map<String, List<String>> head = connection.getHeaderFields();
-            resHead.putAll(head);
+            // Skip the entry with null key that is used for the response line
+            // that some Map implementations may not accept.
+            for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
+                if (entry.getKey() != null) {
+                    resHead.put(entry.getKey(), entry.getValue());
+                }
+            }
         }
         InputStream is;
         if (rc < 400) {
@@ -818,6 +825,29 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         } else {
             return statusLine.substring(9, 12);
         }
+    }
+
+    protected static String getSingleHeader(String header, Map<String,List<String>> headers) {
+        // Assume headers is never null
+
+        // Assume that either:
+        // a) is correct since HTTP headers are case insensitive but most Map
+        //    implementations are case-sensitive; or
+        // b) CaseInsensitiveKeyMap or similar is used
+        List<String> headerValues = headers.get(header);
+
+        // Looking for a single header. No matches are OK
+        if (headerValues == null) {
+            return null;
+        }
+
+        // Found a single header - return the header value
+        if (headerValues.size() == 1) {
+            return headerValues.get(0);
+        }
+
+        // More than one header value is an error
+        throw new IllegalStateException("Found multiple headers for [" + header + "]");
     }
 
     private static class TomcatWithFastSessionIDs extends Tomcat {

@@ -82,9 +82,9 @@ public class BackgroundProcessManager {
 
 
     private void process() {
-        Set<BackgroundProcess> currentProcesses = new HashSet<>();
+        Set<BackgroundProcess> currentProcesses;
         synchronized (processesLock) {
-            currentProcesses.addAll(processes);
+            currentProcesses = new HashSet<>(processes);
         }
         for (BackgroundProcess process : currentProcesses) {
             try {

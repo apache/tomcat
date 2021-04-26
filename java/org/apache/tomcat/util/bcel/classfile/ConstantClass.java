@@ -30,7 +30,7 @@ import org.apache.tomcat.util.bcel.Const;
  */
 public final class ConstantClass extends Constant {
 
-    private final int name_index; // Identical to ConstantString except for the name
+    private final int nameIndex; // Identical to ConstantString except for the name
 
 
     /**
@@ -41,14 +41,14 @@ public final class ConstantClass extends Constant {
      */
     ConstantClass(final DataInput dataInput) throws IOException {
         super(Const.CONSTANT_Class);
-        this.name_index = dataInput.readUnsignedShort();
+        this.nameIndex = dataInput.readUnsignedShort();
     }
 
 
     /**
      * @return Name index in constant pool of class name.
      */
-    public final int getNameIndex() {
-        return name_index;
+    public int getNameIndex() {
+        return nameIndex;
     }
 }

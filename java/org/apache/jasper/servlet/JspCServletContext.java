@@ -37,17 +37,17 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterRegistration;
-import javax.servlet.FilterRegistration.Dynamic;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.FilterRegistration.Dynamic;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
@@ -190,10 +190,7 @@ public class JspCServletContext implements ServletContext {
             throws JasperException {
         List<URL> resourceJars = new ArrayList<>();
         // Build list of potential resource JARs. Use same ordering as ContextConfig
-        Set<WebXml> resourceFragments = new LinkedHashSet<>();
-        for (WebXml fragment : orderedFragments) {
-            resourceFragments.add(fragment);
-        }
+        Set<WebXml> resourceFragments = new LinkedHashSet<>(orderedFragments);
         for (WebXml fragment : fragments) {
             if (!resourceFragments.contains(fragment)) {
                 resourceFragments.add(fragment);
@@ -206,7 +203,6 @@ public class JspCServletContext implements ServletContext {
                     // This is a resource JAR
                     resourceJars.add(resourceFragment.getURL());
                 }
-                jar.close();
             } catch (IOException ioe) {
                 throw new JasperException(ioe);
             }
@@ -382,7 +378,7 @@ public class JspCServletContext implements ServletContext {
     public URL getResource(String path) throws MalformedURLException {
 
         if (!path.startsWith("/")) {
-            throw new MalformedURLException("Path '" + path + "' does not start with '/'");
+            throw new MalformedURLException(Localizer.getMessage("jsp.error.URLMustStartWithSlash", path));
         }
 
         // Strip leading '/'
@@ -449,12 +445,12 @@ public class JspCServletContext implements ServletContext {
             if (theBaseDir.isDirectory()) {
                 String theFiles[] = theBaseDir.list();
                 if (theFiles != null) {
-                    for (int i = 0; i < theFiles.length; i++) {
-                        File testFile = new File(basePath + File.separator + theFiles[i]);
+                    for (String theFile : theFiles) {
+                        File testFile = new File(basePath + File.separator + theFile);
                         if (testFile.isFile()) {
-                            thePaths.add(path + theFiles[i]);
+                            thePaths.add(path + theFile);
                         } else if (testFile.isDirectory()) {
-                            thePaths.add(path + theFiles[i] + "/");
+                            thePaths.add(path + theFile + "/");
                         }
                     }
                 }
@@ -474,13 +470,13 @@ public class JspCServletContext implements ServletContext {
                         if (entryName.startsWith(jarPath) &&
                                 entryName.length() > jarPath.length()) {
                             // Let the Set implementation handle duplicates
-                            int sep = entryName.indexOf("/", jarPath.length());
+                            int sep = entryName.indexOf('/', jarPath.length());
                             if (sep < 0) {
-                                // This is a file
-                                thePaths.add(entryName.substring(jarPath.length() - 1));
+                                // This is a file - strip leading "META-INF/resources"
+                                thePaths.add(entryName.substring(18));
                             } else {
-                                // This is a directory
-                                thePaths.add(entryName.substring(jarPath.length() - 1, sep + 1));
+                                // This is a directory - strip leading "META-INF/resources"
+                                thePaths.add(entryName.substring(18, sep + 1));
                             }
                         }
                     }
@@ -499,7 +495,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getServerInfo() {
-        return "JspC/ApacheTomcat9";
+        return "JspC/ApacheTomcat10";
     }
 
 
@@ -679,7 +675,7 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
-    public javax.servlet.ServletRegistration.Dynamic addJspFile(String jspName, String jspFile) {
+    public jakarta.servlet.ServletRegistration.Dynamic addJspFile(String jspName, String jspFile) {
         return null;
     }
 

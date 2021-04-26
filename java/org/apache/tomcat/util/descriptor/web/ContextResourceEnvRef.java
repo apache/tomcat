@@ -63,7 +63,7 @@ public class ContextResourceEnvRef extends ResourceBase {
         }
         sb.append(", override=");
         sb.append(override);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

@@ -19,7 +19,6 @@ package org.apache.catalina.ant.jmx;
 import org.apache.tools.ant.BuildException;
 
 /**
- *
  * <b>Definition</b>:
  * <pre>
  *   &lt;path id="catalina_ant"&gt;
@@ -150,7 +149,7 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
      * @return true if there is no if condition, or the named property exists
      */
     protected boolean testIfCondition() {
-        if (ifCondition == null || "".equals(ifCondition)) {
+        if (ifCondition == null || ifCondition.isEmpty()) {
             return true;
         }
         return getProject().getProperty(ifCondition) != null;

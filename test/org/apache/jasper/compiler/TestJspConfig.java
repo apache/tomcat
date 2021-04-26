@@ -157,4 +157,22 @@ public class TestJspConfig extends TomcatBaseTest {
 
         Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
     }
+
+    @Test
+    public void testServlet50NoEL() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-5.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/el-as-literal.jsp");
+
+        String result = res.toString();
+
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+    }
 }

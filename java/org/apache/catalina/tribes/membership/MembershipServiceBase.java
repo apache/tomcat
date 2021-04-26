@@ -86,9 +86,9 @@ public abstract class MembershipServiceBase implements MembershipService, Member
     @Override
     public Member findMemberByName(String name) {
         Member[] currentMembers = getMembers();
-        for (int i = 0; i < currentMembers.length; i++) {
-            if (name.equals(currentMembers[i].toString()))
-                return currentMembers[i];
+        for (Member currentMember : currentMembers) {
+            if (name.equals(currentMember.toString()))
+                return currentMember;
         }
         return null;
     }

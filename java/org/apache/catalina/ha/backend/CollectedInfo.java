@@ -27,6 +27,7 @@ import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.res.StringManager;
 
 /*
  * Listener to provider informations to mod_heartbeat.c
@@ -36,6 +37,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * BTW:v  = version :-)
  */
 public class CollectedInfo {
+
+    private static final StringManager sm = StringManager.getManager(CollectedInfo.class);
 
     /* Collect info via JMX */
     protected MBeanServer mBeanServer = null;
@@ -90,8 +93,10 @@ public class CollectedInfo {
             objName = null;
             shost = null;
         }
-        if (objName == null)
-            throw new Exception("Can't find connector for " + host + ":" + port);
+        if (objName == null) {
+            throw new Exception(sm.getString("collectedInfo.noConnector",
+                    host, Integer.valueOf(port)));
+        }
         this.port = iport;
         this.host = shost;
 
@@ -99,7 +104,7 @@ public class CollectedInfo {
 
     public void refresh() throws Exception {
         if (mBeanServer == null || objName == null) {
-            throw new Exception("Not initialized!!!");
+            throw new Exception(sm.getString("collectedInfo.notInitialized"));
         }
         Integer imax = (Integer) mBeanServer.getAttribute(objName, "maxThreads");
 

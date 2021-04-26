@@ -51,7 +51,6 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
      */
     public DelegatingDatabaseMetaData(final DelegatingConnection<?> connection,
             final DatabaseMetaData databaseMetaData) {
-        super();
         this.connection = connection;
         this.databaseMetaData = databaseMetaData;
     }
@@ -130,7 +129,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     public boolean generatedKeyAlwaysReturned() throws SQLException {
         connection.checkOpen();
         try {
-            return databaseMetaData.generatedKeyAlwaysReturned();
+            return Jdbc41Bridge.generatedKeyAlwaysReturned(databaseMetaData);
         } catch (final SQLException e) {
             handleException(e);
             return false;
@@ -439,7 +438,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
      */
     public DatabaseMetaData getInnermostDelegate() {
         DatabaseMetaData m = databaseMetaData;
-        while (m != null && m instanceof DelegatingDatabaseMetaData) {
+        while (m instanceof DelegatingDatabaseMetaData) {
             m = ((DelegatingDatabaseMetaData) m).getDelegate();
             if (this == m) {
                 return null;
@@ -744,8 +743,8 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
             final String columnNamePattern) throws SQLException {
         connection.checkOpen();
         try {
-            return DelegatingResultSet.wrapResultSet(connection,
-                    databaseMetaData.getPseudoColumns(catalog, schemaPattern, tableNamePattern, columnNamePattern));
+            return DelegatingResultSet.wrapResultSet(connection, Jdbc41Bridge.getPseudoColumns(databaseMetaData,
+                    catalog, schemaPattern, tableNamePattern, columnNamePattern));
         } catch (final SQLException e) {
             handleException(e);
             throw new AssertionError();

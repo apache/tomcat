@@ -27,7 +27,7 @@ import javax.management.MBeanAttributeInfo;
  * @author Craig R. McClanahan
  */
 public class AttributeInfo extends FeatureInfo {
-    static final long serialVersionUID = -2511626862303972143L;
+    private static final long serialVersionUID = -2511626862303972143L;
 
     // ----------------------------------------------------- Instance Variables
     protected String displayName = null;

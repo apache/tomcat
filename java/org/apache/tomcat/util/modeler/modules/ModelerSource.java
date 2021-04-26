@@ -21,11 +21,13 @@ import java.util.List;
 import javax.management.ObjectName;
 
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Source for descriptor data. More sources can be added.
  */
 public abstract class ModelerSource {
+    protected static final StringManager sm = StringManager.getManager(Registry.class);
     protected Object source;
 
     /**

@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.http;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
@@ -38,14 +37,6 @@ public final class FastHttpDateFormat {
     private static final int CACHE_SIZE =
         Integer.parseInt(System.getProperty("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", "1000"));
 
-
-    /**
-     * The only date format permitted when generating HTTP headers.
-     *
-     * @deprecated Unused. This will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public static final String RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 
     // HTTP date formats
     private static final String DATE_RFC5322 = "EEE, dd MMM yyyy HH:mm:ss z";
@@ -114,21 +105,6 @@ public final class FastHttpDateFormat {
     /**
      * Get the HTTP format of the specified date.
      * @param value The date
-     * @param threadLocalformat Ignored. The local ConcurrentDateFormat will
-     *                          always be used.
-     * @return the HTTP date
-     *
-     * @deprecated Unused. This will be removed in Tomcat 10
-     */
-    @Deprecated
-    public static final String formatDate(long value, DateFormat threadLocalformat) {
-        return formatDate(value);
-    }
-
-
-    /**
-     * Get the HTTP format of the specified date.
-     * @param value The date
      * @return the HTTP date
      */
     public static final String formatDate(long value) {
@@ -145,23 +121,7 @@ public final class FastHttpDateFormat {
 
 
     /**
-     * Try to parse the given date as a HTTP date.
-     * @param value The HTTP date
-     * @param threadLocalformats Ignored. The local array of
-     *                           ConcurrentDateFormat will always be used.
-     * @return the date as a long
-     *
-     * @deprecated Unused. This will be removed in Tomcat 10
-     *             Use {@link #parseDate(String)}
-     */
-    @Deprecated
-    public static final long parseDate(String value, DateFormat[] threadLocalformats) {
-        return parseDate(value);
-    }
-
-
-    /**
-     * Try to parse the given date as a HTTP date.
+     * Try to parse the given date as an HTTP date.
      * @param value The HTTP date
      * @return the date as a long or <code>-1</code> if the value cannot be
      *         parsed

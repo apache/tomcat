@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -125,35 +126,52 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         if (isClosed()) {
             return;
         }
+        final List<Exception> thrownList = new ArrayList<>();
         try {
-            try {
-                if (connection != null) {
-                    connection.removeTrace(this);
-                    connection = null;
-                }
+            if (connection != null) {
+                connection.removeTrace(this);
+                connection = null;
+            }
 
-                // The JDBC spec requires that a statement close any open
-                // ResultSet's when it is closed.
-                // FIXME The PreparedStatement we're wrapping should handle this for us.
-                // See bug 17301 for what could happen when ResultSets are closed twice.
-                final List<AbandonedTrace> resultSets = getTrace();
-                if (resultSets != null) {
-                    final ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
-                    for (final ResultSet element : set) {
-                        element.close();
+            // The JDBC spec requires that a statement close any open
+            // ResultSet's when it is closed.
+            // FIXME The PreparedStatement we're wrapping should handle this for us.
+            // See bug 17301 for what could happen when ResultSets are closed twice.
+            final List<AbandonedTrace> resultSetList = getTrace();
+            if (resultSetList != null) {
+                final ResultSet[] resultSets = resultSetList.toArray(Utils.EMPTY_RESULT_SET_ARRAY);
+                for (final ResultSet resultSet : resultSets) {
+                    if (resultSet != null) {
+                        try {
+                            resultSet.close();
+                        } catch (final Exception e) {
+                            if (connection != null) {
+                                // Does not rethrow e.
+                                connection.handleExceptionNoThrow(e);
+                            }
+                            thrownList.add(e);
+                        }
                     }
-                    clearTrace();
                 }
-
-                if (statement != null) {
+                clearTrace();
+            }
+            if (statement != null) {
+                try {
                     statement.close();
+                } catch (final Exception e) {
+                    if (connection != null) {
+                        // Does not rethrow e.
+                        connection.handleExceptionNoThrow(e);
+                    }
+                    thrownList.add(e);
                 }
-            } catch (final SQLException e) {
-                handleException(e);
             }
         } finally {
             closed = true;
             statement = null;
+            if (!thrownList.isEmpty()) {
+                throw new SQLExceptionList(thrownList);
+            }
         }
     }
 
@@ -161,7 +179,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     public void closeOnCompletion() throws SQLException {
         checkOpen();
         try {
-            statement.closeOnCompletion();
+            Jdbc41Bridge.closeOnCompletion(statement);
         } catch (final SQLException e) {
             handleException(e);
         }
@@ -192,7 +210,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     @Override
-    public boolean execute(final String sql, final int columnIndexes[]) throws SQLException {
+    public boolean execute(final String sql, final int[] columnIndexes) throws SQLException {
         checkOpen();
         setLastUsedInParent();
         try {
@@ -204,7 +222,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     @Override
-    public boolean execute(final String sql, final String columnNames[]) throws SQLException {
+    public boolean execute(final String sql, final String[] columnNames) throws SQLException {
         checkOpen();
         setLastUsedInParent();
         try {
@@ -339,7 +357,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     @Override
-    public int executeUpdate(final String sql, final int columnIndexes[]) throws SQLException {
+    public int executeUpdate(final String sql, final int[] columnIndexes) throws SQLException {
         checkOpen();
         setLastUsedInParent();
         try {
@@ -351,7 +369,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     @Override
-    public int executeUpdate(final String sql, final String columnNames[]) throws SQLException {
+    public int executeUpdate(final String sql, final String[] columnNames) throws SQLException {
         checkOpen();
         setLastUsedInParent();
         try {
@@ -445,10 +463,9 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
      *
      * @see #getDelegate
      */
-    @SuppressWarnings("resource")
     public Statement getInnermostDelegate() {
         Statement s = statement;
-        while (s != null && s instanceof DelegatingStatement) {
+        while (s instanceof DelegatingStatement) {
             s = ((DelegatingStatement) s).getDelegate();
             if (this == s) {
                 return null;
@@ -615,7 +632,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     /*
-     * Note was protected prior to JDBC 4
+     * Note: This method was protected prior to JDBC 4.
      */
     @Override
     public boolean isClosed() throws SQLException {
@@ -630,7 +647,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     public boolean isCloseOnCompletion() throws SQLException {
         checkOpen();
         try {
-            return statement.isCloseOnCompletion();
+            return Jdbc41Bridge.isCloseOnCompletion(statement);
         } catch (final SQLException e) {
             handleException(e);
             return false;
@@ -790,7 +807,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
      * @return String
      */
     @Override
-    public String toString() {
+    public synchronized String toString() {
         return statement == null ? "NULL" : statement.toString();
     }
 

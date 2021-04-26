@@ -19,10 +19,12 @@ package org.apache.tomcat.util.net;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyStore;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.management.ObjectName;
+import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -63,6 +65,7 @@ public class SSLHostConfigCertificate implements Serializable {
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;
     private String certificateKeystoreType = DEFAULT_KEYSTORE_TYPE;
     private transient KeyStore certificateKeystore = null;
+    private transient X509KeyManager certificateKeyManager = null;
 
     // OpenSSL
     private String certificateChainFile;
@@ -210,6 +213,16 @@ public class SSLHostConfigCertificate implements Serializable {
     }
 
 
+    public void setCertificateKeyManager(X509KeyManager certificateKeyManager) {
+        this.certificateKeyManager = certificateKeyManager;
+    }
+
+
+    public X509KeyManager getCertificateKeyManager() {
+        return certificateKeyManager;
+    }
+
+
     // OpenSSL
 
     public void setCertificateChainFile(String certificateChainFile) {
@@ -268,9 +281,7 @@ public class SSLHostConfigCertificate implements Serializable {
         private Type(Authentication... authentications) {
             compatibleAuthentications = new HashSet<>();
             if (authentications != null) {
-                for (Authentication authentication : authentications) {
-                    compatibleAuthentications.add(authentication);
-                }
+                compatibleAuthentications.addAll(Arrays.asList(authentications));
             }
         }
 
@@ -279,7 +290,7 @@ public class SSLHostConfigCertificate implements Serializable {
         }
     }
 
-    private enum StoreType {
+    enum StoreType {
         KEYSTORE,
         PEM
     }

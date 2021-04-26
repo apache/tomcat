@@ -28,6 +28,7 @@ public class ContextEnvironment extends ResourceBase {
 
     private static final long serialVersionUID = 1L;
 
+
     // ------------------------------------------------------------- Properties
 
 
@@ -86,7 +87,7 @@ public class ContextEnvironment extends ResourceBase {
         }
         sb.append(", override=");
         sb.append(override);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
 
     }

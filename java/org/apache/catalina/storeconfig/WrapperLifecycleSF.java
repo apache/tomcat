@@ -47,8 +47,8 @@ public class WrapperLifecycleSF extends StoreFactoryBase {
                 getStoreAppender().printTagArray(aWriter, "WrapperLifecycle",
                         indent, listeners);
             }
-        } else
-            log.warn("Descriptor for element" + aElement.getClass()
-                    + ".[WrapperLifecycle] not configured!");
+        } else {
+            log.warn(sm.getString("storeFactory.noDescriptor", aElement.getClass(), "WrapperLifecycle"));
+        }
     }
 }

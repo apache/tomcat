@@ -17,7 +17,7 @@
 
 package org.apache.tomcat.util.net.openssl.ciphers;
 
-enum EncryptionLevel {
+public enum EncryptionLevel {
     STRONG_NONE,
     EXP40,
     EXP56,

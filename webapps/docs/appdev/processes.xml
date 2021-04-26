@@ -66,7 +66,7 @@ once (no matter how many web applications you plan to develop).</p>
     logged in, and have the security role <code>manager-script</code> assigned
     to him or her.  How such users are defined depends on which Realm you have
     configured in Tomcat's <code>conf/server.xml</code> file -- see the
-    <a href="../realm-howto.html">Realm Configuration HOW-TO</a> for more
+    <a href="../realm-howto.html">Realm Configuration How-To</a> for more
     information.  You may define any number of users (with any username
     and password that you like) with the <code>manager-script</code> role.
     </p></li>
@@ -126,7 +126,7 @@ the sample <code>build.xml</code> script.  At a minimum, you will generally
 need to define the <code>catalina.home</code> property defining where
 Tomcat is installed, and the manager application username and password.
 You might end up with something like this:</p>
-<source><![CDATA[# Context path to install this application on
+<source># Context path to install this application on
 app.path=/hello
 
 # Tomcat installation directory
@@ -134,7 +134,7 @@ catalina.home=/usr/local/apache-tomcat-<version-major-minor/>
 
 # Manager webapp username and password
 manager.username=myusername
-manager.password=mypassword]]></source>
+manager.password=mypassword</source>
 
 <p>In general, you will <strong>not</strong> want to check the
 <code>build.properties</code> file in to the CVS repository, because it
