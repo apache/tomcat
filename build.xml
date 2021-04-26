@@ -194,7 +194,10 @@
 
   <!-- Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721 -->
   <available file="/dev/urandom" property="test.jvmarg.egd" value="-Djava.security.egd=file:/dev/./urandom"/>
-  <property name="test.jvmarg.egd" value="" />
+  <!-- JREs may fail to start with an empty argument so provide a dummy      -->
+  <!-- value here for those cases, such as Windows, where no value will be   -->
+  <!-- set above.                                                            -->
+  <property name="test.jvmarg.egd" value="-Dignore" />
 
   <!-- Location of OpenSSL binary (file name, not directory) -->
   <!-- The OpenSSL tests cases be disabled by specifying an invalid path here -->
