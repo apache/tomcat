@@ -120,7 +120,7 @@
 -->
 <section name="Tomcat 7.0.110 (violetagg)" rtext="in development">
 </section>
-<section name="Tomcat 7.0.109 (violetagg)" rtext="release in progress">
+<section name="Tomcat 7.0.109 (violetagg)" rtext="released 2021-04-26">
   <subsection name="Catalina">
     <changelog>
       <fix>
