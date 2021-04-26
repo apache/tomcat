@@ -158,6 +158,10 @@
         <bug>65235</bug>: Correct name of <code>changeLocalName</code> in the
         documentation for the <code>RemoteIpValve</code>. (markt)
       </fix>
+      <fix>
+        <bug>65265</bug>: Avoid getting the boot classpath when it is not
+        available in the Manager diagnostics. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
