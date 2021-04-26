@@ -858,7 +858,7 @@
         provided JNDI context with a call to bind(), unbind(),
         createSubContext(), destroySubContext() or close() will trigger a
         <code>javax.naming.OperationNotSupportedException</code> as required by
-        section EE.5.3.4 of the Java EE specification. This exception can be
+        section EE.5.3.4 of the Jakarta EE specification. This exception can be
         disabled by setting this attribute to false in which case any calls to
         modify the JNDI context will return <b>without</b> making any changes
         and methods that return values will return <code>null</code>. If not
@@ -900,8 +900,7 @@
       <attribute name="useNaming" required="false">
         <p>Set to <code>true</code> (the default) to have Catalina enable a
         JNDI <code>InitialContext</code> for this web application that is
-        compatible with Java2 Enterprise Edition (J2EE) platform
-        conventions.</p>
+        compatible with Jakarta EE platform conventions.</p>
       </attribute>
 
       <attribute name="workDir" required="false">

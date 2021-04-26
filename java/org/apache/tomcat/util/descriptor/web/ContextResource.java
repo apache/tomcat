@@ -64,7 +64,7 @@ public class ContextResource extends ResourceBase {
 
     /**
      * Is this resource known to be a singleton resource. The default value is
-     * true since this is what users expect although the JavaEE spec implies
+     * true since this is what users expect although the Jakarta EE spec implies
      * that the default should be false.
      */
     private boolean singleton = true;

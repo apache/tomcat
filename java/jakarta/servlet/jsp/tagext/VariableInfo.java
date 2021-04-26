@@ -49,7 +49,7 @@ package jakarta.servlet.jsp.tagext;
  * Frequently a fully qualified class name will refer to a class that is known
  * to the tag library and thus, delivered in the same JAR file as the tag
  * handlers. In most other remaining cases it will refer to a class that is in
- * the platform on which the JSP processor is built (like J2EE). Using fully
+ * the platform on which the JSP processor is built. Using fully
  * qualified class names in this manner makes the usage relatively resistant to
  * configuration errors.
  * <p>

@@ -60,7 +60,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Holds and manages the naming resources defined in the J2EE Enterprise
+ * Holds and manages the naming resources defined in the Jakarta EE
  * Naming Context and their associated JNDI context.
  *
  * @author Remy Maucherat

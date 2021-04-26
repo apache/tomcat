@@ -272,7 +272,7 @@
                type="boolean"/>
 
     <attribute name="server"
-               description="The J2EE Server this module is deployed on"
+               description="The Jakarta EE Server this module is deployed on"
                type="java.lang.String"/>
 
     <attribute name="sessionCookieName"
