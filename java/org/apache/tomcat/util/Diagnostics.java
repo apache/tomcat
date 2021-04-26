@@ -559,7 +559,9 @@ public class Diagnostics {
 
         sb.append(requestedSm.getString("diagnostics.vmInfoPath"));
         sb.append(":" + CRLF);
-        sb.append(INDENT1 + "bootClassPath: " + runtimeMXBean.getBootClassPath() + CRLF);
+        if (runtimeMXBean.isBootClassPathSupported()) {
+            sb.append(INDENT1 + "bootClassPath: " + runtimeMXBean.getBootClassPath() + CRLF);
+        }
         sb.append(INDENT1 + "classPath: " + runtimeMXBean.getClassPath() + CRLF);
         sb.append(INDENT1 + "libraryPath: " + runtimeMXBean.getLibraryPath() + CRLF);
         sb.append(CRLF);
