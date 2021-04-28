@@ -568,7 +568,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 } else if (prevChr == Constants.CR && chr == Constants.LF) {
                     end = pos - 1;
                     parsingRequestLineEol = true;
-                } else if (!HttpParser.isHttpProtocol(chr)) {
+                } else if (prevChr == Constants.CR || !HttpParser.isHttpProtocol(chr)) {
                     String invalidProtocol = parseInvalid(parsingRequestLineStart, byteBuffer);
                     throw new IllegalArgumentException(sm.getString("iib.invalidHttpProtocol", invalidProtocol));
                 }
