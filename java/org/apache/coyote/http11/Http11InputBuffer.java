@@ -638,7 +638,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         while (buffer.hasRemaining() && b != 0x20) {
             b = buffer.get();
         }
-        String result = HeaderUtil.toPrintableString(buffer.array(), buffer.arrayOffset() + startPos, buffer.position() - startPos - 1);
+        String result = HeaderUtil.toPrintableString(buffer.array(), buffer.arrayOffset() + startPos, buffer.position() - startPos);
         if (b != 0x20) {
             // Ran out of buffer rather than found a space
             result = result + "...";
