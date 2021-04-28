@@ -138,6 +138,11 @@
         protocol component of the request line are rejected with a 400 response
         rather than some requests being rejected with a 505 response. (markt)
       </fix>
+      <fix>
+        When generating the error message for an HTTP request with an invalid
+        request line, ensure that all the available data is included in the
+        error message. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
