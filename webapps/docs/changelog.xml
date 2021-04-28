@@ -186,6 +186,11 @@
         <bug>65218</bug>: Update the version number shown on the left-hand
         banner of the Tomcat installer for Windows to Apache Tomcat 10. (markt)
       </fix>
+      <fix>
+        Move <code>SystemPropertySource</code> to be a regular class to allow
+        more precise configuration if needed. The system property source will
+        still always be enabled. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
