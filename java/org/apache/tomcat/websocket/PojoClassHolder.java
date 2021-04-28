@@ -54,7 +54,7 @@ public class PojoClassHolder implements ClientEndpointHolder {
             } else {
                 pojo = instanceManager.newInstance(pojoClazz);
             }
-            return new PojoEndpointClient(pojo, clientEndpointConfig.getDecoders());
+            return new PojoEndpointClient(pojo, clientEndpointConfig.getDecoders(), instanceManager);
         } catch (ReflectiveOperationException | SecurityException | NamingException e) {
             throw new DeploymentException(sm.getString("clientEndpointHolder.instanceCreationFailed"), e);
         }

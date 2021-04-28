@@ -55,6 +55,6 @@ public class PojoHolder implements ClientEndpointHolder {
                 throw new DeploymentException(sm.getString("clientEndpointHolder.instanceRegistrationFailed"), e);
             }
         }
-        return new PojoEndpointClient(pojo, clientEndpointConfig.getDecoders());
+        return new PojoEndpointClient(pojo, clientEndpointConfig.getDecoders(), instanceManager);
     }
 }
