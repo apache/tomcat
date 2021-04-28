@@ -166,6 +166,11 @@
         Update the packaged version of the Tomcat Native Library to 1.2.28.
         (markt)
       </update>
+      <fix>
+        Move <code>SystemPropertySource</code> to be a regular class to allow
+        more precise configuration if needed. The system property source will
+        still always be enabled. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
