@@ -182,6 +182,11 @@
       <update>
         Update the CXF module to Apache CXF 3.4.3. (remm)
       </update>
+      <fix>
+        Move <code>SystemPropertySource</code> to be a regular class to allow
+        more precise configuration if needed. The system property source will
+        still always be enabled. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
