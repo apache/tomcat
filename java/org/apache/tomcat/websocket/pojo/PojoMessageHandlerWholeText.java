@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.naming.NamingException;
 import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.Decoder.Text;
@@ -73,13 +74,11 @@ public class PojoMessageHandlerWholeText
             if (decoderClazzes != null) {
                 for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
                     if (Text.class.isAssignableFrom(decoderClazz)) {
-                        Text<?> decoder = (Text<?>) decoderClazz.getConstructor().newInstance();
+                        Text<?> decoder = (Text<?>) createDecoderInstance(decoderClazz);
                         decoder.init(config);
                         decoders.add(decoder);
-                    } else if (TextStream.class.isAssignableFrom(
-                            decoderClazz)) {
-                        TextStream<?> decoder =
-                                (TextStream<?>) decoderClazz.getConstructor().newInstance();
+                    } else if (TextStream.class.isAssignableFrom(decoderClazz)) {
+                        TextStream<?> decoder = (TextStream<?>) createDecoderInstance(decoderClazz);
                         decoder.init(config);
                         decoders.add(decoder);
                     } else {
@@ -87,7 +86,7 @@ public class PojoMessageHandlerWholeText
                     }
                 }
             }
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | NamingException e) {
             throw new IllegalArgumentException(e);
         }
     }

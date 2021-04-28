@@ -21,11 +21,16 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.NamingException;
 import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
 
 /**
@@ -37,6 +42,9 @@ import org.apache.tomcat.websocket.WsSession;
 public abstract class PojoMessageHandlerWholeBase<T>
         extends PojoMessageHandlerBase<T> implements MessageHandler.Whole<T> {
 
+    private final Log log = LogFactory.getLog(PojoMessageHandlerWholeBase.class);  // must not be static
+    private static final StringManager sm = StringManager.getManager(PojoMessageHandlerWholeBase.class);
+
     protected final List<Decoder> decoders = new ArrayList<>();
 
     public PojoMessageHandlerWholeBase(Object pojo, Method method,
@@ -44,6 +52,17 @@ public abstract class PojoMessageHandlerWholeBase<T>
             boolean convert, int indexSession, long maxMessageSize) {
         super(pojo, method, session, params, indexPayload, convert,
                 indexSession, maxMessageSize);
+    }
+
+
+    protected Decoder createDecoderInstance(Class<? extends Decoder> clazz)
+            throws ReflectiveOperationException, NamingException {
+        InstanceManager instanceManager = ((WsSession) session).getInstanceManager();
+        if (instanceManager == null) {
+            return clazz.getConstructor().newInstance();
+        } else {
+            return (Decoder) instanceManager.newInstance(clazz);
+        }
     }
 
 
@@ -91,8 +110,17 @@ public abstract class PojoMessageHandlerWholeBase<T>
 
 
     protected void onClose() {
+        InstanceManager instanceManager = ((WsSession) session).getInstanceManager();
+
         for (Decoder decoder : decoders) {
             decoder.destroy();
+            if (instanceManager != null) {
+                try {
+                    instanceManager.destroyInstance(decoder);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    log.warn(sm.getString("pojoMessageHandlerWholeBase.decodeDestoryFailed", decoder.getClass()), e);
+                }
+            }
         }
     }
 
