@@ -99,7 +99,7 @@ public class TesterWsClientAutobahn {
         List<Extension> extensions = new ArrayList<>(1);
         extensions.add(permessageDeflate);
 
-        Endpoint ep = new PojoEndpointClient(testCaseClient, null);
+        Endpoint ep = new PojoEndpointClient(testCaseClient, null, null);
         ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
         ClientEndpointConfig config = builder.extensions(extensions).build();
 
