@@ -74,6 +74,13 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
                 CRLF,
                 Boolean.FALSE, parameterSets);
 
+        // Standard HTTP/1.1 request with invalid HTTP protocol
+        addRequestWithSplits("GET /test HTTP/" + CR + "1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF,
+                Boolean.FALSE, Boolean.FALSE, parameterSets);
+
         // Invalid HTTP/1.1 request
         addRequestWithSplits("GET /te<st HTTP/1.1" + CRLF +
                 "Host: localhost:8080" + CRLF +
