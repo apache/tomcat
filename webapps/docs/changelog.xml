@@ -131,6 +131,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Ensure that all HTTP requests that contain an invalid character in the
+        protocol component of the request line are rejected with a 400 response
+        rather than some requests being rejected with a 505 response. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <scode>
