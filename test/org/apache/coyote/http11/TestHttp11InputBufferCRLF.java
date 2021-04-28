@@ -109,6 +109,14 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
                 CRLF,
                 Boolean.FALSE, Boolean.FALSE, parameterSets);
 
+        // Standard HTTP/1.1 request using LF rather than CRLF
+        addRequestWithSplits("GET /test HTTP/1.1" + LF +
+                "Host: localhost:8080" + LF +
+                "Connection: close" + LF +
+                LF,
+                Boolean.FALSE, parameterSets);
+
+
         return parameterSets;
     }
 
