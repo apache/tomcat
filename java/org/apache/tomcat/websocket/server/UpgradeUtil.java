@@ -219,13 +219,9 @@ public class UpgradeUtil {
         try {
             Class<?> clazz = sec.getEndpointClass();
             if (Endpoint.class.isAssignableFrom(clazz)) {
-                ep = (Endpoint) sec.getConfigurator().getEndpointInstance(
-                        clazz);
+                ep = (Endpoint) sec.getConfigurator().getEndpointInstance(clazz);
             } else {
-                ep = new PojoEndpointServer();
-                // Need to make path params available to POJO
-                perSessionServerEndpointConfig.getUserProperties().put(
-                        org.apache.tomcat.websocket.pojo.Constants.POJO_PATH_PARAM_KEY, pathParams);
+                ep = new PojoEndpointServer(pathParams);
             }
         } catch (InstantiationException e) {
             throw new ServletException(e);
