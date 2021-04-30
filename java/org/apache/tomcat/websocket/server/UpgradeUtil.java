@@ -31,7 +31,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.websocket.Endpoint;
 import javax.websocket.Extension;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.server.ServerEndpointConfig;
@@ -44,7 +43,6 @@ import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.TransformationFactory;
 import org.apache.tomcat.websocket.Util;
 import org.apache.tomcat.websocket.WsHandshakeResponse;
-import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 
 public class UpgradeUtil {
 
@@ -215,21 +213,9 @@ public class UpgradeUtil {
             }
         }
 
-        Endpoint ep;
-        try {
-            Class<?> clazz = sec.getEndpointClass();
-            if (Endpoint.class.isAssignableFrom(clazz)) {
-                ep = (Endpoint) sec.getConfigurator().getEndpointInstance(clazz);
-            } else {
-                ep = new PojoEndpointServer(pathParams);
-            }
-        } catch (InstantiationException e) {
-            throw new ServletException(e);
-        }
-
         WsHttpUpgradeHandler wsHandler =
                 req.upgrade(WsHttpUpgradeHandler.class);
-        wsHandler.preInit(ep, perSessionServerEndpointConfig, sc, wsRequest,
+        wsHandler.preInit(perSessionServerEndpointConfig, sc, wsRequest,
                 negotiatedExtensionsPhase2, subProtocol, transformation, pathParams,
                 req.isSecure());
 
