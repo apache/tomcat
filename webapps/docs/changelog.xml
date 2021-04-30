@@ -162,6 +162,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <scode>
+        Refactor the way Tomcat passes path parameters to POJO end points to
+        simplify the code. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
