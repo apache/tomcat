@@ -506,10 +506,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         // Switch to WebSocket
         WsRemoteEndpointImplClient wsRemoteEndpointClient = new WsRemoteEndpointImplClient(channel);
 
-        WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
-                this, null, null, null, null, null, extensionsAgreed,
-                subProtocol, Collections.<String,String>emptyMap(), secure,
-                clientEndpointConfiguration);
+        WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient, this, extensionsAgreed, subProtocol,
+                Collections.<String,String>emptyMap(), secure, clientEndpointConfiguration);
 
         WsFrameClient wsFrameClient = new WsFrameClient(response, channel,
                 wsSession, transformation);

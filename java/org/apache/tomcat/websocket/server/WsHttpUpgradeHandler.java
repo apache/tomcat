@@ -82,12 +82,11 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     }
 
 
-    public void preInit(Endpoint ep, ServerEndpointConfig serverEndpointConfig,
+    public void preInit(ServerEndpointConfig serverEndpointConfig,
             WsServerContainer wsc, WsHandshakeRequest handshakeRequest,
             List<Extension> negotiatedExtensionsPhase2, String subProtocol,
             Transformation transformation, Map<String,String> pathParameters,
             boolean secure) {
-        this.ep = ep;
         this.serverEndpointConfig = serverEndpointConfig;
         this.webSocketContainer = wsc;
         this.handshakeRequest = handshakeRequest;
@@ -101,7 +100,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
     @Override
     public void init(WebConnection connection) {
-        if (ep == null) {
+        if (serverEndpointConfig == null) {
             throw new IllegalStateException(
                     sm.getString("wsHttpUpgradeHandler.noPreInit"));
         }
@@ -120,13 +119,14 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         t.setContextClassLoader(applicationClassLoader);
         try {
             wsRemoteEndpointServer = new WsRemoteEndpointImplServer(socketWrapper, upgradeInfo, webSocketContainer);
-            wsSession = new WsSession(ep, wsRemoteEndpointServer,
+            wsSession = new WsSession(wsRemoteEndpointServer,
                     webSocketContainer, handshakeRequest.getRequestURI(),
                     handshakeRequest.getParameterMap(),
                     handshakeRequest.getQueryString(),
                     handshakeRequest.getUserPrincipal(), httpSessionId,
                     negotiatedExtensions, subProtocol, pathParameters, secure,
                     serverEndpointConfig);
+            ep = wsSession.getLocal();
             wsFrame = new WsFrameServer(socketWrapper, upgradeInfo, wsSession, transformation,
                     applicationClassLoader);
             // WsFrame adds the necessary final transformations. Copy the
