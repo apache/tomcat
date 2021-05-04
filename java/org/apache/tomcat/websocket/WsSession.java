@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.naming.NamingException;
+
 import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCode;
@@ -47,6 +49,7 @@ import jakarta.websocket.SendResult;
 import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
 import jakarta.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -55,8 +58,12 @@ import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
+import org.apache.tomcat.websocket.server.DefaultServerEndpointConfigurator;
 
 public class WsSession implements Session {
+
+    private final Log log = LogFactory.getLog(WsSession.class); // must not be static
+    private static final StringManager sm = StringManager.getManager(WsSession.class);
 
     // An ellipsis is a single character that looks like three periods in a row
     // and is used to indicate a continuation.
@@ -64,10 +71,16 @@ public class WsSession implements Session {
     // An ellipsis is three bytes in UTF-8
     private static final int ELLIPSIS_BYTES_LEN = ELLIPSIS_BYTES.length;
 
-    private static final StringManager sm = StringManager.getManager(WsSession.class);
+    private static final boolean SEC_CONFIGURATOR_USES_IMPL_DEFAULT;
+
     private static AtomicLong ids = new AtomicLong(0);
 
-    private final Log log = LogFactory.getLog(WsSession.class); // must not be static
+    static {
+        ServerEndpointConfig.Builder builder = ServerEndpointConfig.Builder.create(null, null);
+        ServerEndpointConfig sec = builder.build();
+        SEC_CONFIGURATOR_USES_IMPL_DEFAULT =
+                sec.getConfigurator().getClass().equals(DefaultServerEndpointConfigurator.class);
+    }
 
     private final Endpoint localEndpoint;
     private final WsRemoteEndpointImplBase wsRemoteEndpoint;
@@ -111,7 +124,7 @@ public class WsSession implements Session {
      * called will be used when calling
      * {@link Endpoint#onClose(Session, CloseReason)}.
      *
-     * @param localEndpoint        The end point managed by this code
+     * @param clientEndpointHolder The end point managed by this code
      * @param wsRemoteEndpoint     The other / remote end point
      * @param wsWebSocketContainer The container that created this session
      * @param negotiatedExtensions The agreed extensions to use for this session
@@ -126,12 +139,11 @@ public class WsSession implements Session {
      *                             end point
      * @throws DeploymentException if an invalid encode is specified
      */
-    public WsSession(Endpoint localEndpoint,
+    public WsSession(ClientEndpointHolder clientEndpointHolder,
             WsRemoteEndpointImplBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer,
             List<Extension> negotiatedExtensions, String subProtocol, Map<String, String> pathParameters,
             boolean secure, ClientEndpointConfig clientEndpointConfig) throws DeploymentException {
-        this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
         this.remoteEndpointAsync = new WsRemoteEndpointAsync(wsRemoteEndpoint);
@@ -165,13 +177,8 @@ public class WsSession implements Session {
         if (instanceManager == null) {
             instanceManager = InstanceManagerBindings.get(applicationClassLoader);
         }
-        if (instanceManager != null) {
-            try {
-                instanceManager.newInstance(localEndpoint);
-            } catch (Exception e) {
-                throw new DeploymentException(sm.getString("wsSession.instanceNew"), e);
-            }
-        }
+
+        this.localEndpoint = clientEndpointHolder.getInstance(instanceManager);
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("wsSession.created", id));
@@ -221,17 +228,6 @@ public class WsSession implements Session {
             List<Extension> negotiatedExtensions, String subProtocol, Map<String, String> pathParameters,
             boolean secure, ServerEndpointConfig serverEndpointConfig) throws DeploymentException {
 
-        try {
-            Class<?> clazz = serverEndpointConfig.getEndpointClass();
-            if (Endpoint.class.isAssignableFrom(clazz)) {
-                this.localEndpoint = (Endpoint) serverEndpointConfig.getConfigurator().getEndpointInstance(clazz);
-            } else {
-                this.localEndpoint = new PojoEndpointServer(pathParameters);
-            }
-        } catch (InstantiationException e) {
-            throw new DeploymentException(sm.getString("wsSession.instanceNew"), e);
-        }
-
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
         this.remoteEndpointAsync = new WsRemoteEndpointAsync(wsRemoteEndpoint);
@@ -269,17 +265,49 @@ public class WsSession implements Session {
         if (instanceManager == null) {
             instanceManager = InstanceManagerBindings.get(applicationClassLoader);
         }
-        if (instanceManager != null) {
-            try {
-                instanceManager.newInstance(localEndpoint);
-            } catch (Exception e) {
-                throw new DeploymentException(sm.getString("wsSession.instanceNew"), e);
+
+        Configurator configurator = serverEndpointConfig.getConfigurator();
+        Class<?> clazz = serverEndpointConfig.getEndpointClass();
+
+        Object endpointInstance;
+        try {
+            if (instanceManager == null || !isDefaultConfigurator(configurator)) {
+                endpointInstance = configurator.getEndpointInstance(clazz);
+                if (instanceManager != null) {
+                    try {
+                        instanceManager.newInstance(endpointInstance);
+                    } catch (ReflectiveOperationException | NamingException e) {
+                        throw new DeploymentException(sm.getString("wsSession.instanceNew"), e);
+                    }
+                }
+            } else {
+                endpointInstance = instanceManager.newInstance(clazz);
             }
+        } catch (ReflectiveOperationException | NamingException e) {
+            throw new DeploymentException(sm.getString("wsSession.instanceCreateFailed"), e);
+        }
+
+        if (endpointInstance instanceof Endpoint) {
+            this.localEndpoint = (Endpoint) endpointInstance;
+        } else {
+            this.localEndpoint = new PojoEndpointServer(pathParameters, endpointInstance);
         }
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("wsSession.created", id));
         }
+    }
+
+
+    private boolean isDefaultConfigurator(Configurator configurator) {
+        if (configurator.getClass().equals(DefaultServerEndpointConfigurator.class)) {
+            return true;
+        }
+        if (SEC_CONFIGURATOR_USES_IMPL_DEFAULT &&
+                configurator.getClass().equals(ServerEndpointConfig.Configurator.class)) {
+            return true;
+        }
+        return false;
     }
 
 
