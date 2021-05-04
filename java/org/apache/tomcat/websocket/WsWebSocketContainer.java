@@ -73,7 +73,6 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.KeyStoreUtil;
-import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
 
@@ -114,18 +113,29 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
     @Override
-    public Session connectToServer(Object pojo, URI path)
-            throws DeploymentException {
+    public Session connectToServer(Object pojo, URI path) throws DeploymentException {
+        ClientEndpointConfig config = createClientEndpointConfig(pojo.getClass());
+        ClientEndpointHolder holder = new PojoHolder(pojo, config);
+        return connectToServerRecursive(holder, config, path, new HashSet<>());
+    }
 
-        ClientEndpoint annotation =
-                pojo.getClass().getAnnotation(ClientEndpoint.class);
+
+    @Override
+    public Session connectToServer(Class<?> annotatedEndpointClass, URI path) throws DeploymentException {
+        ClientEndpointConfig config = createClientEndpointConfig(annotatedEndpointClass);
+        ClientEndpointHolder holder = new PojoClassHolder(annotatedEndpointClass, config);
+        return connectToServerRecursive(holder, config, path, new HashSet<>());
+    }
+
+
+    private ClientEndpointConfig createClientEndpointConfig(Class<?> annotatedEndpointClass)
+            throws DeploymentException {
+        ClientEndpoint annotation = annotatedEndpointClass.getAnnotation(ClientEndpoint.class);
         if (annotation == null) {
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.missingAnnotation",
-                            pojo.getClass().getName()));
+                            annotatedEndpointClass.getName()));
         }
-
-        Endpoint ep = new PojoEndpointClient(pojo, Arrays.asList(annotation.decoders()));
 
         Class<? extends ClientEndpointConfig.Configurator> configuratorClazz =
                 annotation.configurator();
@@ -151,59 +161,33 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 encoders(Arrays.asList(annotation.encoders())).
                 preferredSubprotocols(Arrays.asList(annotation.subprotocols())).
                 build();
-        return connectToServer(ep, config, path);
+
+        return config;
     }
 
 
     @Override
-    public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
-            throws DeploymentException {
-
-        Object pojo;
-        try {
-            pojo = annotatedEndpointClass.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.endpointCreateFail",
-                    annotatedEndpointClass.getName()), e);
-        }
-
-        return connectToServer(pojo, path);
+    public Session connectToServer(Class<? extends Endpoint> clazz, ClientEndpointConfig clientEndpointConfiguration,
+            URI path) throws DeploymentException {
+        ClientEndpointHolder holder = new EndpointClassHolder(clazz);
+        return connectToServerRecursive(holder, clientEndpointConfiguration, path, new HashSet<>());
     }
 
 
     @Override
-    public Session connectToServer(Class<? extends Endpoint> clazz,
-            ClientEndpointConfig clientEndpointConfiguration, URI path)
+    public Session connectToServer(Endpoint endpoint, ClientEndpointConfig clientEndpointConfiguration, URI path)
             throws DeploymentException {
-
-        Endpoint endpoint;
-        try {
-            endpoint = clazz.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.endpointCreateFail", clazz.getName()),
-                    e);
-        }
-
-        return connectToServer(endpoint, clientEndpointConfiguration, path);
+        ClientEndpointHolder holder = new EndpointHolder(endpoint);
+        return connectToServerRecursive(holder, clientEndpointConfiguration, path, new HashSet<>());
     }
 
 
-    @Override
-    public Session connectToServer(Endpoint endpoint,
-            ClientEndpointConfig clientEndpointConfiguration, URI path)
-            throws DeploymentException {
-        return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, new HashSet<>());
-    }
-
-    private Session connectToServerRecursive(Endpoint endpoint,
-            ClientEndpointConfig clientEndpointConfiguration, URI path,
-            Set<URI> redirectSet)
+    private Session connectToServerRecursive(ClientEndpointHolder clientEndpointHolder,
+            ClientEndpointConfig clientEndpointConfiguration, URI path, Set<URI> redirectSet)
             throws DeploymentException {
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("wsWebSocketContainer.connect.entry", endpoint.getClass().getName(), path));
+            log.debug(sm.getString("wsWebSocketContainer.connect.entry", clientEndpointHolder.getClassName(), path));
         }
 
         boolean secure = false;
@@ -397,7 +381,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                                 Integer.toString(maxRedirects)));
                     }
 
-                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, redirectLocation, redirectSet);
+                    return connectToServerRecursive(
+                            clientEndpointHolder, clientEndpointConfiguration, redirectLocation, redirectSet);
 
                 }
 
@@ -434,7 +419,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     userProperties.put(Constants.AUTHORIZATION_HEADER_NAME, auth.getAuthorization(
                             requestUri, wwwAuthenticateHeaders.get(0), userProperties));
 
-                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, redirectSet);
+                    return connectToServerRecursive(
+                            clientEndpointHolder, clientEndpointConfiguration, path, redirectSet);
 
                 } else {
                     throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
@@ -505,8 +491,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         // Switch to WebSocket
         WsRemoteEndpointImplClient wsRemoteEndpointClient = new WsRemoteEndpointImplClient(channel);
 
-        WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient, this, extensionsAgreed, subProtocol,
-                Collections.<String,String>emptyMap(), secure, clientEndpointConfiguration);
+        WsSession wsSession = new WsSession(clientEndpointHolder, wsRemoteEndpointClient, this, extensionsAgreed,
+                subProtocol, Collections.<String,String>emptyMap(), secure, clientEndpointConfiguration);
 
         WsFrameClient wsFrameClient = new WsFrameClient(response, channel,
                 wsSession, transformation);
@@ -514,8 +500,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         // completed transformation chain to the remote end point.
         wsRemoteEndpointClient.setTransformation(wsFrameClient.getTransformation());
 
-        endpoint.onOpen(wsSession, clientEndpointConfiguration);
-        registerSession(endpoint, wsSession);
+        wsSession.getLocal().onOpen(wsSession, clientEndpointConfiguration);
+        registerSession(wsSession.getLocal(), wsSession);
 
         /* It is possible that the server sent one or more messages as soon as
          * the WebSocket connection was established. Depending on the exact
