@@ -95,7 +95,9 @@ public class JavaClass {
         if (runtimeVisibleFieldOrMethodAnnotations != null) {
             for (Annotations annotations : runtimeVisibleFieldOrMethodAnnotations.toArray(new Annotations[0])) {
                 for (AnnotationEntry annotationEntry : annotations.getAnnotationEntries()) {
-                    annotationEntries.putIfAbsent(annotationEntry.getAnnotationType(), annotationEntry);
+                    if (!annotationEntries.containsKey(annotationEntry.getAnnotationType())) {
+                        annotationEntries.put(annotationEntry.getAnnotationType(), annotationEntry);
+                    }
                 }
             }
         }
