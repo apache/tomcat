@@ -749,7 +749,7 @@ public class WsSession implements Session {
 
         // Fire the onClose event
         Throwable throwable = null;
-        InstanceManager instanceManager = webSocketContainer.getInstanceManager(applicationClassLoader);
+        InstanceManager instanceManager = getInstanceManager();
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
