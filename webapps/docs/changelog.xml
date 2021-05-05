@@ -147,7 +147,7 @@
         <bug>65272</bug>: Restore the optional HTTP feature that allows
         <code>LF</code> to be treated as a line terminator for the request line
         and/or HTTP headers lines as well as the standard <code>CRLF</code>.
-        This behaviour was previously removed as a side-effect of the fix for 
+        This behaviour was previously removed as a side-effect of the fix for
         CVE-2020-1935. (markt)
       </fix>
     </changelog>
