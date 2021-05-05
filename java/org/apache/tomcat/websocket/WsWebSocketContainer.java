@@ -69,6 +69,7 @@ import jakarta.websocket.WebSocketContainer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
@@ -105,8 +106,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     private InstanceManager instanceManager;
 
-    InstanceManager getInstanceManager() {
-        return instanceManager;
+    protected InstanceManager getInstanceManager(ClassLoader classLoader) {
+        if (instanceManager  != null) {
+            return instanceManager;
+        }
+        return InstanceManagerBindings.get(classLoader);
     }
 
     protected void setInstanceManager(InstanceManager instanceManager) {
