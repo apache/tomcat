@@ -20,7 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.websocket.DecodeException;
@@ -40,8 +39,6 @@ public class PojoMessageHandlerWholeBinary
 
     private static final StringManager sm =
             StringManager.getManager(PojoMessageHandlerWholeBinary.class);
-
-    private final List<Decoder> decoders = new ArrayList<>();
 
     private final boolean isForInputStream;
 
@@ -118,14 +115,6 @@ public class PojoMessageHandlerWholeBinary
             return new ByteArrayInputStream(array);
         } else {
             return array;
-        }
-    }
-
-
-    @Override
-    protected void onClose() {
-        for (Decoder decoder : decoders) {
-            decoder.destroy();
         }
     }
 }

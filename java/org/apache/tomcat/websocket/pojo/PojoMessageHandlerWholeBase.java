@@ -18,8 +18,11 @@ package org.apache.tomcat.websocket.pojo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.websocket.DecodeException;
+import jakarta.websocket.Decoder;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
 
@@ -33,6 +36,8 @@ import org.apache.tomcat.websocket.WsSession;
  */
 public abstract class PojoMessageHandlerWholeBase<T>
         extends PojoMessageHandlerBase<T> implements MessageHandler.Whole<T> {
+
+    protected final List<Decoder> decoders = new ArrayList<>();
 
     public PojoMessageHandlerWholeBase(Object pojo, Method method,
             Session session, Object[] params, int indexPayload,
@@ -84,11 +89,18 @@ public abstract class PojoMessageHandlerWholeBase<T>
         processResult(result);
     }
 
+
+    protected void onClose() {
+        for (Decoder decoder : decoders) {
+            decoder.destroy();
+        }
+    }
+
+
     protected Object convert(T message) {
         return message;
     }
 
 
     protected abstract Object decode(T message) throws DecodeException;
-    protected abstract void onClose();
 }
