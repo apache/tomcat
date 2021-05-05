@@ -18,9 +18,9 @@ package org.apache.tomcat.util.scan;
 
 import java.util.Set;
 
-import jakarta.servlet.ServletContainerInitializer;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.annotation.HandlesTypes;
+import javax.servlet.ServletContainerInitializer;
+import javax.servlet.ServletContext;
+import javax.servlet.annotation.HandlesTypes;
 
 import org.apache.tomcat.util.scan.TestClassParser.Foo;
 
