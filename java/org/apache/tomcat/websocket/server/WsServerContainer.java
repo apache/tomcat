@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import javax.naming.NamingException;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
@@ -250,7 +251,7 @@ public class WsServerContainer extends WsWebSocketContainer
             String path = annotation.value();
 
             // Validate encoders
-            validateEncoders(annotation.encoders());
+            validateEncoders(annotation.encoders(), getInstanceManager(Thread.currentThread().getContextClassLoader()));
 
             // ServerEndpointConfig
             Class<? extends Configurator> configuratorClazz =
@@ -465,17 +466,22 @@ public class WsServerContainer extends WsWebSocketContainer
     }
 
 
-    private static void validateEncoders(Class<? extends Encoder>[] encoders)
+    private static void validateEncoders(Class<? extends Encoder>[] encoders, InstanceManager instanceManager)
             throws DeploymentException {
 
         for (Class<? extends Encoder> encoder : encoders) {
-            // Need to instantiate decoder to ensure it is valid and that
-            // deployment can be failed if it is not
-            @SuppressWarnings("unused")
+            // Need to instantiate encoder to ensure it is valid and that
+            // deployment can be failed if it is not. The encoder is then
+            // discarded immediately.
             Encoder instance;
             try {
-                encoder.getConstructor().newInstance();
-            } catch(ReflectiveOperationException e) {
+                if (instanceManager == null) {
+                    instance = encoder.getConstructor().newInstance();
+                } else {
+                    instance = (Encoder) instanceManager.newInstance(encoder);
+                    instanceManager.destroyInstance(instance);
+                }
+            } catch(ReflectiveOperationException | NamingException e) {
                 throw new DeploymentException(sm.getString(
                         "serverContainer.encoderFail", encoder.getName()), e);
             }

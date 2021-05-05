@@ -180,9 +180,9 @@
         simplify the code. (markt)
       </scode>
       <fix>
-        <bug>65262</bug>: Refactor the creation of WebSocket end point instances
-        to be more IoC friendly. Instances are now created via the
-        <code>InstanceManager</code> where possible. (markt)
+        <bug>65262</bug>: Refactor the creation of WebSocket end point, decoder
+        and encoder instances to be more IoC friendly. Instances are now created
+        via the <code>InstanceManager</code> where possible. (markt)
       </fix>
     </changelog>
   </subsection>
