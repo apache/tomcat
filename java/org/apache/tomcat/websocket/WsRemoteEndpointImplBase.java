@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -33,6 +34,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.naming.NamingException;
+
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.DeploymentException;
@@ -45,6 +48,7 @@ import jakarta.websocket.SendResult;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Utf8Encoder;
 import org.apache.tomcat.util.res.StringManager;
@@ -704,10 +708,15 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         for (Class<? extends Encoder> encoderClazz :
                 endpointConfig.getEncoders()) {
             Encoder instance;
+            InstanceManager instanceManager = wsSession.getInstanceManager();
             try {
-                instance = encoderClazz.getConstructor().newInstance();
+                if (instanceManager == null) {
+                    instance = encoderClazz.getConstructor().newInstance();
+                } else {
+                    instance = (Encoder) instanceManager.newInstance(encoderClazz);
+                }
                 instance.init(endpointConfig);
-            } catch (ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException | NamingException e) {
                 throw new DeploymentException(
                         sm.getString("wsRemoteEndpoint.invalidEncoder",
                                 encoderClazz.getName()), e);
@@ -730,8 +739,16 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     public final void close() {
+        InstanceManager instanceManager = wsSession.getInstanceManager();
         for (EncoderEntry entry : encoderEntries) {
             entry.getEncoder().destroy();
+            if (instanceManager != null) {
+                try {
+                    instanceManager.destroyInstance(entry);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    log.warn(sm.getString("wsRemoteEndpoint.encoderDestoryFailed", encoder.getClass()), e);
+                }
+            }
         }
         // The transformation handles both input and output. It only needs to be
         // closed once so it is closed here on the output side.
