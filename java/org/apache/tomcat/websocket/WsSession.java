@@ -53,7 +53,6 @@ import javax.websocket.server.ServerEndpointConfig.Configurator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
@@ -172,12 +171,7 @@ public class WsSession implements Session {
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
 
-        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
-        if (instanceManager == null) {
-            instanceManager = InstanceManagerBindings.get(applicationClassLoader);
-        }
-
-        this.localEndpoint = clientEndpointHolder.getInstance(instanceManager);
+        this.localEndpoint = clientEndpointHolder.getInstance(getInstanceManager());
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("wsSession.created", id));
@@ -260,11 +254,7 @@ public class WsSession implements Session {
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
 
-        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
-        if (instanceManager == null) {
-            instanceManager = InstanceManagerBindings.get(applicationClassLoader);
-        }
-
+        InstanceManager instanceManager = getInstanceManager();
         Configurator configurator = serverEndpointConfig.getConfigurator();
         Class<?> clazz = serverEndpointConfig.getEndpointClass();
 
@@ -389,10 +379,7 @@ public class WsSession implements Session {
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
 
-        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
-        if (instanceManager == null) {
-            instanceManager = InstanceManagerBindings.get(applicationClassLoader);
-        }
+        InstanceManager instanceManager = getInstanceManager();
         if (instanceManager != null) {
             try {
                 instanceManager.newInstance(localEndpoint);
@@ -404,6 +391,11 @@ public class WsSession implements Session {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("wsSession.created", id));
         }
+    }
+
+
+    public InstanceManager getInstanceManager() {
+        return webSocketContainer.getInstanceManager(applicationClassLoader);
     }
 
 
@@ -757,10 +749,7 @@ public class WsSession implements Session {
 
         // Fire the onClose event
         Throwable throwable = null;
-        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
-        if (instanceManager == null) {
-            instanceManager = InstanceManagerBindings.get(applicationClassLoader);
-        }
+        InstanceManager instanceManager = webSocketContainer.getInstanceManager(applicationClassLoader);
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
