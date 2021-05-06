@@ -2995,17 +2995,14 @@ class Generator {
 
             String attrValue = attr.getValue();
             if (attrValue == null) {
-                if (attr.isNamedAttribute()) {
-                    if (n.checkIfAttributeIsJspFragment(attr.getName())) {
-                        // XXX - no need to generate temporary variable here
-                        attrValue = generateNamedAttributeJspFragment(attr
-                                .getNamedAttributeNode(), tagHandlerVar);
-                    } else {
-                        attrValue = generateNamedAttributeValue(attr
-                                .getNamedAttributeNode());
-                    }
+                // Must be a named attribute
+                if (n.checkIfAttributeIsJspFragment(attr.getName())) {
+                    // XXX - no need to generate temporary variable here
+                    attrValue = generateNamedAttributeJspFragment(attr
+                            .getNamedAttributeNode(), tagHandlerVar);
                 } else {
-                    return null;
+                    attrValue = generateNamedAttributeValue(attr
+                            .getNamedAttributeNode());
                 }
             }
 
