@@ -246,8 +246,17 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * If a file has a BOM, should that be used in preference to fileEncoding?
+     *
+     * - true  - BoM is stripped if present and any BoM found used to determine
+     *            the encoding used to read the resource. This is the default.
+     *
+     * - false - BoM is stripped and resource is read using the configured file
+     *            encoding (which will be the platform default if not explicitly
+     *            configured)
+     *
+     * - pass-through - as current false but does not strip the BoM from the output
      */
-    private boolean useBomIfPresent = true;
+    private String useBomIfPresent = "true";
 
     /**
      * Minimum size for sendfile usage in bytes.
@@ -335,8 +344,15 @@ public class DefaultServlet extends HttpServlet {
             }
         }
 
-        if (getServletConfig().getInitParameter("useBomIfPresent") != null) {
-            useBomIfPresent = Boolean.parseBoolean(getServletConfig().getInitParameter("useBomIfPresent"));
+        final String useBomIfPresentConfig = getServletConfig().getInitParameter("useBomIfPresent");
+        if (useBomIfPresentConfig != null) {
+            if (!Arrays.asList("true", "false", "pass-through").contains(useBomIfPresentConfig)) {
+                if (debug > 0) {
+                    log("DefaultServlet.init:  unsupported value " + useBomIfPresentConfig + " for useBomIfPresent." +
+                            " One of 'true', 'false', 'pass-through' is expected. Using 'true' by default.");
+                }
+            }
+            useBomIfPresent = useBomIfPresentConfig;
         }
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
@@ -1083,8 +1099,8 @@ public class DefaultServlet extends HttpServlet {
                             if (!renderResult.markSupported()) {
                                 renderResult = new BufferedInputStream(renderResult);
                             }
-                            Charset bomCharset = processBom(renderResult);
-                            if (bomCharset != null && useBomIfPresent) {
+                            Charset bomCharset = processBom(renderResult, isStripBOM());
+                            if (bomCharset != null && "true".equals(useBomIfPresent)) {
                                 inputEncoding = bomCharset.name();
                             }
                         }
@@ -1105,8 +1121,8 @@ public class DefaultServlet extends HttpServlet {
                             if (!source.markSupported()) {
                                 source = new BufferedInputStream(source);
                             }
-                            Charset bomCharset = processBom(source);
-                            if (bomCharset != null && useBomIfPresent) {
+                            Charset bomCharset = processBom(source, isStripBOM());
+                            if (bomCharset != null && "true".equals(useBomIfPresent)) {
                                 inputEncoding = bomCharset.name();
                             }
                             // Following test also ensures included resources
@@ -1213,11 +1229,20 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
+    /*
+     * useBomIfPresent can take 3 values (see init): true, false and pass-through
+     *
+     * When later is used, then we'll ignore the BOM and use the configured encoding
+     * but we'll also leave the BOM in the output as opposed to removing it
+     */
+    private boolean isStripBOM() {
+        return !"pass-through".equals(useBomIfPresent);
+    }
 
     /*
      * Code borrowed heavily from Jasper's EncodingDetector
      */
-    private static Charset processBom(InputStream is) throws IOException {
+    private static Charset processBom(final InputStream is, final boolean stripBOM) throws IOException {
         // Java supported character sets do not use BOMs longer than 4 bytes
         byte[] bom = new byte[4];
         is.mark(bom.length);
@@ -1226,7 +1251,7 @@ public class DefaultServlet extends HttpServlet {
 
         // BOMs are at least 2 bytes
         if (count < 2) {
-            skip(is, 0);
+            skip(is, 0, stripBOM);
             return null;
         }
 
@@ -1234,31 +1259,31 @@ public class DefaultServlet extends HttpServlet {
         int b0 = bom[0] & 0xFF;
         int b1 = bom[1] & 0xFF;
         if (b0 == 0xFE && b1 == 0xFF) {
-            skip(is, 2);
+            skip(is, 2, stripBOM);
             return StandardCharsets.UTF_16BE;
         }
         // Delay the UTF_16LE check if there are more that 2 bytes since it
         // overlaps with UTF-32LE.
         if (count == 2 && b0 == 0xFF && b1 == 0xFE) {
-            skip(is, 2);
+            skip(is, 2, stripBOM);
             return StandardCharsets.UTF_16LE;
         }
 
         // Remaining BOMs are at least 3 bytes
         if (count < 3) {
-            skip(is, 0);
+            skip(is, 0, stripBOM);
             return null;
         }
 
         // UTF-8 is only 3-byte BOM
         int b2 = bom[2] & 0xFF;
         if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
-            skip(is, 3);
+            skip(is, 3, stripBOM);
             return StandardCharsets.UTF_8;
         }
 
         if (count < 4) {
-            skip(is, 0);
+            skip(is, 0, stripBOM);
             return null;
         }
 
@@ -1275,18 +1300,18 @@ public class DefaultServlet extends HttpServlet {
         // won't see a UTF16-LE file with a BOM where the first real data is
         // 0x00 0x00
         if (b0 == 0xFF && b1 == 0xFE) {
-            skip(is, 2);
+            skip(is, 2, stripBOM);
             return StandardCharsets.UTF_16LE;
         }
 
-        skip(is, 0);
+        skip(is, 0, stripBOM);
         return null;
     }
 
 
-    private static void skip(InputStream is, int skip) throws IOException {
+    private static void skip(final InputStream is, int skip, final boolean stripBOM) throws IOException {
         is.reset();
-        while (skip-- > 0) {
+        while (stripBOM && skip-- > 0) {
             is.read();
         }
     }

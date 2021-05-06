@@ -17,10 +17,10 @@
 package org.apache.catalina.servlets;
 
 
-public class TestDefaultServletEncodingWithBom extends DefaultServletEncodingBaseTest {
+public class TestDefaultServletEncodingWithBomPassThrough extends DefaultServletEncodingBaseTest {
 
     @Override
     protected String getUseBom() {
-        return "true";
+        return "pass-through";
     }
 }

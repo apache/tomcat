@@ -46,6 +46,9 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.parser.MediaType;
 
+
+import static org.apache.commons.lang3.StringEscapeUtils.escapeJava;
+
 /*
  * Note: This test is split using two base classes. This is because, as a single
  *       test, it takes so long to run it dominates the time taken to run the
@@ -109,16 +112,24 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
     }
 
 
-    private static boolean getExpected(String fileEncoding, boolean useBom, String targetFile,
+    private static boolean getExpected(String fileEncoding, String useBom, String targetFile,
             String outputEncoding, boolean callSetCharacterEncoding, boolean useWriter) {
-        if (useWriter || callSetCharacterEncoding) {
+
+        if (targetFile.endsWith("-bom") && "pass-through".equals(useBom)) {
+            /*
+             * If the target file contains a bom and pass-through is used
+             * It should always fail because BOM will be kept untouched
+             * and may result in a different character in the output
+             */
+            return false;
+        } else if (useWriter || callSetCharacterEncoding) {
             /*
              * Using a writer or setting the output character encoding means the
              * response will specify a character set. These cases therefore
              * reduce to can the file be read with the correct encoding.
              * (Assuming any BOM is always skipped in the included output.)
              */
-            if (targetFile.endsWith("-bom") && useBom ||
+            if (targetFile.endsWith("-bom") && "true".equals(useBom) ||
                     targetFile.startsWith(fileEncoding) ||
                     targetFile.equals("cp1252") && fileEncoding.equals("iso-8859-1") ||
                     targetFile.equals("iso-8859-1") && fileEncoding.equals("cp1252")) {
@@ -160,7 +171,7 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
     public boolean useWriter;
 
 
-    protected abstract boolean getUseBom();
+    protected abstract String getUseBom();
 
 
     @Test
@@ -176,7 +187,7 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
         ctxt.setResponseCharacterEncoding(contextResponseEncoding);
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
         defaultServlet.addInitParameter("fileEncoding", fileEncoding);
-        defaultServlet.addInitParameter("useBomIfPresent", Boolean.toString(getUseBom()));
+        defaultServlet.addInitParameter("useBomIfPresent", getUseBom());
 
         ctxt.addServletMappingDecoded("/", "default");
 
@@ -215,24 +226,29 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
         String body = res.toString();
         /*
          * Remove BOM before checking content
-         * BOM (should be) removed by Tomcat when file is included
+         * BOM (should be) removed by Tomcat when file is included except if pass-through is used
          */
-        if (!useInclude && targetFile.endsWith("-bom")) {
+        if (!useInclude && targetFile.endsWith("-bom") && !"pass-through".equals(getUseBom())) {
             body = body.substring(1);
         }
 
-        if (expectedPass) {
-            if (useInclude) {
-                Assert.assertEquals("\u00bd-\u00bd-\u00bd", body);
-            } else {
-                Assert.assertEquals("\u00bd", body);
-            }
+        String expected;
+        if (useInclude) {
+            expected = "\u00bd-\u00bd-\u00bd";
         } else {
-            if (useInclude) {
-                Assert.assertNotEquals("\u00bd-\u00bd-\u00bd", body);
-            } else {
-                Assert.assertNotEquals("\u00bd", body);
-            }
+            expected = "\u00bd";
+        }
+
+        if (expectedPass) {
+            Assert.assertEquals(
+                    escapeJava(body) + "!=" + escapeJava(expected),
+                    expected, body);
+
+        } else {
+            Assert.assertNotEquals(
+                    escapeJava(body) + "==" + escapeJava(expected),
+                    expected, body);
+
         }
     }
 
