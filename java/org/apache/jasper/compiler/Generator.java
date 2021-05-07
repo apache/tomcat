@@ -3068,14 +3068,13 @@ class Generator {
                     // should the expression be evaluated before passing to
                     // the setter?
                     boolean evaluate = false;
-                    if (tai != null && tai.canBeRequestTime()) {
+                    if (tai.canBeRequestTime()) {
                         evaluate = true; // JSP.2.3.2
                     }
                     if (attr.isDeferredInput()) {
                         evaluate = false; // JSP.2.3.3
                     }
-                    if (attr.isDeferredInput() && tai != null &&
-                            tai.canBeRequestTime()) {
+                    if (attr.isDeferredInput() && tai.canBeRequestTime()) {
                         evaluate = !attrValue.contains("#{"); // JSP.2.3.5
                     }
                     if (evaluate) {
