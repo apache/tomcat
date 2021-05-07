@@ -225,6 +225,9 @@
         more precise configuration if needed. The system property source will
         still always be enabled. (remm)
       </fix>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
