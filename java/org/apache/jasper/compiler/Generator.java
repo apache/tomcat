@@ -3139,9 +3139,6 @@ class Generator {
                 String nameFrom = tagVar.getNameFromAttribute();
                 if (nameFrom != null) {
                     String aliasedName = n.getAttributeValue(nameFrom);
-                    if (aliasedName == null)
-                        continue;
-
                     if (!aliasSeen) {
                         out.printin("java.util.HashMap ");
                         aliasMapVar = tagHandlerVar + "_aliasMap";
