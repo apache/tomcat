@@ -103,7 +103,7 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 8.5.66 (markt)" rtext="in development">
+<section name="Tomcat 8.5.66 (markt)">
   <subsection name="Catalina">
     <changelog>
       <scode>
