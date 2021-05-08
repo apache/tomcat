@@ -113,7 +113,16 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/bnd-5.3.0-SNAPSHOT/biz.aQute.bnd-5.3.0-SNAPSHOT.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/bnd-5.3.0/biz.aQute.bnd-5.3.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$TOMCAT_BUILD_LIBS$/migration-1.0.0/jakartaee-migration-1.0.0-shaded.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
