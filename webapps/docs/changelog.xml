@@ -234,6 +234,10 @@
       <add>
         Improvements to Korean translations. (woonsan)
       </add>
+      <update>
+        Update the version of the Tomcat Migration Tool for Jakarta EE used to
+        provide automatic deployment for Java EE applications to 1.0.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
