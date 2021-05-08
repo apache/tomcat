@@ -29,6 +29,6 @@
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/hamcrest-2.2/hamcrest-2.2.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/cglib-3.3.0/cglib-nodep-3.3.0.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/objenesis-3.1/objenesis-3.1.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/bnd-5.3.0-SNAPSHOT/biz.aQute.bnd-5.3.0-SNAPSHOT.jar"/>
+    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/bnd-5.3.0/biz.aQute.bnd-5.3.0.jar"/>
     <classpathentry kind="output" path=".settings/output"/>
 </classpath>
