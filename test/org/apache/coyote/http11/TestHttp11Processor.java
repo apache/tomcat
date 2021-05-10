@@ -1838,47 +1838,53 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testTEHeaderUnknown01() throws Exception {
-        doTestTEHeaderUnknown("identity");
+        doTestTEHeaderInvalid("identity", false);
     }
 
 
     @Test
     public void testTEHeaderUnknown02() throws Exception {
-        doTestTEHeaderUnknown("identity, chunked");
+        doTestTEHeaderInvalid("identity, chunked", false);
     }
 
 
     @Test
     public void testTEHeaderUnknown03() throws Exception {
-        doTestTEHeaderUnknown("unknown, chunked");
+        doTestTEHeaderInvalid("unknown, chunked", false);
     }
 
 
     @Test
     public void testTEHeaderUnknown04() throws Exception {
-        doTestTEHeaderUnknown("void");
+        doTestTEHeaderInvalid("void", false);
     }
 
 
     @Test
     public void testTEHeaderUnknown05() throws Exception {
-        doTestTEHeaderUnknown("void, chunked");
+        doTestTEHeaderInvalid("void, chunked", false);
     }
 
 
     @Test
     public void testTEHeaderUnknown06() throws Exception {
-        doTestTEHeaderUnknown("void, identity");
+        doTestTEHeaderInvalid("void, identity", false);
     }
 
 
     @Test
     public void testTEHeaderUnknown07() throws Exception {
-        doTestTEHeaderUnknown("identity, void");
+        doTestTEHeaderInvalid("identity, void", false);
     }
 
 
-    private void doTestTEHeaderUnknown(String headerValue) throws Exception {
+    @Test
+    public void testTEHeaderChunkedNotLast01() throws Exception {
+        doTestTEHeaderInvalid("chunked, void", true);
+    }
+
+
+    private void doTestTEHeaderInvalid(String headerValue, boolean badRequest) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -1902,7 +1908,11 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.connect();
         client.processRequest(false);
 
-        Assert.assertTrue(client.isResponse501());
+        if (badRequest) {
+            Assert.assertTrue(client.isResponse400());
+        } else {
+            Assert.assertTrue(client.isResponse501());
+        }
     }
 
 
