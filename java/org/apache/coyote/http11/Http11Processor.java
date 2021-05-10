@@ -454,11 +454,8 @@ public class Http11Processor extends AbstractProcessor {
 
         // Parsing trims and converts to lower case.
 
-        if (encodingName.equals("identity")) {
-            // Skip
-        } else if (encodingName.equals("chunked")) {
-            inputBuffer.addActiveFilter
-                (inputFilters[Constants.CHUNKED_FILTER]);
+        if (encodingName.equals("chunked")) {
+            inputBuffer.addActiveFilter(inputFilters[Constants.CHUNKED_FILTER]);
             contentDelimitation = true;
         } else {
             for (int i = pluggableFilterIndex; i < inputFilters.length; i++) {
@@ -1001,7 +998,6 @@ public class Http11Processor extends AbstractProcessor {
                 List<String> encodingNames = new ArrayList<>();
                 if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
                     for (String encodingName : encodingNames) {
-                        // "identity" codings are ignored
                         addInputFilter(inputFilters, encodingName);
                     }
                 } else {
