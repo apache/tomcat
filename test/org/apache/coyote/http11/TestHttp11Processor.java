@@ -1904,4 +1904,32 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         Assert.assertTrue(client.isResponse501());
     }
+
+
+    @Test
+    public void testWithTEChunkedHttp10() throws Exception {
+
+        getTomcatInstanceTestWebapp(false, true);
+
+        String request =
+            "POST /test/echo-params.jsp HTTP/1.0" + SimpleHttpClient.CRLF +
+            "Host: any" + SimpleHttpClient.CRLF +
+            "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
+            "Content-Type: application/x-www-form-urlencoded" +
+                    SimpleHttpClient.CRLF +
+            "Connection: close" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF +
+            "9" + SimpleHttpClient.CRLF +
+            "test=data" + SimpleHttpClient.CRLF +
+            "0" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF;
+
+        Client client = new Client(getPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.getResponseBody().contains("test - data"));
+    }
 }
