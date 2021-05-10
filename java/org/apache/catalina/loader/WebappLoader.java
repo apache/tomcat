@@ -21,9 +21,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
-import java.lang.instrument.ClassFileTransformer;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -367,17 +365,14 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
 
             // Set Jakarta class converter
             if (getJakartaConverter() != null) {
-                ClassFileTransformer transformer = null;
+                EESpecProfile profile = null;
                 try {
-                    EESpecProfile profile = EESpecProfile.valueOf(getJakartaConverter());
-                    transformer = ClassConverter.class.getConstructor(EESpecProfile.class).newInstance(profile);
-                    // FIXME: after Migration 0.3
-                    //transformer = new ClassConverter(EESpecProfile.valueOf(getJakartaConverter()));
-                } catch (InvocationTargetException | NoSuchMethodException | IllegalArgumentException ignored) {
-                    // Use default value with no argument constructor
-                    transformer = new ClassConverter();
+                    profile = EESpecProfile.valueOf(getJakartaConverter());
+                } catch (IllegalArgumentException ignored) {
+                    // Use default value
+                    log.warn(sm.getString("webappLoader.unknownProfile", getJakartaConverter()));
                 }
-                classLoader.addTransformer(transformer);
+                classLoader.addTransformer((profile != null) ? new ClassConverter(profile) : new ClassConverter());
             }
 
             // Configure our repositories
