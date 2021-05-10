@@ -750,7 +750,9 @@ public class Http11Processor extends AbstractProcessor {
         InputFilter[] inputFilters = inputBuffer.getFilters();
 
         // Parse transfer-encoding header
-        if (http11) {
+        // HTTP specs say an HTTP 1.1 server should accept any recognised
+        // HTTP 1.x header from a 1.x client unless the specs says otherwise.
+        if (!http09) {
             MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
             if (transferEncodingValueMB != null) {
                 List<String> encodingNames = new ArrayList<>();

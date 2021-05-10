@@ -224,6 +224,10 @@
         in 2001. Requests using this transfer encoding will now receive a 501
         response. (markt)
       </fix>
+      <fix>
+        Process transfer encoding headers from both HTTP 1.0 and HTTP 1.1
+        clients. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
