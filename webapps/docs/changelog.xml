@@ -192,6 +192,12 @@
         the empty token is at the start, middle or end of the list of tokens.
         (markt)
       </fix>
+      <fix>
+        Remove support for the <code>identity</code> transfer encoding. The
+        inclusion of this encoding in RFC 2616 was an error that was corrected
+        in 2001. Requests using this transfer encoding will now receive a 501
+        response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
