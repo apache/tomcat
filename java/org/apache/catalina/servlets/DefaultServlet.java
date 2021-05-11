@@ -41,8 +41,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -257,6 +259,8 @@ public class DefaultServlet extends HttpServlet {
      * - pass-through - as current false but does not strip the BoM from the output
      */
     private String useBomIfPresent = "true";
+    private static final Set<String> ALLOWED_BOM_CONFIG_PARAMS =
+            new HashSet<>(Arrays.asList("true", "false", "pass-through"));
 
     /**
      * Minimum size for sendfile usage in bytes.
@@ -346,11 +350,11 @@ public class DefaultServlet extends HttpServlet {
 
         final String useBomIfPresentConfig = getServletConfig().getInitParameter("useBomIfPresent");
         if (useBomIfPresentConfig != null) {
-            if (!Arrays.asList("true", "false", "pass-through").contains(useBomIfPresentConfig)) {
-                if (debug > 0) {
-                    log("DefaultServlet.init:  unsupported value " + useBomIfPresentConfig + " for useBomIfPresent." +
-                            " One of 'true', 'false', 'pass-through' is expected. Using 'true' by default.");
-                }
+            if (!ALLOWED_BOM_CONFIG_PARAMS.contains(useBomIfPresentConfig) && debug > 0) {
+                log("DefaultServlet.init:  " +
+                        "unsupported value " + useBomIfPresentConfig + " for useBomIfPresent. " +
+                        "One of " + String.join(",", ALLOWED_BOM_CONFIG_PARAMS) +
+                        " is expected. Using 'true' by default.");
             }
             useBomIfPresent = useBomIfPresentConfig;
         }
