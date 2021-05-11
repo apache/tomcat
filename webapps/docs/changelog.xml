@@ -104,6 +104,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.67 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <scode>
+        Review code used to generate Java source from JSPs and tags and remove
+        code found to be unnecessary. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.66 (markt)" rtext="release in progress">
   <subsection name="Catalina">
