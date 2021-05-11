@@ -120,6 +120,10 @@ public abstract class DefaultServletEncodingBaseTest extends TomcatBaseTest {
              * If the target file contains a bom and pass-through is used
              * It should always fail because BOM will be kept untouched
              * and may result in a different character in the output
+             *
+             * We could differentiate iso-8859-1 and cp1252 but we would need logic here and in
+             * the asserts and that would make the logic in the test as complex as the code
+             * under test.
              */
             return false;
         } else if (useWriter || callSetCharacterEncoding) {
