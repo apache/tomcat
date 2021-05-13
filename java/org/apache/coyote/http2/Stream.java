@@ -655,7 +655,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 state.sendReset();
                 handler.sendStreamReset(se);
                 cancelAllocationRequests();
-                inputBuffer.swallowUnread();
+                if (inputBuffer != null) {
+                    inputBuffer.swallowUnread();
+                }
             } catch (IOException ioe) {
                 ConnectionException ce = new ConnectionException(
                         sm.getString("stream.reset.fail"), Http2Error.PROTOCOL_ERROR, ioe);
