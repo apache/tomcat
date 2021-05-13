@@ -119,6 +119,10 @@
         Review code used to generate Java source from JSPs and tags and remove
         code found to be unnecessary. (markt)
       </scode>
+      <scode>
+        Refactor use of internal <code>ChildInfo</code> class to use compile
+        time type checking rather than run time type checking. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>

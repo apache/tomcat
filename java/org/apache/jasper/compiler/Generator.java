@@ -52,6 +52,7 @@ import org.apache.el.util.JreCompat;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.jasper.compiler.Node.ChildInfoBase;
 import org.apache.jasper.compiler.Node.NamedAttribute;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
 import org.xml.sax.Attributes;
@@ -3262,8 +3263,7 @@ class Generator {
          * Generates anonymous JspFragment inner class which is passed as an
          * argument to SimpleTag.setJspBody().
          */
-        private void generateJspFragment(Node n, String tagHandlerVar)
-                throws JasperException {
+        private void generateJspFragment(ChildInfoBase n, String tagHandlerVar) throws JasperException {
             // XXX - A possible optimization here would be to check to see
             // if the only child of the parent node is TemplateText. If so,
             // we know there won't be any parameters, etc, so we can
@@ -3377,18 +3377,8 @@ class Generator {
         }
     }
 
-    private static void generateLocalVariables(ServletWriter out, Node n)
-            throws JasperException {
-        Node.ChildInfo ci;
-        if (n instanceof Node.CustomTag) {
-            ci = ((Node.CustomTag) n).getChildInfo();
-        } else if (n instanceof Node.JspBody) {
-            ci = ((Node.JspBody) n).getChildInfo();
-        } else if (n instanceof Node.NamedAttribute) {
-            ci = ((Node.NamedAttribute) n).getChildInfo();
-        } else {
-            throw new JasperException(Localizer.getMessage("jsp.error.internal.unexpectedNodeType"));
-        }
+    private static void generateLocalVariables(ServletWriter out, ChildInfoBase n) {
+        Node.ChildInfo ci = n.getChildInfo();
 
         if (ci.hasUseBean()) {
             out.printil("javax.servlet.http.HttpSession session = _jspx_page_context.getSession();");
@@ -4223,8 +4213,7 @@ class Generator {
             out.printil("}");
         }
 
-        public Fragment openFragment(Node parent, int methodNesting)
-        throws JasperException {
+        public Fragment openFragment(ChildInfoBase parent, int methodNesting) {
             Fragment result = new Fragment(fragments.size(), parent);
             fragments.add(result);
             this.used = true;
