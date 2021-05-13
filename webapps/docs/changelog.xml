@@ -104,6 +104,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.67 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>65303</bug>; Fix a possible <code>NullPointerException</code> is
+        an error occurs on an HTTP/1.1 connection being upgraded to HTTP/2 or on
+        a pushed HTTP/2 stream. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <scode>
