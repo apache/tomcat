@@ -3610,11 +3610,9 @@ class Generator {
         // Generate package declaration
         String className = tagInfo.getTagClassName();
         int lastIndex = className.lastIndexOf('.');
-        if (lastIndex != -1) {
-            String packageName = className.substring(0, lastIndex);
-            genPreamblePackage(packageName);
-            className = className.substring(lastIndex + 1);
-        }
+        String packageName = className.substring(0, lastIndex);
+        genPreamblePackage(packageName);
+        className = className.substring(lastIndex + 1);
 
         // Generate imports
         genPreambleImports();
