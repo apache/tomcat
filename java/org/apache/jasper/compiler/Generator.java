@@ -3846,8 +3846,9 @@ class Generator {
         boolean aliasSeen = false;
         TagVariableInfo[] tagVars = tagInfo.getTagVariableInfos();
         for (TagVariableInfo var : tagVars) {
-            if (var.getNameFromAttribute() != null
-                    && var.getNameGiven() != null) {
+            // If a tag file uses a named attribute, the TagFileDirectiveVisitor
+            // will ensure that an alias is configured.
+            if (var.getNameFromAttribute() != null) {
                 aliasSeen = true;
                 break;
             }
