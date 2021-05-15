@@ -119,6 +119,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.110 (violetagg)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>63508</bug>: NPE in JNDIRealm when no <code>userRoleAttribute</code>
+        is given. (fschumacher)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
