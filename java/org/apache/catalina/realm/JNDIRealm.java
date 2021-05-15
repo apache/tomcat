@@ -2804,6 +2804,9 @@ public class JNDIRealm extends RealmBase {
      * @return String the escaped/encoded result
      */
     protected String doFilterEscaping(String inString) {
+        if (inString == null) {
+            return null;
+        }
         StringBuilder buf = new StringBuilder(inString.length());
         for (int i = 0; i < inString.length(); i++) {
             char c = inString.charAt(i);
@@ -2896,6 +2899,9 @@ public class JNDIRealm extends RealmBase {
      * @return      The string representation of the attribute value
      */
     protected String doAttributeValueEscaping(String input) {
+        if (input == null) {
+            return null;
+        }
         int len = input.length();
         StringBuilder result = new StringBuilder();
 
