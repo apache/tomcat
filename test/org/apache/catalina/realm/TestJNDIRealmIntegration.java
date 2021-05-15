@@ -58,26 +58,33 @@ public class TestJNDIRealmIntegration {
     @Parameterized.Parameters(name = "{index}: user[{5}], pwd[{6}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        for (String roleSearch : new String[] { ROLE_SEARCH_A, ROLE_SEARCH_B, ROLE_SEARCH_C }) {
-            addUsers(USER_PATTERN, null, null, roleSearch, ROLE_BASE, parameterSets);
-            addUsers(null, USER_SEARCH, USER_BASE, roleSearch, ROLE_BASE, parameterSets);
+        for (String userRoleAttribute : new String[] { "cn", null }) {
+            for (String roleSearch : new String[] { ROLE_SEARCH_A, ROLE_SEARCH_B, ROLE_SEARCH_C }) {
+                if (userRoleAttribute != null) {
+                    addUsers(USER_PATTERN, null, null, roleSearch, ROLE_BASE, userRoleAttribute, parameterSets);
+                    addUsers(null, USER_SEARCH, USER_BASE, roleSearch, ROLE_BASE, userRoleAttribute, parameterSets);
+                }
+            }
+            parameterSets.add(new Object[] { "cn={0},ou=s\\;ub,ou=people,dc=example,dc=com", null, null, ROLE_SEARCH_A,
+                    "{3},ou=people,dc=example,dc=com", "testsub", "test", new String[] { "TestGroup4" },
+                    userRoleAttribute });
         }
-        parameterSets.add(new Object[] { "cn={0},ou=s\\;ub,ou=people,dc=example,dc=com", null, null, ROLE_SEARCH_A,
-                "{3},ou=people,dc=example,dc=com", "testsub", "test", new String[] {"TestGroup4"} });
         return parameterSets;
     }
 
 
     private static void addUsers(String userPattern, String userSearch, String userBase, String roleSearch,
-            String roleBase, List<Object[]> parameterSets) {
+            String roleBase, String userRoleAttribute, List<Object[]> parameterSets) {
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "test", "test", new String[] {"TestGroup"} });
+                "test", "test", new String[] {"TestGroup"}, userRoleAttribute });
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "t;", "test", new String[] {"TestGroup"} });
+                "t;", "test", new String[] {"TestGroup"}, userRoleAttribute });
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "t*", "test", new String[] {"TestGroup"} });
+                "t*", "test", new String[] {"TestGroup"}, userRoleAttribute });
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "t=", "test", new String[] {"Test<Group*2", "Test>Group*3"} });
+                "t=", "test", new String[] {"Test<Group*2", "Test>Group*3"}, userRoleAttribute });
+        parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
+                "norole", "test", new String[0], userRoleAttribute });
     }
 
 
@@ -97,6 +104,8 @@ public class TestJNDIRealmIntegration {
     public String credentials;
     @Parameter(7)
     public String[] groups;
+    @Parameter(8)
+    public String realmConfigUserRoleAttribute;
 
     @Test
     public void testAuthenication() throws Exception {
@@ -107,7 +116,7 @@ public class TestJNDIRealmIntegration {
         realm.setUserPattern(realmConfigUserPattern);
         realm.setUserSearch(realmConfigUserSearch);
         realm.setUserBase(realmConfigUserBase);
-        realm.setUserRoleAttribute("cn");
+        realm.setUserRoleAttribute(realmConfigUserRoleAttribute);
         realm.setRoleName("cn");
         realm.setRoleBase(realmConfigRoleBase);
         realm.setRoleSearch(realmConfigRoleSearch);
@@ -201,6 +210,17 @@ public class TestJNDIRealmIntegration {
                     "sn: Tequals",
                     "userPassword: test");
             result = conn.processOperation(addUserTestEquals);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            AddRequest addUserNoRole = new AddRequest(
+                    "dn: cn=norole,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: person",
+                    "objectClass: organizationalPerson",
+                    "cn: norole",
+                    "sn: No Role",
+                    "userPassword: test");
+            result = conn.processOperation(addUserNoRole);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
 
             AddRequest addGroupTest = new AddRequest(
