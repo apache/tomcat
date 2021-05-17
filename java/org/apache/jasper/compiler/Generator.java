@@ -3184,7 +3184,7 @@ class Generator {
                 out.printin(tagHandlerVar);
                 out.print(".setParent(");
                 out.print("new jakarta.servlet.jsp.tagext.TagAdapter(");
-                out.print("(jakarta.servlet.jsp.tagext.SimpleTag) this ));");
+                out.println("(jakarta.servlet.jsp.tagext.SimpleTag) this ));");
             } else if (!simpleTag) {
                 out.printin(tagHandlerVar);
                 out.print(".setParent(");
