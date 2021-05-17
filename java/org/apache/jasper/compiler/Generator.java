@@ -3197,7 +3197,7 @@ class Generator {
                 out.printin(tagHandlerVar);
                 out.print(".setParent(");
                 out.print("new javax.servlet.jsp.tagext.TagAdapter(");
-                out.print("(javax.servlet.jsp.tagext.SimpleTag) this ));");
+                out.println("(javax.servlet.jsp.tagext.SimpleTag) this ));");
             } else if (!simpleTag) {
                 out.printin(tagHandlerVar);
                 out.print(".setParent(");
