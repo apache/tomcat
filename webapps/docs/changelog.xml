@@ -107,7 +107,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        <bug>63508</bug>: NPE in JNDIRealm when no <code>userRoleAttribute</code>
+        <bug>65308</bug>: NPE in JNDIRealm when no <code>userRoleAttribute</code>
         is given. (fschumacher)
       </fix>
     </changelog>
