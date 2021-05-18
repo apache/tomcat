@@ -323,11 +323,9 @@ public class NioBlockingSelector {
                     events();
                     int keyCount = 0;
                     try {
-                        int i = wakeupCounter.get();
-                        if (i > 0) {
+                        if (wakeupCounter.getAndSet(-1) > 0) {
                             keyCount = selector.selectNow();
                         } else {
-                            wakeupCounter.set(-1);
                             keyCount = selector.select(1000);
                         }
                         wakeupCounter.set(0);
