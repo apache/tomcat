@@ -1845,7 +1845,7 @@ class Generator {
 
                 // Initialize local variables used in this method.
                 if (!isTagFile) {
-                    out.printil("final jakarta.servlet.jsp.PageContext pageContext = _jspx_page_context;");
+                    out.printil("jakarta.servlet.jsp.PageContext pageContext = _jspx_page_context;");
                 }
                 // Only need to define out if the tag has a non-empty body or
                 // uses <jsp:attribute>...</jsp:attribute> nodes
