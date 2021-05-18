@@ -1845,9 +1845,13 @@ class Generator {
 
                 // Initialize local variables used in this method.
                 if (!isTagFile) {
-                    out.printil("jakarta.servlet.jsp.PageContext pageContext = _jspx_page_context;");
+                    out.printil("final jakarta.servlet.jsp.PageContext pageContext = _jspx_page_context;");
                 }
-                out.printil("jakarta.servlet.jsp.JspWriter out = _jspx_page_context.getOut();");
+                // Only need to define out if the tag has a non-empty body or
+                // uses <jsp:attribute>...</jsp:attribute> nodes
+                if (!n.hasEmptyBody() || n.getNamedAttributeNodes().size() > 0) {
+                    out.printil("jakarta.servlet.jsp.JspWriter out = _jspx_page_context.getOut();");
+                }
                 generateLocalVariables(out, n);
             }
 

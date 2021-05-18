@@ -131,6 +131,11 @@
         Refactor use of internal <code>ChildInfo</code> class to use compile
         time type checking rather than run time type checking. (markt)
       </scode>
+      <fix>
+        <bug>65124</bug>: Partial fix. When generating Java source code to call
+        a tag handler, only define the local variable <code>JspWriter out</code>
+        when it is going to be used. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
