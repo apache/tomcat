@@ -246,8 +246,9 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * If a file has a BOM, should that be used in preference to fileEncoding?
+     * Will default to {@link BomConfig#TRUE} in {@link #init()}.
      */
-    private boolean useBomIfPresent = true;
+    private BomConfig useBomIfPresent = null;
 
     /**
      * Minimum size for sendfile usage in bytes.
@@ -335,8 +336,23 @@ public class DefaultServlet extends HttpServlet {
             }
         }
 
-        if (getServletConfig().getInitParameter("useBomIfPresent") != null) {
-            useBomIfPresent = Boolean.parseBoolean(getServletConfig().getInitParameter("useBomIfPresent"));
+        String useBomIfPresent = getServletConfig().getInitParameter("useBomIfPresent");
+        if (useBomIfPresent == null) {
+            // Use default
+            this.useBomIfPresent = BomConfig.TRUE;
+        } else {
+            for (BomConfig bomConfig : BomConfig.values()) {
+                if (bomConfig.configurationValue.equalsIgnoreCase(useBomIfPresent)) {
+                    this.useBomIfPresent = bomConfig;
+                    break;
+                }
+            }
+            if (this.useBomIfPresent == null) {
+                // Unrecognised configuration value
+                IllegalArgumentException iae = new IllegalArgumentException(
+                        sm.getString("defaultServlet.unknownBomConfig", useBomIfPresent));
+                throw new ServletException(iae);
+            }
         }
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
@@ -1083,8 +1099,8 @@ public class DefaultServlet extends HttpServlet {
                             if (!renderResult.markSupported()) {
                                 renderResult = new BufferedInputStream(renderResult);
                             }
-                            Charset bomCharset = processBom(renderResult);
-                            if (bomCharset != null && useBomIfPresent) {
+                            Charset bomCharset = processBom(renderResult, useBomIfPresent.stripBom);
+                            if (bomCharset != null && useBomIfPresent.useBomEncoding) {
                                 inputEncoding = bomCharset.name();
                             }
                         }
@@ -1105,8 +1121,8 @@ public class DefaultServlet extends HttpServlet {
                             if (!source.markSupported()) {
                                 source = new BufferedInputStream(source);
                             }
-                            Charset bomCharset = processBom(source);
-                            if (bomCharset != null && useBomIfPresent) {
+                            Charset bomCharset = processBom(source, useBomIfPresent.stripBom);
+                            if (bomCharset != null && useBomIfPresent.useBomEncoding) {
                                 inputEncoding = bomCharset.name();
                             }
                             // Following test also ensures included resources
@@ -1217,7 +1233,7 @@ public class DefaultServlet extends HttpServlet {
     /*
      * Code borrowed heavily from Jasper's EncodingDetector
      */
-    private static Charset processBom(InputStream is) throws IOException {
+    private static Charset processBom(InputStream is, boolean stripBom) throws IOException {
         // Java supported character sets do not use BOMs longer than 4 bytes
         byte[] bom = new byte[4];
         is.mark(bom.length);
@@ -1226,7 +1242,7 @@ public class DefaultServlet extends HttpServlet {
 
         // BOMs are at least 2 bytes
         if (count < 2) {
-            skip(is, 0);
+            skip(is, 0, stripBom);
             return null;
         }
 
@@ -1234,31 +1250,31 @@ public class DefaultServlet extends HttpServlet {
         int b0 = bom[0] & 0xFF;
         int b1 = bom[1] & 0xFF;
         if (b0 == 0xFE && b1 == 0xFF) {
-            skip(is, 2);
+            skip(is, 2, stripBom);
             return StandardCharsets.UTF_16BE;
         }
         // Delay the UTF_16LE check if there are more that 2 bytes since it
         // overlaps with UTF-32LE.
         if (count == 2 && b0 == 0xFF && b1 == 0xFE) {
-            skip(is, 2);
+            skip(is, 2, stripBom);
             return StandardCharsets.UTF_16LE;
         }
 
         // Remaining BOMs are at least 3 bytes
         if (count < 3) {
-            skip(is, 0);
+            skip(is, 0, stripBom);
             return null;
         }
 
         // UTF-8 is only 3-byte BOM
         int b2 = bom[2] & 0xFF;
         if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
-            skip(is, 3);
+            skip(is, 3, stripBom);
             return StandardCharsets.UTF_8;
         }
 
         if (count < 4) {
-            skip(is, 0);
+            skip(is, 0, stripBom);
             return null;
         }
 
@@ -1275,19 +1291,21 @@ public class DefaultServlet extends HttpServlet {
         // won't see a UTF16-LE file with a BOM where the first real data is
         // 0x00 0x00
         if (b0 == 0xFF && b1 == 0xFE) {
-            skip(is, 2);
+            skip(is, 2, stripBom);
             return StandardCharsets.UTF_16LE;
         }
 
-        skip(is, 0);
+        skip(is, 0, stripBom);
         return null;
     }
 
 
-    private static void skip(InputStream is, int skip) throws IOException {
+    private static void skip(InputStream is, int skip, boolean stripBom) throws IOException {
         is.reset();
-        while (skip-- > 0) {
-            is.read();
+        if (stripBom) {
+            while (skip-- > 0) {
+                is.read();
+            }
         }
     }
 
@@ -2939,6 +2957,34 @@ public class DefaultServlet extends HttpServlet {
                 return base.compare(r1, r2);
             else
                 return c;
+        }
+    }
+
+    static enum BomConfig {
+        /**
+         * BoM is stripped if present and any BoM found used to determine the
+         * encoding used to read the resource.
+         */
+        TRUE("true", true, true),
+        /**
+         * BoM is stripped if present but the configured file encoding is used
+         * to read the resource.
+         */
+        FALSE("false", true, false),
+        /**
+         * BoM is not stripped and the configured file encoding is used to read
+         * the resource.
+         */
+        PASS_THROUGH("pass-through", false, false);
+
+        final String configurationValue;
+        final boolean stripBom;
+        final boolean useBomEncoding;
+
+        private BomConfig(String configurationValue, boolean stripBom, boolean useBomEncoding) {
+            this.configurationValue = configurationValue;
+            this.stripBom = stripBom;
+            this.useBomEncoding = useBomEncoding;
         }
     }
 }

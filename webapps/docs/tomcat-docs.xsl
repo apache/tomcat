@@ -43,6 +43,7 @@
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
   <xsl:param    name="year"                select="'yyyy'"/>
   <xsl:param    name="buglink"             select="'https://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
+  <xsl:param    name="prlink"              select="'https://github.com/apache/tomcat/pull/'"/>
   <xsl:param    name="revlink"             select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
   <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-10.0-doc'"/>
   <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-10.html'"/>
@@ -386,6 +387,12 @@
   <xsl:template match="bug">
     <xsl:variable name="link"><xsl:value-of select="$buglink"/><xsl:value-of select="text()"/></xsl:variable>
     <a href="{$link}"><xsl:apply-templates/></a>
+  </xsl:template>
+
+  <!-- Link to a pull request -->
+  <xsl:template match="pr">
+    <xsl:variable name="link"><xsl:value-of select="$prlink"/><xsl:value-of select="text()"/></xsl:variable>
+    <a href="{$link}">#<xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Link to a SVN revision report -->
