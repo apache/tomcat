@@ -2619,6 +2619,7 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
+
     private static class PrecompressedResource {
         public final WebResource resource;
         public final CompressionFormat format;
@@ -2628,6 +2629,7 @@ public class DefaultServlet extends HttpServlet {
             this.format = format;
         }
     }
+
 
     /**
      * This is secure in the sense that any attempt to use an external entity
@@ -2658,6 +2660,7 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
+
     /**
      * Gets the ordering character to be used for a particular column.
      *
@@ -2679,11 +2682,11 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
+
     /**
      * A class encapsulating the sorting of resources.
      */
-    private static class SortManager
-    {
+    private static class SortManager {
         /**
          * The default sort.
          */
@@ -2871,9 +2874,8 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
-    private static class DirsFirstComparator
-        implements Comparator<WebResource>
-    {
+
+    private static class DirsFirstComparator implements Comparator<WebResource> {
         private final Comparator<WebResource> base;
 
         public DirsFirstComparator(Comparator<WebResource> core) {
@@ -2896,18 +2898,15 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
-    private static class ResourceNameComparator
-        implements Comparator<WebResource>
-    {
+    private static class ResourceNameComparator implements Comparator<WebResource> {
         @Override
         public int compare(WebResource r1, WebResource r2) {
             return r1.getName().compareTo(r2.getName());
         }
     }
 
-    private static class ResourceSizeComparator
-        implements Comparator<WebResource>
-    {
+
+    private static class ResourceSizeComparator implements Comparator<WebResource> {
         private Comparator<WebResource> base;
 
         public ResourceSizeComparator(Comparator<WebResource> base) {
@@ -2925,9 +2924,7 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
-    private static class ResourceLastModifiedDateComparator
-        implements Comparator<WebResource>
-    {
+    private static class ResourceLastModifiedDateComparator implements Comparator<WebResource> {
         private Comparator<WebResource> base;
 
         public ResourceLastModifiedDateComparator(Comparator<WebResource> base) {
