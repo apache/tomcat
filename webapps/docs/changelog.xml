@@ -65,6 +65,7 @@
 
   <!ELEMENT bug (#PCDATA)>
   <!ELEMENT rev (#PCDATA)>
+  <!ELEMENT pr (#PCDATA)>
 
   <!-- Random HTML markup tags. Add more here as needed. -->
   <!ELEMENT a (#PCDATA)>
@@ -110,6 +111,14 @@
         <bug>65308</bug>: NPE in JNDIRealm when no <code>userRoleAttribute</code>
         is given. (fschumacher)
       </fix>
+      <add>
+        <pr>418</pr>: Add a new option, <code>pass-through</code>, to the
+        default servlet's <code>useBomIfPresent</code> initialization parameter
+        that causes the default servlet to leave any BOM in place when
+        processing a static file and not to use the BOM to determine the
+        encoding of the file. Based on a pull request by Jean-Louis Monteiro.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

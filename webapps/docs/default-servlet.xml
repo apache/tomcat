@@ -167,6 +167,14 @@ directory listings are disabled and debugging is turned off.
         File encoding to be used when reading static resources.
         [platform default]
   </property>
+  <property name="useBomIfPresent">
+        If a static file contains a byte order mark (BOM), should this be used
+        to determine the file encoding in preference to fileEncoding. This
+        setting must be one of <code>true</code> (remove the BOM and use it in
+        preference to fileEncoding), <code>false</code> (remove the BOM but do
+        not use it) or <code>pass-through</code> (do not use the BOM and do not
+        remove it). [true]
+  </property>
   <property name="sendfileSize">
         If the connector used supports sendfile, this represents the minimal
         file size in KB for which sendfile will be used. Use a negative value
