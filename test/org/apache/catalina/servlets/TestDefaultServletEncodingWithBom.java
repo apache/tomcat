@@ -16,11 +16,12 @@
  */
 package org.apache.catalina.servlets;
 
+import org.apache.catalina.servlets.DefaultServlet.BomConfig;
 
 public class TestDefaultServletEncodingWithBom extends DefaultServletEncodingBaseTest {
 
     @Override
-    protected boolean getUseBom() {
-        return true;
+    protected BomConfig getUseBom() {
+        return BomConfig.TRUE;
     }
 }
