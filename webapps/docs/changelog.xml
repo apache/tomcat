@@ -112,6 +112,11 @@
         is given. (fschumacher)
       </fix>
       <add>
+        <pr>412</pr>: Add commented out, sample users for the Tomcat Manager app
+        to the default <code>tomcat-users.xml</code> file. Based on a PR by
+        Arnaud Dagnelies. (markt)
+      </add>
+      <add>
         <pr>418</pr>: Add a new option, <code>pass-through</code>, to the
         default servlet's <code>useBomIfPresent</code> initialization parameter
         that causes the default servlet to leave any BOM in place when
