@@ -253,7 +253,7 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * If a file has a BOM, should that be used in preference to fileEncoding?
-     * Will default to {@link BomConfig#TRUE} in {@link #init()}.
+     * Will default to {@code BomConfig.TRUE} in {@link #init()}.
      */
     private BomConfig useBomIfPresent = null;
 
