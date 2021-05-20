@@ -432,7 +432,7 @@ public final class Response {
                 return true;
             } catch( NumberFormatException ex ) {
                 // Do nothing - the spec doesn't have any "throws"
-                // and the user might know what he's doing
+                // and the user might know what they're doing
                 return false;
             }
         }

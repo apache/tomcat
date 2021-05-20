@@ -392,7 +392,7 @@ name "java:/comp/env/jdbc/authority".</p>
     <code>Realm</code>.  Thus, any changes you have made to the database
     directly (new users, changed passwords or roles, etc.) will be immediately
     reflected.</li>
-<li>Once a user has been authenticated, the user (and his or her associated
+<li>Once a user has been authenticated, the user (and their associated
     roles) are cached within Tomcat for the duration of the user's login.
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
@@ -737,10 +737,10 @@ userPassword: janet</source>
 searches the directory for a unique entry with that value as its mail
 attribute and attempts to bind to the directory as
 <code>uid=jjones,ou=people,dc=mycompany,dc=com</code> with the given
-password. If authentication succeeds, she is assigned three roles:
-"role2" and "role3", the values of the "memberOf" attribute in her
+password. If authentication succeeds, they are assigned three roles:
+"role2" and "role3", the values of the "memberOf" attribute in their
 directory entry, and "tomcat", the value of the "cn" attribute in the
-only group entry of which she is a member.</p>
+only group entry of which they are a member.</p>
 
 <p>Finally, to authenticate the user by retrieving
 the password from the directory and making a local comparison in the
@@ -769,7 +769,7 @@ authentication is usually to be preferred.</p>
     <code>Realm</code>.  Thus, any changes you have made to the directory
     (new users, changed passwords or roles, etc.) will be immediately
     reflected.</li>
-<li>Once a user has been authenticated, the user (and his or her associated
+<li>Once a user has been authenticated, the user (and their associated
     roles) are cached within Tomcat for the duration of the user's login.
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
@@ -836,7 +836,7 @@ to all virtual hosts and web applications.  The default contents of the
 <li>When a user attempts to access a protected resource for the first time,
     Tomcat will call the <code>authenticate()</code> method of this
     <code>Realm</code>.</li>
-<li>Once a user has been authenticated, the user (and his or her associated
+<li>Once a user has been authenticated, the user (and their associated
     roles) are cached within Tomcat for the duration of the user's login.
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
@@ -894,7 +894,7 @@ valid user, consisting of the following attributes:</p>
 <li>When a user attempts to access a protected resource for the first time,
     Tomcat will call the <code>authenticate()</code> method of this
     <code>Realm</code>.</li>
-<li>Once a user has been authenticated, the user (and his or her associated
+<li>Once a user has been authenticated, the user (and their associated
     roles) are cached within Tomcat for the duration of the user's login.
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
@@ -1005,8 +1005,8 @@ and restarting the server, without any code changes to your application.</li>
               method of this <code>Realm</code>.  Thus, any changes you have made in
               the security mechanism directly (new users, changed passwords or
               roles, etc.) will be immediately reflected.</li>
-          <li>Once a user has been authenticated, the user (and his or
-              her associated roles) are cached within Tomcat for the duration of
+          <li>Once a user has been authenticated, the user (and their
+              associated roles) are cached within Tomcat for the duration of
               the user's login.  For FORM-based authentication, that means until
               the session times out or is invalidated; for BASIC authentication,
               that means until the user closes their browser.  Any changes to the

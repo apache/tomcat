@@ -155,7 +155,7 @@ public class Utf8Decoder extends CharsetDecoder {
         int inIndex = pos + in.arrayOffset();
         int outIndex = out.position() + out.arrayOffset();
         // if someone would change the limit in process,
-        // he would face consequences
+        // they would face consequences
         for (; inIndex < inIndexLimit && outRemaining > 0; inIndex++) {
             int jchar = bArr[inIndex];
             if (jchar < 0) {
