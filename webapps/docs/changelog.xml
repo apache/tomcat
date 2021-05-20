@@ -108,6 +108,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>65301</bug>: <code>RemoteIpValve</code> will now avoid getting
+        the local host name when it is not needed. (remm)
+      </fix>
+      <fix>
         <bug>65308</bug>: NPE in JNDIRealm when no <code>userRoleAttribute</code>
         is given. (fschumacher)
       </fix>

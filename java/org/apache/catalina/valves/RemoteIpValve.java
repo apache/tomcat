@@ -609,7 +609,7 @@ public class RemoteIpValve extends ValveBase {
         final String originalScheme = request.getScheme();
         final boolean originalSecure = request.isSecure();
         final String originalServerName = request.getServerName();
-        final String originalLocalName = request.getLocalName();
+        final String originalLocalName = isChangeLocalName() ? request.getLocalName() : null;
         final int originalServerPort = request.getServerPort();
         final int originalLocalPort = request.getLocalPort();
         final String originalProxiesHeader = request.getHeader(proxiesHeader);
@@ -768,7 +768,9 @@ public class RemoteIpValve extends ValveBase {
             request.setSecure(originalSecure);
             request.getCoyoteRequest().scheme().setString(originalScheme);
             request.getCoyoteRequest().serverName().setString(originalServerName);
-            request.getCoyoteRequest().localName().setString(originalLocalName);
+            if (isChangeLocalName()) {
+                request.getCoyoteRequest().localName().setString(originalLocalName);
+            }
             request.setServerPort(originalServerPort);
             request.setLocalPort(originalLocalPort);
 
