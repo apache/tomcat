@@ -506,13 +506,8 @@ public class DefaultInstanceManager implements InstanceManager {
         Class<?> clazz;
         if (SecurityUtil.isPackageProtectionEnabled()) {
             try {
-                clazz = AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>() {
-
-                    @Override
-                    public Class<?> run() throws Exception {
-                        return loadClass(className, classLoader);
-                    }
-                });
+                clazz = AccessController.doPrivileged(
+                        new PrivilegedLoadClass(className, classLoader));
             } catch (PrivilegedActionException e) {
                 Throwable t = e.getCause();
                 if (t instanceof ClassNotFoundException) {
@@ -675,22 +670,7 @@ public class DefaultInstanceManager implements InstanceManager {
             final AnnotationCacheEntry entry) {
         Method result = null;
         if (Globals.IS_SECURITY_ENABLED) {
-            result = AccessController.doPrivileged(
-                    new PrivilegedAction<Method>() {
-                        @Override
-                        public Method run() {
-                            Method result = null;
-                            try {
-                                result = clazz.getDeclaredMethod(
-                                        entry.getAccessibleObjectName(),
-                                        entry.getParamTypes());
-                            } catch (NoSuchMethodException e) {
-                                // Should never happen. On that basis don't log
-                                // it.
-                            }
-                            return result;
-                        }
-            });
+            result = AccessController.doPrivileged(new PrivilegedGetMethod(clazz, entry));
         } else {
             try {
                 result = clazz.getDeclaredMethod(
@@ -706,21 +686,7 @@ public class DefaultInstanceManager implements InstanceManager {
             final AnnotationCacheEntry entry) {
         Field result = null;
         if (Globals.IS_SECURITY_ENABLED) {
-            result = AccessController.doPrivileged(
-                    new PrivilegedAction<Field>() {
-                        @Override
-                        public Field run() {
-                            Field result = null;
-                            try {
-                                result = clazz.getDeclaredField(
-                                        entry.getAccessibleObjectName());
-                            } catch (NoSuchFieldException e) {
-                                // Should never happen. On that basis don't log
-                                // it.
-                            }
-                            return result;
-                        }
-            });
+            result = AccessController.doPrivileged(new PrivilegedGetField(clazz, entry));
         } else {
             try {
                 result = clazz.getDeclaredField(entry.getAccessibleObjectName());
@@ -799,7 +765,72 @@ public class DefaultInstanceManager implements InstanceManager {
         }
     }
 
+
     private enum AnnotationCacheEntryType {
         FIELD, SETTER, POST_CONSTRUCT, PRE_DESTROY
+    }
+
+
+    private static class PrivilegedGetField implements PrivilegedAction<Field> {
+
+        private final Class<?> clazz;
+        private final AnnotationCacheEntry entry;
+
+        public PrivilegedGetField(Class<?> clazz, AnnotationCacheEntry entry) {
+            this.clazz = clazz;
+            this.entry = entry;
+        }
+
+        @Override
+        public Field run() {
+            Field result = null;
+            try {
+                result = clazz.getDeclaredField(entry.getAccessibleObjectName());
+            } catch (NoSuchFieldException e) {
+                // Should never happen. On that basis don't log it.
+            }
+            return result;
+        }
+    }
+
+
+    private static class PrivilegedGetMethod implements PrivilegedAction<Method> {
+
+        private final Class<?> clazz;
+        private final AnnotationCacheEntry entry;
+
+        public PrivilegedGetMethod(Class<?> clazz, AnnotationCacheEntry entry) {
+            this.clazz = clazz;
+            this.entry = entry;
+        }
+
+        @Override
+        public Method run() {
+            Method result = null;
+            try {
+                result = clazz.getDeclaredMethod(
+                        entry.getAccessibleObjectName(), entry.getParamTypes());
+            } catch (NoSuchMethodException e) {
+                // Should never happen. On that basis don't log it.
+            }
+            return result;
+        }
+    }
+
+
+    private class PrivilegedLoadClass implements PrivilegedExceptionAction<Class<?>> {
+
+        private final String className;
+        private final ClassLoader classLoader;
+
+        public PrivilegedLoadClass(String className, ClassLoader classLoader) {
+            this.className = className;
+            this.classLoader = classLoader;
+        }
+
+        @Override
+        public Class<?> run() throws Exception {
+            return loadClass(className, classLoader);
+        }
     }
 }

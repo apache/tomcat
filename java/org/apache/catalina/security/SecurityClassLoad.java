@@ -61,9 +61,11 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "AsyncContextImpl$DebugException");
         loader.loadClass(basePackage + "AsyncListenerWrapper");
         loader.loadClass(basePackage + "ContainerBase$PrivilegedAddChild");
-        loadAnonymousInnerClasses(loader, basePackage + "DefaultInstanceManager");
         loader.loadClass(basePackage + "DefaultInstanceManager$AnnotationCacheEntry");
         loader.loadClass(basePackage + "DefaultInstanceManager$AnnotationCacheEntryType");
+        loader.loadClass(basePackage + "DefaultInstanceManager$PrivilegedGetField");
+        loader.loadClass(basePackage + "DefaultInstanceManager$PrivilegedGetMethod");
+        loader.loadClass(basePackage + "DefaultInstanceManager$PrivilegedLoadClass");
         loader.loadClass(basePackage + "ApplicationHttpRequest$AttributeNamesEnumerator");
     }
 
