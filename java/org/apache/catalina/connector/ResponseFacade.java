@@ -84,6 +84,22 @@ public class ResponseFacade implements HttpServletResponse {
         }
     }
 
+    private static class FlushBufferPrivilegedAction implements PrivilegedExceptionAction<Void> {
+
+        private final Response response;
+
+        public FlushBufferPrivilegedAction(Response response) {
+            this.response = response;
+        }
+
+        @Override
+        public Void run() throws IOException {
+            response.setAppCommitted(true);
+            response.flushBuffer();
+            return null;
+        }
+    }
+
 
     // ----------------------------------------------------------- Constructors
 
@@ -280,22 +296,12 @@ public class ResponseFacade implements HttpServletResponse {
             return;
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()){
+        if (SecurityUtil.isPackageProtectionEnabled()) {
             try{
-                AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<Void>(){
-
-                    @Override
-                    public Void run() throws IOException{
-                        response.setAppCommitted(true);
-
-                        response.flushBuffer();
-                        return null;
-                    }
-                });
-            } catch(PrivilegedActionException e){
+                AccessController.doPrivileged(new FlushBufferPrivilegedAction(response));
+            } catch(PrivilegedActionException e) {
                 Exception ex = e.getException();
-                if (ex instanceof IOException){
+                if (ex instanceof IOException) {
                     throw (IOException)ex;
                 }
             }
