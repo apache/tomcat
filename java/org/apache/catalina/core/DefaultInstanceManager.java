@@ -382,9 +382,8 @@ public class DefaultInstanceManager implements InstanceManager {
                             postConstruct.getParameterTypes(), null,
                             AnnotationCacheEntryType.POST_CONSTRUCT));
                 } else if (postConstructFromXml != null) {
-                    throw new IllegalArgumentException("Post construct method "
-                        + postConstructFromXml + " for class " + clazz.getName()
-                        + " is declared in deployment descriptor but cannot be found.");
+                    throw new IllegalArgumentException(sm.getString("defaultInstanceManager.postConstructNotFound",
+                        postConstructFromXml, clazz.getName()));
                 }
                 if (preDestroy != null) {
                     annotations.add(new AnnotationCacheEntry(
@@ -392,9 +391,8 @@ public class DefaultInstanceManager implements InstanceManager {
                             preDestroy.getParameterTypes(), null,
                             AnnotationCacheEntryType.PRE_DESTROY));
                 } else if (preDestroyFromXml != null) {
-                    throw new IllegalArgumentException("Pre destroy method "
-                        + preDestroyFromXml + " for class " + clazz.getName()
-                        + " is declared in deployment descriptor but cannot be found.");
+                    throw new IllegalArgumentException(sm.getString("defaultInstanceManager.preDestroyNotFound",
+                        preDestroyFromXml, clazz.getName()));
                 }
 
                 if (context != null) {
@@ -725,8 +723,7 @@ public class DefaultInstanceManager implements InstanceManager {
             });
         } else {
             try {
-                result = clazz.getDeclaredField(
-                        entry.getAccessibleObjectName());
+                result = clazz.getDeclaredField(entry.getAccessibleObjectName());
             } catch (NoSuchFieldException e) {
                 // Should never happen. On that basis don't log it.
             }
