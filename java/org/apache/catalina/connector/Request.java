@@ -2896,22 +2896,14 @@ public class Request implements HttpServletRequest {
                     parts.add(part);
                     if (part.getSubmittedFileName() == null) {
                         String name = part.getName();
-                        String value = null;
-                        try {
-                            value = part.getString(charset.name());
-                        } catch (UnsupportedEncodingException uee) {
-                            // Not possible
-                        }
                         if (maxPostSize >= 0) {
                             // Have to calculate equivalent size. Not completely
                             // accurate but close enough.
                             postSize += name.getBytes(charset).length;
-                            if (value != null) {
-                                // Equals sign
-                                postSize++;
-                                // Value length
-                                postSize += part.getSize();
-                            }
+                            // Equals sign
+                            postSize++;
+                            // Value length
+                            postSize += part.getSize();
                             // Value separator
                             postSize++;
                             if (postSize > maxPostSize) {
@@ -2919,6 +2911,12 @@ public class Request implements HttpServletRequest {
                                 throw new IllegalStateException(sm.getString(
                                         "coyoteRequest.maxPostSizeExceeded"));
                             }
+                        }
+                        String value = null;
+                        try {
+                            value = part.getString(charset.name());
+                        } catch (UnsupportedEncodingException uee) {
+                            // Not possible
                         }
                         parameters.addParameter(name, value);
                     }
