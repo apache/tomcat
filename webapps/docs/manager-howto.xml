@@ -155,7 +155,7 @@ To maintain the CSRF protection:</p>
 </ul>
 
 <p><strong>Note</strong> that JMX proxy interface is effectively low-level root-like
-administrative interface of Tomcat. One can do a lot, if he knows
+administrative interface of Tomcat. One can do a lot, if one knows
 what commands to call. You should be cautious when enabling the
 <strong>manager-jmx</strong> role.</p>
 
@@ -180,7 +180,7 @@ Exactly how the usernames/passwords are configured depends on which
     look something like this:
 <source><![CDATA[<user username="craigmcc" password="secret" roles="standard,manager-script" />]]></source>
     which defines the username and password used by this individual to
-    log on, and the role names he or she is associated with.  You can
+    log on, and the role names they are associated with.  You can
     add the <strong>manager-script</strong> role to the comma-delimited
     <code>roles</code> attribute for one or more existing users, and/or
     create new users with that assigned role.</li>
