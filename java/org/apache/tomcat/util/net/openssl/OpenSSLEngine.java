@@ -903,11 +903,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             accepted = Accepted.EXPLICIT;
             break;
         case IMPLICIT:
-            // A user did not start handshake by calling this method by him/herself,
+            // A user did not start handshake by calling this method by themselves,
             // but handshake has been started already by wrap() or unwrap() implicitly.
             // Because it's the user's first time to call this method, it is unfair to
-            // raise an exception.  From the user's standpoint, he or she never asked
-            // for renegotiation.
+            // raise an exception.  From the user's standpoint, they never asked for
+            // renegotiation.
 
             accepted = Accepted.EXPLICIT; // Next time this method is invoked by the user, we should raise an exception.
             break;

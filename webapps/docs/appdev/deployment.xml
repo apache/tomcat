@@ -53,8 +53,8 @@ distribute your application to be installed.</p>
 <p>The top-level directory of your web application hierarchy is also the
 <em>document root</em> of your application.  Here, you will place the HTML
 files and JSP pages that comprise your application's user interface.  When the
-system administrator deploys your application into a particular server, he
-or she assigns a <em>context path</em> to your application (a later section
+system administrator deploys your application into a particular server, they
+assign a <em>context path</em> to your application (a later section
 of this manual describes deployment on Tomcat).  Thus, if the
 system administrator assigns your application to the context path
 <code>/catalog</code>, then a request URI referring to
