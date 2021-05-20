@@ -621,16 +621,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public HttpSession getSession() {
-        if (facade == null){
-            if (SecurityUtil.isPackageProtectionEnabled()){
-                final StandardSession fsession = this;
-                facade = AccessController.doPrivileged(
-                        new PrivilegedAction<StandardSessionFacade>(){
-                    @Override
-                    public StandardSessionFacade run(){
-                        return new StandardSessionFacade(fsession);
-                    }
-                });
+        if (facade == null) {
+            if (SecurityUtil.isPackageProtectionEnabled()) {
+                facade = AccessController.doPrivileged(new PrivilegedNewSessionFacade(this));
             } else {
                 facade = new StandardSessionFacade(this);
             }
@@ -1859,6 +1852,22 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
                 manager.getContext().getLogger().error(sm.getString("standardSession.attributeEvent"), t);
             }
+        }
+    }
+
+
+    private static class PrivilegedNewSessionFacade implements
+            PrivilegedAction<StandardSessionFacade> {
+
+        private final HttpSession session;
+
+        public PrivilegedNewSessionFacade(HttpSession session) {
+            this.session = session;
+        }
+
+        @Override
+        public StandardSessionFacade run(){
+            return new StandardSessionFacade(session);
         }
     }
 }

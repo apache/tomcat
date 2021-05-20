@@ -97,7 +97,7 @@ public final class SecurityClassLoad {
     private static final void loadSessionPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.session.";
         loader.loadClass(basePackage + "StandardSession");
-        loadAnonymousInnerClasses(loader, basePackage + "StandardSession");
+        loader.loadClass(basePackage + "StandardSession$PrivilegedNewSessionFacade");
         loader.loadClass(basePackage + "StandardManager$PrivilegedDoUnload");
     }
 
