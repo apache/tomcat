@@ -132,6 +132,13 @@
         Add <code>cookieName</code> attribute to the SSO valve to configure the
         SSO cookie name. (remm)
       </update>
+      <fix>
+        <pr>419</pr>: When processing POST requests of type
+        <code>multipart/form-data</code> for parts without a filename that are
+        added to the parameter map in String form, check the size of the part
+        before attempting conversion to String. Pull request provided by
+        tianshuang. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
