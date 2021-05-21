@@ -156,6 +156,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>65317</bug>: When using <code>permessage-deflate</code>, the
+        WebSocket connection was incorrectly closed if the uncompressed payload
+        size was an exact multiple of 8192. Based on a patch provided by Saksham
+        Verma. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

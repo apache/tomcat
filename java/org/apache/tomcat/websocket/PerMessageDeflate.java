@@ -197,7 +197,7 @@ public class PerMessageDeflate implements Transformation {
         int written;
         boolean usedEomBytes = false;
 
-        while (dest.remaining() > 0) {
+        while (dest.remaining() > 0 || usedEomBytes) {
             // Space available in destination. Try and fill it.
             try {
                 written = inflater.inflate(
@@ -210,12 +210,10 @@ public class PerMessageDeflate implements Transformation {
             dest.position(dest.position() + written);
 
             if (inflater.needsInput() && !usedEomBytes ) {
+                readBuffer.clear();
+                TransformationResult nextResult = next.getMoreData(opCode, fin, (rsv ^ RSV_BITMASK), readBuffer);
+                inflater.setInput(readBuffer.array(), readBuffer.arrayOffset(), readBuffer.position());
                 if (dest.hasRemaining()) {
-                    readBuffer.clear();
-                    TransformationResult nextResult =
-                            next.getMoreData(opCode, fin, (rsv ^ RSV_BITMASK), readBuffer);
-                    inflater.setInput(
-                            readBuffer.array(), readBuffer.arrayOffset(), readBuffer.position());
                     if (TransformationResult.UNDERFLOW.equals(nextResult)) {
                         return nextResult;
                     } else if (TransformationResult.END_OF_FRAME.equals(nextResult) &&
@@ -227,6 +225,11 @@ public class PerMessageDeflate implements Transformation {
                             return TransformationResult.END_OF_FRAME;
                         }
                     }
+                } else if (readBuffer.position() > 0) {
+                    return TransformationResult.OVERFLOW;
+                } else if (fin) {
+                    inflater.setInput(EOM_BYTES);
+                    usedEomBytes = true;
                 }
             } else if (written == 0) {
                 if (fin && (isServer && !clientContextTakeover ||
