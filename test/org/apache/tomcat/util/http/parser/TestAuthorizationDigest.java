@@ -512,6 +512,4 @@ public class TestAuthorizationDigest {
         Map<String,String> result = Authorization.parseAuthorizationDigest(input);
         Assert.assertNull(result);
     }
-
-
 }
