@@ -128,6 +128,13 @@
         encoding of the file. Based on a pull request by Jean-Louis Monteiro.
         (markt)
       </add>
+      <fix>
+        <pr>419</pr>: When processing POST requests of type
+        <code>multipart/form-data</code> for parts without a filename that are
+        added to the parameter map in String form, check the size of the part
+        before attempting conversion to String. Pull request provided by
+        tianshuang. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
