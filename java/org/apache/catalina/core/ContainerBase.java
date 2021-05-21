@@ -450,7 +450,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) oldCluster).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setCluster: stop: ", e);
+                    log.error(sm.getString("containerBase.cluster.stop"), e);
                 }
             }
 
@@ -463,7 +463,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) cluster).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setCluster: start: ", e);
+                    log.error(sm.getString("containerBase.cluster.start"), e);
                 }
             }
         } finally {
@@ -664,7 +664,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) oldRealm).stop();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setRealm: stop: ", e);
+                    log.error(sm.getString("containerBase.realm.stop"), e);
                 }
             }
 
@@ -676,7 +676,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 try {
                     ((Lifecycle) realm).start();
                 } catch (LifecycleException e) {
-                    log.error("ContainerBase.setRealm: start: ", e);
+                    log.error(sm.getString("containerBase.realm.start"), e);
                 }
             }
 
@@ -722,13 +722,14 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     private void addChildInternal(Container child) {
 
-        if( log.isDebugEnabled() )
+        if (log.isDebugEnabled()) {
             log.debug("Add child " + child + " " + this);
+        }
+
         synchronized(children) {
             if (children.get(child.getName()) != null)
-                throw new IllegalArgumentException("addChild:  Child name '" +
-                                                   child.getName() +
-                                                   "' is not unique");
+                throw new IllegalArgumentException(
+                        sm.getString("containerBase.child.notUnique", child.getName()));
             child.setParent(this);  // May throw IAE
             children.put(child.getName(), child);
         }
@@ -744,7 +745,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
         } catch (LifecycleException e) {
             log.error("ContainerBase.addChild: start: ", e);
-            throw new IllegalStateException("ContainerBase.addChild: start: " + e);
+            throw new IllegalStateException(sm.getString("containerBase.child.start"), e);
         } finally {
             fireContainerEvent(ADD_CHILD_EVENT, child);
         }
@@ -834,7 +835,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 child.stop();
             }
         } catch (LifecycleException e) {
-            log.error("ContainerBase.removeChild: stop: ", e);
+            log.error(sm.getString("containerBase.child.stop"), e);
         }
 
         try {
@@ -845,7 +846,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 child.destroy();
             }
         } catch (LifecycleException e) {
-            log.error("ContainerBase.removeChild: destroy: ", e);
+            log.error(sm.getString("containerBase.child.destroy"), e);
         }
 
         synchronized(children) {
@@ -947,7 +948,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if (pipeline instanceof Lifecycle) {
             ((Lifecycle) pipeline).start();
         }
-
 
         setState(LifecycleState.STARTING);
 
@@ -1387,11 +1387,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                log.error("Exception invoking periodic operation: ", t);
+                log.error(sm.getString("containerBase.backgroundProcess.error"), t);
             } finally {
                 if (container instanceof Context) {
                     ((Context) container).unbind(false, originalClassLoader);
-               }
+                }
             }
         }
     }
