@@ -35,7 +35,7 @@ version.suffix=-dev
 #ant.tstamp.now=1620482400
 
 # ----- Source control flags -----
-git.branch=master
+git.branch=main
 
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
