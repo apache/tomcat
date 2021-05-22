@@ -25,6 +25,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /*
  * Listener to provider informations to mod_heartbeat.c
@@ -36,6 +37,7 @@ import org.apache.juli.logging.LogFactory;
 public class HeartbeatListener implements LifecycleListener, ContainerListener {
 
     private static final Log log = LogFactory.getLog(HeartbeatListener.class);
+    private static final StringManager sm = StringManager.getManager(HeartbeatListener.class);
 
     /* To allow to select the connector */
     private int port = 0;
@@ -89,7 +91,7 @@ public class HeartbeatListener implements LifecycleListener, ContainerListener {
                     this.port = coll.port;
                     this.host = coll.host;
                 } catch (Exception ex) {
-                    log.error("Unable to initialize info collection: " + ex);
+                    log.error(sm.getString("heartbeatListener.errorCollectingInfo"), ex);
                     coll = null;
                     return;
                 }
@@ -99,7 +101,7 @@ public class HeartbeatListener implements LifecycleListener, ContainerListener {
             try {
                 sender.init(this);
             } catch (Exception ex) {
-                log.error("Unable to initialize Sender: " + ex);
+                log.error(sm.getString("heartbeatListener.senderInitError"), ex);
                 sender = null;
                 return;
             }
@@ -108,7 +110,7 @@ public class HeartbeatListener implements LifecycleListener, ContainerListener {
             try {
                 coll.refresh();
             } catch (Exception ex) {
-                log.error("Unable to collect load information: " + ex);
+                log.error(sm.getString("heartbeatListener.refreshError"), ex);
                 coll = null;
                 return;
             }
@@ -117,7 +119,7 @@ public class HeartbeatListener implements LifecycleListener, ContainerListener {
             try {
                 sender.send(output);
             } catch (Exception ex) {
-                log.error("Unable to send collected load information: " + ex);
+                log.error(sm.getString("heartbeatListener.sendError"), ex);
             }
         }
     }
