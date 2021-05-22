@@ -304,27 +304,19 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         if (getAddress() != null) {
             addressStr = getAddress().getHostAddress();
         }
-        int family = Socket.APR_INET;
-        if (Library.APR_HAVE_IPV6) {
-            if (addressStr == null) {
-                if (!OS.IS_BSD) {
-                    family = Socket.APR_UNSPEC;
-                }
-            } else if (addressStr.indexOf(':') >= 0) {
-                family = Socket.APR_UNSPEC;
-            }
-         }
+        int family = Socket.APR_UNSPEC;
 
         long inetAddress = Address.info(addressStr, family,
                 getPort(), 0, rootPool);
         // Create the APR server socket
-        serverSock = Socket.create(Address.getInfo(inetAddress).family,
+        int saFamily = Address.getInfo(inetAddress).family;
+        serverSock = Socket.create(saFamily,
                 Socket.SOCK_STREAM,
                 Socket.APR_PROTO_TCP, rootPool);
         if (OS.IS_UNIX) {
             Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
         }
-        if (Library.APR_HAVE_IPV6) {
+        if (Library.APR_HAVE_IPV6 && saFamily == Socket.APR_INET6) {
             if (getIpv6v6only()) {
                 Socket.optSet(serverSock, Socket.APR_IPV6_V6ONLY, 1);
             } else {
