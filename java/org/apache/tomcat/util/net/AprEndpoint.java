@@ -472,21 +472,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         if (getAddress() != null) {
             addressStr = getAddress().getHostAddress();
         }
-        int family = Socket.APR_INET;
-        if (Library.APR_HAVE_IPV6) {
-            if (addressStr == null) {
-                if (!OS.IS_BSD && !OS.IS_WIN32 && !OS.IS_WIN64) {
-                    family = Socket.APR_UNSPEC;
-                }
-            } else if (addressStr.indexOf(':') >= 0) {
-                family = Socket.APR_UNSPEC;
-            }
-         }
+        int family = Socket.APR_UNSPEC;
 
         long inetAddress = Address.info(addressStr, family,
                 getPort(), 0, rootPool);
         // Create the APR server socket
-        serverSock = Socket.create(Address.getInfo(inetAddress).family,
+        int saFamily = Address.getInfo(inetAddress).family;
+        serverSock = Socket.create(saFamily,
                 Socket.SOCK_STREAM,
                 Socket.APR_PROTO_TCP, rootPool);
         if (OS.IS_UNIX) {

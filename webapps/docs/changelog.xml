@@ -137,6 +137,9 @@
         Fix failing to run any tests on Windows with Java 8u292 onwards.
         (markt/kkolinko)
       </fix>
+      <update>
+        Simplify AprEndpoint socket bind for all platforms. (michaelo)
+      </update>
     </changelog>
   </subsection>
 </section>
