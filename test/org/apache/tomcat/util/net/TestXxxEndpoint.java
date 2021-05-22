@@ -68,13 +68,7 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         String address = InetAddress.getByName("localhost").getHostAddress();
 
         // Create the APR address that will be bound
-        int family = org.apache.tomcat.jni.Socket.APR_INET;
-        if (Library.APR_HAVE_IPV6) {
-            if (!org.apache.tomcat.jni.OS.IS_BSD && !org.apache.tomcat.jni.OS.IS_WIN32 &&
-                    !org.apache.tomcat.jni.OS.IS_WIN64) {
-                family = org.apache.tomcat.jni.Socket.APR_UNSPEC;
-            }
-         }
+        int family = org.apache.tomcat.jni.Socket.APR_UNSPEC;
 
         long inetAddress = 0;
         try {

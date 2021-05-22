@@ -351,16 +351,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             if (getAddress() != null) {
                 hostname = getAddress().getHostAddress();
             }
-            family = Socket.APR_INET;
-            if (Library.APR_HAVE_IPV6) {
-                if (hostname == null) {
-                    if (!OS.IS_BSD) {
-                        family = Socket.APR_UNSPEC;
-                    }
-                } else if (hostname.indexOf(':') >= 0) {
-                    family = Socket.APR_UNSPEC;
-                }
-            }
+            family = Socket.APR_UNSPEC;
         }
 
         long sockAddress = Address.info(hostname, family, getPortWithOffset(), 0, rootPool);
@@ -370,13 +361,14 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             serverSock = Socket.create(family, Socket.SOCK_STREAM, 0, rootPool);
         }
         else {
-            serverSock = Socket.create(Address.getInfo(sockAddress).family,
+            int saFamily = Address.getInfo(sockAddress).family;
+            serverSock = Socket.create(saFamily,
                 Socket.SOCK_STREAM,
                 Socket.APR_PROTO_TCP, rootPool);
             if (OS.IS_UNIX) {
                 Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
             }
-            if (Library.APR_HAVE_IPV6) {
+            if (Library.APR_HAVE_IPV6 && saFamily == Socket.APR_INET6) {
                 if (getIpv6v6only()) {
                     Socket.optSet(serverSock, Socket.APR_IPV6_V6ONLY, 1);
                 } else {
