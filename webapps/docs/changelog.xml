@@ -169,6 +169,9 @@
         an error occurs on an HTTP/1.1 connection being upgraded to HTTP/2 or on
         a pushed HTTP/2 stream. (markt)
       </fix>
+      <update>
+        Simplify AprEndpoint socket bind for all platforms. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
