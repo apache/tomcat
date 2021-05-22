@@ -167,6 +167,9 @@
         <code>NioBlockingSelector</code> that could cause a delay to select
         operations. (markt)
       </fix>
+      <update>
+        Simplify AprEndpoint socket bind for all platforms. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
