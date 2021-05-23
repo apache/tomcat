@@ -425,8 +425,9 @@ public interface ServletContext {
      * parameter does not exist.
      * <p>
      * This method can make available configuration information useful to an
-     * entire "web application". For example, it can provide a webmaster's email
-     * address or the name of a system that holds critical data.
+     * entire "web application". For example, it can provide a web site
+     * administrator's email address or the name of a system that holds critical
+     * data.
      *
      * @param name
      *            a <code>String</code> containing the name of the parameter

@@ -364,7 +364,7 @@ public class DefaultServlet extends HttpServlet {
             useAcceptRanges = Boolean.parseBoolean(getServletConfig().getInitParameter("useAcceptRanges"));
         }
 
-        // Sanity check on the specified buffer sizes
+        // Prevent the use of buffer sizes that are too small
         if (input < 256) {
             input = 256;
         }
