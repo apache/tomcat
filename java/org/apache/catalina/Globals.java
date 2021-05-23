@@ -286,8 +286,8 @@ public final class Globals {
     // -------------------------------------------------------- Global constants
 
     /**
-     * The master flag which controls strict servlet specification
-     * compliance.
+     * The flag which controls strict servlet specification compliance. Setting
+     * this flag to {@code true} will change the defaults for other settings.
      */
     public static final boolean STRICT_SERVLET_COMPLIANCE =
             Boolean.parseBoolean(System.getProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "false"));

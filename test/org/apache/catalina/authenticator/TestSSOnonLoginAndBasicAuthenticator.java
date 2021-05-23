@@ -121,7 +121,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
     private String encodedURL;
 
     /*
-     * Run some sanity checks without an established SSO session
+     * Run some checks without an established SSO session
      * to make sure the test environment is correct.
      */
     @Test
