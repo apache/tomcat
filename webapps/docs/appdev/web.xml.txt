@@ -53,7 +53,7 @@
     -->
 
     <context-param>
-      <param-name>webmaster</param-name>
+      <param-name>webadmin</param-name>
       <param-value>myaddress@mycompany.com</param-value>
       <description>
         The EMAIL address of the administrator to whom questions

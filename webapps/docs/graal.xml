@@ -71,7 +71,7 @@ cd $JAVA_HOME/bin
 
   <p>
     Download the Tomcat Stuffed module from
-    https://github.com/apache/tomcat/tree/master/modules/stuffed and place
+    https://github.com/apache/tomcat/tree/main/modules/stuffed and place
     all the files in a folder <code>stuffed</code> in this documentation.
     <source>export TOMCAT_STUFFED=/absolute...path...to/stuffed</source>
     The build process now requires both Ant and Maven.
