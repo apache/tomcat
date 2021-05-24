@@ -38,7 +38,7 @@ public class ImportHandler {
     private static final Map<String,Set<String>> standardPackages = new HashMap<>();
 
     static {
-        // Servlet 5.0
+        // Servlet 6.0
         Set<String> servletClassNames = new HashSet<>();
         // Interfaces
         servletClassNames.add("AsyncContext");
@@ -91,7 +91,7 @@ public class ImportHandler {
         servletClassNames.add("UnavailableException");
         standardPackages.put("jakarta.servlet", servletClassNames);
 
-        // Servlet 5.0
+        // Servlet 6.0
         Set<String> servletHttpClassNames = new HashSet<>();
         // Interfaces
         servletHttpClassNames.add("HttpServletMapping");
