@@ -22,6 +22,7 @@ import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.BitSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -408,6 +409,48 @@ public class Cookie implements Cloneable, Serializable {
      */
     public boolean isHttpOnly() {
         return httpOnly;
+    }
+
+    /**
+     * Sets the value for the given cookie attribute. When a value is set via
+     * this method, the value returned by the attribute specific getter (if any)
+     * must be consistent with the value set via this method.
+     *
+     * @param name  Name of attribute to set
+     * @param value Value of attribute
+     *
+     * @throws IllegalArgumentException If the attribute name is null, contains
+     *         any characters not permitted foe use in Cookie names or matches a
+     *         name reserved by the cookie specification.
+     *
+     * @throws NumberFormatException If the attribute is known to be numerical
+     *         but the provided value cannot be parsed to a number.
+     *
+     * @since Servlet 5.1
+     */
+    public void setAttribute(String name, String value) {
+        // TODO - Servlet 5.1
+    }
+
+    /**
+     * Obtain the value for a given attribute. Values returned from this method
+     * must be consistent with the values set and returned by the attribute
+     * specific getters and setters in this class.
+     *
+     * @param name  Name of attribute to return
+     *
+     * @return Value of specified attribute
+     *
+     * @since Servlet 5.1
+     */
+    public String getAttribute(String name) {
+        // TODO - Servlet 5.1
+        return null;
+    }
+
+    public Map<String,String> getAttributes() {
+        // TODO - Servlet 5.1
+        return null;
     }
 }
 
