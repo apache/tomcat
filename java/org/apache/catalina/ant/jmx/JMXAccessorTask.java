@@ -358,11 +358,11 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             String host, String port, String username, String password)
             throws MalformedURLException, IOException {
         String urlForJMX;
-        if (url != null)
+        if (url != null) {
             urlForJMX = url;
-        else
-            urlForJMX = JMX_SERVICE_PREFIX + host + ":" + port
-                    + JMX_SERVICE_SUFFIX;
+        } else {
+            urlForJMX = JMX_SERVICE_PREFIX + host + ":" + port + JMX_SERVICE_SUFFIX;
+        }
         Map<String, String[]> environment = null;
         if (username != null && password != null) {
             String[] credentials = new String[2];
@@ -513,24 +513,27 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return The converted object
      */
     protected Object convertStringToType(String value, String valueType) {
-        if ("java.lang.String".equals(valueType))
+        if ("java.lang.String".equals(valueType)) {
             return value;
+        }
 
         Object convertValue = value;
         if ("java.lang.Integer".equals(valueType) || "int".equals(valueType)) {
             try {
                 convertValue = Integer.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho())
+                if (isEcho()) {
                     handleErrorOutput("Unable to convert to integer:" + value);
+                }
             }
         } else if ("java.lang.Long".equals(valueType)
                 || "long".equals(valueType)) {
             try {
                 convertValue = Long.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho())
+                if (isEcho()) {
                     handleErrorOutput("Unable to convert to long:" + value);
+                }
             }
         } else if ("java.lang.Boolean".equals(valueType)
                 || "boolean".equals(valueType)) {
@@ -540,32 +543,35 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             try {
                 convertValue = Float.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho())
+                if (isEcho()) {
                     handleErrorOutput("Unable to convert to float:" + value);
+                }
             }
         } else if ("java.lang.Double".equals(valueType)
                 || "double".equals(valueType)) {
             try {
                 convertValue = Double.valueOf(value);
             } catch (NumberFormatException ex) {
-                if (isEcho())
+                if (isEcho()) {
                     handleErrorOutput("Unable to convert to double:" + value);
+                }
             }
         } else if ("javax.management.ObjectName".equals(valueType)
                 || "name".equals(valueType)) {
             try {
                 convertValue = new ObjectName(value);
             } catch (MalformedObjectNameException e) {
-                if (isEcho())
-                    handleErrorOutput("Unable to convert to ObjectName:"
-                            + value);
+                if (isEcho()) {
+                    handleErrorOutput("Unable to convert to ObjectName:" + value);
+                }
             }
         } else if ("java.net.InetAddress".equals(valueType)) {
             try {
                 convertValue = InetAddress.getByName(value);
             } catch (UnknownHostException exc) {
-                if (isEcho())
+                if (isEcho()) {
                     handleErrorOutput("Unable to resolve host name:" + value);
+                }
             }
         }
         return convertValue;
@@ -581,8 +587,9 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                 for (int i = 0; i < Array.getLength(result); i++) {
                     handleOutput(name + "." + i + "=" + Array.get(result, i));
                 }
-            } else
+            } else {
                 handleOutput(name + "=" + result);
+            }
         }
     }
 
@@ -610,8 +617,9 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @param result The result
      */
     protected void createProperty(String propertyPrefix, Object result) {
-        if (propertyPrefix == null)
+        if (propertyPrefix == null) {
             propertyPrefix = "";
+        }
         if (result instanceof CompositeDataSupport) {
             CompositeDataSupport data = (CompositeDataSupport) result;
             CompositeType compositeType = data.getCompositeType();
@@ -666,9 +674,9 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                         size++;
                     }
                 }
-                if (size > 0)
-                    setProperty(propertyPrefix + ".Length", Integer
-                            .toString(size));
+                if (size > 0) {
+                    setProperty(propertyPrefix + ".Length", Integer.toString(size));
+                }
             } else {
                 setProperty(propertyPrefix, result.toString());
             }
@@ -696,8 +704,9 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      */
     public boolean setProperty(String property, Object value) {
         if (property != null) {
-            if (value == null)
+            if (value == null) {
                 value = "";
+            }
             if (isEcho()) {
                 handleOutput(property + "=" + value.toString());
             }
