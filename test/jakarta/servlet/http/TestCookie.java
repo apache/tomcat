@@ -134,6 +134,52 @@ public class TestCookie {
         Cookie cookie = new Cookie("$Foo", null);
     }
 
+    @Test
+    public void testGetAttributes01() {
+        Cookie cookie = new Cookie("name", "value");
+        Assert.assertEquals(0, cookie.getAttributes().size());
+    }
+
+    @Test
+    public void testMaxAge01() {
+        Cookie cookie = new Cookie("name", "value");
+        Assert.assertEquals(-1, cookie.getMaxAge());
+
+        for (int value : new int[] { Integer.MIN_VALUE, -2, -1, 0, 1, 2, Integer.MAX_VALUE}) {
+            cookie.setMaxAge(value);
+            Assert.assertEquals(value, cookie.getMaxAge());
+        }
+    }
+
+    @Test
+    public void testAttribute01() {
+        Cookie cookie = new Cookie("name", "value");
+        cookie.setAttribute("aaa", "bbb");
+        Assert.assertEquals("bbb", cookie.getAttribute("aAa"));
+        cookie.setAttribute("aaa", "");
+        Assert.assertEquals("", cookie.getAttribute("aAa"));
+        cookie.setAttribute("aaa", null);
+        Assert.assertNull(cookie.getAttribute("aAa"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAttributeInvalid01() {
+        Cookie cookie = new Cookie("name", "value");
+        cookie.setAttribute("a<aa", "bbb");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAttributeInvalid02() {
+        Cookie cookie = new Cookie("name", "value");
+        cookie.setAttribute(null, "bbb");
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testAttributeInvalid03() {
+        Cookie cookie = new Cookie("name", "value");
+        cookie.setAttribute("Max-Age", "bbb");
+    }
+
     public static void checkCharInName(CookieNameValidator validator, BitSet allowed) {
         for (char ch = 0; ch < allowed.size(); ch++) {
             boolean expected = allowed.get(ch);

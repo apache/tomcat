@@ -21,9 +21,11 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 
 /**
  * Creates a cookie, a small amount of information sent by a servlet to a Web
@@ -55,6 +57,9 @@ import java.util.ResourceBundle;
  * By default, cookies are created using RFC 6265.
  */
 public class Cookie implements Cloneable, Serializable {
+
+    private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
+    private static final ResourceBundle LSTRINGS = ResourceBundle.getBundle(LSTRING_FILE);
 
     private static final CookieNameValidator validation;
 
@@ -103,22 +108,22 @@ public class Cookie implements Cloneable, Serializable {
         }
     }
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private final String name;
     private String value;
 
     private int version = 0; // ;Version=1 ... means RFC 2109 style
 
-    //
     // Attributes encoded in the header's cookie fields.
-    //
-    private String comment; // ;Comment=VALUE ... describes cookie's use
-    private String domain; // ;Domain=VALUE ... domain that sees cookie
-    private int maxAge = -1; // ;Max-Age=VALUE ... cookies auto-expire
-    private String path; // ;Path=VALUE ... URLs that see the cookie
-    private boolean secure; // ;Secure ... e.g. use SSL
-    private boolean httpOnly; // Not in cookie specs, but supported by browsers
+    private volatile Map<String,String> attributes;
+
+    private static final String COMMENT = "Comment";
+    private static final String DOMAIN = "Domain";
+    private static final String MAX_AGE = "Max-Age";
+    private static final String PATH = "Path";
+    private static final String SECURE = "Secure";
+    private static final String HTTP_ONLY = "HttpOnly";
 
     /**
      * Constructs a cookie with a specified name and value.
@@ -153,6 +158,7 @@ public class Cookie implements Cloneable, Serializable {
         this.value = value;
     }
 
+
     /**
      * Specifies a comment that describes a cookie's purpose. The comment is
      * useful if the browser presents the cookie to the user. Comments are not
@@ -164,8 +170,9 @@ public class Cookie implements Cloneable, Serializable {
      * @see #getComment
      */
     public void setComment(String purpose) {
-        comment = purpose;
+        setAttributeInternal(COMMENT, purpose);
     }
+
 
     /**
      * Returns the comment describing the purpose of this cookie, or
@@ -176,8 +183,9 @@ public class Cookie implements Cloneable, Serializable {
      * @see #setComment
      */
     public String getComment() {
-        return comment;
+        return getAttribute(COMMENT);
     }
+
 
     /**
      * Specifies the domain within which this cookie should be presented.
@@ -194,8 +202,14 @@ public class Cookie implements Cloneable, Serializable {
      * @see #getDomain
      */
     public void setDomain(String pattern) {
-        domain = pattern.toLowerCase(Locale.ENGLISH); // IE allegedly needs this
+        if (pattern == null) {
+            setAttributeInternal(DOMAIN, null);
+        } else {
+            // IE requires the domain to be lower case (unconfirmed)
+            setAttributeInternal(DOMAIN, pattern.toLowerCase(Locale.ENGLISH));
+        }
     }
+
 
     /**
      * Returns the domain name set for this cookie. The form of the domain name
@@ -205,8 +219,9 @@ public class Cookie implements Cloneable, Serializable {
      * @see #setDomain
      */
     public String getDomain() {
-        return domain;
+        return getAttribute(DOMAIN);
     }
+
 
     /**
      * Sets the maximum age of the cookie in seconds.
@@ -226,8 +241,9 @@ public class Cookie implements Cloneable, Serializable {
      * @see #getMaxAge
      */
     public void setMaxAge(int expiry) {
-        maxAge = expiry;
+        setAttributeInternal(MAX_AGE, Integer.toString(expiry));
     }
+
 
     /**
      * Returns the maximum age of the cookie, specified in seconds, By default,
@@ -239,8 +255,14 @@ public class Cookie implements Cloneable, Serializable {
      * @see #setMaxAge
      */
     public int getMaxAge() {
-        return maxAge;
+        String maxAge = getAttribute(MAX_AGE);
+        if (maxAge == null) {
+            return -1;
+        } else {
+            return Integer.parseInt(maxAge);
+        }
     }
+
 
     /**
      * Specifies a path for the cookie to which the client should return the
@@ -260,8 +282,9 @@ public class Cookie implements Cloneable, Serializable {
      * @see #getPath
      */
     public void setPath(String uri) {
-        path = uri;
+        setAttributeInternal(PATH, uri);
     }
+
 
     /**
      * Returns the path on the server to which the browser returns this cookie.
@@ -272,8 +295,9 @@ public class Cookie implements Cloneable, Serializable {
      * @see #setPath
      */
     public String getPath() {
-        return path;
+        return getAttribute(PATH);
     }
+
 
     /**
      * Indicates to the browser whether the cookie should only be sent using a
@@ -288,8 +312,9 @@ public class Cookie implements Cloneable, Serializable {
      * @see #getSecure
      */
     public void setSecure(boolean flag) {
-        secure = flag;
+        setAttributeInternal(SECURE, Boolean.toString(flag));
     }
+
 
     /**
      * Returns <code>true</code> if the browser is sending cookies only over a
@@ -301,8 +326,9 @@ public class Cookie implements Cloneable, Serializable {
      * @see #setSecure
      */
     public boolean getSecure() {
-        return secure;
+        return Boolean.parseBoolean(getAttribute(SECURE));
     }
+
 
     /**
      * Returns the name of the cookie. The name cannot be changed after
@@ -313,6 +339,7 @@ public class Cookie implements Cloneable, Serializable {
     public String getName() {
         return name;
     }
+
 
     /**
      * Assigns a new value to a cookie after the cookie is created. If you use a
@@ -332,6 +359,7 @@ public class Cookie implements Cloneable, Serializable {
         value = newValue;
     }
 
+
     /**
      * Returns the value of the cookie.
      *
@@ -342,6 +370,7 @@ public class Cookie implements Cloneable, Serializable {
     public String getValue() {
         return value;
     }
+
 
     /**
      * Returns the version of the protocol this cookie complies with. Version 1
@@ -356,6 +385,7 @@ public class Cookie implements Cloneable, Serializable {
     public int getVersion() {
         return version;
     }
+
 
     /**
      * Sets the version of the cookie protocol this cookie complies with.
@@ -374,6 +404,7 @@ public class Cookie implements Cloneable, Serializable {
         version = v;
     }
 
+
     /**
      * Overrides the standard <code>java.lang.Object.clone</code> method to
      * return a copy of this cookie.
@@ -387,6 +418,7 @@ public class Cookie implements Cloneable, Serializable {
         }
     }
 
+
     /**
      * Sets the flag that controls if this cookie will be hidden from scripts on
      * the client side.
@@ -396,8 +428,9 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public void setHttpOnly(boolean httpOnly) {
-        this.httpOnly = httpOnly;
+        setAttributeInternal(HTTP_ONLY, Boolean.toString(httpOnly));
     }
+
 
     /**
      * Gets the flag that controls if this cookie will be hidden from scripts on
@@ -408,8 +441,9 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public boolean isHttpOnly() {
-        return httpOnly;
+        return Boolean.parseBoolean(getAttribute(HTTP_ONLY));
     }
+
 
     /**
      * Sets the value for the given cookie attribute. When a value is set via
@@ -419,9 +453,8 @@ public class Cookie implements Cloneable, Serializable {
      * @param name  Name of attribute to set
      * @param value Value of attribute
      *
-     * @throws IllegalArgumentException If the attribute name is null, contains
-     *         any characters not permitted foe use in Cookie names or matches a
-     *         name reserved by the cookie specification.
+     * @throws IllegalArgumentException If the attribute name is null or
+     *         contains any characters not permitted for use in Cookie names.
      *
      * @throws NumberFormatException If the attribute is known to be numerical
      *         but the provided value cannot be parsed to a number.
@@ -429,8 +462,40 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 5.1
      */
     public void setAttribute(String name, String value) {
-        // TODO - Servlet 5.1
+        if (name == null) {
+            throw new IllegalArgumentException(LSTRINGS.getString("cookie.attribute.invalidName.null"));
+        }
+        if (!validation.isToken(name)) {
+            String msg = LSTRINGS.getString("cookie.attribute.invalidName.notToken");
+            throw new IllegalArgumentException(MessageFormat.format(msg, name));
+        }
+
+        if (name.equalsIgnoreCase(MAX_AGE)) {
+            if (value == null) {
+                setAttributeInternal(MAX_AGE, null);
+            } else {
+                // Integer.parseInt throws NFE if required
+                setMaxAge(Integer.parseInt(value));
+            }
+        } else {
+            setAttributeInternal(name, value);
+        }
     }
+
+
+    private void setAttributeInternal(String name, String value) {
+        if (attributes == null) {
+            if (value == null) {
+                return;
+            } else {
+                // Case insensitive keys but retain case used
+                attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            }
+        }
+
+        attributes.put(name, value);
+    }
+
 
     /**
      * Obtain the value for a given attribute. Values returned from this method
@@ -444,13 +509,28 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 5.1
      */
     public String getAttribute(String name) {
-        // TODO - Servlet 5.1
-        return null;
+        if (attributes == null) {
+            return null;
+        } else {
+            return attributes.get(name);
+        }
     }
 
+
+    /**
+     * Obtain the Map of attributes and values (excluding version) for this
+     * cookie.
+     *
+     * @return A read-only Map of attributes to values, excluding version.
+     *
+     * @since Servlet 5.1
+     */
     public Map<String,String> getAttributes() {
-        // TODO - Servlet 5.1
-        return null;
+        if (attributes == null) {
+            return Collections.emptyMap();
+        } else {
+            return Collections.unmodifiableMap(attributes);
+        }
     }
 }
 
@@ -480,7 +560,7 @@ class CookieNameValidator {
         }
     }
 
-    private boolean isToken(String possibleToken) {
+    boolean isToken(String possibleToken) {
         int len = possibleToken.length();
 
         for (int i = 0; i < len; i++) {

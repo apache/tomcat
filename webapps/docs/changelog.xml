@@ -147,6 +147,11 @@
         before attempting conversion to String. Pull request provided by
         tianshuang. (markt)
       </fix>
+      <add>
+        Implement the new <code>Cookie</code> methods
+        <code>setAttribute()</code>, <code>getAttribute()</code> and
+        <code>getAttributes()</code> introduced in Servlet 5.1. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
