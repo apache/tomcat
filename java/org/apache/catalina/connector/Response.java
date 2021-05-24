@@ -1058,8 +1058,9 @@ public class Response implements HttpServletResponse {
 
         char cc=name.charAt(0);
         if (cc=='C' || cc=='c') {
-            if (checkSpecialHeader(name, value))
-            return;
+            if (checkSpecialHeader(name, value)) {
+                return;
+            }
         }
 
         getCoyoteResponse().addHeader(name, value, charset);
