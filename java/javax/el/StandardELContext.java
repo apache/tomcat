@@ -133,8 +133,9 @@ public class StandardELContext extends ELContext {
         @Override
         public ValueExpression setVariable(String variable,
                 ValueExpression expression) {
-            if (vars == null)
+            if (vars == null) {
                 vars = new HashMap<>();
+            }
             if (expression == null) {
                 return vars.remove(variable);
             } else {
