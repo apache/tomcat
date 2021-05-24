@@ -115,6 +115,10 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <scode>
+        Incremented supported Servlet version to 5.1 to align with the current
+        development branch of the Servlet specification. (markt)
+      </scode>
       <fix>
         <bug>65301</bug>: <code>RemoteIpValve</code> will now avoid getting
         the local host name when it is not needed. (remm)
