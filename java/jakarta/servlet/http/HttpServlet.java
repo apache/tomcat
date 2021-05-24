@@ -725,10 +725,12 @@ public abstract class HttpServlet extends GenericServlet {
      */
     private void maybeSetLastModified(HttpServletResponse resp,
                                       long lastModified) {
-        if (resp.containsHeader(HEADER_LASTMOD))
+        if (resp.containsHeader(HEADER_LASTMOD)) {
             return;
-        if (lastModified >= 0)
+        }
+        if (lastModified >= 0) {
             resp.setDateHeader(HEADER_LASTMOD, lastModified);
+        }
     }
 
 
