@@ -24,10 +24,10 @@
 
 # ----- Version Control Flags -----
 version.major=10
-version.minor=0
-version.build=7
+version.minor=1
+version.build=0
 version.patch=0
-version.suffix=-dev
+version.suffix=-M1-dev
 
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds

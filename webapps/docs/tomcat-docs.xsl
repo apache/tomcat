@@ -35,9 +35,9 @@
   <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
   <xsl:param    name="subdir"              select="''"/>
   <xsl:param    name="relative-path"       select="'.'"/>
-  <xsl:param    name="version"             select="'10.0.x'"/>
+  <xsl:param    name="version"             select="'10.1.x'"/>
   <xsl:param    name="majorversion"        select="'10'"/>
-  <xsl:param    name="majorminorversion"   select="'10.0'"/>
+  <xsl:param    name="majorminorversion"   select="'10.1'"/>
   <xsl:param    name="minjavaversion"      select="'8'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
@@ -45,7 +45,7 @@
   <xsl:param    name="buglink"             select="'https://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
   <xsl:param    name="prlink"              select="'https://github.com/apache/tomcat/pull/'"/>
   <xsl:param    name="revlink"             select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
-  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-10.0-doc'"/>
+  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-10.1-doc'"/>
   <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-10.html'"/>
   <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-10.cgi'"/>
   <xsl:param    name="sitedir"             select="''"/>

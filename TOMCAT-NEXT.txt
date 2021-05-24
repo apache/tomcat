@@ -15,7 +15,7 @@
   limitations under the License.
 ================================================================================
 
-Notes of things to consider for the next major Tomcat release (10.0.x)
+Notes of things to consider for the next major Tomcat release (10.1.x)
 
 Items carried over from the 9.0.x list:
 

@@ -1238,7 +1238,7 @@
   <p>In addition to the standard TLS related request attributes defined in
   section 3.10 of the Servlet specification, Tomcat supports a number of
   additional TLS related attributes. The full list may be found in the <a
-  href="http://tomcat.apache.org/tomcat-10.0-doc/api/index.html">SSLSupport
+  href="http://tomcat.apache.org/tomcat-10.1-doc/api/index.html">SSLSupport
   Javadoc</a>.</p>
 
   <p>For more information, see the
