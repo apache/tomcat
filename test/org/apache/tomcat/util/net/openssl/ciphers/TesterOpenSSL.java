@@ -50,22 +50,14 @@ public class TesterOpenSSL {
             versionString = "";
         }
         if (versionString.startsWith("OpenSSL 3.0.0")) {
-            // Note: Gump currently tests 9.0.x with OpenSSL master
-            //       (a.k.a 3.0.0-dev)
+            // Note: Gump currently tests 10.x with OpenSSL 3.0.x
             VERSION = 30000;
         } else if (versionString.startsWith("OpenSSL 1.1.1")) {
             // LTS
             // Supported until at least 2023-09-11
+            // Note: Gump currently tests 9.x and earlier with OpenSSL 1.1.1[x]
             VERSION = 10101;
-        } else if (versionString.startsWith("OpenSSL 1.1.0")) {
-            // Support ends 2019-09-11
-            VERSION = 10100;
-        } else if (versionString.startsWith("OpenSSL 1.0.2")) {
-            // LTS
-            // Support ends 2019-12-31
-            // Note: Gump current tests 8.5.x with OpenSSL 1.0.2
-            VERSION = 10002;
-        // Note: Release branches 1.0.1 and earlier are no longer supported by
+        // Note: Release branches 1.1.0 and earlier are no longer supported by
         //       the OpenSSL team so these tests don't support them either.
         } else {
             VERSION = -1;
@@ -107,6 +99,76 @@ public class TesterOpenSSL {
         unimplemented.add(Cipher.SSL2_RC4_128_EXPORT40_WITH_MD5);
         unimplemented.add(Cipher.SSL2_IDEA_128_CBC_WITH_MD5);
         unimplemented.add(Cipher.SSL2_DES_192_EDE3_CBC_WITH_MD5);
+        // These were removed in 1.1.0 so won't be available from that
+        // version onwards.
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA256);
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_GCM_SHA256);
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_CBC_SHA256);
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_GCM_SHA384);
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_DSS_WITH_SEED_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA256);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_GCM_SHA256);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_CBC_SHA256);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_GCM_SHA384);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_RSA_WITH_SEED_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_NULL_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_NULL_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_128_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_256_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256);
+        unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256);
+        unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384);
+        unimplemented.add(Cipher.TLS_RSA_WITH_RC4_128_MD5);
+        unimplemented.add(Cipher.TLS_DH_anon_WITH_RC4_128_MD5);
+        unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_RSA_PSK_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_RSA_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_PSK_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_DHE_PSK_WITH_RC4_128_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_anon_WITH_RC4_128_SHA);
+        // 3DES requires a compile time switch to enable. Treat as removed.
+        unimplemented.add(Cipher.TLS_PSK_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_SRP_SHA_DSS_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_anon_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_RSA_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA);
+        unimplemented.add(Cipher.TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA);
 
         // These are TLS v1.3 cipher suites
         // Java does not currently support these so they are excluded from the
@@ -120,198 +182,10 @@ public class TesterOpenSSL {
         unimplemented.add(Cipher.TLS_AES_256_GCM_SHA384);
         unimplemented.add(Cipher.TLS_CHACHA20_POLY1305_SHA256);
 
-        if (VERSION < 10100) {
-            // These were implemented in 1.1.0 so won't be available in any
-            // earlier version
-            unimplemented.add(Cipher.TLS_PSK_WITH_NULL_SHA);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_NULL_SHA);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_NULL_SHA);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_PSK_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_PSK_WITH_AES_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_PSK_WITH_NULL_SHA256);
-            unimplemented.add(Cipher.TLS_PSK_WITH_NULL_SHA384);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_NULL_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_NULL_SHA384);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_AES_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_NULL_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_NULL_SHA384);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_AES_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_AES_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_NULL_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_NULL_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_NULL_SHA384);
-            unimplemented.add(Cipher.TLS_PSK_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_PSK_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_PSK_WITH_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_PSK_WITH_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_WITH_AES_128_CCM);
-            unimplemented.add(Cipher.TLS_RSA_WITH_AES_256_CCM);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_AES_128_CCM);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_AES_256_CCM);
-            unimplemented.add(Cipher.TLS_RSA_WITH_AES_128_CCM_8);
-            unimplemented.add(Cipher.TLS_RSA_WITH_AES_256_CCM_8);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_AES_128_CCM_8);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_AES_256_CCM_8);
-            unimplemented.add(Cipher.TLS_PSK_WITH_AES_128_CCM);
-            unimplemented.add(Cipher.TLS_PSK_WITH_AES_256_CCM);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_128_CCM);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_256_CCM);
-            unimplemented.add(Cipher.TLS_PSK_WITH_AES_128_CCM_8);
-            unimplemented.add(Cipher.TLS_PSK_WITH_AES_256_CCM_8);
-            unimplemented.add(Cipher.TLS_PSK_DHE_WITH_AES_128_CCM_8);
-            unimplemented.add(Cipher.TLS_PSK_DHE_WITH_AES_256_CCM_8);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_128_CCM);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_256_CCM);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8);
-            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256);
-            unimplemented.add(Cipher.TLS_PSK_WITH_CHACHA20_POLY1305_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256);
-        } else {
-            // These were removed in 1.1.0 so won't be available from that
-            // version onwards.
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_WITH_SEED_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_WITH_SEED_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_NULL_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_NULL_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_128_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_256_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256);
-            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384);
-            unimplemented.add(Cipher.TLS_RSA_WITH_RC4_128_MD5);
-            unimplemented.add(Cipher.TLS_DH_anon_WITH_RC4_128_MD5);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_RSA_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_PSK_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_RC4_128_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_anon_WITH_RC4_128_SHA);
-            // 3DES requires a compile time switch to enable. Treat as removed.
-            unimplemented.add(Cipher.TLS_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_SRP_SHA_DSS_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_anon_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_RSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA);
-        }
-
-        if (VERSION < 10101) {
-            // These were implemented in 1.1.1 so won't be available in any
-            // earlier version
-            unimplemented.add(Cipher.TLS_RSA_WITH_ARIA_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_WITH_ARIA_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_ARIA_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_ARIA_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_ARIA_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_ARIA_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_PSK_WITH_ARIA_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_PSK_WITH_ARIA_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_ARIA_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_ARIA_256_GCM_SHA384);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_ARIA_128_GCM_SHA256);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384);
-        }
-
         if (VERSION < 30000) {
             // No new ciphers in 3.0.0 so far
         } else {
-            // These were moved to the legacy provided in 3.0.0 so won't be
+            // These were moved to the legacy provider in 3.0.0 so won't be
             // available from that version onwards.
             unimplemented.add(Cipher.TLS_RSA_WITH_IDEA_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_anon_WITH_SEED_CBC_SHA);
