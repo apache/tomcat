@@ -43,12 +43,6 @@ public class JSSEImplementation extends SSLImplementation {
         JSSESupport.init();
     }
 
-    @Deprecated
-    @Override
-    public SSLSupport getSSLSupport(SSLSession session) {
-        return getSSLSupport(session, null);
-    }
-
     @Override
     public SSLSupport getSSLSupport(SSLSession session, Map<String, List<String>> additionalAttributes) {
         return new JSSESupport(session, additionalAttributes);

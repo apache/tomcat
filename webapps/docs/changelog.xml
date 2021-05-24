@@ -111,6 +111,9 @@
         This release contains all of the changes upto and including those in
         Apache Tomcat 10.0.6 plus the additional changes listed below. (markt)
       </scode>
+      <scode>
+        Remove code previously marked for removal in Tomcat 10.1.x. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Catalina">

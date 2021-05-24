@@ -584,36 +584,6 @@ public class FarmWarDeployer extends ClusterListener
     }
 
     /**
-     * Verified if a context is being services.
-     * @param name The context name
-     * @return <code>true</code> if the context is being serviced
-     * @throws Exception Error invoking the deployer
-     * @deprecated Unused. Will be removed in Tomcat 10.1.x onwards.
-     */
-    @Deprecated
-    protected boolean isServiced(String name) throws Exception {
-        String[] params = { name };
-        String[] signature = { "java.lang.String" };
-        Boolean result = (Boolean) mBeanServer.invoke(oname, "isServiced",
-                params, signature);
-        return result.booleanValue();
-    }
-
-    /**
-     * Mark a context as being services.
-     * @param name The context name
-     * @throws Exception Error invoking the deployer
-     * @deprecated Unused. Will be removed in Tomcat 10.1.x onwards.
-     *             Use {@link #tryAddServiced}
-     */
-    @Deprecated
-    protected void addServiced(String name) throws Exception {
-        String[] params = { name };
-        String[] signature = { "java.lang.String" };
-        mBeanServer.invoke(oname, "addServiced", params, signature);
-    }
-
-    /**
      * Attempt to mark a context as being serviced
      * @param name The context name
      * @return {@code true} if the application was marked as being serviced and

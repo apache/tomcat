@@ -336,25 +336,6 @@ public class Util {
     /**
      * Build the list of decoder entries from a set of decoder implementations.
      *
-     * @param decoderClazzes Decoder implementation classes
-     *
-     * @return List of mappings from target type to associated decoder
-     *
-     * @throws DeploymentException If a provided decoder class is not valid
-     *
-     * @deprecated Will be removed in Tomcat 10.1.x.
-     *             Use {@link Util#getDecoders(List, InstanceManager)}
-     */
-    @Deprecated
-    public static List<DecoderEntry> getDecoders(List<Class<? extends Decoder>> decoderClazzes)
-            throws DeploymentException {
-        return getDecoders(decoderClazzes, null);
-    }
-
-
-    /**
-     * Build the list of decoder entries from a set of decoder implementations.
-     *
      * @param decoderClazzes    Decoder implementation classes
      * @param instanceManager   Instance manager to use to create Decoder
      *                              instances

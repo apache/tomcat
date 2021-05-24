@@ -2762,30 +2762,6 @@ public class JNDIRealm extends RealmBase {
      * @param inString string to escape according to RFC 2254 guidelines
      *
      * @return String the escaped/encoded result
-     *
-     * @deprecated Will be removed in Tomcat 10.1.x onwards
-     */
-    @Deprecated
-    protected String doRFC2254Encoding(String inString) {
-        return doFilterEscaping(inString);
-    }
-
-
-    /**
-     * Given an LDAP search string, returns the string with certain characters
-     * escaped according to RFC 2254 guidelines.
-     * The character mapping is as follows:
-     *     char -&gt;  Replacement
-     *    ---------------------------
-     *     *  -&gt; \2a
-     *     (  -&gt; \28
-     *     )  -&gt; \29
-     *     \  -&gt; \5c
-     *     \0 -&gt; \00
-     *
-     * @param inString string to escape according to RFC 2254 guidelines
-     *
-     * @return String the escaped/encoded result
      */
     protected String doFilterEscaping(String inString) {
         if (inString == null) {

@@ -76,22 +76,7 @@ public abstract class SSLImplementation {
      * @return An instance of SSLSupport based on the given session and the
      *         provided additional attributes
      */
-    public SSLSupport getSSLSupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
-        return getSSLSupport(session);
-    }
-
-    /**
-     * Obtain an instance of SSLSupport.
-     *
-     * @param session   The TLS session
-     *
-     * @return An instance of SSLSupport based on the given session.
-     *
-     * @deprecated This will be removed in Tomcat 10.1.x onwards.
-     *             Use {@link #getSSLSupport(SSLSession, Map)}.
-     */
-    @Deprecated
-    public abstract SSLSupport getSSLSupport(SSLSession session);
+    public abstract SSLSupport getSSLSupport(SSLSession session, Map<String,List<String>> additionalAttributes);
 
     public abstract SSLUtil getSSLUtil(SSLHostConfigCertificate certificate);
 

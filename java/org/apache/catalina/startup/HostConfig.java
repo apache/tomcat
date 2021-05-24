@@ -147,16 +147,6 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * List of applications which are being serviced, and shouldn't be
-     * deployed/undeployed/redeployed at the moment.
-     * @deprecated Unused. Will be removed in Tomcat 10.1.x onwards. Replaced
-     *             by the private <code>servicedSet</code> field.
-     */
-    @Deprecated
-    protected final ArrayList<String> serviced = new ArrayList<>();
-
-
-    /**
      * Set of applications which are being serviced, and shouldn't be
      * deployed/undeployed/redeployed at the moment.
      */
@@ -334,47 +324,9 @@ public class HostConfig implements LifecycleListener {
      */
     public boolean tryAddServiced(String name) {
         if (servicedSet.add(name)) {
-            synchronized (this) {
-                serviced.add(name);
-            }
             return true;
         }
         return false;
-    }
-
-
-    /**
-     * Add a serviced application to the list if it is not already present. If
-     * the application is already in the list of serviced applications this
-     * method is a NO-OP.
-     *
-     * @param name the context name
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 10.1.x onwards.
-     *             Use {@link #tryAddServiced} instead.
-     */
-    @Deprecated
-    public void addServiced(String name) {
-        servicedSet.add(name);
-        synchronized (this) {
-            serviced.add(name);
-        }
-    }
-
-
-    /**
-     * Is application serviced ?
-     *
-     * @param name the context name
-     *
-     * @return state of the application
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 10.1.x onwards.
-     *             Use {@link #tryAddServiced} instead.
-     */
-    @Deprecated
-    public boolean isServiced(String name) {
-        return servicedSet.contains(name);
     }
 
 
@@ -384,9 +336,6 @@ public class HostConfig implements LifecycleListener {
      */
     public void removeServiced(String name) {
         servicedSet.remove(name);
-        synchronized (this) {
-            serviced.remove(name);
-        }
     }
 
 

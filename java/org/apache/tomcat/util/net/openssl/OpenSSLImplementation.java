@@ -29,12 +29,6 @@ import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 public class OpenSSLImplementation extends SSLImplementation {
 
-    @Deprecated
-    @Override
-    public SSLSupport getSSLSupport(SSLSession session) {
-        return new JSSESupport(session);
-    }
-
     @Override
     public SSLSupport getSSLSupport(SSLSession session, Map<String, List<String>> additionalAttributes) {
         return new JSSESupport(session, additionalAttributes);

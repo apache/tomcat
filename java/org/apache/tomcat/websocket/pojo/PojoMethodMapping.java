@@ -77,25 +77,6 @@ public class PojoMethodMapping {
      * @param clazzPojo         POJO implementation class
      * @param decoderClazzes    Set of potential decoder classes
      * @param wsPath            Path at which the endpoint will be deployed
-     *
-     * @throws DeploymentException If the mapping cannot be completed
-     *
-     * @deprecated Will be removed in Tomcat 10.1.x
-     *             Use (@link {@link #PojoMethodMapping(Class, List, String, InstanceManager)}
-     */
-    @Deprecated
-    public PojoMethodMapping(Class<?> clazzPojo, List<Class<? extends Decoder>> decoderClazzes, String wsPath)
-            throws DeploymentException {
-        this(clazzPojo, decoderClazzes, wsPath, null);
-    }
-
-
-    /**
-     * Create a method mapping for the given POJO
-     *
-     * @param clazzPojo         POJO implementation class
-     * @param decoderClazzes    Set of potential decoder classes
-     * @param wsPath            Path at which the endpoint will be deployed
      * @param instanceManager   Instance manager to use to create Decoder instances
      *
      * @throws DeploymentException If the mapping cannot be completed

@@ -77,17 +77,6 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     private SSLSession session;
     private Map<String,List<String>> additionalAttributes;
 
-    /**
-     * @param session SSLSession from which information is to be extracted
-     *
-     * @deprecated This will be removed in Tomcat 10.1.x onwards
-     *             Use {@link JSSESupport#JSSESupport(SSLSession, Map)}
-     */
-    @Deprecated
-    public JSSESupport(SSLSession session) {
-        this(session, null);
-    }
-
     public JSSESupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
         this.session = session;
         this.additionalAttributes = additionalAttributes;
