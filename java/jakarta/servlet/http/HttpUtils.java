@@ -159,8 +159,9 @@ public class HttpUtils {
         // should a length of 0 be an IllegalArgumentException
 
         // cheap hack to return an empty hash
-        if (len <=0)
+        if (len <= 0) {
             return new Hashtable<>();
+        }
 
         if (in == null) {
             throw new IllegalArgumentException();
@@ -221,8 +222,9 @@ public class HttpUtils {
                 } catch (StringIndexOutOfBoundsException e) {
                     String rest  = s.substring(i);
                     sb.append(rest);
-                    if (rest.length()==2)
+                    if (rest.length() == 2) {
                         i++;
+                    }
                 }
 
                 break;
