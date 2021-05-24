@@ -198,8 +198,9 @@ public class CompositeELResolver extends ELResolver {
 
         @Override
         public boolean hasNext() {
-            if (this.next != null)
+            if (this.next != null) {
                 return true;
+            }
             if (this.itr != null) {
                 while (this.next == null && itr.hasNext()) {
                     this.next = itr.next();
