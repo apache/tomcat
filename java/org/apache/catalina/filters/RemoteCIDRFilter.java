@@ -113,8 +113,9 @@ public final class RemoteCIDRFilter extends FilterBase {
     public void setDeny(final String input) {
         final List<String> messages = fillFromInput(input, deny);
 
-        if (messages.isEmpty())
+        if (messages.isEmpty()) {
             return;
+        }
 
         for (final String message : messages) {
             log.error(message);
