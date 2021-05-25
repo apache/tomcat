@@ -221,6 +221,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 </body>
 </document>
