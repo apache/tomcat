@@ -191,6 +191,11 @@
         Add generics to the EL 5.0 API to align with the current EL 5.0
         development branch. (markt)
       </scode>
+      <update>
+        Update the <code>web-fragment.xml</code> included in
+        <code>jasper.jar</code> and <code>jasper-el.jar</code> to use the
+        Servlet 5.0 schema. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -201,6 +206,10 @@
         size was an exact multiple of 8192. Based on a patch provided by Saksham
         Verma. (markt)
       </fix>
+      <update>
+        Update the <code>web-fragment.xml</code> included in
+        <code>tomcat-websocket.jar</code>to use the Servlet 5.0 schema. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
