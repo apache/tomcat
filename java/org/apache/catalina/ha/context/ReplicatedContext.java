@@ -106,8 +106,12 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         Loader loader = null;
         ClassLoader classLoader = null;
         loader = this.getLoader();
-        if (loader != null) classLoader = loader.getClassLoader();
-        if ( classLoader == null ) classLoader = Thread.currentThread().getContextClassLoader();
+        if (loader != null) {
+            classLoader = loader.getClassLoader();
+        }
+        if ( classLoader == null ) {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        }
         if ( classLoader == Thread.currentThread().getContextClassLoader() ) {
             return new ClassLoader[] {classLoader};
         } else {
@@ -119,8 +123,9 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     public ServletContext getServletContext() {
         if (context == null) {
             context = new ReplApplContext(this);
-            if (getAltDDName() != null)
+            if (getAltDDName() != null) {
                 context.setAttribute(Globals.ALT_DD_ATTR,getAltDDName());
+            }
         }
 
         return ((ReplApplContext)context).getFacade();
@@ -169,8 +174,9 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             }
             if ( (!getParent().getState().isAvailable()) || "org.apache.jasper.runtime.JspApplicationContextImpl".equals(name) ){
                 tomcatAttributes.put(name,value);
-            } else
+            } else {
                 super.setAttribute(name,value);
+            }
         }
 
         @Override

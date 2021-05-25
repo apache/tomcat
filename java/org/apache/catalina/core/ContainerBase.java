@@ -325,8 +325,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public Log getLogger() {
-        if (logger != null)
+        if (logger != null) {
             return logger;
+        }
         logger = LogFactory.getLog(getLogName());
         return logger;
     }
@@ -370,11 +371,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Lock readLock = clusterLock.readLock();
         readLock.lock();
         try {
-            if (cluster != null)
+            if (cluster != null) {
                 return cluster;
+            }
 
-            if (parent != null)
+            if (parent != null) {
                 return parent.getCluster();
+            }
 
             return null;
         } finally {
@@ -411,8 +414,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         try {
             // Change components if necessary
             oldCluster = this.cluster;
-            if (oldCluster == cluster)
+            if (oldCluster == cluster) {
                 return;
+            }
             this.cluster = cluster;
 
             // Stop the old component if necessary
@@ -426,8 +430,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
 
             // Start the new component if necessary
-            if (cluster != null)
+            if (cluster != null) {
                 cluster.setContainer(this);
+            }
 
             if (getState().isAvailable() && (cluster != null) &&
                 (cluster instanceof Lifecycle)) {
@@ -542,8 +547,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public ClassLoader getParentClassLoader() {
-        if (parentClassLoader != null)
+        if (parentClassLoader != null) {
             return parentClassLoader;
+        }
         if (parent != null) {
             return parent.getParentClassLoader();
         }
@@ -591,10 +597,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Lock l = realmLock.readLock();
         l.lock();
         try {
-            if (realm != null)
+            if (realm != null) {
                 return realm;
-            if (parent != null)
+            }
+            if (parent != null) {
                 return parent.getRealm();
+            }
             return null;
         } finally {
             l.unlock();
@@ -625,8 +633,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         try {
             // Change components if necessary
             Realm oldRealm = this.realm;
-            if (oldRealm == realm)
+            if (oldRealm == realm) {
                 return;
+            }
             this.realm = realm;
 
             // Stop the old component if necessary
@@ -640,8 +649,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
 
             // Start the new component if necessary
-            if (realm != null)
+            if (realm != null) {
                 realm.setContainer(this);
+            }
             if (getState().isAvailable() && (realm != null) &&
                 (realm instanceof Lifecycle)) {
                 try {
@@ -698,9 +708,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         synchronized(children) {
-            if (children.get(child.getName()) != null)
+            if (children.get(child.getName()) != null) {
                 throw new IllegalArgumentException(
                         sm.getString("containerBase.child.notUnique", child.getName()));
+            }
             child.setParent(this);  // May throw IAE
             children.put(child.getName(), child);
         }
@@ -826,8 +837,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         synchronized(children) {
-            if (children.get(child.getName()) == null)
+            if (children.get(child.getName()) == null) {
                 return;
+            }
             children.remove(child.getName());
         }
 
@@ -1119,8 +1131,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void backgroundProcess() {
 
-        if (!getState().isAvailable())
+        if (!getState().isAvailable()) {
             return;
+        }
 
         Cluster cluster = getClusterInternal();
         if (cluster != null) {
@@ -1187,8 +1200,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void fireContainerEvent(String type, Object data) {
 
-        if (listeners.size() < 1)
+        if (listeners.size() < 1) {
             return;
+        }
 
         ContainerEvent event = new ContainerEvent(this, type, data);
         // Note for each uses an iterator internally so this is safe
