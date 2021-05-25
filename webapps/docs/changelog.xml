@@ -161,6 +161,11 @@
         a tag handler, only define the local variable <code>JspWriter out</code>
         when it is going to be used. (markt)
       </fix>
+      <update>
+        Update the <code>web-fragment.xml</code> included in
+        <code>jasper.jar</code> and <code>jasper-el.jar</code> to use the
+        Servlet 5.0 schema. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -171,6 +176,10 @@
         size was an exact multiple of 8192. Based on a patch provided by Saksham
         Verma. (markt)
       </fix>
+      <update>
+        Update the <code>web-fragment.xml</code> included in
+        <code>tomcat-websocket.jar</code>to use the Servlet 5.0 schema. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
