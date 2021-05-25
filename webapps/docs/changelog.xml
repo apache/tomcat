@@ -195,6 +195,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.66 (markt)" rtext="2021-05-12">
   <subsection name="Catalina">
