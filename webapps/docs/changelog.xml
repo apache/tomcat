@@ -187,6 +187,10 @@
         a tag handler, only define the local variable <code>JspWriter out</code>
         when it is going to be used. (markt)
       </fix>
+      <scode>
+        Add generics to the EL 5.0 API to align with the current EL 5.0
+        development branch. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

@@ -181,8 +181,9 @@ public final class ValueExpressionImpl extends ValueExpression implements
      *
      * @see jakarta.el.ValueExpression#getValue(jakarta.el.ELContext)
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public Object getValue(ELContext context) throws PropertyNotFoundException,
+    public <T> T getValue(ELContext context) throws PropertyNotFoundException,
             ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);
@@ -192,7 +193,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
             value = context.convertToType(value, this.expectedType);
         }
         context.notifyAfterEvaluation(getExpressionString());
-        return value;
+        return (T) value;
     }
 
     /*

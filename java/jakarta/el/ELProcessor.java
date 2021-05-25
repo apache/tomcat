@@ -55,7 +55,7 @@ public class ELProcessor {
     }
 
 
-    public Object getValue(String expression, Class<?> expectedType) {
+    public <T> T getValue(String expression, Class<T> expectedType) {
         ValueExpression ve = factory.createValueExpression(
                 context, bracket(expression), expectedType);
         return ve.getValue(context);
