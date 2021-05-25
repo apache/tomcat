@@ -196,6 +196,10 @@
         <code>jasper.jar</code> and <code>jasper-el.jar</code> to use the
         Servlet 5.0 schema. (markt)
       </update>
+      <fix>
+        Update JspC to generate <code>web.xml</code> and
+        <code>web-fragment.xml</code> files using Servlet 5.0 schemas. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
