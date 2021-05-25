@@ -397,7 +397,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
 
     public void setErrorState(Throwable t, boolean fireOnError) {
-        if (t!=null) request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
+        if (t!=null) {
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
+        }
         request.getCoyoteRequest().action(ActionCode.ASYNC_ERROR, null);
 
         if (fireOnError) {
