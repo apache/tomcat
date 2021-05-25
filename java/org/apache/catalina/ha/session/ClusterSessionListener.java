@@ -62,13 +62,14 @@ public class ClusterSessionListener extends ClusterListener {
             if (ctxname == null) {
                 for (Map.Entry<String, ClusterManager> entry :
                         managers.entrySet()) {
-                    if (entry.getValue() != null)
+                    if (entry.getValue() != null) {
                         entry.getValue().messageDataReceived(msg);
-                    else {
+                    } else {
                         //this happens a lot before the system has started
                         // up
-                        if (log.isDebugEnabled())
+                        if (log.isDebugEnabled()) {
                             log.debug(sm.getString("clusterSessionListener.noManager", entry.getKey()));
+                        }
                     }
                 }
             } else {
@@ -76,8 +77,9 @@ public class ClusterSessionListener extends ClusterListener {
                 if (mgr != null) {
                     mgr.messageDataReceived(msg);
                 } else {
-                    if (log.isWarnEnabled())
+                    if (log.isWarnEnabled()) {
                         log.warn(sm.getString("clusterSessionListener.noManager", ctxname));
+                    }
 
                     // A no context manager message is replied in order to avoid
                     // timeout of GET_ALL_SESSIONS sync phase.

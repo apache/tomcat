@@ -78,10 +78,11 @@ public class HeartbeatListener implements LifecycleListener, ContainerListener {
 
         if (Lifecycle.PERIODIC_EVENT.equals(event.getType())) {
             if (sender == null) {
-                if (proxyList == null)
+                if (proxyList == null) {
                     sender = new MultiCastSender();
-                else
+                } else {
                     sender = new TcpSender();
+                }
             }
 
             /* Read busy and ready */

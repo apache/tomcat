@@ -171,8 +171,9 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
             current = basic;
         }
         while (current != null) {
-            if (current instanceof Lifecycle)
+            if (current instanceof Lifecycle) {
                 ((Lifecycle) current).start();
+            }
             current = current.getNext();
         }
 
@@ -198,8 +199,9 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
             current = basic;
         }
         while (current != null) {
-            if (current instanceof Lifecycle)
+            if (current instanceof Lifecycle) {
                 ((Lifecycle) current).stop();
+            }
             current = current.getNext();
         }
     }
@@ -256,8 +258,9 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
 
         // Change components if necessary
         Valve oldBasic = this.basic;
-        if (oldBasic == valve)
+        if (oldBasic == valve) {
             return;
+        }
 
         // Stop the old component if necessary
         if (oldBasic != null) {
@@ -278,8 +281,9 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
         }
 
         // Start the new component if necessary
-        if (valve == null)
+        if (valve == null) {
             return;
+        }
         if (valve instanceof Contained) {
             ((Contained) valve).setContainer(this.container);
         }
@@ -330,8 +334,9 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
     public void addValve(Valve valve) {
 
         // Validate that we can add this Valve
-        if (valve instanceof Contained)
+        if (valve instanceof Contained) {
             ((Contained) valve).setContainer(this.container);
+        }
 
         // Start the new component if necessary
         if (getState().isAvailable()) {
@@ -430,10 +435,13 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
             current = current.getNext();
         }
 
-        if (first == basic) first = null;
+        if (first == basic) {
+            first = null;
+        }
 
-        if (valve instanceof Contained)
+        if (valve instanceof Contained) {
             ((Contained) valve).setContainer(null);
+        }
 
         if (valve instanceof Lifecycle) {
             // Stop this valve if necessary

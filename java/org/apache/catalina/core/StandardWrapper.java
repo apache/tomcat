@@ -309,10 +309,11 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void setAvailable(long available) {
         long oldAvailable = this.available;
-        if (available > System.currentTimeMillis())
+        if (available > System.currentTimeMillis()) {
             this.available = available;
-        else
+        } else {
             this.available = 0L;
+        }
         support.firePropertyChange("available", Long.valueOf(oldAvailable),
                                    Long.valueOf(this.available));
     }
@@ -426,9 +427,10 @@ public class StandardWrapper extends ContainerBase
     public void setParent(Container container) {
 
         if ((container != null) &&
-            !(container instanceof Context))
+            !(container instanceof Context)) {
             throw new IllegalArgumentException
                 (sm.getString("standardWrapper.notContext"));
+        }
         if (container instanceof StandardContext) {
             swallowOutput = ((StandardContext)container).getSwallowOutput();
             unloadDelay = ((StandardContext)container).getUnloadDelay();
@@ -531,15 +533,16 @@ public class StandardWrapper extends ContainerBase
     @Override
     public boolean isUnavailable() {
 
-        if (!isEnabled())
+        if (!isEnabled()) {
             return true;
-        else if (available == 0L)
+        } else if (available == 0L) {
             return false;
-        else if (available <= System.currentTimeMillis()) {
+        } else if (available <= System.currentTimeMillis()) {
             available = 0L;
             return false;
-        } else
+        } else {
             return true;
+        }
 
     }
 
@@ -617,8 +620,9 @@ public class StandardWrapper extends ContainerBase
     public void backgroundProcess() {
         super.backgroundProcess();
 
-        if (!getState().isAvailable())
+        if (!getState().isAvailable()) {
             return;
+        }
 
         if (getServlet() instanceof PeriodicEventListener) {
             ((PeriodicEventListener) getServlet()).periodicEvent();
@@ -640,8 +644,9 @@ public class StandardWrapper extends ContainerBase
         do {
             loops++;
             rootCauseCheck = rootCause.getCause();
-            if (rootCauseCheck != null)
+            if (rootCauseCheck != null) {
                 rootCause = rootCauseCheck;
+            }
         } while (rootCauseCheck != null && (loops < 20));
         return rootCause;
     }
@@ -696,8 +701,9 @@ public class StandardWrapper extends ContainerBase
         } finally {
             mappingsLock.writeLock().unlock();
         }
-        if(parent.getState().equals(LifecycleState.STARTED))
+        if(parent.getState().equals(LifecycleState.STARTED)) {
             fireContainerEvent(ADD_MAPPING_EVENT, mapping);
+        }
 
     }
 
@@ -1020,8 +1026,9 @@ public class StandardWrapper extends ContainerBase
     public synchronized Servlet loadServlet() throws ServletException {
 
         // Nothing to do if we already have an instance or an instance pool
-        if (!singleThreadModel && (instance != null))
+        if (!singleThreadModel && (instance != null)) {
             return instance;
+        }
 
         PrintStream out = System.out;
         if (swallowOutput) {
@@ -1120,7 +1127,9 @@ public class StandardWrapper extends ContainerBase
     private synchronized void initServlet(Servlet servlet)
             throws ServletException {
 
-        if (instanceInitialized && !singleThreadModel) return;
+        if (instanceInitialized && !singleThreadModel) {
+            return;
+        }
 
         // Call the initialization method of this servlet
         try {
@@ -1194,8 +1203,9 @@ public class StandardWrapper extends ContainerBase
         } finally {
             mappingsLock.writeLock().unlock();
         }
-        if(parent.getState().equals(LifecycleState.STARTED))
+        if(parent.getState().equals(LifecycleState.STARTED)) {
             fireContainerEvent(REMOVE_MAPPING_EVENT, mapping);
+        }
 
     }
 
@@ -1229,14 +1239,16 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void unavailable(UnavailableException unavailable) {
         getServletContext().log(sm.getString("standardWrapper.unavailable", getName()));
-        if (unavailable == null)
+        if (unavailable == null) {
             setAvailable(Long.MAX_VALUE);
-        else if (unavailable.isPermanent())
+        } else if (unavailable.isPermanent()) {
             setAvailable(Long.MAX_VALUE);
-        else {
+        } else {
             int unavailableSeconds = unavailable.getUnavailableSeconds();
             if (unavailableSeconds <= 0)
+             {
                 unavailableSeconds = 60;        // Arbitrary default
+            }
             setAvailable(System.currentTimeMillis() +
                          (unavailableSeconds * 1000L));
         }
@@ -1258,8 +1270,9 @@ public class StandardWrapper extends ContainerBase
     public synchronized void unload() throws ServletException {
 
         // Nothing to do if we have never loaded the instance
-        if (!singleThreadModel && (instance == null))
+        if (!singleThreadModel && (instance == null)) {
             return;
+        }
         unloading = true;
 
         // Loaf a while if the current instance is allocated
@@ -1421,12 +1434,13 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public ServletContext getServletContext() {
-        if (parent == null)
+        if (parent == null) {
             return null;
-        else if (!(parent instanceof Context))
+        } else if (!(parent instanceof Context)) {
             return null;
-        else
+        } else {
             return ((Context) parent).getServletContext();
+        }
     }
 
 

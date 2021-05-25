@@ -75,12 +75,15 @@ public class CollectedInfo {
             String [] shosts = elenames[1].split("%2F");
             shost = shosts[0];
 
-            if (port==0 && host==null)
+            if (port==0 && host==null) {
                 break; /* Done: take the first one */
-            if (host==null && iport==port)
+            }
+            if (host==null && iport==port) {
                 break; /* Only port done */
-            if (shost.compareTo(host) == 0)
+            }
+            if (shost.compareTo(host) == 0) {
                 break; /* Done port and host are the expected ones */
+            }
         }
         if (objName == null) {
             throw new Exception(sm.getString("collectedInfo.noConnector",

@@ -104,8 +104,9 @@ public class TcpSender
                         connections[i].bind(addrs);
                         addrs = new InetSocketAddress(proxies[i].address, proxies[i].port);
                         connections[i].connect(addrs);
-                    } else
+                    } else {
                         connections[i] = new Socket(proxies[i].address, proxies[i].port);
+                    }
                     connectionReaders[i] = new BufferedReader(new InputStreamReader(connections[i].getInputStream()));
                     connectionWriters[i] = new BufferedWriter(new OutputStreamWriter(connections[i].getOutputStream()));
                 } catch (Exception ex) {
@@ -114,7 +115,9 @@ public class TcpSender
                 }
             }
             if (connections[i] == null)
+             {
                 continue; // try next proxy in the list
+            }
             BufferedWriter writer = connectionWriters[i];
             try {
                 writer.write(requestLine);
@@ -131,7 +134,9 @@ public class TcpSender
                 close(i);
             }
             if (connections[i] == null)
+             {
                 continue; // try next proxy in the list
+            }
 
             /* Read httpd answer */
             String responseStatus = connectionReaders[i].readLine();

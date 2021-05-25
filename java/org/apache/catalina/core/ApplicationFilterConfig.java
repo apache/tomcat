@@ -252,8 +252,9 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
             IllegalArgumentException, NoSuchMethodException, SecurityException {
 
         // Return the existing filter instance, if any
-        if (this.filter != null)
+        if (this.filter != null) {
             return this.filter;
+        }
 
         // Identify the class loader we will be using
         String filterClass = filterDef.getFilterClass();
@@ -395,9 +396,10 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         if (oname != null) {
             try {
                 Registry.getRegistry(null, null).unregisterComponent(oname);
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug(sm.getString("applicationFilterConfig.jmxUnregister",
                             getFilterClass(), getFilterName()));
+                }
             } catch(Exception ex) {
                 log.warn(sm.getString("applicationFilterConfig.jmxUnregisterFail",
                         getFilterClass(), getFilterName()), ex);

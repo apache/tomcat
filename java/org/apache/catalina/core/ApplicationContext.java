@@ -345,14 +345,17 @@ public class ApplicationContext implements ServletContext {
     @Override
     public String getMimeType(String file) {
 
-        if (file == null)
+        if (file == null) {
             return null;
+        }
         int period = file.lastIndexOf('.');
-        if (period < 0)
+        if (period < 0) {
             return null;
+        }
         String extension = file.substring(period + 1);
-        if (extension.length() < 1)
+        if (extension.length() < 1) {
             return null;
+        }
         return context.findMimeMapping(extension);
 
     }
@@ -368,13 +371,15 @@ public class ApplicationContext implements ServletContext {
     public RequestDispatcher getNamedDispatcher(String name) {
 
         // Validate the name argument
-        if (name == null)
+        if (name == null) {
             return null;
+        }
 
         // Create and return a corresponding request dispatcher
         Wrapper wrapper = (Wrapper) context.findChild(name);
-        if (wrapper == null)
+        if (wrapper == null) {
             return null;
+        }
 
         return new ApplicationDispatcher(wrapper, null, null, null, null, null, name);
 
@@ -1148,7 +1153,9 @@ public class ApplicationContext implements ServletContext {
             match = true;
         }
 
-        if (match) return;
+        if (match) {
+            return;
+        }
 
         if (t instanceof ServletContextListener) {
             throw new IllegalArgumentException(sm.getString(
@@ -1377,8 +1384,9 @@ public class ApplicationContext implements ServletContext {
      */
     void setAttributeReadOnly(String name) {
 
-        if (attributes.containsKey(name))
+        if (attributes.containsKey(name)) {
             readOnlyAttributes.put(name, name);
+        }
 
     }
 

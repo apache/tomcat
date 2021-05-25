@@ -194,7 +194,9 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
      *            of its parent Service.
      */
     private void stopIdleThreads(Context context) {
-        if (serverStopping) return;
+        if (serverStopping) {
+            return;
+        }
 
         if (!(context instanceof StandardContext) ||
             !((StandardContext) context).getRenewThreadsWhenStoppingContext()) {
