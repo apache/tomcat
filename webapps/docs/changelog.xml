@@ -144,6 +144,10 @@
         it does not contain a charset. Also remove the outdated workaround for
         the buggy Adobe Reader 9 plug-in for IE. (markt)
       </fix>
+      <fix>
+        AprLifecycleListener does not show dev version suffix for libtcnative
+        and libapr. (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
