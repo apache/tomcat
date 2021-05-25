@@ -79,16 +79,19 @@ public class CollectedInfo {
             String [] elenames = name.split("-");
             String sport = elenames[elenames.length-1];
             iport = Integer.parseInt(sport);
-            if (elenames.length == 4)
+            if (elenames.length == 4) {
                 shost = elenames[2];
+            }
 
-            if (port==0 && host==null)
+            if (port==0 && host==null) {
                 break; /* Done: take the first one */
+            }
             if (iport==port) {
-                if (host == null)
+                if (host == null) {
                     break; /* Done: return the first with the right port */
-                else if (shost != null && shost.compareTo(host) == 0)
+                } else if (shost != null && shost.compareTo(host) == 0) {
                     break; /* Done port and host are the expected ones */
+                }
             }
             objName = null;
             shost = null;
