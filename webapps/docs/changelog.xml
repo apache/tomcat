@@ -119,8 +119,9 @@
   <subsection name="Catalina">
     <changelog>
       <scode>
-        Incremented supported Servlet version to 5.1 to align with the current
-        development branch of the Servlet specification. (markt)
+        Incremented tje supported Jakarta Servlet version to 5.1 to align with
+        the current development branch of the Jakarta Servlet specification.
+        (markt)
       </scode>
       <fix>
         <bug>65301</bug>: <code>RemoteIpValve</code> will now avoid getting
@@ -168,6 +169,11 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <scode>
+        Incremented the supported Jakarta Expression Language version to 5.0 to
+        align with the current development branch of the Jakarta Expression
+        Language specification. (markt)
+      </scode>
       <scode>
         Review code used to generate Java source from JSPs and tags and remove
         code found to be unnecessary. (markt)
