@@ -135,7 +135,7 @@ public abstract class ELResolver {
      *
      * @since EL 3.0
      */
-    public Object convertToType(ELContext context, Object obj, Class<?> type) {
+    public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
         context.setPropertyResolved(false);
         return null;
     }

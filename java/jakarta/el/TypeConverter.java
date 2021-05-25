@@ -57,6 +57,5 @@ public abstract class TypeConverter extends ELResolver {
     }
 
     @Override
-    public abstract Object convertToType(ELContext context, Object obj,
-            Class<?> type);
+    public abstract <T> T convertToType(ELContext context, Object obj, Class<T> type);
 }

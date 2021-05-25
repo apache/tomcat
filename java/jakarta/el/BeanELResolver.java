@@ -137,7 +137,7 @@ public class BeanELResolver extends ELResolver {
 
         ExpressionFactory factory = ELManager.getExpressionFactory();
 
-        String methodName = (String) factory.coerceToType(method, String.class);
+        String methodName = factory.coerceToType(method, String.class);
 
         // Find the matching method
         Method matchingMethod =

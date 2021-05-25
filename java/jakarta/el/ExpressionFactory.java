@@ -226,7 +226,7 @@ public abstract class ExpressionFactory {
      * @throws ELException
      *              If the conversion fails
      */
-    public abstract Object coerceToType(Object obj, Class<?> expectedType);
+    public abstract <T> T coerceToType(Object obj, Class<T> expectedType);
 
     /**
      * @return This default implementation returns null

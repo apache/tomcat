@@ -151,11 +151,11 @@ public class CompositeELResolver extends ELResolver {
     }
 
     @Override
-    public Object convertToType(ELContext context, Object obj, Class<?> type) {
+    public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
         context.setPropertyResolved(false);
         int sz = this.size;
         for (int i = 0; i < sz; i++) {
-            Object result = this.resolvers[i].convertToType(context, obj, type);
+            T result = this.resolvers[i].convertToType(context, obj, type);
             if (context.isPropertyResolved()) {
                 return result;
             }

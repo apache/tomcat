@@ -488,13 +488,13 @@ public class ELSupport {
         }
     }
 
-    public static final Object coerceToType(final ELContext ctx, final Object obj,
-            final Class<?> type) throws ELException {
+    public static final <T> T coerceToType(final ELContext ctx, final Object obj,
+            final Class<T> type) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
             try {
-                Object result = ctx.getELResolver().convertToType(ctx, obj, type);
+                T result = ctx.getELResolver().convertToType(ctx, obj, type);
                 if (ctx.isPropertyResolved()) {
                     return result;
                 }
@@ -505,7 +505,9 @@ public class ELSupport {
 
         if (type == null || Object.class.equals(type) ||
                 (obj != null && type.isAssignableFrom(obj.getClass()))) {
-            return obj;
+            @SuppressWarnings("unchecked")
+            T result = (T) obj;
+            return result;
         }
 
         if (!COERCE_TO_ZERO) {
@@ -516,24 +518,35 @@ public class ELSupport {
         }
 
         if (String.class.equals(type)) {
-            return coerceToString(ctx, obj);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToString(ctx, obj);
+            return result;
         }
         if (ELArithmetic.isNumberType(type)) {
-            return coerceToNumber(ctx, obj, type);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToNumber(ctx, obj, type);
+            return result;
         }
         if (Character.class.equals(type) || Character.TYPE == type) {
-            return coerceToCharacter(ctx, obj);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToCharacter(ctx, obj);
+            return result;
         }
         if (Boolean.class.equals(type) || Boolean.TYPE == type) {
-            return coerceToBoolean(ctx, obj, Boolean.TYPE == type);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToBoolean(ctx, obj, Boolean.TYPE == type);
+            return result;
         }
         if (type.isEnum()) {
-            return coerceToEnum(ctx, obj, type);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToEnum(ctx, obj, type);
+            return result;
         }
 
         // new to spec
-        if (obj == null)
+        if (obj == null) {
             return null;
+        }
         if (obj instanceof String) {
             String str = (String) obj;
             PropertyEditor editor = PropertyEditorManager.findEditor(type);
@@ -546,7 +559,9 @@ public class ELSupport {
             } else {
                 try {
                     editor.setAsText(str);
-                    return editor.getValue();
+                    @SuppressWarnings("unchecked")
+                    T result = (T) editor.getValue();
+                    return result;
                 } catch (RuntimeException e) {
                     if (str.isEmpty()) {
                         return null;
@@ -561,12 +576,16 @@ public class ELSupport {
         // for an empty map. The parser will always parse {} as an empty set.
         if (obj instanceof Set && type == Map.class &&
                 ((Set<?>) obj).isEmpty()) {
-            return Collections.EMPTY_MAP;
+            @SuppressWarnings("unchecked")
+            T result = (T) Collections.EMPTY_MAP;
+            return result;
         }
 
         // Handle arrays
         if (type.isArray() && obj.getClass().isArray()) {
-            return coerceToArray(ctx, obj, type);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToArray(ctx, obj, type);
+            return result;
         }
 
         throw new ELException(MessageFactory.get("error.convert",

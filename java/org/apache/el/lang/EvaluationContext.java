@@ -148,7 +148,7 @@ public final class EvaluationContext extends ELContext {
     }
 
     @Override
-    public Object convertToType(Object obj, Class<?> type) {
+    public <T> T convertToType(Object obj, Class<T> type) {
         return elContext.convertToType(obj, type);
     }
 }

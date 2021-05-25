@@ -299,14 +299,14 @@ public abstract class ELContext {
      *
      * @since EL 3.0
      */
-    public Object convertToType(Object obj, Class<?> type) {
+    public <T> T convertToType(Object obj, Class<T> type) {
 
         boolean originalResolved = isPropertyResolved();
         setPropertyResolved(false);
         try {
             ELResolver resolver = getELResolver();
             if (resolver != null) {
-                Object result = resolver.convertToType(this, obj, type);
+                T result = resolver.convertToType(this, obj, type);
                 if (isPropertyResolved()) {
                     return result;
                 }

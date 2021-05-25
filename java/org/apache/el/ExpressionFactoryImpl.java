@@ -37,7 +37,7 @@ import org.apache.el.util.MessageFactory;
 public class ExpressionFactoryImpl extends ExpressionFactory {
 
     @Override
-    public Object coerceToType(Object obj, Class<?> type) {
+    public <T> T coerceToType(Object obj, Class<T> type) {
         return ELSupport.coerceToType(null, obj, type);
     }
 
