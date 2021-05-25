@@ -156,6 +156,10 @@
         <code>setAttribute()</code>, <code>getAttribute()</code> and
         <code>getAttributes()</code> introduced in Servlet 5.1. (markt)
       </add>
+      <fix>
+        AprLifecycleListener does not show dev version suffix for libtcnative
+        and libapr. (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
