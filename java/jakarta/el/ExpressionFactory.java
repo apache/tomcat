@@ -217,6 +217,7 @@ public abstract class ExpressionFactory {
 
     /**
      * Coerce the supplied object to the requested type.
+     * @param <T>          The type to which the object should be coerced
      *
      * @param obj          The object to be coerced
      * @param expectedType The type to which the object should be coerced

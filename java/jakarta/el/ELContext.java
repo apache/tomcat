@@ -289,6 +289,8 @@ public abstract class ELContext {
     /**
      * Coerce the supplied object to the requested type.
      *
+     * @param <T>  The type to which the object should be coerced
+     *
      * @param obj  The object to be coerced
      * @param type The type to which the object should be coerced
      *

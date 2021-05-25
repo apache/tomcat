@@ -126,6 +126,7 @@ public abstract class ELResolver {
     /**
      * Converts the given object to the given type. This default implementation
      * always returns <code>null</code>.
+     * @param <T>     The type to which the object should be converted
      *
      * @param context The EL context for this evaluation
      * @param obj     The object to convert
