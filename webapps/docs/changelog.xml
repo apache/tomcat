@@ -119,7 +119,7 @@
   <subsection name="Catalina">
     <changelog>
       <scode>
-        Incremented tje supported Jakarta Servlet version to 5.1 to align with
+        Incremented the supported Jakarta Servlet version to 5.1 to align with
         the current development branch of the Jakarta Servlet specification.
         (markt)
       </scode>
