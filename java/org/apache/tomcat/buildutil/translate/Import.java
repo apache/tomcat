@@ -82,7 +82,7 @@ public class Import {
                 w.write(System.lineSeparator());
             }
 
-            w.write(cKey.key + "=" + Utils.formatValue(value));
+            w.write(cKey.key + "=" + Utils.formatValueImport(value));
             w.write(System.lineSeparator());
         }
         if (w != null) {
