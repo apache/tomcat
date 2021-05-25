@@ -32,9 +32,10 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-    private static final Pattern ADD_CONTINUATION = Pattern.compile("\\n", Pattern.MULTILINE);
     private static final Pattern ESCAPE_LEADING_SPACE = Pattern.compile("^(\\s)", Pattern.MULTILINE);
-    private static final Pattern FIX_SINGLE_QUOTE = Pattern.compile("(?<!')'(?!')", Pattern.MULTILINE);
+
+    // Package private so it is visible to tests
+    static final String PADDING = "POEDITOR_EXPORT_PADDING_DO_NOT_DELETE";
 
     private Utils() {
         // Utility class. Hide default constructor.
@@ -59,21 +60,47 @@ public class Utils {
     }
 
 
-    static String formatValue(String in) {
-        String result = ADD_CONTINUATION.matcher(in).replaceAll("\\\\n\\\\\n");
-        if (result.endsWith("\\\n")) {
+    static String formatValueExport(String in) {
+        String result;
+
+        if (in.startsWith("\n")) {
+            result = PADDING + in;
+        } else {
+            result = in;
+        }
+
+        return formatValueCommon(result);
+    }
+
+
+    static String formatValueImport(String in) {
+        String result;
+
+        if (in.startsWith(PADDING)) {
+            result = in.substring(PADDING.length());
+        } else {
+            result = in;
+        }
+
+        return formatValueCommon(result);
+    }
+
+
+    /*
+     * Common formatting to convert a String for storage as a value in a
+     * property file.
+     */
+    static String formatValueCommon(String in) {
+        String result = in.replace("\n", "\\n\\\n");
+        if (result.endsWith("\\n\\\n")) {
             result = result.substring(0, result.length() - 2);
         }
+
         result = ESCAPE_LEADING_SPACE.matcher(result).replaceAll("\\\\$1");
 
-        if (result.contains("\n\\\t")) {
-            result = result.replace("\n\\\t", "\n\\t");
-        }
+        result = result.replaceAll("\t", "\\t");
 
-        if (result.contains("[{0}]")) {
-            result = FIX_SINGLE_QUOTE.matcher(result).replaceAll("''");
-        }
-        return result.trim();
+        return result;
     }
 
 
@@ -140,7 +167,7 @@ public class Utils {
             String[] keys = translation.keySet().toArray(new String[0]);
             Arrays.sort(keys);
             for (Object key : keys) {
-                w.write(key + "=" + Utils.formatValue(translation.getProperty((String) key)) + "\n");
+                w.write(key + "=" + Utils.formatValueExport(translation.getProperty((String) key)) + "\n");
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
