@@ -135,6 +135,10 @@
         before attempting conversion to String. Pull request provided by
         tianshuang. (markt)
       </fix>
+      <fix>
+        AprLifecycleListener does not show dev version suffix for libtcnative
+        and libapr. (michaelo)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
