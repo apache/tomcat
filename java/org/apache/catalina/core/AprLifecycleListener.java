@@ -220,8 +220,8 @@ public class AprLifecycleListener
             return;
         }
         if (apver < rqver) {
-            log.error(sm.getString("aprListener.tcnInvalid", major + "."
-                    + minor + "." + patch,
+            log.error(sm.getString("aprListener.tcnInvalid",
+                    Library.versionString(),
                     TCN_REQUIRED_MAJOR + "." +
                     TCN_REQUIRED_MINOR + "." +
                     TCN_REQUIRED_PATCH));
@@ -237,17 +237,15 @@ public class AprLifecycleListener
         }
         if (apver < rcver) {
             initInfoLogMessages.add(sm.getString("aprListener.tcnVersion",
-                    major + "." + minor + "." + patch,
+                    Library.versionString(),
                     TCN_REQUIRED_MAJOR + "." +
                     TCN_RECOMMENDED_MINOR + "." +
                     TCN_RECOMMENDED_PV));
         }
 
         initInfoLogMessages.add(sm.getString("aprListener.tcnValid",
-                major + "." + minor + "." + patch,
-                Library.APR_MAJOR_VERSION + "." +
-                Library.APR_MINOR_VERSION + "." +
-                Library.APR_PATCH_VERSION));
+                Library.versionString(),
+                Library.aprVersionString()));
 
         // Log APR flags
         initInfoLogMessages.add(sm.getString("aprListener.flags",
