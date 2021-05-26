@@ -81,8 +81,9 @@ public class StandardHostSF extends StoreFactoryBase {
             if(valves != null && valves.length > 0 ) {
                 List<Valve> hostValves = new ArrayList<>() ;
                 for (Valve valve : valves) {
-                    if (!(valve instanceof ClusterValve))
+                    if (!(valve instanceof ClusterValve)) {
                         hostValves.add(valve);
+                    }
                 }
                 storeElementArray(aWriter, indent, hostValves.toArray());
             }

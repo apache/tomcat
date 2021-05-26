@@ -46,18 +46,20 @@ public class ManagerSF extends StoreFactoryBase {
             if (aElement instanceof StandardManager) {
                 StandardManager manager = (StandardManager) aElement;
                 if (!isDefaultManager(manager)) {
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug(sm.getString("factory.storeTag", elementDesc
                                 .getTag(), aElement));
+                    }
                     super.store(aWriter, indent, aElement);
                 }
             } else {
                 super.store(aWriter, indent, aElement);
             }
         } else {
-            if (log.isWarnEnabled())
+            if (log.isWarnEnabled()) {
                 log.warn(sm.getString("factory.storeNoDescriptor", aElement
                         .getClass()));
+            }
         }
     }
 

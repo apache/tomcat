@@ -116,9 +116,10 @@ public class StoreFactoryBase implements IStoreFactory {
                 aElement.getClass());
 
         if (elementDesc != null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug(sm.getString("factory.storeTag",
                         elementDesc.getTag(), aElement));
+            }
             getStoreAppender().printIndent(aWriter, indent + 2);
             if (!elementDesc.isChildren()) {
                 getStoreAppender().printTag(aWriter, indent, aElement,
@@ -130,9 +131,10 @@ public class StoreFactoryBase implements IStoreFactory {
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printCloseTag(aWriter, elementDesc);
             }
-        } else
+        } else {
             log.warn(sm.getString("factory.storeNoDescriptor", aElement
                     .getClass()));
+        }
     }
 
     /**
@@ -166,8 +168,9 @@ public class StoreFactoryBase implements IStoreFactory {
             if (elementFactory != null) {
                 StoreDescription desc = getRegistry().findDescription(
                         aTagElement.getClass());
-                if (!desc.isTransientChild(aTagElement.getClass().getName()))
+                if (!desc.isTransientChild(aTagElement.getClass().getName())) {
                     elementFactory.store(aWriter, indent, aTagElement);
+                }
             } else {
                 log.warn(sm.getString("factory.storeNoDescriptor", aTagElement
                         .getClass()));

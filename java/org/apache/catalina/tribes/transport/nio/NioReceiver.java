@@ -82,21 +82,29 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             setPool(new RxTaskPool(getMaxThreads(),getMinThreads(),this));
         } catch (Exception x) {
             log.fatal(sm.getString("nioReceiver.threadpool.fail"), x);
-            if ( x instanceof IOException ) throw (IOException)x;
-            else throw new IOException(x.getMessage());
+            if ( x instanceof IOException ) {
+                throw (IOException)x;
+            } else {
+                throw new IOException(x.getMessage());
+            }
         }
         try {
             getBind();
             bind();
             String channelName = "";
-            if (getChannel().getName() != null) channelName = "[" + getChannel().getName() + "]";
+            if (getChannel().getName() != null) {
+                channelName = "[" + getChannel().getName() + "]";
+            }
             Thread t = new Thread(this, "NioReceiver" + channelName);
             t.setDaemon(true);
             t.start();
         } catch (Exception x) {
             log.fatal(sm.getString("nioReceiver.start.fail"), x);
-            if ( x instanceof IOException ) throw (IOException)x;
-            else throw new IOException(x.getMessage());
+            if ( x instanceof IOException ) {
+                throw (IOException)x;
+            } else {
+                throw new IOException(x.getMessage());
+            }
         }
     }
 
@@ -182,21 +190,33 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         }
         key.cancel();
         key.attach(null);
-        if (key.channel() instanceof SocketChannel)
-            try { ((SocketChannel)key.channel()).socket().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
-        if (key.channel() instanceof DatagramChannel)
-            try { ((DatagramChannel)key.channel()).socket().close(); } catch (Exception e) { if (log.isDebugEnabled()) log.debug("", e); }
-        try { key.channel().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
+        if (key.channel() instanceof SocketChannel) {
+            try { ((SocketChannel)key.channel()).socket().close(); } catch (IOException e) { if (log.isDebugEnabled()) {
+                log.debug("", e);
+            } }
+        }
+        if (key.channel() instanceof DatagramChannel) {
+            try { ((DatagramChannel)key.channel()).socket().close(); } catch (Exception e) { if (log.isDebugEnabled()) {
+                log.debug("", e);
+            } }
+        }
+        try { key.channel().close(); } catch (IOException e) { if (log.isDebugEnabled()) {
+            log.debug("", e);
+        } }
 
     }
     protected long lastCheck = System.currentTimeMillis();
     protected void socketTimeouts() {
         long now = System.currentTimeMillis();
-        if ( (now-lastCheck) < getSelectorTimeout() ) return;
+        if ( (now-lastCheck) < getSelectorTimeout() ) {
+            return;
+        }
         //timeout
         Selector tmpsel = this.selector.get();
         Set<SelectionKey> keys =  (isListening()&&tmpsel!=null)?tmpsel.keys():null;
-        if ( keys == null ) return;
+        if ( keys == null ) {
+            return;
+        }
         for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext();) {
             SelectionKey key = iter.next();
             try {
@@ -215,13 +235,14 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                     if ( ka != null ) {
                         long delta = now - ka.getLastAccess();
                         if (delta > getTimeout() && (!ka.isAccessed())) {
-                            if (log.isWarnEnabled())
+                            if (log.isWarnEnabled()) {
                                 log.warn(sm.getString(
                                         "nioReceiver.threadsExhausted",
                                         Integer.valueOf(getTimeout()),
                                         Boolean.valueOf(ka.isCancelled()),
                                         key,
                                         new java.sql.Timestamp(ka.getLastAccess())));
+                            }
                             ka.setLastAccess(now);
                             //key.interestOps(SelectionKey.OP_READ);
                         }//end if
@@ -326,7 +347,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             try {
                 datagramChannel.close();
             }catch (Exception iox) {
-                if (log.isDebugEnabled()) log.debug("Unable to close datagram channel.",iox);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to close datagram channel.",iox);
+                }
             }
             datagramChannel=null;
         }
@@ -367,7 +390,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     private void closeSelector() throws IOException {
         Selector selector = this.selector.getAndSet(null);
-        if (selector == null) return;
+        if (selector == null) {
+            return;
+        }
         try {
             // look at each key in the selected set
             for (SelectionKey key : selector.keys()) {
@@ -406,7 +431,10 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                                    SelectableChannel channel,
                                    int ops,
                                    Object attach) throws Exception {
-        if (channel == null)return; // could happen
+        if (channel == null)
+         {
+            return; // could happen
+        }
         // set the new channel non-blocking
         channel.configureBlocking(false);
         // register it with the selector
@@ -446,7 +474,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
             // loop will keep calling this method until a
             // thread becomes available, the thread pool itself has a waiting mechanism
             // so we will not wait here.
-            if (log.isDebugEnabled()) log.debug("No TcpReplicationThread available");
+            if (log.isDebugEnabled()) {
+                log.debug("No TcpReplicationThread available");
+            }
         } else {
             // invoking this wakes up the worker thread then returns
             //add task to thread pool

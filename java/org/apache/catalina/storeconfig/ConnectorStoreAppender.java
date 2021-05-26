@@ -128,8 +128,9 @@ public class ConnectorStoreAppender extends StoreAppender {
             }
             if ("protocol".equals(descriptor.getName())
                     || "protocolHandlerClassName".equals(descriptor
-                            .getName()))
+                            .getName())) {
                 continue;
+            }
             propertyKeys.add(descriptor.getName());
         }
         // Add the properties of the protocol handler
@@ -287,8 +288,9 @@ public class ConnectorStoreAppender extends StoreAppender {
 
         File jkHomeBase;
         File file = new File(jkHome);
-        if (!file.isAbsolute())
+        if (!file.isAbsolute()) {
             file = new File(appBase, jkHome);
+        }
         try {
             jkHomeBase = file.getCanonicalFile();
         } catch (IOException e) {

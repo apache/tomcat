@@ -199,7 +199,9 @@ public class Membership implements Cloneable {
                     break;
                 }
             }
-            if (n < 0) return;
+            if (n < 0) {
+                return;
+            }
             Member results[] = new Member[members.length - 1];
             int j = 0;
             for (int i = 0; i < members.length; i++) {

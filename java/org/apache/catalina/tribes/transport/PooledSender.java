@@ -160,7 +160,9 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         public synchronized DataSender getSender(long timeout) {
             long start = System.currentTimeMillis();
             while ( true ) {
-                if (!isOpen)throw new IllegalStateException(sm.getString("pooledSender.closed.queue"));
+                if (!isOpen) {
+                    throw new IllegalStateException(sm.getString("pooledSender.closed.queue"));
+                }
                 DataSender sender = null;
                 if (notinuse.size() == 0 && inuse.size() < limit) {
                     sender = parent.getNewDataSender();
@@ -172,8 +174,9 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                     return sender;
                 }//end if
                 long delta = System.currentTimeMillis() - start;
-                if ( delta > timeout && timeout>0) return null;
-                else {
+                if ( delta > timeout && timeout>0) {
+                    return null;
+                } else {
                     try {
                         wait(Math.max(timeout - delta,1));
                     }catch (InterruptedException x){}
@@ -189,8 +192,9 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             //to do
             inuse.remove(sender);
             //just in case the limit has changed
-            if ( notinuse.size() < this.getLimit() ) notinuse.add(sender);
-            else
+            if ( notinuse.size() < this.getLimit() ) {
+                notinuse.add(sender);
+            } else {
                 try {
                     sender.disconnect();
                 } catch (Exception e) {
@@ -199,6 +203,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                                 "PooledSender.senderDisconnectFail"), e);
                     }
                 }
+            }
             notifyAll();
         }
 
