@@ -43,16 +43,23 @@ public class BufferPool {
     }
 
     public XByteBuffer getBuffer(int minSize, boolean discard) {
-        if ( pool != null ) return pool.getBuffer(minSize, discard);
-        else return new XByteBuffer(minSize,discard);
+        if ( pool != null ) {
+            return pool.getBuffer(minSize, discard);
+        } else {
+            return new XByteBuffer(minSize,discard);
+        }
     }
 
     public void returnBuffer(XByteBuffer buffer) {
-        if ( pool != null ) pool.returnBuffer(buffer);
+        if ( pool != null ) {
+            pool.returnBuffer(buffer);
+        }
     }
 
     public void clear() {
-        if ( pool != null ) pool.clear();
+        if ( pool != null ) {
+            pool.clear();
+        }
     }
 
 

@@ -94,7 +94,9 @@ public class ByteMessage implements Externalizable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(message!=null?message.length:0);
-        if ( message!=null ) out.write(message,0,message.length);
+        if ( message!=null ) {
+            out.write(message,0,message.length);
+        }
     }
 
 }

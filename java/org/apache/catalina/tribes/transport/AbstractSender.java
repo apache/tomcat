@@ -110,10 +110,16 @@ public abstract class AbstractSender implements DataSender {
     @Override
     public boolean keepalive() {
         boolean disconnect = false;
-        if (isUdpBased()) disconnect = true; //always disconnect UDP, TODO optimize the keepalive handling
-        else if ( keepAliveCount >= 0 && requestCount>keepAliveCount ) disconnect = true;
-        else if ( keepAliveTime >= 0 && (System.currentTimeMillis()-connectTime)>keepAliveTime ) disconnect = true;
-        if ( disconnect ) disconnect();
+        if (isUdpBased()) {
+            disconnect = true; //always disconnect UDP, TODO optimize the keepalive handling
+        } else if ( keepAliveCount >= 0 && requestCount>keepAliveCount ) {
+            disconnect = true;
+        } else if ( keepAliveTime >= 0 && (System.currentTimeMillis()-connectTime)>keepAliveTime ) {
+            disconnect = true;
+        }
+        if ( disconnect ) {
+            disconnect();
+        }
         return disconnect;
     }
 

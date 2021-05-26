@@ -53,7 +53,7 @@
     <module name="AvoidNestedBlocks">
       <property name="allowInSwitchCase" value="true"/>
     </module>
-    <!-- ~1500 errors
+    <!-- ~1000 errors
     <module name="NeedBraces"/>
     -->
 

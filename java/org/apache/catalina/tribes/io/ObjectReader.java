@@ -97,14 +97,18 @@ public class ObjectReader {
     public int append(ByteBuffer data, int len, boolean count) {
        buffer.append(data,len);
        int pkgCnt = -1;
-       if ( count ) pkgCnt = buffer.countPackages();
+       if ( count ) {
+        pkgCnt = buffer.countPackages();
+    }
        return pkgCnt;
    }
 
      public int append(byte[] data,int off,int len, boolean count) {
         buffer.append(data,off,len);
         int pkgCnt = -1;
-        if ( count ) pkgCnt = buffer.countPackages();
+        if ( count ) {
+            pkgCnt = buffer.countPackages();
+        }
         return pkgCnt;
     }
 
