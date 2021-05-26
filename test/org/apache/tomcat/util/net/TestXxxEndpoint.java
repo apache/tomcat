@@ -32,7 +32,6 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Error;
-import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.Socket;
