@@ -415,8 +415,9 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                 StringBuilder classFileName = new StringBuilder(outputDir).append('/');
                                 for (int j = 0;
                                      j < compoundName.length; j++) {
-                                    if (j > 0)
+                                    if (j > 0) {
                                         classFileName.append('/');
+                                    }
                                     classFileName.append(compoundName[j]);
                                 }
                                 byte[] bytes = classFile.getBytes();

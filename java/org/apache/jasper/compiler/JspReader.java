@@ -112,8 +112,9 @@ class JspReader {
         try {
             CharArrayWriter caw = new CharArrayWriter();
             char buf[] = new char[1024];
-            for (int i = 0 ; (i = reader.read(buf)) != -1 ;)
+            for (int i = 0 ; (i = reader.read(buf)) != -1 ;) {
                 caw.write(buf, 0, i);
+            }
             caw.close();
             current = new Mark(this, caw.toCharArray(), fname);
         } catch (Throwable ex) {
@@ -152,8 +153,9 @@ class JspReader {
     }
 
     int nextChar() {
-        if (!hasMoreInput())
+        if (!hasMoreInput()) {
             return -1;
+        }
 
         int ch = current.stream[current.cursor];
 
@@ -198,8 +200,9 @@ class JspReader {
      * and the cursor point to next character.
      */
     private Boolean indexOf(char c, Mark mark) {
-        if (!hasMoreInput())
+        if (!hasMoreInput()) {
             return null;
+        }
 
         int end = current.stream.length;
         int ch;
@@ -345,11 +348,13 @@ class JspReader {
     boolean matchesETag(String tagName) {
         Mark mark = mark();
 
-        if (!matches("</" + tagName))
+        if (!matches("</" + tagName)) {
             return false;
+        }
         skipSpaces();
-        if (nextChar() == '>')
+        if (nextChar() == '>') {
             return true;
+        }
 
         setCurrent(mark);
         return false;
@@ -358,11 +363,13 @@ class JspReader {
     boolean matchesETagWithoutLessThan(String tagName) {
        Mark mark = mark();
 
-       if (!matches("/" + tagName))
-           return false;
+       if (!matches("/" + tagName)) {
+        return false;
+    }
        skipSpaces();
-       if (nextChar() == '>')
-           return true;
+       if (nextChar() == '>') {
+        return true;
+    }
 
        setCurrent(mark);
        return false;
@@ -464,10 +471,11 @@ class JspReader {
                 skipELExpression();
             } else if (ch == firstChar) {
                 for (int i = 1 ; i < limlen ; i++) {
-                    if (peekChar() == limit.charAt(i))
+                    if (peekChar() == limit.charAt(i)) {
                         nextChar();
-                    else
+                    } else {
                         continue skip;
+                    }
                 }
                 return ret;
             }
@@ -487,8 +495,9 @@ class JspReader {
         Mark ret = skipUntil("</" + tag);
         if (ret != null) {
             skipSpaces();
-            if (nextChar() != '>')
+            if (nextChar() != '>') {
                 ret = null;
+            }
         }
         return ret;
     }
@@ -576,8 +585,9 @@ class JspReader {
                 ch = nextChar();
                 for (ch = nextChar(); ch != -1 && ch != endQuote;
                          ch = nextChar()) {
-                    if (ch == '\\')
+                    if (ch == '\\') {
                         ch = nextChar();
+                    }
                     StringBuilder.append((char) ch);
                 }
                 // Check end of quote, skip closing quote:
@@ -595,8 +605,9 @@ class JspReader {
                     // Take care of the quoting here.
                     if (ch == '\\') {
                         if (peekChar() == '"' || peekChar() == '\'' ||
-                               peekChar() == '>' || peekChar() == '%')
+                               peekChar() == '>' || peekChar() == '%') {
                             ch = nextChar();
+                        }
                     }
                     StringBuilder.append((char) ch);
                 } while (!isDelimiter());

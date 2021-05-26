@@ -407,8 +407,9 @@ public class ELParser {
         int start = index;
         while (hasNextChar()) {
             char c = expression.charAt(index);
-            if (c > ' ')
+            if (c > ' ') {
                 break;
+            }
             index++;
         }
         whiteSpace = expression.substring(start, index);

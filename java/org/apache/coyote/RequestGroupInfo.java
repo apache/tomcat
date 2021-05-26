@@ -40,8 +40,9 @@ public class RequestGroupInfo extends BaseModelMBean {
 
     public synchronized void removeRequestProcessor( RequestInfo rp ) {
         if( rp != null ) {
-            if( deadMaxTime < rp.getMaxTime() )
+            if( deadMaxTime < rp.getMaxTime() ) {
                 deadMaxTime = rp.getMaxTime();
+            }
             deadProcessingTime += rp.getProcessingTime();
             deadRequestCount += rp.getRequestCount();
             deadErrorCount += rp.getErrorCount();

@@ -115,8 +115,9 @@ public class BodyContentImpl extends BodyContent {
                 return;
             }
 
-            if (len >= bufferSize - nextChar)
+            if (len >= bufferSize - nextChar) {
                 reAllocBuff (len);
+            }
 
             System.arraycopy(cbuf, off, cb, nextChar, len);
             nextChar+=len;
@@ -152,8 +153,9 @@ public class BodyContentImpl extends BodyContent {
             writer.write(s, off, len);
         } else {
             ensureOpen();
-            if (len >= bufferSize - nextChar)
+            if (len >= bufferSize - nextChar) {
                 reAllocBuff(len);
+            }
 
             s.getChars(off, off + len, cb, nextChar);
             nextChar += len;
@@ -336,7 +338,9 @@ public class BodyContentImpl extends BodyContent {
      */
     @Override
     public void print(String s) throws IOException {
-        if (s == null) s = "null";
+        if (s == null) {
+            s = "null";
+        }
         if (writer != null) {
             writer.write(s);
         } else {

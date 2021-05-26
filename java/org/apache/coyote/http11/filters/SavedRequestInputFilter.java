@@ -47,8 +47,9 @@ public class SavedRequestInputFilter implements InputFilter {
 
     @Override
     public int doRead(ApplicationBufferHandler handler) throws IOException {
-        if(input.getOffset()>= input.getEnd())
+        if(input.getOffset()>= input.getEnd()) {
             return -1;
+        }
 
         ByteBuffer byteBuffer = handler.getByteBuffer();
         byteBuffer.position(byteBuffer.limit()).limit(byteBuffer.capacity());
