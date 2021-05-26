@@ -125,15 +125,17 @@ public class MemoryUserDatabaseTests {
         Runnable job = new Runnable() {
             @Override
             public void run() {
-                for(int i=0; i<10; ++i)
-                    db.createUser("newUser-" + Thread.currentThread().getName() + "-" + i, "x", null);
+                for(int i=0; i<10; ++i) {
+                  db.createUser("newUser-" + Thread.currentThread().getName() + "-" + i, "x", null);
+                }
             }
         };
 
         int numThreads = 100;
         Thread[] threads = new Thread[numThreads + 1];
-        for(int i=0; i<numThreads; ++i)
-            threads[i] = new Thread(job);
+        for(int i=0; i<numThreads; ++i) {
+          threads[i] = new Thread(job);
+        }
 
         // Let's
         threads[numThreads] = new Thread(new Runnable() {
@@ -148,18 +150,21 @@ public class MemoryUserDatabaseTests {
 
         ++numThreads;
 
-        for(int i=0; i<numThreads; ++i)
-            threads[i].start();
+        for(int i=0; i<numThreads; ++i) {
+          threads[i].start();
+        }
 
-        for(int i=0; i<numThreads; ++i)
-            threads[i].join();
+        for(int i=0; i<numThreads; ++i) {
+          threads[i].join();
+        }
 
         // Remove all those extra users
         Iterator<User> users = db.getUsers();
         for(; users.hasNext();) {
             User user = users.next();
-            if(user.getUsername().startsWith("newUser"))
-                db.removeUser(user);
+            if(user.getUsername().startsWith("newUser")) {
+              db.removeUser(user);
+            }
         }
 
         users = db.getUsers();

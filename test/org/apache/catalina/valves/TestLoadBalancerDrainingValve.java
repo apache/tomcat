@@ -155,8 +155,9 @@ public class TestLoadBalancerDrainingValve {
                 response.addCookie(expectedCookie);
                 EasyMock.expect(ctx.getSessionCookieName()).andReturn(sessionCookieName); // Indirect call
                 String expectedRequestURI = requestURI;
-                if(null != queryString)
-                    expectedRequestURI = expectedRequestURI + '?' + queryString;
+                if(null != queryString) {
+                  expectedRequestURI = expectedRequestURI + '?' + queryString;
+                }
                 response.setHeader("Location", expectedRequestURI);
                 response.setStatus(307);
             }

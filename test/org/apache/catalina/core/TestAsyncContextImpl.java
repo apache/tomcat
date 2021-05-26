@@ -1955,8 +1955,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 loops--;
                 req.setAttribute("loops", Integer.valueOf(loops));
                 ctx.dispatch();
-            } else
-                throw new ServletException();
+            } else {
+              throw new ServletException();
+            }
         }
     }
 
