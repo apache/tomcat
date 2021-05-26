@@ -316,16 +316,4 @@ public final class MethodExpressionImpl extends MethodExpression implements
     public boolean isParametersProvided() {
         return this.getNode().isParametersProvided();
     }
-
-    /**
-     * @since EL 2.2
-     * Note: The spelling mistake is deliberate.
-     * isParmetersProvided()  - Specification definition
-     * isParametersProvided() - Corrected spelling
-     */
-    @Override
-    public boolean isParmetersProvided() {
-        return this.getNode().isParametersProvided();
-    }
-
 }

@@ -207,6 +207,11 @@
         Update JspC to generate <code>web.xml</code> and
         <code>web-fragment.xml</code> files using Servlet 5.0 schemas. (markt)
       </fix>
+      <scode>
+        Remove the deprecated method
+        <code>MethodExpression.getParmetersProvided()</code> from the EL API to
+        align with the current EL 5.0 development branch. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

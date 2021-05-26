@@ -64,21 +64,4 @@ public abstract class MethodExpression extends Expression {
         // Expected to be over-ridden by implementation
         return false;
     }
-
-    /**
-     * @since EL 2.2
-     *
-     * Note: The spelling mistake is deliberate.
-     * isParmetersProvided()  - Specification definition
-     * isParametersProvided() - Corrected spelling
-     *
-     * @return Always <code>false</code>
-     *
-     * @deprecated  Use {@link #isParametersProvided()}
-     */
-    @Deprecated
-    public boolean isParmetersProvided() {
-        // Expected to be over-ridden by implementation
-        return false;
-    }
 }
