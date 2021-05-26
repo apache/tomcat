@@ -73,11 +73,13 @@ public class MBeanDumper {
                 Object value = null;
 
                 for (MBeanAttributeInfo attr : attrs) {
-                    if (!attr.isReadable())
+                    if (!attr.isReadable()) {
                         continue;
+                    }
                     String attName = attr.getName();
-                    if ("modelerType".equals(attName))
+                    if ("modelerType".equals(attName)) {
                         continue;
+                    }
                     if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0
                             || attName.indexOf(' ') >= 0) {
                         continue;
@@ -170,8 +172,9 @@ public class MBeanDumper {
             appendHead(sb, value, prev, idx);
             sb.append("\\n\n ");
             prev = idx + 1;
-            if (idx == value.length() - 1)
+            if (idx == value.length() - 1) {
                 break;
+            }
             idx = value.indexOf('\n', idx + 1);
         }
         if (prev < value.length()) {

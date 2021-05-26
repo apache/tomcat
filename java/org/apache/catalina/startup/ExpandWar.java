@@ -386,8 +386,9 @@ public class ExpandWar {
             byte buffer[] = new byte[2048];
             while (true) {
                 int n = input.read(buffer);
-                if (n <= 0)
+                if (n <= 0) {
                     break;
+                }
                 output.write(buffer, 0, n);
             }
         }

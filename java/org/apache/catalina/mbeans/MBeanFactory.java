@@ -772,12 +772,13 @@ public class MBeanFactory {
             Context context = (Context) host.findChild(pathStr);
             // Remove this component from its parent component
             host.removeChild(context);
-            if(context instanceof StandardContext)
-            try {
-                context.destroy();
-            } catch (Exception e) {
-                log.warn(sm.getString("mBeanFactory.contextDestroyError"), e);
-           }
+            if(context instanceof StandardContext) {
+                try {
+                    context.destroy();
+                } catch (Exception e) {
+                    log.warn(sm.getString("mBeanFactory.contextDestroyError"), e);
+         }
+            }
 
         }
     }

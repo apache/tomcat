@@ -341,9 +341,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
                      String message,
                      StringManager smClient) throws IOException {
 
-        if (debug >= 1)
+        if (debug >= 1) {
             log("list: Listing contexts for virtual host '" +
                 host.getName() + "'");
+        }
 
         PrintWriter writer = response.getWriter();
 
@@ -403,8 +404,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
         // Create sorted map of deployed applications by context name.
         Container children[] = host.findChildren();
         String contextNames[] = new String[children.length];
-        for (int i = 0; i < children.length; i++)
+        for (int i = 0; i < children.length; i++) {
             contextNames[i] = children[i].getName();
+        }
 
         Arrays.sort(contextNames);
 
@@ -920,7 +922,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
             StringManager smClient) {
 
         List<Session> sessions = getSessionsForName(cn, smClient);
-        if (sessions.isEmpty()) return null;
+        if (sessions.isEmpty()) {
+            return null;
+        }
         for(Session session : sessions) {
             if (session.getId().equals(id)) {
                 return session;

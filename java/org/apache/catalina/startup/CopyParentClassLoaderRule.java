@@ -61,8 +61,9 @@ public class CopyParentClassLoaderRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 
-        if (digester.getLogger().isDebugEnabled())
+        if (digester.getLogger().isDebugEnabled()) {
             digester.getLogger().debug("Copying parent class loader");
+        }
         Container child = (Container) digester.peek(0);
         Object parent = digester.peek(1);
         Method method =

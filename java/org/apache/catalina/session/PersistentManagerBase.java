@@ -230,8 +230,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     public void setMaxIdleBackup (int backup) {
 
-        if (backup == this.maxIdleBackup)
+        if (backup == this.maxIdleBackup) {
             return;
+        }
         int oldBackup = this.maxIdleBackup;
         this.maxIdleBackup = backup;
         support.firePropertyChange("maxIdleBackup",
@@ -261,8 +262,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     public void setMaxIdleSwap(int max) {
 
-        if (max == this.maxIdleSwap)
+        if (max == this.maxIdleSwap) {
             return;
+        }
         int oldMaxIdleSwap = this.maxIdleSwap;
         this.maxIdleSwap = max;
         support.firePropertyChange("maxIdleSwap",
@@ -292,8 +294,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     public void setMinIdleSwap(int min) {
 
-        if (this.minIdleSwap == min)
+        if (this.minIdleSwap == min) {
             return;
+        }
         int oldMinIdleSwap = this.minIdleSwap;
         this.minIdleSwap = min;
         support.firePropertyChange("minIdleSwap",
@@ -375,8 +378,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     public void setSaveOnRestart(boolean saveOnRestart) {
 
-        if (saveOnRestart == this.saveOnRestart)
+        if (saveOnRestart == this.saveOnRestart) {
             return;
+        }
 
         boolean oldSaveOnRestart = this.saveOnRestart;
         this.saveOnRestart = saveOnRestart;
@@ -395,8 +399,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     public void clearStore() {
 
-        if (store == null)
+        if (store == null) {
             return;
+        }
 
         try {
             if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -426,8 +431,9 @@ public abstract class PersistentManagerBase extends ManagerBase
         long timeNow = System.currentTimeMillis();
         Session sessions[] = findSessions();
         int expireHere = 0 ;
-        if(log.isDebugEnabled())
-             log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
+        if(log.isDebugEnabled()) {
+            log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
+        }
         for (Session session : sessions) {
             if (!session.isValid()) {
                 expiredSessions.incrementAndGet();
@@ -440,8 +446,9 @@ public abstract class PersistentManagerBase extends ManagerBase
         }
 
         long timeEnd = System.currentTimeMillis();
-        if(log.isDebugEnabled())
-             log.debug("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) + " expired sessions: " + expireHere);
+        if(log.isDebugEnabled()) {
+            log.debug("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) + " expired sessions: " + expireHere);
+        }
         processingTime += (timeEnd - timeNow);
 
     }
@@ -487,8 +494,9 @@ public abstract class PersistentManagerBase extends ManagerBase
                 }
             }
         }
-        if (session != null)
+        if (session != null) {
             return session;
+        }
 
         // See if the Session is in the Store
         session = swapIn(id);
@@ -522,8 +530,9 @@ public abstract class PersistentManagerBase extends ManagerBase
         // Initialize our internal data structures
         sessions.clear();
 
-        if (store == null)
+        if (store == null) {
             return;
+        }
 
         String[] ids = null;
         try {
@@ -544,18 +553,21 @@ public abstract class PersistentManagerBase extends ManagerBase
         }
 
         int n = ids.length;
-        if (n == 0)
+        if (n == 0) {
             return;
+        }
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("persistentManager.loading", String.valueOf(n)));
+        }
 
-        for (String id : ids)
+        for (String id : ids) {
             try {
                 swapIn(id);
             } catch (IOException e) {
                 log.error(sm.getString("persistentManager.storeLoadError"), e);
             }
+        }
 
     }
 
@@ -610,24 +622,28 @@ public abstract class PersistentManagerBase extends ManagerBase
     @Override
     public void unload() {
 
-        if (store == null)
+        if (store == null) {
             return;
+        }
 
         Session sessions[] = findSessions();
         int n = sessions.length;
-        if (n == 0)
+        if (n == 0) {
             return;
+        }
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("persistentManager.unloading",
                              String.valueOf(n)));
+        }
 
-        for (Session session : sessions)
+        for (Session session : sessions) {
             try {
                 swapOut(session);
             } catch (IOException e) {
                 // This is logged in writeSession()
             }
+        }
 
     }
 
@@ -675,8 +691,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     protected Session swapIn(String id) throws IOException {
 
-        if (store == null)
+        if (store == null) {
             return null;
+        }
 
         Object swapInLock = null;
 
@@ -737,8 +754,9 @@ public abstract class PersistentManagerBase extends ManagerBase
     }
 
     private void reactivateLoadedSession(String id, Session session) {
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
             log.debug(sm.getString("persistentManager.swapIn", id));
+        }
 
         session.setManager(this);
         // make sure the listeners know about it.
@@ -858,10 +876,11 @@ public abstract class PersistentManagerBase extends ManagerBase
 
         super.startInternal();
 
-        if (store == null)
+        if (store == null) {
             log.error("No Store configured, persistence disabled");
-        else if (store instanceof Lifecycle)
+        } else if (store instanceof Lifecycle) {
             ((Lifecycle)store).start();
+        }
 
         setState(LifecycleState.STARTING);
     }
@@ -877,8 +896,9 @@ public abstract class PersistentManagerBase extends ManagerBase
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Stopping");
+        }
 
         setState(LifecycleState.STOPPING);
 
@@ -889,8 +909,9 @@ public abstract class PersistentManagerBase extends ManagerBase
             Session sessions[] = findSessions();
             for (Session value : sessions) {
                 StandardSession session = (StandardSession) value;
-                if (!session.isValid())
+                if (!session.isValid()) {
                     continue;
+                }
                 session.expire();
             }
         }
@@ -912,8 +933,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     protected void processMaxIdleSwaps() {
 
-        if (!getState().isAvailable() || maxIdleSwap < 0)
+        if (!getState().isAvailable() || maxIdleSwap < 0) {
             return;
+        }
 
         Session sessions[] = findSessions();
 
@@ -922,8 +944,9 @@ public abstract class PersistentManagerBase extends ManagerBase
             for (Session value : sessions) {
                 StandardSession session = (StandardSession) value;
                 synchronized (session) {
-                    if (!session.isValid())
+                    if (!session.isValid()) {
                         continue;
+                    }
                     int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                     if (timeIdle >= maxIdleSwap && timeIdle >= minIdleSwap) {
                         if (session.accessCount != null &&
@@ -931,11 +954,12 @@ public abstract class PersistentManagerBase extends ManagerBase
                             // Session is currently being accessed - skip it
                             continue;
                         }
-                        if (log.isDebugEnabled())
+                        if (log.isDebugEnabled()) {
                             log.debug(sm.getString
                                     ("persistentManager.swapMaxIdle",
                                             session.getIdInternal(),
                                             Integer.valueOf(timeIdle)));
+                        }
                         try {
                             swapOut(session);
                         } catch (IOException e) {
@@ -963,13 +987,15 @@ public abstract class PersistentManagerBase extends ManagerBase
         // FIXME: Smarter algorithm (LRU)
         int limit = (int) (getMaxActiveSessions() * 0.9);
 
-        if (limit >= sessions.length)
+        if (limit >= sessions.length) {
             return;
+        }
 
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
             log.debug(sm.getString
                 ("persistentManager.tooManyActive",
                  Integer.valueOf(sessions.length)));
+        }
 
         int toswap = sessions.length - limit;
 
@@ -983,11 +1009,12 @@ public abstract class PersistentManagerBase extends ManagerBase
                         // Session is currently being accessed - skip it
                         continue;
                     }
-                    if(log.isDebugEnabled())
+                    if(log.isDebugEnabled()) {
                         log.debug(sm.getString
                             ("persistentManager.swapTooManyActive",
                              session.getIdInternal(),
                              Integer.valueOf(timeIdle)));
+                    }
                     try {
                         swapOut(session);
                     } catch (IOException e) {
@@ -1006,8 +1033,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     protected void processMaxIdleBackups() {
 
-        if (!getState().isAvailable() || maxIdleBackup < 0)
+        if (!getState().isAvailable() || maxIdleBackup < 0) {
             return;
+        }
 
         Session sessions[] = findSessions();
 
@@ -1016,21 +1044,24 @@ public abstract class PersistentManagerBase extends ManagerBase
             for (Session value : sessions) {
                 StandardSession session = (StandardSession) value;
                 synchronized (session) {
-                    if (!session.isValid())
+                    if (!session.isValid()) {
                         continue;
+                    }
                     long lastAccessedTime = session.getLastAccessedTimeInternal();
                     Long persistedLastAccessedTime =
                             (Long) session.getNote(PERSISTED_LAST_ACCESSED_TIME);
                     if (persistedLastAccessedTime != null &&
-                            lastAccessedTime == persistedLastAccessedTime.longValue())
+                            lastAccessedTime == persistedLastAccessedTime.longValue()) {
                         continue;
+                    }
                     int timeIdle = (int) (session.getIdleTimeInternal() / 1000L);
                     if (timeIdle >= maxIdleBackup) {
-                        if (log.isDebugEnabled())
+                        if (log.isDebugEnabled()) {
                             log.debug(sm.getString
                                     ("persistentManager.backupMaxIdle",
                                             session.getIdInternal(),
                                             Integer.valueOf(timeIdle)));
+                        }
 
                         try {
                             writeSession(session);
