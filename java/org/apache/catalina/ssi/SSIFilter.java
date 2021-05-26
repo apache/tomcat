@@ -73,14 +73,16 @@ public class SSIFilter extends GenericFilter {
 
         isVirtualWebappRelative = Boolean.parseBoolean(getInitParameter("isVirtualWebappRelative"));
 
-        if (getInitParameter("expires") != null)
+        if (getInitParameter("expires") != null) {
             expires = Long.valueOf(getInitParameter("expires"));
+        }
 
         allowExec = Boolean.parseBoolean(getInitParameter("allowExec"));
 
-        if (debug > 0)
+        if (debug > 0) {
             getServletContext().log(
                     "SSIFilter.init() SSI invoker started with 'debug'=" + debug);
+        }
     }
 
     @Override

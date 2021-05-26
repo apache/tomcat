@@ -197,9 +197,12 @@ public class SSIProcessor {
         StringBuilder retBuf = new StringBuilder();
         while (bIdx < cmd.length()) {
             if (!inside) {
-                while (bIdx < cmd.length() && isSpace(cmd.charAt(bIdx)))
+                while (bIdx < cmd.length() && isSpace(cmd.charAt(bIdx))) {
                     bIdx++;
-                if (bIdx >= cmd.length()) break;
+                }
+                if (bIdx >= cmd.length()) {
+                    break;
+                }
                 inside = !inside;
             } else {
                 while (bIdx < cmd.length() && cmd.charAt(bIdx) != '=') {
@@ -217,7 +220,9 @@ public class SSIProcessor {
                         escaped = true;
                         continue;
                     }
-                    if (c == '"' && !escaped) quotes++;
+                    if (c == '"' && !escaped) {
+                        quotes++;
+                    }
                     escaped = false;
                 }
             }
@@ -249,9 +254,12 @@ public class SSIProcessor {
         char endQuote = 0;
         for (int bIdx = start; bIdx < cmd.length(); bIdx++) {
             if (!inside) {
-                while (bIdx < cmd.length() && !isQuote(cmd.charAt(bIdx)))
+                while (bIdx < cmd.length() && !isQuote(cmd.charAt(bIdx))) {
                     bIdx++;
-                if (bIdx >= cmd.length()) break;
+                }
+                if (bIdx >= cmd.length()) {
+                    break;
+                }
                 inside = !inside;
                 endQuote = cmd.charAt(bIdx);
             } else {
@@ -264,17 +272,23 @@ public class SSIProcessor {
                         continue;
                     }
                     // If we reach the other " then stop
-                    if (c == endQuote && !escaped) break;
+                    if (c == endQuote && !escaped) {
+                        break;
+                    }
                     // Since parsing of attributes and var
                     // substitution is done in separate places,
                     // we need to leave escape in the string
-                    if (c == '$' && escaped) sb.append('\\');
+                    if (c == '$' && escaped) {
+                        sb.append('\\');
+                    }
                     escaped = false;
                     sb.append(c);
                 }
                 // If we hit the end without seeing a quote
                 // the signal an error
-                if (bIdx == cmd.length()) return null;
+                if (bIdx == cmd.length()) {
+                    return null;
+                }
                 vals[valIndex++] = sb.toString();
                 sb.delete(0, sb.length()); // clear the buffer
                 inside = !inside;

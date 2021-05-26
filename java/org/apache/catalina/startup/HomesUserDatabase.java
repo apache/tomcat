@@ -120,8 +120,9 @@ public final class HomesUserDatabase
 
         String homeBase = userConfig.getHomeBase();
         File homeBaseDir = new File(homeBase);
-        if (!homeBaseDir.exists() || !homeBaseDir.isDirectory())
+        if (!homeBaseDir.exists() || !homeBaseDir.isDirectory()) {
             return;
+        }
         String homeBaseFiles[] = homeBaseDir.list();
         if (homeBaseFiles == null) {
             return;
@@ -129,8 +130,9 @@ public final class HomesUserDatabase
 
         for (String homeBaseFile : homeBaseFiles) {
             File homeDir = new File(homeBaseDir, homeBaseFile);
-            if (!homeDir.isDirectory() || !homeDir.canRead())
+            if (!homeDir.isDirectory() || !homeDir.canRead()) {
                 continue;
+            }
             homes.put(homeBaseFile, homeDir.toString());
         }
     }

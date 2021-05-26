@@ -104,8 +104,9 @@ public class LifecycleListenerRule extends Rule {
         // Check the container for the specified attribute
         if (attributeName != null) {
             String value = attributes.getValue(attributeName);
-            if (value != null)
+            if (value != null) {
                 className = value;
+            }
         }
 
         // Check the container's parent for the specified attribute

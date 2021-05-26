@@ -733,19 +733,21 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     public boolean modified() {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("modified()");
+        }
 
         for (Entry<String,ResourceEntry> entry : resourceEntries.entrySet()) {
             long cachedLastModified = entry.getValue().lastModified;
             long lastModified = resources.getClassLoaderResource(
                     entry.getKey()).getLastModified();
             if (lastModified != cachedLastModified) {
-                if( log.isDebugEnabled() )
+                if( log.isDebugEnabled() ) {
                     log.debug(sm.getString("webappClassLoader.resourceModified",
                             entry.getKey(),
                             new Date(cachedLastModified),
                             new Date(lastModified)));
+                }
                 return true;
             }
         }
@@ -830,8 +832,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("    findClass(" + name + ")");
+        }
 
         checkStateForClassLoading(name);
 
@@ -840,12 +843,14 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             int i = name.lastIndexOf('.');
             if (i >= 0) {
                 try {
-                    if (log.isTraceEnabled())
+                    if (log.isTraceEnabled()) {
                         log.trace("      securityManager.checkPackageDefinition");
+                    }
                     securityManager.checkPackageDefinition(name.substring(0,i));
                 } catch (Exception se) {
-                    if (log.isTraceEnabled())
+                    if (log.isTraceEnabled()) {
                         log.trace("      -->Exception-->ClassNotFoundException", se);
+                    }
                     throw new ClassNotFoundException(name, se);
                 }
             }
@@ -855,8 +860,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         // (throws ClassNotFoundException if it is not found)
         Class<?> clazz = null;
         try {
-            if (log.isTraceEnabled())
+            if (log.isTraceEnabled()) {
                 log.trace("      findClassInternal(" + name + ")");
+            }
             try {
                 if (securityManager != null) {
                     PrivilegedAction<Class<?>> dp =
@@ -870,8 +876,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         ace.getMessage()), ace);
                 throw new ClassNotFoundException(name, ace);
             } catch (RuntimeException e) {
-                if (log.isTraceEnabled())
+                if (log.isTraceEnabled()) {
                     log.trace("      -->RuntimeException Rethrown", e);
+                }
                 throw e;
             }
             if ((clazz == null) && hasExternalRepositories) {
@@ -882,25 +889,29 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                             ace.getMessage()), ace);
                     throw new ClassNotFoundException(name, ace);
                 } catch (RuntimeException e) {
-                    if (log.isTraceEnabled())
+                    if (log.isTraceEnabled()) {
                         log.trace("      -->RuntimeException Rethrown", e);
+                    }
                     throw e;
                 }
             }
             if (clazz == null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("    --> Returning ClassNotFoundException");
+                }
                 throw new ClassNotFoundException(name);
             }
         } catch (ClassNotFoundException e) {
-            if (log.isTraceEnabled())
+            if (log.isTraceEnabled()) {
                 log.trace("    --> Passing on ClassNotFoundException");
+            }
             throw e;
         }
 
         // Return the class we have located
-        if (log.isTraceEnabled())
+        if (log.isTraceEnabled()) {
             log.debug("      Returning class " + clazz);
+        }
 
         if (log.isTraceEnabled()) {
             ClassLoader cl;
@@ -927,8 +938,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @Override
     public URL findResource(final String name) {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("    findResource(" + name + ")");
+        }
 
         checkStateForResourceLoading(name);
 
@@ -947,10 +959,11 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         if (log.isDebugEnabled()) {
-            if (url != null)
+            if (url != null) {
                 log.debug("    --> Returning '" + url.toString() + "'");
-            else
+            } else {
                 log.debug("    --> Resource not found, returning null");
+            }
         }
         return url;
     }
@@ -980,8 +993,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @Override
     public Enumeration<URL> findResources(String name) throws IOException {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("    findResources(" + name + ")");
+        }
 
         checkStateForResourceLoading(name);
 
@@ -1033,8 +1047,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @Override
     public URL getResource(String name) {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("getResource(" + name + ")");
+        }
 
         checkStateForResourceLoading(name);
 
@@ -1044,12 +1059,14 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         // (1) Delegate to parent if requested
         if (delegateFirst) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  Delegating to parent classloader " + parent);
+            }
             url = parent.getResource(name);
             if (url != null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  --> Returning '" + url.toString() + "'");
+                }
                 return url;
             }
         }
@@ -1057,8 +1074,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         // (2) Search local repositories
         url = findResource(name);
         if (url != null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  --> Returning '" + url.toString() + "'");
+            }
             return url;
         }
 
@@ -1066,15 +1084,17 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (!delegateFirst) {
             url = parent.getResource(name);
             if (url != null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  --> Returning '" + url.toString() + "'");
+                }
                 return url;
             }
         }
 
         // (4) Resource was not found
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("  --> Resource not found, returning null");
+        }
         return null;
 
     }
@@ -1110,8 +1130,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     @Override
     public InputStream getResourceAsStream(String name) {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("getResourceAsStream(" + name + ")");
+        }
 
         checkStateForResourceLoading(name);
 
@@ -1121,19 +1142,22 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         // (1) Delegate to parent if requested
         if (delegateFirst) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  Delegating to parent classloader " + parent);
+            }
             stream = parent.getResourceAsStream(name);
             if (stream != null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  --> Returning stream from parent");
+                }
                 return stream;
             }
         }
 
         // (2) Search local repositories
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("  Searching local repositories");
+        }
         String path = nameToPath(name);
         WebResource resource = resources.getClassLoaderResource(path);
         if (resource.exists()) {
@@ -1186,26 +1210,30 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             // Ignore
         }
         if (stream != null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  --> Returning stream from local");
+            }
             return stream;
         }
 
         // (3) Delegate to parent unconditionally
         if (!delegateFirst) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  Delegating to parent classloader unconditionally " + parent);
+            }
             stream = parent.getResourceAsStream(name);
             if (stream != null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  --> Returning stream from parent");
+                }
                 return stream;
             }
         }
 
         // (4) Resource was not found
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("  --> Resource not found, returning null");
+        }
         return null;
     }
 
@@ -1254,8 +1282,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 
         synchronized (JreCompat.isGraalAvailable() ? this : getClassLoadingLock(name)) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("loadClass(" + name + ", " + resolve + ")");
+            }
             Class<?> clazz = null;
 
             // Log access to stopped class loader
@@ -1264,20 +1293,24 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             // (0) Check our previously loaded local class cache
             clazz = findLoadedClass0(name);
             if (clazz != null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  Returning class from cache");
-                if (resolve)
+                }
+                if (resolve) {
                     resolveClass(clazz);
+                }
                 return clazz;
             }
 
             // (0.1) Check our previously loaded class cache
             clazz = JreCompat.isGraalAvailable() ? null : findLoadedClass(name);
             if (clazz != null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  Returning class from cache");
-                if (resolve)
+                }
+                if (resolve) {
                     resolveClass(clazz);
+                }
                 return clazz;
             }
 
@@ -1320,8 +1353,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 try {
                     clazz = javaseLoader.loadClass(name);
                     if (clazz != null) {
-                        if (resolve)
+                        if (resolve) {
                             resolveClass(clazz);
+                        }
                         return clazz;
                     }
                 } catch (ClassNotFoundException e) {
@@ -1347,15 +1381,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
             // (1) Delegate to our parent if requested
             if (delegateLoad) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  Delegating to parent classloader1 " + parent);
+                }
                 try {
                     clazz = Class.forName(name, false, parent);
                     if (clazz != null) {
-                        if (log.isDebugEnabled())
+                        if (log.isDebugEnabled()) {
                             log.debug("  Loading class from parent");
-                        if (resolve)
+                        }
+                        if (resolve) {
                             resolveClass(clazz);
+                        }
                         return clazz;
                     }
                 } catch (ClassNotFoundException e) {
@@ -1364,15 +1401,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (2) Search local repositories
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  Searching local repositories");
+            }
             try {
                 clazz = findClass(name);
                 if (clazz != null) {
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug("  Loading class from local repository");
-                    if (resolve)
+                    }
+                    if (resolve) {
                         resolveClass(clazz);
+                    }
                     return clazz;
                 }
             } catch (ClassNotFoundException e) {
@@ -1381,15 +1421,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
             // (3) Delegate to parent unconditionally
             if (!delegateLoad) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  Delegating to parent classloader at end: " + parent);
+                }
                 try {
                     clazz = Class.forName(name, false, parent);
                     if (clazz != null) {
-                        if (log.isDebugEnabled())
+                        if (log.isDebugEnabled()) {
                             log.debug("  Loading class from parent");
-                        if (resolve)
+                        }
+                        if (resolve) {
                             resolveClass(clazz);
+                        }
                         return clazz;
                     }
                 } catch (ClassNotFoundException e) {
@@ -2375,13 +2418,15 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         Class<?> clazz = entry.loadedClass;
-        if (clazz != null)
+        if (clazz != null) {
             return clazz;
+        }
 
         synchronized (JreCompat.isGraalAvailable() ? this : getClassLoadingLock(name)) {
             clazz = entry.loadedClass;
-            if (clazz != null)
+            if (clazz != null) {
                 return clazz;
+            }
 
             if (resource == null) {
                 resource = resources.getClassLoaderResource(path);
@@ -2426,8 +2471,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             // Looking up the package
             String packageName = null;
             int pos = name.lastIndexOf('.');
-            if (pos != -1)
+            if (pos != -1) {
                 packageName = name.substring(0, pos);
+            }
 
             Package pkg = null;
 
@@ -2458,10 +2504,11 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     } else {
                         sealCheck = (manifest == null) || !isPackageSealed(packageName, manifest);
                     }
-                    if (!sealCheck)
+                    if (!sealCheck) {
                         throw new SecurityException
                             ("Sealing violation loading " + name + " : Package "
                              + packageName + " is sealed.");
+                    }
                 }
 
             }
@@ -2581,8 +2628,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     protected boolean filter(String name, boolean isClassName) {
 
-        if (name == null)
+        if (name == null) {
             return false;
+        }
 
         char ch;
         if (name.startsWith("jakarta")) {
