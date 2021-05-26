@@ -74,7 +74,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
     @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
             throws ChannelException {
-        if ( destination == null ) destination = membershipService.getMembers();
+        if ( destination == null ) {
+            destination = membershipService.getMembers();
+        }
         if ((msg.getOptions()&Channel.SEND_OPTIONS_MULTICAST) == Channel.SEND_OPTIONS_MULTICAST) {
             membershipService.broadcast(msg);
         } else {
@@ -138,8 +140,14 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             //make sure we don't pass down any flags that are unrelated to the bottom layer
             svc = svc & Channel.DEFAULT;
 
-            if (startLevel == Channel.DEFAULT) return; //we have already started up all components
-            if (svc == 0 ) return;//nothing to start
+            if (startLevel == Channel.DEFAULT)
+             {
+                return; //we have already started up all components
+            }
+            if (svc == 0 )
+             {
+                return;//nothing to start
+            }
 
             if (svc == (svc & startLevel)) {
                 throw new ChannelException(sm.getString("channelCoordinator.alreadyStarted",
@@ -217,8 +225,14 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             //make sure we don't pass down any flags that are unrelated to the bottom layer
             svc = svc & Channel.DEFAULT;
 
-            if (startLevel == 0) return; //we have already stopped up all components
-            if (svc == 0 ) return;//nothing to stop
+            if (startLevel == 0)
+             {
+                return; //we have already stopped up all components
+            }
+            if (svc == 0 )
+             {
+                return;//nothing to stop
+            }
 
             boolean valid = false;
             if ( Channel.MBR_TX_SEQ==(svc & Channel.MBR_TX_SEQ) ) {
@@ -296,7 +310,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             this.clusterReceiver = clusterReceiver;
             this.clusterReceiver.setMessageListener(this);
         } else {
-            if  (this.clusterReceiver!=null ) this.clusterReceiver.setMessageListener(null);
+            if  (this.clusterReceiver!=null ) {
+                this.clusterReceiver.setMessageListener(null);
+            }
             this.clusterReceiver = null;
         }
     }
@@ -312,7 +328,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
 
     @Override
     public void heartbeat() {
-        if ( clusterSender!=null ) clusterSender.heartbeat();
+        if ( clusterSender!=null ) {
+            clusterSender.heartbeat();
+        }
         super.heartbeat();
     }
 

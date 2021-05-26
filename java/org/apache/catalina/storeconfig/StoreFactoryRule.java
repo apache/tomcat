@@ -114,8 +114,9 @@ public class StoreFactoryRule extends Rule {
         String className = defaultName;
         if (attr != null) {
             String value = attributes.getValue(attr);
-            if (value != null)
+            if (value != null) {
                 className = value;
+            }
         }
         Class<?> clazz = Class.forName(className);
         return clazz.getConstructor().newInstance();

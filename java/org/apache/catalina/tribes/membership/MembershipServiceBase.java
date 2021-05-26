@@ -53,19 +53,25 @@ public abstract class MembershipServiceBase implements MembershipService, Member
 
     @Override
     public boolean hasMembers() {
-        if (getMembershipProvider() == null ) return false;
+        if (getMembershipProvider() == null ) {
+            return false;
+        }
         return getMembershipProvider().hasMembers();
     }
 
     @Override
     public Member getMember(Member mbr) {
-        if (getMembershipProvider() == null) return null;
+        if (getMembershipProvider() == null) {
+            return null;
+        }
         return getMembershipProvider().getMember(mbr);
     }
 
     @Override
     public Member[] getMembers() {
-        if (getMembershipProvider() == null) return Membership.EMPTY_MEMBERS;
+        if (getMembershipProvider() == null) {
+            return Membership.EMPTY_MEMBERS;
+        }
         return getMembershipProvider().getMembers();
     }
 
@@ -78,8 +84,9 @@ public abstract class MembershipServiceBase implements MembershipService, Member
             for (int i = 0; i < currentMembers.length; i++) {
                 membernames[i] = currentMembers[i].toString() ;
             }
-        } else
+        } else {
             membernames = new String[0] ;
+        }
         return membernames ;
     }
 
@@ -87,8 +94,9 @@ public abstract class MembershipServiceBase implements MembershipService, Member
     public Member findMemberByName(String name) {
         Member[] currentMembers = getMembers();
         for (Member currentMember : currentMembers) {
-            if (name.equals(currentMember.toString()))
+            if (name.equals(currentMember.toString())) {
                 return currentMember;
+            }
         }
         return null;
     }
@@ -106,13 +114,17 @@ public abstract class MembershipServiceBase implements MembershipService, Member
     @Override
     public void memberAdded(Member member) {
         MembershipListener listener = this.listener;
-        if (listener != null) listener.memberAdded(member);
+        if (listener != null) {
+            listener.memberAdded(member);
+        }
     }
 
     @Override
     public void memberDisappeared(Member member) {
         MembershipListener listener = this.listener;
-        if (listener != null) listener.memberDisappeared(member);
+        if (listener != null) {
+            listener.memberDisappeared(member);
+        }
     }
 
     @Override

@@ -73,7 +73,9 @@ public class ChannelData implements ChannelMessage {
      * @param generateUUID boolean - if true, a unique Id will be generated
      */
     public ChannelData(boolean generateUUID) {
-        if ( generateUUID ) generateUUID();
+        if ( generateUUID ) {
+            generateUUID();
+        }
     }
 
 
@@ -293,7 +295,9 @@ public class ChannelData implements ChannelMessage {
     public boolean equals(Object o) {
         if ( o instanceof ChannelData ) {
             return Arrays.equals(getUniqueId(),((ChannelData)o).getUniqueId());
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -365,7 +369,9 @@ public class ChannelData implements ChannelMessage {
     public static String bToS(byte[] data) {
         StringBuilder buf = new StringBuilder(4*16);
         buf.append('{');
-        for (int i=0; data!=null && i<data.length; i++ ) buf.append(String.valueOf(data[i])).append(' ');
+        for (int i=0; data!=null && i<data.length; i++ ) {
+            buf.append(String.valueOf(data[i])).append(' ');
+        }
         buf.append('}');
         return buf.toString();
     }

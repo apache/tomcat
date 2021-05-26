@@ -99,8 +99,9 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         }
 
         String ver = getEnv(CUSTOM_ENV_PREFIX + "API_VERSION", "KUBERNETES_API_VERSION");
-        if (ver == null)
+        if (ver == null) {
             ver = "v1";
+        }
 
         String labels = getEnv(CUSTOM_ENV_PREFIX + "LABELS", "KUBERNETES_LABELS");
 

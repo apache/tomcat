@@ -39,12 +39,15 @@ public class PooledParallelSender extends PooledSender implements PooledParallel
             ChannelException cx = new ChannelException(sm.getString(
                     "pooledParallelSender.unable.retrieveSender.timeout",
                     Long.toString(getMaxWait())));
-            for (Member member : destination)
+            for (Member member : destination) {
                 cx.addFaultyMember(member, new NullPointerException(sm.getString("pooledParallelSender.unable.retrieveSender")));
+            }
             throw cx;
         } else {
             try {
-                if (!sender.isConnected()) sender.connect();
+                if (!sender.isConnected()) {
+                    sender.connect();
+                }
                 sender.sendMessage(destination, message);
                 sender.keepalive();
             } catch (ChannelException x) {

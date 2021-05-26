@@ -49,14 +49,22 @@ public class JmxRegistry {
             return null;
         }
         JmxRegistry registry = registryCache.get(channel.getName());
-        if (registry != null) return registry;
+        if (registry != null) {
+            return registry;
+        }
 
-        if (!(channel instanceof JmxChannel)) return null;
+        if (!(channel instanceof JmxChannel)) {
+            return null;
+        }
         JmxChannel jmxChannel = (JmxChannel) channel;
-        if (!jmxChannel.isJmxEnabled()) return null;
+        if (!jmxChannel.isJmxEnabled()) {
+            return null;
+        }
         ObjectName baseOn = createBaseObjectName(jmxChannel.getJmxDomain(),
                 jmxChannel.getJmxPrefix(), channel.getName());
-        if (baseOn == null) return null;
+        if (baseOn == null) {
+            return null;
+        }
         // create registry
         registry = new JmxRegistry();
         registry.baseOname = baseOn;
@@ -69,7 +77,9 @@ public class JmxRegistry {
 
     public static void removeRegistry(Channel channel, boolean clear) {
         JmxRegistry registry = registryCache.get(channel.getName());
-        if (registry == null) return;
+        if (registry == null) {
+            return;
+        }
         if (clear) {
             registry.clearMBeans();
         }
@@ -121,7 +131,9 @@ public class JmxRegistry {
     }
 
     public void unregisterJmx(ObjectName oname) {
-        if (oname ==null) return;
+        if (oname ==null) {
+            return;
+        }
         try {
             mbserver.unregisterMBean(oname);
         } catch (InstanceNotFoundException e) {
