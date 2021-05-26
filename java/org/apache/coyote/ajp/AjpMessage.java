@@ -371,10 +371,12 @@ public class AjpMessage {
             log.debug(prefix + ": " + HexUtils.toHexString(buf) + " " + pos +"/" + (len + 4));
         }
         int max = pos;
-        if (len + 4 > pos)
+        if (len + 4 > pos) {
             max = len+4;
-        if (max > 1000)
+        }
+        if (max > 1000) {
             max = 1000;
+        }
         if (log.isDebugEnabled()) {
             for (int j = 0; j < max; j += 16) {
                 log.debug(hexLine(buf, j, len));

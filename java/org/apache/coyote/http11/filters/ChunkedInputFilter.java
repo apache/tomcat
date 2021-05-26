@@ -395,8 +395,9 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         while (!eol) {
 
             if (readChunk == null || readChunk.position() >= readChunk.limit()) {
-                if (readBytes() <= 0)
+                if (readBytes() <= 0) {
                     return false;
+                }
             }
 
             byte chr = readChunk.get(readChunk.position());

@@ -68,12 +68,15 @@ public class ServerInfo {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
-        if (info == null)
+        if (info == null) {
             info = "Apache Tomcat 8.5.x-dev";
-        if (built == null)
+        }
+        if (built == null) {
             built = "unknown";
-        if (number == null)
+        }
+        if (number == null) {
             number = "8.5.x";
+        }
 
         serverInfo = info;
         serverBuilt = built;

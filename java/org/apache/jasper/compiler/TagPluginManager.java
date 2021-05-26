@@ -62,8 +62,9 @@ public class TagPluginManager {
     }
 
     private void init(ErrorDispatcher err) throws JasperException {
-        if (initialized)
+        if (initialized) {
             return;
+        }
 
         String blockExternalString = ctxt.getInitParameter(
                 Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
@@ -209,16 +210,18 @@ public class TagPluginManager {
         @Override
         public boolean isConstantAttribute(String attribute) {
             Node.JspAttribute attr = getNodeAttribute(attribute);
-            if (attr == null)
+            if (attr == null) {
                 return false;
+            }
             return attr.isLiteral();
         }
 
         @Override
         public String getConstantAttribute(String attribute) {
             Node.JspAttribute attr = getNodeAttribute(attribute);
-            if (attr == null)
+            if (attr == null) {
                 return null;
+            }
             return attr.getValue();
         }
 

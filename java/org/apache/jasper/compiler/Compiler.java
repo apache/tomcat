@@ -533,9 +533,10 @@ public abstract class Compiler {
                     return true;
                 }
             } catch (Exception e) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("Problem accessing resource. Treat as outdated.",
                             e);
+                }
                 return true;
             }
         }
@@ -570,8 +571,9 @@ public abstract class Compiler {
 
         try {
             File javaFile = new File(ctxt.getServletJavaFileName());
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Deleting " + javaFile);
+            }
             if (javaFile.exists()) {
                 if (!javaFile.delete()) {
                     log.warn(Localizer.getMessage(
@@ -589,8 +591,9 @@ public abstract class Compiler {
     public void removeGeneratedClassFiles() {
         try {
             File classFile = new File(ctxt.getClassFileName());
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Deleting " + classFile);
+            }
             if (classFile.exists()) {
                 if (!classFile.delete()) {
                     log.warn(Localizer.getMessage(

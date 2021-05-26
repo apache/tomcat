@@ -593,10 +593,11 @@ class JspDocumentParser
                             startMark = new Mark(ctxt, path, line, column);
                             break;
                         }
-                        if (ch == '"')
+                        if (ch == '"') {
                             doubleQ = !doubleQ;
-                        else if (ch == '\'')
+                        } else if (ch == '\'') {
                             singleQ = !singleQ;
+                        }
 
                         ttext.write(ch);
                         lastCh = ch;
@@ -1351,10 +1352,12 @@ class JspDocumentParser
                 Node n = body.getNode(i);
                 if (!(n instanceof Node.TemplateText)) {
                     String elemType = SCRIPTLET_ACTION;
-                    if (scriptingElem instanceof Node.Declaration)
+                    if (scriptingElem instanceof Node.Declaration) {
                         elemType = DECLARATION_ACTION;
-                    if (scriptingElem instanceof Node.Expression)
+                    }
+                    if (scriptingElem instanceof Node.Expression) {
                         elemType = EXPRESSION_ACTION;
+                    }
                     String msg =
                         Localizer.getMessage(
                             "jsp.error.parse.xml.scripting.invalid.body",

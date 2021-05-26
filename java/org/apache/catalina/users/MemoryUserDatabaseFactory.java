@@ -106,8 +106,9 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
         // Return the configured database instance
         database.open();
         // Don't try something we know won't work
-        if (!database.getReadonly())
+        if (!database.getReadonly()) {
             database.save();
+        }
         return database;
 
     }

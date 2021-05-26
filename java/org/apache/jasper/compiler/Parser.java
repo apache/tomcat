@@ -208,8 +208,9 @@ class Parser implements TagConstants {
 
         // Get the qualified name
         String qName = parseName();
-        if (qName == null)
+        if (qName == null) {
             return false;
+        }
 
         boolean ignoreEL = pageInfo.isELIgnored();
 
@@ -228,13 +229,15 @@ class Parser implements TagConstants {
         }
 
         reader.skipSpaces();
-        if (!reader.matches("="))
+        if (!reader.matches("=")) {
             err.jspError(reader.mark(), "jsp.error.attribute.noequal");
+        }
 
         reader.skipSpaces();
         char quote = (char) reader.nextChar();
-        if (quote != '\'' && quote != '"')
+        if (quote != '\'' && quote != '"') {
             err.jspError(reader.mark(), "jsp.error.attribute.noquote");
+        }
 
         String watchString = "";
         if (reader.matches("<%=")) {
@@ -302,8 +305,9 @@ class Parser implements TagConstants {
         } catch (IllegalArgumentException iae) {
             err.jspError(start, iae.getMessage());
         }
-        if (watch.length() == 1) // quote
+        if (watch.length() == 1) {
             return ret;
+        }
 
         // Put back delimiter '<%=' and '%>', since they are needed if the
         // attribute does not allow RTexpression.
@@ -1303,8 +1307,9 @@ class Parser implements TagConstants {
      */
     private void parseTemplateText(Node parent) {
 
-        if (!reader.hasMoreInput())
+        if (!reader.hasMoreInput()) {
             return;
+        }
 
         CharArrayWriter ttext = new CharArrayWriter();
 

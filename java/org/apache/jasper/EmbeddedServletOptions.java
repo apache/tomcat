@@ -652,12 +652,14 @@ public final class EmbeddedServletOptions implements Options {
         }
 
         String ieClassId = config.getInitParameter("ieClassId");
-        if (ieClassId != null)
+        if (ieClassId != null) {
             this.ieClassId = ieClassId;
+        }
 
         String classpath = config.getInitParameter("classpath");
-        if (classpath != null)
+        if (classpath != null) {
             this.classpath = classpath;
+        }
 
         /*
          * scratchdir
@@ -678,9 +680,10 @@ public final class EmbeddedServletOptions implements Options {
         }
 
         if (!(scratchDir.exists() && scratchDir.canRead() &&
-                scratchDir.canWrite() && scratchDir.isDirectory()))
+                scratchDir.canWrite() && scratchDir.isDirectory())) {
             log.fatal(Localizer.getMessage("jsp.error.bad.scratch.dir",
                     scratchDir.getAbsolutePath()));
+        }
 
         this.compiler = config.getInitParameter("compiler");
 
