@@ -232,7 +232,9 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                     resp.setCharacterEncoding("UTF-8");
                     OutputStream os = resp.getOutputStream();
                     resp.setContentType("text/plain");
-                    for (int i = 0; i < 16; i++) {
+                    // Needs to be large enough to fill buffers and trigger
+                    // the IOE for the test to work as expected.
+                    for (int i = 0; i < 64; i++) {
                         os.write(TestCoyoteAdapter.TEXT_8K.getBytes(StandardCharsets.UTF_8));
                     }
                 } catch (IOException e) {
