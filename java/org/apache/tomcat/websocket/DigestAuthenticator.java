@@ -102,11 +102,11 @@ public class DigestAuthenticator extends Authenticator {
         StringBuilder preDigest = new StringBuilder();
         String A1;
 
-        if (algorithm.equalsIgnoreCase("MD5"))
+        if (algorithm.equalsIgnoreCase("MD5")) {
             A1 = userName + ":" + realm + ":" + password;
-
-        else
+        } else {
             A1 = encodeMD5(userName + ":" + realm + ":" + password) + ":" + nonce + ":" + cNonce;
+        }
 
         /*
          * If the "qop" value is "auth-int", then A2 is: A2 = Method ":"
