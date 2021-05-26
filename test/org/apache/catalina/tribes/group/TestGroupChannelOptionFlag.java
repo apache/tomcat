@@ -58,7 +58,9 @@ public class TestGroupChannelOptionFlag {
         try {
             channel.start(Channel.DEFAULT);
         }catch ( ChannelException x ) {
-            if ( x.getMessage().indexOf("option flag conflict") >= 0 ) error = true;
+            if ( x.getMessage().indexOf("option flag conflict") >= 0 ) {
+                error = true;
+            }
         }
         Assert.assertTrue(error);
     }
@@ -79,7 +81,9 @@ public class TestGroupChannelOptionFlag {
         try {
             channel.start(Channel.DEFAULT);
         }catch ( ChannelException x ) {
-            if ( x.getMessage().indexOf("option flag conflict") >= 0 ) error = true;
+            if ( x.getMessage().indexOf("option flag conflict") >= 0 ) {
+                error = true;
+            }
         }
         Assert.assertFalse(error);
     }

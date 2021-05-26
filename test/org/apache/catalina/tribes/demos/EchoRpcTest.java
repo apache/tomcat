@@ -145,9 +145,13 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                 } else if ("-name".equals(args[i])) {
                     name = args[++i];
                 } else if ("-mode".equals(args[i])) {
-                    if ( "all".equals(args[++i]) ) options = RpcChannel.ALL_REPLY;
-                    else if ( "first".equals(args[i]) ) options = RpcChannel.FIRST_REPLY;
-                    else if ( "majority".equals(args[i]) ) options = RpcChannel.MAJORITY_REPLY;
+                    if ( "all".equals(args[++i]) ) {
+                      options = RpcChannel.ALL_REPLY;
+                    } else if ( "first".equals(args[i]) ) {
+                      options = RpcChannel.FIRST_REPLY;
+                    } else if ( "majority".equals(args[i]) ) {
+                      options = RpcChannel.MAJORITY_REPLY;
+                    }
                 } else if ("-debug".equals(args[i])) {
                     // Not used
                 } else if ("-help".equals(args[i])) {

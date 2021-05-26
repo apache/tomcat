@@ -58,12 +58,16 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
 
     public static synchronized void startTest() {
         threadCount++;
-        if ( messageStartSendTime == 0 ) messageStartSendTime = System.currentTimeMillis();
+        if ( messageStartSendTime == 0 ) {
+          messageStartSendTime = System.currentTimeMillis();
+        }
     }
 
     public static synchronized void endTest() {
         threadCount--;
-        if ( messageEndSendTime == 0 && threadCount==0 ) messageEndSendTime = System.currentTimeMillis();
+        if ( messageEndSendTime == 0 && threadCount==0 ) {
+          messageEndSendTime = System.currentTimeMillis();
+        }
     }
 
 
@@ -129,16 +133,24 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
                         }
                         channel.send(channel.getMembers(), msg, channelOptions);
                         if ( pause > 0 ) {
-                            if ( debug) System.out.println("Pausing sender for "+pause+" ms.");
+                            if ( debug) {
+                              System.out.println("Pausing sender for "+pause+" ms.");
+                            }
                             Thread.sleep(pause);
                         }
                     } catch (ChannelException x) {
-                        if ( debug ) log.error("Unable to send message:"+x.getMessage(),x);
+                        if ( debug ) {
+                          log.error("Unable to send message:"+x.getMessage(),x);
+                        }
                         log.error("Unable to send message:"+x.getMessage());
                         ChannelException.FaultyMember[] faulty = x.getFaultyMembers();
-                        for (ChannelException.FaultyMember faultyMember : faulty) log.error("Faulty: " + faultyMember);
+                        for (ChannelException.FaultyMember faultyMember : faulty) {
+                          log.error("Faulty: " + faultyMember);
+                        }
                         --counter;
-                        if ( this.breakonChannelException ) throw x;
+                        if ( this.breakonChannelException ) {
+                          throw x;
+                        }
                     }
                 }
                 if ( (counter % statsInterval) == 0 && (counter > 0)) {
@@ -153,7 +165,9 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             }
         }catch ( Exception x ) {
             log.error("Captured error while sending:"+x.getMessage());
-            if ( debug ) log.error("",x);
+            if ( debug ) {
+              log.error("",x);
+            }
             printSendStats(LoadTest.messagesSent, LoadTest.messageSize);
         }
         endTest();
@@ -194,7 +208,9 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
 
     @Override
     public void messageReceived(Serializable msg, Member mbr){
-        if ( receiveStart == 0 ) receiveStart = System.currentTimeMillis();
+        if ( receiveStart == 0 ) {
+          receiveStart = System.currentTimeMillis();
+        }
         if ( debug ) {
             if ( msg instanceof LoadMessage ) {
                 printArray(((LoadMessage)msg).getMessage());
@@ -333,7 +349,9 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
                 size = Integer.parseInt(args[++i])-4;
                 System.out.println("Message size will be:"+(size+4)+" bytes");
             } else if ("-mode".equals(args[i])) {
-                if ( "receive".equals(args[++i]) ) send = false;
+                if ( "receive".equals(args[++i]) ) {
+                  send = false;
+                }
             } else if ("-debug".equals(args[i])) {
                 debug = true;
             } else if ("-help".equals(args[i]))
@@ -363,7 +381,9 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             test.channelOptions = channelOptions;
         }
         test.run();
-        if ( shutdown && send ) channel.stop(Channel.DEFAULT);
+        if ( shutdown && send ) {
+          channel.stop(Channel.DEFAULT);
+        }
         System.out.println("System test complete, sleeping to let threads finish.");
         Thread.sleep(60*1000*60);
     }

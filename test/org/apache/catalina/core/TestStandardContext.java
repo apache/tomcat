@@ -735,7 +735,9 @@ public class TestStandardContext extends TomcatBaseTest {
         private Context context;
 
         private synchronized void init() throws Exception {
-            if (init) return;
+            if (init) {
+              return;
+            }
 
             Tomcat tomcat = getTomcatInstance();
             context = tomcat.addContext("", TEMP_DIR);

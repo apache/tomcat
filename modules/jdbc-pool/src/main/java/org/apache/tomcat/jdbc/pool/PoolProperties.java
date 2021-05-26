@@ -96,9 +96,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      */
     @Override
     public void setAbandonWhenPercentageFull(int percentage) {
-        if (percentage<0) abandonWhenPercentageFull = 0;
-        else if (percentage>100) abandonWhenPercentageFull = 100;
-        else abandonWhenPercentageFull = percentage;
+        if (percentage<0) {
+          abandonWhenPercentageFull = 0;
+        } else if (percentage>100) {
+          abandonWhenPercentageFull = 100;
+        } else {
+          abandonWhenPercentageFull = percentage;
+        }
     }
 
     /**
@@ -999,14 +1003,22 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         public boolean getValueAsBoolean(boolean def) {
-            if (value==null) return def;
-            if ("true".equals(value)) return true;
-            if ("false".equals(value)) return false;
+            if (value==null) {
+              return def;
+            }
+            if ("true".equals(value)) {
+              return true;
+            }
+            if ("false".equals(value)) {
+              return false;
+            }
             return def;
         }
 
         public int getValueAsInt(int def) {
-            if (value==null) return def;
+            if (value==null) {
+              return def;
+            }
             try {
                 int v = Integer.parseInt(value);
                 return v;
@@ -1016,7 +1028,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         public long getValueAsLong(long def) {
-            if (value==null) return def;
+            if (value==null) {
+              return def;
+            }
             try {
                 return Long.parseLong(value);
             }catch (NumberFormatException nfe) {
@@ -1025,7 +1039,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         public byte getValueAsByte(byte def) {
-            if (value==null) return def;
+            if (value==null) {
+              return def;
+            }
             try {
                 return Byte.parseByte(value);
             }catch (NumberFormatException nfe) {
@@ -1034,7 +1050,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         public short getValueAsShort(short def) {
-            if (value==null) return def;
+            if (value==null) {
+              return def;
+            }
             try {
                 return Short.parseShort(value);
             }catch (NumberFormatException nfe) {
@@ -1043,7 +1061,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         public float getValueAsFloat(float def) {
-            if (value==null) return def;
+            if (value==null) {
+              return def;
+            }
             try {
                 return Float.parseFloat(value);
             }catch (NumberFormatException nfe) {
@@ -1052,7 +1072,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         public double getValueAsDouble(double def) {
-            if (value==null) return def;
+            if (value==null) {
+              return def;
+            }
             try {
                 return Double.parseDouble(value);
             }catch (NumberFormatException nfe) {
@@ -1061,7 +1083,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
 
         public char getValueAschar(char def) {
-            if (value==null) return def;
+            if (value==null) {
+              return def;
+            }
             try {
                 return value.charAt(0);
             }catch (StringIndexOutOfBoundsException nfe) {
@@ -1076,7 +1100,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         @Override
         public boolean equals(Object o) {
-            if (o==this) return true;
+            if (o==this) {
+              return true;
+            }
             if (o instanceof InterceptorProperty) {
                 InterceptorProperty other = (InterceptorProperty)o;
                 return other.name.equals(this.name);
@@ -1178,7 +1204,9 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
 
     public static Properties getProperties(String propText, Properties props) {
-        if (props==null) props = new Properties();
+        if (props==null) {
+          props = new Properties();
+        }
         if (propText != null) {
             try {
                 props.load(new ByteArrayInputStream(propText.replace(';', '\n').getBytes()));

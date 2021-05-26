@@ -380,7 +380,9 @@ public class CheckOutThreadTest extends DefaultTestCase {
                         nroffetch++;
                     } finally {
                         long cstart = System.nanoTime();
-                        if (con!=null) try {con.close();}catch(Exception x) {x.printStackTrace();}
+                        if (con!=null) {
+                          try {con.close();}catch(Exception x) {x.printStackTrace();}
+                        }
                         long cdelta = System.nanoTime() - cstart;
                         totalcmax += cdelta;
                         cmax = Math.max(cdelta, cmax);

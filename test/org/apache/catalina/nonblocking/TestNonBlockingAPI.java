@@ -493,17 +493,20 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         @Override
         public byte[] next() {
             if (count < max) {
-                if (count > 0)
-                    try {
-                        if (delay > 0)
-                            Thread.sleep(delay);
-                    } catch (Exception x) {
-                    }
+                if (count > 0) {
+                  try {
+                      if (delay > 0) {
+                        Thread.sleep(delay);
+                      }
+                  } catch (Exception x) {
+                  }
+                }
                 count++;
-                if (count < max)
-                    return b;
-                else
-                    return f;
+                if (count < max) {
+                  return b;
+                } else {
+                  return f;
+                }
             } else {
                 return null;
             }
