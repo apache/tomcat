@@ -144,8 +144,9 @@ public class UserDatabaseRealm extends RealmBase {
         // Check for a role alias defined in a <security-role-ref> element
         if (wrapper != null) {
             String realRole = wrapper.findSecurityReference(role);
-            if (realRole != null)
+            if (realRole != null) {
                 role = realRole;
+            }
         }
         if (principal instanceof GenericPrincipal) {
             GenericPrincipal gp = (GenericPrincipal) principal;

@@ -394,8 +394,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
         // In digest auth, digests are always lower case
         String md5a1 = getDigest(username, realm);
-        if (md5a1 == null)
+        if (md5a1 == null) {
             return null;
+        }
         md5a1 = md5a1.toLowerCase(Locale.ENGLISH);
         String serverDigestValue;
         if (qop == null) {
@@ -441,22 +442,26 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     @Override
     public Principal authenticate(X509Certificate certs[]) {
 
-        if ((certs == null) || (certs.length < 1))
+        if ((certs == null) || (certs.length < 1)) {
             return null;
+        }
 
         // Check the validity of each certificate in the chain
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Authenticating client certificate chain");
+        }
         if (validate) {
             for (X509Certificate cert : certs) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug(" Checking validity for '" +
                             cert.getSubjectDN().getName() + "'");
+                }
                 try {
                     cert.checkValidity();
                 } catch (Exception e) {
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug("  Validity exception", e);
+                    }
                     return null;
                 }
             }
@@ -548,8 +553,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
         // Are there any defined security constraints?
         SecurityConstraint constraints[] = context.findConstraints();
         if ((constraints == null) || (constraints.length == 0)) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  No applicable constraints defined");
+            }
             return null;
         }
 
@@ -772,8 +778,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
         if(results == null) {
             // No applicable security constraint was found
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  No applicable constraint located");
+            }
         }
         return resultsToArray(results);
     }
@@ -811,8 +818,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
                                          Context context)
         throws IOException {
 
-        if (constraints == null || constraints.length == 0)
+        if (constraints == null || constraints.length == 0) {
             return true;
+        }
 
         // Which user principal have we already authenticated?
         Principal principal = request.getPrincipal();
@@ -827,11 +835,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
                 roles = constraint.findAuthRoles();
             }
 
-            if (roles == null)
+            if (roles == null) {
                 roles = new String[0];
+            }
 
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  Checking roles " + principal);
+            }
 
             if (constraint.getAuthenticatedUsers() && principal != null) {
                 if (log.isDebugEnabled()) {
@@ -941,10 +951,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
         if (log.isDebugEnabled()) {
             String name = principal.getName();
-            if (result)
+            if (result) {
                 log.debug(sm.getString("realmBase.hasRoleSuccess", name, role));
-            else
+            } else {
                 log.debug(sm.getString("realmBase.hasRoleFailure", name, role));
+            }
         }
 
         return result;
@@ -998,28 +1009,32 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
         // Is there a relevant user data constraint?
         if (constraints == null || constraints.length == 0) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  No applicable security constraint defined");
+            }
             return true;
         }
         for (SecurityConstraint constraint : constraints) {
             String userConstraint = constraint.getUserConstraint();
             if (userConstraint == null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  No applicable user data constraint defined");
+                }
                 return true;
             }
             if (userConstraint.equals(TransportGuarantee.NONE.name())) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("  User data constraint has no restrictions");
+                }
                 return true;
             }
 
         }
         // Validate the request against the user data constraint
         if (request.getRequest().isSecure()) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  User data constraint already satisfied");
+            }
             return true;
         }
         // Initialize variables we need to determine the appropriate action
@@ -1027,8 +1042,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
         // Is redirecting disabled?
         if (redirectPort <= 0) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  SSL redirect is disabled");
+            }
             response.sendError
                 (HttpServletResponse.SC_FORBIDDEN,
                  request.getRequestURI());
@@ -1061,8 +1077,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
             file.append('?');
             file.append(queryString);
         }
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("  Redirecting to " + file.toString());
+        }
         response.sendRedirect(file.toString(), transportGuaranteeRedirectStatus);
         return false;
 
@@ -1228,8 +1245,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
     protected Principal getPrincipal(X509Certificate usercert) {
         String username = x509UsernameRetriever.getUsername(usercert);
 
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
             log.debug(sm.getString("realmBase.gotX509Username", username));
+        }
 
         return(getPrincipal(username));
     }
@@ -1606,8 +1624,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
 
     private static X509UsernameRetriever createUsernameRetriever(String className)
         throws LifecycleException {
-        if(null == className || className.trim().isEmpty())
+        if(null == className || className.trim().isEmpty()) {
             return new X509SubjectDnRetriever();
+        }
 
         try {
             @SuppressWarnings("unchecked")

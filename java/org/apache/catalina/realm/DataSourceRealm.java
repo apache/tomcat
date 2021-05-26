@@ -305,9 +305,10 @@ public class DataSourceRealm extends RealmBase {
         // No user or no credentials
         // Can't possibly authenticate, don't bother the database then
         if (username == null || credentials == null) {
-            if (containerLog.isTraceEnabled())
+            if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
                                                 username));
+            }
             return null;
         }
 
@@ -319,9 +320,10 @@ public class DataSourceRealm extends RealmBase {
             // Waste a bit of time as not to reveal that the user does not exist.
             getCredentialHandler().mutate(credentials);
 
-            if (containerLog.isTraceEnabled())
+            if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
                                                 username));
+            }
             return null;
         }
 
@@ -329,13 +331,15 @@ public class DataSourceRealm extends RealmBase {
         boolean validated = getCredentialHandler().matches(credentials, dbCredentials);
 
         if (validated) {
-            if (containerLog.isTraceEnabled())
+            if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("dataSourceRealm.authenticateSuccess",
                                                 username));
+            }
         } else {
-            if (containerLog.isTraceEnabled())
+            if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
                                                 username));
+            }
             return null;
         }
 
@@ -354,8 +358,9 @@ public class DataSourceRealm extends RealmBase {
     protected void close(Connection dbConnection) {
 
         // Do nothing if the database connection is already closed
-        if (dbConnection == null)
+        if (dbConnection == null) {
             return;
+        }
 
         // Commit if not auto committed
         try {

@@ -135,8 +135,9 @@ public class JMXProxyServlet extends HttpServlet {
             ObjectName oname = new ObjectName(onameStr);
             Object value = mBeanServer.getAttribute(oname, att);
 
-            if (null != key && value instanceof CompositeData)
+            if (null != key && value instanceof CompositeData) {
                 value = ((CompositeData) value).get(key);
+            }
 
             String valueStr;
             if (value != null) {
@@ -233,10 +234,11 @@ public class JMXProxyServlet extends HttpServlet {
      *         <code>paramString</code> was <code>null</code>).
      */
     private String[] getInvokeParameters(String paramString) {
-        if (paramString == null)
+        if (paramString == null) {
             return NO_PARAMETERS;
-        else
+        } else {
             return paramString.split(",");
+        }
     }
 
 

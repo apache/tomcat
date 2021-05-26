@@ -211,8 +211,9 @@ public class StandardManager extends ManagerBase {
                         getWarnOnSessionAttributeFilterFailure())) {
                     Integer count = (Integer) ois.readObject();
                     int n = count.intValue();
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug("Loading " + n + " persisted sessions");
+                    }
                     for (int i = 0; i < n; i++) {
                         StandardSession session = getNewSession();
                         session.readObjectData(ois);
@@ -278,8 +279,9 @@ public class StandardManager extends ManagerBase {
      */
     protected void doUnload() throws IOException {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("standardManager.unloading.debug"));
+        }
 
         if (sessions.isEmpty()) {
             log.debug(sm.getString("standardManager.unloading.nosessions"));

@@ -557,8 +557,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     @Override
     public void backgroundProcess() {
         count = (count + 1) % processExpiresFrequency;
-        if (count == 0)
+        if (count == 0) {
             processExpires();
+        }
     }
 
     /**
@@ -570,16 +571,18 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         Session sessions[] = findSessions();
         int expireHere = 0 ;
 
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
             log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
+        }
         for (Session session : sessions) {
             if (session != null && !session.isValid()) {
                 expireHere++;
             }
         }
         long timeEnd = System.currentTimeMillis();
-        if(log.isDebugEnabled())
-             log.debug("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) + " expired sessions: " + expireHere);
+        if(log.isDebugEnabled()) {
+            log.debug("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) + " expired sessions: " + expireHere);
+        }
         processingTime += ( timeEnd - timeNow );
 
     }
@@ -626,11 +629,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             ((Lifecycle) sessionIdGenerator).start();
         } else {
             // Force initialization of the random number generator
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Force random number initialization starting");
+            }
             sessionIdGenerator.generateSessionId();
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Force random number initialization completed");
+            }
         }
     }
 
@@ -1131,7 +1136,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             return null;
         }
         Object o=s.getSession().getAttribute(key);
-        if( o==null ) return null;
+        if( o==null ) {
+            return null;
+        }
         return o.toString();
     }
 

@@ -68,9 +68,13 @@ public class MBeanDumper {
                 Object value=null;
 
                 for (int i=0; i< attrs.length; i++) {
-                    if (! attrs[i].isReadable()) continue;
+                    if (! attrs[i].isReadable()) {
+                        continue;
+                    }
                     String attName=attrs[i].getName();
-                    if ("modelerType".equals(attName)) continue;
+                    if ("modelerType".equals(attName)) {
+                        continue;
+                    }
                     if (attName.indexOf('=') >=0 ||
                             attName.indexOf(':') >=0 ||
                             attName.indexOf(' ') >=0 ) {
@@ -102,7 +106,9 @@ public class MBeanDumper {
                                 " " + attName, t);
                         continue;
                     }
-                    if (value==null) continue;
+                    if (value==null) {
+                        continue;
+                    }
                     String valueString;
                     try {
                         Class<?> c = value.getClass();
@@ -170,16 +176,21 @@ public class MBeanDumper {
 
             sb.append( "\\n\n ");
             prev=idx+1;
-            if( idx==value.length() -1 ) break;
+            if( idx==value.length() -1 ) {
+                break;
+            }
             idx=value.indexOf('\n', idx+1);
         }
-        if( prev < value.length() )
+        if( prev < value.length() ) {
             appendHead( sb, value, prev, value.length());
+        }
         return sb.toString();
     }
 
     private static void appendHead( StringBuilder sb, String value, int start, int end) {
-        if (end < 1) return;
+        if (end < 1) {
+            return;
+        }
 
         int pos=start;
         while( end-pos > 78 ) {

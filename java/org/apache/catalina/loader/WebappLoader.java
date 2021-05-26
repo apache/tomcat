@@ -366,8 +366,9 @@ public class WebappLoader extends LifecycleMBeanBase
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("WebappLoader[");
-        if (context != null)
+        if (context != null) {
             sb.append(context.getName());
+        }
         sb.append("]");
         return (sb.toString());
     }
@@ -383,8 +384,9 @@ public class WebappLoader extends LifecycleMBeanBase
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("webappLoader.starting"));
+        }
 
         if (context.getResources() == null) {
             log.info("No resources for " + context);
@@ -437,8 +439,9 @@ public class WebappLoader extends LifecycleMBeanBase
     @Override
     protected void stopInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("webappLoader.stopping"));
+        }
 
         setState(LifecycleState.STOPPING);
 
@@ -486,8 +489,9 @@ public class WebappLoader extends LifecycleMBeanBase
     public void propertyChange(PropertyChangeEvent event) {
 
         // Validate the source of this event
-        if (!(event.getSource() instanceof Context))
+        if (!(event.getSource() instanceof Context)) {
             return;
+        }
 
         // Process a relevant property change
         if (event.getPropertyName().equals("reloadable")) {
@@ -532,10 +536,12 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     private void setPermissions() {
 
-        if (!Globals.IS_SECURITY_ENABLED)
+        if (!Globals.IS_SECURITY_ENABLED) {
             return;
-        if (context == null)
+        }
+        if (context == null) {
             return;
+        }
 
         // Tell the class loader the root of the context
         ServletContext servletContext = context.getServletContext();
@@ -569,11 +575,13 @@ public class WebappLoader extends LifecycleMBeanBase
     private void setClassPath() {
 
         // Validate our current state information
-        if (context == null)
+        if (context == null) {
             return;
+        }
         ServletContext servletContext = context.getServletContext();
-        if (servletContext == null)
+        if (servletContext == null) {
             return;
+        }
 
         StringBuilder classpath = new StringBuilder();
 
@@ -612,16 +620,19 @@ public class WebappLoader extends LifecycleMBeanBase
             URL repositories[] = ((URLClassLoader) loader).getURLs();
             for (URL url : repositories) {
                 String repository = url.toString();
-                if (repository.startsWith("file://"))
+                if (repository.startsWith("file://")) {
                     repository = UDecoder.URLDecode(repository.substring(7), StandardCharsets.ISO_8859_1);
-                else if (repository.startsWith("file:"))
+                } else if (repository.startsWith("file:")) {
                     repository = UDecoder.URLDecode(repository.substring(5), StandardCharsets.ISO_8859_1);
-                else
+                } else {
                     continue;
-                if (repository == null)
+                }
+                if (repository == null) {
                     continue;
-                if (classpath.length() > 0)
+                }
+                if (classpath.length() > 0) {
                     classpath.append(File.pathSeparator);
+                }
                 classpath.append(repository);
             }
         } else if (loader == ClassLoader.getSystemClassLoader()){

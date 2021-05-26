@@ -97,8 +97,9 @@ public class MBeanUtils {
 
         // Perform the standard transformation
         int period = className.lastIndexOf('.');
-        if (period >= 0)
+        if (period >= 0) {
             className = className.substring(period + 1);
+        }
         return className;
 
     }
@@ -122,8 +123,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(environment);
         ObjectName oname = createObjectName(domain, environment);
         if( mserver.isRegistered( oname ))  {
@@ -153,8 +155,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(resource);
         ObjectName oname = createObjectName(domain, resource);
         if( mserver.isRegistered( oname ))  {
@@ -184,8 +187,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(resourceLink);
         ObjectName oname = createObjectName(domain, resourceLink);
         if( mserver.isRegistered( oname ))  {
@@ -215,8 +219,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(group);
         ObjectName oname = createObjectName(domain, group);
         if( mserver.isRegistered( oname ))  {
@@ -246,8 +251,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(role);
         ObjectName oname = createObjectName(domain, role);
         if( mserver.isRegistered( oname ))  {
@@ -277,8 +283,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(user);
         ObjectName oname = createObjectName(domain, user);
         if( mserver.isRegistered( oname ))  {
@@ -308,8 +315,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(userDatabase);
         ObjectName oname = createObjectName(domain, userDatabase);
         if( mserver.isRegistered( oname ))  {
@@ -593,11 +601,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, environment);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -625,11 +635,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, resource);
-        if( mserver.isRegistered(oname ))
+        if( mserver.isRegistered(oname )) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -651,11 +663,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, resourceLink);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -676,11 +690,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, group);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -702,11 +718,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, role);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -728,11 +746,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, user);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 

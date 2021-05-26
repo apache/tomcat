@@ -311,8 +311,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         // Identify the request parameters that we need
         String command = request.getPathInfo();
-        if (command == null)
+        if (command == null) {
             command = request.getServletPath();
+        }
         String config = request.getParameter("config");
         String path = request.getParameter("path");
         ContextName cn = null;
@@ -419,8 +420,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         // Identify the request parameters that we need
         String command = request.getPathInfo();
-        if (command == null)
+        if (command == null) {
             command = request.getServletPath();
+        }
         String path = request.getParameter("path");
         ContextName cn = null;
         if (path != null) {
@@ -465,9 +467,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     public void init() throws ServletException {
 
         // Ensure that our ContainerServlet properties have been set
-        if ((wrapper == null) || (context == null))
+        if ((wrapper == null) || (context == null)) {
             throw new UnavailableException(
                     sm.getString("managerServlet.noWrapper"));
+        }
 
         // Set our properties from the initialization parameters
         String value = null;
@@ -493,10 +496,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         Container host = null;
         Container engine = null;
         while (container != null) {
-            if (container instanceof Host)
+            if (container instanceof Host) {
                 host = container;
-            if (container instanceof Engine)
+            }
+            if (container instanceof Engine) {
                 engine = container;
+            }
             container = container.getParent();
         }
         if (engine != null) {
@@ -1027,9 +1032,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      */
     protected void list(PrintWriter writer, StringManager smClient) {
 
-        if (debug >= 1)
+        if (debug >= 1) {
             log("list: Listing contexts for virtual host '" +
                 host.getName() + "'");
+        }
 
         writer.println(smClient.getString("managerServlet.listed",
                                     host.getName()));
@@ -1038,8 +1044,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             Context context = (Context) container;
             if (context != null) {
                 String displayPath = context.getPath();
-                if (displayPath.equals(""))
+                if (displayPath.equals("")) {
                     displayPath = "/";
+                }
                 List<String> parts = null;
                 if (context.getState().isAvailable()) {
                     parts = Arrays.asList(
@@ -1070,8 +1077,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected void reload(PrintWriter writer, ContextName cn,
             StringManager smClient) {
 
-        if (debug >= 1)
+        if (debug >= 1) {
             log("restart: Reloading web application '" + cn + "'");
+        }
 
         if (!validateContextName(cn, writer, smClient)) {
             return;
@@ -1211,8 +1219,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      * @param smClient i18n support for current client's locale
     */
     protected void serverinfo(PrintWriter writer,  StringManager smClient) {
-        if (debug >= 1)
+        if (debug >= 1) {
             log("serverinfo");
+        }
         try {
             writer.println(smClient.getString("managerServlet.serverInfo", ServerInfo.getServerInfo(),
                     System.getProperty("os.name"), System.getProperty("os.version"), System.getProperty("os.arch"),
@@ -1240,8 +1249,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         if (debug >= 1) {
             log("sessions: Session information for web application '" + cn + "'");
-            if (idle >= 0)
+            if (idle >= 0) {
                 log("sessions: Session expiration for " + idle + " minutes '" + cn + "'");
+            }
         }
 
         if (!validateContextName(cn, writer, smClient)) {
@@ -1268,13 +1278,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             int maxInactiveInterval = context.getSessionTimeout();
             if (maxInactiveInterval > 0) {
                 histoInterval = maxInactiveInterval / maxCount;
-                if (histoInterval * maxCount < maxInactiveInterval)
+                if (histoInterval * maxCount < maxInactiveInterval) {
                     histoInterval++;
-                if (0 == histoInterval)
+                }
+                if (0 == histoInterval) {
                     histoInterval = 1;
+                }
                 maxCount = maxInactiveInterval / histoInterval;
-                if (histoInterval * maxCount < maxInactiveInterval)
+                if (histoInterval * maxCount < maxInactiveInterval) {
                     maxCount++;
+                }
             }
 
             writer.println(smClient.getString("managerServlet.sessions",
@@ -1293,23 +1306,26 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     expired++;
                 }
                 time = time / 60 / histoInterval;
-                if (time < 0)
+                if (time < 0) {
                     notimeout++;
-                else if (time >= maxCount)
+                } else if (time >= maxCount) {
                     timeout[maxCount]++;
-                else
+                } else {
                     timeout[time]++;
+                }
             }
-            if (timeout[0] > 0)
+            if (timeout[0] > 0) {
                 writer.println(smClient.getString(
                         "managerServlet.sessiontimeout",
                         "<" + histoInterval, "" + timeout[0]));
+            }
             for (int i = 1; i < maxCount; i++) {
-                if (timeout[i] > 0)
+                if (timeout[i] > 0) {
                     writer.println(smClient.getString(
                             "managerServlet.sessiontimeout",
                             "" + (i)*histoInterval + " - <" + (i+1)*histoInterval,
                             "" + timeout[i]));
+                }
             }
             if (timeout[maxCount] > 0) {
                 writer.println(smClient.getString(
@@ -1317,14 +1333,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         ">=" + maxCount*histoInterval,
                         "" + timeout[maxCount]));
             }
-            if (notimeout > 0)
+            if (notimeout > 0) {
                 writer.println(smClient.getString(
                         "managerServlet.sessiontimeout.unlimited",
                         "" + notimeout));
-            if (idle >= 0)
+            }
+            if (idle >= 0) {
                 writer.println(smClient.getString(
                         "managerServlet.sessiontimeout.expired",
                         ">" + idle,"" + expired));
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.sessions[" + displayPath + "]", t);
@@ -1367,8 +1385,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected void start(PrintWriter writer, ContextName cn,
             StringManager smClient) {
 
-        if (debug >= 1)
+        if (debug >= 1) {
             log("start: Starting web application '" + cn + "'");
+        }
 
         if (!validateContextName(cn, writer, smClient)) {
             return;
@@ -1384,12 +1403,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
             context.start();
-            if (context.getState().isAvailable())
+            if (context.getState().isAvailable()) {
                 writer.println(smClient.getString("managerServlet.started",
                         displayPath));
-            else
+            } else {
                 writer.println(smClient.getString("managerServlet.startFailed",
                         displayPath));
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             getServletContext().log(sm.getString("managerServlet.startFailed",
@@ -1413,8 +1433,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected void stop(PrintWriter writer, ContextName cn,
             StringManager smClient) {
 
-        if (debug >= 1)
+        if (debug >= 1) {
             log("stop: Stopping web application '" + cn + "'");
+        }
 
         if (!validateContextName(cn, writer, smClient)) {
             return;
@@ -1457,8 +1478,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected void undeploy(PrintWriter writer, ContextName cn,
             StringManager smClient) {
 
-        if (debug >= 1)
+        if (debug >= 1) {
             log("undeploy: Undeploying web application at '" + cn + "'");
+        }
 
         if (!validateContextName(cn, writer, smClient)) {
             return;
@@ -1771,8 +1793,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     int len = 0;
                     while (true) {
                         len = is.read(buf);
-                        if (len == -1)
+                        if (len == -1) {
                             break;
+                        }
                         os.write(buf, 0, len);
                     }
                 } catch (IOException e) {

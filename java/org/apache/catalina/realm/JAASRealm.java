@@ -280,15 +280,20 @@ public class JAASRealm extends RealmBase {
      */
     protected void parseClassNames(String classNamesString, List<String> classNamesList) {
         classNamesList.clear();
-        if (classNamesString == null) return;
+        if (classNamesString == null) {
+            return;
+        }
 
         ClassLoader loader = this.getClass().getClassLoader();
-        if (isUseContextClassLoader())
+        if (isUseContextClassLoader()) {
             loader = Thread.currentThread().getContextClassLoader();
+        }
 
         String[] classNames = classNamesString.split("[ ]*,[ ]*");
         for (String className : classNames) {
-            if (className.length() == 0) continue;
+            if (className.length() == 0) {
+                continue;
+            }
             try {
                 Class<?> principalClass = Class.forName(className, false,
                         loader);
@@ -388,10 +393,13 @@ public class JAASRealm extends RealmBase {
         // Establish a LoginContext to use for authentication
         try {
             LoginContext loginContext = null;
-            if( appName==null ) appName="Tomcat";
+            if( appName==null ) {
+                appName="Tomcat";
+            }
 
-            if( log.isDebugEnabled())
+            if( log.isDebugEnabled()) {
                 log.debug(sm.getString("jaasRealm.beginLogin", username, appName));
+            }
 
             // What if the LoginModule is in the container class loader ?
             ClassLoader ocl = null;
@@ -419,8 +427,9 @@ public class JAASRealm extends RealmBase {
                 }
             }
 
-            if( log.isDebugEnabled())
+            if( log.isDebugEnabled()) {
                 log.debug("Login context created " + username);
+            }
 
             // Negotiate a login via this LoginContext
             Subject subject = null;
@@ -433,27 +442,31 @@ public class JAASRealm extends RealmBase {
                 // of the JAAS operation to keep variable consistent.
                 invocationSuccess = true;
                 if (subject == null) {
-                    if( log.isDebugEnabled())
+                    if( log.isDebugEnabled()) {
                         log.debug(sm.getString("jaasRealm.failedLogin", username));
+                    }
                     return (null);
                 }
             } catch (AccountExpiredException e) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug(sm.getString("jaasRealm.accountExpired", username));
+                }
                 // JAAS checked LoginExceptions are successful authentication
                 // invocations so mark JAAS realm as available
                 invocationSuccess = true;
                 return null;
             } catch (CredentialExpiredException e) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug(sm.getString("jaasRealm.credentialExpired", username));
+                }
                 // JAAS checked LoginExceptions are successful authentication
                 // invocations so mark JAAS realm as available
                 invocationSuccess = true;
                 return null;
             } catch (FailedLoginException e) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug(sm.getString("jaasRealm.failedLogin", username));
+                }
                 // JAAS checked LoginExceptions are successful authentication
                 // invocations so mark JAAS realm as available
                 invocationSuccess = true;
@@ -473,8 +486,9 @@ public class JAASRealm extends RealmBase {
                 return null;
             }
 
-            if( log.isDebugEnabled())
+            if( log.isDebugEnabled()) {
                 log.debug(sm.getString("jaasRealm.loginContextCreated", username));
+            }
 
             // Return the appropriate Principal for this authenticated Subject
             Principal principal = createPrincipal(username, subject, loginContext);

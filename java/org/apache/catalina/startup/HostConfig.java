@@ -439,8 +439,9 @@ public class HostConfig implements LifecycleListener {
 
     protected File returnCanonicalPath(String path) {
         File file = new File(path);
-        if (!file.isAbsolute())
+        if (!file.isAbsolute()) {
             file = new File(host.getCatalinaBase(), path);
+        }
         try {
             return file.getCanonicalFile();
         } catch (IOException e) {
@@ -1251,15 +1252,17 @@ public class HostConfig implements LifecycleListener {
                 if (docBase != null) {
                     resource = new File(docBaseFile, watchedResource);
                 } else {
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug("Ignoring non-existent WatchedResource '" +
                                 resource.getAbsolutePath() + "'");
+                    }
                     continue;
                 }
             }
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Watching WatchedResource '" +
                         resource.getAbsolutePath() + "'");
+            }
             app.reloadResources.put(resource.getAbsolutePath(),
                     Long.valueOf(resource.lastModified()));
         }
@@ -1304,9 +1307,10 @@ public class HostConfig implements LifecycleListener {
                 System.currentTimeMillis() - FILE_MODIFICATION_RESOLUTION_MS;
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Checking context[" + app.name +
                         "] redeploy resource " + resource);
+            }
             long lastModified =
                     app.redeployResources.get(resources[i]).longValue();
             if (resource.exists() || lastModified == 0) {
@@ -1418,8 +1422,9 @@ public class HostConfig implements LifecycleListener {
      *       ignored.
      */
     private void reload(DeployedApplication app, File fileToRemove, String newDocBase) {
-        if(log.isInfoEnabled())
+        if(log.isInfoEnabled()) {
             log.info(sm.getString("hostConfig.reload", app.name));
+        }
         Context context = (Context) host.findChild(app.name);
         if (context.getState().isAvailable()) {
             if (fileToRemove != null && newDocBase != null) {
@@ -1445,8 +1450,9 @@ public class HostConfig implements LifecycleListener {
 
 
     private void undeploy(DeployedApplication app) {
-        if (log.isInfoEnabled())
+        if (log.isInfoEnabled()) {
             log.info(sm.getString("hostConfig.undeploy", app.name));
+        }
         Container context = host.findChild(app.name);
         try {
             host.removeChild(context);
@@ -1579,8 +1585,9 @@ public class HostConfig implements LifecycleListener {
      */
     public void start() {
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug(sm.getString("hostConfig.start"));
+        }
 
         try {
             ObjectName hostON = host.getObjectName();
@@ -1745,8 +1752,9 @@ public class HostConfig implements LifecycleListener {
 
         String contextName = context.getName();
 
-        if (deployed.containsKey(contextName))
+        if (deployed.containsKey(contextName)) {
             return;
+        }
 
         DeployedApplication deployedApp =
                 new DeployedApplication(contextName, false);

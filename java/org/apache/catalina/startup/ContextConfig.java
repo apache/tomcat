@@ -1712,8 +1712,9 @@ public class ContextConfig implements LifecycleListener {
      */
     protected InputSource getHostWebXmlSource() {
         File hostConfigBase = getHostConfigBase();
-        if (hostConfigBase == null)
+        if (hostConfigBase == null) {
             return null;
+        }
 
         return getWebXmlSource(Constants.HostWebXml, hostConfigBase.getPath());
     }

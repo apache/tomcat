@@ -432,8 +432,9 @@ public class DataSourceStore extends JDBCStore {
     protected void close(Connection dbConnection) {
 
         // Do nothing if the database connection is already closed
-        if (dbConnection == null)
+        if (dbConnection == null) {
             return;
+        }
 
         // Commit if autoCommit is false
         try {

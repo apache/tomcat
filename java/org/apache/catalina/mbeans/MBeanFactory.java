@@ -809,12 +809,13 @@ public class MBeanFactory {
             Context context = (Context) host.findChild(pathStr);
             // Remove this component from its parent component
             host.removeChild(context);
-            if(context instanceof StandardContext)
-            try {
-                ((StandardContext)context).destroy();
-            } catch (Exception e) {
-                log.warn("Error during context [" + context.getName() + "] destroy ", e);
-           }
+            if(context instanceof StandardContext) {
+                try {
+                    ((StandardContext)context).destroy();
+                } catch (Exception e) {
+                    log.warn("Error during context [" + context.getName() + "] destroy ", e);
+         }
+            }
 
         }
     }
