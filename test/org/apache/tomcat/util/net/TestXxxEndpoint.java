@@ -31,7 +31,6 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.jni.Error;
-import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.util.compat.JreCompat;
 
