@@ -146,8 +146,9 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
             Object[] keys = set.toArray();
             for (Object o : keys) {
                 FragKey key = (FragKey) o;
-                if (key != null && key.expired(getExpire()))
+                if (key != null && key.expired(getExpire())) {
                     removeFragCollection(key);
+                }
             }
         }catch ( Exception x ) {
             if ( log.isErrorEnabled() ) {
@@ -201,12 +202,16 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
 
         public boolean complete() {
             boolean result = true;
-            for ( int i=0; (i<frags.length) && (result); i++ ) result = (frags[i] != null);
+            for ( int i=0; (i<frags.length) && (result); i++ ) {
+                result = (frags[i] != null);
+            }
             return result;
         }
 
         public ChannelMessage assemble() {
-            if ( !complete() ) throw new IllegalStateException(sm.getString("fragmentationInterceptor.fragments.missing"));
+            if ( !complete() ) {
+                throw new IllegalStateException(sm.getString("fragmentationInterceptor.fragments.missing"));
+            }
             int buffersize = 0;
             for (XByteBuffer frag : frags) {
                 buffersize += frag.getLength();
@@ -239,7 +244,9 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
         public boolean equals(Object o ) {
             if ( o instanceof FragKey ) {
             return Arrays.equals(uniqueId,((FragKey)o).uniqueId);
-        } else return false;
+        } else {
+                return false;
+            }
 
         }
 

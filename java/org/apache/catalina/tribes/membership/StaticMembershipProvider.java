@@ -137,7 +137,9 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
     }
 
     protected void startMembership(Member[] members) throws ChannelException {
-        if (members.length == 0) return;
+        if (members.length == 0) {
+            return;
+        }
         MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_START, service.getLocalMember(true));
         Response[] resp = rpcChannel.send(members, msg, RpcChannel.ALL_REPLY, sendOptions, rpcTimeout);
         if (resp.length > 0) {
@@ -185,12 +187,16 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
     }
 
     protected void memberAlive(Member member) {
-        if (!membership.contains(member)) memberAdded(member);
+        if (!membership.contains(member)) {
+            memberAdded(member);
+        }
         membership.memberAlive(member);
     }
 
     protected void stopMembership(Member[] members) {
-        if (members.length == 0 ) return;
+        if (members.length == 0 ) {
+            return;
+        }
         Member localmember = service.getLocalMember(false);
         localmember.setCommand(Member.SHUTDOWN_PAYLOAD);
         MemberMessage msg = new MemberMessage(membershipId, MemberMessage.MSG_STOP, localmember);
@@ -225,7 +231,9 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
 
     @Override
     public Serializable replyRequest(Serializable msg, final Member sender) {
-        if (!(msg instanceof MemberMessage)) return null;
+        if (!(msg instanceof MemberMessage)) {
+            return null;
+        }
         MemberMessage memMsg = (MemberMessage) msg;
         if (memMsg.getMsgtype() == MemberMessage.MSG_START) {
             messageReceived(memMsg, sender);
@@ -237,16 +245,19 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
             return memMsg;
         } else {
             // other messages are ignored.
-            if (log.isInfoEnabled())
+            if (log.isInfoEnabled()) {
                 log.info(sm.getString("staticMembershipProvider.replyRequest.ignored",
                         memMsg.getTypeDesc()));
+            }
             return null;
         }
     }
 
     @Override
     public void leftOver(Serializable msg, Member sender) {
-        if (!(msg instanceof MemberMessage)) return;
+        if (!(msg instanceof MemberMessage)) {
+            return;
+        }
         MemberMessage memMsg = (MemberMessage) msg;
         if (memMsg.getMsgtype() == MemberMessage.MSG_START) {
             messageReceived(memMsg, sender);
@@ -254,16 +265,19 @@ public class StaticMembershipProvider extends MembershipProviderBase implements 
             messageReceived(memMsg, sender);
         } else {
             // other messages are ignored.
-            if (log.isInfoEnabled())
+            if (log.isInfoEnabled()) {
                 log.info(sm.getString("staticMembershipProvider.leftOver.ignored",
                         memMsg.getTypeDesc()));
+            }
         }
     }
 
     @Override
     public void heartbeat() {
         try {
-            if (!useThread) ping();
+            if (!useThread) {
+                ping();
+            }
         } catch (ChannelException e) {
             log.warn(sm.getString("staticMembershipProvider.heartbeat.failed"), e);
         }

@@ -248,14 +248,16 @@ public class StoreDescription {
     }
 
     public void addTransientAttribute(String attribute) {
-        if (transientAttributes == null)
+        if (transientAttributes == null) {
             transientAttributes = new ArrayList<>();
+        }
         transientAttributes.add(attribute);
     }
 
     public void removeTransientAttribute(String attribute) {
-        if (transientAttributes != null)
+        if (transientAttributes != null) {
             transientAttributes.remove(attribute);
+        }
     }
 
     /**
@@ -274,14 +276,16 @@ public class StoreDescription {
     }
 
     public void addTransientChild(String classname) {
-        if (transientChildren == null)
+        if (transientChildren == null) {
             transientChildren = new ArrayList<>();
+        }
         transientChildren.add(classname);
     }
 
     public void removeTransientChild(String classname) {
-        if (transientChildren != null)
+        if (transientChildren != null) {
             transientChildren.remove(classname);
+        }
     }
 
     /**
@@ -291,8 +295,9 @@ public class StoreDescription {
      * @return is classname attribute?
      */
     public boolean isTransientChild(String classname) {
-        if (transientChildren != null)
+        if (transientChildren != null) {
             return transientChildren.contains(classname);
+        }
         return false;
     }
 
@@ -303,8 +308,9 @@ public class StoreDescription {
      * @return is transient attribute?
      */
     public boolean isTransientAttribute(String attribute) {
-        if (transientAttributes != null)
+        if (transientAttributes != null) {
             return transientAttributes.contains(attribute);
+        }
         return false;
     }
 
@@ -314,10 +320,11 @@ public class StoreDescription {
      * @return Returns the id.
      */
     public String getId() {
-        if (id != null)
+        if (id != null) {
             return id;
-        else
+        } else {
             return getTagClass();
+        }
     }
 
     /**

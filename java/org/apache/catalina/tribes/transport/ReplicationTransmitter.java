@@ -76,7 +76,9 @@ public class ReplicationTransmitter implements ChannelSender {
         getTransport().connect();
         // register jmx
         JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
-        if (jmxRegistry != null) this.oname = jmxRegistry.registerJmx(",component=Sender", transport);
+        if (jmxRegistry != null) {
+            this.oname = jmxRegistry.registerJmx(",component=Sender", transport);
+        }
     }
 
     /**
@@ -101,7 +103,9 @@ public class ReplicationTransmitter implements ChannelSender {
      */
     @Override
     public void heartbeat() {
-        if (getTransport()!=null) getTransport().keepalive();
+        if (getTransport()!=null) {
+            getTransport().keepalive();
+        }
     }
 
     /**

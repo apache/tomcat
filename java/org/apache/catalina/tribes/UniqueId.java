@@ -47,7 +47,9 @@ public final class UniqueId implements Serializable{
 
     @Override
     public int hashCode() {
-        if ( id == null ) return 0;
+        if ( id == null ) {
+            return 0;
+        }
         return Arrays.hashCode(id);
     }
 
@@ -56,10 +58,15 @@ public final class UniqueId implements Serializable{
         boolean result = (other instanceof UniqueId);
         if ( result ) {
             UniqueId uid = (UniqueId)other;
-            if ( this.id == null && uid.id == null ) result = true;
-            else if ( this.id == null && uid.id != null ) result = false;
-            else if ( this.id != null && uid.id == null ) result = false;
-            else result = Arrays.equals(this.id,uid.id);
+            if ( this.id == null && uid.id == null ) {
+                result = true;
+            } else if ( this.id == null && uid.id != null ) {
+                result = false;
+            } else if ( this.id != null && uid.id == null ) {
+                result = false;
+            } else {
+                result = Arrays.equals(this.id,uid.id);
+            }
         }//end if
         return result;
     }

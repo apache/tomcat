@@ -44,9 +44,10 @@ public class LoaderSF extends StoreFactoryBase {
         if (elementDesc != null) {
             Loader loader = (Loader) aElement;
             if (!isDefaultLoader(loader)) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("store " + elementDesc.getTag() + "( " + aElement
                             + " )");
+                }
                 getStoreAppender().printIndent(aWriter, indent + 2);
                 getStoreAppender().printTag(aWriter, indent + 2, loader,
                         elementDesc);

@@ -71,8 +71,9 @@ public class StoreAppender {
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
-        if (aDesc.isAttributes() && bean != null)
+        if (aDesc.isAttributes() && bean != null) {
             printAttributes(aWriter, indent, bean, aDesc);
+        }
         aWriter.println(">");
     }
 
@@ -89,8 +90,9 @@ public class StoreAppender {
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
-        if (aDesc.isAttributes() && bean != null)
+        if (aDesc.isAttributes() && bean != null) {
             printAttributes(aWriter, indent, bean, aDesc);
+        }
         aWriter.println("/>");
     }
 
@@ -131,8 +133,9 @@ public class StoreAppender {
             for (int i = 0; i < elements.length; i++) {
                 printIndent(aWriter, indent + 4);
                 aWriter.print(elements[i]);
-                if (i + 1 < elements.length)
+                if (i + 1 < elements.length) {
                     aWriter.println(",");
+                }
             }
             printIndent(aWriter, indent + 2);
             aWriter.print("</");
@@ -298,8 +301,9 @@ public class StoreAppender {
      * @param value The attribute value
      */
     protected void printAttribute(PrintWriter writer, int indent, Object bean, StoreDescription desc, String attributeName, Object bean2, Object value) {
-        if (isPrintValue(bean, bean2, attributeName, desc))
+        if (isPrintValue(bean, bean2, attributeName, desc)) {
             printValue(writer, indent, attributeName, value);
+        }
     }
 
     /**

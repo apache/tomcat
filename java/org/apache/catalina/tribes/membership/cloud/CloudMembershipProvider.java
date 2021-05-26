@@ -76,8 +76,9 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
         String val = null;
         for (String key : keys) {
             val = AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getenv(key));
-            if (val != null)
+            if (val != null) {
                 break;
+            }
         }
         return val;
     }
