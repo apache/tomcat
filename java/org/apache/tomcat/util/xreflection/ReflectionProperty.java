@@ -52,12 +52,18 @@ final class ReflectionProperty implements Comparable<ReflectionProperty> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ReflectionProperty property1 = (ReflectionProperty) o;
 
-        if (!clazz.equals(property1.clazz)) return false;
+        if (!clazz.equals(property1.clazz)) {
+            return false;
+        }
         return propertyName.equals(property1.propertyName);
     }
 

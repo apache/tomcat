@@ -55,8 +55,9 @@ public class AuthenticatorFactory {
         ServiceLoader<Authenticator> serviceLoader = ServiceLoader.load(Authenticator.class);
 
         for (Authenticator auth : serviceLoader) {
-            if (auth.getSchemeName().equalsIgnoreCase(authScheme))
+            if (auth.getSchemeName().equalsIgnoreCase(authScheme)) {
                 return auth;
+            }
         }
 
         return null;
