@@ -141,8 +141,9 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
                 entries.iterator();
             while (items.hasNext()) {
                 BaseNotificationBroadcasterEntry item = items.next();
-                if (item.listener == listener)
+                if (item.listener == listener) {
                     items.remove();
+                }
             }
         }
 

@@ -2922,8 +2922,9 @@ public class StandardContext extends ContainerBase
         synchronized (constraintsLock) {
             SecurityConstraint results[] =
                 new SecurityConstraint[constraints.length + 1];
-            for (int i = 0; i < constraints.length; i++)
+            for (int i = 0; i < constraints.length; i++) {
                 results[i] = constraints[i];
+            }
             results[constraints.length] = constraint;
             constraints = results;
         }
@@ -3165,8 +3166,9 @@ public class StandardContext extends ContainerBase
 
         synchronized (securityRolesLock) {
             String results[] =new String[securityRoles.length + 1];
-            for (int i = 0; i < securityRoles.length; i++)
+            for (int i = 0; i < securityRoles.length; i++) {
                 results[i] = securityRoles[i];
+            }
             results[securityRoles.length] = role;
             securityRoles = results;
         }
@@ -3236,8 +3238,9 @@ public class StandardContext extends ContainerBase
 
         synchronized (watchedResourcesLock) {
             String results[] = new String[watchedResources.length + 1];
-            for (int i = 0; i < watchedResources.length; i++)
+            for (int i = 0; i < watchedResources.length; i++) {
                 results[i] = watchedResources[i];
+            }
             results[watchedResources.length] = name;
             watchedResources = results;
         }
@@ -3262,8 +3265,9 @@ public class StandardContext extends ContainerBase
                 setReplaceWelcomeFiles(false);
             }
             String results[] =new String[welcomeFiles.length + 1];
-            for (int i = 0; i < welcomeFiles.length; i++)
+            for (int i = 0; i < welcomeFiles.length; i++) {
                 results[i] = welcomeFiles[i];
+            }
             results[welcomeFiles.length] = name;
             welcomeFiles = results;
         }
@@ -3284,8 +3288,9 @@ public class StandardContext extends ContainerBase
 
         synchronized (wrapperLifecyclesLock) {
             String results[] =new String[wrapperLifecycles.length + 1];
-            for (int i = 0; i < wrapperLifecycles.length; i++)
+            for (int i = 0; i < wrapperLifecycles.length; i++) {
                 results[i] = wrapperLifecycles[i];
+            }
             results[wrapperLifecycles.length] = listener;
             wrapperLifecycles = results;
         }
@@ -3305,8 +3310,9 @@ public class StandardContext extends ContainerBase
 
         synchronized (wrapperListenersLock) {
             String results[] =new String[wrapperListeners.length + 1];
-            for (int i = 0; i < wrapperListeners.length; i++)
+            for (int i = 0; i < wrapperListeners.length; i++) {
                 results[i] = wrapperListeners[i];
+            }
             results[wrapperListeners.length] = listener;
             wrapperListeners = results;
         }

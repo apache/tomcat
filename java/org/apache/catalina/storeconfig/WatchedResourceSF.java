@@ -48,8 +48,9 @@ public class WatchedResourceSF extends StoreFactoryBase {
                 getStoreAppender().printTagArray(aWriter, "WatchedResource",
                         indent, resources);
             }
-        } else
+        } else {
             log.warn("Descriptor for element" + aElement.getClass()
                     + ".[WatchedResource] not configured!");
+        }
     }
 }

@@ -430,8 +430,9 @@ public class McastService
             for (int i = 0; i < currentMembers.length; i++) {
                 membernames[i] = currentMembers[i].toString() ;
             }
-        } else
+        } else {
             membernames = new String[0] ;
+        }
         return membernames ;
     }
 
@@ -442,8 +443,9 @@ public class McastService
     public Member findMemberByName(String name) {
         Member[] currentMembers = getMembers();
         for (int i = 0; i < currentMembers.length; i++) {
-            if (name.equals(currentMembers[i].toString()))
+            if (name.equals(currentMembers[i].toString())) {
                 return currentMembers[i];
+            }
         }
         return null;
     }
@@ -453,13 +455,17 @@ public class McastService
      */
     @Override
     public boolean hasMembers() {
-       if ( impl == null || impl.membership == null ) return false;
+       if ( impl == null || impl.membership == null ) {
+        return false;
+    }
        return impl.membership.hasMembers();
     }
 
     @Override
     public Member getMember(Member mbr) {
-        if ( impl == null || impl.membership == null ) return null;
+        if ( impl == null || impl.membership == null ) {
+            return null;
+        }
         return impl.membership.getMember(mbr);
     }
 
@@ -469,7 +475,9 @@ public class McastService
     protected static final Member[]EMPTY_MEMBERS = new Member[0];
     @Override
     public Member[] getMembers() {
-        if ( impl == null || impl.membership == null ) return EMPTY_MEMBERS;
+        if ( impl == null || impl.membership == null ) {
+            return EMPTY_MEMBERS;
+        }
         return impl.membership.getMembers();
     }
     /**

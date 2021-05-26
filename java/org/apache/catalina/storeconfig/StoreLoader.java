@@ -133,8 +133,9 @@ public class StoreLoader {
                 "addTransientChild", 0);
 
         long t2 = System.currentTimeMillis();
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Digester for server-registry.xml created " + (t2 - t1));
+        }
         return digester;
 
     }
@@ -148,12 +149,14 @@ public class StoreLoader {
      */
     protected File serverFile(String aFile) {
 
-        if (aFile == null || aFile.length() < 1)
+        if (aFile == null || aFile.length() < 1) {
             aFile = "server-registry.xml";
+        }
         File file = new File(aFile);
-        if (!file.isAbsolute())
+        if (!file.isAbsolute()) {
             file = new File(System.getProperty("catalina.base") + "/conf",
                     aFile);
+        }
         try {
             file = file.getCanonicalFile();
         } catch (IOException e) {
@@ -199,9 +202,10 @@ public class StoreLoader {
             String configUrl = getConfigUrl();
             if (configUrl != null) {
                 is = (new URL(configUrl)).openStream();
-                if (log.isInfoEnabled())
+                if (log.isInfoEnabled()) {
                     log.info("Find registry server-registry.xml from system property at url "
                             + configUrl);
+                }
                 registryResource = new URL(configUrl);
             }
         } catch (Throwable t) {
@@ -213,9 +217,10 @@ public class StoreLoader {
                 File conf = new File(home, "conf");
                 File reg = new File(conf, "server-registry.xml");
                 is = new FileInputStream(reg);
-                if (log.isInfoEnabled())
+                if (log.isInfoEnabled()) {
                     log.info("Find registry server-registry.xml at file "
                             + reg.getCanonicalPath());
+                }
                 registryResource = reg.toURI().toURL();
             } catch (Throwable t) {
                 // Ignore
@@ -225,8 +230,9 @@ public class StoreLoader {
             try {
                 is = StoreLoader.class
                         .getResourceAsStream("/org/apache/catalina/storeconfig/server-registry.xml");
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("Find registry server-registry.xml at classpath resource");
+                }
                 registryResource = StoreLoader.class
                     .getResource("/org/apache/catalina/storeconfig/server-registry.xml");
 

@@ -172,8 +172,9 @@ public class StandardJarScanner implements JarScanner {
         }
 
         if (jarScanFilter instanceof StandardJarScanFilter) {
-            if (((StandardJarScanFilter) jarScanFilter).isSkipAll())
+            if (((StandardJarScanFilter) jarScanFilter).isSkipAll()) {
                 return;
+            }
         }
 
         Set<URL> processedURLs = new HashSet<>();
@@ -289,8 +290,9 @@ public class StandardJarScanner implements JarScanner {
             Set<URL> processedURLs, boolean isWebapp, Deque<URL> classPathUrlsToProcess) {
 
         if (jarScanFilter instanceof StandardJarScanFilter) {
-            if (((StandardJarScanFilter) jarScanFilter).isSkipAll())
+            if (((StandardJarScanFilter) jarScanFilter).isSkipAll()) {
                 return;
+            }
         }
 
         while (!classPathUrlsToProcess.isEmpty()) {

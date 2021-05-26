@@ -342,8 +342,9 @@ public class JDBCRealm
                 containerLog.error(sm.getString("jdbcRealm.exception"), e);
 
                 // Close the connection so that it gets reopened next time
-                if (dbConnection != null)
+                if (dbConnection != null) {
                     close(dbConnection);
+                }
 
             }
 
@@ -379,9 +380,10 @@ public class JDBCRealm
         // No user or no credentials
         // Can't possibly authenticate, don't bother the database then
         if (username == null || credentials == null) {
-            if (containerLog.isTraceEnabled())
+            if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("jdbcRealm.authenticateFailure",
                                                 username));
+            }
             return null;
         }
 
@@ -393,9 +395,10 @@ public class JDBCRealm
             // Waste a bit of time as not to reveal that the user does not exist.
             getCredentialHandler().mutate(credentials);
 
-            if (containerLog.isTraceEnabled())
+            if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("jdbcRealm.authenticateFailure",
                                                 username));
+            }
             return null;
         }
 
@@ -403,13 +406,15 @@ public class JDBCRealm
         boolean validated = getCredentialHandler().matches(credentials, dbCredentials);
 
         if (validated) {
-            if (containerLog.isTraceEnabled())
+            if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("jdbcRealm.authenticateSuccess",
                                                 username));
+            }
         } else {
-            if (containerLog.isTraceEnabled())
+            if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("jdbcRealm.authenticateFailure",
                                                 username));
+            }
             return null;
         }
 
@@ -434,8 +439,9 @@ public class JDBCRealm
     protected void close(Connection dbConnection) {
 
         // Do nothing if the database connection is already closed
-        if (dbConnection == null)
+        if (dbConnection == null) {
             return;
+        }
 
         // Close our prepared statements (if any)
         try {
@@ -631,8 +637,9 @@ public class JDBCRealm
                 containerLog.error(sm.getString("jdbcRealm.exception"), e);
 
                 // Close the connection so that it gets reopened next time
-                if (dbConnection != null)
+                if (dbConnection != null) {
                     close(dbConnection);
+                }
             }
 
             numberOfTries--;
@@ -651,8 +658,9 @@ public class JDBCRealm
     protected Connection open() throws SQLException {
 
         // Do nothing if there is a database connection already open
-        if (dbConnection != null)
+        if (dbConnection != null) {
             return dbConnection;
+        }
 
         // Instantiate our database driver if necessary
         if (driver == null) {
@@ -667,10 +675,12 @@ public class JDBCRealm
 
         // Open a new connection
         Properties props = new Properties();
-        if (connectionName != null)
+        if (connectionName != null) {
             props.put("user", connectionName);
-        if (connectionPassword != null)
+        }
+        if (connectionPassword != null) {
             props.put("password", connectionPassword);
+        }
         dbConnection = driver.connect(connectionURL, props);
         if (dbConnection == null) {
             throw new SQLException(sm.getString(

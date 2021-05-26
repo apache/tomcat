@@ -302,7 +302,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             running = false;
             unlockAccept();
             for (int i=0; pollers!=null && i<pollers.length; i++) {
-                if (pollers[i]==null) continue;
+                if (pollers[i]==null) {
+                    continue;
+                }
                 pollers[i].destroy();
                 pollers[i] = null;
             }
@@ -753,22 +755,30 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             ka.setWriteTimeout(getConnectionTimeout());
             PollerEvent r = eventCache.pop();
             ka.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
-            if ( r==null) r = new PollerEvent(socket,ka,OP_REGISTER);
-            else r.reset(socket,ka,OP_REGISTER);
+            if ( r==null) {
+                r = new PollerEvent(socket,ka,OP_REGISTER);
+            } else {
+                r.reset(socket,ka,OP_REGISTER);
+            }
             addEvent(r);
         }
 
         public NioSocketWrapper cancelledKey(SelectionKey key) {
             NioSocketWrapper ka = null;
             try {
-                if ( key == null ) return null;//nothing to do
+                if ( key == null )
+                 {
+                    return null;//nothing to do
+                }
                 ka = (NioSocketWrapper) key.attach(null);
                 if (ka != null) {
                     // If attachment is non-null then there may be a current
                     // connection with an associated processor.
                     getHandler().release(ka);
                 }
-                if (key.isValid()) key.cancel();
+                if (key.isValid()) {
+                    key.cancel();
+                }
                 // If it is available, close the NioChannel first which should
                 // in turn close the underlying SocketChannel. The NioChannel
                 // needs to be closed first, if available, to ensure that TLS
@@ -809,7 +819,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
-                if (log.isDebugEnabled()) log.error("",e);
+                if (log.isDebugEnabled()) {
+                    log.error("",e);
+                }
             }
             return ka;
         }
@@ -1015,7 +1027,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     return SendfileState.PENDING;
                 }
             } catch (IOException x) {
-                if (log.isDebugEnabled()) log.debug("Unable to complete sendfile request:", x);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to complete sendfile request:", x);
+                }
                 if (!calledByProcessor && sc != null) {
                     close(sc, sk);
                 }
@@ -1136,8 +1150,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public CountDownLatch getReadLatch() { return readLatch; }
         public CountDownLatch getWriteLatch() { return writeLatch; }
         protected CountDownLatch resetLatch(CountDownLatch latch) {
-            if ( latch==null || latch.getCount() == 0 ) return null;
-            else throw new IllegalStateException("Latch must be at count 0");
+            if ( latch==null || latch.getCount() == 0 ) {
+                return null;
+            } else {
+                throw new IllegalStateException("Latch must be at count 0");
+            }
         }
         public void resetReadLatch() { readLatch = resetLatch(readLatch); }
         public void resetWriteLatch() { writeLatch = resetLatch(writeLatch); }
@@ -1145,14 +1162,17 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         protected CountDownLatch startLatch(CountDownLatch latch, int cnt) {
             if ( latch == null || latch.getCount() == 0 ) {
                 return new CountDownLatch(cnt);
+            } else {
+                throw new IllegalStateException("Latch must be at count 0 or null.");
             }
-            else throw new IllegalStateException("Latch must be at count 0 or null.");
         }
         public void startReadLatch(int cnt) { readLatch = startLatch(readLatch,cnt);}
         public void startWriteLatch(int cnt) { writeLatch = startLatch(writeLatch,cnt);}
 
         protected void awaitLatch(CountDownLatch latch, long timeout, TimeUnit unit) throws InterruptedException {
-            if ( latch == null ) throw new IllegalStateException("Latch cannot be null");
+            if ( latch == null ) {
+                throw new IllegalStateException("Latch cannot be null");
+            }
             // Note: While the return value is ignored if the latch does time
             //       out, logic further up the call stack will trigger a
             //       SocketTimeoutException

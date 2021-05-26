@@ -456,14 +456,16 @@ public class MemberImpl implements Member, java.io.Externalizable {
     }
 
     public String getHostname() {
-        if ( this.hostname != null ) return hostname;
-        else {
+        if ( this.hostname != null ) {
+            return hostname;
+        } else {
             try {
                 byte[] host = this.host;
-                if (DO_DNS_LOOKUPS)
+                if (DO_DNS_LOOKUPS) {
                     this.hostname = java.net.InetAddress.getByAddress(host).getHostName();
-                else
+                } else {
                     this.hostname = org.apache.catalina.tribes.util.Arrays.toString(host,0,host.length,true);
+                }
                 return this.hostname;
             }catch ( IOException x ) {
                 throw new RuntimeException(sm.getString("memberImpl.unableParse.hostname"),x);

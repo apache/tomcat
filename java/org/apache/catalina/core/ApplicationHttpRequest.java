@@ -503,7 +503,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         String scheme = getScheme();
         int port = getServerPort();
         if (port < 0)
+         {
             port = 80; // Work around java.net.URL bug
+        }
 
         url.append(scheme);
         url.append("://");

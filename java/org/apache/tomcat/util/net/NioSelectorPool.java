@@ -202,7 +202,10 @@ public class NioSelectorPool {
                         time = System.currentTimeMillis(); //reset our timeout timer
                         continue; //we successfully wrote, try again without a selector
                     }
-                    if (cnt==0 && (!block)) break; //don't block
+                    if (cnt==0 && (!block))
+                     {
+                        break; //don't block
+                    }
                 }
                 if (selector != null) {
                     //register OP_WRITE to the selector
@@ -230,7 +233,10 @@ public class NioSelectorPool {
         } finally {
             if (key != null) {
                 key.cancel();
-                if (selector != null) selector.selectNow();//removes the key from this selector
+                if (selector != null)
+                 {
+                    selector.selectNow();//removes the key from this selector
+                }
             }
         }
         return written;
@@ -289,7 +295,10 @@ public class NioSelectorPool {
                         break;
                     }
                     read += cnt;
-                    if (cnt > 0) continue; //read some more
+                    if (cnt > 0)
+                     {
+                        continue; //read some more
+                    }
                     if (cnt == 0 && (read > 0 || (!block))) {
                         break; //we are done reading
                     }

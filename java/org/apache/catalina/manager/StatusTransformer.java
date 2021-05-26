@@ -955,8 +955,9 @@ public class StatusTransformer {
     @Deprecated
     public static String filter(Object obj) {
 
-        if (obj == null)
+        if (obj == null) {
             return ("?");
+        }
         String message = obj.toString();
 
         char content[] = new char[message.length()];
@@ -994,8 +995,9 @@ public class StatusTransformer {
      */
     @Deprecated
     public static String filterXml(String s) {
-        if (s == null)
+        if (s == null) {
             return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

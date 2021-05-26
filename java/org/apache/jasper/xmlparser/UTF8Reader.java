@@ -206,8 +206,9 @@ public class UTF8Reader
 
         // return character
         if (DEBUG_READ) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("read(): 0x"+Integer.toHexString(c));
+            }
         }
         return c;
 
@@ -492,8 +493,9 @@ public class UTF8Reader
 
         // return number of characters converted
         if (DEBUG_READ) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("read(char[],"+offset+','+length+"): count="+count);
+            }
         }
         return count;
 

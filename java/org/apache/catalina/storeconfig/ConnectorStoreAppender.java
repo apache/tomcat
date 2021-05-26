@@ -94,8 +94,9 @@ public class ConnectorStoreAppender extends StoreAppender {
                 printValue(writer, indent, key, value);
             }
         }
-        if (protocol != null && !"HTTP/1.1".equals(protocol))
+        if (protocol != null && !"HTTP/1.1".equals(protocol)) {
             super.printValue(writer, indent, "protocol", protocol);
+        }
 
     }
 

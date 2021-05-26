@@ -229,8 +229,9 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
             authenticatedUsers = false;
 
             String results[] = new String[authRoles.length + 1];
-            for (int i = 0; i < authRoles.length; i++)
+            for (int i = 0; i < authRoles.length; i++) {
                 results[i] = authRoles[i];
+            }
             results[authRoles.length] = ROLE_ALL_AUTHENTICATED_USERS;
             authRoles = results;
             authConstraint = true;
@@ -264,8 +265,9 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         }
 
         String results[] = new String[authRoles.length + 1];
-        for (int i = 0; i < authRoles.length; i++)
+        for (int i = 0; i < authRoles.length; i++) {
             results[i] = authRoles[i];
+        }
         results[authRoles.length] = authRole;
         authRoles = results;
         authConstraint = true;
@@ -297,8 +299,9 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
 
         SecurityCollection results[] =
             new SecurityCollection[collections.length + 1];
-        for (int i = 0; i < collections.length; i++)
+        for (int i = 0; i < collections.length; i++) {
             results[i] = collections[i];
+        }
         results[collections.length] = collection;
         collections = results;
 

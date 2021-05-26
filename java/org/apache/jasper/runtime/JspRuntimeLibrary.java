@@ -226,10 +226,11 @@ public class JspRuntimeLibrary {
                 return getValueFromBeanInfoPropertyEditor(
                                     t, propertyName, s, propertyEditorClass);
             } else if ( t.equals(Boolean.class) || t.equals(Boolean.TYPE) ) {
-                if (s.equalsIgnoreCase("on") || s.equalsIgnoreCase("true"))
+                if (s.equalsIgnoreCase("on") || s.equalsIgnoreCase("true")) {
                     s = "true";
-                else
+                } else {
                     s = "false";
+                }
                 return Boolean.valueOf(s);
             } else if ( t.equals(Byte.class) || t.equals(Byte.TYPE) ) {
                 return Byte.valueOf(s);

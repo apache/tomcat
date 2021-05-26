@@ -127,8 +127,9 @@ public final class ExampleFilter implements Filter {
     @Override
     public String toString() {
 
-        if (filterConfig == null)
+        if (filterConfig == null) {
             return ("ExampleFilter()");
+        }
 
         return "ExampleFilter(" + filterConfig + ")";
     }

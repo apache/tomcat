@@ -184,7 +184,10 @@ public class SecureNioChannel extends NioChannel  {
             }
         }
 
-        if (!flush(netOutBuffer)) return SelectionKey.OP_WRITE; //we still have data to write
+        if (!flush(netOutBuffer))
+         {
+            return SelectionKey.OP_WRITE; //we still have data to write
+        }
 
         SSLEngineResult handshake = null;
 
@@ -220,8 +223,9 @@ public class SecureNioChannel extends NioChannel  {
                         handshake = handshakeWrap(write);
                     }
                     if (handshake.getStatus() == Status.OK) {
-                        if (handshakeStatus == HandshakeStatus.NEED_TASK)
+                        if (handshakeStatus == HandshakeStatus.NEED_TASK) {
                             handshakeStatus = tasks();
+                        }
                     } else if (handshake.getStatus() == Status.CLOSED) {
                         flush(netOutBuffer);
                         return -1;
@@ -241,8 +245,9 @@ public class SecureNioChannel extends NioChannel  {
                     //perform the unwrap function
                     handshake = handshakeUnwrap(read);
                     if ( handshake.getStatus() == Status.OK ) {
-                        if (handshakeStatus == HandshakeStatus.NEED_TASK)
+                        if (handshakeStatus == HandshakeStatus.NEED_TASK) {
                             handshakeStatus = tasks();
+                        }
                     } else if ( handshake.getStatus() == Status.BUFFER_UNDERFLOW ){
                         //read more data, reregister for OP_READ
                         return SelectionKey.OP_READ;
@@ -374,10 +379,18 @@ public class SecureNioChannel extends NioChannel  {
     @SuppressWarnings("null") // key cannot be null
     public void rehandshake(long timeout) throws IOException {
         //validate the network buffers are empty
-        if (netInBuffer.position() > 0 && netInBuffer.position()<netInBuffer.limit()) throw new IOException(sm.getString("channel.nio.ssl.netInputNotEmpty"));
-        if (netOutBuffer.position() > 0 && netOutBuffer.position()<netOutBuffer.limit()) throw new IOException(sm.getString("channel.nio.ssl.netOutputNotEmpty"));
-        if (!getBufHandler().isReadBufferEmpty()) throw new IOException(sm.getString("channel.nio.ssl.appInputNotEmpty"));
-        if (!getBufHandler().isWriteBufferEmpty()) throw new IOException(sm.getString("channel.nio.ssl.appOutputNotEmpty"));
+        if (netInBuffer.position() > 0 && netInBuffer.position()<netInBuffer.limit()) {
+            throw new IOException(sm.getString("channel.nio.ssl.netInputNotEmpty"));
+        }
+        if (netOutBuffer.position() > 0 && netOutBuffer.position()<netOutBuffer.limit()) {
+            throw new IOException(sm.getString("channel.nio.ssl.netOutputNotEmpty"));
+        }
+        if (!getBufHandler().isReadBufferEmpty()) {
+            throw new IOException(sm.getString("channel.nio.ssl.appInputNotEmpty"));
+        }
+        if (!getBufHandler().isWriteBufferEmpty()) {
+            throw new IOException(sm.getString("channel.nio.ssl.appOutputNotEmpty"));
+        }
         handshakeComplete = false;
         boolean isReadable = false;
         boolean isWriteable = false;
@@ -822,7 +835,9 @@ public class SecureNioChannel extends NioChannel  {
             netOutBuffer.flip();
 
             if (result.getStatus() == Status.OK) {
-                if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
+                if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
+                    tasks();
+                }
             } else {
                 throw new IOException(sm.getString("channel.nio.ssl.wrapFail", result.getStatus()));
             }

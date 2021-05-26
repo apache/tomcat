@@ -249,10 +249,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
 
-        if (lastActiveFilter == -1)
+        if (lastActiveFilter == -1) {
             return inputStreamInputBuffer.doRead(chunk);
-        else
+        } else {
             return activeFilters[lastActiveFilter].doRead(chunk);
+        }
 
     }
 
@@ -1174,8 +1175,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             if (byteBuffer.position() >= byteBuffer.limit()) {
                 // The application is reading the HTTP request body which is
                 // always a blocking operation.
-                if (!fill(true))
+                if (!fill(true)) {
                     return -1;
+                }
             }
 
             int length = byteBuffer.remaining();

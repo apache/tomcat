@@ -48,8 +48,9 @@ public class WrapperListenerSF extends StoreFactoryBase {
                 getStoreAppender().printTagArray(aWriter, "WrapperListener",
                         indent, listeners);
             }
-        } else
+        } else {
             log.warn("Descriptor for element" + aElement.getClass()
                     + ".[WrapperListener] not configured!");
+        }
     }
 }

@@ -604,10 +604,12 @@ public class RewriteValve extends ValveBase {
         Container host = null;
         Container engine = null;
         while (container != null) {
-            if (container instanceof Host)
+            if (container instanceof Host) {
                 host = container;
-            if (container instanceof Engine)
+            }
+            if (container instanceof Engine) {
                 engine = container;
+            }
             container = container.getParent();
         }
         if (engine != null) {

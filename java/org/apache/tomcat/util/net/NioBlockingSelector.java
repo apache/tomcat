@@ -255,23 +255,33 @@ public class NioBlockingSelector {
         }
 
         public void wakeup() {
-            if (wakeupCounter.addAndGet(1)==0) selector.wakeup();
+            if (wakeupCounter.addAndGet(1)==0) {
+                selector.wakeup();
+            }
         }
 
         public void cancel(SelectionKey sk, NioSocketWrapper key, int ops){
             if (sk!=null) {
                 sk.cancel();
                 sk.attach(null);
-                if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
-                if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+                if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) {
+                    countDown(key.getWriteLatch());
+                }
+                if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ)) {
+                    countDown(key.getReadLatch());
+                }
             }
         }
 
         public void add(final NioSocketWrapper key, final int ops, final KeyReference ref) {
-            if ( key == null ) return;
+            if ( key == null ) {
+                return;
+            }
             NioChannel nch = key.getSocket();
             final SocketChannel ch = nch.getIOChannel();
-            if ( ch == null ) return;
+            if ( ch == null ) {
+                return;
+            }
 
             Runnable r = new RunnableAdd(ch, key, ops, ref);
             events.offer(r);
@@ -279,10 +289,14 @@ public class NioBlockingSelector {
         }
 
         public void remove(final NioSocketWrapper key, final int ops) {
-            if ( key == null ) return;
+            if ( key == null ) {
+                return;
+            }
             NioChannel nch = key.getSocket();
             final SocketChannel ch = nch.getIOChannel();
-            if ( ch == null ) return;
+            if ( ch == null ) {
+                return;
+            }
 
             Runnable r = new RunnableRemove(ch, key, ops);
             events.offer(r);
@@ -326,15 +340,23 @@ public class NioBlockingSelector {
                             keyCount = selector.select(1000);
                         }
                         wakeupCounter.set(0);
-                        if (!run) break;
+                        if (!run) {
+                            break;
+                        }
                     }catch ( NullPointerException x ) {
                         //sun bug 5076772 on windows JDK 1.5
-                        if (selector==null) throw x;
-                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
+                        if (selector==null) {
+                            throw x;
+                        }
+                        if ( log.isDebugEnabled() ) {
+                            log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
+                        }
                         continue;
                     } catch ( CancelledKeyException x ) {
                         //sun bug 5076772 on windows JDK 1.5
-                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
+                        if ( log.isDebugEnabled() ) {
+                            log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
+                        }
                         continue;
                     } catch (Throwable x) {
                         ExceptionUtils.handleThrowable(x);
@@ -378,18 +400,24 @@ public class NioBlockingSelector {
                     // Cancels all remaining keys
                     selector.selectNow();
                 }catch( Exception ignore ) {
-                    if (log.isDebugEnabled())log.debug("",ignore);
+                    if (log.isDebugEnabled()) {
+                        log.debug("",ignore);
+                    }
                 }
             }
             try {
                 selector.close();
             }catch( Exception ignore ) {
-                if (log.isDebugEnabled())log.debug("",ignore);
+                if (log.isDebugEnabled()) {
+                    log.debug("",ignore);
+                }
             }
         }
 
         public void countDown(CountDownLatch latch) {
-            if ( latch == null ) return;
+            if ( latch == null ) {
+                return;
+            }
             latch.countDown();
         }
 
@@ -446,13 +474,21 @@ public class NioBlockingSelector {
                 SelectionKey sk = ch.keyFor(selector);
                 try {
                     if (sk == null) {
-                        if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
-                        if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+                        if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) {
+                            countDown(key.getWriteLatch());
+                        }
+                        if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ)) {
+                            countDown(key.getReadLatch());
+                        }
                     } else {
                         if (sk.isValid()) {
                             sk.interestOps(sk.interestOps() & (~ops));
-                            if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
-                            if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+                            if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) {
+                                countDown(key.getWriteLatch());
+                            }
+                            if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ)) {
+                                countDown(key.getReadLatch());
+                            }
                             if (sk.interestOps()==0) {
                                 sk.cancel();
                                 sk.attach(null);

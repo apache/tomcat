@@ -52,8 +52,9 @@ public class SavedRequestInputFilter implements InputFilter {
     @Deprecated
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
-        if(input.getOffset()>= input.getEnd())
+        if(input.getOffset()>= input.getEnd()) {
             return -1;
+        }
 
         int writeLength = 0;
 

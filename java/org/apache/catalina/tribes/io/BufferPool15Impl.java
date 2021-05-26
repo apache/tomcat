@@ -38,9 +38,14 @@ class BufferPool15Impl implements BufferPool.BufferPoolAPI {
     @Override
     public XByteBuffer getBuffer(int minSize, boolean discard) {
         XByteBuffer buffer = queue.poll();
-        if ( buffer != null ) size.addAndGet(-buffer.getCapacity());
-        if ( buffer == null ) buffer = new XByteBuffer(minSize,discard);
-        else if ( buffer.getCapacity() <= minSize ) buffer.expand(minSize);
+        if ( buffer != null ) {
+            size.addAndGet(-buffer.getCapacity());
+        }
+        if ( buffer == null ) {
+            buffer = new XByteBuffer(minSize,discard);
+        } else if ( buffer.getCapacity() <= minSize ) {
+            buffer.expand(minSize);
+        }
         buffer.setDiscard(discard);
         buffer.reset();
         return buffer;
