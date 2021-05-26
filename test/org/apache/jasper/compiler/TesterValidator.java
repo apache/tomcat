@@ -78,8 +78,9 @@ public class TesterValidator {
     }
 
     private static String doTestBug53867OldVersion(String s) {
-        if (s == null)
-            return null;
+        if (s == null) {
+          return null;
+        }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

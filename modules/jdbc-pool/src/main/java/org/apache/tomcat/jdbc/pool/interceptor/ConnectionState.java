@@ -129,12 +129,16 @@ public class ConnectionState extends JdbcInterceptor  {
         int index = -1;
         for (int i=0; (!read) && i<readState.length; i++) {
             read = compare(name,readState[i]);
-            if (read) index = i;
+            if (read) {
+              index = i;
+            }
         }
         boolean write = false;
         for (int i=0; (!write) && (!read) && i<writeState.length; i++) {
             write = compare(name,writeState[i]);
-            if (write) index = i;
+            if (write) {
+              index = i;
+            }
         }
         Object result = null;
         if (read) {
@@ -146,7 +150,9 @@ public class ConnectionState extends JdbcInterceptor  {
                 default: // NOOP
             }
             //return cached result, if we have it
-            if (result!=null) return result;
+            if (result!=null) {
+              return result;
+            }
         }
 
         result = super.invoke(proxy, method, args);

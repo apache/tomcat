@@ -41,8 +41,9 @@ public class TestMessageDigestCredentialHandler {
     public void testGeneral() throws Exception {
         for (String digest : DIGESTS) {
             for (int saltLength = 0; saltLength < 20; saltLength++) {
-                for (int iterations = 1; iterations < 100; iterations += 10)
-                doTest(digest, saltLength, iterations);
+                for (int iterations = 1; iterations < 100; iterations += 10) {
+                  doTest(digest, saltLength, iterations);
+                }
             }
         }
     }

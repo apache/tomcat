@@ -67,7 +67,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      */
     @Override
     public void postDeregister() {
-        if (oname!=null) unregisterJmx();
+        if (oname!=null) {
+          unregisterJmx();
+        }
     }
 
     /**
@@ -98,7 +100,9 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         try {
             if ( isJmxEnabled() ) {
                 this.oname = createObjectName(name);
-                if (oname!=null) registerJmx();
+                if (oname!=null) {
+                  registerJmx();
+                }
             }
         }catch (MalformedObjectNameException x) {
             log.error("Unable to create object name for JDBC pool.",x);

@@ -26,8 +26,9 @@ class Dumper {
         private int indent = 0;
 
         private String getAttributes(Attributes attrs) {
-            if (attrs == null)
-                return "";
+            if (attrs == null) {
+              return "";
+            }
 
             StringBuilder buf = new StringBuilder();
             for (int i=0; i < attrs.getLength(); i++) {

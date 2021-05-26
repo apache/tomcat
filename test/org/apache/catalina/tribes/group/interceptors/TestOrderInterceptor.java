@@ -77,8 +77,12 @@ public class TestOrderInterceptor {
             };
         }
         TesterUtil.addRandomDomain(channels);
-        for ( int i=0; i<channelCount; i++ ) threads[i].start();
-        for ( int i=0; i<channelCount; i++ ) threads[i].join();
+        for ( int i=0; i<channelCount; i++ ) {
+          threads[i].start();
+        }
+        for ( int i=0; i<channelCount; i++ ) {
+          threads[i].join();
+        }
         Thread.sleep(1500);
     }
 
@@ -158,8 +162,11 @@ public class TestOrderInterceptor {
         public synchronized void messageReceived(Serializable msg, Member sender) {
             total++;
             Integer i = (Integer)msg;
-            if ( i.intValue() != cnt ) fail = true;
-            else cnt++;
+            if ( i.intValue() != cnt ) {
+              fail = true;
+            } else {
+              cnt++;
+            }
             System.out.println("Listener["+id+"] Message received:"+i+" Count:"+total+" Fail:"+fail);
 
         }

@@ -117,7 +117,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
         String sql = super.reportQuery(query, args, name, start, delta);
         if (this.maxQueries > 0 ) {
             QueryStats qs = this.getQueryStats(sql);
-            if (qs != null) qs.add(delta, start);
+            if (qs != null) {
+              qs.add(delta, start);
+            }
         }
         return sql;
     }
@@ -150,7 +152,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
     public void prepareStatement(String sql, long time) {
         if (this.maxQueries > 0 ) {
             QueryStats qs = getQueryStats(sql);
-            if (qs != null) qs.prepare(time);
+            if (qs != null) {
+              qs.prepare(time);
+            }
         }
     }
 
@@ -158,7 +162,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
     public void prepareCall(String sql, long time) {
         if (this.maxQueries > 0 ) {
             QueryStats qs = getQueryStats(sql);
-            if (qs != null) qs.prepare(time);
+            if (qs != null) {
+              qs.prepare(time);
+            }
         }
     }
 
@@ -192,10 +198,14 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     protected QueryStats getQueryStats(String sql) {
-        if (sql==null) sql = "";
+        if (sql==null) {
+          sql = "";
+        }
         ConcurrentHashMap<String,QueryStats> queries = SlowQueryReport.this.queries;
         if (queries==null) {
-            if (log.isWarnEnabled()) log.warn("Connection has already been closed or abandoned");
+            if (log.isWarnEnabled()) {
+              log.warn("Connection has already been closed or abandoned");
+            }
             return null;
         }
         QueryStats qs = queries.get(sql);
@@ -224,7 +234,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
         while (queries.size() > maxQueries) {
             String sql = list.get(removeIndex).getQuery();
             queries.remove(sql);
-            if (log.isDebugEnabled()) log.debug("Removing slow query, capacity reached:"+sql);
+            if (log.isDebugEnabled()) {
+              log.debug("Removing slow query, capacity reached:"+sql);
+            }
             removeIndex++;
         }
     }
@@ -233,10 +245,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
-        if (parent!=null)
-            queries = SlowQueryReport.perPoolStats.get(parent.getName());
-        else
-            queries = null;
+        if (parent!=null) {
+          queries = SlowQueryReport.perPoolStats.get(parent.getName());
+        } else {
+          queries = null;
+        }
     }
 
 

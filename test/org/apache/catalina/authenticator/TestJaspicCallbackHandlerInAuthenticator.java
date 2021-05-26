@@ -167,8 +167,9 @@ public class TestJaspicCallbackHandlerInAuthenticator {
 
         @Override
         public Principal authenticate(String username, String password) {
-            if (getPassword(username).equals(password))
-                return getPrincipal(username);
+            if (getPassword(username).equals(password)) {
+              return getPrincipal(username);
+            }
             return null;
         }
 

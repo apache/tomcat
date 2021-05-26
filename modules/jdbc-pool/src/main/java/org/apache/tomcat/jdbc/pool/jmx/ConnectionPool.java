@@ -115,8 +115,12 @@ public class ConnectionPool extends NotificationBroadcasterSupport
         MBeanNotificationInfo[] pres = super.getNotificationInfo();
         MBeanNotificationInfo[] loc = getDefaultNotificationInfo();
         MBeanNotificationInfo[] aug = new MBeanNotificationInfo[pres.length + loc.length];
-        if (pres.length>0) System.arraycopy(pres, 0, aug, 0, pres.length);
-        if (loc.length >0) System.arraycopy(loc, 0, aug, pres.length, loc.length);
+        if (pres.length>0) {
+          System.arraycopy(pres, 0, aug, 0, pres.length);
+        }
+        if (loc.length >0) {
+          System.arraycopy(loc, 0, aug, pres.length, loc.length);
+        }
         return aug;
     }
 
