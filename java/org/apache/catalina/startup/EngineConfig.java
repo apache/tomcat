@@ -76,10 +76,11 @@ public class EngineConfig
         }
 
         // Process the event that has occurred
-        if (event.getType().equals(Lifecycle.START_EVENT))
+        if (event.getType().equals(Lifecycle.START_EVENT)) {
             start();
-        else if (event.getType().equals(Lifecycle.STOP_EVENT))
+        } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             stop();
+        }
 
     }
 
@@ -92,8 +93,9 @@ public class EngineConfig
      */
     protected void start() {
 
-        if (engine.getLogger().isDebugEnabled())
+        if (engine.getLogger().isDebugEnabled()) {
             engine.getLogger().debug(sm.getString("engineConfig.start"));
+        }
 
     }
 
@@ -103,8 +105,9 @@ public class EngineConfig
      */
     protected void stop() {
 
-        if (engine.getLogger().isDebugEnabled())
+        if (engine.getLogger().isDebugEnabled()) {
             engine.getLogger().debug(sm.getString("engineConfig.stop"));
+        }
 
     }
 

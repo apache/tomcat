@@ -185,8 +185,9 @@ public class JAASCallbackHandler implements CallbackHandler {
         for (Callback callback : callbacks) {
 
             if (callback instanceof NameCallback) {
-                if (realm.getContainer().getLogger().isTraceEnabled())
+                if (realm.getContainer().getLogger().isTraceEnabled()) {
                     realm.getContainer().getLogger().trace(sm.getString("jaasCallback.username", username));
+                }
                 ((NameCallback) callback).setName(username);
             }
             else if (callback instanceof PasswordCallback) {

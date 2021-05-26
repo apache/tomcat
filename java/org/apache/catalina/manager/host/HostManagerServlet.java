@@ -200,8 +200,9 @@ public class HostManagerServlet
 
         // Identify the request parameters that we need
         String command = request.getPathInfo();
-        if (command == null)
+        if (command == null) {
             command = request.getServletPath();
+        }
         String name = request.getParameter("name");
 
         // Prepare our output writer to generate the response message
@@ -291,8 +292,9 @@ public class HostManagerServlet
             } else if (value.equals("true")) {
                 booleanValue = true;
             }
-        } else if (htmlMode)
+        } else if (htmlMode) {
             booleanValue = false;
+        }
         return booleanValue;
     }
 
@@ -301,9 +303,10 @@ public class HostManagerServlet
     public void init() throws ServletException {
 
         // Ensure that our ContainerServlet properties have been set
-        if ((wrapper == null) || (context == null))
+        if ((wrapper == null) || (context == null)) {
             throw new UnavailableException
                 (sm.getString("hostManagerServlet.noWrapper"));
+        }
 
         // Set our properties from the initialization parameters
         String value = null;
@@ -371,8 +374,9 @@ public class HostManagerServlet
             applicationBase = name;
         }
         file = new File(applicationBase);
-        if (!file.isAbsolute())
+        if (!file.isAbsolute()) {
             file = new File(engine.getCatalinaBase(), file.getPath());
+        }
         try {
             appBaseFile = file.getCanonicalFile();
         } catch (IOException e) {
@@ -484,7 +488,9 @@ public class HostManagerServlet
         try {
             Container child = engine.findChild(name);
             engine.removeChild(child);
-            if ( child instanceof ContainerBase ) child.destroy();
+            if ( child instanceof ContainerBase ) {
+                child.destroy();
+            }
         } catch (Exception e) {
             writer.println(smClient.getString("hostManagerServlet.exception",
                     e.toString()));
