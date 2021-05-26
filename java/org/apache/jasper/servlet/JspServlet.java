@@ -139,7 +139,9 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), e);
             } catch (PrivilegedActionException e) {
                 Throwable t = e.getCause();
-                if (t instanceof ServletException) throw (ServletException)t;
+                if (t instanceof ServletException) {
+                    throw (ServletException)t;
+                }
                 throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), e);
             }
         }

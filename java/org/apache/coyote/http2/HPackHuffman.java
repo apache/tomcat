@@ -555,13 +555,21 @@ public class HPackHuffman {
         public boolean equals(Object o) {
 
 
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
 
             HuffmanCode that = (HuffmanCode) o;
 
-            if (length != that.length) return false;
-            if (value != that.value) return false;
+            if (length != that.length) {
+                return false;
+            }
+            if (value != that.value) {
+                return false;
+            }
 
             return true;
         }

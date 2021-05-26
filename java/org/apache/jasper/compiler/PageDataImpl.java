@@ -665,7 +665,9 @@ class PageDataImpl extends PageData implements TagConstants {
          * within the given text, so it can be included in a CDATA section.
          */
         private String escapeCDATA(String text) {
-            if( text==null ) return "";
+            if( text==null ) {
+                return "";
+            }
             int len = text.length();
             CharArrayWriter result = new CharArrayWriter(len);
             for (int i=0; i<len; i++) {

@@ -545,7 +545,9 @@ class ParserController implements TagConstants {
         Mark start = null;
         while ((start = reader.skipUntil("<")) != null) {
             int c = reader.nextChar();
-            if (c != '!' && c != '?') break;
+            if (c != '!' && c != '?') {
+                break;
+            }
         }
         if (start == null) {
             return false;

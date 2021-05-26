@@ -60,8 +60,9 @@ public class JspFactoryImpl extends JspFactory {
 
     @Override
     public void releasePageContext(PageContext pc) {
-        if( pc == null )
+        if( pc == null ) {
             return;
+        }
         if( Constants.IS_SECURITY_ENABLED ) {
             PrivilegedReleasePageContext dp = new PrivilegedReleasePageContext(
                     this,pc);

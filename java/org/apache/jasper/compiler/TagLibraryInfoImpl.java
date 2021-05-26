@@ -385,8 +385,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      */
     public ValidationMessage[] validate(PageData thePage) {
         TagLibraryValidator tlv = getTagLibraryValidator();
-        if (tlv == null)
+        if (tlv == null) {
             return null;
+        }
 
         String uri = getURI();
         if (uri.startsWith("/")) {
