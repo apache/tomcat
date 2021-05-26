@@ -161,8 +161,9 @@ class Collector {
 
         @Override
         public void visit(Node.JspElement n) throws JasperException {
-            if (n.getNameAttribute().isExpression())
+            if (n.getNameAttribute().isExpression()) {
                 scriptingElementSeen = true;
+            }
 
             Node.JspAttribute[] attrs = n.getJspAttributes();
             for (Node.JspAttribute attr : attrs) {

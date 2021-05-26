@@ -1041,8 +1041,9 @@ public class AjpProcessor extends AbstractProcessor {
      */
     @Override
     protected final void finishResponse() throws IOException {
-        if (responseFinished)
+        if (responseFinished) {
             return;
+        }
 
         responseFinished = true;
 

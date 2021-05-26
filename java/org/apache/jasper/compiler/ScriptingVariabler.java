@@ -95,10 +95,11 @@ class ScriptingVariabler {
             Node.CustomTag parent = n.getCustomTagParent();
             if (scope == VariableInfo.AT_BEGIN
                     || scope == VariableInfo.AT_END) {
-                if (parent == null)
+                if (parent == null) {
                     ownRange = MAX_SCOPE;
-                else
+                } else {
                     ownRange = parent.getNumCount();
+                }
             } else {
                 // NESTED
                 ownRange = n.getNumCount();

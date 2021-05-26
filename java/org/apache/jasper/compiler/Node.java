@@ -460,8 +460,9 @@ abstract class Node implements TagConstants {
 
             // Figure out and set the parent root
             Node r = parent;
-            while ((r != null) && !(r instanceof Node.Root))
+            while ((r != null) && !(r instanceof Node.Root)) {
                 r = r.getParent();
+            }
             parentRoot = (Node.Root) r;
         }
 

@@ -1225,7 +1225,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     size.incrementAndGet();
                 }
             }
-            if (!result) handler.unregister(processor);
+            if (!result) {
+                handler.unregister(processor);
+            }
             return result;
         }
 

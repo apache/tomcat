@@ -146,7 +146,9 @@ public class FunctionMapperImpl extends FunctionMapper implements
                 ClassNotFoundException {
 
             this.prefix = in.readUTF();
-            if (this.prefix.isEmpty()) this.prefix = null;
+            if (this.prefix.isEmpty()) {
+                this.prefix = null;
+            }
             this.localName = in.readUTF();
             this.owner = in.readUTF();
             this.name = in.readUTF();

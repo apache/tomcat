@@ -163,8 +163,9 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
             filter.setBuffer(outputStreamOutputBuffer);
         } else {
             for (int i = 0; i <= lastActiveFilter; i++) {
-                if (activeFilters[i] == filter)
+                if (activeFilters[i] == filter) {
                     return;
+                }
             }
             filter.setBuffer(activeFilters[lastActiveFilter]);
         }

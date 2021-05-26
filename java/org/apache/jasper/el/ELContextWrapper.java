@@ -45,7 +45,9 @@ public final class ELContextWrapper extends ELContext {
 
     @Override
     public FunctionMapper getFunctionMapper() {
-        if (this.fnMapper != null) return this.fnMapper;
+        if (this.fnMapper != null) {
+            return this.fnMapper;
+        }
         return this.target.getFunctionMapper();
     }
 
