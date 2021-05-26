@@ -31,12 +31,13 @@ public class LogTag extends ExampleTagBase {
     boolean toBrowser = false;
 
     public void setToBrowser(String value) {
-        if (value == null)
+        if (value == null) {
             toBrowser = false;
-        else if (value.equalsIgnoreCase("true"))
+        } else if (value.equalsIgnoreCase("true")) {
             toBrowser = true;
-        else
+        } else {
             toBrowser = false;
+        }
     }
 
     @Override
@@ -49,8 +50,9 @@ public class LogTag extends ExampleTagBase {
         try {
             String s = bodyOut.getString();
             System.err.println(s);
-            if (toBrowser)
+            if (toBrowser) {
                 bodyOut.writeOut(bodyOut.getEnclosingWriter());
+            }
             return SKIP_BODY;
         } catch (IOException ex) {
             throw new JspTagException(ex.toString());

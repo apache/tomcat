@@ -64,10 +64,12 @@ public class TableBean {
 
         // Get the name and e-mail.
         this.processError = false;
-        if (name == null || name.equals(""))
+        if (name == null || name.equals("")) {
             setName(request.getParameter("name"));
-        if (email == null || email.equals(""))
+        }
+        if (email == null || email.equals("")) {
             setEmail(request.getParameter("email"));
+        }
         if (name == null || email == null || name.equals("")
                 || email.equals("")) {
             this.processError = true;
@@ -76,12 +78,13 @@ public class TableBean {
 
         // Get the date.
         String dateR = request.getParameter("date");
-        if (dateR == null)
+        if (dateR == null) {
             date = JspCal.getCurrentDate();
-        else if (dateR.equalsIgnoreCase("next"))
+        } else if (dateR.equalsIgnoreCase("next")) {
             date = JspCal.getNextDate();
-        else if (dateR.equalsIgnoreCase("prev"))
+        } else if (dateR.equalsIgnoreCase("prev")) {
             date = JspCal.getPrevDate();
+        }
 
         entries = table.get(date);
         if (entries == null) {
@@ -91,8 +94,9 @@ public class TableBean {
 
         // If time is provided add the event.
         String time = request.getParameter("time");
-        if (time != null)
+        if (time != null) {
             entries.processRequest(request, time);
+        }
     }
 
     public boolean getProcessError() {

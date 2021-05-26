@@ -60,25 +60,37 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
     }
 
     public boolean force(Runnable o) {
-        if (parent == null || parent.isShutdown()) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
+        if (parent == null || parent.isShutdown()) {
+            throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
+        }
         return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
     }
 
     public boolean force(Runnable o, long timeout, TimeUnit unit) throws InterruptedException {
-        if (parent == null || parent.isShutdown()) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
+        if (parent == null || parent.isShutdown()) {
+            throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
+        }
         return super.offer(o,timeout,unit); //forces the item onto the queue, to be used if the task is rejected
     }
 
     @Override
     public boolean offer(Runnable o) {
       //we can't do any checks
-        if (parent==null) return super.offer(o);
+        if (parent==null) {
+            return super.offer(o);
+        }
         //we are maxed out on threads, simply queue the object
-        if (parent.getPoolSize() == parent.getMaximumPoolSize()) return super.offer(o);
+        if (parent.getPoolSize() == parent.getMaximumPoolSize()) {
+            return super.offer(o);
+        }
         //we have idle threads, just add it to the queue
-        if (parent.getSubmittedCount()<=(parent.getPoolSize())) return super.offer(o);
+        if (parent.getSubmittedCount()<=(parent.getPoolSize())) {
+            return super.offer(o);
+        }
         //if we have less threads than maximum force creation of a new thread
-        if (parent.getPoolSize()<parent.getMaximumPoolSize()) return false;
+        if (parent.getPoolSize()<parent.getMaximumPoolSize()) {
+            return false;
+        }
         //if we reached here, we need to add it to the queue
         return super.offer(o);
     }
