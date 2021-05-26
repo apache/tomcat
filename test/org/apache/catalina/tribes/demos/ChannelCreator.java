@@ -199,7 +199,9 @@ public class ChannelCreator {
 
         McastService service = new McastService();
         service.setAddress(mcastaddr);
-        if (mbind != null) service.setMcastBindAddress(mbind);
+        if (mbind != null) {
+          service.setMcastBindAddress(mbind);
+        }
         service.setFrequency(mcastfreq);
         service.setMcastDropTime(mcastdrop);
         service.setPort(mcastport);
@@ -209,8 +211,12 @@ public class ChannelCreator {
         channel.setChannelSender(ps);
         channel.setMembershipService(service);
 
-        if ( throughput ) channel.addInterceptor(new ThroughputInterceptor());
-        if (gzip) channel.addInterceptor(new GzipInterceptor());
+        if ( throughput ) {
+          channel.addInterceptor(new ThroughputInterceptor());
+        }
+        if (gzip) {
+          channel.addInterceptor(new GzipInterceptor());
+        }
         if ( frag ) {
             FragmentationInterceptor fi = new FragmentationInterceptor();
             fi.setMaxSize(fragsize);

@@ -44,8 +44,9 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         try {
-            if (statement instanceof Statement)
-                statements.add(new StatementEntry((Statement)statement));
+            if (statement instanceof Statement) {
+              statements.add(new StatementEntry((Statement)statement));
+            }
         }catch (ClassCastException x) {
             //ignore this one
         }

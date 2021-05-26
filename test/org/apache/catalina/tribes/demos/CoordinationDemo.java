@@ -56,7 +56,9 @@ public class CoordinationDemo {
 
     public void clearScreen() {
         StringBuilder buf = new StringBuilder(700);
-        for (int i=0; i<CLEAR_SCREEN; i++ ) buf.append("\n");
+        for (int i=0; i<CLEAR_SCREEN; i++ ) {
+          buf.append("\n");
+        }
         System.out.println(buf);
     }
 
@@ -74,7 +76,9 @@ public class CoordinationDemo {
         System.out.println(" ###."+getHeader());
         for ( int i=0; i<status.length; i++ ) {
             System.out.print(leftfill(String.valueOf(i+1)+".",5," "));
-            if ( status[i] != null ) System.out.print(status[i].getStatusLine());
+            if ( status[i] != null ) {
+              System.out.print(status[i].getStatusLine());
+            }
         }
         System.out.println("\n\n");
         System.out.println("Overall status:"+statusLine);
@@ -105,12 +109,16 @@ public class CoordinationDemo {
     public String[] tokenize(String line) {
         StringTokenizer tz = new StringTokenizer(line," ");
         String[] result = new String[tz.countTokens()];
-        for (int i=0; i<result.length; i++ ) result[i] = tz.nextToken();
+        for (int i=0; i<result.length; i++ ) {
+          result[i] = tz.nextToken();
+        }
         return result;
     }
 
     public void waitForInput() throws IOException {
-        for ( int i=0; i<status.length; i++ ) status[i] = new Status(this);
+        for ( int i=0; i<status.length; i++ ) {
+          status[i] = new Status(this);
+        }
         printScreen();
         String l = reader.readLine();
         String[] args;
@@ -132,7 +140,9 @@ public class CoordinationDemo {
                 args = tokenize(l);
             }
         }
-        for (Status value : status) value.stop();
+        for (Status value : status) {
+          value.stop();
+        }
     }
 
     private void cmdStop(String[] args) {
@@ -148,7 +158,13 @@ public class CoordinationDemo {
                     }
                 };
             }
-            for (int i = 0; i < status.length; i++) if (MULTI_THREAD ) t[i].start(); else t[i].run();
+            for (int i = 0; i < status.length; i++) {
+              if (MULTI_THREAD ) {
+                t[i].start();
+              } else {
+                t[i].run();
+              }
+            }
             setSystemStatus("System stopped.");
         } else {
             int index = -1;
@@ -174,7 +190,13 @@ public class CoordinationDemo {
                     }
                 };
             }
-            for (int i = 0; i < status.length; i++) if (MULTI_THREAD ) t[i].start(); else t[i].run();
+            for (int i = 0; i < status.length; i++) {
+              if (MULTI_THREAD ) {
+                t[i].start();
+              } else {
+                t[i].run();
+              }
+            }
             setSystemStatus("System started.");
         } else {
             int index = -1;
@@ -207,17 +229,19 @@ public class CoordinationDemo {
         java.util.Arrays.fill(VIEW_EVENTS,true);
 
         for (int i=0; i<args.length; i++ ) {
-            if ( "-c".equals(args[i]) )
-                CHANNEL_COUNT = Integer.parseInt(args[++i]);
-            else if ( "-t".equals(args[i]) )
-                MULTI_THREAD = Boolean.parseBoolean(args[++i]);
-            else if ( "-s".equals(args[i]) )
-                SLEEP_TIME = Long.parseLong(args[++i]);
-            else if ( "-sc".equals(args[i]) )
-                CLEAR_SCREEN = Integer.parseInt(args[++i]);
-            else if ( "-p".equals(args[i]) )
-                setEvents(args[++i]);
-            else if ( "-h".equals(args[i]) ) System.exit(0);
+            if ( "-c".equals(args[i]) ) {
+              CHANNEL_COUNT = Integer.parseInt(args[++i]);
+            } else if ( "-t".equals(args[i]) ) {
+              MULTI_THREAD = Boolean.parseBoolean(args[++i]);
+            } else if ( "-s".equals(args[i]) ) {
+              SLEEP_TIME = Long.parseLong(args[++i]);
+            } else if ( "-sc".equals(args[i]) ) {
+              CLEAR_SCREEN = Integer.parseInt(args[++i]);
+            } else if ( "-p".equals(args[i]) ) {
+              setEvents(args[++i]);
+            } else if ( "-h".equals(args[i]) ) {
+              System.exit(0);
+            }
         }
         demo.init();
         demo.waitForInput();
@@ -248,9 +272,15 @@ public class CoordinationDemo {
 
     public static String fill(String value, int length, String ch, boolean left) {
         StringBuilder buf = new StringBuilder();
-        if ( !left ) buf.append(value.trim());
-        for (int i=value.trim().length(); i<length; i++ ) buf.append(ch);
-        if ( left ) buf.append(value.trim());
+        if ( !left ) {
+          buf.append(value.trim());
+        }
+        for (int i=value.trim().length(); i<length; i++ ) {
+          buf.append(ch);
+        }
+        if ( left ) {
+          buf.append(value.trim());
+        }
         return buf.toString();
     }
 
@@ -299,7 +329,9 @@ public class CoordinationDemo {
         }
 
         public String getByteString(byte[] b) {
-            if ( b == null ) return "{}";
+            if ( b == null ) {
+              return "{}";
+            }
             return Arrays.toString(b,0,Math.min(b.length,4));
         }
 
@@ -317,7 +349,9 @@ public class CoordinationDemo {
                 synchronized (System.err) {
                     System.err.println("Start failed:");
                     StackTraceElement[] els = x.getStackTrace();
-                    for (StackTraceElement el : els) System.err.println(el.toString());
+                    for (StackTraceElement el : els) {
+                      System.err.println(el.toString());
+                    }
                 }
                 status = "Start failed:"+x.getMessage();
                 error = x;
@@ -342,7 +376,9 @@ public class CoordinationDemo {
                 synchronized (System.err) {
                     System.err.println("Stop failed:");
                     StackTraceElement[] els = x.getStackTrace();
-                    for (StackTraceElement el : els) System.err.println(el.toString());
+                    for (StackTraceElement el : els) {
+                      System.err.println(el.toString());
+                    }
                 }
 
                 status = "Stop failed:"+x.getMessage();
@@ -363,7 +399,9 @@ public class CoordinationDemo {
                     status = event.getEventTypeDesc();
                     int type = event.getEventType();
                     boolean display = VIEW_EVENTS[type];
-                    if ( display ) parent.printScreen();
+                    if ( display ) {
+                      parent.printScreen();
+                    }
                     try { Thread.sleep(SLEEP_TIME); }catch ( Exception x){
                         // Ignore
                     }

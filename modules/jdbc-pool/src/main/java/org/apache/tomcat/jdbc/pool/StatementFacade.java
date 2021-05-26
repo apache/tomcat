@@ -102,12 +102,18 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 return Integer.valueOf(this.hashCode());
             }
             if (compare(CLOSE_VAL, method)) {
-                if (delegate == null) return null;
+                if (delegate == null) {
+                  return null;
+                }
             }
             if (compare(ISCLOSED_VAL, method)) {
-                if (delegate == null) return Boolean.TRUE;
+                if (delegate == null) {
+                  return Boolean.TRUE;
+                }
             }
-            if (delegate == null) throw new SQLException("Statement closed.");
+            if (delegate == null) {
+              throw new SQLException("Statement closed.");
+            }
             Object result =  null;
             try {
                 //invoke next

@@ -88,10 +88,11 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
     @Test
     public void testOpenSSLConfCmdCipher() throws Exception {
-        if (TesterSupport.isOpensslAvailable())
-            log.info("Found OpenSSL version 0x" + Integer.toHexString(OPENSSL_VERSION));
-        else
-            log.warn("OpenSSL not found: " + TesterSupport.OPENSSL_ERROR);
+        if (TesterSupport.isOpensslAvailable()) {
+          log.info("Found OpenSSL version 0x" + Integer.toHexString(OPENSSL_VERSION));
+        } else {
+          log.warn("OpenSSL not found: " + TesterSupport.OPENSSL_ERROR);
+        }
 
         SSLHostConfig sslHostConfig;
         if (hasTLS13()) {
@@ -111,10 +112,11 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
     @Test
     public void testOpenSSLConfCmdProtocol() throws Exception {
-        if (TesterSupport.isOpensslAvailable())
-            log.info("Found OpenSSL version 0x" + Integer.toHexString(OPENSSL_VERSION));
-        else
-            log.warn("OpenSSL not found: " + TesterSupport.OPENSSL_ERROR);
+        if (TesterSupport.isOpensslAvailable()) {
+          log.info("Found OpenSSL version 0x" + Integer.toHexString(OPENSSL_VERSION));
+        } else {
+          log.warn("OpenSSL not found: " + TesterSupport.OPENSSL_ERROR);
+        }
 
         Set<String> disabledProtocols = new HashSet<>(Arrays.asList(DISABLED_PROTOCOLS));
         StringBuilder sb = new StringBuilder();
