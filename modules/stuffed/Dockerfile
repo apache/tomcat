@@ -23,6 +23,7 @@ RUN mkdir -m 777 -p /deployments
 ADD target/tomcat-stuffed-1.0.jar /deployments/app.jar
 ADD conf /deployments/conf
 ADD webapps /deployments/webapps
+# COPY *.war /deployments/
 RUN chmod 777 /deployments/webapps
 
 WORKDIR /deployments
@@ -54,3 +55,4 @@ RUN mkdir -p /opt
 # EXPOSE $prometheusport
 
 ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar app.jar" ]
+# ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar app.jar --war myrootwebapp.war --path /mydemo --war demo-1.0.war" ]
