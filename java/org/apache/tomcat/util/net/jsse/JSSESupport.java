@@ -95,16 +95,18 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     @Override
     public String getCipherSuite() throws IOException {
         // Look up the current SSLSession
-        if (session == null)
+        if (session == null) {
             return null;
+        }
         return session.getCipherSuite();
     }
 
     @Override
     public java.security.cert.X509Certificate[] getPeerCertificateChain() throws IOException {
         // Look up the current SSLSession
-        if (session == null)
+        if (session == null) {
             return null;
+        }
 
         Certificate [] certs=null;
         try {
@@ -113,7 +115,9 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
             log.debug(sm.getString("jsseSupport.clientCertError"), t);
             return null;
         }
-        if( certs==null ) return null;
+        if( certs==null ) {
+            return null;
+        }
 
         java.security.cert.X509Certificate [] x509Certs =
             new java.security.cert.X509Certificate[certs.length];
@@ -136,11 +140,13 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
                     return null;
                 }
             }
-            if(log.isTraceEnabled())
+            if(log.isTraceEnabled()) {
                 log.trace("Cert #" + i + " = " + x509Certs[i]);
+            }
         }
-        if(x509Certs.length < 1)
+        if(x509Certs.length < 1) {
             return null;
+        }
         return x509Certs;
     }
 
@@ -164,17 +170,23 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     public String getSessionId()
         throws IOException {
         // Look up the current SSLSession
-        if (session == null)
+        if (session == null) {
             return null;
+        }
         // Expose ssl_session (getId)
         byte [] ssl_session = session.getId();
-        if ( ssl_session == null)
+        if ( ssl_session == null) {
             return null;
+        }
         StringBuilder buf=new StringBuilder();
         for (byte b : ssl_session) {
             String digit = Integer.toHexString(b);
-            if (digit.length() < 2) buf.append('0');
-            if (digit.length() > 2) digit = digit.substring(digit.length() - 2);
+            if (digit.length() < 2) {
+                buf.append('0');
+            }
+            if (digit.length() > 2) {
+                digit = digit.substring(digit.length() - 2);
+            }
             buf.append(digit);
         }
         return buf.toString();

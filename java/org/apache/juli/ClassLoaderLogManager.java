@@ -460,18 +460,20 @@ public class ClassLoaderLogManager extends LogManager {
                 URL logConfig = ((URLClassLoader)classLoader).findResource("logging.properties");
 
                 if(null != logConfig) {
-                    if(Boolean.getBoolean(DEBUG_PROPERTY))
+                    if(Boolean.getBoolean(DEBUG_PROPERTY)) {
                         System.err.println(getClass().getName()
                                            + ".readConfiguration(): "
                                            + "Found logging.properties at "
                                            + logConfig);
+                    }
 
                     is = classLoader.getResourceAsStream("logging.properties");
                 } else {
-                    if(Boolean.getBoolean(DEBUG_PROPERTY))
+                    if(Boolean.getBoolean(DEBUG_PROPERTY)) {
                         System.err.println(getClass().getName()
                                            + ".readConfiguration(): "
                                            + "Found no logging.properties");
+                    }
                 }
             }
         } catch (AccessControlException ace) {

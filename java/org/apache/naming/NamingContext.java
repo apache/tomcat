@@ -269,11 +269,13 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
-        if (name.isEmpty())
+        }
+        if (name.isEmpty()) {
             throw new NamingException
                 (sm.getString("namingContext.invalidName"));
+        }
 
         NamingEntry entry = bindings.get(name.get(0));
 
@@ -364,8 +366,9 @@ public class NamingContext implements Context {
     public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
+        }
         if (name.isEmpty()) {
             return new NamingContextEnumeration(bindings.values().iterator());
         }
@@ -418,8 +421,9 @@ public class NamingContext implements Context {
     public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
+        }
         if (name.isEmpty()) {
             return new NamingContextBindingsEnumeration(bindings.values().iterator(), this);
         }
@@ -487,11 +491,13 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
-        if (name.isEmpty())
+        }
+        if (name.isEmpty()) {
             throw new NamingException
                 (sm.getString("namingContext.invalidName"));
+        }
 
         NamingEntry entry = bindings.get(name.get(0));
 
@@ -632,10 +638,12 @@ public class NamingContext implements Context {
     public NameParser getNameParser(Name name)
         throws NamingException {
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
-        if (name.isEmpty())
+        }
+        if (name.isEmpty()) {
             return nameParser;
+        }
 
         if (name.size() > 1) {
             Object obj = bindings.get(name.get(0));
@@ -803,8 +811,9 @@ public class NamingContext implements Context {
         throws NamingException {
 
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
+        }
         if (name.isEmpty()) {
             // If name is empty, a newly allocated naming context is returned
             return new NamingContext(env, this.name, bindings);
@@ -888,11 +897,13 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
-        if (name.isEmpty())
+        }
+        if (name.isEmpty()) {
             throw new NamingException
                 (sm.getString("namingContext.invalidName"));
+        }
 
         NamingEntry entry = bindings.get(name.get(0));
 

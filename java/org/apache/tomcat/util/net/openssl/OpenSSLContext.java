@@ -117,8 +117,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             if (openSslConf != null) {
                 try {
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug(sm.getString("openssl.makeConf"));
+                    }
                     cctx = SSLConf.make(aprPool,
                                         SSL.SSL_CONF_FLAG_FILE |
                                         SSL.SSL_CONF_FLAG_SERVER |
@@ -294,8 +295,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // an acceptable certificate
                 for (X509Certificate caCert : x509TrustManager.getAcceptedIssuers()) {
                     SSLContext.addClientCACertificateRaw(ctx, caCert.getEncoded());
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
+                    }
                 }
             } else {
                 // Client certificate verification based on trusted CA files and dirs
@@ -316,8 +318,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             if (openSslConf != null && cctx != 0) {
                 // Check OpenSSLConfCmd if used
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug(sm.getString("openssl.checkConf"));
+                }
                 try {
                     if (!openSslConf.check(cctx)) {
                         log.error(sm.getString("openssl.errCheckConf"));
@@ -326,8 +329,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } catch (Exception e) {
                     throw new Exception(sm.getString("openssl.errCheckConf"), e);
                 }
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug(sm.getString("openssl.applyConf"));
+                }
                 try {
                     if (!openSslConf.apply(cctx, ctx)) {
                         log.error(sm.getString("openssl.errApplyConf"));

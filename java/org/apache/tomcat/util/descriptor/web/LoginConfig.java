@@ -184,31 +184,41 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!(obj instanceof LoginConfig))
+        }
+        if (!(obj instanceof LoginConfig)) {
             return false;
+        }
         LoginConfig other = (LoginConfig) obj;
         if (authMethod == null) {
-            if (other.authMethod != null)
+            if (other.authMethod != null) {
                 return false;
-        } else if (!authMethod.equals(other.authMethod))
+            }
+        } else if (!authMethod.equals(other.authMethod)) {
             return false;
+        }
         if (errorPage == null) {
-            if (other.errorPage != null)
+            if (other.errorPage != null) {
                 return false;
-        } else if (!errorPage.equals(other.errorPage))
+            }
+        } else if (!errorPage.equals(other.errorPage)) {
             return false;
+        }
         if (loginPage == null) {
-            if (other.loginPage != null)
+            if (other.loginPage != null) {
                 return false;
-        } else if (!loginPage.equals(other.loginPage))
+            }
+        } else if (!loginPage.equals(other.loginPage)) {
             return false;
+        }
         if (realmName == null) {
-            if (other.realmName != null)
+            if (other.realmName != null) {
                 return false;
-        } else if (!realmName.equals(other.realmName))
+            }
+        } else if (!realmName.equals(other.realmName)) {
             return false;
+        }
         return true;
     }
 

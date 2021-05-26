@@ -93,8 +93,9 @@ public class MailSessionFactory implements ObjectFactory {
 
         // Return null if we cannot create an object of the requested type
         final Reference ref = (Reference) refObj;
-        if (!ref.getClassName().equals(factoryType))
+        if (!ref.getClassName().equals(factoryType)) {
             return null;
+        }
 
         // Create a new Session inside a doPrivileged block, so that JavaMail
         // can read its default properties without throwing Security

@@ -1371,7 +1371,9 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
 
     private static void appendElement(StringBuilder sb, String indent,
             String elementName, Object value) {
-        if (value == null) return;
+        if (value == null) {
+            return;
+        }
         appendElement(sb, indent, elementName, value.toString());
     }
 

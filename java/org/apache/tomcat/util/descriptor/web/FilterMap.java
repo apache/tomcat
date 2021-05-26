@@ -170,7 +170,9 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
     public int getDispatcherMapping() {
         // per the SRV.6.2.5 absence of any dispatcher elements is
         // equivalent to a REQUEST value
-        if (dispatcherMapping == NOT_SET) return REQUEST;
+        if (dispatcherMapping == NOT_SET) {
+            return REQUEST;
+        }
 
         return dispatcherMapping;
     }

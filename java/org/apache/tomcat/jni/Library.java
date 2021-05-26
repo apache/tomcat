@@ -174,10 +174,11 @@ public final class Library {
      */
     public static synchronized boolean initialize(String libraryName) throws Exception {
         if (_instance == null) {
-            if (libraryName == null)
+            if (libraryName == null) {
                 _instance = new Library();
-            else
+            } else {
                 _instance = new Library(libraryName);
+            }
             TCN_MAJOR_VERSION  = version(0x01);
             TCN_MINOR_VERSION  = version(0x02);
             TCN_PATCH_VERSION  = version(0x03);

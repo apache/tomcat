@@ -179,27 +179,35 @@ public class SocketProperties {
 
 
     public void setProperties(Socket socket) throws SocketException{
-        if (rxBufSize != null)
+        if (rxBufSize != null) {
             socket.setReceiveBufferSize(rxBufSize.intValue());
-        if (txBufSize != null)
+        }
+        if (txBufSize != null) {
             socket.setSendBufferSize(txBufSize.intValue());
-        if (ooBInline !=null)
+        }
+        if (ooBInline !=null) {
             socket.setOOBInline(ooBInline.booleanValue());
-        if (soKeepAlive != null)
+        }
+        if (soKeepAlive != null) {
             socket.setKeepAlive(soKeepAlive.booleanValue());
+        }
         if (performanceConnectionTime != null && performanceLatency != null &&
-                performanceBandwidth != null)
+                performanceBandwidth != null) {
             socket.setPerformancePreferences(
                     performanceConnectionTime.intValue(),
                     performanceLatency.intValue(),
                     performanceBandwidth.intValue());
-        if (soReuseAddress != null)
+        }
+        if (soReuseAddress != null) {
             socket.setReuseAddress(soReuseAddress.booleanValue());
-        if (soLingerOn != null && soLingerTime != null)
+        }
+        if (soLingerOn != null && soLingerTime != null) {
             socket.setSoLinger(soLingerOn.booleanValue(),
                     soLingerTime.intValue());
-        if (soTimeout != null && soTimeout.intValue() >= 0)
+        }
+        if (soTimeout != null && soTimeout.intValue() >= 0) {
             socket.setSoTimeout(soTimeout.intValue());
+        }
         if (tcpNoDelay != null) {
             try {
                 socket.setTcpNoDelay(tcpNoDelay.booleanValue());
@@ -210,40 +218,52 @@ public class SocketProperties {
     }
 
     public void setProperties(ServerSocket socket) throws SocketException{
-        if (rxBufSize != null)
+        if (rxBufSize != null) {
             socket.setReceiveBufferSize(rxBufSize.intValue());
+        }
         if (performanceConnectionTime != null && performanceLatency != null &&
-                performanceBandwidth != null)
+                performanceBandwidth != null) {
             socket.setPerformancePreferences(
                     performanceConnectionTime.intValue(),
                     performanceLatency.intValue(),
                     performanceBandwidth.intValue());
-        if (soReuseAddress != null)
+        }
+        if (soReuseAddress != null) {
             socket.setReuseAddress(soReuseAddress.booleanValue());
-        if (soTimeout != null && soTimeout.intValue() >= 0)
+        }
+        if (soTimeout != null && soTimeout.intValue() >= 0) {
             socket.setSoTimeout(soTimeout.intValue());
+        }
     }
 
     public void setProperties(AsynchronousSocketChannel socket) throws IOException {
-        if (rxBufSize != null)
+        if (rxBufSize != null) {
             socket.setOption(StandardSocketOptions.SO_RCVBUF, rxBufSize);
-        if (txBufSize != null)
+        }
+        if (txBufSize != null) {
             socket.setOption(StandardSocketOptions.SO_SNDBUF, txBufSize);
-        if (soKeepAlive != null)
+        }
+        if (soKeepAlive != null) {
             socket.setOption(StandardSocketOptions.SO_KEEPALIVE, soKeepAlive);
-        if (soReuseAddress != null)
+        }
+        if (soReuseAddress != null) {
             socket.setOption(StandardSocketOptions.SO_REUSEADDR, soReuseAddress);
-        if (soLingerOn != null && soLingerOn.booleanValue() && soLingerTime != null)
+        }
+        if (soLingerOn != null && soLingerOn.booleanValue() && soLingerTime != null) {
             socket.setOption(StandardSocketOptions.SO_LINGER, soLingerTime);
-        if (tcpNoDelay != null)
+        }
+        if (tcpNoDelay != null) {
             socket.setOption(StandardSocketOptions.TCP_NODELAY, tcpNoDelay);
+        }
     }
 
     public void setProperties(AsynchronousServerSocketChannel socket) throws IOException {
-        if (rxBufSize != null)
+        if (rxBufSize != null) {
             socket.setOption(StandardSocketOptions.SO_RCVBUF, rxBufSize);
-        if (soReuseAddress != null)
+        }
+        if (soReuseAddress != null) {
             socket.setOption(StandardSocketOptions.SO_REUSEADDR, soReuseAddress);
+        }
     }
 
     public boolean getDirectBuffer() {
