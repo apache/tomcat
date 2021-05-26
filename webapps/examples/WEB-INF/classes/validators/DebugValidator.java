@@ -67,8 +67,9 @@ public class DebugValidator extends TagLibraryValidator {
         while (true) {
             try {
                 int ch = is.read();
-                if (ch < 0)
+                if (ch < 0) {
                     break;
+                }
                 System.out.print((char) ch);
             } catch (IOException e) {
                 break;

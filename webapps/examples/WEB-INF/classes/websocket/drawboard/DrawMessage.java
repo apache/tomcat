@@ -204,22 +204,25 @@ public final class DrawMessage {
             String[] elements = str.split(",");
 
             type = Integer.parseInt(elements[0]);
-            if (!(type >= 1 && type <= 4))
+            if (!(type >= 1 && type <= 4)) {
                 throw new ParseException("Invalid type: " + type);
+            }
 
             for (int i = 0; i < colors.length; i++) {
                 colors[i] = (byte) Integer.parseInt(elements[1 + i]);
             }
 
             thickness = Double.parseDouble(elements[5]);
-            if (Double.isNaN(thickness) || thickness < 0 || thickness > 100)
+            if (Double.isNaN(thickness) || thickness < 0 || thickness > 100) {
                 throw new ParseException("Invalid thickness: " + thickness);
+            }
 
             for (int i = 0; i < coords.length; i++) {
                 coords[i] = Double.parseDouble(elements[6 + i]);
-                if (Double.isNaN(coords[i]))
+                if (Double.isNaN(coords[i])) {
                     throw new ParseException("Invalid coordinate: "
                             + coords[i]);
+                }
             }
 
         } catch (RuntimeException ex) {
