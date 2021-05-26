@@ -51,8 +51,9 @@ public abstract class SSLImplementation {
      */
     public static SSLImplementation getInstance(String className)
             throws ClassNotFoundException {
-        if (className == null)
+        if (className == null) {
             return new JSSEImplementation();
+        }
 
         try {
             Class<?> clazz = Class.forName(className);

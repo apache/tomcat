@@ -117,8 +117,9 @@ public class NotificationInfo extends FeatureInfo {
     public MBeanNotificationInfo createNotificationInfo() {
 
         // Return our cached information (if any)
-        if (info != null)
+        if (info != null) {
             return info;
+        }
 
         // Create and return a new information object
         info = new MBeanNotificationInfo
