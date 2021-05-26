@@ -1694,7 +1694,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                 } catch (IOException x) {
                     handshake = -1;
-                    if (log.isDebugEnabled()) log.debug("Error during SSL handshake",x);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Error during SSL handshake",x);
+                    }
                 } catch (CancelledKeyException ckx) {
                     handshake = -1;
                 }

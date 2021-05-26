@@ -51,8 +51,9 @@ public class BaseAttributeFilter implements NotificationFilter {
     public BaseAttributeFilter(String name) {
 
         super();
-        if (name != null)
+        if (name != null) {
             addAttribute(name);
+        }
 
     }
 
@@ -125,19 +126,23 @@ public class BaseAttributeFilter implements NotificationFilter {
     @Override
     public boolean isNotificationEnabled(Notification notification) {
 
-        if (notification == null)
+        if (notification == null) {
             return false;
-        if (!(notification instanceof AttributeChangeNotification))
+        }
+        if (!(notification instanceof AttributeChangeNotification)) {
             return false;
+        }
         AttributeChangeNotification acn =
             (AttributeChangeNotification) notification;
-        if (!AttributeChangeNotification.ATTRIBUTE_CHANGE.equals(acn.getType()))
+        if (!AttributeChangeNotification.ATTRIBUTE_CHANGE.equals(acn.getType())) {
             return false;
+        }
         synchronized (names) {
-            if (names.size() < 1)
+            if (names.size() < 1) {
                 return true;
-            else
+            } else {
                 return names.contains(acn.getAttributeName());
+            }
         }
 
     }

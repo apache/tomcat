@@ -641,10 +641,12 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         try {
 
             // 1: Set socket options: timeout, linger, etc
-            if (socketProperties.getSoLingerOn() && socketProperties.getSoLingerTime() >= 0)
+            if (socketProperties.getSoLingerOn() && socketProperties.getSoLingerTime() >= 0) {
                 Socket.optSet(socket, Socket.APR_SO_LINGER, socketProperties.getSoLingerTime());
-            if (socketProperties.getTcpNoDelay())
+            }
+            if (socketProperties.getTcpNoDelay()) {
                 Socket.optSet(socket, Socket.APR_TCP_NODELAY, (socketProperties.getTcpNoDelay() ? 1 : 0));
+            }
             Socket.timeoutSet(socket, socketProperties.getSoTimeout() * 1000);
 
             // 2: SSL handshake

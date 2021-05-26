@@ -86,8 +86,9 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
                     x = (Exception) cause;
                 }
             }
-            if (x instanceof NamingException) throw (NamingException)x;
-            else {
+            if (x instanceof NamingException) {
+                throw (NamingException)x;
+            } else {
                 NamingException nx = new NamingException(x.getMessage());
                 nx.initCause(x);
                 throw nx;

@@ -867,7 +867,9 @@ public class SecureNioChannel extends NioChannel {
         netOutBuffer.flip();
 
         if (result.getStatus() == Status.OK) {
-            if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
+            if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
+                tasks();
+            }
         } else {
             throw new IOException(sm.getString("channel.nio.ssl.wrapFail", result.getStatus()));
         }

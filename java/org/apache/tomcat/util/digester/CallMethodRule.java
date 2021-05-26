@@ -319,9 +319,9 @@ public class CallMethodRule extends Rule {
             // for non-stringy param types
             Object param = parameters[i];
             // Tolerate null non-primitive values
-            if(null == param && !paramTypes[i].isPrimitive())
+            if(null == param && !paramTypes[i].isPrimitive()) {
                 paramValues[i] = null;
-            else if(param instanceof String &&
+            } else if(param instanceof String &&
                     !String.class.isAssignableFrom(paramTypes[i])) {
 
                 paramValues[i] =

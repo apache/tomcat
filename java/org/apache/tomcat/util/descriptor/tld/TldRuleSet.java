@@ -392,8 +392,9 @@ public class TldRuleSet implements RuleSet {
 
         @Override
         public void body(String namespace, String name, String text) throws Exception {
-            if(null != text)
+            if(null != text) {
                 text = text.trim();
+            }
             boolean value = "true".equalsIgnoreCase(text) || "yes".equalsIgnoreCase(text);
             setter.invoke(digester.peek(), Boolean.valueOf(value));
 
