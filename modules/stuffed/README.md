@@ -45,7 +45,7 @@ Docker build arguments include `namespace` (default is `tomcat`) and `port` whic
 
 Add a webapp as folder mywebapp (for this example, or specify another path), or a path from which a configured Host will auto deploy
 ```
---path: Specify a path the wepapp will use
+--path: Specify a path the webapp will use
 --war: Add the spcified path (directory or war) as a webapp (if no path has been specified, it will be the root webapp)
 ```
 
