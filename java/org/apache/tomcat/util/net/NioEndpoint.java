@@ -719,8 +719,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     // If is important to cancel the key first, otherwise a deadlock may occur between the
                     // poller select and the socket channel close which would cancel the key
                     // This workaround is not needed on Java 11+
-                    // TODO: verify, if not fixed in Java 11+ then 14+ is needed, see BZ 64007
-                    // TODO: the cancelledKey method can be removed with Java 11 as minimum
                     if (sk != null) {
                         sk.attach(null);
                         if (sk.isValid()) {
