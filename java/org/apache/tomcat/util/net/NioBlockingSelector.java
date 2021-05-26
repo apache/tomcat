@@ -250,7 +250,9 @@ public class NioBlockingSelector {
         }
 
         public void wakeup() {
-            if (wakeupCounter.addAndGet(1)==0) selector.wakeup();
+            if (wakeupCounter.addAndGet(1)==0) {
+                selector.wakeup();
+            }
         }
 
         public void cancel(SelectionKey sk, NioSocketWrapper key, int ops){
@@ -391,15 +393,17 @@ public class NioBlockingSelector {
                     // Cancels all remaining keys
                     selector.selectNow();
                 } catch (Exception ignore) {
-                    if (log.isDebugEnabled())
+                    if (log.isDebugEnabled()) {
                         log.debug("", ignore);
+                    }
                 }
             }
             try {
                 selector.close();
             } catch (Exception ignore) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("", ignore);
+                }
             }
         }
 

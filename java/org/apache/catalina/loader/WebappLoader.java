@@ -497,8 +497,9 @@ public class WebappLoader extends LifecycleMBeanBase
     public void propertyChange(PropertyChangeEvent event) {
 
         // Validate the source of this event
-        if (!(event.getSource() instanceof Context))
+        if (!(event.getSource() instanceof Context)) {
             return;
+        }
 
         // Process a relevant property change
         if (event.getPropertyName().equals("reloadable")) {

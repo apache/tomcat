@@ -543,8 +543,9 @@ public class JDBCStore extends StoreBase {
                     manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
                     keys = new String[0];
                     // Close the connection so that it gets reopened next time
-                    if (dbConnection != null)
+                    if (dbConnection != null) {
                         close(dbConnection);
+                    }
                 } finally {
                     release(_conn);
                 }
@@ -594,8 +595,9 @@ public class JDBCStore extends StoreBase {
                     }
                 } catch (SQLException e) {
                     manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
+                    if (dbConnection != null) {
                         close(dbConnection);
+                    }
                 } finally {
                     release(_conn);
                 }
@@ -662,8 +664,9 @@ public class JDBCStore extends StoreBase {
                     }
                 } catch (SQLException e) {
                     contextLog.error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
+                    if (dbConnection != null) {
                         close(dbConnection);
+                    }
                 } finally {
                     context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
                     release(_conn);
@@ -702,8 +705,9 @@ public class JDBCStore extends StoreBase {
                     numberOfTries = 0;
                 } catch (SQLException e) {
                     manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
+                    if (dbConnection != null) {
                         close(dbConnection);
+                    }
                 } finally {
                     release(_conn);
                 }
@@ -767,8 +771,9 @@ public class JDBCStore extends StoreBase {
                     numberOfTries = 0;
                 } catch (SQLException e) {
                     manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
+                    if (dbConnection != null) {
                         close(dbConnection);
+                    }
                 } finally {
                     release(_conn);
                 }
@@ -832,8 +837,9 @@ public class JDBCStore extends StoreBase {
                     }
                 } catch (SQLException e) {
                     manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
+                    if (dbConnection != null) {
                         close(dbConnection);
+                    }
                 } catch (IOException e) {
                     // Ignore
                 } finally {
@@ -889,8 +895,9 @@ public class JDBCStore extends StoreBase {
     protected Connection open() throws SQLException {
 
         // Do nothing if there is a database connection already open
-        if (dbConnection != null)
+        if (dbConnection != null) {
             return dbConnection;
+        }
 
         if (dataSourceName != null && dataSource == null) {
             org.apache.catalina.Context context = getManager().getContext();
@@ -934,10 +941,12 @@ public class JDBCStore extends StoreBase {
 
         // Open a new connection
         Properties props = new Properties();
-        if (connectionName != null)
+        if (connectionName != null) {
             props.put("user", connectionName);
-        if (connectionPassword != null)
+        }
+        if (connectionPassword != null) {
             props.put("password", connectionPassword);
+        }
         dbConnection = driver.connect(connectionURL, props);
         if (dbConnection == null) {
             throw new SQLException(sm.getString(getStoreName() + ".connectError", connectionURL));
@@ -955,8 +964,9 @@ public class JDBCStore extends StoreBase {
     protected void close(Connection dbConnection) {
 
         // Do nothing if the database connection is already closed
-        if (dbConnection == null)
+        if (dbConnection == null) {
             return;
+        }
 
         // Close our prepared statements (if any)
         try {

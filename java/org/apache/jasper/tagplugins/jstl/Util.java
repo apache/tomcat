@@ -174,10 +174,12 @@ public class Util {
         int sessionStart;
         while ((sessionStart = u.toString().indexOf(";" + Constants.SESSION_PARAMETER_NAME + "=")) != -1) {
             int sessionEnd = u.toString().indexOf(';', sessionStart + 1);
-            if (sessionEnd == -1)
+            if (sessionEnd == -1) {
                 sessionEnd = u.toString().indexOf('?', sessionStart + 1);
-            if (sessionEnd == -1) // still
+            }
+            if (sessionEnd == -1) {
                 sessionEnd = u.length();
+            }
             u.delete(sessionStart, sessionEnd);
         }
         return u.toString();

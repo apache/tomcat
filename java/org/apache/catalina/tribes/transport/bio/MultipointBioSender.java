@@ -50,11 +50,15 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
             try {
                 senders[i].sendMessage(data,(msg.getOptions()&Channel.SEND_OPTIONS_USE_ACK)==Channel.SEND_OPTIONS_USE_ACK);
             } catch (Exception x) {
-                if (cx == null) cx = new ChannelException(x);
+                if (cx == null) {
+                    cx = new ChannelException(x);
+                }
                 cx.addFaultyMember(destination[i],x);
             }
         }
-        if (cx!=null ) throw cx;
+        if (cx!=null ) {
+            throw cx;
+        }
     }
 
 
@@ -72,15 +76,22 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
                     bioSenders.put(destination[i], sender);
                 }
                 result[i] = sender;
-                if (!result[i].isConnected() ) result[i].connect();
+                if (!result[i].isConnected() ) {
+                    result[i].connect();
+                }
                 result[i].keepalive();
             }catch (Exception x ) {
-                if ( cx== null ) cx = new ChannelException(x);
+                if ( cx== null ) {
+                    cx = new ChannelException(x);
+                }
                 cx.addFaultyMember(destination[i],x);
             }
         }
-        if ( cx!=null ) throw cx;
-        else return result;
+        if ( cx!=null ) {
+            throw cx;
+        } else {
+            return result;
+        }
     }
 
     @Override
@@ -99,12 +110,16 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
                 BioSender sender = bioSenders.get(mbr);
                 sender.disconnect();
             }catch ( Exception e ) {
-                if ( x == null ) x = new ChannelException(e);
+                if ( x == null ) {
+                    x = new ChannelException(e);
+                }
                 x.addFaultyMember(mbr,e);
             }
             bioSenders.remove(mbr);
         }
-        if ( x != null ) throw x;
+        if ( x != null ) {
+            throw x;
+        }
     }
 
     @Override
@@ -118,7 +133,9 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     public void remove(Member member) {
         //disconnect senders
         BioSender sender = bioSenders.remove(member);
-        if ( sender != null ) sender.disconnect();
+        if ( sender != null ) {
+            sender.disconnect();
+        }
     }
 
 

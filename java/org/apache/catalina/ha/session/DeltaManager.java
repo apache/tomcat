@@ -539,7 +539,9 @@ public class DeltaManager extends ClusterManagerBase{
     protected void changeSessionId(Session session, boolean notify) {
         String orgSessionID = session.getId();
         super.changeSessionId(session);
-        if (notify) sendChangeSessionId(session.getId(), orgSessionID);
+        if (notify) {
+            sendChangeSessionId(session.getId(), orgSessionID);
+        }
     }
 
     protected String rotateSessionId(Session session, boolean notify) {

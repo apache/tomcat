@@ -213,7 +213,10 @@ public class NioSelectorPool {
         } finally {
             if (key != null) {
                 key.cancel();
-                if (selector != null) selector.selectNow();//removes the key from this selector
+                if (selector != null)
+                 {
+                    selector.selectNow();//removes the key from this selector
+                }
             }
         }
         return written;
@@ -254,7 +257,10 @@ public class NioSelectorPool {
                         break;
                     }
                     read += cnt;
-                    if (cnt > 0) continue; //read some more
+                    if (cnt > 0)
+                     {
+                        continue; //read some more
+                    }
                     if (cnt == 0 && read > 0) {
                         break; //we are done reading
                     }
