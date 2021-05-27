@@ -631,17 +631,17 @@ public class TestUtf8 {
 
         if ((flags & REPLACE_MISSING1) != 0) {
             expected = expected.substring(0, 1) +
-                    expected.substring(2, expected.length());
+                    expected.substring(2);
         }
 
         if ((flags & REPLACE_MISSING2) != 0) {
             expected = expected.substring(0, 1) +
-                    expected.substring(3, expected.length());
+                    expected.substring(3);
         }
 
         if ((flags & REPLACE_MISSING4) != 0) {
             expected = expected.substring(0, 1) +
-                    expected.substring(5, expected.length());
+                    expected.substring(5);
         }
 
         Assert.assertEquals(testCase.description, expected, cb.toString());

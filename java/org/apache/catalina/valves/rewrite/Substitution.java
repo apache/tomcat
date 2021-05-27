@@ -143,7 +143,7 @@ public class Substitution {
             if (percentPos == -1 && dollarPos == -1 && backslashPos == -1) {
                 // Static text
                 StaticElement newElement = new StaticElement();
-                newElement.value = sub.substring(pos, sub.length());
+                newElement.value = sub.substring(pos);
                 pos = sub.length();
                 elements.add(newElement);
             } else if (isFirstPos(backslashPos, dollarPos, percentPos)) {
