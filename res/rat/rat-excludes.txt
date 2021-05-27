@@ -73,6 +73,7 @@ output/deployer/deployer-howto.html
 output/dist/webapps/docs/*/package-list
 output/dist/webapps/docs/*/script.js
 
+output/dist/src/test/webapp/404.html
 output/dist/src/test/webapp/index.html.br
 output/dist/src/test/webapp/bug49nnn/bug49464-cp1252.txt
 output/dist/src/test/webapp/bug49nnn/bug49464-ibm850.txt
@@ -85,6 +86,7 @@ output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
 output/dist/src/test/webresources/dir1/d1/d1-f1.txt
 output/dist/src/test/webresources/dir1/d2/d2-f1.txt
 output/dist/src/test/webresources/dir1/*.txt
+test/webapp/404.html
 test/webapp/index.html.br
 test/webapp/bug49nnn/bug49464-cp1252.txt
 test/webapp/bug49nnn/bug49464-ibm850.txt
