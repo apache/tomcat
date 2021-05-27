@@ -174,6 +174,9 @@
         Add back simplification of NIO block read and write, now better
         validated in Tomcat 10. (remm)
       </update>
+      <fix>
+        Optimize NIO selector handling for Java 11. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
