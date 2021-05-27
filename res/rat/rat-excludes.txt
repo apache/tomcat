@@ -152,6 +152,7 @@ output/classes/jakarta/servlet/resources/javaee_web_services_client_1_2.xsd
 output/classes/jakarta/servlet/resources/javaee_web_services_client_1_3.xsd
 output/classes/jakarta/servlet/resources/javaee_web_services_client_1_4.xsd
 output/classes/jakarta/servlet/resources/jakartaee_web_services_client_1_4.xsd
+output/classes/jakarta/servlet/resources/jakartaee_web_services_client_2_0.xsd
 output/classes/jakarta/servlet/resources/jsp_2_2.xsd
 output/classes/jakarta/servlet/resources/jsp_2_3.xsd
 output/classes/jakarta/servlet/resources/jsp_3_0.xsd
@@ -162,6 +163,7 @@ output/classes/jakarta/servlet/resources/web-app_5_0.xsd
 output/classes/jakarta/servlet/resources/web-common_3_0.xsd
 output/classes/jakarta/servlet/resources/web-common_3_1.xsd
 output/classes/jakarta/servlet/resources/web-common_4_0.xsd
+output/classes/jakarta/servlet/resources/web-common_5_0.xsd
 output/classes/jakarta/servlet/resources/web-fragment_3_0.xsd
 output/classes/jakarta/servlet/resources/web-fragment_3_1.xsd
 output/classes/jakarta/servlet/resources/web-fragment_4_0.xsd
