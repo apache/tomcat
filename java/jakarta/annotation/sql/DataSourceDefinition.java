@@ -117,5 +117,4 @@ public @interface DataSourceDefinition {
      * @return the login timeout
      */
     int loginTimeout() default 0;
-
 }
