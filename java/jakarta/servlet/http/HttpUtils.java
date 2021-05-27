@@ -99,7 +99,7 @@ public class HttpUtils {
                 throw new IllegalArgumentException();
             }
             String key = parseName(pair.substring(0, pos), sb);
-            String val = parseName(pair.substring(pos+1, pair.length()), sb);
+            String val = parseName(pair.substring(pos+1), sb);
             if (ht.containsKey(key)) {
                 String oldVals[] = ht.get(key);
                 valArray = Arrays.copyOf(oldVals, oldVals.length + 1);

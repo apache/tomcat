@@ -638,7 +638,7 @@ public class JspUtil {
         InputStream in = null;
 
         if (jar != null) {
-            String jarEntryName = fname.substring(1, fname.length());
+            String jarEntryName = fname.substring(1);
             in = jar.getInputStream(jarEntryName);
         } else {
             in = ctxt.getResourceAsStream(fname);
@@ -656,7 +656,7 @@ public class JspUtil {
         throws IOException {
         InputSource source;
         if (jar != null) {
-            String jarEntryName = fname.substring(1, fname.length());
+            String jarEntryName = fname.substring(1);
             source = new InputSource(jar.getInputStream(jarEntryName));
             source.setSystemId(jar.getURL(jarEntryName));
         } else {
