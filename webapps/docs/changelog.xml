@@ -170,6 +170,10 @@
       <update>
         Simplify AprEndpoint socket bind for all platforms. (michaelo)
       </update>
+      <update>
+        Add back simplification of NIO block read and write, now better
+        validated in Tomcat 10. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

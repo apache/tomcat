@@ -73,9 +73,7 @@ public class SecureNioChannel extends NioChannel {
 
     private final Map<String,List<String>> additionalTlsAttributes = new HashMap<>();
 
-    protected NioSelectorPool pool;
-
-    public SecureNioChannel(SocketBufferHandler bufHandler, NioSelectorPool pool, NioEndpoint endpoint) {
+    public SecureNioChannel(SocketBufferHandler bufHandler, NioEndpoint endpoint) {
         super(bufHandler);
 
         // Create the network buffers (these hold the encrypted data).
@@ -87,8 +85,6 @@ public class SecureNioChannel extends NioChannel {
             netOutBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
         }
 
-        // selector pool for blocking operations
-        this.pool = pool;
         this.endpoint = endpoint;
     }
 
@@ -115,28 +111,6 @@ public class SecureNioChannel extends NioChannel {
 //===========================================================================================
 //                  NIO SSL METHODS
 //===========================================================================================
-
-    /**
-     * Flush the channel.
-     *
-     * @param block     Should a blocking write be used?
-     * @param s         The selector to use for blocking, if null then a busy
-     *                  write will be initiated
-     * @param timeout   The timeout for this write operation in milliseconds,
-     *                  -1 means no timeout
-     * @return <code>true</code> if the network buffer has been flushed out and
-     *         is empty else <code>false</code>
-     * @throws IOException If an I/O error occurs during the operation
-     */
-    @Override
-    public boolean flush(boolean block, Selector s, long timeout) throws IOException {
-        if (!block) {
-            flush(netOutBuffer);
-        } else {
-            pool.write(netOutBuffer, this, s, timeout);
-        }
-        return !netOutBuffer.hasRemaining();
-    }
 
     /**
      * Flushes the buffer to the network, non blocking
