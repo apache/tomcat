@@ -286,8 +286,9 @@ public class ResourceAttributes implements Attributes {
         this.collection = collection;
         if (attributes != null) {
             String value = "";
-            if (collection)
-                value = COLLECTION_TYPE;
+            if (collection) {
+              value = COLLECTION_TYPE;
+            }
             attributes.put(TYPE, value);
         }
     }
@@ -299,8 +300,9 @@ public class ResourceAttributes implements Attributes {
      * @return content length value
      */
     public long getContentLength() {
-        if (contentLength != -1L)
-            return contentLength;
+        if (contentLength != -1L) {
+          return contentLength;
+        }
         if (attributes != null) {
             Attribute attribute = attributes.get(CONTENT_LENGTH);
             if (attribute != null) {
@@ -331,8 +333,9 @@ public class ResourceAttributes implements Attributes {
      */
     public void setContentLength(long contentLength) {
         this.contentLength = contentLength;
-        if (attributes != null)
-            attributes.put(CONTENT_LENGTH, Long.valueOf(contentLength));
+        if (attributes != null) {
+          attributes.put(CONTENT_LENGTH, Long.valueOf(contentLength));
+        }
     }
 
 
@@ -342,10 +345,12 @@ public class ResourceAttributes implements Attributes {
      * @return creation time value
      */
     public long getCreation() {
-        if (creation != -1L)
-            return creation;
-        if (creationDate != null)
-            return creationDate.getTime();
+        if (creation != -1L) {
+          return creation;
+        }
+        if (creationDate != null) {
+          return creationDate.getTime();
+        }
         if (attributes != null) {
             Attribute attribute = attributes.get(CREATION_DATE);
             if (attribute != null) {
@@ -391,8 +396,9 @@ public class ResourceAttributes implements Attributes {
     public void setCreation(long creation) {
         this.creation = creation;
         this.creationDate = null;
-        if (attributes != null)
-            attributes.put(CREATION_DATE, new Date(creation));
+        if (attributes != null) {
+          attributes.put(CREATION_DATE, new Date(creation));
+        }
     }
 
 
@@ -402,8 +408,9 @@ public class ResourceAttributes implements Attributes {
      * @return Creation date value
      */
     public Date getCreationDate() {
-        if (creationDate != null)
-            return creationDate;
+        if (creationDate != null) {
+          return creationDate;
+        }
         if (creation != -1L) {
             creationDate = new Date(creation);
             return creationDate;
@@ -452,8 +459,9 @@ public class ResourceAttributes implements Attributes {
     public void setCreationDate(Date creationDate) {
         this.creation = creationDate.getTime();
         this.creationDate = creationDate;
-        if (attributes != null)
-            attributes.put(CREATION_DATE, creationDate);
+        if (attributes != null) {
+          attributes.put(CREATION_DATE, creationDate);
+        }
     }
 
 
@@ -463,10 +471,12 @@ public class ResourceAttributes implements Attributes {
      * @return lastModified time value
      */
     public long getLastModified() {
-        if (lastModified != -1L)
-            return lastModified;
-        if (lastModifiedDate != null)
-            return lastModifiedDate.getTime();
+        if (lastModified != -1L) {
+          return lastModified;
+        }
+        if (lastModifiedDate != null) {
+          return lastModifiedDate.getTime();
+        }
         if (attributes != null) {
             Attribute attribute = attributes.get(LAST_MODIFIED);
             if (attribute != null) {
@@ -510,8 +520,9 @@ public class ResourceAttributes implements Attributes {
     public void setLastModified(long lastModified) {
         this.lastModified = lastModified;
         this.lastModifiedDate = null;
-        if (attributes != null)
-            attributes.put(LAST_MODIFIED, new Date(lastModified));
+        if (attributes != null) {
+          attributes.put(LAST_MODIFIED, new Date(lastModified));
+        }
     }
 
 
@@ -521,8 +532,9 @@ public class ResourceAttributes implements Attributes {
      * @return LastModified date value
      */
     public Date getLastModifiedDate() {
-        if (lastModifiedDate != null)
-            return lastModifiedDate;
+        if (lastModifiedDate != null) {
+          return lastModifiedDate;
+        }
         if (lastModified != -1L) {
             lastModifiedDate = new Date(lastModified);
             return lastModifiedDate;
@@ -573,8 +585,9 @@ public class ResourceAttributes implements Attributes {
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModified = lastModifiedDate.getTime();
         this.lastModifiedDate = lastModifiedDate;
-        if (attributes != null)
-            attributes.put(LAST_MODIFIED, lastModifiedDate);
+        if (attributes != null) {
+          attributes.put(LAST_MODIFIED, lastModifiedDate);
+        }
     }
 
 
@@ -582,8 +595,9 @@ public class ResourceAttributes implements Attributes {
      * @return Returns the lastModifiedHttp.
      */
     public String getLastModifiedHttp() {
-        if (lastModifiedHttp != null)
-            return lastModifiedHttp;
+        if (lastModifiedHttp != null) {
+          return lastModifiedHttp;
+        }
         Date modifiedDate = getLastModifiedDate();
         if (modifiedDate == null) {
             modifiedDate = getCreationDate();
@@ -628,8 +642,9 @@ public class ResourceAttributes implements Attributes {
      * @return Name value
      */
     public String getName() {
-        if (name != null)
-            return name;
+        if (name != null) {
+          return name;
+        }
         if (attributes != null) {
             Attribute attribute = attributes.get(NAME);
             if (attribute != null) {
@@ -651,8 +666,9 @@ public class ResourceAttributes implements Attributes {
      */
     public void setName(String name) {
         this.name = name;
-        if (attributes != null)
-            attributes.put(NAME, name);
+        if (attributes != null) {
+          attributes.put(NAME, name);
+        }
     }
 
 
@@ -674,8 +690,9 @@ public class ResourceAttributes implements Attributes {
             }
         }
         if (result == null) {
-            if (collection)
-                result = COLLECTION_TYPE;
+            if (collection) {
+              result = COLLECTION_TYPE;
+            }
         }
         return result;
     }
@@ -688,8 +705,9 @@ public class ResourceAttributes implements Attributes {
      */
     public void setResourceType(String resourceType) {
         collection = resourceType.equals(COLLECTION_TYPE);
-        if (attributes != null)
-            attributes.put(TYPE, resourceType);
+        if (attributes != null) {
+          attributes.put(TYPE, resourceType);
+        }
     }
 
 
@@ -736,8 +754,9 @@ public class ResourceAttributes implements Attributes {
      */
     public void setETag(String eTag) {
         this.strongETag = eTag;
-        if (attributes != null)
-            attributes.put(ETAG, eTag);
+        if (attributes != null) {
+          attributes.put(ETAG, eTag);
+        }
     }
 
 
@@ -764,47 +783,69 @@ public class ResourceAttributes implements Attributes {
         if (attributes == null) {
             if (attrID.equals(CREATION_DATE)) {
                 Date creationDate = getCreationDate();
-                if (creationDate == null) return null;
+                if (creationDate == null) {
+                  return null;
+                }
                 return new BasicAttribute(CREATION_DATE, creationDate);
             } else if (attrID.equals(ALTERNATE_CREATION_DATE)) {
                 Date creationDate = getCreationDate();
-                if (creationDate == null) return null;
+                if (creationDate == null) {
+                  return null;
+                }
                 return new BasicAttribute(ALTERNATE_CREATION_DATE, creationDate);
             } else if (attrID.equals(LAST_MODIFIED)) {
                 Date lastModifiedDate = getLastModifiedDate();
-                if (lastModifiedDate == null) return null;
+                if (lastModifiedDate == null) {
+                  return null;
+                }
                 return new BasicAttribute(LAST_MODIFIED, lastModifiedDate);
             } else if (attrID.equals(ALTERNATE_LAST_MODIFIED)) {
                 Date lastModifiedDate = getLastModifiedDate();
-                if (lastModifiedDate == null) return null;
+                if (lastModifiedDate == null) {
+                  return null;
+                }
                 return new BasicAttribute(ALTERNATE_LAST_MODIFIED, lastModifiedDate);
             } else if (attrID.equals(NAME)) {
                 String name = getName();
-                if (name == null) return null;
+                if (name == null) {
+                  return null;
+                }
                 return new BasicAttribute(NAME, name);
             } else if (attrID.equals(TYPE)) {
                 String resourceType = getResourceType();
-                if (resourceType == null) return null;
+                if (resourceType == null) {
+                  return null;
+                }
                 return new BasicAttribute(TYPE, resourceType);
             } else if (attrID.equals(ALTERNATE_TYPE)) {
                 String resourceType = getResourceType();
-                if (resourceType == null) return null;
+                if (resourceType == null) {
+                  return null;
+                }
                 return new BasicAttribute(ALTERNATE_TYPE, resourceType);
             } else if (attrID.equals(CONTENT_LENGTH)) {
                 long contentLength = getContentLength();
-                if (contentLength < 0) return null;
+                if (contentLength < 0) {
+                  return null;
+                }
                 return new BasicAttribute(CONTENT_LENGTH, Long.valueOf(contentLength));
             } else if (attrID.equals(ALTERNATE_CONTENT_LENGTH)) {
                 long contentLength = getContentLength();
-                if (contentLength < 0) return null;
+                if (contentLength < 0) {
+                  return null;
+                }
                 return new BasicAttribute(ALTERNATE_CONTENT_LENGTH, Long.valueOf(contentLength));
             } else if (attrID.equals(ETAG)) {
                 String etag = getETag();
-                if (etag == null) return null;
+                if (etag == null) {
+                  return null;
+                }
                 return new BasicAttribute(ETAG, etag);
             } else if (attrID.equals(ALTERNATE_ETAG)) {
                 String etag = getETag();
-                if (etag == null) return null;
+                if (etag == null) {
+                  return null;
+                }
                 return new BasicAttribute(ALTERNATE_ETAG, etag);
             }
         } else {
@@ -954,12 +995,24 @@ public class ResourceAttributes implements Attributes {
     public int size() {
         if (attributes == null) {
             int size = 0;
-            if (getCreationDate() != null) size += 2;
-            if (getLastModifiedDate() != null) size += 2;
-            if (getName() != null) size++;
-            if (getResourceType() != null) size += 2;
-            if (getContentLength() >= 0) size += 2;
-            if (getETag() != null) size += 2;
+            if (getCreationDate() != null) {
+              size += 2;
+            }
+            if (getLastModifiedDate() != null) {
+              size += 2;
+            }
+            if (getName() != null) {
+              size++;
+            }
+            if (getResourceType() != null) {
+              size += 2;
+            }
+            if (getContentLength() >= 0) {
+              size += 2;
+            }
+            if (getETag() != null) {
+              size += 2;
+            }
             return size;
         } else {
             return attributes.size();

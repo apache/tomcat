@@ -37,11 +37,19 @@ public class Arrays {
         Charset.forName("ISO-8859-1");
 
     public static boolean contains(byte[] source, int srcoffset, byte[] key, int keyoffset, int length) {
-        if ( srcoffset < 0 || srcoffset >= source.length) throw new ArrayIndexOutOfBoundsException("srcoffset is out of bounds.");
-        if ( keyoffset < 0 || keyoffset >= key.length) throw new ArrayIndexOutOfBoundsException("keyoffset is out of bounds.");
-        if ( length > (key.length-keyoffset) ) throw new ArrayIndexOutOfBoundsException("not enough data elements in the key, length is out of bounds.");
+        if ( srcoffset < 0 || srcoffset >= source.length) {
+          throw new ArrayIndexOutOfBoundsException("srcoffset is out of bounds.");
+        }
+        if ( keyoffset < 0 || keyoffset >= key.length) {
+          throw new ArrayIndexOutOfBoundsException("keyoffset is out of bounds.");
+        }
+        if ( length > (key.length-keyoffset) ) {
+          throw new ArrayIndexOutOfBoundsException("not enough data elements in the key, length is out of bounds.");
+        }
         //we don't have enough data to validate it
-        if ( length > (source.length-srcoffset) ) return false;
+        if ( length > (source.length-srcoffset) ) {
+          return false;
+        }
         boolean match = true;
         int pos = keyoffset;
         for ( int i=srcoffset; match && i<length; i++ ) {
@@ -112,7 +120,9 @@ public class Arrays {
 
     public static int add(int[] data) {
         int result = 0;
-        for (int datum : data) result += datum;
+        for (int datum : data) {
+          result += datum;
+        }
         return result;
     }
 
@@ -130,7 +140,11 @@ public class Arrays {
 
     public static boolean equals(Object[] o1, Object[] o2) {
         boolean result = o1.length == o2.length;
-        if ( result ) for (int i=0; i<o1.length && result; i++ ) result = o1[i].equals(o2[i]);
+        if ( result ) {
+          for (int i=0; i<o1.length && result; i++ ) {
+            result = o1[i].equals(o2[i]);
+          }
+        }
         return result;
     }
 
@@ -144,7 +158,11 @@ public class Arrays {
         AbsoluteOrder.absoluteOrder(m1);
         AbsoluteOrder.absoluteOrder(m2);
         ArrayList<Member> list = new ArrayList<Member>(java.util.Arrays.asList(m1));
-        for (Member member : m2) if (!list.contains(member)) list.add(member);
+        for (Member member : m2) {
+          if (!list.contains(member)) {
+            list.add(member);
+          }
+        }
         Member[] result = new Member[list.size()];
         list.toArray(result);
         AbsoluteOrder.absoluteOrder(result);
@@ -152,15 +170,21 @@ public class Arrays {
     }
 
     public static void fill(Membership mbrship, Member[] m) {
-        for (Member member : m) mbrship.addMember((MemberImpl) member);
+        for (Member member : m) {
+          mbrship.addMember((MemberImpl) member);
+        }
     }
 
     public static Member[] diff(Membership complete, Membership local, Member ignore) {
         ArrayList<Member> result = new ArrayList<Member>();
         Member[] comp = complete.getMembers();
         for (Member member : comp) {
-            if (ignore != null && ignore.equals(member)) continue;
-            if (local.getMember(member) == null) result.add(member);
+            if (ignore != null && ignore.equals(member)) {
+              continue;
+            }
+            if (local.getMember(member) == null) {
+              result.add(member);
+            }
         }
         return result.toArray(new MemberImpl[0]);
     }
@@ -172,27 +196,35 @@ public class Arrays {
     public static Member[] extract(Member[] all, Member[] remove) {
         List<Member> alist = java.util.Arrays.asList(all);
         ArrayList<Member> list = new ArrayList<Member>(alist);
-        for (Member member : remove) list.remove(member);
+        for (Member member : remove) {
+          list.remove(member);
+        }
         return list.toArray(new Member[0]);
     }
 
     public static int indexOf(Member member, Member[] members) {
         int result = -1;
-        for (int i=0; (result==-1) && (i<members.length); i++ )
-            if ( member.equals(members[i]) ) result = i;
+        for (int i=0; (result==-1) && (i<members.length); i++ ) {
+          if ( member.equals(members[i]) ) {
+            result = i;
+          }
+        }
         return result;
     }
 
     public static int nextIndex(Member member, Member[] members) {
         int idx = indexOf(member,members)+1;
-        if (idx >= members.length ) idx = ((members.length>0)?0:-1);
+        if (idx >= members.length ) {
+          idx = ((members.length>0)?0:-1);
+        }
 
         return idx;
     }
 
     public static int hashCode(byte a[]) {
-        if (a == null)
-            return 0;
+        if (a == null) {
+          return 0;
+        }
 
         int result = 1;
         for (byte element : a) {
@@ -202,11 +234,17 @@ public class Arrays {
     }
 
     public static byte[] fromString(String value) {
-        if ( value == null ) return null;
-        if ( !value.startsWith("{") ) throw new RuntimeException("byte arrays must be represented as {1,3,4,5,6}");
+        if ( value == null ) {
+          return null;
+        }
+        if ( !value.startsWith("{") ) {
+          throw new RuntimeException("byte arrays must be represented as {1,3,4,5,6}");
+        }
         StringTokenizer t = new StringTokenizer(value,"{,}",false);
         byte[] result = new byte[t.countTokens()];
-        for (int i=0; i<result.length; i++ ) result[i] = Byte.parseByte(t.nextToken());
+        for (int i=0; i<result.length; i++ ) {
+          result[i] = Byte.parseByte(t.nextToken());
+        }
         return result;
     }
 

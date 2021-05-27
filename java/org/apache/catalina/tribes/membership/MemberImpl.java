@@ -224,7 +224,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * @return byte[]
      */
     public byte[] getData(boolean getalive, boolean reset)  {
-        if ( reset ) dataPkg = null;
+        if ( reset ) {
+          dataPkg = null;
+        }
         //look in cache first
         if ( dataPkg!=null ) {
             if ( getalive ) {
@@ -467,13 +469,15 @@ public class MemberImpl implements Member, java.io.Externalizable {
     }
 
     public String getHostname() {
-        if ( this.hostname != null ) return hostname;
-        else {
+        if ( this.hostname != null ) {
+          return hostname;
+        } else {
             try {
-                if (DO_DNS_LOOKUPS)
-                    this.hostname = java.net.InetAddress.getByAddress(host).getHostName();
-                else
-                    this.hostname = org.apache.catalina.tribes.util.Arrays.toString(host,0,host.length,true);
+                if (DO_DNS_LOOKUPS) {
+                  this.hostname = java.net.InetAddress.getByAddress(host).getHostName();
+                } else {
+                  this.hostname = org.apache.catalina.tribes.util.Arrays.toString(host,0,host.length,true);
+                }
                 return this.hostname;
             }catch ( IOException x ) {
                 throw new RuntimeException("Unable to parse hostname.",x);
@@ -592,9 +596,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
             return Arrays.equals(this.getHost(),((MemberImpl)o).getHost()) &&
                    this.getPort() == ((MemberImpl)o).getPort() &&
                    Arrays.equals(this.getUniqueId(),((MemberImpl)o).getUniqueId());
+        } else {
+          return false;
         }
-        else
-            return false;
     }
 
     public void setHost(byte[] host) {

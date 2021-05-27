@@ -63,7 +63,9 @@ public class SocketReceive {
                 printStats(start, mb, count, df, total);
                 System.exit(1);
             }
-            if ( bytes.intValue() != len ) bytes = new BigDecimal((double)len);
+            if ( bytes.intValue() != len ) {
+              bytes = new BigDecimal((double)len);
+            }
             total = total.add(bytes);
             mb += ( (double) len) / 1024 / 1024;
             if ( ((++count) % 10000) == 0 ) {

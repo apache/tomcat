@@ -539,8 +539,9 @@ public class JDBCStore extends StoreBase {
                     manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
                     keys = new String[0];
                     // Close the connection so that it gets reopened next time
-                    if (dbConnection != null)
-                        close(dbConnection);
+                    if (dbConnection != null) {
+                      close(dbConnection);
+                    }
                 } finally {
                     release(_conn);
                 }
@@ -591,12 +592,14 @@ public class JDBCStore extends StoreBase {
                     numberOfTries = 0;
                 } catch (SQLException e) {
                     manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
-                        close(dbConnection);
+                    if (dbConnection != null) {
+                      close(dbConnection);
+                    }
                 } finally {
                     try {
-                        if (rst != null)
-                            rst.close();
+                        if (rst != null) {
+                          rst.close();
+                        }
                     } catch (SQLException e) {
                         // Ignore
                     }
@@ -674,8 +677,9 @@ public class JDBCStore extends StoreBase {
                     numberOfTries = 0;
                 } catch (SQLException e) {
                     containerLog.error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
-                        close(dbConnection);
+                    if (dbConnection != null) {
+                      close(dbConnection);
+                    }
                 } finally {
                     try {
                         if (rst != null) {
@@ -728,8 +732,9 @@ public class JDBCStore extends StoreBase {
                     numberOfTries = 0;
                 } catch (SQLException e) {
                     manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
-                        close(dbConnection);
+                    if (dbConnection != null) {
+                      close(dbConnection);
+                    }
                 } finally {
                     release(_conn);
                 }
@@ -793,8 +798,9 @@ public class JDBCStore extends StoreBase {
                     numberOfTries = 0;
                 } catch (SQLException e) {
                     manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
-                        close(dbConnection);
+                    if (dbConnection != null) {
+                      close(dbConnection);
+                    }
                 } finally {
                     release(_conn);
                 }
@@ -862,8 +868,9 @@ public class JDBCStore extends StoreBase {
                     numberOfTries = 0;
                 } catch (SQLException e) {
                     manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
-                    if (dbConnection != null)
-                        close(dbConnection);
+                    if (dbConnection != null) {
+                      close(dbConnection);
+                    }
                 } catch (IOException e) {
                     // Ignore
                 } finally {
@@ -929,8 +936,9 @@ public class JDBCStore extends StoreBase {
     protected Connection open() throws SQLException {
 
         // Do nothing if there is a database connection already open
-        if (dbConnection != null)
-            return dbConnection;
+        if (dbConnection != null) {
+          return dbConnection;
+        }
 
         if (dataSourceName != null && dataSource == null) {
             Context initCtx;
@@ -971,10 +979,12 @@ public class JDBCStore extends StoreBase {
 
         // Open a new connection
         Properties props = new Properties();
-        if (connectionName != null)
-            props.put("user", connectionName);
-        if (connectionPassword != null)
-            props.put("password", connectionPassword);
+        if (connectionName != null) {
+          props.put("user", connectionName);
+        }
+        if (connectionPassword != null) {
+          props.put("password", connectionPassword);
+        }
         dbConnection = driver.connect(connectionURL, props);
         dbConnection.setAutoCommit(true);
         return dbConnection;
@@ -989,8 +999,9 @@ public class JDBCStore extends StoreBase {
     protected void close(Connection dbConnection) {
 
         // Do nothing if the database connection is already closed
-        if (dbConnection == null)
-            return;
+        if (dbConnection == null) {
+          return;
+        }
 
         // Close our prepared statements (if any)
         try {

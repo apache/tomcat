@@ -78,8 +78,9 @@ public class SmapGenerator {
     public synchronized void addStratum(SmapStratum stratum,
                                         boolean defaultStratum) {
         strata.add(stratum);
-        if (defaultStratum)
-            this.defaultStratum = stratum.getStratumName();
+        if (defaultStratum) {
+          this.defaultStratum = stratum.getStratumName();
+        }
     }
 
     /**
@@ -110,8 +111,9 @@ public class SmapGenerator {
 
     public synchronized String getString() {
         // check state and initialize buffer
-        if (outputFileName == null)
-            throw new IllegalStateException();
+        if (outputFileName == null) {
+          throw new IllegalStateException();
+        }
         StringBuilder out = new StringBuilder();
 
         // start the SMAP

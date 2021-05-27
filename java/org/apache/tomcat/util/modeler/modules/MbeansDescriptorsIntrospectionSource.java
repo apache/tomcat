@@ -81,11 +81,15 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     }
 
     public void execute() throws Exception {
-        if( registry==null ) registry=Registry.getRegistry(null, null);
+        if( registry==null ) {
+          registry=Registry.getRegistry(null, null);
+        }
         try {
             ManagedBean managed = createManagedBean(registry, null,
                     (Class<?>)source, type);
-            if( managed==null ) return;
+            if( managed==null ) {
+              return;
+            }
             managed.setName( type );
 
             registry.addManagedBean(managed);
@@ -323,26 +327,33 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                     //ai.setGetMethodObj( gm );
                     ai.setGetMethod( gm.getName());
                     Class<?> t=gm.getReturnType();
-                    if( t!=null )
-                        ai.setType( t.getName() );
+                    if( t!=null ) {
+                      ai.setType( t.getName() );
+                    }
                 }
                 Method sm = setAttMap.get(name);
                 if( sm!=null ) {
                     //ai.setSetMethodObj(sm);
                     Class<?> t = sm.getParameterTypes()[0];
-                    if( t!=null )
-                        ai.setType( t.getName());
+                    if( t!=null ) {
+                      ai.setType( t.getName());
+                    }
                     ai.setSetMethod( sm.getName());
                 }
                 ai.setDescription("Introspected attribute " + name);
-                if( log.isDebugEnabled()) log.debug("Introspected attribute " +
-                        name + " " + gm + " " + sm);
-                if( gm==null )
-                    ai.setReadable(false);
-                if( sm==null )
-                    ai.setWriteable(false);
-                if( sm!=null || gm!=null )
-                    mbean.addAttribute(ai);
+                if( log.isDebugEnabled()) {
+                  log.debug("Introspected attribute " +
+                          name + " " + gm + " " + sm);
+                }
+                if( gm==null ) {
+                  ai.setReadable(false);
+                }
+                if( sm==null ) {
+                  ai.setWriteable(false);
+                }
+                if( sm!=null || gm!=null ) {
+                  mbean.addAttribute(ai);
+                }
             }
 
             // This map is populated by iterating the methods (which end up as
@@ -367,8 +378,9 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 mbean.addOperation(op);
             }
 
-            if( log.isDebugEnabled())
-                log.debug("Setting name: " + type );
+            if( log.isDebugEnabled()) {
+              log.debug("Setting name: " + type );
+            }
             mbean.setName( type );
 
             return mbean;

@@ -93,12 +93,14 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
      * @throws LifecycleException
      */
     public void start() throws LifecycleException {
-        if (started)
-            return;
+        if (started) {
+          return;
+        }
         getCluster().addClusterListener(this);
         started = true;
-        if (log.isInfoEnabled())
-            log.info(sm.getString("jvmRoute.clusterListener.started"));
+        if (log.isInfoEnabled()) {
+          log.info(sm.getString("jvmRoute.clusterListener.started"));
+        }
     }
 
     /**
@@ -109,8 +111,9 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
     public void stop() throws LifecycleException {
         started = false;
         getCluster().removeClusterListener(this);
-        if (log.isInfoEnabled())
-            log.info(sm.getString("jvmRoute.clusterListener.stopped"));
+        if (log.isInfoEnabled()) {
+          log.info(sm.getString("jvmRoute.clusterListener.stopped"));
+        }
     }
 
     /**
@@ -124,12 +127,13 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
     public void messageReceived(ClusterMessage msg) {
         if (msg instanceof SessionIDMessage) {
             SessionIDMessage sessionmsg = (SessionIDMessage) msg;
-            if (log.isDebugEnabled())
-                log.debug(sm.getString(
-                        "jvmRoute.receiveMessage.sessionIDChanged", sessionmsg
-                                .getOrignalSessionID(), sessionmsg
-                                .getBackupSessionID(), sessionmsg
-                                .getContextName()));
+            if (log.isDebugEnabled()) {
+              log.debug(sm.getString(
+                      "jvmRoute.receiveMessage.sessionIDChanged", sessionmsg
+                              .getOrignalSessionID(), sessionmsg
+                              .getBackupSessionID(), sessionmsg
+                              .getContextName()));
+            }
             Container container = getCluster().getContainer();
             Container host = null ;
             if(container instanceof Engine) {
@@ -146,20 +150,23 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
                                 sessionmsg.getOrignalSessionID());
                         if (session != null) {
                             session.setId(sessionmsg.getBackupSessionID());
-                        } else if (log.isInfoEnabled())
-                            log.info(sm.getString("jvmRoute.lostSession",
-                                    sessionmsg.getOrignalSessionID(),
-                                    sessionmsg.getContextName()));
+                        } else if (log.isInfoEnabled()) {
+                          log.info(sm.getString("jvmRoute.lostSession",
+                                  sessionmsg.getOrignalSessionID(),
+                                  sessionmsg.getContextName()));
+                        }
                     } catch (IOException e) {
                         log.error(e);
                     }
 
-                } else if (log.isErrorEnabled())
-                    log.error(sm.getString("jvmRoute.contextNotFound",
-                            sessionmsg.getContextName(), ((StandardEngine) host
-                                    .getParent()).getJvmRoute()));
-            } else if (log.isErrorEnabled())
-                log.error(sm.getString("jvmRoute.hostNotFound", sessionmsg.getContextName()));
+                } else if (log.isErrorEnabled()) {
+                  log.error(sm.getString("jvmRoute.contextNotFound",
+                          sessionmsg.getContextName(), ((StandardEngine) host
+                                  .getParent()).getJvmRoute()));
+                }
+            } else if (log.isErrorEnabled()) {
+              log.error(sm.getString("jvmRoute.hostNotFound", sessionmsg.getContextName()));
+            }
         }
         return;
     }

@@ -1283,7 +1283,9 @@ public class WebXml {
 
     private static void appendElement(StringBuilder sb, String indent,
             String elementName, Object value) {
-        if (value == null) return;
+        if (value == null) {
+          return;
+        }
         appendElement(sb, indent, elementName, value.toString());
     }
 
@@ -1292,8 +1294,9 @@ public class WebXml {
      * Escape the 5 entities defined by XML.
      */
     private static String escapeXml(String s) {
-        if (s == null)
-            return null;
+        if (s == null) {
+          return null;
+        }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

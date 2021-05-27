@@ -136,30 +136,31 @@ public class JspConfig {
                     element = list.next();
                     String tname = element.getName();
 
-                    if ("url-pattern".equals(tname))
-                        urlPatterns.addElement( element.getBody() );
-                    else if ("page-encoding".equals(tname))
-                        pageEncoding = element.getBody();
-                    else if ("is-xml".equals(tname))
-                        isXml = element.getBody();
-                    else if ("el-ignored".equals(tname))
-                        elIgnored = element.getBody();
-                    else if ("scripting-invalid".equals(tname))
-                        scriptingInvalid = element.getBody();
-                    else if ("include-prelude".equals(tname))
-                        includePrelude.addElement(element.getBody());
-                    else if ("include-coda".equals(tname))
-                        includeCoda.addElement(element.getBody());
-                    else if ("deferred-syntax-allowed-as-literal".equals(tname))
-                        deferredSyntaxAllowedAsLiteral = element.getBody();
-                    else if ("trim-directive-whitespaces".equals(tname))
-                        trimDirectiveWhitespaces = element.getBody();
-                    else if ("default-content-type".equals(tname))
-                        defaultContentType = element.getBody();
-                    else if ("buffer".equals(tname))
-                        buffer = element.getBody();
-                    else if ("error-on-undeclared-namespace".equals(tname))
-                        errorOnUndeclaredNamespace = element.getBody();
+                    if ("url-pattern".equals(tname)) {
+                      urlPatterns.addElement( element.getBody() );
+                    } else if ("page-encoding".equals(tname)) {
+                      pageEncoding = element.getBody();
+                    } else if ("is-xml".equals(tname)) {
+                      isXml = element.getBody();
+                    } else if ("el-ignored".equals(tname)) {
+                      elIgnored = element.getBody();
+                    } else if ("scripting-invalid".equals(tname)) {
+                      scriptingInvalid = element.getBody();
+                    } else if ("include-prelude".equals(tname)) {
+                      includePrelude.addElement(element.getBody());
+                    } else if ("include-coda".equals(tname)) {
+                      includeCoda.addElement(element.getBody());
+                    } else if ("deferred-syntax-allowed-as-literal".equals(tname)) {
+                      deferredSyntaxAllowedAsLiteral = element.getBody();
+                    } else if ("trim-directive-whitespaces".equals(tname)) {
+                      trimDirectiveWhitespaces = element.getBody();
+                    } else if ("default-content-type".equals(tname)) {
+                      defaultContentType = element.getBody();
+                    } else if ("buffer".equals(tname)) {
+                      buffer = element.getBody();
+                    } else if ("error-on-undeclared-namespace".equals(tname)) {
+                      errorOnUndeclaredNamespace = element.getBody();
+                    }
                 }
 
                 if (urlPatterns.size() == 0) {

@@ -56,8 +56,9 @@ public class AttributeInfo extends FeatureInfo {
      * The name of the property getter method, if non-standard.
      */
     public String getGetMethod() {
-        if(getMethod == null)
-            getMethod = getMethodName(getName(), true, isIs());
+        if(getMethod == null) {
+          getMethod = getMethodName(getName(), true, isIs());
+        }
         return (this.getMethod);
     }
 
@@ -93,8 +94,9 @@ public class AttributeInfo extends FeatureInfo {
      * The name of the property setter method, if non-standard.
      */
     public String getSetMethod() {
-        if( setMethod == null )
-            setMethod = getMethodName(getName(), false, false);
+        if( setMethod == null ) {
+          setMethod = getMethodName(getName(), false, false);
+        }
         return (this.setMethod);
     }
 
@@ -144,12 +146,14 @@ public class AttributeInfo extends FeatureInfo {
 
         StringBuilder sb = new StringBuilder();
         if (getter) {
-            if (is)
-                sb.append("is");
-            else
-                sb.append("get");
-        } else
-            sb.append("set");
+            if (is) {
+              sb.append("is");
+            } else {
+              sb.append("get");
+            }
+        } else {
+          sb.append("set");
+        }
         sb.append(Character.toUpperCase(name.charAt(0)));
         sb.append(name.substring(1));
         return (sb.toString());

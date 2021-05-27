@@ -475,9 +475,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     @Override
     public void start() throws Exception {
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.start",
-                    getName()));
+        if (getLog().isInfoEnabled()) {
+          getLog().info(sm.getString("abstractProtocolHandler.start",
+                  getName()));
+        }
         try {
             endpoint.start();
         } catch (Exception ex) {
@@ -490,9 +491,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     @Override
     public void pause() throws Exception {
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.pause",
-                    getName()));
+        if(getLog().isInfoEnabled()) {
+          getLog().info(sm.getString("abstractProtocolHandler.pause",
+                  getName()));
+        }
         try {
             endpoint.pause();
         } catch (Exception ex) {
@@ -505,9 +507,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     @Override
     public void resume() throws Exception {
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.resume",
-                    getName()));
+        if(getLog().isInfoEnabled()) {
+          getLog().info(sm.getString("abstractProtocolHandler.resume",
+                  getName()));
+        }
         try {
             endpoint.resume();
         } catch (Exception ex) {
@@ -520,9 +523,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     @Override
     public void stop() throws Exception {
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.stop",
-                    getName()));
+        if(getLog().isInfoEnabled()) {
+          getLog().info(sm.getString("abstractProtocolHandler.stop",
+                  getName()));
+        }
         try {
             endpoint.stop();
         } catch (Exception ex) {
@@ -551,10 +555,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             Registry.getRegistry(null, null).unregisterComponent(oname);
         }
 
-        if (tpOname != null)
-            Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if (rgOname != null)
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
+        if (tpOname != null) {
+          Registry.getRegistry(null, null).unregisterComponent(tpOname);
+        }
+        if (rgOname != null) {
+          Registry.getRegistry(null, null).unregisterComponent(rgOname);
+        }
     }
 
 
@@ -895,7 +901,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     size.incrementAndGet();
                 }
             }
-            if (!result) handler.unregister(processor);
+            if (!result) {
+              handler.unregister(processor);
+            }
             return result;
         }
 

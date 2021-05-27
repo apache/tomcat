@@ -38,7 +38,9 @@ public class SocketTribesReceive {
 
     public static void main(String[] args) throws Exception {
         int size = 43800;
-        if (args.length > 0 ) try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
+        if (args.length > 0 ) {
+          try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
+        }
         XByteBuffer xbuf = new XByteBuffer(43800,true);
         ServerSocket srvSocket = new ServerSocket(9999);
         System.out.println("Listening on 9999");
@@ -67,7 +69,9 @@ public class SocketTribesReceive {
                 System.exit(1);
             }
             xbuf.append(buf,0,len);
-            if ( bytes.intValue() != len ) bytes = new BigDecimal((double)len);
+            if ( bytes.intValue() != len ) {
+              bytes = new BigDecimal((double)len);
+            }
             total = total.add(bytes);
             while ( xbuf.countPackages(true) > 0 ) {
                 xbuf.extractPackage(true);

@@ -466,8 +466,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
         // In digest auth, digests are always lower case
         String md5a1 = getDigest(username, realm);
-        if (md5a1 == null)
-            return null;
+        if (md5a1 == null) {
+          return null;
+        }
         md5a1 = md5a1.toLowerCase(Locale.ENGLISH);
         String serverDigestValue;
         if (qop == null) {
@@ -517,22 +518,26 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
     @Override
     public Principal authenticate(X509Certificate certs[]) {
 
-        if ((certs == null) || (certs.length < 1))
-            return null;
+        if ((certs == null) || (certs.length < 1)) {
+          return null;
+        }
 
         // Check the validity of each certificate in the chain
-        if (log.isDebugEnabled())
-            log.debug("Authenticating client certificate chain");
+        if (log.isDebugEnabled()) {
+          log.debug("Authenticating client certificate chain");
+        }
         if (validate) {
             for (X509Certificate cert : certs) {
-                if (log.isDebugEnabled())
-                    log.debug(" Checking validity for '" +
-                            cert.getSubjectDN().getName() + "'");
+                if (log.isDebugEnabled()) {
+                  log.debug(" Checking validity for '" +
+                          cert.getSubjectDN().getName() + "'");
+                }
                 try {
                     cert.checkValidity();
                 } catch (Exception e) {
-                    if (log.isDebugEnabled())
-                        log.debug("  Validity exception", e);
+                    if (log.isDebugEnabled()) {
+                      log.debug("  Validity exception", e);
+                    }
                     return null;
                 }
             }
@@ -690,8 +695,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
         // Are there any defined security constraints?
         SecurityConstraint constraints[] = context.findConstraints();
         if ((constraints == null) || (constraints.length == 0)) {
-            if (log.isDebugEnabled())
-                log.debug("  No applicable constraints defined");
+            if (log.isDebugEnabled()) {
+              log.debug("  No applicable constraints defined");
+            }
             return null;
         }
 
@@ -914,8 +920,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
         if(results == null) {
             // No applicable security constraint was found
-            if (log.isDebugEnabled())
-                log.debug("  No applicable constraint located");
+            if (log.isDebugEnabled()) {
+              log.debug("  No applicable constraint located");
+            }
         }
         return resultsToArray(results);
     }
@@ -953,8 +960,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
                                          Context context)
         throws IOException {
 
-        if (constraints == null || constraints.length == 0)
-            return true;
+        if (constraints == null || constraints.length == 0) {
+          return true;
+        }
 
         // Which user principal have we already authenticated?
         Principal principal = request.getPrincipal();
@@ -969,11 +977,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
                 roles = constraint.findAuthRoles();
             }
 
-            if (roles == null)
-                roles = new String[0];
+            if (roles == null) {
+              roles = new String[0];
+            }
 
-            if (log.isDebugEnabled())
-                log.debug("  Checking roles " + principal);
+            if (log.isDebugEnabled()) {
+              log.debug("  Checking roles " + principal);
+            }
 
             if (roles.length == 0 && !constraint.getAllRoles()) {
                 if(constraint.getAuthConstraint()) {
@@ -1065,23 +1075,26 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
         // Check for a role alias
         if (wrapper != null) {
             String realRole = wrapper.findSecurityReference(role);
-            if (realRole != null)
-                role = realRole;
+            if (realRole != null) {
+              role = realRole;
+            }
         }
 
         // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if ((principal == null) || (role == null) ||
-            !(principal instanceof GenericPrincipal))
-            return (false);
+            !(principal instanceof GenericPrincipal)) {
+          return (false);
+        }
 
         GenericPrincipal gp = (GenericPrincipal) principal;
         boolean result = gp.hasRole(role);
         if (log.isDebugEnabled()) {
             String name = principal.getName();
-            if (result)
-                log.debug(sm.getString("realmBase.hasRoleSuccess", name, role));
-            else
-                log.debug(sm.getString("realmBase.hasRoleFailure", name, role));
+            if (result) {
+              log.debug(sm.getString("realmBase.hasRoleSuccess", name, role));
+            } else {
+              log.debug(sm.getString("realmBase.hasRoleFailure", name, role));
+            }
         }
 
         return result;
@@ -1108,28 +1121,32 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
         // Is there a relevant user data constraint?
         if (constraints == null || constraints.length == 0) {
-            if (log.isDebugEnabled())
-                log.debug("  No applicable security constraint defined");
+            if (log.isDebugEnabled()) {
+              log.debug("  No applicable security constraint defined");
+            }
             return true;
         }
         for (SecurityConstraint constraint : constraints) {
             String userConstraint = constraint.getUserConstraint();
             if (userConstraint == null) {
-                if (log.isDebugEnabled())
-                    log.debug("  No applicable user data constraint defined");
+                if (log.isDebugEnabled()) {
+                  log.debug("  No applicable user data constraint defined");
+                }
                 return true;
             }
             if (userConstraint.equals(Constants.NONE_TRANSPORT)) {
-                if (log.isDebugEnabled())
-                    log.debug("  User data constraint has no restrictions");
+                if (log.isDebugEnabled()) {
+                  log.debug("  User data constraint has no restrictions");
+                }
                 return true;
             }
 
         }
         // Validate the request against the user data constraint
         if (request.getRequest().isSecure()) {
-            if (log.isDebugEnabled())
-                log.debug("  User data constraint already satisfied");
+            if (log.isDebugEnabled()) {
+              log.debug("  User data constraint already satisfied");
+            }
             return true;
         }
         // Initialize variables we need to determine the appropriate action
@@ -1137,8 +1154,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
         // Is redirecting disabled?
         if (redirectPort <= 0) {
-            if (log.isDebugEnabled())
-                log.debug("  SSL redirect is disabled");
+            if (log.isDebugEnabled()) {
+              log.debug("  SSL redirect is disabled");
+            }
             response.sendError
                 (HttpServletResponse.SC_FORBIDDEN,
                  request.getRequestURI());
@@ -1171,8 +1189,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
             file.append('?');
             file.append(queryString);
         }
-        if (log.isDebugEnabled())
-            log.debug("  Redirecting to " + file.toString());
+        if (log.isDebugEnabled()) {
+          log.debug("  Redirecting to " + file.toString());
+        }
         response.sendRedirect(file.toString(), transportGuaranteeRedirectStatus);
         return (false);
 
@@ -1274,8 +1293,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
     protected String digest(String credentials)  {
 
         // If no MessageDigest instance is specified, return unchanged
-        if (hasMessageDigest() == false)
-            return (credentials);
+        if (hasMessageDigest() == false) {
+          return (credentials);
+        }
 
         // Digest the user credentials and return as hexadecimal
         synchronized (this) {
@@ -1365,8 +1385,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
     protected Principal getPrincipal(X509Certificate usercert) {
         String username = x509UsernameRetriever.getUsername(usercert);
 
-        if(log.isDebugEnabled())
-            log.debug(sm.getString("realmBase.gotX509Username", username));
+        if(log.isDebugEnabled()) {
+          log.debug(sm.getString("realmBase.gotX509Username", username));
+        }
 
         return(getPrincipal(username));
     }
@@ -1607,8 +1628,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements GSSRealm {
 
     private static X509UsernameRetriever createUsernameRetriever(String className)
         throws LifecycleException {
-        if(null == className || "".equals(className.trim()))
-            return new X509SubjectDnRetriever();
+        if(null == className || "".equals(className.trim())) {
+          return new X509SubjectDnRetriever();
+        }
 
         try {
             @SuppressWarnings("unchecked")

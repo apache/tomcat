@@ -148,11 +148,15 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      * TODO Fix non blocking write properly
      */
     private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean block, boolean flip) throws IOException {
-        if ( flip ) bytebuffer.flip();
+        if ( flip ) {
+          bytebuffer.flip();
+        }
 
         int written = 0;
         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment();
-        if ( att == null ) throw new IOException("Key must be cancelled");
+        if ( att == null ) {
+          throw new IOException("Key must be cancelled");
+        }
         long writeTimeout = att.getWriteTimeout();
         Selector selector = null;
         try {
@@ -164,12 +168,19 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             written = pool.write(bytebuffer, socket, selector, writeTimeout, block);
             //make sure we are flushed
             do {
-                if (socket.flush(true,selector,writeTimeout)) break;
+                if (socket.flush(true,selector,writeTimeout)) {
+                  break;
+                }
             }while ( true );
         }finally {
-            if ( selector != null ) pool.put(selector);
+            if ( selector != null ) {
+              pool.put(selector);
+            }
         }
-        if ( block ) bytebuffer.clear(); //only clear
+        if ( block )
+         {
+          bytebuffer.clear(); //only clear
+        }
         return written;
     }
 
@@ -221,7 +232,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             offset = offset + thisTime;
         }
         NioEndpoint.KeyAttachment ka = (NioEndpoint.KeyAttachment)socket.getAttachment();
-        if ( ka!= null ) ka.access();//prevent timeouts for just doing client writes
+        if ( ka!= null )
+         {
+          ka.access();//prevent timeouts for just doing client writes
+        }
     }
 
 

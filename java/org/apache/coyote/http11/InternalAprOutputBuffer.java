@@ -141,11 +141,13 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
         }
 
-        if (finished)
-            return;
+        if (finished) {
+          return;
+        }
 
-        if (lastActiveFilter != -1)
-            activeFilters[lastActiveFilter].end();
+        if (lastActiveFilter != -1) {
+          activeFilters[lastActiveFilter].end();
+        }
 
         flushBuffer();
 
@@ -165,8 +167,9 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         throws IOException {
 
         if (!committed) {
-            if (Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0)
-                throw new IOException(sm.getString("iib.failedwrite"));
+            if (Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0) {
+              throw new IOException(sm.getString("iib.failedwrite"));
+            }
         }
 
     }

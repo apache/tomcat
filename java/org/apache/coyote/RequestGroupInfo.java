@@ -38,8 +38,9 @@ public class RequestGroupInfo {
 
     public synchronized void removeRequestProcessor( RequestInfo rp ) {
         if( rp != null ) {
-            if( deadMaxTime < rp.getMaxTime() )
-                deadMaxTime = rp.getMaxTime();
+            if( deadMaxTime < rp.getMaxTime() ) {
+              deadMaxTime = rp.getMaxTime();
+            }
             deadProcessingTime += rp.getProcessingTime();
             deadRequestCount += rp.getRequestCount();
             deadErrorCount += rp.getErrorCount();
@@ -54,7 +55,9 @@ public class RequestGroupInfo {
         long maxTime=deadMaxTime;
         for( int i=0; i<processors.size(); i++ ) {
             RequestInfo rp=processors.get( i );
-            if( maxTime < rp.getMaxTime() ) maxTime=rp.getMaxTime();
+            if( maxTime < rp.getMaxTime() ) {
+              maxTime=rp.getMaxTime();
+            }
         }
         return maxTime;
     }

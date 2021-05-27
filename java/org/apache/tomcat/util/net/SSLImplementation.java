@@ -43,8 +43,9 @@ public abstract class SSLImplementation {
                 SSLImplementation impl = getInstance(implementations[i]);
                 return impl;
             } catch (Exception e) {
-                if (logger.isTraceEnabled())
-                    logger.trace("Error creating " + implementations[i], e);
+                if (logger.isTraceEnabled()) {
+                  logger.trace("Error creating " + implementations[i], e);
+                }
             }
         }
 
@@ -54,8 +55,9 @@ public abstract class SSLImplementation {
 
     public static SSLImplementation getInstance(String className)
             throws ClassNotFoundException {
-        if (className == null)
-            return getInstance();
+        if (className == null) {
+          return getInstance();
+        }
 
         try {
             // Workaround for the J2SE 1.4.x classloading problem (under
@@ -68,10 +70,11 @@ public abstract class SSLImplementation {
             Class<?> clazz = Class.forName(className);
             return (SSLImplementation) clazz.newInstance();
         } catch (Exception e) {
-            if (logger.isDebugEnabled())
-                logger
-                        .debug("Error loading SSL Implementation " + className,
-                                e);
+            if (logger.isDebugEnabled()) {
+              logger
+                      .debug("Error loading SSL Implementation " + className,
+                              e);
+            }
             throw new ClassNotFoundException(
                     "Error loading SSL Implementation " + className + " :"
                             + e.toString());

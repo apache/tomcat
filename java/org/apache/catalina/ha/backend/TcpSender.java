@@ -65,8 +65,9 @@ public class TcpSender
         while (tok.hasMoreTokens()) {
             String token = tok.nextToken().trim();
             int pos = token.indexOf(':');
-            if (pos <=0)
-                throw new Exception("bad ProxyList");
+            if (pos <=0) {
+              throw new Exception("bad ProxyList");
+            }
             proxies[i] = new Proxy();
             proxies[i].port = Integer.parseInt(token.substring(pos + 1));
             try {
@@ -101,8 +102,9 @@ public class TcpSender
                         connections[i].bind(addrs);
                         addrs = new InetSocketAddress(proxies[i].address, proxies[i].port);
                         connections[i].connect(addrs);
-                    } else
-                        connections[i] = new Socket(proxies[i].address, proxies[i].port);
+                    } else {
+                      connections[i] = new Socket(proxies[i].address, proxies[i].port);
+                    }
                     connectionReaders[i] = new BufferedReader(new InputStreamReader(connections[i].getInputStream()));
                     connectionWriters[i] = new BufferedWriter(new OutputStreamWriter(connections[i].getOutputStream()));
                 } catch (Exception ex) {
@@ -111,7 +113,9 @@ public class TcpSender
                 }
             }
             if (connections[i] == null)
-                continue; // try next proxy in the list
+             {
+              continue; // try next proxy in the list
+            }
             BufferedWriter writer = connectionWriters[i];
             try {
                 writer.write(requestLine);
@@ -128,7 +132,9 @@ public class TcpSender
                 close(i);
             }
             if (connections[i] == null)
-                continue; // try next proxy in the list
+             {
+              continue; // try next proxy in the list
+            }
 
             /* Read httpd answer */
             String responseStatus = connectionReaders[i].readLine();

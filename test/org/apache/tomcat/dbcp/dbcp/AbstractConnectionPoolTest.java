@@ -604,9 +604,15 @@ public abstract class AbstractConnectionPoolTest extends TestCase {
                     _complete = true;
                     break;
                 } finally {
-                    try { if (rset != null) rset.close(); } catch(Exception e) { }
-                    try { if (stmt != null) stmt.close(); } catch(Exception e) { }
-                    try { if (conn != null) conn.close(); } catch(Exception e) { }
+                    try { if (rset != null) {
+                      rset.close();
+                    } } catch(Exception e) { }
+                    try { if (stmt != null) {
+                      stmt.close();
+                    } } catch(Exception e) { }
+                    try { if (conn != null) {
+                      conn.close();
+                    } } catch(Exception e) { }
                 }
             }
             _complete = true;

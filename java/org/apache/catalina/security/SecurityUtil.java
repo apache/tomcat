@@ -336,16 +336,17 @@ public final class SecurityUtil{
                 log.debug(sm.getString("SecurityUtil.doAsPrivilege"), e);
             }
 
-            if (e instanceof UnavailableException)
-                throw (UnavailableException) e;
-            else if (e instanceof ServletException)
-                throw (ServletException) e;
-            else if (e instanceof IOException)
-                throw (IOException) e;
-            else if (e instanceof RuntimeException)
-                throw (RuntimeException) e;
-            else
-                throw new ServletException(e.getMessage(), e);
+            if (e instanceof UnavailableException) {
+              throw (UnavailableException) e;
+            } else if (e instanceof ServletException) {
+              throw (ServletException) e;
+            } else if (e instanceof IOException) {
+              throw (IOException) e;
+            } else if (e instanceof RuntimeException) {
+              throw (RuntimeException) e;
+            } else {
+              throw new ServletException(e.getMessage(), e);
+            }
         }
     }
 

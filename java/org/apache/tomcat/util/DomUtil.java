@@ -56,10 +56,14 @@ public class DomUtil {
     /** Get the trimmed text content of a node or null if there is no text
      */
     public static String getContent(Node n ) {
-        if( n==null ) return null;
+        if( n==null ) {
+          return null;
+        }
         Node n1=DomUtil.getChild(n, Node.TEXT_NODE);
 
-        if( n1==null ) return null;
+        if( n1==null ) {
+          return null;
+        }
 
         String s1=n1.getNodeValue();
         return s1.trim();
@@ -70,15 +74,20 @@ public class DomUtil {
      * @param name name of the element. If null return the first element.
      */
     public static Node getChild( Node parent, String name ) {
-        if( parent==null ) return null;
+        if( parent==null ) {
+          return null;
+        }
         Node first=parent.getFirstChild();
-        if( first==null ) return null;
+        if( first==null ) {
+          return null;
+        }
 
         for (Node node = first; node != null;
              node = node.getNextSibling()) {
             //System.out.println("getNode: " + name + " " + node.getNodeName());
-            if( node.getNodeType()!=Node.ELEMENT_NODE)
-                continue;
+            if( node.getNodeType()!=Node.ELEMENT_NODE) {
+              continue;
+            }
             if( name != null &&
                 name.equals( node.getNodeName() ) ) {
                 return node;
@@ -92,9 +101,13 @@ public class DomUtil {
 
     public static String getAttribute(Node element, String attName ) {
         NamedNodeMap attrs=element.getAttributes();
-        if( attrs==null ) return null;
+        if( attrs==null ) {
+          return null;
+        }
         Node attN=attrs.getNamedItem(attName);
-        if( attN==null ) return null;
+        if( attN==null ) {
+          return null;
+        }
         return attN.getNodeValue();
     }
 
@@ -155,7 +168,9 @@ public class DomUtil {
      */
     public static String getChildContent( Node parent, String name ) {
         Node first=parent.getFirstChild();
-        if( first==null ) return null;
+        if( first==null ) {
+          return null;
+        }
         for (Node node = first; node != null;
              node = node.getNextSibling()) {
             //System.out.println("getNode: " + name + " " + node.getNodeName());
@@ -173,7 +188,9 @@ public class DomUtil {
         while( n!=null && type != n.getNodeType() ) {
             n=n.getNextSibling();
         }
-        if( n==null ) return null;
+        if( n==null ) {
+          return null;
+        }
         return n;
     }
 
@@ -189,15 +206,20 @@ public class DomUtil {
      */
     public static Node getNext( Node current, String name, int type) {
         Node first=current.getNextSibling();
-        if( first==null ) return null;
+        if( first==null ) {
+          return null;
+        }
 
         for (Node node = first; node != null;
              node = node.getNextSibling()) {
 
-            if( type >= 0 && node.getNodeType() != type ) continue;
+            if( type >= 0 && node.getNodeType() != type ) {
+              continue;
+            }
             //System.out.println("getNode: " + name + " " + node.getNodeName());
-            if( name==null )
-                return node;
+            if( name==null ) {
+              return node;
+            }
             if( name.equals( node.getNodeName() ) ) {
                 return node;
             }
@@ -211,8 +233,9 @@ public class DomUtil {
                                                    String systemId)
             throws SAXException, IOException
         {
-            if( log.isTraceEnabled())
-                log.trace("ResolveEntity: " + publicId + " " + systemId);
+            if( log.isTraceEnabled()) {
+              log.trace("ResolveEntity: " + publicId + " " + systemId);
+            }
             return new InputSource(new StringReader(""));
         }
     }
@@ -220,16 +243,19 @@ public class DomUtil {
     public static void setAttributes( Object o, Node parent)
     {
         NamedNodeMap attrs=parent.getAttributes();
-        if( attrs==null ) return;
+        if( attrs==null ) {
+          return;
+        }
 
         for (int i=0; i<attrs.getLength(); i++ ) {
             Node n=attrs.item(i);
             String name=n.getNodeName();
             String value=n.getNodeValue();
 
-            if( log.isTraceEnabled() )
-                log.trace("Attribute " + parent.getNodeName() + " " +
-                            name + "=" + value);
+            if( log.isTraceEnabled() ) {
+              log.trace("Attribute " + parent.getNodeName() + " " +
+                          name + "=" + value);
+            }
             try {
                 IntrospectionUtils.setProperty(o, name, value);
             } catch( Exception ex ) {

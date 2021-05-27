@@ -64,7 +64,9 @@ public class ClusterJmxHelper {
 
     protected static boolean initMetaData(Class<?> clazz) {
         try {
-            if (clazz==null) return false;
+            if (clazz==null) {
+              return false;
+            }
             getRegistry().loadMetadata(clazz.getResourceAsStream("mbeans-descriptors.xml"));
         }catch (Exception x) {
             log.warn("Unable to load meta data for class:"+clazz.getName());

@@ -123,11 +123,12 @@ public final class ExpressionBuilder implements NodeVisitor {
                     Node child = null;
                     for (int i = 0; i < numChildren; i++) {
                         child = n.jjtGetChild(i);
-                        if (child instanceof AstLiteralExpression)
-                            continue;
-                        if (type == null)
-                            type = child.getClass();
-                        else {
+                        if (child instanceof AstLiteralExpression) {
+                          continue;
+                        }
+                        if (type == null) {
+                          type = child.getClass();
+                        } else {
                             if (!type.equals(child.getClass())) {
                                 throw new ELException(MessageFactory.get(
                                         "error.mixed", expr));

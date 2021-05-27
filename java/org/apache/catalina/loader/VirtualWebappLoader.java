@@ -121,8 +121,9 @@ public class VirtualWebappLoader extends WebappLoader {
                 continue;
             }
 
-            if (log.isDebugEnabled())
-                log.debug(sm.getString("virtualWebappLoader.token", token));
+            if (log.isDebugEnabled()) {
+              log.debug(sm.getString("virtualWebappLoader.token", token));
+            }
 
             if (token.endsWith("*.jar")) {
                 // glob
@@ -147,8 +148,9 @@ public class VirtualWebappLoader extends WebappLoader {
                     Arrays.sort(filenames);
                     for (int j = 0; j < filenames.length; j++) {
                         String filename = filenames[j].toLowerCase(Locale.ENGLISH);
-                        if (!filename.endsWith(".jar"))
-                            continue;
+                        if (!filename.endsWith(".jar")) {
+                          continue;
+                        }
                         File file = new File(directory, filenames[j]);
                         if (!file.isFile()) {
                             if (log.isDebugEnabled()) {

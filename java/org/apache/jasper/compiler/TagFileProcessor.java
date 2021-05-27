@@ -263,8 +263,9 @@ class TagFileProcessor {
                     err.jspError(n, "jsp.error.frgmentwithrtexprvalue");
                 }
             } else {
-                if (type == null)
-                    type = "java.lang.String";
+                if (type == null) {
+                  type = "java.lang.String";
+                }
 
                 if (deferredValue) {
                     type = ValueExpression.class.getName();
@@ -310,13 +311,15 @@ class TagFileProcessor {
             }
 
             String className = n.getAttributeValue("variable-class");
-            if (className == null)
-                className = "java.lang.String";
+            if (className == null) {
+              className = "java.lang.String";
+            }
 
             String declareStr = n.getAttributeValue("declare");
             boolean declare = true;
-            if (declareStr != null)
-                declare = JspUtil.booleanValue(declareStr);
+            if (declareStr != null) {
+              declare = JspUtil.booleanValue(declareStr);
+            }
 
             int scope = VariableInfo.NESTED;
             String scopeStr = n.getAttributeValue("scope");

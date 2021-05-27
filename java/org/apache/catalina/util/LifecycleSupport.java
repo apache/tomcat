@@ -84,8 +84,9 @@ public final class LifecycleSupport {
       synchronized (listenersLock) {
           LifecycleListener results[] =
             new LifecycleListener[listeners.length + 1];
-          for (int i = 0; i < listeners.length; i++)
-              results[i] = listeners[i];
+          for (int i = 0; i < listeners.length; i++) {
+            results[i] = listeners[i];
+          }
           results[listeners.length] = listener;
           listeners = results;
       }
@@ -116,8 +117,9 @@ public final class LifecycleSupport {
 
         LifecycleEvent event = new LifecycleEvent(lifecycle, type, data);
         LifecycleListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
-            interested[i].lifecycleEvent(event);
+        for (int i = 0; i < interested.length; i++) {
+          interested[i].lifecycleEvent(event);
+        }
 
     }
 
@@ -137,14 +139,16 @@ public final class LifecycleSupport {
                     break;
                 }
             }
-            if (n < 0)
-                return;
+            if (n < 0) {
+              return;
+            }
             LifecycleListener results[] =
               new LifecycleListener[listeners.length - 1];
             int j = 0;
             for (int i = 0; i < listeners.length; i++) {
-                if (i != n)
-                    results[j++] = listeners[i];
+                if (i != n) {
+                  results[j++] = listeners[i];
+                }
             }
             listeners = results;
         }

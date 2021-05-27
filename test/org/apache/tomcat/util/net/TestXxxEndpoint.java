@@ -30,7 +30,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Error;
-import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.Socket;

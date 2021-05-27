@@ -799,8 +799,9 @@ public class JspC extends Task implements Options {
      */
     @Override
     public String getClassPath() {
-        if( classPath != null )
-            return classPath;
+        if( classPath != null ) {
+          return classPath;
+        }
         return System.getProperty("java.class.path");
     }
 
@@ -1247,12 +1248,14 @@ public class JspC extends Task implements Options {
             }
         }
 
-        if(!webXml2.delete() && log.isDebugEnabled())
-            log.debug(Localizer.getMessage("jspc.delete.fail",
-                    webXml2.toString()));
+        if(!webXml2.delete() && log.isDebugEnabled()) {
+          log.debug(Localizer.getMessage("jspc.delete.fail",
+                  webXml2.toString()));
+        }
 
-        if (!(new File(webxmlFile)).delete() && log.isDebugEnabled())
-            log.debug(Localizer.getMessage("jspc.delete.fail", webxmlFile));
+        if (!(new File(webxmlFile)).delete() && log.isDebugEnabled()) {
+          log.debug(Localizer.getMessage("jspc.delete.fail", webxmlFile));
+        }
 
     }
 
@@ -1559,7 +1562,9 @@ public class JspC extends Task implements Options {
     }
 
     protected String nextFile() {
-        if (fullstop) argPos++;
+        if (fullstop) {
+          argPos++;
+        }
         if (argPos >= args.length) {
             return null;
         } else {
@@ -1688,7 +1693,9 @@ public class JspC extends Task implements Options {
                 String[] libs = webinfLib.list();
                 if (libs != null) {
                     for (String lib : libs) {
-                        if (lib.length() < 5) continue;
+                        if (lib.length() < 5) {
+                          continue;
+                        }
                         String ext = lib.substring(lib.length() - 4);
                         if (!".jar".equalsIgnoreCase(ext)) {
                             if (".tld".equalsIgnoreCase(ext)) {

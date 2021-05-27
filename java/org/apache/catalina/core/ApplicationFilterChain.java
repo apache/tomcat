@@ -195,14 +195,15 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                 );
             } catch( PrivilegedActionException pe) {
                 Exception e = pe.getException();
-                if (e instanceof ServletException)
-                    throw (ServletException) e;
-                else if (e instanceof IOException)
-                    throw (IOException) e;
-                else if (e instanceof RuntimeException)
-                    throw (RuntimeException) e;
-                else
-                    throw new ServletException(e.getMessage(), e);
+                if (e instanceof ServletException) {
+                  throw (ServletException) e;
+                } else if (e instanceof IOException) {
+                  throw (IOException) e;
+                } else if (e instanceof RuntimeException) {
+                  throw (RuntimeException) e;
+                } else {
+                  throw new ServletException(e.getMessage(), e);
+                }
             }
         } else {
             internalDoFilter(request,response);
@@ -244,26 +245,30 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                 support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
                                           filter, request, response);
             } catch (IOException e) {
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
+                if (filter != null) {
+                  support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
+                                            filter, request, response, e);
+                }
                 throw e;
             } catch (ServletException e) {
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
+                if (filter != null) {
+                  support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
+                                            filter, request, response, e);
+                }
                 throw e;
             } catch (RuntimeException e) {
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
+                if (filter != null) {
+                  support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
+                                            filter, request, response, e);
+                }
                 throw e;
             } catch (Throwable e) {
                 e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
+                if (filter != null) {
+                  support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
+                                            filter, request, response, e);
+                }
                 throw new ServletException
                   (sm.getString("filterChain.filter"), e);
             }
@@ -362,14 +367,15 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                 );
             } catch( PrivilegedActionException pe) {
                 Exception e = pe.getException();
-                if (e instanceof ServletException)
-                    throw (ServletException) e;
-                else if (e instanceof IOException)
-                    throw (IOException) e;
-                else if (e instanceof RuntimeException)
-                    throw (RuntimeException) e;
-                else
-                    throw new ServletException(e.getMessage(), e);
+                if (e instanceof ServletException) {
+                  throw (ServletException) e;
+                } else if (e instanceof IOException) {
+                  throw (IOException) e;
+                } else if (e instanceof RuntimeException) {
+                  throw (RuntimeException) e;
+                } else {
+                  throw new ServletException(e.getMessage(), e);
+                }
             }
         } else {
             internalDoFilterEvent(event);
@@ -526,9 +532,11 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     void addFilter(ApplicationFilterConfig filterConfig) {
 
         // Prevent the same filter being added multiple times
-        for(ApplicationFilterConfig filter:filters)
-            if(filter==filterConfig)
-                return;
+        for(ApplicationFilterConfig filter:filters) {
+          if(filter==filterConfig) {
+            return;
+          }
+        }
 
         if (n == filters.length) {
             ApplicationFilterConfig[] newFilters =

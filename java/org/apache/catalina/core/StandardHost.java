@@ -460,9 +460,10 @@ public class StandardHost extends ContainerBase implements Host {
     @Override
     public void setName(String name) {
 
-        if (name == null)
-            throw new IllegalArgumentException
-                (sm.getString("standardHost.nullName"));
+        if (name == null) {
+          throw new IllegalArgumentException
+              (sm.getString("standardHost.nullName"));
+        }
 
         name = name.toLowerCase(Locale.ENGLISH);      // Internally all names are lower case
 
@@ -599,8 +600,9 @@ public class StandardHost extends ContainerBase implements Host {
         synchronized (aliasesLock) {
             // Skip duplicate aliases
             for (String s : aliases) {
-                if (s.equals(alias))
-                    return;
+                if (s.equals(alias)) {
+                  return;
+                }
             }
             // Add this alias to the list
             String newAliases[] = Arrays.copyOf(aliases, aliases.length + 1);
@@ -622,9 +624,10 @@ public class StandardHost extends ContainerBase implements Host {
     @Override
     public void addChild(Container child) {
 
-        if (!(child instanceof Context))
-            throw new IllegalArgumentException
-                (sm.getString("standardHost.notContext"));
+        if (!(child instanceof Context)) {
+          throw new IllegalArgumentException
+              (sm.getString("standardHost.notContext"));
+        }
 
         child.addLifecycleListener(new MemoryLeakTrackingListener());
 
@@ -729,15 +732,17 @@ public class StandardHost extends ContainerBase implements Host {
                     break;
                 }
             }
-            if (n < 0)
-                return;
+            if (n < 0) {
+              return;
+            }
 
             // Remove the specified alias
             int j = 0;
             String results[] = new String[aliases.length - 1];
             for (int i = 0; i < aliases.length; i++) {
-                if (i != n)
-                    results[j++] = aliases[i];
+                if (i != n) {
+                  results[j++] = aliases[i];
+                }
             }
             aliases = results;
 

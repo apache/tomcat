@@ -173,7 +173,9 @@ final class StandardWrapperValve
 
         MessageBytes requestPathMB = request.getRequestPathMB();
         DispatcherType dispatcherType = DispatcherType.REQUEST;
-        if (request.getDispatcherType()==DispatcherType.ASYNC) dispatcherType = DispatcherType.ASYNC;
+        if (request.getDispatcherType()==DispatcherType.ASYNC) {
+          dispatcherType = DispatcherType.ASYNC;
+        }
         request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,dispatcherType);
         request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                 requestPathMB);
@@ -316,8 +318,12 @@ final class StandardWrapperValve
 
             long time=t2-t1;
             processingTime += time;
-            if( time > maxTime) maxTime=time;
-            if( time < minTime) minTime=time;
+            if( time > maxTime) {
+              maxTime=time;
+            }
+            if( time < minTime) {
+              minTime=time;
+            }
         }
     }
 
@@ -481,8 +487,12 @@ final class StandardWrapperValve
 
             long time=t2-t1;
             processingTime += time;
-            if( time > maxTime) maxTime=time;
-            if( time < minTime) minTime=time;
+            if( time > maxTime) {
+              maxTime=time;
+            }
+            if( time < minTime) {
+              minTime=time;
+            }
         }
     }
 

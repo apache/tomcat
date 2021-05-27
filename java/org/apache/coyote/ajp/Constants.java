@@ -262,10 +262,11 @@ public final class Constants {
     public static final int getResponseAjpIndex(String header)
     {
         Integer i = responseTransHash.get(header);
-        if (i == null)
-            return 0;
-        else
-            return i.intValue();
+        if (i == null) {
+          return 0;
+        } else {
+          return i.intValue();
+        }
     }
 
 

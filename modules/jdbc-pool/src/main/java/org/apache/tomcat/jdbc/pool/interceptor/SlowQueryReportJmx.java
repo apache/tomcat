@@ -221,7 +221,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         ConcurrentHashMap<String,QueryStats> queries = perPoolStats.get(poolName);
         if (queries!=null) {
             Iterator<String> it = queries.keySet().iterator();
-            while (it.hasNext()) it.remove();
+            while (it.hasNext()) {
+              it.remove();
+            }
         }
     }
 

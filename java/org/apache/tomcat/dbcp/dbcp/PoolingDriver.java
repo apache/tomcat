@@ -329,7 +329,9 @@ public class PoolingDriver implements Driver {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) return true;
+            if (this == obj) {
+              return true;
+            }
             if (delegate == null){
                 return false;
             }

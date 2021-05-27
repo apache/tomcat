@@ -85,7 +85,9 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
      */
     @Override
     public boolean equals(Object obj) {
-    	if (obj == this) return true;
+    	if (obj == this) {
+        return true;
+      }
         Statement delegate = getInnermostDelegate();
         if (delegate == null) {
             return false;

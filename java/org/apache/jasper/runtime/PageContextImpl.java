@@ -143,11 +143,13 @@ public class PageContextImpl extends PageContext {
         this.applicationContext = JspApplicationContextImpl.getInstance(context);
 
         // Setup session (if required)
-        if (request instanceof HttpServletRequest && needsSession)
-            this.session = ((HttpServletRequest) request).getSession();
-        if (needsSession && session == null)
-            throw new IllegalStateException(
-                    "Page needs a session and none is available");
+        if (request instanceof HttpServletRequest && needsSession) {
+          this.session = ((HttpServletRequest) request).getSession();
+        }
+        if (needsSession && session == null) {
+          throw new IllegalStateException(
+                  "Page needs a session and none is available");
+        }
 
         // initialize the initial out ...
         depth = -1;
@@ -166,8 +168,9 @@ public class PageContextImpl extends PageContext {
         setAttribute(REQUEST, request);
         setAttribute(RESPONSE, response);
 
-        if (session != null)
-            setAttribute(SESSION, session);
+        if (session != null) {
+          setAttribute(SESSION, session);
+        }
 
         setAttribute(PAGE, servlet);
         setAttribute(CONFIG, config);
@@ -437,24 +440,28 @@ public class PageContextImpl extends PageContext {
     }
 
     private int doGetAttributeScope(String name) {
-        if (attributes.get(name) != null)
-            return PAGE_SCOPE;
+        if (attributes.get(name) != null) {
+          return PAGE_SCOPE;
+        }
 
-        if (request.getAttribute(name) != null)
-            return REQUEST_SCOPE;
+        if (request.getAttribute(name) != null) {
+          return REQUEST_SCOPE;
+        }
 
         if (session != null) {
             try {
-                if (session.getAttribute(name) != null)
-                    return SESSION_SCOPE;
+                if (session.getAttribute(name) != null) {
+                  return SESSION_SCOPE;
+                }
             } catch(IllegalStateException ise) {
                 // Session has been invalidated.
                 // Ignore and fall through to application scope.
             }
         }
 
-        if (context.getAttribute(name) != null)
-            return APPLICATION_SCOPE;
+        if (context.getAttribute(name) != null) {
+          return APPLICATION_SCOPE;
+        }
 
         return 0;
     }
@@ -487,12 +494,14 @@ public class PageContextImpl extends PageContext {
     private Object doFindAttribute(String name) {
 
         Object o = attributes.get(name);
-        if (o != null)
-            return o;
+        if (o != null) {
+          return o;
+        }
 
         o = request.getAttribute(name);
-        if (o != null)
-            return o;
+        if (o != null) {
+          return o;
+        }
 
         if (session != null) {
             try {
@@ -501,8 +510,9 @@ public class PageContextImpl extends PageContext {
                 // Session has been invalidated.
                 // Ignore and fall through to application scope.
             }
-            if (o != null)
-                return o;
+            if (o != null) {
+              return o;
+            }
         }
 
         return context.getAttribute(name);
@@ -642,8 +652,9 @@ public class PageContextImpl extends PageContext {
         if (!path.startsWith("/")) {
             String uri = (String) request.getAttribute(
                     RequestDispatcher.INCLUDE_SERVLET_PATH);
-            if (uri == null)
-                uri = ((HttpServletRequest) request).getServletPath();
+            if (uri == null) {
+              uri = ((HttpServletRequest) request).getServletPath();
+            }
             String baseURI = uri.substring(0, uri.lastIndexOf('/'));
             path = baseURI + '/' + path;
         }
@@ -745,14 +756,16 @@ public class PageContextImpl extends PageContext {
         String includeUri = (String) request.getAttribute(
                 RequestDispatcher.INCLUDE_SERVLET_PATH);
 
-        if (includeUri != null)
-            request.removeAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
+        if (includeUri != null) {
+          request.removeAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
+        }
         try {
             context.getRequestDispatcher(path).forward(request, response);
         } finally {
-            if (includeUri != null)
-                request.setAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH,
-                        includeUri);
+            if (includeUri != null) {
+              request.setAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH,
+                      includeUri);
+            }
         }
     }
 
@@ -821,8 +834,9 @@ public class PageContextImpl extends PageContext {
     @Override
     public void handlePageException(final Throwable t) throws IOException,
             ServletException {
-        if (t == null)
-            throw new NullPointerException("null Throwable");
+        if (t == null) {
+          throw new NullPointerException("null Throwable");
+        }
 
         if (SecurityUtil.isPackageProtectionEnabled()) {
             try {
@@ -895,12 +909,15 @@ public class PageContextImpl extends PageContext {
             // Otherwise throw the exception wrapped inside a ServletException.
             // Set the exception as the root cause in the ServletException
             // to get a stack trace for the real problem
-            if (t instanceof IOException)
-                throw (IOException) t;
-            if (t instanceof ServletException)
-                throw (ServletException) t;
-            if (t instanceof RuntimeException)
-                throw (RuntimeException) t;
+            if (t instanceof IOException) {
+              throw (IOException) t;
+            }
+            if (t instanceof ServletException) {
+              throw (ServletException) t;
+            }
+            if (t instanceof RuntimeException) {
+              throw (RuntimeException) t;
+            }
 
             Throwable rootCause = null;
             if (t instanceof JspException) {

@@ -137,8 +137,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 if (useAvailableData) {
                     return false;
                 }
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
             // Set the start time once we start reading data (even if it is
             // just skipping blank lines)
@@ -157,8 +158,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             if (useAvailableData) {
                 return false;
             }
-            if (!fill())
-                throw new EOFException(sm.getString("iib.eof.error"));
+            if (!fill()) {
+              throw new EOFException(sm.getString("iib.eof.error"));
+            }
         }
 
         //
@@ -172,8 +174,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             // Spec says method name is a token followed by a single SP but
@@ -194,8 +197,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         while (space) {
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 pos++;
@@ -219,8 +223,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             if (buf[pos -1] == Constants.CR && buf[pos] != Constants.LF) {
@@ -279,8 +284,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         while (space && !eol) {
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 pos++;
@@ -303,8 +309,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             if (buf[pos] == Constants.CR) {
@@ -367,8 +374,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             prevChr = chr;
@@ -406,8 +414,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             if (buf[pos] == Constants.COLON) {
@@ -449,8 +458,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill())
-                        throw new EOFException(sm.getString("iib.eof.error"));
+                    if (!fill()) {
+                      throw new EOFException(sm.getString("iib.eof.error"));
+                    }
                 }
 
                 if ((buf[pos] == Constants.SP) || (buf[pos] == Constants.HT)) {
@@ -468,8 +478,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill())
-                        throw new EOFException(sm.getString("iib.eof.error"));
+                    if (!fill()) {
+                      throw new EOFException(sm.getString("iib.eof.error"));
+                    }
                 }
 
                 prevChr = chr;
@@ -510,8 +521,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             byte peek = buf[pos];
@@ -546,8 +558,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             prevChr = chr;
@@ -584,10 +597,11 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     public int doRead(ByteChunk chunk, Request req)
         throws IOException {
 
-        if (lastActiveFilter == -1)
-            return inputStreamInputBuffer.doRead(chunk, req);
-        else
-            return activeFilters[lastActiveFilter].doRead(chunk,req);
+        if (lastActiveFilter == -1) {
+          return inputStreamInputBuffer.doRead(chunk, req);
+        } else {
+          return activeFilters[lastActiveFilter].doRead(chunk,req);
+        }
 
     }
 
@@ -700,8 +714,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             throws IOException {
 
             if (pos >= lastValid) {
-                if (!fill())
-                    return -1;
+                if (!fill()) {
+                  return -1;
+                }
             }
 
             int length = lastValid - pos;

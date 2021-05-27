@@ -66,14 +66,17 @@ public final class  Base64
         base64Alphabet['+']  = 62;
         base64Alphabet['/']  = 63;
 
-        for (int i = 0; i <= 25; i++ )
-            lookUpBase64Alphabet[i] = (byte) ('A' + i);
+        for (int i = 0; i <= 25; i++ ) {
+          lookUpBase64Alphabet[i] = (byte) ('A' + i);
+        }
 
-        for (int i = 26,  j = 0; i <= 51; i++, j++ )
-            lookUpBase64Alphabet[i] = (byte) ('a'+ j);
+        for (int i = 26,  j = 0; i <= 51; i++, j++ ) {
+          lookUpBase64Alphabet[i] = (byte) ('a'+ j);
+        }
 
-        for (int i = 52,  j = 0; i <= 61; i++, j++ )
-            lookUpBase64Alphabet[i] = (byte) ('0' + j);
+        for (int i = 52,  j = 0; i <= 61; i++, j++ ) {
+          lookUpBase64Alphabet[i] = (byte) ('0' + j);
+        }
 
         lookUpBase64Alphabet[62] = (byte) '+';
         lookUpBase64Alphabet[63] = (byte) '/';

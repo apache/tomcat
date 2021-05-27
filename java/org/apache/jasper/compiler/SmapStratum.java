@@ -45,14 +45,16 @@ public class SmapStratum {
         private boolean lineFileIDSet = false;
 
         public void setInputStartLine(int inputStartLine) {
-            if (inputStartLine < 0)
-                throw new IllegalArgumentException("" + inputStartLine);
+            if (inputStartLine < 0) {
+              throw new IllegalArgumentException("" + inputStartLine);
+            }
             this.inputStartLine = inputStartLine;
         }
 
         public void setOutputStartLine(int outputStartLine) {
-            if (outputStartLine < 0)
-                throw new IllegalArgumentException("" + outputStartLine);
+            if (outputStartLine < 0) {
+              throw new IllegalArgumentException("" + outputStartLine);
+            }
             this.outputStartLine = outputStartLine;
         }
 
@@ -65,21 +67,24 @@ public class SmapStratum {
          * @param lineFileID The new line file ID
          */
         public void setLineFileID(int lineFileID) {
-            if (lineFileID < 0)
-                throw new IllegalArgumentException("" + lineFileID);
+            if (lineFileID < 0) {
+              throw new IllegalArgumentException("" + lineFileID);
+            }
             this.lineFileID = lineFileID;
             this.lineFileIDSet = true;
         }
 
         public void setInputLineCount(int inputLineCount) {
-            if (inputLineCount < 0)
-                throw new IllegalArgumentException("" + inputLineCount);
+            if (inputLineCount < 0) {
+              throw new IllegalArgumentException("" + inputLineCount);
+            }
             this.inputLineCount = inputLineCount;
         }
 
         public void setOutputLineIncrement(int outputLineIncrement) {
-            if (outputLineIncrement < 0)
-                throw new IllegalArgumentException("" + outputLineIncrement);
+            if (outputLineIncrement < 0) {
+              throw new IllegalArgumentException("" + outputLineIncrement);
+            }
             this.outputLineIncrement = outputLineIncrement;
         }
 
@@ -89,17 +94,21 @@ public class SmapStratum {
          *         specified, as its necessity is sensitive to context).
          */
         public String getString() {
-            if (inputStartLine == -1 || outputStartLine == -1)
-                throw new IllegalStateException();
+            if (inputStartLine == -1 || outputStartLine == -1) {
+              throw new IllegalStateException();
+            }
             StringBuilder out = new StringBuilder();
             out.append(inputStartLine);
-            if (lineFileIDSet)
-                out.append("#" + lineFileID);
-            if (inputLineCount != 1)
-                out.append("," + inputLineCount);
+            if (lineFileIDSet) {
+              out.append("#" + lineFileID);
+            }
+            if (inputLineCount != 1) {
+              out.append("," + inputLineCount);
+            }
             out.append(":" + outputStartLine);
-            if (outputLineIncrement != 1)
-                out.append("," + outputLineIncrement);
+            if (outputLineIncrement != 1) {
+              out.append("," + outputLineIncrement);
+            }
             out.append('\n');
             return out.toString();
         }
@@ -249,17 +258,19 @@ public class SmapStratum {
         int outputLineIncrement) {
         // check the input - what are you doing here??
         int fileIndex = filePathList.indexOf(inputFileName);
-        if (fileIndex == -1) // still
-            throw new IllegalArgumentException(
-                "inputFileName: " + inputFileName);
+        if (fileIndex == -1) {
+          throw new IllegalArgumentException(
+              "inputFileName: " + inputFileName);
+        }
 
         //Jasper incorrectly SMAPs certain Nodes, giving them an
         //outputStartLine of 0.  This can cause a fatal error in
         //optimizeLineSection, making it impossible for Jasper to
         //compile the JSP.  Until we can fix the underlying
         //SMAPping problem, we simply ignore the flawed SMAP entries.
-        if (outputStartLine == 0)
-            return;
+        if (outputStartLine == 0) {
+          return;
+        }
 
         // build the LineInfo
         LineInfo li = new LineInfo();
@@ -267,8 +278,9 @@ public class SmapStratum {
         li.setInputLineCount(inputLineCount);
         li.setOutputStartLine(outputStartLine);
         li.setOutputLineIncrement(outputLineIncrement);
-        if (fileIndex != lastFileID)
-            li.setLineFileID(fileIndex);
+        if (fileIndex != lastFileID) {
+          li.setLineFileID(fileIndex);
+        }
         lastFileID = fileIndex;
 
         // save it
@@ -291,8 +303,9 @@ public class SmapStratum {
      */
     public String getString() {
         // check state and initialize buffer
-        if (fileNameList.size() == 0 || lineData.size() == 0)
-            return null;
+        if (fileNameList.size() == 0 || lineData.size() == 0) {
+          return null;
+        }
 
         StringBuilder out = new StringBuilder();
 

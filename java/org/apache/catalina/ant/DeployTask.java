@@ -158,10 +158,11 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     fsInput = new FileInputStream(war);
                     long size = fsInput.getChannel().size();
 
-                    if (size > Integer.MAX_VALUE)
-                        throw new UnsupportedOperationException(
-                                "DeployTask does not support WAR files " +
-                                "greater than 2 Gb");
+                    if (size > Integer.MAX_VALUE) {
+                      throw new UnsupportedOperationException(
+                              "DeployTask does not support WAR files " +
+                              "greater than 2 Gb");
+                    }
                     contentLength = (int) size;
 
                     stream = new BufferedInputStream(fsInput, 1024);

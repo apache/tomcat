@@ -387,8 +387,9 @@ public class ManagedBean implements java.io.Serializable {
             if( clazz==null ) {
                 try {
                     ClassLoader cl= Thread.currentThread().getContextClassLoader();
-                    if ( cl != null)
-                        clazz= cl.loadClass(getClassName());
+                    if ( cl != null) {
+                      clazz= cl.loadClass(getClassName());
+                    }
                 } catch (Exception e) {
                     ex=e;
                 }
@@ -414,8 +415,9 @@ public class ManagedBean implements java.io.Serializable {
 
         // Set the managed resource (if any)
         try {
-            if (instance != null)
-                mbean.setManagedResource(instance, "ObjectReference");
+            if (instance != null) {
+              mbean.setManagedResource(instance, "ObjectReference");
+            }
         } catch (InstanceNotFoundException e) {
             throw e;
         }
@@ -434,8 +436,9 @@ public class ManagedBean implements java.io.Serializable {
         Lock l = mBeanInfoLock.readLock();
         l.lock();
         try {
-            if (info != null)
-                return info;
+            if (info != null) {
+              return info;
+            }
         } finally {
             l.unlock();
         }
@@ -447,14 +450,16 @@ public class ManagedBean implements java.io.Serializable {
             AttributeInfo attrs[] = getAttributes();
             MBeanAttributeInfo attributes[] =
                 new MBeanAttributeInfo[attrs.length];
-            for (int i = 0; i < attrs.length; i++)
-                attributes[i] = attrs[i].createAttributeInfo();
+            for (int i = 0; i < attrs.length; i++) {
+              attributes[i] = attrs[i].createAttributeInfo();
+            }
 
             OperationInfo opers[] = getOperations();
             MBeanOperationInfo operations[] =
                 new MBeanOperationInfo[opers.length];
-            for (int i = 0; i < opers.length; i++)
-                operations[i] = opers[i].createOperationInfo();
+            for (int i = 0; i < opers.length; i++) {
+              operations[i] = opers[i].createOperationInfo();
+            }
 
 
 //        ConstructorInfo consts[] = getConstructors();
@@ -466,8 +471,9 @@ public class ManagedBean implements java.io.Serializable {
             NotificationInfo notifs[] = getNotifications();
             MBeanNotificationInfo notifications[] =
                 new MBeanNotificationInfo[notifs.length];
-            for (int i = 0; i < notifs.length; i++)
-                notifications[i] = notifs[i].createNotificationInfo();
+            for (int i = 0; i < notifs.length; i++) {
+              notifications[i] = notifs[i].createNotificationInfo();
+            }
 
 
             // Construct and return a new ModelMBeanInfo object
@@ -527,12 +533,14 @@ public class ManagedBean implements java.io.Serializable {
 
         AttributeInfo attrInfo = attributes.get(aname);
         // Look up the actual operation to be used
-        if (attrInfo == null)
-            throw new AttributeNotFoundException(" Cannot find attribute " + aname + " for " + resource);
+        if (attrInfo == null) {
+          throw new AttributeNotFoundException(" Cannot find attribute " + aname + " for " + resource);
+        }
 
         String getMethod = attrInfo.getGetMethod();
-        if (getMethod == null)
-            throw new AttributeNotFoundException("Cannot find attribute " + aname + " get method name");
+        if (getMethod == null) {
+          throw new AttributeNotFoundException("Cannot find attribute " + aname + " get method name");
+        }
 
         Object object = null;
         NoSuchMethodException exception = null;
@@ -551,9 +559,10 @@ public class ManagedBean implements java.io.Serializable {
                 exception = e;
             }
         }
-        if( exception != null )
-            throw new ReflectionException(exception,
-                                          "Cannot find getter method " + getMethod);
+        if( exception != null ) {
+          throw new ReflectionException(exception,
+                                        "Cannot find getter method " + getMethod);
+        }
 
         return m;
     }
@@ -564,13 +573,15 @@ public class ManagedBean implements java.io.Serializable {
         Method m = null;
 
         AttributeInfo attrInfo = attributes.get(aname);
-        if (attrInfo == null)
-            throw new AttributeNotFoundException(" Cannot find attribute " + aname);
+        if (attrInfo == null) {
+          throw new AttributeNotFoundException(" Cannot find attribute " + aname);
+        }
 
         // Look up the actual operation to be used
         String setMethod = attrInfo.getSetMethod();
-        if (setMethod == null)
-            throw new AttributeNotFoundException("Cannot find attribute " + aname + " set method name");
+        if (setMethod == null) {
+          throw new AttributeNotFoundException("Cannot find attribute " + aname + " set method name");
+        }
 
         String argType=attrInfo.getType();
 
@@ -594,10 +605,11 @@ public class ManagedBean implements java.io.Serializable {
                 exception = e;
             }
         }
-        if( exception != null )
-            throw new ReflectionException(exception,
-                                          "Cannot find setter method " + setMethod +
-                    " " + resource);
+        if( exception != null ) {
+          throw new ReflectionException(exception,
+                                        "Cannot find setter method " + setMethod +
+                  " " + resource);
+        }
 
         return m;
     }
@@ -607,24 +619,28 @@ public class ManagedBean implements java.io.Serializable {
 
         Method method = null;
 
-        if (params == null)
-            params = new Object[0];
-        if (signature == null)
-            signature = new String[0];
-        if (params.length != signature.length)
-            throw new RuntimeOperationsException(
-                    new IllegalArgumentException(
-                            "Inconsistent arguments and signature"),
-                    "Inconsistent arguments and signature");
+        if (params == null) {
+          params = new Object[0];
+        }
+        if (signature == null) {
+          signature = new String[0];
+        }
+        if (params.length != signature.length) {
+          throw new RuntimeOperationsException(
+                  new IllegalArgumentException(
+                          "Inconsistent arguments and signature"),
+                  "Inconsistent arguments and signature");
+        }
 
         // Acquire the ModelMBeanOperationInfo information for
         // the requested operation
         OperationInfo opInfo =
                 operations.get(createOperationKey(aname, signature));
-        if (opInfo == null)
-            throw new MBeanException(new ServiceNotFoundException(
-                    "Cannot find operation " + aname),
-                    "Cannot find operation " + aname);
+        if (opInfo == null) {
+          throw new MBeanException(new ServiceNotFoundException(
+                  "Cannot find operation " + aname),
+                  "Cannot find operation " + aname);
+        }
 
         // Prepare the signature required by Java reflection APIs
         // FIXME - should we use the signature from opInfo?

@@ -225,14 +225,16 @@ public class ParserUtils {
             int n = children.getLength();
             for (int i = 0; i < n; i++) {
                 Node child = children.item(i);
-                if (child instanceof Comment)
-                    continue;
+                if (child instanceof Comment) {
+                  continue;
+                }
                 if (child instanceof Text) {
                     String body = ((Text) child).getData();
                     if (body != null) {
                         body = body.trim();
-                        if (body.length() > 0)
-                            treeNode.setBody(body);
+                        if (body.length() > 0) {
+                          treeNode.setBody(body);
+                        }
                     }
                 } else {
                     convert(treeNode, child);

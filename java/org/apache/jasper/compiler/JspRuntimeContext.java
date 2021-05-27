@@ -603,9 +603,10 @@ public final class JspRuntimeContext {
                         permissions.add(
                                 new FilePermission(jarUrl.substring(4),"read"));
                     }
-                    if (jndiUrl != null)
-                        permissions.add(
-                                new FilePermission(jndiUrl,"read") );
+                    if (jndiUrl != null) {
+                      permissions.add(
+                              new FilePermission(jndiUrl,"read") );
+                    }
                 }
             } catch (IOException e) {
                 context.log(Localizer.getMessage("jsp.error.security"), e);

@@ -75,15 +75,19 @@ public class CollectedInfo {
             String [] shosts = elenames[1].split("%2F");
             shost = shosts[0];
 
-            if (port==0 && host==null)
-                  break; /* Take the first one */
-            if (host==null && iport==port)
-                break; /* Only port done */
-            if (shost.compareTo(host) == 0)
-                break; /* Done port and host are the expected ones */
+            if (port==0 && host==null) {
+              break; /* Take the first one */
+            }
+            if (host==null && iport==port) {
+              break; /* Only port done */
+            }
+            if (shost.compareTo(host) == 0) {
+              break; /* Done port and host are the expected ones */
+            }
         }
-        if (objName == null)
-            throw(new Exception("Can't find connector for " + host + ":" + port));
+        if (objName == null) {
+          throw(new Exception("Can't find connector for " + host + ":" + port));
+        }
         this.port = iport;
         this.host = shost;
 

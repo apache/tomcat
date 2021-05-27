@@ -348,8 +348,9 @@ public class ChunkedInputFilter implements InputFilter {
         while (!eol) {
 
             if (pos >= lastValid) {
-                if (readBytes() <= 0)
-                    return false;
+                if (readBytes() <= 0) {
+                  return false;
+                }
             }
 
             if (buf[pos] == Constants.CR || buf[pos] == Constants.LF) {

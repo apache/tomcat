@@ -301,7 +301,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
         int index = sessionId.indexOf('.');
         if (index > 0) {
             requestJvmRoute = sessionId
-                    .substring(index + 1, sessionId.length());
+                    .substring(index + 1);
         }
         if (requestJvmRoute != null && !requestJvmRoute.equals(localJvmRoute)) {
             if (log.isDebugEnabled()) {
@@ -356,8 +356,9 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
         catalinaSession.setId(newSessionID, false);
         // FIXME: Why we remove change data from other running request?
         // setId also trigger resetDeltaRequest!!
-        if (catalinaSession instanceof DeltaSession)
-            ((DeltaSession) catalinaSession).resetDeltaRequest();
+        if (catalinaSession instanceof DeltaSession) {
+          ((DeltaSession) catalinaSession).resetDeltaRequest();
+        }
         changeRequestSessionID(request, sessionId, newSessionID);
 
         // now sending the change to all other clusternodes!
@@ -430,8 +431,9 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             // compatibility with JvmRouteBinderValve version 1.1
             // ( setup at context.xml or context.xml.default )
             if (!(hostContainer instanceof Host)) {
-                if (log.isWarnEnabled())
-                    log.warn(sm.getString("jvmRoute.configure.warn"));
+                if (log.isWarnEnabled()) {
+                  log.warn(sm.getString("jvmRoute.configure.warn"));
+                }
                 hostContainer = hostContainer.getParent();
             }
             if (hostContainer instanceof Host

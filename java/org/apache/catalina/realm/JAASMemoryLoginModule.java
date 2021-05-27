@@ -142,13 +142,14 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     public boolean abort() throws LoginException {
 
         // If our authentication was not successful, just return false
-        if (principal == null)
-            return (false);
+        if (principal == null) {
+          return (false);
+        }
 
         // Clean up if overall authentication failed
-        if (committed)
-            logout();
-        else {
+        if (committed) {
+          logout();
+        } else {
             committed = false;
             principal = null;
         }
@@ -174,8 +175,9 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         log.debug("commit " + principal);
 
         // If authentication was not successful, just return false
-        if (principal == null)
-            return (false);
+        if (principal == null) {
+          return (false);
+        }
 
         // Add our Principal to the Subject if needed
         if (!subject.getPrincipals().contains(principal)) {
@@ -221,8 +223,9 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         this.options = options;
 
         // Perform instance-specific initialization
-        if (options.get("pathname") != null)
-            this.pathname = (String) options.get("pathname");
+        if (options.get("pathname") != null) {
+          this.pathname = (String) options.get("pathname");
+        }
 
         // Load our defined Principals
         load();
@@ -243,8 +246,9 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     public boolean login() throws LoginException {
 
         // Set up our CallbackHandler requests
-        if (callbackHandler == null)
-            throw new LoginException("No CallbackHandler specified");
+        if (callbackHandler == null) {
+          throw new LoginException("No CallbackHandler specified");
+        }
         Callback callbacks[] = new Callback[9];
         callbacks[0] = new NameCallback("Username: ");
         callbacks[1] = new PasswordCallback("Password: ", false);
@@ -341,8 +345,9 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
         // Validate the existence of our configuration file
         File file = new File(pathname);
-        if (!file.isAbsolute())
-            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
+        if (!file.isAbsolute()) {
+          file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
+        }
         if (!file.exists() || !file.canRead()) {
             log.warn("Cannot load configuration file " + file.getAbsolutePath());
             return;

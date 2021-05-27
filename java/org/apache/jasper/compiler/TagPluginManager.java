@@ -63,8 +63,9 @@ public class TagPluginManager {
     }
 
     private void init(ErrorDispatcher err) throws JasperException {
-        if (initialized)
-            return;
+        if (initialized) {
+          return;
+        }
 
         tagPlugins = new HashMap<String, TagPlugin>();
 
@@ -243,16 +244,18 @@ public class TagPluginManager {
         @Override
         public boolean isConstantAttribute(String attribute) {
             Node.JspAttribute attr = getNodeAttribute(attribute);
-            if (attr == null)
-                return false;
+            if (attr == null) {
+              return false;
+            }
             return attr.isLiteral();
         }
 
         @Override
         public String getConstantAttribute(String attribute) {
             Node.JspAttribute attr = getNodeAttribute(attribute);
-            if (attr == null)
-                return null;
+            if (attr == null) {
+              return null;
+            }
             return attr.getValue();
         }
 

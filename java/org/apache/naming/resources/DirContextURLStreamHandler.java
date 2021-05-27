@@ -86,8 +86,9 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
     protected URLConnection openConnection(URL u)
         throws IOException {
         DirContext currentContext = this.context;
-        if (currentContext == null)
-            currentContext = get();
+        if (currentContext == null) {
+          currentContext = get();
+        }
         return new DirContextURLConnection(currentContext, u);
     }
 
@@ -108,8 +109,9 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
         if (u.getQuery() != null) {
             len += 1 + u.getQuery().length();
         }
-        if (u.getRef() != null)
-            len += 1 + u.getRef().length();
+        if (u.getRef() != null) {
+          len += 1 + u.getRef().length();
+        }
         StringBuilder result = new StringBuilder(len);
         result.append(u.getProtocol());
         result.append(":");
@@ -165,8 +167,9 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
     public static void bind(DirContext dirContext) {
         ClassLoader currentCL =
             Thread.currentThread().getContextClassLoader();
-        if (currentCL != null)
-            clBindings.put(currentCL, dirContext);
+        if (currentCL != null) {
+          clBindings.put(currentCL, dirContext);
+        }
     }
 
 
@@ -176,8 +179,9 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
     public static void unbind() {
         ClassLoader currentCL =
             Thread.currentThread().getContextClassLoader();
-        if (currentCL != null)
-            clBindings.remove(currentCL);
+        if (currentCL != null) {
+          clBindings.remove(currentCL);
+        }
     }
 
 
@@ -209,8 +213,9 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
 
         // Checking CL binding
         result = clBindings.get(currentCL);
-        if (result != null)
-            return result;
+        if (result != null) {
+          return result;
+        }
 
         // Checking thread biding
         result = threadBindings.get(currentThread);
@@ -219,13 +224,15 @@ public class DirContextURLStreamHandler extends URLStreamHandler {
         currentCL = currentCL.getParent();
         while (currentCL != null) {
             result = clBindings.get(currentCL);
-            if (result != null)
-                return result;
+            if (result != null) {
+              return result;
+            }
             currentCL = currentCL.getParent();
         }
 
-        if (result == null)
-            throw new IllegalStateException("Illegal class loader binding");
+        if (result == null) {
+          throw new IllegalStateException("Illegal class loader binding");
+        }
 
         return result;
 

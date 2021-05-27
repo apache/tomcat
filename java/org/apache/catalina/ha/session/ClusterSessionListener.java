@@ -75,14 +75,15 @@ public class ClusterSessionListener extends ClusterListener {
             if (ctxname == null) {
                 for (Map.Entry<String, ClusterManager> entry :
                         managers.entrySet()) {
-                    if (entry.getValue() != null)
-                        entry.getValue().messageDataReceived(msg);
-                    else {
+                    if (entry.getValue() != null) {
+                      entry.getValue().messageDataReceived(msg);
+                    } else {
                         //this happens a lot before the system has started
                         // up
-                        if (log.isDebugEnabled())
-                            log.debug("Context manager doesn't exist:"
-                                    + entry.getKey());
+                        if (log.isDebugEnabled()) {
+                          log.debug("Context manager doesn't exist:"
+                                  + entry.getKey());
+                        }
                     }
                 }
             } else {
@@ -90,8 +91,9 @@ public class ClusterSessionListener extends ClusterListener {
                 if (mgr != null) {
                     mgr.messageDataReceived(msg);
                 } else {
-                    if (log.isWarnEnabled())
-                        log.warn("Context manager doesn't exist:" + ctxname);
+                    if (log.isWarnEnabled()) {
+                      log.warn("Context manager doesn't exist:" + ctxname);
+                    }
 
                     // A no context manager message is replied in order to avoid
                     // timeout of GET_ALL_SESSIONS sync phase.

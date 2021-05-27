@@ -191,11 +191,13 @@ public class SecurityCollection implements Serializable {
      */
     public void addMethod(String method) {
 
-        if (method == null)
-            return;
+        if (method == null) {
+          return;
+        }
         String results[] = new String[methods.length + 1];
-        for (int i = 0; i < methods.length; i++)
-            results[i] = methods[i];
+        for (int i = 0; i < methods.length; i++) {
+          results[i] = methods[i];
+        }
         results[methods.length] = method;
         methods = results;
 
@@ -207,11 +209,13 @@ public class SecurityCollection implements Serializable {
      * web resource collection.
      */
     public void addOmittedMethod(String method) {
-        if (method == null)
-            return;
+        if (method == null) {
+          return;
+        }
         String results[] = new String[omittedMethods.length + 1];
-        for (int i = 0; i < omittedMethods.length; i++)
-            results[i] = omittedMethods[i];
+        for (int i = 0; i < omittedMethods.length; i++) {
+          results[i] = omittedMethods[i];
+        }
         results[omittedMethods.length] = method;
         omittedMethods = results;
     }
@@ -221,8 +225,9 @@ public class SecurityCollection implements Serializable {
      */
     public void addPattern(String pattern) {
 
-        if (pattern == null)
-            return;
+        if (pattern == null) {
+          return;
+        }
 
         String decodedPattern = RequestUtil.URLDecode(pattern);
         String results[] = new String[patterns.length + 1];
@@ -243,19 +248,22 @@ public class SecurityCollection implements Serializable {
      */
     public boolean findMethod(String method) {
 
-        if (methods.length == 0 && omittedMethods.length == 0)
-            return (true);
+        if (methods.length == 0 && omittedMethods.length == 0) {
+          return (true);
+        }
         if (methods.length > 0) {
             for (String s : methods) {
-                if (s.equals(method))
-                    return true;
+                if (s.equals(method)) {
+                  return true;
+                }
             }
             return false;
         }
         if (omittedMethods.length > 0) {
             for (String omittedMethod : omittedMethods) {
-                if (omittedMethod.equals(method))
-                    return false;
+                if (omittedMethod.equals(method)) {
+                  return false;
+                }
             }
         }
         return true;
@@ -293,8 +301,9 @@ public class SecurityCollection implements Serializable {
      */
     public boolean findPattern(String pattern) {
         for (String s : patterns) {
-            if (s.equals(pattern))
-                return true;
+            if (s.equals(pattern)) {
+              return true;
+            }
         }
         return (false);
 
@@ -321,8 +330,9 @@ public class SecurityCollection implements Serializable {
      */
     public void removeMethod(String method) {
 
-        if (method == null)
-            return;
+        if (method == null) {
+          return;
+        }
         int n = -1;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].equals(method)) {
@@ -334,8 +344,9 @@ public class SecurityCollection implements Serializable {
             int j = 0;
             String results[] = new String[methods.length - 1];
             for (int i = 0; i < methods.length; i++) {
-                if (i != n)
-                    results[j++] = methods[i];
+                if (i != n) {
+                  results[j++] = methods[i];
+                }
             }
             methods = results;
         }
@@ -351,8 +362,9 @@ public class SecurityCollection implements Serializable {
      */
     public void removeOmittedMethod(String method) {
 
-        if (method == null)
-            return;
+        if (method == null) {
+          return;
+        }
         int n = -1;
         for (int i = 0; i < omittedMethods.length; i++) {
             if (omittedMethods[i].equals(method)) {
@@ -364,8 +376,9 @@ public class SecurityCollection implements Serializable {
             int j = 0;
             String results[] = new String[omittedMethods.length - 1];
             for (int i = 0; i < omittedMethods.length; i++) {
-                if (i != n)
-                    results[j++] = omittedMethods[i];
+                if (i != n) {
+                  results[j++] = omittedMethods[i];
+                }
             }
             omittedMethods = results;
         }
@@ -381,8 +394,9 @@ public class SecurityCollection implements Serializable {
      */
     public void removePattern(String pattern) {
 
-        if (pattern == null)
-            return;
+        if (pattern == null) {
+          return;
+        }
         int n = -1;
         for (int i = 0; i < patterns.length; i++) {
             if (patterns[i].equals(pattern)) {
@@ -394,8 +408,9 @@ public class SecurityCollection implements Serializable {
             int j = 0;
             String results[] = new String[patterns.length - 1];
             for (int i = 0; i < patterns.length; i++) {
-                if (i != n)
-                    results[j++] = patterns[i];
+                if (i != n) {
+                  results[j++] = patterns[i];
+                }
             }
             patterns = results;
         }

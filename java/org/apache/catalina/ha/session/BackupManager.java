@@ -118,7 +118,9 @@ public class BackupManager extends ClusterManagerBase
 
     @Override
     public ClusterMessage requestCompleted(String sessionId) {
-        if (!getState().isAvailable()) return null;
+        if (!getState().isAvailable()) {
+          return null;
+        }
         LazyReplicatedMap<String,Session> map =
                 (LazyReplicatedMap<String,Session>)sessions;
         map.replicate(sessionId,false);
@@ -170,7 +172,9 @@ public class BackupManager extends ClusterManagerBase
         super.startInternal();
 
         try {
-            if (cluster == null) throw new LifecycleException(sm.getString("backupManager.noCluster", getName()));
+            if (cluster == null) {
+              throw new LifecycleException(sm.getString("backupManager.noCluster", getName()));
+            }
             LazyReplicatedMap<String,Session> map = new LazyReplicatedMap<String,Session>(
                     this, cluster.getChannel(), rpcTimeout, getMapName(),
                     getClassLoaders(), terminateOnStartFailure);
@@ -186,7 +190,9 @@ public class BackupManager extends ClusterManagerBase
 
     public String getMapName() {
         String name = cluster.getManagerName(getName(),this)+"-"+"map";
-        if ( log.isDebugEnabled() ) log.debug("Backup manager, Setting map name to:"+name);
+        if ( log.isDebugEnabled() ) {
+          log.debug("Backup manager, Setting map name to:"+name);
+        }
         return name;
     }
 
@@ -204,8 +210,9 @@ public class BackupManager extends ClusterManagerBase
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("backupManager.stopped", getName()));
+        if (log.isDebugEnabled()) {
+          log.debug(sm.getString("backupManager.stopped", getName()));
+        }
 
         setState(LifecycleState.STOPPING);
 

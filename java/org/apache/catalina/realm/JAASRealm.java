@@ -274,15 +274,20 @@ public class JAASRealm extends RealmBase {
       */
      protected void parseClassNames(String classNamesString, List<String> classNamesList) {
          classNamesList.clear();
-         if (classNamesString == null) return;
+         if (classNamesString == null) {
+          return;
+        }
 
          ClassLoader loader = this.getClass().getClassLoader();
-         if (isUseContextClassLoader())
-             loader = Thread.currentThread().getContextClassLoader();
+         if (isUseContextClassLoader()) {
+          loader = Thread.currentThread().getContextClassLoader();
+        }
 
          String[] classNames = classNamesString.split("[ ]*,[ ]*");
          for (String className : classNames) {
-             if (className.length()==0) continue;
+             if (className.length()==0) {
+              continue;
+            }
              try {
                  Class<?> principalClass = Class.forName(className, false,
                          loader);
@@ -389,10 +394,13 @@ public class JAASRealm extends RealmBase {
         // Establish a LoginContext to use for authentication
         try {
         LoginContext loginContext = null;
-        if( appName==null ) appName="Tomcat";
+        if( appName==null ) {
+          appName="Tomcat";
+        }
 
-        if( log.isDebugEnabled())
-            log.debug(sm.getString("jaasRealm.beginLogin", username, appName));
+        if( log.isDebugEnabled()) {
+          log.debug(sm.getString("jaasRealm.beginLogin", username, appName));
+        }
 
         // What if the LoginModule is in the container class loader ?
         ClassLoader ocl = null;
@@ -417,8 +425,9 @@ public class JAASRealm extends RealmBase {
             }
         }
 
-        if( log.isDebugEnabled())
-            log.debug("Login context created " + username);
+        if( log.isDebugEnabled()) {
+          log.debug("Login context created " + username);
+        }
 
         // Negotiate a login via this LoginContext
         Subject subject = null;
@@ -426,21 +435,25 @@ public class JAASRealm extends RealmBase {
             loginContext.login();
             subject = loginContext.getSubject();
             if (subject == null) {
-                if( log.isDebugEnabled())
-                    log.debug(sm.getString("jaasRealm.failedLogin", username));
+                if( log.isDebugEnabled()) {
+                  log.debug(sm.getString("jaasRealm.failedLogin", username));
+                }
                 return (null);
             }
         } catch (AccountExpiredException e) {
-            if (log.isDebugEnabled())
-                log.debug(sm.getString("jaasRealm.accountExpired", username));
+            if (log.isDebugEnabled()) {
+              log.debug(sm.getString("jaasRealm.accountExpired", username));
+            }
             return (null);
         } catch (CredentialExpiredException e) {
-            if (log.isDebugEnabled())
-                log.debug(sm.getString("jaasRealm.credentialExpired", username));
+            if (log.isDebugEnabled()) {
+              log.debug(sm.getString("jaasRealm.credentialExpired", username));
+            }
             return (null);
         } catch (FailedLoginException e) {
-            if (log.isDebugEnabled())
-                log.debug(sm.getString("jaasRealm.failedLogin", username));
+            if (log.isDebugEnabled()) {
+              log.debug(sm.getString("jaasRealm.failedLogin", username));
+            }
             return (null);
         } catch (LoginException e) {
             log.warn(sm.getString("jaasRealm.loginException", username), e);
@@ -451,8 +464,9 @@ public class JAASRealm extends RealmBase {
             return (null);
         }
 
-        if( log.isDebugEnabled())
-            log.debug(sm.getString("jaasRealm.loginContextCreated", username));
+        if( log.isDebugEnabled()) {
+          log.debug(sm.getString("jaasRealm.loginContextCreated", username));
+        }
 
         // Return the appropriate Principal for this authenticated Subject
         Principal principal = createPrincipal(username, subject, loginContext);

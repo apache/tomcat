@@ -79,8 +79,9 @@ public class SchemaResolver implements EntityResolver {
      */
      public void register(String publicId, String entityURL) {
          String key = publicId;
-         if (publicId.indexOf(schemaExtension) != -1)
-             key = publicId.substring(publicId.lastIndexOf('/')+1);
+         if (publicId.indexOf(schemaExtension) != -1) {
+          key = publicId.substring(publicId.lastIndexOf('/')+1);
+        }
          entityValidator.put(key, entityURL);
      }
 

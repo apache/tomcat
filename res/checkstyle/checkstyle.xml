@@ -53,6 +53,7 @@
     <module name="AvoidNestedBlocks">
       <property name="allowInSwitchCase" value="true"/>
     </module>
+    <module name="NeedBraces"/>
 
     <!-- Coding -->
     <module name="IllegalInstantiation"/>

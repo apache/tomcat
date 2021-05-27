@@ -105,8 +105,9 @@ public final class ApplicationFilterFactory {
         }
 
         // If there is no servlet to execute, return null
-        if (servlet == null)
-            return null;
+        if (servlet == null) {
+          return null;
+        }
 
         boolean comet = false;
 
@@ -143,8 +144,9 @@ public final class ApplicationFilterFactory {
         FilterMap filterMaps[] = context.findFilterMaps();
 
         // If there are no filter mappings, we are done
-        if ((filterMaps == null) || (filterMaps.length == 0))
-            return filterChain;
+        if ((filterMaps == null) || (filterMaps.length == 0)) {
+          return filterChain;
+        }
 
         // Acquire the information we will need to match filter mappings
         String servletName = wrapper.getName();
@@ -154,8 +156,9 @@ public final class ApplicationFilterFactory {
             if (!matchDispatcher(filterMap, dispatcher)) {
                 continue;
             }
-            if (!matchFiltersURL(filterMap, requestPath))
-                continue;
+            if (!matchFiltersURL(filterMap, requestPath)) {
+              continue;
+            }
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
                     context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
@@ -186,8 +189,9 @@ public final class ApplicationFilterFactory {
             if (!matchDispatcher(filterMap, dispatcher)) {
                 continue;
             }
-            if (!matchFiltersServlet(filterMap, servletName))
-                continue;
+            if (!matchFiltersServlet(filterMap, servletName)) {
+              continue;
+            }
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
                     context.findFilterConfig(filterMap.getFilterName());
             if (filterConfig == null) {
@@ -231,11 +235,13 @@ public final class ApplicationFilterFactory {
 
         // Check the specific "*" special URL pattern, which also matches
         // named dispatches
-        if (filterMap.getMatchAllUrlPatterns())
-            return true;
+        if (filterMap.getMatchAllUrlPatterns()) {
+          return true;
+        }
 
-        if (requestPath == null)
-            return false;
+        if (requestPath == null) {
+          return false;
+        }
 
         // Match on context relative request path
         String[] testPaths = filterMap.getURLPatterns();
@@ -262,16 +268,19 @@ public final class ApplicationFilterFactory {
      */
     private static boolean matchFiltersURL(String testPath, String requestPath) {
 
-        if (testPath == null)
-            return false;
+        if (testPath == null) {
+          return false;
+        }
 
         // Case 1 - Exact Match
-        if (testPath.equals(requestPath))
-            return true;
+        if (testPath.equals(requestPath)) {
+          return true;
+        }
 
         // Case 2 - Path Match ("/.../*")
-        if (testPath.equals("/*"))
-            return true;
+        if (testPath.equals("/*")) {
+          return true;
+        }
         if (testPath.endsWith("/*")) {
             if (testPath.regionMatches(0, requestPath, 0,
                                        testPath.length() - 2)) {

@@ -138,7 +138,9 @@ public final class ExtensionValidator {
             new ArrayList<ManifestResource>();
         // If the application context is null it does not exist and
         // therefore is not valid
-        if (dirContext == null) return false;
+        if (dirContext == null) {
+          return false;
+        }
         // Find the Manifest for the Web Application
         InputStream inputStream = null;
         try {

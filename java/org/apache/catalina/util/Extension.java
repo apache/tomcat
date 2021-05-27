@@ -180,32 +180,38 @@ public final class Extension {
     public boolean isCompatibleWith(Extension required) {
 
         // Extension Name must match
-        if (extensionName == null)
-            return (false);
-        if (!extensionName.equals(required.getExtensionName()))
-            return (false);
+        if (extensionName == null) {
+          return (false);
+        }
+        if (!extensionName.equals(required.getExtensionName())) {
+          return (false);
+        }
 
         // If specified, available specification version must be >= required
         if (required.getSpecificationVersion() != null) {
             if (!isNewer(specificationVersion,
-                         required.getSpecificationVersion()))
-                return (false);
+                         required.getSpecificationVersion())) {
+              return (false);
+            }
         }
 
         // If specified, Implementation Vendor ID must match
         if (required.getImplementationVendorId() != null) {
-            if (implementationVendorId == null)
-                return (false);
+            if (implementationVendorId == null) {
+              return (false);
+            }
             if (!implementationVendorId.equals(required
-                    .getImplementationVendorId()))
-                return (false);
+                    .getImplementationVendorId())) {
+              return (false);
+            }
         }
 
         // If specified, Implementation version must be >= required
         if (required.getImplementationVersion() != null) {
             if (!isNewer(implementationVersion,
-                         required.getImplementationVersion()))
-                return (false);
+                         required.getImplementationVersion())) {
+              return (false);
+            }
         }
 
         // This available optional package satisfies the requirements
@@ -267,32 +273,39 @@ public final class Extension {
     private boolean isNewer(String first, String second)
         throws NumberFormatException {
 
-        if ((first == null) || (second == null))
-            return (false);
-        if (first.equals(second))
-            return (true);
+        if ((first == null) || (second == null)) {
+          return (false);
+        }
+        if (first.equals(second)) {
+          return (true);
+        }
 
         StringTokenizer fTok = new StringTokenizer(first, ".", true);
         StringTokenizer sTok = new StringTokenizer(second, ".", true);
         int fVersion = 0;
         int sVersion = 0;
         while (fTok.hasMoreTokens() || sTok.hasMoreTokens()) {
-            if (fTok.hasMoreTokens())
-                fVersion = Integer.parseInt(fTok.nextToken());
-            else
-                fVersion = 0;
-            if (sTok.hasMoreTokens())
-                sVersion = Integer.parseInt(sTok.nextToken());
-            else
-                sVersion = 0;
-            if (fVersion < sVersion)
-                return (false);
-            else if (fVersion > sVersion)
-                return (true);
-            if (fTok.hasMoreTokens())   // Swallow the periods
-                fTok.nextToken();
-            if (sTok.hasMoreTokens())
-                sTok.nextToken();
+            if (fTok.hasMoreTokens()) {
+              fVersion = Integer.parseInt(fTok.nextToken());
+            } else {
+              fVersion = 0;
+            }
+            if (sTok.hasMoreTokens()) {
+              sVersion = Integer.parseInt(sTok.nextToken());
+            } else {
+              sVersion = 0;
+            }
+            if (fVersion < sVersion) {
+              return (false);
+            } else if (fVersion > sVersion) {
+              return (true);
+            }
+            if (fTok.hasMoreTokens()) {
+              fTok.nextToken();
+            }
+            if (sTok.hasMoreTokens()) {
+              sTok.nextToken();
+            }
         }
 
         return (true);  // Exact match

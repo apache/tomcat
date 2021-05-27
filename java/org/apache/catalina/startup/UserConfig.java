@@ -222,7 +222,9 @@ public final class UserConfig
      * Return the regular expression used to test for user who deployment is allowed.
      */
     public String getAllow() {
-        if (allow == null) return null;
+        if (allow == null) {
+          return null;
+        }
         return allow.toString();
     }
 
@@ -245,7 +247,9 @@ public final class UserConfig
      * Return the regular expression used to test for user who deployment is denied.
      */
     public String getDeny() {
-        if (deny == null) return null;
+        if (deny == null) {
+          return null;
+        }
         return deny.toString();
     }
 
@@ -283,10 +287,11 @@ public final class UserConfig
         }
 
         // Process the event that has occurred
-        if (event.getType().equals(Lifecycle.START_EVENT))
-            start();
-        else if (event.getType().equals(Lifecycle.STOP_EVENT))
-            stop();
+        if (event.getType().equals(Lifecycle.START_EVENT)) {
+          start();
+        } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
+          stop();
+        }
 
     }
 
@@ -300,8 +305,9 @@ public final class UserConfig
      */
     private void deploy() {
 
-        if (host.getLogger().isDebugEnabled())
-            host.getLogger().debug(sm.getString("userConfig.deploying"));
+        if (host.getLogger().isDebugEnabled()) {
+          host.getLogger().debug(sm.getString("userConfig.deploying"));
+        }
 
         // Load the user database object for this host
         UserDatabase database = null;
@@ -321,7 +327,9 @@ public final class UserConfig
         Enumeration<String> users = database.getUsers();
         while (users.hasMoreElements()) {
             String user = users.nextElement();
-            if (!isDeployAllowed(user)) continue;
+            if (!isDeployAllowed(user)) {
+              continue;
+            }
             String home = database.getHome(user);
             results.add(executor.submit(new DeployUserDirectory(this, user, home)));
         }
@@ -347,11 +355,13 @@ public final class UserConfig
 
         // Does this user have a web application to be deployed?
         String contextPath = "/~" + user;
-        if (host.findChild(contextPath) != null)
-            return;
+        if (host.findChild(contextPath) != null) {
+          return;
+        }
         File app = new File(home, directoryName);
-        if (!app.exists() || !app.isDirectory())
-            return;
+        if (!app.exists() || !app.isDirectory()) {
+          return;
+        }
         /*
         File dd = new File(app, "/WEB-INF/web.xml");
         if (!dd.exists() || !dd.isFile() || !dd.canRead())
@@ -383,8 +393,9 @@ public final class UserConfig
      */
     private void start() {
 
-        if (host.getLogger().isDebugEnabled())
-            host.getLogger().debug(sm.getString("userConfig.start"));
+        if (host.getLogger().isDebugEnabled()) {
+          host.getLogger().debug(sm.getString("userConfig.start"));
+        }
 
         deploy();
 
@@ -396,8 +407,9 @@ public final class UserConfig
      */
     private void stop() {
 
-        if (host.getLogger().isDebugEnabled())
-            host.getLogger().debug(sm.getString("userConfig.stop"));
+        if (host.getLogger().isDebugEnabled()) {
+          host.getLogger().debug(sm.getString("userConfig.stop"));
+        }
 
     }
 

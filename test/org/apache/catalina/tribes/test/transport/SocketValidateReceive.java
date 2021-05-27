@@ -35,7 +35,9 @@ public class SocketValidateReceive {
 
     public static void main(String[] args) throws Exception {
         int size = 43800;
-        if (args.length > 0 ) try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
+        if (args.length > 0 ) {
+          try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
+        }
 
         ServerSocket srvSocket = new ServerSocket(9999);
         System.out.println("Listening on 9999");
@@ -66,7 +68,9 @@ public class SocketValidateReceive {
             }
             count += reader.append(buf,0,len);
 
-            if ( bytes.intValue() != len ) bytes = new BigDecimal((double)len);
+            if ( bytes.intValue() != len ) {
+              bytes = new BigDecimal((double)len);
+            }
             total = total.add(bytes);
             mb += ( (double) len) / 1024 / 1024;
             if ( ((count) % 10000) == 0 ) {
@@ -98,7 +102,9 @@ public class SocketValidateReceive {
                     seq++;
                     packages++;
                 }
-                if ( b[i] != seq ) throw new Exception("mismatch on seq:"+seq+" and byte nr:"+cur+" count:"+count+" packages:"+packages);
+                if ( b[i] != seq ) {
+                  throw new Exception("mismatch on seq:"+seq+" and byte nr:"+cur+" count:"+count+" packages:"+packages);
+                }
                 cur++;
             }
             return packages;

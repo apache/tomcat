@@ -83,15 +83,17 @@ public final class ReplicationStream extends ObjectInputStream {
 
         boolean tryRepFirst = name.startsWith("org.apache.catalina.tribes");
             try {
-            if (tryRepFirst)
-                return findReplicationClass(name);
-            else
-                return findExternalClass(name);
+            if (tryRepFirst) {
+              return findReplicationClass(name);
+            } else {
+              return findExternalClass(name);
+            }
         } catch (Exception x) {
-            if (tryRepFirst)
-                return findExternalClass(name);
-            else
-                return findReplicationClass(name);
+            if (tryRepFirst) {
+              return findExternalClass(name);
+            } else {
+              return findReplicationClass(name);
+            }
         }
     }
 
@@ -116,7 +118,9 @@ public final class ReplicationStream extends ObjectInputStream {
         Class<?>[] classObjs = new Class[interfaces.length];
         for (int i = 0; i < interfaces.length; i++) {
             Class<?> cl = this.resolveClass(interfaces[i]);
-            if (latestLoader==null) latestLoader = cl.getClassLoader();
+            if (latestLoader==null) {
+              latestLoader = cl.getClassLoader();
+            }
             if ((cl.getModifiers() & Modifier.PUBLIC) == 0) {
                 if (hasNonPublicInterface) {
                     if (nonPublicLoader != cl.getClassLoader()) {
@@ -155,8 +159,11 @@ public final class ReplicationStream extends ObjectInputStream {
                 cnfe = x;
             }
         }
-        if ( cnfe != null ) throw cnfe;
-        else throw new ClassNotFoundException(name);
+        if ( cnfe != null ) {
+          throw cnfe;
+        } else {
+          throw new ClassNotFoundException(name);
+        }
     }
 
     @Override

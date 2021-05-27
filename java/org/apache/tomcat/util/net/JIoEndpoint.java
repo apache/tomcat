@@ -284,7 +284,9 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
         protected SocketStatus status = null;
 
         public SocketProcessor(SocketWrapper<Socket> socket) {
-            if (socket==null) throw new NullPointerException();
+            if (socket==null) {
+              throw new NullPointerException();
+            }
             this.socket = socket;
         }
 
@@ -406,11 +408,12 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                 }
             } catch (BindException orig) {
                 String msg;
-                if (getAddress() == null)
-                    msg = orig.getMessage() + " <null>:" + getPort();
-                else
-                    msg = orig.getMessage() + " " +
-                            getAddress().toString() + ":" + getPort();
+                if (getAddress() == null) {
+                  msg = orig.getMessage() + " <null>:" + getPort();
+                } else {
+                  msg = orig.getMessage() + " " +
+                          getAddress().toString() + ":" + getPort();
+                }
                 BindException be = new BindException(msg);
                 be.initCause(orig);
                 throw be;
@@ -467,8 +470,9 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
         }
         if (serverSocket != null) {
             try {
-                if (serverSocket != null)
-                    serverSocket.close();
+                if (serverSocket != null) {
+                  serverSocket.close();
+                }
             } catch (Exception e) {
                 log.error(sm.getString("endpoint.err.close"), e);
             }

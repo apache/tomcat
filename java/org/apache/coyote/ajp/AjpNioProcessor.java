@@ -251,7 +251,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             break;
         }
         case ASYNC_SETTIMEOUT: {
-            if (param == null) return;
+            if (param == null) {
+              return;
+            }
             long timeout = ((Long)param).longValue();
             final KeyAttachment ka =
                     (KeyAttachment)socketWrapper.getSocket().getAttachment();
@@ -297,7 +299,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
         KeyAttachment att =
                 (KeyAttachment) socketWrapper.getSocket().getAttachment();
-        if ( att == null ) throw new IOException("Key must be cancelled");
+        if ( att == null ) {
+          throw new IOException("Key must be cancelled");
+        }
 
         ByteBuffer writeBuffer =
                 socketWrapper.getSocket().getBufHandler().getWriteBuffer();
@@ -322,7 +326,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                         selector, writeTimeout, true);
             } finally {
                 writeBuffer.clear();
-                if ( selector != null ) pool.put(selector);
+                if ( selector != null ) {
+                  pool.put(selector);
+                }
             }
             written += thisTime;
         }
@@ -386,13 +392,17 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             try {
                 NioEndpoint.KeyAttachment att =
                         (NioEndpoint.KeyAttachment) socketWrapper.getSocket().getAttachment();
-                if ( att == null ) throw new IOException("Key must be cancelled.");
+                if ( att == null ) {
+                  throw new IOException("Key must be cancelled.");
+                }
                 nRead = pool.read(readBuffer, socketWrapper.getSocket(),
                         selector, att.getTimeout());
             } catch ( EOFException eof ) {
                 nRead = -1;
             } finally {
-                if ( selector != null ) pool.put(selector);
+                if ( selector != null ) {
+                  pool.put(selector);
+                }
             }
         } else {
             nRead = socketWrapper.getSocket().read(readBuffer);

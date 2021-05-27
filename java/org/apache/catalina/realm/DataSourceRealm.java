@@ -320,9 +320,10 @@ public class DataSourceRealm
         // No user or no credentials
         // Can't possibly authenticate, don't bother the database then
         if (username == null || credentials == null) {
-            if (containerLog.isTraceEnabled())
-                containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
-                                                username));
+            if (containerLog.isTraceEnabled()) {
+              containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
+                                              username));
+            }
             return null;
         }
 
@@ -334,9 +335,10 @@ public class DataSourceRealm
             // Waste a bit of time as not to reveal that the user does not exist.
             compareCredentials(credentials, getClass().getName());
 
-            if (containerLog.isTraceEnabled())
-                containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
-                                                username));
+            if (containerLog.isTraceEnabled()) {
+              containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
+                                              username));
+            }
             return null;
         }
 
@@ -344,13 +346,15 @@ public class DataSourceRealm
         boolean validated = compareCredentials(credentials, dbCredentials);
 
         if (validated) {
-            if (containerLog.isTraceEnabled())
-                containerLog.trace(sm.getString("dataSourceRealm.authenticateSuccess",
-                                                username));
+            if (containerLog.isTraceEnabled()) {
+              containerLog.trace(sm.getString("dataSourceRealm.authenticateSuccess",
+                                              username));
+            }
         } else {
-            if (containerLog.isTraceEnabled())
-                containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
-                                                username));
+            if (containerLog.isTraceEnabled()) {
+              containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
+                                              username));
+            }
             return null;
         }
 
@@ -369,8 +373,9 @@ public class DataSourceRealm
     protected void close(Connection dbConnection) {
 
         // Do nothing if the database connection is already closed
-        if (dbConnection == null)
-            return;
+        if (dbConnection == null) {
+          return;
+        }
 
         // Commit if not auto committed
         try {

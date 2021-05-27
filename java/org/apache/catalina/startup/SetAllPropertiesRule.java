@@ -37,7 +37,11 @@ public class SetAllPropertiesRule extends Rule {
     public SetAllPropertiesRule() {}
 
     public SetAllPropertiesRule(String[] exclude) {
-        for (String s : exclude) if (s != null) this.excludes.put(s, s);
+        for (String s : exclude) {
+          if (s != null) {
+            this.excludes.put(s, s);
+          }
+        }
     }
 
     // ----------------------------------------------------- Instance Variables

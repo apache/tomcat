@@ -83,7 +83,9 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
     }
 
     public void execute() throws Exception {
-        if( registry==null ) registry=Registry.getRegistry(null, null);
+        if( registry==null ) {
+          registry=Registry.getRegistry(null, null);
+        }
 
         try {
             InputStream stream=(InputStream)source;
@@ -280,8 +282,9 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                     {
                         ParameterInfo pi=new ParameterInfo();
                         DomUtil.setAttributes(pi, paramN);
-                        if( log.isTraceEnabled())
-                            log.trace("Add param " + pi.getName());
+                        if( log.isTraceEnabled()) {
+                          log.trace("Add param " + pi.getName());
+                        }
                         oi.addParameter( pi );
                     }
 

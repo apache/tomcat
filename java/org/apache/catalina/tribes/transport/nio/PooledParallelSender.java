@@ -43,7 +43,9 @@ public class PooledParallelSender extends PooledSender {
 
     @Override
     public void sendMessage(Member[] destination, ChannelMessage message) throws ChannelException {
-        if ( !connected ) throw new ChannelException("Sender not connected.");
+        if ( !connected ) {
+          throw new ChannelException("Sender not connected.");
+        }
         ParallelNioSender sender = (ParallelNioSender)getSender();
         if (sender == null) {
             ChannelException cx = new ChannelException("Unable to retrieve a data sender, time out(" + getMaxWait() + " ms) error.");
@@ -53,7 +55,9 @@ public class PooledParallelSender extends PooledSender {
             throw cx;
         } else {
             try {
-                if (!sender.isConnected()) sender.connect();
+                if (!sender.isConnected()) {
+                  sender.connect();
+                }
                 sender.sendMessage(destination, message);
                 sender.keepalive();
             } catch (ChannelException x) {
@@ -61,7 +65,9 @@ public class PooledParallelSender extends PooledSender {
                 throw x;
             } finally {
                 returnSender(sender);
-                if (!connected) disconnect();
+                if (!connected) {
+                  disconnect();
+                }
             }
         }
     }

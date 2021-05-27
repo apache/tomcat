@@ -63,8 +63,9 @@ public class ELContextImpl extends ELContext {
         @Override
         public ValueExpression setVariable(String variable,
                 ValueExpression expression) {
-            if (vars == null)
-                vars = new HashMap<String, ValueExpression>();
+            if (vars == null) {
+              vars = new HashMap<String, ValueExpression>();
+            }
             return vars.put(variable, expression);
         }
 

@@ -909,10 +909,11 @@ public class XMLEncodingDetector {
                     if (fCurrentEntity.position == fCurrentEntity.count - 1) {
                         fCurrentEntity.ch[0] = (char)c;
                         entityChanged = load(1, true);
-                        if (!entityChanged)
-                                // the load change the position to be 1,
-                                // need to restore it when entity not changed
-                            fCurrentEntity.position = 0;
+                        if (!entityChanged) {
+                          // the load change the position to be 1,
+                              // need to restore it when entity not changed
+                          fCurrentEntity.position = 0;
+                        }
                     }
                     if (c == '\r' && external) {
                         // REVISIT: Does this need to be updated to fix the
@@ -934,8 +935,9 @@ public class XMLEncodingDetector {
                     fCurrentEntity.columnNumber++;
                 }
                 // load more characters, if needed
-                if (!entityChanged)
-                    fCurrentEntity.position++;
+                if (!entityChanged) {
+                  fCurrentEntity.position++;
+                }
                 if (fCurrentEntity.position == fCurrentEntity.count) {
                     load(0, true);
                 }

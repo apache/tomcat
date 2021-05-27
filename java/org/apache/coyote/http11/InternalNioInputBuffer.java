@@ -215,7 +215,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         throws IOException {
 
         //check state
-        if ( !parsingRequestLine ) return true;
+        if ( !parsingRequestLine ) {
+          return true;
+        }
         //
         // Skipping blank lines
         //
@@ -258,8 +260,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             while (!space) {
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill(true, false)) //request line parsing
-                        return false;
+                    if (!fill(true, false)) {
+                      return false;
+                    }
                 }
                 // Spec says method name is a token followed by a single SP but
                 // also be tolerant of multiple SP and/or HT.
@@ -280,8 +283,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             while (space) {
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill(true, false)) //request line parsing
-                        return false;
+                    if (!fill(true, false)) {
+                      return false;
+                    }
                 }
                 if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                     pos++;
@@ -303,8 +307,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             while (!space) {
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill(true,false)) //request line parsing
-                        return false;
+                    if (!fill(true,false)) {
+                      return false;
+                    }
                 }
 
                 if (buf[pos -1] == Constants.CR && buf[pos] != Constants.LF) {
@@ -370,8 +375,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             while (space) {
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill(true, false)) //request line parsing
-                        return false;
+                    if (!fill(true, false)) {
+                      return false;
+                    }
                 }
                 if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                     pos++;
@@ -393,8 +399,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             while (!parsingRequestLineEol) {
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill(true, false)) //request line parsing
-                        return false;
+                    if (!fill(true, false)) {
+                      return false;
+                    }
                 }
 
                 if (buf[pos] == Constants.CR) {
@@ -471,7 +478,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             } catch ( EOFException eof ) {
                 nRead = -1;
             } finally {
-                if ( selector != null ) pool.put(selector);
+                if ( selector != null ) {
+                  pool.put(selector);
+                }
             }
         } else {
             nRead = socket.read(socket.getBufHandler().getReadBuffer());
@@ -881,8 +890,9 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
             throws IOException {
 
             if (pos >= lastValid) {
-                if (!fill(true,true)) //read body, must be blocking, as the thread is inside the app
-                    return -1;
+                if (!fill(true,true)) {
+                  return -1;
+                }
             }
 
             int length = lastValid - pos;

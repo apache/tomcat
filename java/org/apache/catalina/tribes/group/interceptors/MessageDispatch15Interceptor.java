@@ -82,7 +82,9 @@ public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
 
     @Override
     public void startQueue() {
-        if ( run ) return;
+        if ( run ) {
+          return;
+        }
         String channelName = "";
         if (getChannel() instanceof GroupChannel
                 && ((GroupChannel)getChannel()).getName() != null) {

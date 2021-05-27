@@ -85,7 +85,9 @@ public class NioBlockingSelector {
     public int write(ByteBuffer buf, NioChannel socket, long writeTimeout)
             throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-        if ( key == null ) throw new IOException("Key no longer registered");
+        if ( key == null ) {
+          throw new IOException("Key no longer registered");
+        }
         KeyReference reference = keyReferenceQueue.poll();
         if (reference == null) {
             reference = new KeyReference();
@@ -99,8 +101,9 @@ public class NioBlockingSelector {
             while ( (!timedout) && buf.hasRemaining()) {
                 if (keycount > 0) { //only write if we were registered for a write
                     int cnt = socket.write(buf); //write the data
-                    if (cnt == -1)
-                        throw new EOFException();
+                    if (cnt == -1) {
+                      throw new EOFException();
+                    }
                     written += cnt;
                     if (cnt > 0) {
                         time = System.currentTimeMillis(); //reset our timeout timer
@@ -108,7 +111,9 @@ public class NioBlockingSelector {
                     }
                 }
                 try {
-                    if ( att.getWriteLatch()==null || att.getWriteLatch().getCount()==0) att.startWriteLatch(1);
+                    if ( att.getWriteLatch()==null || att.getWriteLatch().getCount()==0) {
+                      att.startWriteLatch(1);
+                    }
                     poller.add(att,SelectionKey.OP_WRITE,reference);
                     if (writeTimeout < 0) {
                         att.awaitWriteLatch(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
@@ -127,11 +132,13 @@ public class NioBlockingSelector {
                     att.resetWriteLatch();
                 }
 
-                if (writeTimeout > 0 && (keycount == 0))
-                    timedout = (System.currentTimeMillis() - time) >= writeTimeout;
+                if (writeTimeout > 0 && (keycount == 0)) {
+                  timedout = (System.currentTimeMillis() - time) >= writeTimeout;
+                }
             } //while
-            if (timedout)
-                throw new SocketTimeoutException();
+            if (timedout) {
+              throw new SocketTimeoutException();
+            }
         } finally {
             poller.remove(att,SelectionKey.OP_WRITE);
             if (timedout && reference.key!=null) {
@@ -157,7 +164,9 @@ public class NioBlockingSelector {
      */
     public int read(ByteBuffer buf, NioChannel socket, long readTimeout) throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-        if ( key == null ) throw new IOException("Key no longer registered");
+        if ( key == null ) {
+          throw new IOException("Key no longer registered");
+        }
         KeyReference reference = keyReferenceQueue.poll();
         if (reference == null) {
             reference = new KeyReference();
@@ -171,13 +180,17 @@ public class NioBlockingSelector {
             while(!timedout) {
                 if (keycount > 0) { //only read if we were registered for a read
                     read = socket.read(buf);
-                    if (read == -1)
-                        throw new EOFException();
-                    if (read > 0)
-                        break;
+                    if (read == -1) {
+                      throw new EOFException();
+                    }
+                    if (read > 0) {
+                      break;
+                    }
                 }
                 try {
-                    if ( att.getReadLatch()==null || att.getReadLatch().getCount()==0) att.startReadLatch(1);
+                    if ( att.getReadLatch()==null || att.getReadLatch().getCount()==0) {
+                      att.startReadLatch(1);
+                    }
                     poller.add(att,SelectionKey.OP_READ, reference);
                     if (readTimeout < 0) {
                         att.awaitReadLatch(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -195,11 +208,13 @@ public class NioBlockingSelector {
                     keycount = 1;
                     att.resetReadLatch();
                 }
-                if (readTimeout >= 0 && (keycount == 0))
-                    timedout = (System.currentTimeMillis() - time) >= readTimeout;
+                if (readTimeout >= 0 && (keycount == 0)) {
+                  timedout = (System.currentTimeMillis() - time) >= readTimeout;
+                }
             } //while
-            if (timedout)
-                throw new SocketTimeoutException();
+            if (timedout) {
+              throw new SocketTimeoutException();
+            }
         } finally {
             poller.remove(att,SelectionKey.OP_READ);
             if (timedout && reference.key!=null) {
@@ -230,15 +245,21 @@ public class NioBlockingSelector {
         }
 
         public void wakeup() {
-            if (wakeupCounter.addAndGet(1)==0) selector.wakeup();
+            if (wakeupCounter.addAndGet(1)==0) {
+              selector.wakeup();
+            }
         }
 
         public void cancel(SelectionKey sk, KeyAttachment key, int ops){
             if (sk!=null) {
                 sk.cancel();
                 sk.attach(null);
-                if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
-                if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+                if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) {
+                  countDown(key.getWriteLatch());
+                }
+                if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ)) {
+                  countDown(key.getReadLatch());
+                }
             }
         }
 
@@ -246,11 +267,17 @@ public class NioBlockingSelector {
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    if ( key == null ) return;
+                    if ( key == null ) {
+                      return;
+                    }
                     NioChannel nch = key.getChannel();
-                    if ( nch == null ) return;
+                    if ( nch == null ) {
+                      return;
+                    }
                     SocketChannel ch = nch.getIOChannel();
-                    if ( ch == null ) return;
+                    if ( ch == null ) {
+                      return;
+                    }
                     SelectionKey sk = ch.keyFor(selector);
                     try {
                         if (sk == null) {
@@ -276,21 +303,35 @@ public class NioBlockingSelector {
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    if ( key == null ) return;
+                    if ( key == null ) {
+                      return;
+                    }
                     NioChannel nch = key.getChannel();
-                    if ( nch == null ) return;
+                    if ( nch == null ) {
+                      return;
+                    }
                     SocketChannel ch = nch.getIOChannel();
-                    if ( ch == null ) return;
+                    if ( ch == null ) {
+                      return;
+                    }
                     SelectionKey sk = ch.keyFor(selector);
                     try {
                         if (sk == null) {
-                            if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
-                            if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+                            if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) {
+                              countDown(key.getWriteLatch());
+                            }
+                            if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ)) {
+                              countDown(key.getReadLatch());
+                            }
                         } else {
                             if (sk.isValid()) {
                                 sk.interestOps(sk.interestOps() & (~ops));
-                                if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
-                                if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+                                if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) {
+                                  countDown(key.getWriteLatch());
+                                }
+                                if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ)) {
+                                  countDown(key.getReadLatch());
+                                }
                                 if (sk.interestOps()==0) {
                                     sk.cancel();
                                     sk.attach(null);
@@ -345,22 +386,30 @@ public class NioBlockingSelector {
                     int keyCount = 0;
                     try {
                         int i = wakeupCounter.get();
-                        if (i>0)
-                            keyCount = selector.selectNow();
-                        else {
+                        if (i>0) {
+                          keyCount = selector.selectNow();
+                        } else {
                             wakeupCounter.set(-1);
                             keyCount = selector.select(1000);
                         }
                         wakeupCounter.set(0);
-                        if (!run) break;
+                        if (!run) {
+                          break;
+                        }
                     }catch ( NullPointerException x ) {
                         //sun bug 5076772 on windows JDK 1.5
-                        if (selector==null) throw x;
-                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
+                        if (selector==null) {
+                          throw x;
+                        }
+                        if ( log.isDebugEnabled() ) {
+                          log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
+                        }
                         continue;
                     } catch ( CancelledKeyException x ) {
                         //sun bug 5076772 on windows JDK 1.5
-                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
+                        if ( log.isDebugEnabled() ) {
+                          log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
+                        }
                         continue;
                     } catch (Throwable x) {
                         ExceptionUtils.handleThrowable(x);
@@ -405,18 +454,24 @@ public class NioBlockingSelector {
                     // Cancels all remaining keys
                     selector.selectNow();
                 }catch( Exception ignore ) {
-                    if (log.isDebugEnabled())log.debug("",ignore);
+                    if (log.isDebugEnabled()) {
+                      log.debug("",ignore);
+                    }
                 }
             }
             try {
                 selector.close();
             }catch( Exception ignore ) {
-                if (log.isDebugEnabled())log.debug("",ignore);
+                if (log.isDebugEnabled()) {
+                  log.debug("",ignore);
+                }
             }
         }
 
         public void countDown(CountDownLatch latch) {
-            if ( latch == null ) return;
+            if ( latch == null ) {
+              return;
+            }
             latch.countDown();
         }
     }

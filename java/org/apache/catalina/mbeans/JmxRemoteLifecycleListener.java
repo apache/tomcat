@@ -490,18 +490,23 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (!super.equals(obj))
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
+            if (this == obj) {
+              return true;
+            }
+            if (!super.equals(obj)) {
+              return false;
+            }
+            if (getClass() != obj.getClass()) {
+              return false;
+            }
             SslRmiServerBindSocketFactory other = (SslRmiServerBindSocketFactory) obj;
             if (bindAddress == null) {
-                if (other.bindAddress != null)
-                    return false;
-            } else if (!bindAddress.equals(other.bindAddress))
-                return false;
+                if (other.bindAddress != null) {
+                  return false;
+                }
+            } else if (!bindAddress.equals(other.bindAddress)) {
+              return false;
+            }
             return true;
         }
     }

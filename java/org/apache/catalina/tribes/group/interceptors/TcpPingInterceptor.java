@@ -80,10 +80,12 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         //acquire the interceptors to invoke on send ping events
         ChannelInterceptor next = getNext();
         while ( next != null ) {
-            if ( next instanceof TcpFailureDetector )
-                failureDetector = new WeakReference<TcpFailureDetector>((TcpFailureDetector)next);
-            if ( next instanceof StaticMembershipInterceptor )
-                staticMembers = new WeakReference<StaticMembershipInterceptor>((StaticMembershipInterceptor)next);
+            if ( next instanceof TcpFailureDetector ) {
+              failureDetector = new WeakReference<TcpFailureDetector>((TcpFailureDetector)next);
+            }
+            if ( next instanceof StaticMembershipInterceptor ) {
+              staticMembers = new WeakReference<StaticMembershipInterceptor>((StaticMembershipInterceptor)next);
+            }
             next = next.getNext();
         }
 
@@ -102,7 +104,9 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
     @Override
     public void heartbeat() {
         super.heartbeat();
-        if (!getUseThread()) sendPing();
+        if (!getUseThread()) {
+          sendPing();
+        }
     }
 
     public long getInterval() {
@@ -148,7 +152,9 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
     }
 
     protected void sendPingMessage(Member[] members) {
-        if ( members == null || members.length == 0 ) return;
+        if ( members == null || members.length == 0 ) {
+          return;
+        }
         ChannelData data = new ChannelData(true);//generates a unique Id
         data.setAddress(getLocalMember(false));
         data.setTimestamp(System.currentTimeMillis());
@@ -172,8 +178,11 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         }//end if
 
         //ignore the message, it doesnt have the flag set
-        if ( process ) super.messageReceived(msg);
-        else if ( log.isDebugEnabled() ) log.debug("Received a TCP ping packet:"+msg);
+        if ( process ) {
+          super.messageReceived(msg);
+        } else if ( log.isDebugEnabled() ) {
+          log.debug("Received a TCP ping packet:"+msg);
+        }
     }//messageReceived
 
     protected class PingThread extends Thread {

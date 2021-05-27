@@ -59,10 +59,14 @@ public final class JspValueExpression extends ValueExpression implements
         try {
             return this.target.getType(context);
         } catch (PropertyNotFoundException e) {
-            if (e instanceof JspPropertyNotFoundException) throw e;
+            if (e instanceof JspPropertyNotFoundException) {
+              throw e;
+            }
             throw new JspPropertyNotFoundException(this.mark, e);
         } catch (ELException e) {
-            if (e instanceof JspELException) throw e;
+            if (e instanceof JspELException) {
+              throw e;
+            }
             throw new JspELException(this.mark, e);
         }
     }
@@ -73,10 +77,14 @@ public final class JspValueExpression extends ValueExpression implements
         try {
             return this.target.isReadOnly(context);
         } catch (PropertyNotFoundException e) {
-            if (e instanceof JspPropertyNotFoundException) throw e;
+            if (e instanceof JspPropertyNotFoundException) {
+              throw e;
+            }
             throw new JspPropertyNotFoundException(this.mark, e);
         } catch (ELException e) {
-            if (e instanceof JspELException) throw e;
+            if (e instanceof JspELException) {
+              throw e;
+            }
             throw new JspELException(this.mark, e);
         }
     }
@@ -88,13 +96,19 @@ public final class JspValueExpression extends ValueExpression implements
         try {
             this.target.setValue(context, value);
         } catch (PropertyNotWritableException e) {
-            if (e instanceof JspPropertyNotWritableException) throw e;
+            if (e instanceof JspPropertyNotWritableException) {
+              throw e;
+            }
             throw new JspPropertyNotWritableException(this.mark, e);
         } catch (PropertyNotFoundException e) {
-            if (e instanceof JspPropertyNotFoundException) throw e;
+            if (e instanceof JspPropertyNotFoundException) {
+              throw e;
+            }
             throw new JspPropertyNotFoundException(this.mark, e);
         } catch (ELException e) {
-            if (e instanceof JspELException) throw e;
+            if (e instanceof JspELException) {
+              throw e;
+            }
             throw new JspELException(this.mark, e);
         }
     }
@@ -105,10 +119,14 @@ public final class JspValueExpression extends ValueExpression implements
         try {
             return this.target.getValue(context);
         } catch (PropertyNotFoundException e) {
-            if (e instanceof JspPropertyNotFoundException) throw e;
+            if (e instanceof JspPropertyNotFoundException) {
+              throw e;
+            }
             throw new JspPropertyNotFoundException(this.mark, e);
         } catch (ELException e) {
-            if (e instanceof JspELException) throw e;
+            if (e instanceof JspELException) {
+              throw e;
+            }
             throw new JspELException(this.mark, e);
         }
     }

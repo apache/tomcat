@@ -928,8 +928,9 @@ public class StatusTransformer {
      */
     public static String filter(Object obj) {
 
-        if (obj == null)
-            return ("?");
+        if (obj == null) {
+          return ("?");
+        }
         String message = obj.toString();
 
         char content[] = new char[message.length()];
@@ -964,8 +965,9 @@ public class StatusTransformer {
      * @return filtered XML content
      */
     public static String filterXml(String s) {
-        if (s == null)
-            return "";
+        if (s == null) {
+          return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);

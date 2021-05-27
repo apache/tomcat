@@ -161,7 +161,9 @@ public class TestRequest extends TomcatBaseTest {
         }
 
         private synchronized void init() throws Exception {
-            if (init) return;
+            if (init) {
+              return;
+            }
 
             Tomcat tomcat = getTomcatInstance();
             // No file system docBase required
@@ -341,17 +343,21 @@ public class TestRequest extends TomcatBaseTest {
 
             req.login(USER, PWD);
 
-            if (!req.getRemoteUser().equals(USER))
-                throw new ServletException();
-            if (!req.getUserPrincipal().getName().equals(USER))
-                throw new ServletException();
+            if (!req.getRemoteUser().equals(USER)) {
+              throw new ServletException();
+            }
+            if (!req.getUserPrincipal().getName().equals(USER)) {
+              throw new ServletException();
+            }
 
             req.logout();
 
-            if (req.getRemoteUser() != null)
-                throw new ServletException();
-            if (req.getUserPrincipal() != null)
-                throw new ServletException();
+            if (req.getRemoteUser() != null) {
+              throw new ServletException();
+            }
+            if (req.getUserPrincipal() != null) {
+              throw new ServletException();
+            }
 
             resp.getWriter().write(OK);
         }
@@ -522,10 +528,11 @@ public class TestRequest extends TomcatBaseTest {
                 java.util.Arrays.sort(values);
 
                 for (String value : values) {
-                    if (first)
-                        first = false;
-                    else
-                        out.print(",");
+                    if (first) {
+                      first = false;
+                    } else {
+                      out.print(",");
+                    }
 
                     out.print(name + "=" + value);
                 }
@@ -541,7 +548,9 @@ public class TestRequest extends TomcatBaseTest {
         private boolean init;
 
         private synchronized void init() throws Exception {
-            if (init) return;
+            if (init) {
+              return;
+            }
 
             Tomcat tomcat = getTomcatInstance();
             // No file system docBase required
@@ -564,17 +573,20 @@ public class TestRequest extends TomcatBaseTest {
 
             try {
                 init();
-                if(allowBody)
-                    tomcat.getConnector().setParseBodyMethods(method);
-                else
-                    tomcat.getConnector().setParseBodyMethods(""); // never parse
+                if(allowBody) {
+                  tomcat.getConnector().setParseBodyMethods(method);
+                }
+                else {
+                  tomcat.getConnector().setParseBodyMethods(""); // never parse
+                }
 
                 // Open connection
                 connect();
 
                 // Re-encode the request body so that bytes = characters
-                if(null != requestBody)
-                    requestBody = new String(requestBody.getBytes("UTF-8"), "ASCII");
+                if(null != requestBody) {
+                  requestBody = new String(requestBody.getBytes("UTF-8"), "ASCII");
+                }
 
                 // Send specified request body using method
                 String[] request = {

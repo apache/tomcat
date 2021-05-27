@@ -86,7 +86,11 @@ public class TestRemoteProcessException {
                     throw e;
                 }
             }
-            if ( error ) errC++; else nerrC++;
+            if ( error ) {
+              errC++;
+            } else {
+              nerrC++;
+            }
         }
         System.err.println("Finished SYNC_ACK");
 
@@ -160,7 +164,9 @@ public class TestRemoteProcessException {
 
         public static boolean verify(Data d) {
             boolean result = (d.length == d.data.length);
-            for ( int i=0; result && (i<d.data.length); i++ ) result = result && d.data[i] == d.key;
+            for ( int i=0; result && (i<d.data.length); i++ ) {
+              result = result && d.data[i] == d.key;
+            }
             return result;
         }
     }

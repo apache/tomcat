@@ -239,8 +239,9 @@ public class FastQueue {
         boolean ok = true;
 
         if (!enabled) {
-            if (log.isInfoEnabled())
-                log.info("FastQueue.add: queue disabled, add aborted");
+            if (log.isInfoEnabled()) {
+              log.info("FastQueue.add: queue disabled, add aborted");
+            }
             return false;
         }
 
@@ -250,11 +251,13 @@ public class FastQueue {
                 log.trace("FastQueue.add: starting with size " + size.get());
             }
             if (checkLock) {
-                if (inAdd)
-                    log.warn("FastQueue.add: Detected other add");
+                if (inAdd) {
+                  log.warn("FastQueue.add: Detected other add");
+                }
                 inAdd = true;
-                if (inMutex)
-                    log.warn("FastQueue.add: Detected other mutex in add");
+                if (inMutex) {
+                  log.warn("FastQueue.add: Detected other mutex in add");
+                }
                 inMutex = true;
             }
 
@@ -288,12 +291,18 @@ public class FastQueue {
             }
 
             if (checkLock) {
-                if (!inMutex) log.warn("FastQueue.add: Cancelled by other mutex in add");
+                if (!inMutex) {
+                  log.warn("FastQueue.add: Cancelled by other mutex in add");
+                }
                 inMutex = false;
-                if (!inAdd) log.warn("FastQueue.add: Cancelled by other add");
+                if (!inAdd) {
+                  log.warn("FastQueue.add: Cancelled by other add");
+                }
                 inAdd = false;
             }
-            if (log.isTraceEnabled()) log.trace("FastQueue.add: add ending with size " + size.get());
+            if (log.isTraceEnabled()) {
+              log.trace("FastQueue.add: add ending with size " + size.get());
+            }
 
         } finally {
             lock.unlockAdd(true);
@@ -310,8 +319,9 @@ public class FastQueue {
         boolean gotLock;
 
         if (!enabled) {
-            if (log.isInfoEnabled())
-                log.info("FastQueue.remove: queue disabled, remove aborted");
+            if (log.isInfoEnabled()) {
+              log.info("FastQueue.remove: queue disabled, remove aborted");
+            }
             return null;
         }
 
@@ -320,11 +330,13 @@ public class FastQueue {
 
             if (!gotLock) {
                 if (enabled) {
-                    if (log.isInfoEnabled())
-                        log.info("FastQueue.remove: Remove aborted although queue enabled");
+                    if (log.isInfoEnabled()) {
+                      log.info("FastQueue.remove: Remove aborted although queue enabled");
+                    }
                 } else {
-                    if (log.isInfoEnabled())
-                        log.info("FastQueue.remove: queue disabled, remove aborted");
+                    if (log.isInfoEnabled()) {
+                      log.info("FastQueue.remove: queue disabled, remove aborted");
+                    }
                 }
                 return null;
             }
@@ -333,11 +345,13 @@ public class FastQueue {
                 log.trace("FastQueue.remove: remove starting with size " + size.get());
             }
             if (checkLock) {
-                if (inRemove)
-                    log.warn("FastQueue.remove: Detected other remove");
+                if (inRemove) {
+                  log.warn("FastQueue.remove: Detected other remove");
+                }
                 inRemove = true;
-                if (inMutex)
-                    log.warn("FastQueue.remove: Detected other mutex in remove");
+                if (inMutex) {
+                  log.warn("FastQueue.remove: Detected other mutex in remove");
+                }
                 inMutex = true;
             }
 
@@ -347,11 +361,13 @@ public class FastQueue {
             size.set(0);
 
             if (checkLock) {
-                if (!inMutex)
-                    log.warn("FastQueue.remove: Cancelled by other mutex in remove");
+                if (!inMutex) {
+                  log.warn("FastQueue.remove: Cancelled by other mutex in remove");
+                }
                 inMutex = false;
-                if (!inRemove)
-                    log.warn("FastQueue.remove: Cancelled by other remove");
+                if (!inRemove) {
+                  log.warn("FastQueue.remove: Cancelled by other remove");
+                }
                 inRemove = false;
             }
             if (log.isTraceEnabled()) {

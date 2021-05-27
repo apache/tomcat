@@ -207,8 +207,9 @@ public class FileDirContext extends BaseDirContext {
         Object result = null;
         File file = file(name, true);
 
-        if (file == null)
-            return null;
+        if (file == null) {
+          return null;
+        }
 
         if (file.isDirectory()) {
             FileDirContext tempContext = new FileDirContext(env);
@@ -244,13 +245,15 @@ public class FileDirContext extends BaseDirContext {
 
         File file = file(name, true);
 
-        if (file == null)
-            throw new NameNotFoundException(
-                    sm.getString("resources.notFound", name));
+        if (file == null) {
+          throw new NameNotFoundException(
+                  sm.getString("resources.notFound", name));
+        }
 
-        if (!file.delete())
-            throw new NamingException
-                (sm.getString("resources.unbindFailed", name));
+        if (!file.delete()) {
+          throw new NamingException
+              (sm.getString("resources.unbindFailed", name));
+        }
 
     }
 
@@ -305,8 +308,9 @@ public class FileDirContext extends BaseDirContext {
 
         File file = file(name, true);
 
-        if (file == null)
-            return null;
+        if (file == null) {
+          return null;
+        }
 
         return list(file);
 
@@ -409,8 +413,9 @@ public class FileDirContext extends BaseDirContext {
         // Building attribute list
         File file = file(name, true);
 
-        if (file == null)
-            return null;
+        if (file == null) {
+          return null;
+        }
 
         return new FileResourceAttributes(file);
 
@@ -489,9 +494,10 @@ public class FileDirContext extends BaseDirContext {
         if (file == null) {
             throw new NamingException(sm.getString("resources.bindFailed", name));
         }
-        if (file.exists())
-            throw new NameAlreadyBoundException
-                (sm.getString("resources.alreadyBound", name));
+        if (file.exists()) {
+          throw new NameAlreadyBoundException
+              (sm.getString("resources.alreadyBound", name));
+        }
 
         rebind(name, obj, attrs);
 
@@ -539,17 +545,20 @@ public class FileDirContext extends BaseDirContext {
             is = (InputStream) obj;
         } else if (obj instanceof DirContext) {
             if (file.exists()) {
-                if (!file.delete())
-                    throw new NamingException
-                        (sm.getString("resources.bindFailed", name));
+                if (!file.delete()) {
+                  throw new NamingException
+                      (sm.getString("resources.bindFailed", name));
+                }
             }
-            if (!file.mkdir())
-                throw new NamingException
-                    (sm.getString("resources.bindFailed", name));
+            if (!file.mkdir()) {
+              throw new NamingException
+                  (sm.getString("resources.bindFailed", name));
+            }
         }
-        if (is == null)
-            throw new NamingException
-                (sm.getString("resources.bindFailed", name));
+        if (is == null) {
+          throw new NamingException
+              (sm.getString("resources.bindFailed", name));
+        }
 
         // Open os
 
@@ -560,8 +569,9 @@ public class FileDirContext extends BaseDirContext {
             os = new FileOutputStream(file);
             while (true) {
                 len = is.read(buffer);
-                if (len == -1)
-                    break;
+                if (len == -1) {
+                  break;
+                }
                 os.write(buffer, 0, len);
             }
         } catch (IOException e) {
@@ -610,10 +620,12 @@ public class FileDirContext extends BaseDirContext {
         if (file == null) {
             throw new NamingException(sm.getString("resources.bindFailed", name));
         }
-        if (file.exists())
-            throw new NameAlreadyBoundException(sm.getString("resources.alreadyBound", name));
-        if (!file.mkdir())
-            throw new NamingException(sm.getString("resources.bindFailed", name));
+        if (file.exists()) {
+          throw new NameAlreadyBoundException(sm.getString("resources.alreadyBound", name));
+        }
+        if (!file.mkdir()) {
+          throw new NamingException(sm.getString("resources.bindFailed", name));
+        }
         return (DirContext) lookup(name);
 
     }
@@ -943,8 +955,9 @@ public class FileDirContext extends BaseDirContext {
     protected List<NamingEntry> list(File file) {
 
         List<NamingEntry> entries = new ArrayList<NamingEntry>();
-        if (!file.isDirectory())
-            return entries;
+        if (!file.isDirectory()) {
+          return entries;
+        }
         String[] names = file.list();
         if (names==null) {
             /* Some IO error occurred such as bad file permissions.
@@ -1084,8 +1097,9 @@ public class FileDirContext extends BaseDirContext {
          */
         @Override
         public long getContentLength() {
-            if (contentLength != -1L)
-                return contentLength;
+            if (contentLength != -1L) {
+              return contentLength;
+            }
             contentLength = file.length();
             return contentLength;
         }
@@ -1098,8 +1112,9 @@ public class FileDirContext extends BaseDirContext {
          */
         @Override
         public long getCreation() {
-            if (creation != -1L)
-                return creation;
+            if (creation != -1L) {
+              return creation;
+            }
             creation = getLastModified();
             return creation;
         }
@@ -1126,8 +1141,9 @@ public class FileDirContext extends BaseDirContext {
          */
         @Override
         public long getLastModified() {
-            if (lastModified != -1L)
-                return lastModified;
+            if (lastModified != -1L) {
+              return lastModified;
+            }
             lastModified = file.lastModified();
             return lastModified;
         }
@@ -1154,8 +1170,9 @@ public class FileDirContext extends BaseDirContext {
          */
         @Override
         public String getName() {
-            if (name == null)
-                name = file.getName();
+            if (name == null) {
+              name = file.getName();
+            }
             return name;
         }
 

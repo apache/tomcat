@@ -83,18 +83,21 @@ public class NioReplicationTask extends AbstractRxTask {
         if (key == null) {
             return; // just in case
         }
-        if ( log.isTraceEnabled() )
-            log.trace("Servicing key:"+key);
+        if ( log.isTraceEnabled() ) {
+          log.trace("Servicing key:"+key);
+        }
 
         try {
             ObjectReader reader = (ObjectReader)key.attachment();
             if ( reader == null ) {
-                if ( log.isTraceEnabled() )
-                    log.trace("No object reader, cancelling:"+key);
+                if ( log.isTraceEnabled() ) {
+                  log.trace("No object reader, cancelling:"+key);
+                }
                 cancelKey(key);
             } else {
-                if ( log.isTraceEnabled() )
-                    log.trace("Draining channel:"+key);
+                if ( log.isTraceEnabled() ) {
+                  log.trace("Draining channel:"+key);
+                }
 
                 drainChannel(key, reader);
             }
@@ -105,8 +108,11 @@ public class NioReplicationTask extends AbstractRxTask {
                 //do nothing
             } else if ( e instanceof IOException ) {
                 //don't spew out stack traces for IO exceptions unless debug is enabled.
-                if (log.isDebugEnabled()) log.debug ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].", e);
-                else log.warn ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].");
+                if (log.isDebugEnabled()) {
+                  log.debug ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].", e);
+                } else {
+                  log.warn ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].");
+                }
             } else if ( log.isErrorEnabled() ) {
                 //this is a real error, log it.
                 log.error("Exception caught in TcpReplicationThread.drainChannel.",e);
@@ -132,9 +138,13 @@ public class NioReplicationTask extends AbstractRxTask {
      * worker thread is servicing it.
      */
     public synchronized void serviceChannel (SelectionKey key) {
-        if ( log.isTraceEnabled() ) log.trace("About to service key:"+key);
+        if ( log.isTraceEnabled() ) {
+          log.trace("About to service key:"+key);
+        }
         ObjectReader reader = (ObjectReader)key.attachment();
-        if ( reader != null ) reader.setLastAccess(System.currentTimeMillis());
+        if ( reader != null ) {
+          reader.setLastAccess(System.currentTimeMillis());
+        }
         this.key = key;
         key.interestOps (key.interestOps() & (~SelectionKey.OP_READ));
         key.interestOps (key.interestOps() & (~SelectionKey.OP_WRITE));
@@ -160,22 +170,26 @@ public class NioReplicationTask extends AbstractRxTask {
             // loop while data available, channel is non-blocking
             while ((count = channel.read (buffer)) > 0) {
                 buffer.flip();      // make buffer readable
-                if ( buffer.hasArray() )
-                    reader.append(buffer.array(),0,count,false);
-                else
-                    reader.append(buffer,count,false);
+                if ( buffer.hasArray() ) {
+                  reader.append(buffer.array(),0,count,false);
+                } else {
+                  reader.append(buffer,count,false);
+                }
                 buffer.clear();     // make buffer empty
                 //do we have at least one package?
-                if ( reader.hasPackage() ) break;
+                if ( reader.hasPackage() ) {
+                  break;
+                }
             }
         } else if (channel instanceof DatagramChannel) {
             DatagramChannel dchannel = (DatagramChannel)channel;
             saddr = dchannel.receive(buffer);
             buffer.flip();      // make buffer readable
-            if ( buffer.hasArray() )
-                reader.append(buffer.array(),0,buffer.limit()-buffer.position(),false);
-            else
-                reader.append(buffer,buffer.limit()-buffer.position(),false);
+            if ( buffer.hasArray() ) {
+              reader.append(buffer.array(),0,buffer.limit()-buffer.position(),false);
+            } else {
+              reader.append(buffer,buffer.limit()-buffer.position(),false);
+            }
             buffer.clear();     // make buffer empty
             //did we get a package
             count = reader.hasPackage()?1:-1;
@@ -216,13 +230,21 @@ public class NioReplicationTask extends AbstractRxTask {
                  * server before sending the ack to the remote server
                  * This is considered a synchronized request
                  */
-                if (ChannelData.sendAckSync(msg.getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND,saddr);
+                if (ChannelData.sendAckSync(msg.getOptions())) {
+                  sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND,saddr);
+                }
             }catch ( RemoteProcessException e ) {
-                if ( log.isDebugEnabled() ) log.error("Processing of cluster message failed.",e);
-                if (ChannelData.sendAckSync(msg.getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
+                if ( log.isDebugEnabled() ) {
+                  log.error("Processing of cluster message failed.",e);
+                }
+                if (ChannelData.sendAckSync(msg.getOptions())) {
+                  sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
+                }
             }catch ( Exception e ) {
                 log.error("Processing of cluster message failed.",e);
-                if (ChannelData.sendAckSync(msg.getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
+                if (ChannelData.sendAckSync(msg.getOptions())) {
+                  sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
+                }
             }
             if (getUseBufferPool()) {
                 BufferPool.getBufferPool().returnBuffer(msg.getMessage());
@@ -238,13 +260,16 @@ public class NioReplicationTask extends AbstractRxTask {
 
     private void remoteEof(SelectionKey key) {
         // close channel on EOF, invalidates the key
-        if ( log.isDebugEnabled() ) log.debug("Channel closed on the remote end, disconnecting");
+        if ( log.isDebugEnabled() ) {
+          log.debug("Channel closed on the remote end, disconnecting");
+        }
         cancelKey(key);
     }
 
     protected void registerForRead(final SelectionKey key, ObjectReader reader) {
-        if ( log.isTraceEnabled() )
-            log.trace("Adding key for read event:"+key);
+        if ( log.isTraceEnabled() ) {
+          log.trace("Adding key for read event:"+key);
+        }
         reader.finish();
         //register our OP_READ interest
         Runnable r = new Runnable() {
@@ -257,13 +282,15 @@ public class NioReplicationTask extends AbstractRxTask {
                         // resume interest in OP_READ, OP_WRITE
                         int resumeOps = key.interestOps() | SelectionKey.OP_READ;
                         key.interestOps(resumeOps);
-                        if ( log.isTraceEnabled() )
-                            log.trace("Registering key for read:"+key);
+                        if ( log.isTraceEnabled() ) {
+                          log.trace("Registering key for read:"+key);
+                        }
                     }
                 } catch (CancelledKeyException ckx ) {
                     NioReceiver.cancelledKey(key);
-                    if ( log.isTraceEnabled() )
-                        log.trace("CKX Cancelling key:"+key);
+                    if ( log.isTraceEnabled() ) {
+                      log.trace("CKX Cancelling key:"+key);
+                    }
 
                 } catch (Exception x) {
                     log.error("Error registering key for read:"+key,x);
@@ -274,8 +301,9 @@ public class NioReplicationTask extends AbstractRxTask {
     }
 
     private void cancelKey(final SelectionKey key) {
-        if ( log.isTraceEnabled() )
-            log.trace("Adding key for cancel event:"+key);
+        if ( log.isTraceEnabled() ) {
+          log.trace("Adding key for cancel event:"+key);
+        }
 
         ObjectReader reader = (ObjectReader)key.attachment();
         if ( reader != null ) {
@@ -285,8 +313,9 @@ public class NioReplicationTask extends AbstractRxTask {
         Runnable cx = new Runnable() {
             @Override
             public void run() {
-                if ( log.isTraceEnabled() )
-                    log.trace("Cancelling key:"+key);
+                if ( log.isTraceEnabled() ) {
+                  log.trace("Cancelling key:"+key);
+                }
 
                 NioReceiver.cancelledKey(key);
             }

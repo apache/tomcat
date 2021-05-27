@@ -110,7 +110,9 @@ public class TestParallelWebappClassLoader extends TomcatBaseTest {
     }
 
     private Method getDeclaredMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
-        if (clazz == null) return null;
+        if (clazz == null) {
+          return null;
+        }
         for (Method method: clazz.getDeclaredMethods()) {
             if (method.getName().equals(name)) {
                 return method;

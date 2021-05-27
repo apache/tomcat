@@ -99,7 +99,10 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     @Override
     public void stop() {
-        if ( executor != null ) executor.shutdownNow();//ignore left overs
+        if ( executor != null )
+         {
+          executor.shutdownNow();//ignore left overs
+        }
         executor = null;
         channel = null;
     }
@@ -195,8 +198,9 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                 if ("auto".equals(host)) {
                     host = java.net.InetAddress.getLocalHost().getHostAddress();
                 }
-                if (log.isDebugEnabled())
-                    log.debug("Starting replication listener on address:"+ host);
+                if (log.isDebugEnabled()) {
+                  log.debug("Starting replication listener on address:"+ host);
+                }
                 bind = java.net.InetAddress.getByName(host);
             } catch (IOException ioe) {
                 log.error("Failed bind replication listener on address:"+ host, ioe);
@@ -280,13 +284,17 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public void messageDataReceived(ChannelMessage data) {
         if ( this.listener != null ) {
-            if ( listener.accept(data) ) listener.messageReceived(data);
+            if ( listener.accept(data) ) {
+              listener.messageReceived(data);
+            }
         }
     }
 
     public int getWorkerThreadOptions() {
         int options = 0;
-        if ( getDirect() ) options = options | OPTION_DIRECT_BUFFER;
+        if ( getDirect() ) {
+          options = options | OPTION_DIRECT_BUFFER;
+        }
         return options;
     }
 
@@ -471,7 +479,9 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public void setAutoBind(int autoBind) {
         this.autoBind = autoBind;
-        if ( this.autoBind <= 0 ) this.autoBind = 1;
+        if ( this.autoBind <= 0 ) {
+          this.autoBind = 1;
+        }
     }
 
     public void setMaxThreads(int maxThreads) {

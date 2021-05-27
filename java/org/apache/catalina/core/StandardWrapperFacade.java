@@ -76,8 +76,9 @@ public final class StandardWrapperFacade
     public ServletContext getServletContext() {
         if (context == null) {
             context = config.getServletContext();
-            if ((context != null) && (context instanceof ApplicationContext))
-                context = ((ApplicationContext) context).getFacade();
+            if ((context != null) && (context instanceof ApplicationContext)) {
+              context = ((ApplicationContext) context).getFacade();
+            }
         }
         return (context);
     }

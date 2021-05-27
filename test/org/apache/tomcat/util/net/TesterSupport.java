@@ -333,10 +333,11 @@ public final class TesterSupport {
 
             // Report the number of bytes read
             resp.setContentType("text/plain");
-            if (contentOK)
-                resp.getWriter().print("OK-" + read);
-            else
-                resp.getWriter().print("CONTENT-MISMATCH-" + read);
+            if (contentOK) {
+              resp.getWriter().print("OK-" + read);
+            } else {
+              resp.getWriter().print("CONTENT-MISMATCH-" + read);
+            }
         }
     }
 

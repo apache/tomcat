@@ -374,8 +374,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         switch (actionCode) {
         case COMMIT: {
-            if (response.isCommitted())
-                return;
+            if (response.isCommitted()) {
+              return;
+            }
 
             // Validate and write response headers
             try {
@@ -1197,8 +1198,9 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             }
         }
 
-        if (finished)
-            return;
+        if (finished) {
+          return;
+        }
 
         finished = true;
 

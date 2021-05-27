@@ -256,21 +256,25 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             try {
                 if (sslSupport != null) {
                     Object sslO = sslSupport.getCipherSuite();
-                    if (sslO != null)
-                        request.setAttribute
-                            (SSLSupport.CIPHER_SUITE_KEY, sslO);
+                    if (sslO != null) {
+                      request.setAttribute
+                          (SSLSupport.CIPHER_SUITE_KEY, sslO);
+                    }
                     sslO = sslSupport.getPeerCertificateChain(false);
-                    if (sslO != null)
-                        request.setAttribute
-                            (SSLSupport.CERTIFICATE_KEY, sslO);
+                    if (sslO != null) {
+                      request.setAttribute
+                          (SSLSupport.CERTIFICATE_KEY, sslO);
+                    }
                     sslO = sslSupport.getKeySize();
-                    if (sslO != null)
-                        request.setAttribute
-                            (SSLSupport.KEY_SIZE_KEY, sslO);
+                    if (sslO != null) {
+                      request.setAttribute
+                          (SSLSupport.KEY_SIZE_KEY, sslO);
+                    }
                     sslO = sslSupport.getSessionId();
-                    if (sslO != null)
-                        request.setAttribute
-                            (SSLSupport.SESSION_ID_KEY, sslO);
+                    if (sslO != null) {
+                      request.setAttribute
+                          (SSLSupport.SESSION_ID_KEY, sslO);
+                    }
                     sslO = sslSupport.getProtocol();
                     if (sslO != null) {
                         request.setAttribute
@@ -321,8 +325,9 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             break;
         }
         case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            if (localAddr == null)
-               localAddr = socketWrapper.getSocket().getLocalAddress().getHostAddress();
+            if (localAddr == null) {
+              localAddr = socketWrapper.getSocket().getLocalAddress().getHostAddress();
+            }
 
             request.localAddr().setString(localAddr);
             break;
@@ -372,7 +377,9 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
             break;
         }
         case ASYNC_SETTIMEOUT: {
-            if (param == null) return;
+            if (param == null) {
+              return;
+            }
             long timeout = ((Long)param).longValue();
             // if we are not piggy backing on a worker thread, set the timeout
             socketWrapper.setTimeout(timeout);

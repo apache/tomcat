@@ -225,10 +225,12 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getRealPath(String path) {
-        if (!myResourceBaseURL.getProtocol().equals("file"))
-            return null;
-        if (!path.startsWith("/"))
-            return null;
+        if (!myResourceBaseURL.getProtocol().equals("file")) {
+          return null;
+        }
+        if (!path.startsWith("/")) {
+          return null;
+        }
         try {
             File f = new File(getResource(path).toURI());
             return f.getAbsolutePath();

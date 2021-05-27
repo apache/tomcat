@@ -41,16 +41,23 @@ public class BufferPool {
     }
 
     public XByteBuffer getBuffer(int minSize, boolean discard) {
-        if ( pool != null ) return pool.getBuffer(minSize, discard);
-        else return new XByteBuffer(minSize,discard);
+        if ( pool != null ) {
+          return pool.getBuffer(minSize, discard);
+        } else {
+          return new XByteBuffer(minSize,discard);
+        }
     }
 
     public void returnBuffer(XByteBuffer buffer) {
-        if ( pool != null ) pool.returnBuffer(buffer);
+        if ( pool != null ) {
+          pool.returnBuffer(buffer);
+        }
     }
 
     public void clear() {
-        if ( pool != null ) pool.clear();
+        if ( pool != null ) {
+          pool.clear();
+        }
     }
 
 
@@ -66,7 +73,9 @@ public class BufferPool {
                        pool = (BufferPoolAPI)clazz.newInstance();
                    } catch ( Throwable x ) {
                        log.warn("Unable to initilize BufferPool, not pooling XByteBuffer objects:"+x.getMessage());
-                       if ( log.isDebugEnabled() ) log.debug("Unable to initilize BufferPool, not pooling XByteBuffer objects:",x);
+                       if ( log.isDebugEnabled() ) {
+                        log.debug("Unable to initilize BufferPool, not pooling XByteBuffer objects:",x);
+                      }
                    }
                    if (pool != null) {
                        pool.setMaxSize(DEFAULT_POOL_SIZE);

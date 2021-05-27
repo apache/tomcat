@@ -57,8 +57,11 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         if (okToProcess(msg.getOptions()) ) {
             super.sendMessage(destination, msg, null);
             ChannelMessage confirmation = null;
-            if ( deepclone ) confirmation = (ChannelMessage)msg.deepclone();
-            else confirmation = (ChannelMessage)msg.clone();
+            if ( deepclone ) {
+              confirmation = (ChannelMessage)msg.deepclone();
+            } else {
+              confirmation = (ChannelMessage)msg.clone();
+            }
             confirmation.getMessage().reset();
             UUIDGenerator.randomUUID(false,confirmation.getUniqueId(),0);
             confirmation.getMessage().append(START_DATA,0,START_DATA.length);
@@ -85,7 +88,9 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
                 if ( original != null ) {
                     super.messageReceived(original.msg);
                     messages.remove(id);
-                } else log.warn("Received a confirmation, but original message is missing. Id:"+Arrays.toString(id.getBytes()));
+                } else {
+                  log.warn("Received a confirmation, but original message is missing. Id:"+Arrays.toString(id.getBytes()));
+                }
             } else {
                 UniqueId id = new UniqueId(msg.getUniqueId());
                 MapEntry entry = new MapEntry((ChannelMessage)msg.deepclone(),id,System.currentTimeMillis());

@@ -868,9 +868,10 @@ final class SetPublicIdRule extends Rule {
         }
 
         m.invoke(top, (Object [])paramValues);
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("" + top.getClass().getName() + "."
-                                       + method + "(" + paramValues[0] + ")");
+        if (digester.getLogger().isDebugEnabled()) {
+          digester.getLogger().debug("" + top.getClass().getName() + "."
+                                     + method + "(" + paramValues[0] + ")");
+        }
 
     }
 
@@ -893,16 +894,18 @@ final class ServletDefCreateRule extends Rule {
         throws Exception {
         ServletDef servletDef = new ServletDef();
         digester.push(servletDef);
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("new " + servletDef.getClass().getName());
+        if (digester.getLogger().isDebugEnabled()) {
+          digester.getLogger().debug("new " + servletDef.getClass().getName());
+        }
     }
 
     @Override
     public void end(String namespace, String name)
         throws Exception {
         ServletDef servletDef = (ServletDef) digester.pop();
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("pop " + servletDef.getClass().getName());
+        if (digester.getLogger().isDebugEnabled()) {
+          digester.getLogger().debug("pop " + servletDef.getClass().getName());
+        }
     }
 
 }

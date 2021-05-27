@@ -161,8 +161,9 @@ public class RequestInfo  {
         bytesSent+=req.getResponse().getContentWritten();
 
         requestCount++;
-        if( req.getResponse().getStatus() >=400 )
-            errorCount++;
+        if( req.getResponse().getStatus() >=400 ) {
+          errorCount++;
+        }
         long t0=req.getStartTime();
         long t1=System.currentTimeMillis();
         long time=t1-t0;

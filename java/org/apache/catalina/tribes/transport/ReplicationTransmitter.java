@@ -110,7 +110,9 @@ public class ReplicationTransmitter implements ChannelSender {
      */
     @Override
     public void heartbeat() {
-        if (getTransport()!=null) getTransport().keepalive();
+        if (getTransport()!=null) {
+          getTransport().keepalive();
+        }
     }
 
     /**

@@ -82,13 +82,15 @@ public class FixedNotificationFilter implements NotificationFilter {
     @Override
     public boolean isNotificationEnabled(Notification notification) {
 
-        if (notification == null)
-            return (false);
+        if (notification == null) {
+          return (false);
+        }
         synchronized (names) {
-            if (names.size() < 1)
-                return (true);
-            else
-                return (names.contains(notification.getType()));
+            if (names.size() < 1) {
+              return (true);
+            } else {
+              return (names.contains(notification.getType()));
+            }
         }
 
     }

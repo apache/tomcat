@@ -96,7 +96,9 @@ public class Membership implements Cloneable {
      */
     public Membership(MemberImpl local, boolean includeLocal) {
         this.local = local;
-        if ( includeLocal ) addMember(local);
+        if ( includeLocal ) {
+          addMember(local);
+        }
     }
 
     public Membership(MemberImpl local) {
@@ -130,7 +132,9 @@ public class Membership implements Cloneable {
     public synchronized boolean memberAlive(MemberImpl member) {
         boolean result = false;
         //ignore ourselves
-        if (  member.equals(local) ) return result;
+        if (  member.equals(local) ) {
+          return result;
+        }
 
         //return true if the membership has changed
         MbrEntry entry = map.get(member);
@@ -162,7 +166,9 @@ public class Membership implements Cloneable {
           if (!map.containsKey(member) ) {
               map.put(member, entry);
               MemberImpl results[] = new MemberImpl[members.length + 1];
-              for (int i = 0; i < members.length; i++) results[i] = members[i];
+              for (int i = 0; i < members.length; i++) {
+                results[i] = members[i];
+              }
               results[members.length] = member;
               members = results;
               Arrays.sort(members, memberComparator);
@@ -186,12 +192,15 @@ public class Membership implements Cloneable {
                     break;
                 }
             }
-            if (n < 0) return;
+            if (n < 0) {
+              return;
+            }
             MemberImpl results[] = new MemberImpl[members.length - 1];
             int j = 0;
             for (int i = 0; i < members.length; i++) {
-                if (i != n)
-                    results[j++] = members[i];
+                if (i != n) {
+                  results[j++] = members[i];
+                }
             }
             members = results;
         }
@@ -212,8 +221,9 @@ public class Membership implements Cloneable {
         ArrayList<MemberImpl> list = null;
         for (MbrEntry entry : map.values()) {
             if( entry.hasExpired(maxtime) ) {
-                if(list == null) // only need a list when members are expired (smaller gc)
-                    list = new java.util.ArrayList<MemberImpl>();
+                if(list == null) {
+                  list = new java.util.ArrayList<MemberImpl>();
+                }
                 list.add(entry.getMember());
             }
         }
@@ -274,8 +284,9 @@ public class Membership implements Cloneable {
         MbrEntry[] result = new MbrEntry[map.size()];
         Iterator<Map.Entry<MemberImpl,MbrEntry>> i = map.entrySet().iterator();
         int pos = 0;
-        while ( i.hasNext() )
-            result[pos++] = i.next().getValue();
+        while ( i.hasNext() ) {
+          result[pos++] = i.next().getValue();
+        }
         return result;
     }
 
@@ -290,12 +301,13 @@ public class Membership implements Cloneable {
         public int compare(Member m1, Member m2) {
             //longer alive time, means sort first
             long result = m2.getMemberAliveTime() - m1.getMemberAliveTime();
-            if (result < 0)
-                return -1;
-            else if (result == 0)
-                return 0;
-            else
-                return 1;
+            if (result < 0) {
+              return -1;
+            } else if (result == 0) {
+              return 0;
+            } else {
+              return 1;
+            }
         }
     }
 

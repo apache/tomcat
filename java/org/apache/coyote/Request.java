@@ -334,8 +334,9 @@ public final class Request {
     }
 
     public void action(ActionCode actionCode, Object param) {
-        if( hook==null && response!=null )
-            hook=response.getHook();
+        if( hook==null && response!=null ) {
+          hook=response.getHook();
+        }
 
         if (hook != null) {
             if (param == null) {

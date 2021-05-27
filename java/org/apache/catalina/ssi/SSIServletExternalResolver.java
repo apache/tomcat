@@ -200,15 +200,16 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                 }
                 if (accept != null) {
                     Enumeration<String> acceptHeaders = req.getHeaders(accept);
-                    if (acceptHeaders != null)
-                        if (acceptHeaders.hasMoreElements()) {
-                            StringBuilder rv = new StringBuilder(
-                                    acceptHeaders.nextElement());
-                            while (acceptHeaders.hasMoreElements()) {
-                                rv.append(", ");
-                                rv.append(acceptHeaders.nextElement());
-                            }
-                        retVal = rv.toString();
+                    if (acceptHeaders != null) {
+                      if (acceptHeaders.hasMoreElements()) {
+                          StringBuilder rv = new StringBuilder(
+                                  acceptHeaders.nextElement());
+                          while (acceptHeaders.hasMoreElements()) {
+                              rv.append(", ");
+                              rv.append(acceptHeaders.nextElement());
+                          }
+                      retVal = rv.toString();
+          }
                     }
                 }
             }
@@ -221,12 +222,14 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             else if (nameParts[1].equals("REFERER")) {
                 retVal = req.getHeader("Referer");
             }
-            else if (nameParts[1].equals("USER"))
-                if (nameParts.length == 3)
-                    if (nameParts[2].equals("AGENT")) {
-                        requiredParts = 3;
-                        retVal = req.getHeader("User-Agent");
-                    }
+            else if (nameParts[1].equals("USER")) {
+              if (nameParts.length == 3) {
+                if (nameParts[2].equals("AGENT")) {
+                    requiredParts = 3;
+                    retVal = req.getHeader("User-Agent");
+                }
+              }
+            }
 
         } else if (nameParts[0].equals("PATH")) {
             if (nameParts[1].equals("INFO")) {
@@ -295,7 +298,9 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                 // If this is an error page, get the original URI
                 retVal = (String) req.getAttribute(
                         RequestDispatcher.FORWARD_REQUEST_URI);
-                if (retVal == null) retVal=req.getRequestURI();
+                if (retVal == null) {
+                  retVal=req.getRequestURI();
+                }
             }
         } else if (nameParts[0].equals("SCRIPT")) {
             String scriptName = req.getServletPath();
@@ -328,7 +333,9 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         } else if (name.equalsIgnoreCase("UNIQUE_ID")) {
             retVal = req.getRequestedSessionId();
         }
-        if (requiredParts != nameParts.length) return null;
+        if (requiredParts != nameParts.length) {
+          return null;
+        }
             return retVal;
     }
 

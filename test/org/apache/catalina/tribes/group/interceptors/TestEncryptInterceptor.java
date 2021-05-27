@@ -433,8 +433,9 @@ public class TestEncryptInterceptor {
                     xbb.append(bytes, 0, bytes.length);
                     msg.setMessage(xbb);
 
-                    for(int i=0; i<messagesPerThread; ++i)
-                        src.sendMessage(null, msg, null);
+                    for(int i=0; i<messagesPerThread; ++i) {
+                      src.sendMessage(null, msg, null);
+                    }
                 } catch (ChannelException e) {
                     Assert.fail("Encountered exception sending messages: " + e.getMessage());
                 }
@@ -447,11 +448,13 @@ public class TestEncryptInterceptor {
             threads[i].setName("Message-Thread-" + i);
         }
 
-        for(int i=0; i<numThreads; ++i)
-            threads[i].start();
+        for(int i=0; i<numThreads; ++i) {
+          threads[i].start();
+        }
 
-        for(int i=0; i<numThreads; ++i)
-            threads[i].join();
+        for(int i=0; i<numThreads; ++i) {
+          threads[i].join();
+        }
 
         // Check all received messages to make sure they are not corrupted
         Collection<byte[]> messages = ((ValuesCaptureInterceptor)dest.getPrevious()).getValues();
@@ -459,8 +462,9 @@ public class TestEncryptInterceptor {
         Assert.assertEquals("Did not receive all expected messages",
                 numThreads * messagesPerThread, messages.size());
 
-        for(byte[] message : messages)
-            Assert.assertArrayEquals("Message is corrupted", message, bytes);
+        for(byte[] message : messages) {
+          Assert.assertArrayEquals("Message is corrupted", message, bytes);
+        }
     }
 
     @Test
@@ -489,8 +493,9 @@ public class TestEncryptInterceptor {
         private ChannelInterceptor dest;
 
         public PipedInterceptor(ChannelInterceptor dest) {
-            if(null == dest)
-                throw new IllegalArgumentException("Destination must not be null");
+            if(null == dest) {
+              throw new IllegalArgumentException("Destination must not be null");
+            }
 
             this.dest = dest;
         }

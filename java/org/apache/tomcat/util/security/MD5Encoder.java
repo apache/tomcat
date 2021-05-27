@@ -59,8 +59,9 @@ public final class MD5Encoder {
      */
     public static String encode( byte[] binaryData ) {
 
-        if (binaryData.length != 16)
-            return null;
+        if (binaryData.length != 16) {
+          return null;
+        }
 
         char[] buffer = new char[32];
 

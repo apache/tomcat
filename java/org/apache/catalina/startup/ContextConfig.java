@@ -574,7 +574,9 @@ public class ContextConfig implements LifecycleListener {
             defaultContextXml = ((StandardContext)context).getDefaultContextXml();
         }
         // set the default if we don't have any overrides
-        if( defaultContextXml==null ) getDefaultContextXml();
+        if( defaultContextXml==null ) {
+          getDefaultContextXml();
+        }
 
         if (!context.getOverride()) {
             File defaultContextFile = new File(defaultContextXml);
@@ -1154,8 +1156,9 @@ public class ContextConfig implements LifecycleListener {
         if (host != null && host.getXmlBase()!=null) {
             String xmlBase = host.getXmlBase();
             file = new File(xmlBase);
-            if (!file.isAbsolute())
-                file = new File(getBaseDir(), xmlBase);
+            if (!file.isAbsolute()) {
+              file = new File(getBaseDir(), xmlBase);
+            }
         } else {
             StringBuilder result = new StringBuilder();
             if (engine != null) {
@@ -1675,8 +1678,9 @@ public class ContextConfig implements LifecycleListener {
      */
     protected InputSource getHostWebXmlSource() {
         File hostConfigBase = getHostConfigBase();
-        if (!hostConfigBase.exists())
-            return null;
+        if (!hostConfigBase.exists()) {
+          return null;
+        }
 
         return getWebXmlSource(Constants.HostWebXml, hostConfigBase.getPath());
     }
@@ -1805,7 +1809,9 @@ public class ContextConfig implements LifecycleListener {
     protected void parseWebXml(InputSource source, WebXml dest,
             boolean fragment) {
 
-        if (source == null) return;
+        if (source == null) {
+          return;
+        }
 
         XmlErrorHandler handler = new XmlErrorHandler();
 

@@ -258,7 +258,9 @@ public abstract class AbstractEndpoint<S> {
      * is 100.
      */
     private int backlog = 100;
-    public void setBacklog(int backlog) { if (backlog > 0) this.backlog = backlog; }
+    public void setBacklog(int backlog) { if (backlog > 0) {
+      this.backlog = backlog;
+    } }
     public int getBacklog() { return backlog; }
 
     /**
@@ -625,10 +627,12 @@ public abstract class AbstractEndpoint<S> {
             s = new java.net.Socket();
             int stmo = 2 * 1000;
             int utmo = 2 * 1000;
-            if (getSocketProperties().getSoTimeout() > stmo)
-                stmo = getSocketProperties().getSoTimeout();
-            if (getSocketProperties().getUnlockTimeout() > utmo)
-                utmo = getSocketProperties().getUnlockTimeout();
+            if (getSocketProperties().getSoTimeout() > stmo) {
+              stmo = getSocketProperties().getSoTimeout();
+            }
+            if (getSocketProperties().getUnlockTimeout() > utmo) {
+              utmo = getSocketProperties().getUnlockTimeout();
+            }
             s.setSoTimeout(stmo);
             // TODO Consider hard-coding to s.setSoLinger(true,0)
             s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
@@ -837,7 +841,9 @@ public abstract class AbstractEndpoint<S> {
     public abstract boolean getUsePolling();
 
     protected LimitLatch initializeConnectionLatch() {
-        if (maxConnections==-1) return null;
+        if (maxConnections==-1) {
+          return null;
+        }
         if (connectionLimitLatch==null) {
             connectionLimitLatch = new LimitLatch(getMaxConnections());
         }
@@ -846,18 +852,26 @@ public abstract class AbstractEndpoint<S> {
 
     protected void releaseConnectionLatch() {
         LimitLatch latch = connectionLimitLatch;
-        if (latch!=null) latch.releaseAll();
+        if (latch!=null) {
+          latch.releaseAll();
+        }
         connectionLimitLatch = null;
     }
 
     protected void countUpOrAwaitConnection() throws InterruptedException {
-        if (maxConnections==-1) return;
+        if (maxConnections==-1) {
+          return;
+        }
         LimitLatch latch = connectionLimitLatch;
-        if (latch!=null) latch.countUpOrAwait();
+        if (latch!=null) {
+          latch.countUpOrAwait();
+        }
     }
 
     protected long countDownConnection() {
-        if (maxConnections==-1) return -1;
+        if (maxConnections==-1) {
+          return -1;
+        }
         LimitLatch latch = connectionLimitLatch;
         if (latch!=null) {
             long result = latch.countDown();
@@ -865,7 +879,9 @@ public abstract class AbstractEndpoint<S> {
                 getLog().warn("Incorrect connection count, multiple socket.close called on the same socket." );
             }
             return result;
-        } else return -1;
+        } else {
+          return -1;
+        }
     }
 
     /**

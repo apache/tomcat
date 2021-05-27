@@ -81,7 +81,9 @@ public class RpcChannel implements ChannelListener {
                            int channelOptions,
                            long timeout) throws ChannelException {
 
-        if ( destination==null || destination.length == 0 ) return new Response[0];
+        if ( destination==null || destination.length == 0 ) {
+          return new Response[0];
+        }
 
         //avoid dead lock
         int sendOptions =
@@ -91,10 +93,14 @@ public class RpcChannel implements ChannelListener {
         RpcCollector collector = new RpcCollector(key,rpcOptions,destination.length);
         try {
             synchronized (collector) {
-                if ( rpcOptions != NO_REPLY ) responseMap.put(key, collector);
+                if ( rpcOptions != NO_REPLY ) {
+                  responseMap.put(key, collector);
+                }
                 RpcMessage rmsg = new RpcMessage(rpcId, key.id, message);
                 channel.send(destination, rmsg, sendOptions);
-                if ( rpcOptions != NO_REPLY ) collector.wait(timeout);
+                if ( rpcOptions != NO_REPLY ) {
+                  collector.wait(timeout);
+                }
             }
         } catch ( InterruptedException ix ) {
             Thread.currentThread().interrupt();
@@ -111,20 +117,25 @@ public class RpcChannel implements ChannelListener {
         if ( rmsg.reply ) {
             RpcCollector collector = responseMap.get(key);
             if (collector == null) {
-                if (!(rmsg instanceof RpcMessage.NoRpcChannelReply))
-                    callback.leftOver(rmsg.message, sender);
+                if (!(rmsg instanceof RpcMessage.NoRpcChannelReply)) {
+                  callback.leftOver(rmsg.message, sender);
+                }
             } else {
                 synchronized (collector) {
                     //make sure it hasn't been removed
                     if ( responseMap.containsKey(key) ) {
-                        if ( (rmsg instanceof RpcMessage.NoRpcChannelReply) )
-                            collector.destcnt--;
-                        else
-                            collector.addResponse(rmsg.message, sender);
-                        if (collector.isComplete()) collector.notifyAll();
+                        if ( (rmsg instanceof RpcMessage.NoRpcChannelReply) ) {
+                          collector.destcnt--;
+                        } else {
+                          collector.addResponse(rmsg.message, sender);
+                        }
+                        if (collector.isComplete()) {
+                          collector.notifyAll();
+                        }
                     } else {
-                        if (! (rmsg instanceof RpcMessage.NoRpcChannelReply) )
-                            callback.leftOver(rmsg.message, sender);
+                        if (! (rmsg instanceof RpcMessage.NoRpcChannelReply) ) {
+                          callback.leftOver(rmsg.message, sender);
+                        }
                     }
                 }//synchronized
             }//end if
@@ -186,7 +197,9 @@ public class RpcChannel implements ChannelListener {
         if ( msg instanceof RpcMessage ) {
             RpcMessage rmsg = (RpcMessage)msg;
             return Arrays.equals(rmsg.rpcId,rpcId);
-        } else return false;
+        } else {
+          return false;
+        }
     }
 
     public Channel getChannel() {
@@ -259,7 +272,9 @@ public class RpcChannel implements ChannelListener {
         }
 
         public boolean isComplete() {
-            if ( destcnt <= 0 ) return true;
+            if ( destcnt <= 0 ) {
+              return true;
+            }
             switch (options) {
                 case ALL_REPLY:
                     return destcnt == responses.size();
@@ -283,7 +298,9 @@ public class RpcChannel implements ChannelListener {
             if ( o instanceof RpcCollector ) {
                 RpcCollector r = (RpcCollector)o;
                 return r.key.equals(this.key);
-            } else return false;
+            } else {
+              return false;
+            }
         }
 
         public Response[] getResponses() {
@@ -307,7 +324,9 @@ public class RpcChannel implements ChannelListener {
             if ( o instanceof RpcCollectorKey ) {
                 RpcCollectorKey r = (RpcCollectorKey)o;
                 return Arrays.equals(id,r.id);
-            } else return false;
+            } else {
+              return false;
+            }
         }
 
     }
@@ -319,7 +338,9 @@ public class RpcChannel implements ChannelListener {
     protected static String bToS(byte[] data) {
         StringBuilder buf = new StringBuilder(4*16);
         buf.append("{");
-        for (int i=0; data!=null && i<data.length; i++ ) buf.append(String.valueOf(data[i])).append(" ");
+        for (int i=0; data!=null && i<data.length; i++ ) {
+          buf.append(String.valueOf(data[i])).append(" ");
+        }
         buf.append("}");
         return buf.toString();
     }

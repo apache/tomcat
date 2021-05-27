@@ -99,8 +99,9 @@ public final class InstanceSupport {
       synchronized (listenersLock) {
           InstanceListener results[] =
             new InstanceListener[listeners.length + 1];
-          for (int i = 0; i < listeners.length; i++)
-              results[i] = listeners[i];
+          for (int i = 0; i < listeners.length; i++) {
+            results[i] = listeners[i];
+          }
           results[listeners.length] = listener;
           listeners = results;
       }
@@ -118,13 +119,15 @@ public final class InstanceSupport {
      */
     public void fireInstanceEvent(String type, Filter filter) {
 
-        if (listeners.length == 0)
-            return;
+        if (listeners.length == 0) {
+          return;
+        }
 
         InstanceEvent event = new InstanceEvent(wrapper, filter, type);
         InstanceListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
-            interested[i].instanceEvent(event);
+        for (int i = 0; i < interested.length; i++) {
+          interested[i].instanceEvent(event);
+        }
 
     }
 
@@ -141,14 +144,16 @@ public final class InstanceSupport {
     public void fireInstanceEvent(String type, Filter filter,
                                   Throwable exception) {
 
-        if (listeners.length == 0)
-            return;
+        if (listeners.length == 0) {
+          return;
+        }
 
         InstanceEvent event = new InstanceEvent(wrapper, filter, type,
                                                 exception);
         InstanceListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
-            interested[i].instanceEvent(event);
+        for (int i = 0; i < interested.length; i++) {
+          interested[i].instanceEvent(event);
+        }
 
     }
 
@@ -167,14 +172,16 @@ public final class InstanceSupport {
                                   ServletRequest request,
                                   ServletResponse response) {
 
-        if (listeners.length == 0)
-            return;
+        if (listeners.length == 0) {
+          return;
+        }
 
         InstanceEvent event = new InstanceEvent(wrapper, filter, type,
                                                 request, response);
         InstanceListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
-            interested[i].instanceEvent(event);
+        for (int i = 0; i < interested.length; i++) {
+          interested[i].instanceEvent(event);
+        }
 
     }
 
@@ -195,14 +202,16 @@ public final class InstanceSupport {
                                   ServletResponse response,
                                   Throwable exception) {
 
-        if (listeners.length == 0)
-            return;
+        if (listeners.length == 0) {
+          return;
+        }
 
         InstanceEvent event = new InstanceEvent(wrapper, filter, type,
                                                 request, response, exception);
         InstanceListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
-            interested[i].instanceEvent(event);
+        for (int i = 0; i < interested.length; i++) {
+          interested[i].instanceEvent(event);
+        }
 
     }
 
@@ -217,13 +226,15 @@ public final class InstanceSupport {
      */
     public void fireInstanceEvent(String type, Servlet servlet) {
 
-        if (listeners.length == 0)
-            return;
+        if (listeners.length == 0) {
+          return;
+        }
 
         InstanceEvent event = new InstanceEvent(wrapper, servlet, type);
         InstanceListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
-            interested[i].instanceEvent(event);
+        for (int i = 0; i < interested.length; i++) {
+          interested[i].instanceEvent(event);
+        }
 
     }
 
@@ -240,14 +251,16 @@ public final class InstanceSupport {
     public void fireInstanceEvent(String type, Servlet servlet,
                                   Throwable exception) {
 
-        if (listeners.length == 0)
-            return;
+        if (listeners.length == 0) {
+          return;
+        }
 
         InstanceEvent event = new InstanceEvent(wrapper, servlet, type,
                                                 exception);
         InstanceListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
-            interested[i].instanceEvent(event);
+        for (int i = 0; i < interested.length; i++) {
+          interested[i].instanceEvent(event);
+        }
 
     }
 
@@ -266,14 +279,16 @@ public final class InstanceSupport {
                                   ServletRequest request,
                                   ServletResponse response) {
 
-        if (listeners.length == 0)
-            return;
+        if (listeners.length == 0) {
+          return;
+        }
 
         InstanceEvent event = new InstanceEvent(wrapper, servlet, type,
                                                 request, response);
         InstanceListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
-            interested[i].instanceEvent(event);
+        for (int i = 0; i < interested.length; i++) {
+          interested[i].instanceEvent(event);
+        }
 
     }
 
@@ -294,14 +309,16 @@ public final class InstanceSupport {
                                   ServletResponse response,
                                   Throwable exception) {
 
-        if (listeners.length == 0)
-            return;
+        if (listeners.length == 0) {
+          return;
+        }
 
         InstanceEvent event = new InstanceEvent(wrapper, servlet, type,
                                                 request, response, exception);
         InstanceListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++)
-            interested[i].instanceEvent(event);
+        for (int i = 0; i < interested.length; i++) {
+          interested[i].instanceEvent(event);
+        }
 
     }
 
@@ -321,14 +338,16 @@ public final class InstanceSupport {
                     break;
                 }
             }
-            if (n < 0)
-                return;
+            if (n < 0) {
+              return;
+            }
             InstanceListener results[] =
               new InstanceListener[listeners.length - 1];
             int j = 0;
             for (int i = 0; i < listeners.length; i++) {
-                if (i != n)
-                    results[j++] = listeners[i];
+                if (i != n) {
+                  results[j++] = listeners[i];
+                }
             }
             listeners = results;
         }

@@ -51,8 +51,9 @@ public class CreateTestTable extends DefaultTestCase {
         try {
             ResultSet rs = st.executeQuery(check);
 
-            if (rs.next())
-                count = rs.getInt(1);
+            if (rs.next()) {
+              count = rs.getInt(1);
+            }
             rs.close();
             st.close();
             System.out.println("Count:"+count);

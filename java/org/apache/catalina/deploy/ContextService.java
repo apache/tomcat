@@ -175,8 +175,9 @@ public class ContextService extends ResourceBase {
     }
 
     public void addPortcomponent(String serviceendpoint, String portlink) {
-        if (portlink == null)
-            portlink = "";
+        if (portlink == null) {
+          portlink = "";
+        }
         this.setProperty(serviceendpoint, portlink);
     }
 

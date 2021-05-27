@@ -51,8 +51,9 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
         } else {
             if (logCounter.incrementAndGet() >= logInterval) {
                 logCounter.set(0);
-                if (log.isWarnEnabled())
-                    log.warn("Received message from cluster["+msg.getAddress()+"] was refused.");
+                if (log.isWarnEnabled()) {
+                  log.warn("Received message from cluster["+msg.getAddress()+"] was refused.");
+                }
             }
         }
     }//messageReceived
@@ -60,45 +61,63 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
 
     @Override
     public void memberAdded(Member member) {
-        if ( membership == null ) setupMembership();
+        if ( membership == null ) {
+          setupMembership();
+        }
         boolean notify = false;
         synchronized (membership) {
             notify = Arrays.equals(domain,member.getDomain());
-            if ( notify ) notify = membership.memberAlive((MemberImpl)member);
+            if ( notify ) {
+              notify = membership.memberAlive((MemberImpl)member);
+            }
         }
         if ( notify ) {
             super.memberAdded(member);
         } else {
-            if(log.isInfoEnabled()) log.info("Member was refused to join cluster["+member+"]");
+            if(log.isInfoEnabled()) {
+              log.info("Member was refused to join cluster["+member+"]");
+            }
         }
     }
 
     @Override
     public void memberDisappeared(Member member) {
-        if ( membership == null ) setupMembership();
+        if ( membership == null ) {
+          setupMembership();
+        }
         boolean notify = false;
         synchronized (membership) {
             notify = Arrays.equals(domain,member.getDomain());
-            if ( notify ) membership.removeMember((MemberImpl)member);
+            if ( notify ) {
+              membership.removeMember((MemberImpl)member);
+            }
         }
-        if ( notify ) super.memberDisappeared(member);
+        if ( notify ) {
+          super.memberDisappeared(member);
+        }
     }
 
     @Override
     public boolean hasMembers() {
-        if ( membership == null ) setupMembership();
+        if ( membership == null ) {
+          setupMembership();
+        }
         return membership.hasMembers();
     }
 
     @Override
     public Member[] getMembers() {
-        if ( membership == null ) setupMembership();
+        if ( membership == null ) {
+          setupMembership();
+        }
         return membership.getMembers();
     }
 
     @Override
     public Member getMember(Member mbr) {
-        if ( membership == null ) setupMembership();
+        if ( membership == null ) {
+          setupMembership();
+        }
         return membership.getMember(mbr);
     }
 
@@ -124,11 +143,14 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
     }
 
     public void setDomain(String domain) {
-        if ( domain == null ) return;
-        if (domain.startsWith("{"))
-            setDomain(org.apache.catalina.tribes.util.Arrays.fromString(domain));
-        else
-            setDomain(org.apache.catalina.tribes.util.Arrays.convert(domain));
+        if ( domain == null ) {
+          return;
+        }
+        if (domain.startsWith("{")) {
+          setDomain(org.apache.catalina.tribes.util.Arrays.fromString(domain));
+        } else {
+          setDomain(org.apache.catalina.tribes.util.Arrays.convert(domain));
+        }
     }
 
     public int getLogInterval() {

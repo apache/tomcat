@@ -116,20 +116,23 @@ public class WARDirContext extends BaseDirContext {
     public void setDocBase(String docBase) {
 
         // Validate the format of the proposed document root
-        if (docBase == null)
-            throw new IllegalArgumentException
-                (sm.getString("resources.null"));
-        if (!(docBase.endsWith(".war")))
-            throw new IllegalArgumentException
-                (sm.getString("warResources.notWar"));
+        if (docBase == null) {
+          throw new IllegalArgumentException
+              (sm.getString("resources.null"));
+        }
+        if (!(docBase.endsWith(".war"))) {
+          throw new IllegalArgumentException
+              (sm.getString("warResources.notWar"));
+        }
 
         // Calculate a File object referencing this document base directory
         File base = new File(docBase);
 
         // Validate that the document base is an existing directory
-        if (!base.exists() || !base.canRead() || base.isDirectory())
-            throw new IllegalArgumentException
-                (sm.getString("warResources.invalidWar", docBase));
+        if (!base.exists() || !base.canRead() || base.isDirectory()) {
+          throw new IllegalArgumentException
+              (sm.getString("warResources.invalidWar", docBase));
+        }
         try {
             this.base = new ZipFile(base);
         } catch (Exception e) {
@@ -198,17 +201,20 @@ public class WARDirContext extends BaseDirContext {
             return null;
         }
 
-        if (name.isEmpty())
-            return this;
+        if (name.isEmpty()) {
+          return this;
+        }
         Entry entry = treeLookup(name);
-        if (entry == null)
-            return null;
+        if (entry == null) {
+          return null;
+        }
 
         ZipEntry zipEntry = entry.getEntry();
-        if (zipEntry.isDirectory())
-            return new WARDirContext(base, entry);
-        else
-            return new WARResource(entry.getEntry());
+        if (zipEntry.isDirectory()) {
+          return new WARDirContext(base, entry);
+        } else {
+          return new WARResource(entry.getEntry());
+        }
     }
 
 
@@ -276,12 +282,14 @@ public class WARDirContext extends BaseDirContext {
 
         Name name = getEscapedJndiName(strName);
 
-        if (name.isEmpty())
-            return list(entries);
+        if (name.isEmpty()) {
+          return list(entries);
+        }
 
         Entry entry = treeLookup(name);
-        if (entry == null)
-            return null;
+        if (entry == null) {
+          return null;
+        }
 
         return list(entry);
     }
@@ -377,22 +385,25 @@ public class WARDirContext extends BaseDirContext {
         throws NamingException {
 
         Entry entry = null;
-        if (name.isEmpty())
-            entry = entries;
-        else
-            entry = treeLookup(name);
-        if (entry == null)
-            return null;
+        if (name.isEmpty()) {
+          entry = entries;
+        } else {
+          entry = treeLookup(name);
+        }
+        if (entry == null) {
+          return null;
+        }
 
         ZipEntry zipEntry = entry.getEntry();
 
         ResourceAttributes attrs = new ResourceAttributes();
         attrs.setCreationDate(new Date(zipEntry.getTime()));
         attrs.setName(entry.getName());
-        if (!zipEntry.isDirectory())
-            attrs.setResourceType("");
-        else
-            attrs.setCollection(true);
+        if (!zipEntry.isDirectory()) {
+          attrs.setResourceType("");
+        } else {
+          attrs.setCollection(true);
+        }
         attrs.setContentLength(zipEntry.getSize());
         attrs.setLastModified(zipEntry.getTime());
 
@@ -713,18 +724,20 @@ public class WARDirContext extends BaseDirContext {
                         // signify that it is a directory entry
                         String zipName = name.substring(1, currentPos) + "/";
                         child = new Entry(entryName, new ZipEntry(zipName));
-                        if (parent != null)
-                            parent.addChild(child);
+                        if (parent != null) {
+                          parent.addChild(child);
+                        }
                     }
                     // Increment lastPos
                     lastPos = currentPos + 1;
                 }
-                String entryName = name.substring(pos + 1, name.length());
+                String entryName = name.substring(pos + 1);
                 Name compositeName = getEscapedJndiName(name.substring(0, pos));
                 Entry parent = treeLookup(compositeName);
                 Entry child = new Entry(entryName, entry);
-                if (parent != null)
-                    parent.addChild(child);
+                if (parent != null) {
+                  parent.addChild(child);
+                }
 
             }
 
@@ -739,15 +752,18 @@ public class WARDirContext extends BaseDirContext {
      * Entry tree lookup.
      */
     protected Entry treeLookup(Name name) {
-        if (name.isEmpty() || entries == null)
-            return entries;
+        if (name.isEmpty() || entries == null) {
+          return entries;
+        }
         Entry currentEntry = entries;
         for (int i = 0; i < name.size(); i++) {
-            if (name.get(i).length() == 0)
-                continue;
+            if (name.get(i).length() == 0) {
+              continue;
+            }
             currentEntry = currentEntry.getChild(name.get(i));
-            if (currentEntry == null)
-                return null;
+            if (currentEntry == null) {
+              return null;
+            }
         }
         return currentEntry;
     }
@@ -818,15 +834,17 @@ public class WARDirContext extends BaseDirContext {
 
         @Override
         public int compareTo(Object o) {
-            if (!(o instanceof Entry))
-                return (+1);
+            if (!(o instanceof Entry)) {
+              return (+1);
+            }
             return name.compareTo(((Entry) o).getName());
         }
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Entry))
-                return false;
+            if (!(o instanceof Entry)) {
+              return false;
+            }
             return name.equals(((Entry) o).getName());
         }
 
@@ -847,8 +865,9 @@ public class WARDirContext extends BaseDirContext {
 
         public void addChild(Entry entry) {
             Entry[] newChildren = new Entry[children.length + 1];
-            for (int i = 0; i < children.length; i++)
-                newChildren[i] = children[i];
+            for (int i = 0; i < children.length; i++) {
+              newChildren[i] = children[i];
+            }
             newChildren[children.length] = entry;
             children = newChildren;
             childrenSorted = false;

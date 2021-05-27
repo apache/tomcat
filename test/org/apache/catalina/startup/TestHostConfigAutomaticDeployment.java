@@ -1947,8 +1947,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private static File getCanonicalPath(String path) {
         File file = new File(path);
         File base = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
-        if (!file.isAbsolute())
-            file = new File(base,path);
+        if (!file.isAbsolute()) {
+          file = new File(base,path);
+        }
         try {
             return file.getCanonicalFile();
         } catch (IOException e) {

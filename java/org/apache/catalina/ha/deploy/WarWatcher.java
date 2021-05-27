@@ -73,8 +73,9 @@ public class WarWatcher {
      * check for modification and send notification to listener
      */
     public void check() {
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("warWatcher.checkingWars", watchDir));
+        if (log.isDebugEnabled()) {
+          log.debug(sm.getString("warWatcher.checkingWars", watchDir));
+        }
         File[] list = watchDir.listFiles(new WarFilter());
         if (list == null) {
             log.warn(sm.getString("warWatcher.cantListWatchDir",
@@ -84,9 +85,10 @@ public class WarWatcher {
         }
         //first make sure all the files are listed in our current status
         for (File file : list) {
-            if (!file.exists())
-                log.warn(sm.getString("warWatcher.listedFileDoesNotExist",
-                        file, watchDir));
+            if (!file.exists()) {
+              log.warn(sm.getString("warWatcher.listedFileDoesNotExist",
+                      file, watchDir));
+            }
 
             addWarInfo(file);
         }
@@ -96,9 +98,10 @@ public class WarWatcher {
                 currentStatus.entrySet().iterator(); i.hasNext();) {
             Map.Entry<String,WarInfo> entry = i.next();
             WarInfo info = entry.getValue();
-            if(log.isTraceEnabled())
-                log.trace(sm.getString("warWatcher.checkingWar",
-                                       info.getWar()));
+            if(log.isTraceEnabled()) {
+              log.trace(sm.getString("warWatcher.checkingWar",
+                                     info.getWar()));
+            }
             int check = info.check();
             if (check == 1) {
                 listener.fileModified(info.getWar());
@@ -107,10 +110,11 @@ public class WarWatcher {
                 //no need to keep in memory
                 i.remove();
             }
-            if(log.isTraceEnabled())
-                log.trace(sm.getString("warWatcher.checkWarResult",
-                                       Integer.valueOf(check),
-                                       info.getWar()));
+            if(log.isTraceEnabled()) {
+              log.trace(sm.getString("warWatcher.checkWarResult",
+                                     Integer.valueOf(check),
+                                     info.getWar()));
+            }
         }
 
     }
@@ -173,8 +177,9 @@ public class WarWatcher {
     protected static class WarFilter implements java.io.FilenameFilter {
         @Override
         public boolean accept(File path, String name) {
-            if (name == null)
-                return false;
+            if (name == null) {
+              return false;
+            }
             return name.endsWith(".war");
         }
     }
@@ -192,8 +197,9 @@ public class WarWatcher {
         public WarInfo(File war) {
             this.war = war;
             this.lastChecked = war.lastModified();
-            if (!war.exists())
-                lastState = -1;
+            if (!war.exists()) {
+              lastState = -1;
+            }
         }
 
         public boolean modified() {

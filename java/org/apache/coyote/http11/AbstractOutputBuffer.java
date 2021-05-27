@@ -150,8 +150,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
             filter.setBuffer(outputStreamOutputBuffer);
         } else {
             for (int i = 0; i <= lastActiveFilter; i++) {
-                if (activeFilters[i] == filter)
-                    return;
+                if (activeFilters[i] == filter) {
+                  return;
+                }
             }
             filter.setBuffer(activeFilters[lastActiveFilter]);
         }
@@ -186,10 +187,11 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
         }
 
-        if (lastActiveFilter == -1)
-            return outputStreamOutputBuffer.doWrite(chunk, res);
-        else
-            return activeFilters[lastActiveFilter].doWrite(chunk, res);
+        if (lastActiveFilter == -1) {
+          return outputStreamOutputBuffer.doWrite(chunk, res);
+        } else {
+          return activeFilters[lastActiveFilter].doWrite(chunk, res);
+        }
 
     }
 
@@ -245,8 +247,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
      */
     public void reset() {
 
-        if (committed)
-            throw new IllegalStateException(/*FIXME:Put an error message*/);
+        if (committed) {
+          throw new IllegalStateException(/*FIXME:Put an error message*/);
+        }
 
         // These will need to be reset if the reset was triggered by the error
         // handling if the headers were too large
@@ -301,11 +304,13 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
 
         }
 
-        if (finished)
-            return;
+        if (finished) {
+          return;
+        }
 
-        if (lastActiveFilter != -1)
-            activeFilters[lastActiveFilter].end();
+        if (lastActiveFilter != -1) {
+          activeFilters[lastActiveFilter].end();
+        }
         finished = true;
     }
 
@@ -501,8 +506,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
      */
     protected void write(String s) {
 
-        if (s == null)
-            return;
+        if (s == null) {
+          return;
+        }
 
         // From the Tomcat 3.3 HTTP/1.0 connector
         int len = s.length();

@@ -236,28 +236,32 @@ public abstract class BaseDirContext implements DirContext {
         // Overwrite whatever is currently set
         aliases.clear();
 
-        if (theAliases == null || theAliases.length() == 0)
-            return;
+        if (theAliases == null || theAliases.length() == 0) {
+          return;
+        }
 
         String[] kvps = theAliases.split(",");
         for (String kvp : kvps) {
             // Skip blanks introduced by regexp split and/or poor input
             kvp = kvp.trim();
-            if(0 == kvp.length())
-                continue;
+            if(0 == kvp.length()) {
+              continue;
+            }
 
             String[] kv = kvp.split("=");
-            if (kv.length != 2)
-                throw new IllegalArgumentException(
-                        sm.getString("resources.invalidAliasMapping", kvp));
+            if (kv.length != 2) {
+              throw new IllegalArgumentException(
+                      sm.getString("resources.invalidAliasMapping", kvp));
+            }
 
             // Trim whitespace from key and value
             kv[0] = kv[0].trim();
             kv[1] = kv[1].trim();
 
-            if(kv[0].length() == 0 || kv[1].length() == 0)
-                throw new IllegalArgumentException(
-                        sm.getString("resources.invalidAliasMapping", kvp));
+            if(kv[0].length() == 0 || kv[1].length() == 0) {
+              throw new IllegalArgumentException(
+                      sm.getString("resources.invalidAliasMapping", kvp));
+            }
 
             if (kv[0].equals("/")) {
                 throw new IllegalArgumentException(
@@ -304,9 +308,10 @@ public abstract class BaseDirContext implements DirContext {
     public void setDocBase(String docBase) {
 
         // Validate the format of the proposed document root
-        if (docBase == null)
-            throw new IllegalArgumentException
-                (sm.getString("resources.null"));
+        if (docBase == null) {
+          throw new IllegalArgumentException
+              (sm.getString("resources.null"));
+        }
 
         // Change the document root property
         this.docBase = docBase;
@@ -423,16 +428,18 @@ public abstract class BaseDirContext implements DirContext {
         // Next do a standard getRealPath()
         String path = doGetRealPath(name);
 
-        if (path != null)
-            return path;
+        if (path != null) {
+          return path;
+        }
 
         String resourceName = "/META-INF/resources" + name;
         // Check the alternate locations
         for (DirContext altDirContext : altDirContexts) {
             if (altDirContext instanceof BaseDirContext){
                 path = ((BaseDirContext) altDirContext).getRealPath(resourceName);
-                if (path != null)
-                    return path;
+                if (path != null) {
+                  return path;
+                }
             }
         }
 
@@ -1162,23 +1169,25 @@ public abstract class BaseDirContext implements DirContext {
         // Next do a standard lookup
         Attributes attrs = doGetAttributes(name, attrIds);
 
-        if (attrs != null)
-            return attrs;
+        if (attrs != null) {
+          return attrs;
+        }
 
         String resourceName = "/META-INF/resources" + name;
         // Check the alternate locations
         for (DirContext altDirContext : altDirContexts) {
-            if (altDirContext instanceof BaseDirContext)
-                attrs = ((BaseDirContext) altDirContext).doGetAttributes(resourceName, attrIds);
-            else {
+            if (altDirContext instanceof BaseDirContext) {
+              attrs = ((BaseDirContext) altDirContext).doGetAttributes(resourceName, attrIds);
+            } else {
                 try {
                     attrs = altDirContext.getAttributes(name, attrIds);
                 } catch (NamingException ne) {
                     // Ignore
                 }
             }
-            if (attrs != null)
-                return attrs;
+            if (attrs != null) {
+              return attrs;
+            }
         }
 
         // Really not found
@@ -1699,8 +1708,9 @@ public abstract class BaseDirContext implements DirContext {
         result.dirContext = aliases.get(searchName);
         while (result.dirContext == null) {
             int slash = searchName.lastIndexOf('/');
-            if (slash < 0)
-                break;
+            if (slash < 0) {
+              break;
+            }
             searchName = searchName.substring(0, slash);
             result.dirContext = aliases.get(searchName);
         }

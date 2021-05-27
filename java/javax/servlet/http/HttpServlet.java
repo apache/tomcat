@@ -496,35 +496,63 @@ public abstract class HttpServlet extends GenericServlet {
                 ALLOW_GET = true;
                 ALLOW_HEAD = true;
             }
-            if (m.getName().equals("doPost"))
-                ALLOW_POST = true;
-            if (m.getName().equals("doPut"))
-                ALLOW_PUT = true;
-            if (m.getName().equals("doDelete"))
-                ALLOW_DELETE = true;
+            if (m.getName().equals("doPost")) {
+              ALLOW_POST = true;
+            }
+            if (m.getName().equals("doPut")) {
+              ALLOW_PUT = true;
+            }
+            if (m.getName().equals("doDelete")) {
+              ALLOW_DELETE = true;
+            }
         }
 
         String allow = null;
-        if (ALLOW_GET)
-            allow=METHOD_GET;
-        if (ALLOW_HEAD)
-            if (allow==null) allow=METHOD_HEAD;
-            else allow += ", " + METHOD_HEAD;
-        if (ALLOW_POST)
-            if (allow==null) allow=METHOD_POST;
-            else allow += ", " + METHOD_POST;
-        if (ALLOW_PUT)
-            if (allow==null) allow=METHOD_PUT;
-            else allow += ", " + METHOD_PUT;
-        if (ALLOW_DELETE)
-            if (allow==null) allow=METHOD_DELETE;
-            else allow += ", " + METHOD_DELETE;
-        if (ALLOW_TRACE)
-            if (allow==null) allow=METHOD_TRACE;
-            else allow += ", " + METHOD_TRACE;
-        if (ALLOW_OPTIONS)
-            if (allow==null) allow=METHOD_OPTIONS;
-            else allow += ", " + METHOD_OPTIONS;
+        if (ALLOW_GET) {
+          allow=METHOD_GET;
+        }
+        if (ALLOW_HEAD) {
+          if (allow==null) {
+            allow=METHOD_HEAD;
+          } else {
+            allow += ", " + METHOD_HEAD;
+          }
+        }
+        if (ALLOW_POST) {
+          if (allow==null) {
+            allow=METHOD_POST;
+          } else {
+            allow += ", " + METHOD_POST;
+          }
+        }
+        if (ALLOW_PUT) {
+          if (allow==null) {
+            allow=METHOD_PUT;
+          } else {
+            allow += ", " + METHOD_PUT;
+          }
+        }
+        if (ALLOW_DELETE) {
+          if (allow==null) {
+            allow=METHOD_DELETE;
+          } else {
+            allow += ", " + METHOD_DELETE;
+          }
+        }
+        if (ALLOW_TRACE) {
+          if (allow==null) {
+            allow=METHOD_TRACE;
+          } else {
+            allow += ", " + METHOD_TRACE;
+          }
+        }
+        if (ALLOW_OPTIONS) {
+          if (allow==null) {
+            allow=METHOD_OPTIONS;
+          } else {
+            allow += ", " + METHOD_OPTIONS;
+          }
+        }
 
         resp.setHeader("Allow", allow);
     }
@@ -683,10 +711,12 @@ public abstract class HttpServlet extends GenericServlet {
      */
     private void maybeSetLastModified(HttpServletResponse resp,
                                       long lastModified) {
-        if (resp.containsHeader(HEADER_LASTMOD))
-            return;
-        if (lastModified >= 0)
-            resp.setDateHeader(HEADER_LASTMOD, lastModified);
+        if (resp.containsHeader(HEADER_LASTMOD)) {
+          return;
+        }
+        if (lastModified >= 0) {
+          resp.setDateHeader(HEADER_LASTMOD, lastModified);
+        }
     }
 
 

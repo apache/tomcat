@@ -158,8 +158,9 @@ public final class StringParser {
      */
     public void advance() {
 
-        if (index < length)
-            index++;
+        if (index < length) {
+          index++;
+        }
 
     }
 
@@ -173,10 +174,11 @@ public final class StringParser {
      */
     public String extract(int start) {
 
-        if ((start < 0) || (start >= length))
-            return ("");
-        else
-            return (string.substring(start));
+        if ((start < 0) || (start >= length)) {
+          return ("");
+        } else {
+          return (string.substring(start));
+        }
 
     }
 
@@ -191,10 +193,11 @@ public final class StringParser {
      */
     public String extract(int start, int end) {
 
-        if ((start < 0) || (start >= end) || (end > length))
-            return ("");
-        else
-            return (string.substring(start, end));
+        if ((start < 0) || (start >= end) || (end > length)) {
+          return ("");
+        } else {
+          return (string.substring(start, end));
+        }
 
     }
 
@@ -209,8 +212,9 @@ public final class StringParser {
      */
     public int findChar(char ch) {
 
-        while ((index < length) && (ch != chars[index]))
-            index++;
+        while ((index < length) && (ch != chars[index])) {
+          index++;
+        }
         return (index);
 
     }
@@ -224,8 +228,9 @@ public final class StringParser {
      */
     public int findText() {
 
-        while ((index < length) && isWhite(chars[index]))
-            index++;
+        while ((index < length) && isWhite(chars[index])) {
+          index++;
+        }
         return (index);
 
     }
@@ -239,8 +244,9 @@ public final class StringParser {
      */
     public int findWhite() {
 
-        while ((index < length) && !isWhite(chars[index]))
-            index++;
+        while ((index < length) && !isWhite(chars[index])) {
+          index++;
+        }
         return (index);
 
     }
@@ -266,8 +272,9 @@ public final class StringParser {
      */
     public int skipChar(char ch) {
 
-        while ((index < length) && (ch == chars[index]))
-            index++;
+        while ((index < length) && (ch == chars[index])) {
+          index++;
+        }
         return (index);
 
     }
@@ -280,8 +287,9 @@ public final class StringParser {
      */
     public int skipText() {
 
-        while ((index < length) && !isWhite(chars[index]))
-            index++;
+        while ((index < length) && !isWhite(chars[index])) {
+          index++;
+        }
         return (index);
 
     }
@@ -294,8 +302,9 @@ public final class StringParser {
      */
     public int skipWhite() {
 
-        while ((index < length) && isWhite(chars[index]))
-            index++;
+        while ((index < length) && isWhite(chars[index])) {
+          index++;
+        }
         return (index);
 
     }
@@ -311,10 +320,11 @@ public final class StringParser {
      */
     protected boolean isWhite(char ch) {
 
-        if ((ch == ' ') || (ch == '\t') || (ch == '\r') || (ch == '\n'))
-            return (true);
-        else
-            return (false);
+        if ((ch == ' ') || (ch == '\t') || (ch == '\r') || (ch == '\n')) {
+          return (true);
+        } else {
+          return (false);
+        }
 
     }
 

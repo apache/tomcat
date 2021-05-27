@@ -98,12 +98,13 @@ public class HttpUtils {
                 throw new IllegalArgumentException();
             }
             String key = parseName(pair.substring(0, pos), sb);
-            String val = parseName(pair.substring(pos+1, pair.length()), sb);
+            String val = parseName(pair.substring(pos+1), sb);
             if (ht.containsKey(key)) {
                 String oldVals[] = ht.get(key);
                 valArray = new String[oldVals.length + 1];
-                for (int i = 0; i < oldVals.length; i++)
-                    valArray[i] = oldVals[i];
+                for (int i = 0; i < oldVals.length; i++) {
+                  valArray[i] = oldVals[i];
+                }
                 valArray[oldVals.length] = val;
             } else {
                 valArray = new String[1];
@@ -160,8 +161,9 @@ public class HttpUtils {
         // should a length of 0 be an IllegalArgumentException
 
         // cheap hack to return an empty hash
-        if (len <=0)
-            return new Hashtable<String,String[]>();
+        if (len <=0) {
+          return new Hashtable<String,String[]>();
+        }
 
         if (in == null) {
             throw new IllegalArgumentException();
@@ -222,8 +224,9 @@ public class HttpUtils {
                 } catch (StringIndexOutOfBoundsException e) {
                     String rest  = s.substring(i);
                     sb.append(rest);
-                    if (rest.length()==2)
-                        i++;
+                    if (rest.length()==2) {
+                      i++;
+                    }
                 }
 
                 break;

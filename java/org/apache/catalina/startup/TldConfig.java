@@ -217,8 +217,9 @@ public final class TldConfig  implements LifecycleListener {
     }
 
     public void addApplicationListener( String s ) {
-        if(log.isDebugEnabled())
-            log.debug( "Add tld listener " + s);
+        if(log.isDebugEnabled()) {
+          log.debug( "Add tld listener " + s);
+        }
         listeners.add(s);
     }
 
@@ -276,9 +277,10 @@ public final class TldConfig  implements LifecycleListener {
         // Now add all the listeners we found to the listeners for this context
         String list[] = getTldListeners();
 
-        if( log.isDebugEnabled() )
-            log.debug(sm.getString("tldConfig.addListeners",
-                    Integer.valueOf(list.length)));
+        if( log.isDebugEnabled() ) {
+          log.debug(sm.getString("tldConfig.addListeners",
+                  Integer.valueOf(list.length)));
+        }
 
         for( int i=0; i<list.length; i++ ) {
             context.addApplicationListener(

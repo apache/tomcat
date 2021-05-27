@@ -396,11 +396,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Lock readLock = loaderLock.readLock();
         readLock.lock();
         try {
-            if (loader != null)
-                return loader;
+            if (loader != null) {
+              return loader;
+            }
 
-            if (parent != null)
-                return parent.getLoader();
+            if (parent != null) {
+              return parent.getLoader();
+            }
 
             return null;
         } finally {
@@ -436,8 +438,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         try {
             // Change components if necessary
             oldLoader = this.loader;
-            if (oldLoader == loader)
-                return;
+            if (oldLoader == loader) {
+              return;
+            }
             this.loader = loader;
 
             // Stop the old component if necessary
@@ -451,8 +454,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
 
             // Start the new component if necessary
-            if (loader != null)
-                loader.setContainer(this);
+            if (loader != null) {
+              loader.setContainer(this);
+            }
             if (getState().isAvailable() && (loader != null) &&
                     (loader instanceof Lifecycle)) {
                 try {
@@ -476,8 +480,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public Log getLogger() {
-        if (logger != null)
-            return logger;
+        if (logger != null) {
+          return logger;
+        }
         logger = LogFactory.getLog(logName());
         return logger;
     }
@@ -493,11 +498,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Lock readLock = managerLock.readLock();
         readLock.lock();
         try {
-            if (manager != null)
-                return manager;
+            if (manager != null) {
+              return manager;
+            }
 
-            if (parent != null)
-                return parent.getManager();
+            if (parent != null) {
+              return parent.getManager();
+            }
 
             return null;
         } finally {
@@ -533,8 +540,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         try {
             // Change components if necessary
             oldManager = this.manager;
-            if (oldManager == manager)
-                return;
+            if (oldManager == manager) {
+              return;
+            }
             this.manager = manager;
 
             // Stop the old component if necessary
@@ -548,8 +556,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
 
             // Start the new component if necessary
-            if (manager != null)
-                manager.setContainer(this);
+            if (manager != null) {
+              manager.setContainer(this);
+            }
             if (getState().isAvailable() && manager instanceof Lifecycle) {
                 try {
                     ((Lifecycle) manager).start();
@@ -586,11 +595,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Lock readLock = clusterLock.readLock();
         readLock.lock();
         try {
-            if (cluster != null)
-                return cluster;
+            if (cluster != null) {
+              return cluster;
+            }
 
-            if (parent != null)
-                return parent.getCluster();
+            if (parent != null) {
+              return parent.getCluster();
+            }
 
             return null;
         } finally {
@@ -627,8 +638,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         try {
             // Change components if necessary
             oldCluster = this.cluster;
-            if (oldCluster == cluster)
-                return;
+            if (oldCluster == cluster) {
+              return;
+            }
             this.cluster = cluster;
 
             // Stop the old component if necessary
@@ -642,8 +654,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
 
             // Start the new component if necessary
-            if (cluster != null)
-                cluster.setContainer(this);
+            if (cluster != null) {
+              cluster.setContainer(this);
+            }
 
             if (getState().isAvailable() && (cluster != null) &&
                 (cluster instanceof Lifecycle)) {
@@ -758,8 +771,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public ClassLoader getParentClassLoader() {
-        if (parentClassLoader != null)
-            return parentClassLoader;
+        if (parentClassLoader != null) {
+          return parentClassLoader;
+        }
         if (parent != null) {
             return parent.getParentClassLoader();
         }
@@ -807,10 +821,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Lock l = realmLock.readLock();
         l.lock();
         try {
-            if (realm != null)
-                return realm;
-            if (parent != null)
-                return parent.getRealm();
+            if (realm != null) {
+              return realm;
+            }
+            if (parent != null) {
+              return parent.getRealm();
+            }
             return null;
         } finally {
             l.unlock();
@@ -841,8 +857,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         try {
             // Change components if necessary
             Realm oldRealm = this.realm;
-            if (oldRealm == realm)
-                return;
+            if (oldRealm == realm) {
+              return;
+            }
             this.realm = realm;
 
             // Stop the old component if necessary
@@ -856,8 +873,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             }
 
             // Start the new component if necessary
-            if (realm != null)
-                realm.setContainer(this);
+            if (realm != null) {
+              realm.setContainer(this);
+            }
             if (getState().isAvailable() && (realm != null) &&
                 (realm instanceof Lifecycle)) {
                 try {
@@ -887,11 +905,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         Lock readLock = resourcesLock.readLock();
         readLock.lock();
         try {
-            if (resources != null)
-                return resources;
+            if (resources != null) {
+              return resources;
+            }
 
-            if (parent != null)
-                return parent.getResources();
+            if (parent != null) {
+              return parent.getResources();
+            }
 
             return null;
         } finally {
@@ -931,16 +951,18 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         try {
             // Change components if necessary
             oldResources = this.resources;
-            if (oldResources == resources)
-                return;
+            if (oldResources == resources) {
+              return;
+            }
             // null resources don't need to be wrapped. Neither do resources
             // that are already wrapped.
             if (resources == null || resources instanceof ProxyDirContext) {
                 this.resources = resources;
             } else {
                 Hashtable<String, String> env = new Hashtable<String, String>();
-                if (getParent() != null)
-                    env.put(ProxyDirContext.HOST, getParent().getName());
+                if (getParent() != null) {
+                  env.put(ProxyDirContext.HOST, getParent().getName());
+                }
                 env.put(ProxyDirContext.CONTEXT, getName());
                 this.resources = new ProxyDirContext(env, resources);
             }
@@ -986,13 +1008,15 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     private void addChildInternal(Container child) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Add child " + child + " " + this);
+        if( log.isDebugEnabled() ) {
+          log.debug("Add child " + child + " " + this);
+        }
         synchronized(children) {
-            if (children.get(child.getName()) != null)
-                throw new IllegalArgumentException("addChild:  Child name '" +
-                                                   child.getName() +
-                                                   "' is not unique");
+            if (children.get(child.getName()) != null) {
+              throw new IllegalArgumentException("addChild:  Child name '" +
+                                                 child.getName() +
+                                                 "' is not unique");
+            }
             child.setParent(this);  // May throw IAE
             children.put(child.getName(), child);
         }
@@ -1137,8 +1161,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         synchronized(children) {
-            if (children.get(child.getName()) == null)
-                return;
+            if (children.get(child.getName()) == null) {
+              return;
+            }
             children.remove(child.getName());
         }
 
@@ -1196,22 +1221,27 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Start our subordinate components, if any
         Loader loader = getLoaderInternal();
-        if ((loader != null) && (loader instanceof Lifecycle))
-            ((Lifecycle) loader).start();
+        if ((loader != null) && (loader instanceof Lifecycle)) {
+          ((Lifecycle) loader).start();
+        }
         logger = null;
         getLogger();
         Manager manager = getManagerInternal();
-        if ((manager != null) && (manager instanceof Lifecycle))
-            ((Lifecycle) manager).start();
+        if ((manager != null) && (manager instanceof Lifecycle)) {
+          ((Lifecycle) manager).start();
+        }
         Cluster cluster = getClusterInternal();
-        if ((cluster != null) && (cluster instanceof Lifecycle))
-            ((Lifecycle) cluster).start();
+        if ((cluster != null) && (cluster instanceof Lifecycle)) {
+          ((Lifecycle) cluster).start();
+        }
         Realm realm = getRealmInternal();
-        if ((realm != null) && (realm instanceof Lifecycle))
-            ((Lifecycle) realm).start();
+        if ((realm != null) && (realm instanceof Lifecycle)) {
+          ((Lifecycle) realm).start();
+        }
         DirContext resources = getResourcesInternal();
-        if ((resources != null) && (resources instanceof Lifecycle))
-            ((Lifecycle) resources).start();
+        if ((resources != null) && (resources instanceof Lifecycle)) {
+          ((Lifecycle) resources).start();
+        }
 
         // Start our child containers, if any
         Container children[] = findChildren();
@@ -1444,8 +1474,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void backgroundProcess() {
 
-        if (!getState().isAvailable())
-            return;
+        if (!getState().isAvailable()) {
+          return;
+        }
 
         Cluster cluster = getClusterInternal();
         if (cluster != null) {
@@ -1505,8 +1536,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     public void fireContainerEvent(String type, Object data) {
 
-        if (listeners.size() < 1)
-            return;
+        if (listeners.size() < 1) {
+          return;
+        }
 
         ContainerEvent event = new ContainerEvent(this, type, data);
         // Note for each uses an iterator internally so this is safe
@@ -1571,10 +1603,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     protected void threadStart() {
 
-        if (thread != null)
-            return;
-        if (backgroundProcessorDelay <= 0)
-            return;
+        if (thread != null) {
+          return;
+        }
+        if (backgroundProcessorDelay <= 0) {
+          return;
+        }
 
         threadDone = false;
         String threadName = "ContainerBackgroundProcessor[" + toString() + "]";
@@ -1591,8 +1625,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     protected void threadStop() {
 
-        if (thread == null)
-            return;
+        if (thread == null) {
+          return;
+        }
 
         threadDone = true;
         thread.interrupt();

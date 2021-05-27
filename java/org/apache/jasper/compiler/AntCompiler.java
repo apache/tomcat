@@ -64,8 +64,9 @@ public class AntCompiler extends Compiler {
     // Lazy eval - if we don't need to compile we probably don't need the project
     protected Project getProject() {
 
-        if (project != null)
-            return project;
+        if (project != null) {
+          return project;
+        }
 
         // Initializing project
         project = new Project();
@@ -79,8 +80,9 @@ public class AntCompiler extends Compiler {
         }
 
         if( options.getCompiler() != null ) {
-            if( log.isDebugEnabled() )
-                log.debug("Compiler " + options.getCompiler() );
+            if( log.isDebugEnabled() ) {
+              log.debug("Compiler " + options.getCompiler() );
+            }
             project.setProperty("build.compiler", options.getCompiler() );
         }
         project.init();

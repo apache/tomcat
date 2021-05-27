@@ -366,8 +366,9 @@ public final class Response {
     public void setHeader(String name, String value) {
         char cc=name.charAt(0);
         if( cc=='C' || cc=='c' ) {
-            if( checkSpecialHeader(name, value) )
-            return;
+            if( checkSpecialHeader(name, value) ) {
+              return;
+            }
         }
         headers.setValue(name).setString( value);
     }
@@ -376,8 +377,9 @@ public final class Response {
     public void addHeader(String name, String value) {
         char cc=name.charAt(0);
         if( cc=='C' || cc=='c' ) {
-            if( checkSpecialHeader(name, value) )
-            return;
+            if( checkSpecialHeader(name, value) ) {
+              return;
+            }
         }
         headers.addValue(name).setString( value );
     }

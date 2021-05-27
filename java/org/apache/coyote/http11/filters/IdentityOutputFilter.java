@@ -137,8 +137,9 @@ public class IdentityOutputFilter implements OutputFilter {
     public long end()
         throws IOException {
 
-        if (remaining > 0)
-            return remaining;
+        if (remaining > 0) {
+          return remaining;
+        }
         return 0;
 
     }

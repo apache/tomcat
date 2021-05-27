@@ -168,8 +168,9 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
          */
         @Override
         public void release(SocketChannel socket) {
-            if (log.isDebugEnabled())
-                log.debug("Iterating through our connections to release a socket channel:"+socket);
+            if (log.isDebugEnabled()) {
+              log.debug("Iterating through our connections to release a socket channel:"+socket);
+            }
             boolean released = false;
             Iterator<java.util.Map.Entry<NioChannel, Processor<NioChannel>>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
@@ -183,8 +184,9 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                     break;
                 }
             }
-            if (log.isDebugEnabled())
-                log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
+            if (log.isDebugEnabled()) {
+              log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
+            }
         }
 
         /**

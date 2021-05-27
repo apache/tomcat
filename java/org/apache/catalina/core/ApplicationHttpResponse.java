@@ -103,8 +103,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     public void reset() {
 
         // If already committed, the wrapped response will throw ISE
-        if (!included || getResponse().isCommitted())
-            getResponse().reset();
+        if (!included || getResponse().isCommitted()) {
+          getResponse().reset();
+        }
 
     }
 
@@ -117,8 +118,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void setContentLength(int len) {
 
-        if (!included)
-            getResponse().setContentLength(len);
+        if (!included) {
+          getResponse().setContentLength(len);
+        }
 
     }
 
@@ -131,8 +133,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void setContentType(String type) {
 
-        if (!included)
-            getResponse().setContentType(type);
+        if (!included) {
+          getResponse().setContentType(type);
+        }
 
     }
 
@@ -145,8 +148,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void setLocale(Locale loc) {
 
-        if (!included)
-            getResponse().setLocale(loc);
+        if (!included) {
+          getResponse().setLocale(loc);
+        }
 
     }
 
@@ -158,8 +162,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      */
     @Override
     public void setBufferSize(int size) {
-        if (!included)
-            getResponse().setBufferSize(size);
+        if (!included) {
+          getResponse().setBufferSize(size);
+        }
     }
 
 
@@ -174,8 +179,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void addCookie(Cookie cookie) {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).addCookie(cookie);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).addCookie(cookie);
+        }
 
     }
 
@@ -189,8 +195,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void addDateHeader(String name, long value) {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).addDateHeader(name, value);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).addDateHeader(name, value);
+        }
 
     }
 
@@ -204,8 +211,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void addHeader(String name, String value) {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).addHeader(name, value);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).addHeader(name, value);
+        }
 
     }
 
@@ -219,8 +227,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void addIntHeader(String name, int value) {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).addIntHeader(name, value);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).addIntHeader(name, value);
+        }
 
     }
 
@@ -235,8 +244,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void sendError(int sc) throws IOException {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).sendError(sc);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).sendError(sc);
+        }
 
     }
 
@@ -252,8 +262,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void sendError(int sc, String msg) throws IOException {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).sendError(sc, msg);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).sendError(sc, msg);
+        }
 
     }
 
@@ -268,8 +279,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void sendRedirect(String location) throws IOException {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).sendRedirect(location);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).sendRedirect(location);
+        }
 
     }
 
@@ -283,8 +295,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void setDateHeader(String name, long value) {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).setDateHeader(name, value);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).setDateHeader(name, value);
+        }
 
     }
 
@@ -298,8 +311,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void setHeader(String name, String value) {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).setHeader(name, value);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).setHeader(name, value);
+        }
 
     }
 
@@ -313,8 +327,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void setIntHeader(String name, int value) {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).setIntHeader(name, value);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).setIntHeader(name, value);
+        }
 
     }
 
@@ -327,8 +342,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void setStatus(int sc) {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).setStatus(sc);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).setStatus(sc);
+        }
 
     }
 
@@ -347,8 +363,9 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
     @Override
     public void setStatus(int sc, String msg) {
 
-        if (!included)
-            ((HttpServletResponse) getResponse()).setStatus(sc, msg);
+        if (!included) {
+          ((HttpServletResponse) getResponse()).setStatus(sc, msg);
+        }
 
     }
 

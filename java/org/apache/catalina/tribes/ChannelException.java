@@ -110,7 +110,9 @@ public class ChannelException extends Exception {
     public int addFaultyMember(FaultyMember[] mbrs) {
         int result = 0;
         for (int i=0; mbrs!=null && i<mbrs.length; i++ ) {
-            if ( addFaultyMember(mbrs[i]) ) result++;
+            if ( addFaultyMember(mbrs[i]) ) {
+              result++;
+            }
         }
         return result;
     }
@@ -120,9 +122,14 @@ public class ChannelException extends Exception {
      * @param mbr FaultyMember
      */
     public boolean addFaultyMember(FaultyMember mbr) {
-        if ( this.faultyMembers==null ) this.faultyMembers = new ArrayList<FaultyMember>();
-        if ( !faultyMembers.contains(mbr) ) return faultyMembers.add(mbr);
-        else return false;
+        if ( this.faultyMembers==null ) {
+          this.faultyMembers = new ArrayList<FaultyMember>();
+        }
+        if ( !faultyMembers.contains(mbr) ) {
+          return faultyMembers.add(mbr);
+        } else {
+          return false;
+        }
     }
 
     /**
@@ -130,7 +137,9 @@ public class ChannelException extends Exception {
      * @return FaultyMember[]
      */
     public FaultyMember[] getFaultyMembers() {
-        if ( this.faultyMembers==null ) return EMPTY_LIST;
+        if ( this.faultyMembers==null ) {
+          return EMPTY_LIST;
+        }
         return faultyMembers.toArray(new FaultyMember[0]);
     }
 
@@ -172,7 +181,9 @@ public class ChannelException extends Exception {
 
         @Override
         public boolean equals(Object o) {
-            if (member==null || (!(o instanceof FaultyMember)) || (((FaultyMember)o).member==null)) return false;
+            if (member==null || (!(o instanceof FaultyMember)) || (((FaultyMember)o).member==null)) {
+              return false;
+            }
             return member.equals(((FaultyMember)o).member);
         }
     }

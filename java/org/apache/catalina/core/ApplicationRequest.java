@@ -134,8 +134,9 @@ class ApplicationRequest extends ServletRequestWrapper {
 
         synchronized (attributes) {
             attributes.remove(name);
-            if (!isSpecial(name))
-                getRequest().removeAttribute(name);
+            if (!isSpecial(name)) {
+              getRequest().removeAttribute(name);
+            }
         }
 
     }
@@ -153,8 +154,9 @@ class ApplicationRequest extends ServletRequestWrapper {
 
         synchronized (attributes) {
             attributes.put(name, value);
-            if (!isSpecial(name))
-                getRequest().setAttribute(name, value);
+            if (!isSpecial(name)) {
+              getRequest().setAttribute(name, value);
+            }
         }
 
     }
@@ -199,8 +201,9 @@ class ApplicationRequest extends ServletRequestWrapper {
     protected boolean isSpecial(String name) {
 
         for (String special : specials) {
-            if (special.equals(name))
-                return true;
+            if (special.equals(name)) {
+              return true;
+            }
         }
         return (false);
 

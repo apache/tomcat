@@ -406,8 +406,9 @@ public class ELSupport {
         }
 
         // new to spec
-        if (obj == null)
-            return null;
+        if (obj == null) {
+          return null;
+        }
         if (obj instanceof String) {
             PropertyEditor editor = PropertyEditorManager.findEditor(type);
             if (editor == null) {

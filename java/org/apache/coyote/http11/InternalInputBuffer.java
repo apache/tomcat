@@ -99,8 +99,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
             // Set the start time once we start reading data (even if it is
             // just skipping blank lines)
@@ -126,8 +127,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             // Spec says method name is a token followed by a single SP but
@@ -148,8 +150,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         while (space) {
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 pos++;
@@ -173,8 +176,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             if (buf[pos -1] == Constants.CR && buf[pos] != Constants.LF) {
@@ -233,8 +237,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         while (space && !eol) {
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 pos++;
@@ -255,8 +260,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             if (buf[pos] == Constants.CR) {
@@ -319,8 +325,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             prevChr = chr;
@@ -358,8 +365,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             if (buf[pos] == Constants.COLON) {
@@ -402,8 +410,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill())
-                        throw new EOFException(sm.getString("iib.eof.error"));
+                    if (!fill()) {
+                      throw new EOFException(sm.getString("iib.eof.error"));
+                    }
                 }
 
                 if ((buf[pos] == Constants.SP) || (buf[pos] == Constants.HT)) {
@@ -421,8 +430,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill())
-                        throw new EOFException(sm.getString("iib.eof.error"));
+                    if (!fill()) {
+                      throw new EOFException(sm.getString("iib.eof.error"));
+                    }
                 }
 
                 prevChr = chr;
@@ -463,8 +473,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             byte peek = buf[pos];
@@ -517,8 +528,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
-                    throw new EOFException(sm.getString("iib.eof.error"));
+                if (!fill()) {
+                  throw new EOFException(sm.getString("iib.eof.error"));
+                }
             }
 
             prevChr = chr;
@@ -609,8 +621,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             throws IOException {
 
             if (pos >= lastValid) {
-                if (!fill())
-                    return -1;
+                if (!fill()) {
+                  return -1;
+                }
             }
 
             int length = lastValid - pos;

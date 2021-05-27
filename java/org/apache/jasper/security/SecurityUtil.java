@@ -50,8 +50,9 @@ public final class SecurityUtil{
      */
     public static String filter(String message) {
 
-        if (message == null)
-            return (null);
+        if (message == null) {
+          return (null);
+        }
 
         char content[] = new char[message.length()];
         message.getChars(0, message.length(), content, 0);

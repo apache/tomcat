@@ -129,8 +129,12 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
 
     @Override
     public void init() throws Exception {
-        if( mbeans==null) execute();
-        if( registry==null ) registry=Registry.getRegistry(null, null);
+        if( mbeans==null) {
+          execute();
+        }
+        if( registry==null ) {
+          registry=Registry.getRegistry(null, null);
+        }
 
         registry.invoke(mbeans, "init", false);
     }
@@ -145,7 +149,9 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     }
 
     public void execute() throws Exception {
-        if( registry==null ) registry=Registry.getRegistry(null, null);
+        if( registry==null ) {
+          registry=Registry.getRegistry(null, null);
+        }
         try {
             InputStream stream=getInputStream();
             long t1=System.currentTimeMillis();
@@ -163,8 +169,9 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
 
             if( firstMbeanN==null ) {
                 // maybe we have a single mlet
-                if( log.isDebugEnabled() )
-                    log.debug("No child " + descriptorsN);
+                if( log.isDebugEnabled() ) {
+                  log.debug("No child " + descriptorsN);
+                }
                 firstMbeanN=descriptorsN;
             }
 
@@ -196,13 +203,16 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                         objectName=DomUtil.getAttribute( mbeanN, "name" );
                     }
 
-                    if( log.isDebugEnabled())
-                        log.debug( "Processing mbean objectName=" + objectName +
-                                " code=" + code);
+                    if( log.isDebugEnabled()) {
+                      log.debug( "Processing mbean objectName=" + objectName +
+                              " code=" + code);
+                    }
 
                     // args can be grouped in constructor or direct childs
                     Node constructorN=DomUtil.getChild(mbeanN, "constructor");
-                    if( constructorN == null ) constructorN=mbeanN;
+                    if( constructorN == null ) {
+                      constructorN=mbeanN;
+                    }
 
                     processArg(constructorN);
 
@@ -233,14 +243,16 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                     }
                 } else if("jmx-operation".equals(nodeName) ) {
                     String name=DomUtil.getAttribute(mbeanN, "objectName");
-                    if( name==null )
-                        name=DomUtil.getAttribute(mbeanN, "name");
+                    if( name==null ) {
+                      name=DomUtil.getAttribute(mbeanN, "name");
+                    }
 
                     String operation=DomUtil.getAttribute(mbeanN, "operation");
 
-                    if( log.isDebugEnabled())
-                        log.debug( "Processing invoke objectName=" + name +
-                                " code=" + operation);
+                    if( log.isDebugEnabled()) {
+                      log.debug( "Processing invoke objectName=" + name +
+                              " code=" + operation);
+                    }
                     try {
                         ObjectName oname=new ObjectName(name);
 
@@ -279,7 +291,9 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     public void updateField( ObjectName oname, String name,
                              Object value )
     {
-        if( loading ) return;
+        if( loading ) {
+          return;
+        }
         // nothing by default
         //log.info( "XXX UpdateField " + oname + " " + name + " " + value);
         Node n = object2Node.get(oname);
@@ -337,9 +351,10 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
             value=DomUtil.getContent(descN);
         }
         try {
-            if( log.isDebugEnabled())
-                log.debug("Set attribute " + objectName + " " + attName +
-                        " " + value);
+            if( log.isDebugEnabled()) {
+              log.debug("Set attribute " + objectName + " " + attName +
+                      " " + value);
+            }
             ObjectName oname=new ObjectName(objectName);
             // find the type
             type=registry.getType(  oname, attName );

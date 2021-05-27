@@ -53,8 +53,9 @@ public final class RequestUtil {
      */
     public static String filter(String message) {
 
-        if (message == null)
-            return (null);
+        if (message == null) {
+          return (null);
+        }
 
         char content[] = new char[message.length()];
         message.getChars(0, message.length(), content, 0);
@@ -203,8 +204,9 @@ public final class RequestUtil {
      * by a valid 2-digit hexadecimal number
      */
     public static String URLDecode(String str, String enc, boolean isQuery) {
-        if (str == null)
-            return (null);
+        if (str == null) {
+          return (null);
+        }
 
         // use the specified encoding to extract bytes out of the
         // given string so that the encoding is not lost. If an
@@ -268,8 +270,9 @@ public final class RequestUtil {
      */
     public static String URLDecode(byte[] bytes, String enc, boolean isQuery) {
 
-        if (bytes == null)
-            return null;
+        if (bytes == null) {
+          return null;
+        }
 
         int len = bytes.length;
         int ix = 0;
@@ -309,9 +312,15 @@ public final class RequestUtil {
      * @param b the character value byte
      */
     private static byte convertHexDigit( byte b ) {
-        if ((b >= '0') && (b <= '9')) return (byte)(b - '0');
-        if ((b >= 'a') && (b <= 'f')) return (byte)(b - 'a' + 10);
-        if ((b >= 'A') && (b <= 'F')) return (byte)(b - 'A' + 10);
+        if ((b >= '0') && (b <= '9')) {
+          return (byte)(b - '0');
+        }
+        if ((b >= 'a') && (b <= 'f')) {
+          return (byte)(b - 'a' + 10);
+        }
+        if ((b >= 'A') && (b <= 'F')) {
+          return (byte)(b - 'A' + 10);
+        }
         throw new IllegalArgumentException(
                 sm.getString("requestUtil.convertHexDigit.notHex",
                         Character.valueOf((char)b)));

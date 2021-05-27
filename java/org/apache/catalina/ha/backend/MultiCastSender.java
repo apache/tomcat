@@ -54,8 +54,9 @@ public class MultiCastSender
                     InetAddress addr =  InetAddress.getByName(config.host);
                     InetSocketAddress addrs = new InetSocketAddress(addr, config.getMultiport());
                     s = new MulticastSocket(addrs);
-                } else
-                    s = new MulticastSocket(config.getMultiport());
+                } else {
+                  s = new MulticastSocket(config.getMultiport());
+                }
 
                 s.setTimeToLive(config.getTtl());
                 s.joinGroup(group);

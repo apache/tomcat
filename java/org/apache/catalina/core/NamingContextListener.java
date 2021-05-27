@@ -248,8 +248,9 @@ public class NamingContextListener
 
         if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType())) {
 
-            if (initialized)
-                return;
+            if (initialized) {
+              return;
+            }
 
             try {
                 Hashtable<String, Object> contextEnv = new Hashtable<String, Object>();
@@ -317,8 +318,9 @@ public class NamingContextListener
 
         } else if (Lifecycle.CONFIGURE_STOP_EVENT.equals(event.getType())) {
 
-            if (!initialized)
-                return;
+            if (!initialized) {
+              return;
+            }
 
             try {
                 // Setting the context in read/write mode
@@ -398,8 +400,9 @@ public class NamingContextListener
     @Override
     public void propertyChange(PropertyChangeEvent event) {
 
-        if (!initialized)
-            return;
+        if (!initialized) {
+          return;
+        }
 
         Object source = event.getSource();
         if (source == namingResources) {
@@ -563,8 +566,9 @@ public class NamingContextListener
 
         int i;
 
-        if (log.isDebugEnabled())
-            log.debug("Creating JNDI naming context");
+        if (log.isDebugEnabled()) {
+          log.debug("Creating JNDI naming context");
+        }
 
         if (namingResources == null) {
             namingResources = new NamingResources();
@@ -680,8 +684,9 @@ public class NamingContextListener
                         ",name=" + quotedResourceName);
         } else if (container instanceof Context) {
             String contextName = ((Context)container).getName();
-            if (!contextName.startsWith("/"))
-                contextName = "/" + contextName;
+            if (!contextName.startsWith("/")) {
+              contextName = "/" + contextName;
+            }
             Host host = (Host) ((Context)container).getParent();
             name = new ObjectName(domain + ":type=DataSource" +
                         ",context=" + contextName +
@@ -902,10 +907,11 @@ public class NamingContextListener
                         log.error(sm.getString("naming.wsdlFailed", e));
                     }
                 }
-                if (wsdlURL == null)
-                    service.setWsdlfile(null);
-                else
-                    service.setWsdlfile(wsdlURL.toString());
+                if (wsdlURL == null) {
+                  service.setWsdlfile(null);
+                } else {
+                  service.setWsdlfile(wsdlURL.toString());
+                }
             }
 
             if (service.getJaxrpcmappingfile() != null) {
@@ -934,10 +940,11 @@ public class NamingContextListener
                         log.error(sm.getString("naming.wsdlFailed", e));
                     }
                 }
-                if (jaxrpcURL == null)
-                    service.setJaxrpcmappingfile(null);
-                else
-                    service.setJaxrpcmappingfile(jaxrpcURL.toString());
+                if (jaxrpcURL == null) {
+                  service.setJaxrpcmappingfile(null);
+                } else {
+                  service.setJaxrpcmappingfile(jaxrpcURL.toString());
+                }
             }
 
             // Create a reference to the resource.
@@ -1097,8 +1104,9 @@ public class NamingContextListener
             "UserTransaction".equals(resourceLink.getName())
             ? compCtx : envCtx;
         try {
-            if (logger.isDebugEnabled())
-                log.debug("  Adding resource link " + resourceLink.getName());
+            if (logger.isDebugEnabled()) {
+              log.debug("  Adding resource link " + resourceLink.getName());
+            }
             createSubcontexts(envCtx, resourceLink.getName());
             ctx.bind(resourceLink.getName(), ref);
         } catch (NamingException e) {

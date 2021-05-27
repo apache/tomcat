@@ -148,8 +148,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     public static synchronized Registry getRegistry(Object key, Object guard) {
         Registry localRegistry;
         if( perLoaderRegistries!=null ) {
-            if( key==null )
-                key=Thread.currentThread().getContextClassLoader();
+            if( key==null ) {
+              key=Thread.currentThread().getContextClassLoader();
+            }
             if( key != null ) {
                 localRegistry = perLoaderRegistries.get(key);
                 if( localRegistry == null ) {
@@ -324,8 +325,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
                 getMBeanServer().invoke(current, operation, new Object[] {}, new String[] {});
 
             } catch (Exception t) {
-                if (failFirst)
-                    throw t;
+                if (failFirst) {
+                  throw t;
+                }
                 log.info("Error initializing " + current + " " + t.toString());
             }
         }
@@ -402,8 +404,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     public ManagedBean findManagedBean(String name) {
         // XXX Group ?? Use Group + Type
         ManagedBean mb = descriptors.get(name);
-        if (mb == null)
-            mb = descriptorsByClass.get(name);
+        if (mb == null) {
+          mb = descriptorsByClass.get(name);
+        }
         return mb;
     }
 
@@ -813,10 +816,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         log.debug("Found " + dURL);
         searchedPaths.put(packageName, dURL);
         try {
-            if (descriptors.endsWith(".xml"))
-                loadDescriptors("MbeansDescriptorsDigesterSource", dURL, null);
-            else
-                loadDescriptors("MbeansDescriptorsSerSource", dURL, null);
+            if (descriptors.endsWith(".xml")) {
+              loadDescriptors("MbeansDescriptorsDigesterSource", dURL, null);
+            } else {
+              loadDescriptors("MbeansDescriptorsSerSource", dURL, null);
+            }
             return;
         } catch(Exception ex ) {
             log.error("Error loading " + dURL);
@@ -859,8 +863,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         String pkg = className;
         while (pkg.indexOf(".") > 0) {
             int lastComp = pkg.lastIndexOf(".");
-            if (lastComp <= 0)
-                return;
+            if (lastComp <= 0) {
+              return;
+            }
             pkg = pkg.substring(0, lastComp);
             if (searchedPaths.get(pkg) != null) {
                 return;
@@ -871,8 +876,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     private ModelerSource getModelerSource(String type) throws Exception {
-        if (type == null)
-            type = "MbeansDescriptorsDigesterSource";
+        if (type == null) {
+          type = "MbeansDescriptorsDigesterSource";
+        }
         if (!type.contains(".")) {
             type = "org.apache.tomcat.util.modeler.modules." + type;
         }

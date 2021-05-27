@@ -703,7 +703,7 @@ public class JspUtil {
         InputStream in = null;
 
         if (jarFile != null) {
-            String jarEntryName = fname.substring(1, fname.length());
+            String jarEntryName = fname.substring(1);
             ZipEntry jarEntry = jarFile.getEntry(jarEntryName);
             if (jarEntry == null) {
                 throw new FileNotFoundException(Localizer.getMessage(

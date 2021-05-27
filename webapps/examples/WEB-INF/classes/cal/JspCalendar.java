@@ -40,8 +40,9 @@ public class JspCalendar {
                                         "April", "May", "June",
                                         "July", "August", "September",
                                         "October", "November", "December" };
-        if (m > 12)
-            return "Unknown to Man";
+        if (m > 12) {
+          return "Unknown to Man";
+        }
 
         return months[m - 1];
 
@@ -52,8 +53,9 @@ public class JspCalendar {
         String[] days = new String[] {"Sunday", "Monday", "Tuesday", "Wednesday",
                                       "Thursday", "Friday", "Saturday"};
 
-        if (x > 7)
-            return "Unknown to Man";
+        if (x > 7) {
+          return "Unknown to Man";
+        }
 
         return days[x - 1];
 

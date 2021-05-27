@@ -248,7 +248,9 @@ public class TldLocationsCache {
      *
      */
     private synchronized void init() throws JasperException {
-        if (initialized) return;
+        if (initialized) {
+          return;
+        }
         try {
             tldScanWebXml();
             tldScanResourcePaths(WEB_INF);
@@ -329,17 +331,21 @@ public class TldLocationsCache {
                 String tagUri = null;
                 String tagLoc = null;
                 TreeNode child = taglib.findChild("taglib-uri");
-                if (child != null)
-                    tagUri = child.getBody();
+                if (child != null) {
+                  tagUri = child.getBody();
+                }
                 child = taglib.findChild("taglib-location");
-                if (child != null)
-                    tagLoc = child.getBody();
+                if (child != null) {
+                  tagLoc = child.getBody();
+                }
 
                 // Save this location if appropriate
-                if (tagLoc == null)
-                    continue;
-                if (uriType(tagLoc) == NOROOT_REL_URI)
-                    tagLoc = "/WEB-INF/" + tagLoc;
+                if (tagLoc == null) {
+                  continue;
+                }
+                if (uriType(tagLoc) == NOROOT_REL_URI) {
+                  tagLoc = "/WEB-INF/" + tagLoc;
+                }
                 TldLocation location;
                 if (tagLoc.endsWith(JAR_EXT)) {
                     location = new TldLocation("META-INF/taglib.tld", ctxt.getResource(tagLoc).toString());
@@ -533,8 +539,9 @@ public class TldLocationsCache {
             TreeNode uriNode = tld.findChild("uri");
             if (uriNode != null) {
                 String body = uriNode.getBody();
-                if (body != null)
-                    uri = body;
+                if (body != null) {
+                  uri = body;
+                }
             }
 
             // Add implicit map entry only if its uri is not already

@@ -76,12 +76,14 @@ public final class IntrospectionUtils {
         params[1] = Object.class;
         executeM = findMethod(c, "setAttribute", params);
         if (executeM == null) {
-            if (log.isDebugEnabled())
-                log.debug("No setAttribute in " + proxy.getClass());
+            if (log.isDebugEnabled()) {
+              log.debug("No setAttribute in " + proxy.getClass());
+            }
             return;
         }
-        if (log.isDebugEnabled())
-            log.debug("Setting " + n + "=" + v + "  in " + proxy);
+        if (log.isDebugEnabled()) {
+          log.debug("Setting " + n + "=" + v + "  in " + proxy);
+        }
         executeM.invoke(proxy, new Object[] { n, v });
         return;
     }
@@ -98,8 +100,9 @@ public final class IntrospectionUtils {
         params[0] = String.class;
         executeM = findMethod(c, "getAttribute", params);
         if (executeM == null) {
-            if (log.isDebugEnabled())
-                log.debug("No getAttribute in " + proxy.getClass());
+            if (log.isDebugEnabled()) {
+              log.debug("No getAttribute in " + proxy.getClass());
+            }
             return null;
         }
         return executeM.invoke(proxy, new Object[] { n });
@@ -117,8 +120,9 @@ public final class IntrospectionUtils {
             paramT[0] = urls.getClass();
             paramT[1] = ClassLoader.class;
             Method m = findMethod(urlCL, "newInstance", paramT);
-            if (m == null)
-                return null;
+            if (m == null) {
+              return null;
+            }
 
             ClassLoader cl = (ClassLoader) m.invoke(urlCL, new Object[] { urls,
                     parent });
@@ -159,15 +163,18 @@ public final class IntrospectionUtils {
         String install = null;
         String home = null;
 
-        if (installSysProp != null)
-            install = System.getProperty(installSysProp);
+        if (installSysProp != null) {
+          install = System.getProperty(installSysProp);
+        }
 
-        if (homeSysProp != null)
-            home = System.getProperty(homeSysProp);
+        if (homeSysProp != null) {
+          home = System.getProperty(homeSysProp);
+        }
 
         if (install != null) {
-            if (home == null)
-                System.getProperties().put(homeSysProp, install);
+            if (home == null) {
+              System.getProperties().put(homeSysProp, install);
+            }
             return install;
         }
 
@@ -190,13 +197,17 @@ public final class IntrospectionUtils {
                     File f = new File(home);
                     String parentDir = f.getParent();
                     if (parentDir == null)
-                        parentDir = home; // unix style
+                     {
+                      parentDir = home; // unix style
+                    }
                     File f1 = new File(parentDir);
                     install = f1.getCanonicalPath();
-                    if (installSysProp != null)
-                        System.getProperties().put(installSysProp, install);
-                    if (homeSysProp != null)
-                        System.getProperties().put(homeSysProp, install);
+                    if (installSysProp != null) {
+                      System.getProperties().put(installSysProp, install);
+                    }
+                    if (homeSysProp != null) {
+                      System.getProperties().put(homeSysProp, install);
+                    }
                     return install;
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -209,13 +220,17 @@ public final class IntrospectionUtils {
                         File f = new File(path);
                         String parentDir = f.getParent();
                         if (parentDir == null)
-                            parentDir = path; // unix style
+                         {
+                          parentDir = path; // unix style
+                        }
                         File f1 = new File(parentDir);
                         install = f1.getCanonicalPath();
-                        if (installSysProp != null)
-                            System.getProperties().put(installSysProp, install);
-                        if (home == null && homeSysProp != null)
-                            System.getProperties().put(homeSysProp, install);
+                        if (installSysProp != null) {
+                          System.getProperties().put(installSysProp, install);
+                        }
+                        if (home == null && homeSysProp != null) {
+                          System.getProperties().put(homeSysProp, install);
+                        }
                         return install;
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -262,14 +277,16 @@ public final class IntrospectionUtils {
      */
     @Deprecated
     public static String classPathAdd(URL urls[], String cp) {
-        if (urls == null)
-            return cp;
+        if (urls == null) {
+          return cp;
+        }
 
         for (int i = 0; i < urls.length; i++) {
-            if (cp != null)
-                cp += PATH_SEPARATOR + urls[i].getFile();
-            else
-                cp = urls[i].getFile();
+            if (cp != null) {
+              cp += PATH_SEPARATOR + urls[i].getFile();
+            } else {
+              cp = urls[i].getFile();
+            }
         }
         return cp;
     }
@@ -290,9 +307,10 @@ public final class IntrospectionUtils {
     @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value,
             boolean invokeSetProperty) {
-        if (log.isDebugEnabled())
-            log.debug("IntrospectionUtils: setProperty(" +
-                    o.getClass() + " " + name + "=" + value + ")");
+        if (log.isDebugEnabled()) {
+          log.debug("IntrospectionUtils: setProperty(" +
+                  o.getClass() + " " + name + "=" + value + ")");
+        }
 
         String setter = "set" + capitalize(name);
 
@@ -350,16 +368,18 @@ public final class IntrospectionUtils {
                         try {
                             params[0] = InetAddress.getByName(value);
                         } catch (UnknownHostException exc) {
-                            if (log.isDebugEnabled())
-                                log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
+                            if (log.isDebugEnabled()) {
+                              log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
+                            }
                             ok = false;
                         }
 
                         // Unknown type
                     } else {
-                        if (log.isDebugEnabled())
-                            log.debug("IntrospectionUtils: Unknown type " +
-                                    paramType.getName());
+                        if (log.isDebugEnabled()) {
+                          log.debug("IntrospectionUtils: Unknown type " +
+                                  paramType.getName());
+                        }
                     }
 
                     if (ok) {
@@ -484,9 +504,10 @@ public final class IntrospectionUtils {
                 }
             }
         } catch (Exception ex1) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: Exception for " +
-                        o.getClass() + " " + name, ex1);
+            if (log.isDebugEnabled()) {
+              log.debug("IntrospectionUtils: Exception for " +
+                      o.getClass() + " " + name, ex1);
+            }
         }
     }
 
@@ -578,8 +599,9 @@ public final class IntrospectionUtils {
                 prev = endName + 1;
             }
         }
-        if (prev < value.length())
-            sb.append(value.substring(prev));
+        if (prev < value.length()) {
+          sb.append(value.substring(prev));
+        }
         return sb.toString();
     }
 
@@ -646,8 +668,9 @@ public final class IntrospectionUtils {
                 int jarCount = cpComp.length;
                 for (int i = 0; i < jarCount; i++) {
                     URL url = getURL(dir, cpComp[i]);
-                    if (url != null)
-                        cpV.addElement(url);
+                    if (url != null) {
+                      cpV.addElement(url);
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -670,10 +693,11 @@ public final class IntrospectionUtils {
                 // That's a bug, but we can work around and be nice.
                 f = new File(System.getProperty("java.home") + "/lib/tools.jar");
                 if (f.exists()) {
-                    if (log.isDebugEnabled())
-                        log.debug("Detected strange java.home value "
-                            + System.getProperty("java.home")
-                            + ", it should point to jre");
+                    if (log.isDebugEnabled()) {
+                      log.debug("Detected strange java.home value "
+                          + System.getProperty("java.home")
+                          + ", it should point to jre");
+                    }
                 }
             }
             URL url = new URL("file", "", f.getAbsolutePath());
@@ -720,8 +744,9 @@ public final class IntrospectionUtils {
             if (f.isDirectory()) {
                 path += "/";
             }
-            if (!f.exists())
-                return null;
+            if (!f.exists()) {
+              return null;
+            }
             return new URL("file", "", path);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -788,21 +813,24 @@ public final class IntrospectionUtils {
         if (dir != null) {
             // Add dir/classes first, if it exists
             URL url = getURL(dir, "classes");
-            if (url != null)
-                jarsV.addElement(url);
+            if (url != null) {
+              jarsV.addElement(url);
+            }
             addToClassPath(jarsV, dir);
         }
 
-        if (cpath != null)
-            addJarsFromClassPath(jarsV, cpath);
+        if (cpath != null) {
+          addJarsFromClassPath(jarsV, cpath);
+        }
 
         if (cpathProp != null) {
             String cpath1 = System.getProperty(cpathProp);
             addJarsFromClassPath(jarsV, cpath1);
         }
 
-        if (addTools)
-            addToolsJar(jarsV);
+        if (addTools) {
+          addToolsJar(jarsV);
+        }
 
         return getClassPath(jarsV);
     }
@@ -817,8 +845,9 @@ public final class IntrospectionUtils {
 
     public static Method[] findMethods(Class<?> c) {
         Method methods[] = objectMethods.get(c);
-        if (methods != null)
-            return methods;
+        if (methods != null) {
+          return methods;
+        }
 
         methods = c.getMethods();
         objectMethods.put(c, methods);
@@ -901,20 +930,23 @@ public final class IntrospectionUtils {
                     "IntrospectionUtils: Assert: Illegal params " +
                     target + " " + param1);
         }
-        if (log.isDebugEnabled())
-            log.debug("IntrospectionUtils: callMethod1 " +
-                    target.getClass().getName() + " " +
-                    param1.getClass().getName() + " " + typeParam1);
+        if (log.isDebugEnabled()) {
+          log.debug("IntrospectionUtils: callMethod1 " +
+                  target.getClass().getName() + " " +
+                  param1.getClass().getName() + " " + typeParam1);
+        }
 
         Class<?> params[] = new Class[1];
-        if (typeParam1 == null)
-            params[0] = param1.getClass();
-        else
-            params[0] = cl.loadClass(typeParam1);
+        if (typeParam1 == null) {
+          params[0] = param1.getClass();
+        } else {
+          params[0] = cl.loadClass(typeParam1);
+        }
         Method m = findMethod(target.getClass(), methodN, params);
-        if (m == null)
-            throw new NoSuchMethodException(target.getClass().getName() + " "
-                    + methodN);
+        if (m == null) {
+          throw new NoSuchMethodException(target.getClass().getName() + " "
+                  + methodN);
+        }
         try {
             return m.invoke(target, new Object[] { param1 });
         } catch (InvocationTargetException ie) {
@@ -930,20 +962,23 @@ public final class IntrospectionUtils {
     public static Object callMethod0(Object target, String methodN)
             throws Exception {
         if (target == null) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: Assert: Illegal params " +
-                        target);
+            if (log.isDebugEnabled()) {
+              log.debug("IntrospectionUtils: Assert: Illegal params " +
+                      target);
+            }
             return null;
         }
-        if (log.isDebugEnabled())
-            log.debug("IntrospectionUtils: callMethod0 " +
-                    target.getClass().getName() + "." + methodN);
+        if (log.isDebugEnabled()) {
+          log.debug("IntrospectionUtils: callMethod0 " +
+                  target.getClass().getName() + "." + methodN);
+        }
 
         Class<?> params[] = new Class[0];
         Method m = findMethod(target.getClass(), methodN, params);
-        if (m == null)
-            throw new NoSuchMethodException(target.getClass().getName() + " "
-                    + methodN);
+        if (m == null) {
+          throw new NoSuchMethodException(target.getClass().getName() + " "
+                  + methodN);
+        }
         try {
             return m.invoke(target, emptyArray);
         } catch (InvocationTargetException ie) {
@@ -963,9 +998,10 @@ public final class IntrospectionUtils {
         Method m = null;
         m = findMethod(target.getClass(), methodN, typeParams);
         if (m == null) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: Can't find method " + methodN +
-                        " in " + target + " CLASS " + target.getClass());
+            if (log.isDebugEnabled()) {
+              log.debug("IntrospectionUtils: Can't find method " + methodN +
+                      " in " + target + " CLASS " + target.getClass());
+            }
             return null;
         }
         try {
@@ -977,8 +1013,9 @@ public final class IntrospectionUtils {
                 sb.append(target.getClass().getName()).append('.')
                         .append(methodN).append("( ");
                 for (int i = 0; i < params.length; i++) {
-                    if (i > 0)
-                        sb.append(", ");
+                    if (i > 0) {
+                      sb.append(", ");
+                    }
                     sb.append(params[i]);
                 }
                 sb.append(")");
@@ -1012,16 +1049,18 @@ public final class IntrospectionUtils {
             try {
                 result = InetAddress.getByName(object);
             } catch (UnknownHostException exc) {
-                if (log.isDebugEnabled())
-                    log.debug("IntrospectionUtils: Unable to resolve host name:" +
-                            object);
+                if (log.isDebugEnabled()) {
+                  log.debug("IntrospectionUtils: Unable to resolve host name:" +
+                          object);
+                }
             }
 
             // Unknown type
         } else {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: Unknown type " +
-                        paramType.getName());
+            if (log.isDebugEnabled()) {
+              log.debug("IntrospectionUtils: Unknown type " +
+                      paramType.getName());
+            }
         }
         if (result == null) {
             throw new IllegalArgumentException("Can't convert argument: " + object);

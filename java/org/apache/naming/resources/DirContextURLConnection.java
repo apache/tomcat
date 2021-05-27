@@ -62,9 +62,10 @@ public class DirContextURLConnection extends URLConnection {
 
     public DirContextURLConnection(DirContext context, URL url) {
         super(url);
-        if (context == null)
-            throw new IllegalArgumentException
-                ("Directory context can't be null");
+        if (context == null) {
+          throw new IllegalArgumentException
+              ("Directory context can't be null");
+        }
         if (org.apache.naming.Constants.IS_SECURITY_ENABLED) {
             this.permission = new JndiPermission(url.toString());
     }
@@ -148,8 +149,9 @@ public class DirContextURLConnection extends URLConnection {
                     String hostName = proxyDirContext.getHostName();
                     String contextPath = proxyDirContext.getContextPath();
                     if (hostName != null) {
-                        if (!path.startsWith("/" + hostName + "/"))
-                            return;
+                        if (!path.startsWith("/" + hostName + "/")) {
+                          return;
+                        }
                         path = path.substring(hostName.length()+ 1);
                     }
                     if (contextPath != null) {
@@ -161,10 +163,12 @@ public class DirContextURLConnection extends URLConnection {
                 }
                 object = context.lookup(path);
                 attributes = context.getAttributes(path);
-                if (object instanceof Resource)
-                    resource = (Resource) object;
-                if (object instanceof DirContext)
-                    collection = (DirContext) object;
+                if (object instanceof Resource) {
+                  resource = (Resource) object;
+                }
+                if (object instanceof DirContext) {
+                  collection = (DirContext) object;
+                }
             } catch (NamingException e) {
                 // Object not found
             }
@@ -216,8 +220,9 @@ public class DirContextURLConnection extends URLConnection {
             }
         }
 
-        if (attributes == null)
-            return 0;
+        if (attributes == null) {
+          return 0;
+        }
 
         Attribute lastModified =
             attributes.get(ResourceAttributes.LAST_MODIFIED);
@@ -235,7 +240,9 @@ public class DirContextURLConnection extends URLConnection {
 
 
     protected String getHeaderValueAsString(Object headerValue) {
-        if (headerValue == null) return null;
+        if (headerValue == null) {
+          return null;
+        }
         if (headerValue instanceof Date) {
             // return date strings (ie Last-Modified) in HTTP format, rather
             // than Java format
@@ -261,8 +268,9 @@ public class DirContextURLConnection extends URLConnection {
           }
       }
 
-      if (attributes == null)
-          return (Collections.emptyMap());
+      if (attributes == null) {
+        return (Collections.emptyMap());
+      }
 
       HashMap<String,List<String>> headerFields =
           new HashMap<String,List<String>>(attributes.size());
@@ -271,7 +279,9 @@ public class DirContextURLConnection extends URLConnection {
           while (attributeEnum.hasMore()) {
               String attributeID = attributeEnum.next();
               Attribute attribute = attributes.get(attributeID);
-              if (attribute == null) continue;
+              if (attribute == null) {
+                continue;
+              }
               ArrayList<String> attributeValueList =
                   new ArrayList<String>(attribute.size());
               NamingEnumeration<?> attributeValues = attribute.getAll();
@@ -306,8 +316,9 @@ public class DirContextURLConnection extends URLConnection {
             }
         }
 
-        if (attributes == null)
-            return (null);
+        if (attributes == null) {
+          return (null);
+        }
 
         NamingEnumeration<String> attributeEnum = attributes.getIDs();
         try {
@@ -315,7 +326,9 @@ public class DirContextURLConnection extends URLConnection {
                 String attributeID = attributeEnum.next();
                 if (attributeID.equalsIgnoreCase(name)) {
                     Attribute attribute = attributes.get(attributeID);
-                    if (attribute == null) return null;
+                    if (attribute == null) {
+                      return null;
+                    }
                     Object attrValue = attribute.get(attribute.size()-1);
                     return getHeaderValueAsString(attrValue);
                 }
@@ -336,15 +349,19 @@ public class DirContextURLConnection extends URLConnection {
     public Object getContent()
         throws IOException {
 
-        if (!connected)
-            connect();
+        if (!connected) {
+          connect();
+        }
 
-        if (resource != null)
-            return getInputStream();
-        if (collection != null)
-            return collection;
-        if (object != null)
-            return object;
+        if (resource != null) {
+          return getInputStream();
+        }
+        if (collection != null) {
+          return collection;
+        }
+        if (object != null) {
+          return object;
+        }
 
         throw new FileNotFoundException(
                 getURL() == null ? "null" : getURL().toString());
@@ -362,8 +379,9 @@ public class DirContextURLConnection extends URLConnection {
         Object obj = getContent();
 
         for (int i = 0; i < classes.length; i++) {
-            if (classes[i].isInstance(obj))
-                return obj;
+            if (classes[i].isInstance(obj)) {
+              return obj;
+            }
         }
 
         return null;
@@ -377,8 +395,9 @@ public class DirContextURLConnection extends URLConnection {
     @Override
     public InputStream getInputStream() throws IOException {
 
-        if (!connected)
-            connect();
+        if (!connected) {
+          connect();
+        }
 
         if (resource == null) {
             throw new FileNotFoundException(

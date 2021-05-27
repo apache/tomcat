@@ -81,8 +81,9 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
     @Override
     public String getCipherSuite() throws IOException {
         // Look up the current SSLSession
-        if (session == null)
-            return null;
+        if (session == null) {
+          return null;
+        }
         return session.getCipherSuite();
     }
 
@@ -100,7 +101,9 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
             log.debug(sm.getString("jsseSupport.clientCertError"), t);
             return null;
         }
-        if( certs==null ) return null;
+        if( certs==null ) {
+          return null;
+        }
 
         X509Certificate [] x509Certs = new X509Certificate[certs.length];
         for(int i=0; i < certs.length; i++) {
@@ -121,11 +124,13 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
                     return null;
                 }
             }
-            if(log.isTraceEnabled())
-                log.trace("Cert #" + i + " = " + x509Certs[i]);
+            if(log.isTraceEnabled()) {
+              log.trace("Cert #" + i + " = " + x509Certs[i]);
+            }
         }
-        if(x509Certs.length < 1)
-            return null;
+        if(x509Certs.length < 1) {
+          return null;
+        }
         return x509Certs;
     }
 
@@ -133,8 +138,9 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
     public Object[] getPeerCertificateChain(boolean force)
         throws IOException {
         // Look up the current SSLSession
-        if (session == null)
-            return null;
+        if (session == null) {
+          return null;
+        }
 
         // Check to see if we already have the peer certificate chain
         Object[] jsseCerts = null;
@@ -143,8 +149,9 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         } catch(Exception bex) {
             // ignore.
         }
-        if (jsseCerts == null)
-            jsseCerts = new Object[0];
+        if (jsseCerts == null) {
+          jsseCerts = new Object[0];
+        }
         if(jsseCerts.length <= 0 && force && ssl != null) {
             session.invalidate();
             handShake();
@@ -178,8 +185,9 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         ssl.startHandshake();
         int maxTries = 60; // 60 * 1000 = example 1 minute time out
         for (int i = 0; i < maxTries; i++) {
-            if (log.isTraceEnabled())
-                log.trace("Reading for try #" + i);
+            if (log.isTraceEnabled()) {
+              log.trace("Reading for try #" + i);
+            }
             try {
                 int read = in.read(b);
                 if (read > 0) {
@@ -214,8 +222,9 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         throws IOException {
         // Look up the current SSLSession
         SSLSupport.CipherData c_aux[]=ciphers;
-        if (session == null)
-            return null;
+        if (session == null) {
+          return null;
+        }
 
         Integer keySize = null;
         synchronized(keySizeCache) {
@@ -243,17 +252,23 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
     public String getSessionId()
         throws IOException {
         // Look up the current SSLSession
-        if (session == null)
-            return null;
+        if (session == null) {
+          return null;
+        }
         // Expose ssl_session (getId)
         byte [] ssl_session = session.getId();
-        if ( ssl_session == null)
-            return null;
+        if ( ssl_session == null) {
+          return null;
+        }
         StringBuilder buf=new StringBuilder();
         for (byte b : ssl_session) {
             String digit = Integer.toHexString(b);
-            if (digit.length() < 2) buf.append('0');
-            if (digit.length() > 2) digit = digit.substring(digit.length() - 2);
+            if (digit.length() < 2) {
+              buf.append('0');
+            }
+            if (digit.length() > 2) {
+              digit = digit.substring(digit.length() - 2);
+            }
             buf.append(digit);
         }
         return buf.toString();

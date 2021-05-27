@@ -66,14 +66,16 @@ public class ServletWriter {
 
     public void pushIndent() {
         virtual_indent += TAB_WIDTH;
-        if (virtual_indent >= 0 && virtual_indent <= SPACES.length())
-            indent = virtual_indent;
+        if (virtual_indent >= 0 && virtual_indent <= SPACES.length()) {
+          indent = virtual_indent;
+        }
     }
 
     public void popIndent() {
         virtual_indent -= TAB_WIDTH;
-        if (virtual_indent >= 0 && virtual_indent <= SPACES.length())
-            indent = virtual_indent;
+        if (virtual_indent >= 0 && virtual_indent <= SPACES.length()) {
+          indent = virtual_indent;
+        }
     }
 
     /**

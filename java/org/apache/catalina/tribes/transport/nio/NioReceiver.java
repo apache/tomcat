@@ -103,8 +103,11 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             setPool(new RxTaskPool(getMaxThreads(),getMinThreads(),this));
         } catch (Exception x) {
             log.fatal("ThreadPool can initilzed. Listener not started", x);
-            if ( x instanceof IOException ) throw (IOException)x;
-            else throw new IOException(x.getMessage());
+            if ( x instanceof IOException ) {
+              throw (IOException)x;
+            } else {
+              throw new IOException(x.getMessage());
+            }
         }
         try {
             getBind();
@@ -119,8 +122,11 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             t.start();
         } catch (Exception x) {
             log.fatal("Unable to start cluster receiver", x);
-            if ( x instanceof IOException ) throw (IOException)x;
-            else throw new IOException(x.getMessage());
+            if ( x instanceof IOException ) {
+              throw (IOException)x;
+            } else {
+              throw new IOException(x.getMessage());
+            }
         }
     }
 
@@ -179,18 +185,26 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             synchronized (events) {
                 events.add(event);
             }
-            if ( log.isTraceEnabled() ) log.trace("Adding event to selector:"+event);
-            if ( isListening() ) selector.wakeup();
+            if ( log.isTraceEnabled() ) {
+              log.trace("Adding event to selector:"+event);
+            }
+            if ( isListening() ) {
+              selector.wakeup();
+            }
         }
     }
 
     public void events() {
-        if ( events.size() == 0 ) return;
+        if ( events.size() == 0 ) {
+          return;
+        }
         synchronized (events) {
             Runnable r = null;
             while ( (events.size() > 0) && (r = events.removeFirst()) != null ) {
                 try {
-                    if ( log.isTraceEnabled() ) log.trace("Processing event in selector:"+r);
+                    if ( log.isTraceEnabled() ) {
+                      log.trace("Processing event in selector:"+r);
+                    }
                     r.run();
                 } catch ( Exception x ) {
                     log.error("",x);
@@ -208,21 +222,33 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         }
         key.cancel();
         key.attach(null);
-        if (key.channel() instanceof SocketChannel)
-            try { ((SocketChannel)key.channel()).socket().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
-        if (key.channel() instanceof DatagramChannel)
-            try { ((DatagramChannel)key.channel()).socket().close(); } catch (Exception e) { if (log.isDebugEnabled()) log.debug("", e); }
-        try { key.channel().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
+        if (key.channel() instanceof SocketChannel) {
+          try { ((SocketChannel)key.channel()).socket().close(); } catch (IOException e) { if (log.isDebugEnabled()) {
+            log.debug("", e);
+          } }
+        }
+        if (key.channel() instanceof DatagramChannel) {
+          try { ((DatagramChannel)key.channel()).socket().close(); } catch (Exception e) { if (log.isDebugEnabled()) {
+            log.debug("", e);
+          } }
+        }
+        try { key.channel().close(); } catch (IOException e) { if (log.isDebugEnabled()) {
+          log.debug("", e);
+        } }
 
     }
     protected long lastCheck = System.currentTimeMillis();
     protected void socketTimeouts() {
         long now = System.currentTimeMillis();
-        if ( (now-lastCheck) < getSelectorTimeout() ) return;
+        if ( (now-lastCheck) < getSelectorTimeout() ) {
+          return;
+        }
         //timeout
         Selector tmpsel = this.selector.get();
         Set<SelectionKey> keys =  (isListening()&&tmpsel!=null)?tmpsel.keys():null;
-        if ( keys == null ) return;
+        if ( keys == null ) {
+          return;
+        }
         for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext();) {
             SelectionKey key = iter.next();
             try {
@@ -241,8 +267,9 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                     if ( ka != null ) {
                         long delta = now - ka.getLastAccess();
                         if (delta > getTimeout() && (!ka.isAccessed())) {
-                            if (log.isWarnEnabled())
-                                log.warn("Channel key is registered, but has had no interest ops for the last "+getTimeout()+" ms. (cancelled:"+ka.isCancelled()+"):"+key+" last access:"+new java.sql.Timestamp(ka.getLastAccess())+" Possible cause: all threads used, perform thread dump");
+                            if (log.isWarnEnabled()) {
+                              log.warn("Channel key is registered, but has had no interest ops for the last "+getTimeout()+" ms. (cancelled:"+ka.isCancelled()+"):"+key+" last access:"+new java.sql.Timestamp(ka.getLastAccess())+" Possible cause: all threads used, perform thread dump");
+                            }
                             ka.setLastAccess(now);
                             //key.interestOps(SelectionKey.OP_READ);
                         }//end if
@@ -353,7 +380,9 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             try {
                 datagramChannel.close();
             }catch (Exception iox) {
-                if (log.isDebugEnabled()) log.debug("Unable to close datagram channel.",iox);
+                if (log.isDebugEnabled()) {
+                  log.debug("Unable to close datagram channel.",iox);
+                }
             }
             datagramChannel=null;
         }
@@ -394,7 +423,9 @@ public class NioReceiver extends ReceiverBase implements Runnable {
 
     private void closeSelector() throws IOException {
         Selector selector = this.selector.getAndSet(null);
-        if (selector==null) return;
+        if (selector==null) {
+          return;
+        }
         try {
             Iterator<SelectionKey> it = selector.keys().iterator();
             // look at each key in the selected set
@@ -422,7 +453,10 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                                    SelectableChannel channel,
                                    int ops,
                                    Object attach) throws Exception {
-        if (channel == null)return; // could happen
+        if (channel == null)
+         {
+          return; // could happen
+        }
         // set the new channel non-blocking
         channel.configureBlocking(false);
         // register it with the selector
@@ -461,7 +495,9 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             // loop will keep calling this method until a
             // thread becomes available, the thread pool itself has a waiting mechanism
             // so we will not wait here.
-            if (log.isDebugEnabled()) log.debug("No TcpReplicationThread available");
+            if (log.isDebugEnabled()) {
+              log.debug("No TcpReplicationThread available");
+            }
         } else {
             // invoking this wakes up the worker thread then returns
             //add task to thread pool

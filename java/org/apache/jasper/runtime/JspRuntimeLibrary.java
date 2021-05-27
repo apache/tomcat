@@ -86,17 +86,19 @@ public class JspRuntimeLibrary {
     }
 
     public static boolean coerceToBoolean(String s) {
-        if (s == null || s.length() == 0)
-            return false;
-        else
-            return Boolean.parseBoolean(s);
+        if (s == null || s.length() == 0) {
+          return false;
+        } else {
+          return Boolean.parseBoolean(s);
+        }
     }
 
     public static byte coerceToByte(String s) {
-        if (s == null || s.length() == 0)
-            return (byte) 0;
-        else
-            return Byte.parseByte(s);
+        if (s == null || s.length() == 0) {
+          return (byte) 0;
+        } else {
+          return Byte.parseByte(s);
+        }
     }
 
     public static char coerceToChar(String s) {
@@ -109,38 +111,43 @@ public class JspRuntimeLibrary {
     }
 
     public static double coerceToDouble(String s) {
-        if (s == null || s.length() == 0)
-            return 0;
-        else
-            return Double.parseDouble(s);
+        if (s == null || s.length() == 0) {
+          return 0;
+        } else {
+          return Double.parseDouble(s);
+        }
     }
 
     public static float coerceToFloat(String s) {
-        if (s == null || s.length() == 0)
-            return 0;
-        else
-            return Float.parseFloat(s);
+        if (s == null || s.length() == 0) {
+          return 0;
+        } else {
+          return Float.parseFloat(s);
+        }
     }
 
     public static int coerceToInt(String s) {
-        if (s == null || s.length() == 0)
-            return 0;
-        else
-            return Integer.parseInt(s);
+        if (s == null || s.length() == 0) {
+          return 0;
+        } else {
+          return Integer.parseInt(s);
+        }
     }
 
     public static short coerceToShort(String s) {
-        if (s == null || s.length() == 0)
-            return (short) 0;
-        else
-            return Short.parseShort(s);
+        if (s == null || s.length() == 0) {
+          return (short) 0;
+        } else {
+          return Short.parseShort(s);
+        }
     }
 
     public static long coerceToLong(String s) {
-        if (s == null || s.length() == 0)
-            return 0;
-        else
-            return Long.parseLong(s);
+        if (s == null || s.length() == 0) {
+          return 0;
+        } else {
+          return Long.parseLong(s);
+        }
     }
 
     public static Object coerce(String s, Class<?> target) {
@@ -153,40 +160,47 @@ public class JspRuntimeLibrary {
             }
             return Boolean.valueOf(s);
         } else if (target == Byte.class) {
-            if (isNullOrEmpty)
-                return Byte.valueOf((byte) 0);
-            else
-                return Byte.valueOf(s);
+            if (isNullOrEmpty) {
+              return Byte.valueOf((byte) 0);
+            } else {
+              return Byte.valueOf(s);
+            }
         } else if (target == Character.class) {
-            if (isNullOrEmpty)
-                return Character.valueOf((char) 0);
-            else
-                return Character.valueOf(s.charAt(0));
+            if (isNullOrEmpty) {
+              return Character.valueOf((char) 0);
+            } else {
+              return Character.valueOf(s.charAt(0));
+            }
         } else if (target == Double.class) {
-            if (isNullOrEmpty)
-                return Double.valueOf(0);
-            else
-                return Double.valueOf(s);
+            if (isNullOrEmpty) {
+              return Double.valueOf(0);
+            } else {
+              return Double.valueOf(s);
+            }
         } else if (target == Float.class) {
-            if (isNullOrEmpty)
-                return Float.valueOf(0);
-            else
-                return Float.valueOf(s);
+            if (isNullOrEmpty) {
+              return Float.valueOf(0);
+            } else {
+              return Float.valueOf(s);
+            }
         } else if (target == Integer.class) {
-            if (isNullOrEmpty)
-                return Integer.valueOf(0);
-            else
-                return Integer.valueOf(s);
+            if (isNullOrEmpty) {
+              return Integer.valueOf(0);
+            } else {
+              return Integer.valueOf(s);
+            }
         } else if (target == Short.class) {
-            if (isNullOrEmpty)
-                return Short.valueOf((short) 0);
-            else
-                return Short.valueOf(s);
+            if (isNullOrEmpty) {
+              return Short.valueOf((short) 0);
+            } else {
+              return Short.valueOf(s);
+            }
         } else if (target == Long.class) {
-            if (isNullOrEmpty)
-                return Long.valueOf(0);
-            else
-                return Long.valueOf(s);
+            if (isNullOrEmpty) {
+              return Long.valueOf(0);
+            } else {
+              return Long.valueOf(s);
+            }
         } else {
             return null;
         }
@@ -199,19 +213,21 @@ public class JspRuntimeLibrary {
     {
         try {
             if (s == null) {
-                if (t.equals(Boolean.class) || t.equals(Boolean.TYPE))
-                    s = "false";
-                else
-                    return null;
+                if (t.equals(Boolean.class) || t.equals(Boolean.TYPE)) {
+                  s = "false";
+                } else {
+                  return null;
+                }
             }
             if (propertyEditorClass != null) {
                 return getValueFromBeanInfoPropertyEditor(
                                     t, propertyName, s, propertyEditorClass);
             } else if ( t.equals(Boolean.class) || t.equals(Boolean.TYPE) ) {
-                if (s.equalsIgnoreCase("on") || s.equalsIgnoreCase("true"))
-                    s = "true";
-                else
-                    s = "false";
+                if (s.equalsIgnoreCase("on") || s.equalsIgnoreCase("true")) {
+                  s = "true";
+                } else {
+                  s = "false";
+                }
                 return Boolean.valueOf(s);
             } else if ( t.equals(Byte.class) || t.equals(Byte.TYPE) ) {
                 return Byte.valueOf(s);
@@ -286,7 +302,9 @@ public class JspRuntimeLibrary {
                     Class<?> t = type.getComponentType();
                     String[] values = request.getParameterValues(param);
                     //XXX Please check.
-                    if(values == null) return;
+                    if(values == null) {
+                      return;
+                    }
                     if(t.equals(String.class)) {
                         method.invoke(bean, new Object[] { values });
                     } else {
@@ -294,10 +312,13 @@ public class JspRuntimeLibrary {
                                           propertyEditorClass);
                     }
                 } else {
-                    if(value == null || (param != null && value.equals(""))) return;
+                    if(value == null || (param != null && value.equals(""))) {
+                      return;
+                    }
                     Object oval = convert(prop, value, type, propertyEditorClass);
-                    if ( oval != null )
-                        method.invoke(bean, new Object[] { oval });
+                    if ( oval != null ) {
+                      method.invoke(bean, new Object[] { oval });
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -387,83 +408,99 @@ public class JspRuntimeLibrary {
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Integer.class)) {
                 Integer []tmpval = new Integer[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] =  Integer.valueOf(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] =  Integer.valueOf(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Byte.class)) {
                 Byte[] tmpval = new Byte[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Byte.valueOf(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Byte.valueOf(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Boolean.class)) {
                 Boolean[] tmpval = new Boolean[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Boolean.valueOf(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Boolean.valueOf(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Short.class)) {
                 Short[] tmpval = new Short[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Short.valueOf(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Short.valueOf(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Long.class)) {
                 Long[] tmpval = new Long[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Long.valueOf(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Long.valueOf(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Double.class)) {
                 Double[] tmpval = new Double[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Double.valueOf(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Double.valueOf(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Float.class)) {
                 Float[] tmpval = new Float[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Float.valueOf(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Float.valueOf(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Character.class)) {
                 Character[] tmpval = new Character[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Character.valueOf(values[i].charAt(0));
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Character.valueOf(values[i].charAt(0));
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(int.class)) {
                 int []tmpval = new int[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Integer.parseInt (values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Integer.parseInt (values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(byte.class)) {
                 byte[] tmpval = new byte[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Byte.parseByte (values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Byte.parseByte (values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(boolean.class)) {
                 boolean[] tmpval = new boolean[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Boolean.parseBoolean(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Boolean.parseBoolean(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(short.class)) {
                 short[] tmpval = new short[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Short.parseShort (values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Short.parseShort (values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(long.class)) {
                 long[] tmpval = new long[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Long.parseLong (values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Long.parseLong (values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(double.class)) {
                 double[] tmpval = new double[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Double.parseDouble(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Double.parseDouble(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(float.class)) {
                 float[] tmpval = new float[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = Float.parseFloat(values[i]);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = Float.parseFloat(values[i]);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(char.class)) {
                 char[] tmpval = new char[values.length];
-                for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = values[i].charAt(0);
+                for (int i = 0 ; i < values.length; i++) {
+                  tmpval[i] = values[i].charAt(0);
+                }
                 method.invoke (bean, new Object[] {tmpval});
             } else {
                 Object[] tmpval = new Integer[values.length];
@@ -836,10 +873,12 @@ public class JspRuntimeLibrary {
     public static String getContextRelativePath(ServletRequest request,
                                                 String relativePath) {
 
-        if (relativePath.startsWith("/"))
-            return (relativePath);
-        if (!(request instanceof HttpServletRequest))
-            return (relativePath);
+        if (relativePath.startsWith("/")) {
+          return (relativePath);
+        }
+        if (!(request instanceof HttpServletRequest)) {
+          return (relativePath);
+        }
         HttpServletRequest hrequest = (HttpServletRequest) request;
         String uri = (String) request.getAttribute(
                 RequestDispatcher.INCLUDE_SERVLET_PATH);
@@ -847,13 +886,15 @@ public class JspRuntimeLibrary {
             String pathInfo = (String)
                 request.getAttribute(RequestDispatcher.INCLUDE_PATH_INFO);
             if (pathInfo == null) {
-                if (uri.lastIndexOf('/') >= 0)
-                    uri = uri.substring(0, uri.lastIndexOf('/'));
+                if (uri.lastIndexOf('/') >= 0) {
+                  uri = uri.substring(0, uri.lastIndexOf('/'));
+                }
             }
         } else {
             uri = hrequest.getServletPath();
-            if (uri.lastIndexOf('/') >= 0)
-                uri = uri.substring(0, uri.lastIndexOf('/'));
+            if (uri.lastIndexOf('/') >= 0) {
+              uri = uri.substring(0, uri.lastIndexOf('/'));
+            }
         }
         return uri + '/' + relativePath;
 
@@ -880,8 +921,9 @@ public class JspRuntimeLibrary {
                                boolean flush)
         throws IOException, ServletException {
 
-        if (flush && !(out instanceof BodyContent))
-            out.flush();
+        if (flush && !(out instanceof BodyContent)) {
+          out.flush();
+        }
 
         // FIXME - It is tempting to use request.getRequestDispatcher() to
         // resolve a relative path directly, but Catalina currently does not

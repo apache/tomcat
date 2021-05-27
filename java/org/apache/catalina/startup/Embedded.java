@@ -309,9 +309,10 @@ public class Embedded  extends StandardService {
         }
 
         // Make sure we have a Container to send requests to
-        if (engines.length < 1)
-            throw new IllegalStateException
-                (sm.getString("embedded.noEngines"));
+        if (engines.length < 1) {
+          throw new IllegalStateException
+              (sm.getString("embedded.noEngines"));
+        }
 
         /*
          * Add the connector. This will set the connector's container to the
@@ -328,13 +329,15 @@ public class Embedded  extends StandardService {
      */
     public synchronized void addEngine(Engine engine) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Adding engine (" + engine.getInfo() + ")");
+        if( log.isDebugEnabled() ) {
+          log.debug("Adding engine (" + engine.getInfo() + ")");
+        }
 
         // Add this Engine to our set of defined Engines
         Engine results[] = new Engine[engines.length + 1];
-        for (int i = 0; i < engines.length; i++)
-            results[i] = engines[i];
+        for (int i = 0; i < engines.length; i++) {
+          results[i] = engines[i];
+        }
         results[engines.length] = engine;
         engines = results;
 
@@ -465,9 +468,10 @@ public class Embedded  extends StandardService {
      */
     public Context createContext(String path, String docBase) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Creating context '" + path + "' with docBase '" +
-                       docBase + "'");
+        if( log.isDebugEnabled() ) {
+          log.debug("Creating context '" + path + "' with docBase '" +
+                     docBase + "'");
+        }
 
         StandardContext context = new StandardContext();
 
@@ -490,8 +494,9 @@ public class Embedded  extends StandardService {
      */
     public Engine createEngine() {
 
-        if( log.isDebugEnabled() )
-            log.debug("Creating engine");
+        if( log.isDebugEnabled() ) {
+          log.debug("Creating engine");
+        }
 
         StandardEngine engine = new StandardEngine();
 
@@ -531,9 +536,10 @@ public class Embedded  extends StandardService {
      */
     public Host createHost(String name, String appBase) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Creating host '" + name + "' with appBase '" +
-                       appBase + "'");
+        if( log.isDebugEnabled() ) {
+          log.debug("Creating host '" + name + "' with appBase '" +
+                     appBase + "'");
+        }
 
         StandardHost host = new StandardHost();
 
@@ -554,9 +560,10 @@ public class Embedded  extends StandardService {
      */
     public Loader createLoader(ClassLoader parent) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Creating Loader with parent class loader '" +
-                       parent + "'");
+        if( log.isDebugEnabled() ) {
+          log.debug("Creating Loader with parent class loader '" +
+                     parent + "'");
+        }
 
         WebappLoader loader = new WebappLoader(parent);
         return (loader);
@@ -586,8 +593,9 @@ public class Embedded  extends StandardService {
      */
     public synchronized void removeContext(Context context) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Removing context[" + context.getName() + "]");
+        if( log.isDebugEnabled() ) {
+          log.debug("Removing context[" + context.getName() + "]");
+        }
 
         // Is this Context actually among those that are defined?
         boolean found = false;
@@ -601,18 +609,22 @@ public class Embedded  extends StandardService {
                         break;
                     }
                 }
-                if (found)
-                    break;
+                if (found) {
+                  break;
+                }
             }
-            if (found)
-                break;
+            if (found) {
+              break;
+            }
         }
-        if (!found)
-            return;
+        if (!found) {
+          return;
+        }
 
         // Remove this Context from the associated Host
-        if( log.isDebugEnabled() )
-            log.debug(" Removing this Context");
+        if( log.isDebugEnabled() ) {
+          log.debug(" Removing this Context");
+        }
         context.getParent().removeChild(context);
 
     }
@@ -627,8 +639,9 @@ public class Embedded  extends StandardService {
      */
     public synchronized void removeEngine(Engine engine) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Removing engine (" + engine.getInfo() + ")");
+        if( log.isDebugEnabled() ) {
+          log.debug("Removing engine (" + engine.getInfo() + ")");
+        }
 
         // Is the specified Engine actually defined?
         int j = -1;
@@ -638,12 +651,14 @@ public class Embedded  extends StandardService {
                 break;
             }
         }
-        if (j < 0)
-            return;
+        if (j < 0) {
+          return;
+        }
 
         // Remove any Connector that is using this Engine
-        if( log.isDebugEnabled() )
-            log.debug(" Removing related Containers");
+        if( log.isDebugEnabled() ) {
+          log.debug(" Removing related Containers");
+        }
         while (true) {
             int n = -1;
             for (int i = 0; i < connectors.length; i++) {
@@ -652,14 +667,16 @@ public class Embedded  extends StandardService {
                     break;
                 }
             }
-            if (n < 0)
-                break;
+            if (n < 0) {
+              break;
+            }
             removeConnector(connectors[n]);
         }
 
         // Stop this Engine if necessary
-        if( log.isDebugEnabled() )
-            log.debug(" Stopping this Engine");
+        if( log.isDebugEnabled() ) {
+          log.debug(" Stopping this Engine");
+        }
         try {
             engine.stop();
         } catch (LifecycleException e) {
@@ -667,13 +684,15 @@ public class Embedded  extends StandardService {
         }
 
         // Remove this Engine from our set of defined Engines
-        if( log.isDebugEnabled() )
-            log.debug(" Removing this Engine");
+        if( log.isDebugEnabled() ) {
+          log.debug(" Removing this Engine");
+        }
         int k = 0;
         Engine results[] = new Engine[engines.length - 1];
         for (int i = 0; i < engines.length; i++) {
-            if (i != j)
-                results[k++] = engines[i];
+            if (i != j) {
+              results[k++] = engines[i];
+            }
         }
         engines = results;
 
@@ -689,8 +708,9 @@ public class Embedded  extends StandardService {
      */
     public synchronized void removeHost(Host host) {
 
-        if( log.isDebugEnabled() )
-            log.debug("Removing host[" + host.getName() + "]");
+        if( log.isDebugEnabled() ) {
+          log.debug("Removing host[" + host.getName() + "]");
+        }
 
         // Is this Host actually among those that are defined?
         boolean found = false;
@@ -703,15 +723,18 @@ public class Embedded  extends StandardService {
 
                 }
             }
-            if (found)
-                break;
+            if (found) {
+              break;
+            }
         }
-        if (!found)
-            return;
+        if (!found) {
+          return;
+        }
 
         // Remove this Host from the associated Engine
-        if( log.isDebugEnabled() )
-            log.debug(" Removing this Host");
+        if( log.isDebugEnabled() ) {
+          log.debug(" Removing this Host");
+        }
         host.getParent().removeChild(host);
 
     }
@@ -760,8 +783,9 @@ public class Embedded  extends StandardService {
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if( log.isInfoEnabled() )
-            log.info("Starting tomcat server");
+        if( log.isInfoEnabled() ) {
+          log.info("Starting tomcat server");
+        }
 
         // Validate the setup of our required system properties
         initDirs();
@@ -795,8 +819,9 @@ public class Embedded  extends StandardService {
     @Override
     protected void stopInternal() throws LifecycleException {
 
-        if( log.isDebugEnabled() )
-            log.debug("Stopping embedded server");
+        if( log.isDebugEnabled() ) {
+          log.debug("Stopping embedded server");
+        }
 
         setState(LifecycleState.STOPPING);
 
@@ -840,8 +865,9 @@ public class Embedded  extends StandardService {
                 value = value + ":" + oldValue;
             }
             System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
-            if( log.isDebugEnabled() )
-                log.debug("Setting naming prefix=" + value);
+            if( log.isDebugEnabled() ) {
+              log.debug("Setting naming prefix=" + value);
+            }
             value = System.getProperty
                 (javax.naming.Context.INITIAL_CONTEXT_FACTORY);
             if (value == null) {

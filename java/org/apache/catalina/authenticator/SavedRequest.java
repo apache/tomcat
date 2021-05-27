@@ -81,10 +81,11 @@ public final class SavedRequest {
 
     public Iterator<String> getHeaderValues(String name) {
         List<String> values = headers.get(name);
-        if (values == null)
-            return (new ArrayList<String>()).iterator();
-        else
-            return values.iterator();
+        if (values == null) {
+          return (new ArrayList<String>()).iterator();
+        } else {
+          return values.iterator();
+        }
     }
 
 

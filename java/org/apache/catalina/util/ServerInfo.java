@@ -74,12 +74,15 @@ public class ServerInfo {
                 }
             }
         }
-        if (serverInfo == null)
-            serverInfo = "Apache Tomcat 7.0.x-dev";
-        if (serverBuilt == null)
-            serverBuilt = "unknown";
-        if (serverNumber == null)
-            serverNumber = "7.0.x";
+        if (serverInfo == null) {
+          serverInfo = "Apache Tomcat 7.0.x-dev";
+        }
+        if (serverBuilt == null) {
+          serverBuilt = "unknown";
+        }
+        if (serverNumber == null) {
+          serverNumber = "7.0.x";
+        }
 
     }
 

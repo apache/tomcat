@@ -179,8 +179,9 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
                 String mType = getMBeanAttributeType(jmxServerConnection, name,
                         attribute);
                 realValue = convertStringToType(value, mType);
-            } else
-                realValue = value;
+            } else {
+              realValue = value;
+            }
         }
         jmxServerConnection.setAttribute(new ObjectName(name), new Attribute(
                 attribute, realValue));
@@ -206,8 +207,9 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
         MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
         MBeanAttributeInfo attrs[] = minfo.getAttributes();
         for (int i = 0; mattrType == null && i < attrs.length; i++) {
-            if (attribute.equals(attrs[i].getName()))
-                mattrType = attrs[i].getType();
+            if (attribute.equals(attrs[i].getName())) {
+              mattrType = attrs[i].getType();
+            }
         }
         return mattrType;
     }

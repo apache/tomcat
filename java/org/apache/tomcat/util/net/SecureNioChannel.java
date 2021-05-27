@@ -60,8 +60,12 @@ public class SecureNioChannel extends NioChannel  {
         int appBufSize = sslEngine.getSession().getApplicationBufferSize();
         int netBufSize = sslEngine.getSession().getPacketBufferSize();
         //allocate network buffers - TODO, add in optional direct non-direct buffers
-        if ( netInBuffer == null ) netInBuffer = ByteBuffer.allocateDirect(netBufSize);
-        if ( netOutBuffer == null ) netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
+        if ( netInBuffer == null ) {
+          netInBuffer = ByteBuffer.allocateDirect(netBufSize);
+        }
+        if ( netOutBuffer == null ) {
+          netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
+        }
 
         //selector pool for blocking operations
         this.pool = pool;
@@ -160,9 +164,15 @@ public class SecureNioChannel extends NioChannel  {
      */
     @Override
     public int handshake(boolean read, boolean write) throws IOException {
-        if ( handshakeComplete ) return 0; //we have done our initial handshake
+        if ( handshakeComplete )
+         {
+          return 0; //we have done our initial handshake
+        }
 
-        if (!flush(netOutBuffer)) return SelectionKey.OP_WRITE; //we still have data to write
+        if (!flush(netOutBuffer))
+         {
+          return SelectionKey.OP_WRITE; //we still have data to write
+        }
 
         SSLEngineResult handshake = null;
 
@@ -189,8 +199,9 @@ public class SecureNioChannel extends NioChannel  {
                         handshake = handshakeWrap(write);
                     }
                     if (handshake.getStatus() == Status.OK) {
-                        if (handshakeStatus == HandshakeStatus.NEED_TASK)
-                            handshakeStatus = tasks();
+                        if (handshakeStatus == HandshakeStatus.NEED_TASK) {
+                          handshakeStatus = tasks();
+                        }
                     } else if (handshake.getStatus() == Status.CLOSED) {
                         flush(netOutBuffer);
                         return -1;
@@ -210,8 +221,9 @@ public class SecureNioChannel extends NioChannel  {
                     //perform the unwrap function
                     handshake = handshakeUnwrap(read);
                     if ( handshake.getStatus() == Status.OK ) {
-                        if (handshakeStatus == HandshakeStatus.NEED_TASK)
-                            handshakeStatus = tasks();
+                        if (handshakeStatus == HandshakeStatus.NEED_TASK) {
+                          handshakeStatus = tasks();
+                        }
                     } else if ( handshake.getStatus() == Status.BUFFER_UNDERFLOW ){
                         //read more data, reregister for OP_READ
                         return SelectionKey.OP_READ;
@@ -241,10 +253,18 @@ public class SecureNioChannel extends NioChannel  {
      */
     public void rehandshake(long timeout) throws IOException {
         //validate the network buffers are empty
-        if (netInBuffer.position() > 0 && netInBuffer.position()<netInBuffer.limit()) throw new IOException("Network input buffer still contains data. Handshake will fail.");
-        if (netOutBuffer.position() > 0 && netOutBuffer.position()<netOutBuffer.limit()) throw new IOException("Network output buffer still contains data. Handshake will fail.");
-        if (getBufHandler().getReadBuffer().position()>0 && getBufHandler().getReadBuffer().position()<getBufHandler().getReadBuffer().limit()) throw new IOException("Application input buffer still contains data. Data would have been lost.");
-        if (getBufHandler().getWriteBuffer().position()>0 && getBufHandler().getWriteBuffer().position()<getBufHandler().getWriteBuffer().limit()) throw new IOException("Application output buffer still contains data. Data would have been lost.");
+        if (netInBuffer.position() > 0 && netInBuffer.position()<netInBuffer.limit()) {
+          throw new IOException("Network input buffer still contains data. Handshake will fail.");
+        }
+        if (netOutBuffer.position() > 0 && netOutBuffer.position()<netOutBuffer.limit()) {
+          throw new IOException("Network output buffer still contains data. Handshake will fail.");
+        }
+        if (getBufHandler().getReadBuffer().position()>0 && getBufHandler().getReadBuffer().position()<getBufHandler().getReadBuffer().limit()) {
+          throw new IOException("Application input buffer still contains data. Data would have been lost.");
+        }
+        if (getBufHandler().getWriteBuffer().position()>0 && getBufHandler().getWriteBuffer().position()<getBufHandler().getWriteBuffer().limit()) {
+          throw new IOException("Application output buffer still contains data. Data would have been lost.");
+        }
         reset();
         boolean isReadable = true;
         boolean isWriteable = true;
@@ -534,7 +554,9 @@ public class SecureNioChannel extends NioChannel  {
             netOutBuffer.flip();
 
             if (result.getStatus() == Status.OK) {
-                if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
+                if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
+                  tasks();
+                }
             } else {
                 throw new IOException("Unable to wrap data, invalid engine state: " +result.getStatus());
             }

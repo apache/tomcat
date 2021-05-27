@@ -60,7 +60,9 @@ public class ConnectorCreateRule extends Rule {
             ex = svc.getExecutor(attributes.getValue("executor"));
         }
         Connector con = new Connector(attributes.getValue("protocol"));
-        if ( ex != null )  _setExecutor(con,ex);
+        if ( ex != null ) {
+          _setExecutor(con,ex);
+        }
 
         digester.push(con);
     }

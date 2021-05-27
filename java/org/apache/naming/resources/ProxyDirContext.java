@@ -215,10 +215,11 @@ public class ProxyDirContext implements DirContext {
      */
     @Deprecated
     public String getDocBase() {
-        if (dirContext instanceof BaseDirContext)
-            return ((BaseDirContext) dirContext).getDocBase();
-        else
-            return "";
+        if (dirContext instanceof BaseDirContext) {
+          return ((BaseDirContext) dirContext).getDocBase();
+        } else {
+          return "";
+        }
     }
 
 
@@ -275,10 +276,11 @@ public class ProxyDirContext implements DirContext {
             }
         }
         Object object = dirContext.lookup(parseName(name));
-        if (object instanceof InputStream)
-            return new Resource((InputStream) object);
-        else
-            return object;
+        if (object instanceof InputStream) {
+          return new Resource((InputStream) object);
+        } else {
+          return object;
+        }
     }
 
 
@@ -1513,8 +1515,9 @@ public class ProxyDirContext implements DirContext {
      * Lookup in cache.
      */
     protected CacheEntry cacheLookup(String lookupName) {
-        if (cache == null)
-            return (null);
+        if (cache == null) {
+          return (null);
+        }
         String name;
         if (lookupName == null) {
             name = "";
@@ -1569,14 +1572,17 @@ public class ProxyDirContext implements DirContext {
     protected boolean revalidate(CacheEntry entry) {
         // Get the attributes at the given path, and check the last
         // modification date
-        if (!entry.exists)
-            return false;
-        if (entry.attributes == null)
-            return false;
+        if (!entry.exists) {
+          return false;
+        }
+        if (entry.attributes == null) {
+          return false;
+        }
         long lastModified = entry.attributes.getLastModified();
         long contentLength = entry.attributes.getContentLength();
-        if (lastModified <= 0)
-            return false;
+        if (lastModified <= 0) {
+          return false;
+        }
         try {
             Attributes tempAttributes = dirContext.getAttributes(entry.name);
             ResourceAttributes attributes = null;
@@ -1656,8 +1662,9 @@ public class ProxyDirContext implements DirContext {
                 byte[] b = new byte[length];
                 while (pos < length) {
                     int n = is.read(b, pos, length - pos);
-                    if (n < 0)
-                        break;
+                    if (n < 0) {
+                      break;
+                    }
                     pos = pos + n;
                 }
                 entry.resource.setContent(b);
@@ -1665,8 +1672,9 @@ public class ProxyDirContext implements DirContext {
                 // Ignore
             } finally {
                 try {
-                    if (is != null)
-                        is.close();
+                    if (is != null) {
+                      is.close();
+                    }
                 } catch (IOException e) {
                     // Ignore
                 }
@@ -1694,8 +1702,9 @@ public class ProxyDirContext implements DirContext {
      * Remove entry from cache.
      */
     protected boolean cacheUnload(String name) {
-        if (cache == null)
-            return false;
+        if (cache == null) {
+          return false;
+        }
         // To ensure correct operation, particularly of WebDAV, unload
         // the resource with and without a trailing /
         String name2;

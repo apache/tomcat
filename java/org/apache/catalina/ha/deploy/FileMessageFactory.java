@@ -150,13 +150,15 @@ public class FileMessageFactory {
             throws FileNotFoundException, IOException {
         this.file = f;
         this.openForWrite = openForWrite;
-        if (log.isDebugEnabled())
-            log.debug("open file " + f + " write " + openForWrite);
+        if (log.isDebugEnabled()) {
+          log.debug("open file " + f + " write " + openForWrite);
+        }
         if (openForWrite) {
-            if (!file.exists())
-                if (!file.createNewFile()) {
-                    throw new IOException(sm.getString("fileNewFail", file));
-                }
+            if (!file.exists()) {
+              if (!file.createNewFile()) {
+                  throw new IOException(sm.getString("fileNewFail", file));
+              }
+            }
             out = new FileOutputStream(f);
         } else {
             size = file.length();
@@ -239,9 +241,10 @@ public class FileMessageFactory {
         if (!openForWrite) {
             throw new IllegalArgumentException(sm.getString("fileMessageFactory.cannotWrite"));
         }
-        if (log.isDebugEnabled())
-            log.debug("Message " + msg + " data " + HexUtils.toHexString(msg.getData())
-                    + " data length " + msg.getDataLength() + " out " + out);
+        if (log.isDebugEnabled()) {
+          log.debug("Message " + msg + " data " + HexUtils.toHexString(msg.getData())
+                  + " data length " + msg.getDataLength() + " out " + out);
+        }
 
         if (msg.getMessageNumber() <= lastMessageProcessed.get()) {
             // Duplicate of message already processed
@@ -298,16 +301,18 @@ public class FileMessageFactory {
      * Closes the factory, its streams and sets all its references to null
      */
     public void cleanup() {
-        if (in != null)
-            try {
-                in.close();
-            } catch (IOException ignore) {
-            }
-        if (out != null)
-            try {
-                out.close();
-            } catch (IOException ignore) {
-            }
+        if (in != null) {
+          try {
+              in.close();
+          } catch (IOException ignore) {
+          }
+        }
+        if (out != null) {
+          try {
+              out.close();
+          } catch (IOException ignore) {
+          }
+        }
         in = null;
         out = null;
         size = 0;

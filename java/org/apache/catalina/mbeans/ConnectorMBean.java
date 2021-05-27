@@ -78,9 +78,10 @@ public class ConnectorMBean extends ClassNameMBean {
             MBeanException, ReflectionException {
 
         // Validate the input parameters
-        if (name == null)
-            throw new RuntimeOperationsException(new IllegalArgumentException(
-                    "Attribute name is null"), "Attribute name is null");
+        if (name == null) {
+          throw new RuntimeOperationsException(new IllegalArgumentException(
+                  "Attribute name is null"), "Attribute name is null");
+        }
 
         Object result = null;
         try {
@@ -116,14 +117,16 @@ public class ConnectorMBean extends ClassNameMBean {
             ReflectionException {
 
         // Validate the input parameters
-        if (attribute == null)
-            throw new RuntimeOperationsException(new IllegalArgumentException(
-                    "Attribute is null"), "Attribute is null");
+        if (attribute == null) {
+          throw new RuntimeOperationsException(new IllegalArgumentException(
+                  "Attribute is null"), "Attribute is null");
+        }
         String name = attribute.getName();
         Object value = attribute.getValue();
-        if (name == null)
-            throw new RuntimeOperationsException(new IllegalArgumentException(
-                    "Attribute name is null"), "Attribute name is null");
+        if (name == null) {
+          throw new RuntimeOperationsException(new IllegalArgumentException(
+                  "Attribute name is null"), "Attribute name is null");
+        }
 
         try {
             Connector connector = (Connector) getManagedResource();

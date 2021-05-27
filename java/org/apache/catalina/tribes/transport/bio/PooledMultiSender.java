@@ -48,14 +48,18 @@ public class PooledMultiSender extends PooledSender {
             sender = (MultiPointSender)getSender();
             if (sender == null) {
                 ChannelException cx = new ChannelException("Unable to retrieve a data sender, time out("+getMaxWait()+" ms) error.");
-                for (int i = 0; i < destination.length; i++) cx.addFaultyMember(destination[i], new NullPointerException("Unable to retrieve a sender from the sender pool"));
+                for (int i = 0; i < destination.length; i++) {
+                  cx.addFaultyMember(destination[i], new NullPointerException("Unable to retrieve a sender from the sender pool"));
+                }
                 throw cx;
             } else {
                 sender.sendMessage(destination, msg);
             }
             sender.keepalive();
         }finally {
-            if ( sender != null ) returnSender(sender);
+            if ( sender != null ) {
+              returnSender(sender);
+            }
         }
     }
 

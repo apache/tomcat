@@ -109,8 +109,9 @@ public class LookupFactory implements ObjectFactory {
                         try {
                             factory = (ObjectFactory) factoryClass.getConstructor().newInstance();
                         } catch (Throwable t) {
-                            if (t instanceof NamingException)
-                                throw (NamingException) t;
+                            if (t instanceof NamingException) {
+                              throw (NamingException) t;
+                            }
                             NamingException ex = new NamingException(
                                     sm.getString("lookupFactory.createFailed"));
                             ex.initCause(t);

@@ -69,7 +69,9 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
                 }//end if
             }//end if
             //add to queue
-            if ( useDeepClone ) msg = (ChannelMessage)msg.deepclone();
+            if ( useDeepClone ) {
+              msg = (ChannelMessage)msg.deepclone();
+            }
             if (!addToQueue(msg, destination, payload) ) {
                 throw new ChannelException("Unable to add the message to the async queue, queue bug?");
             }
@@ -112,7 +114,9 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
 
     @Override
     public void setOptionFlag(int flag) {
-        if ( flag != Channel.SEND_OPTIONS_ASYNCHRONOUS ) log.warn("Warning, you are overriding the asynchronous option flag, this will disable the Channel.SEND_OPTIONS_ASYNCHRONOUS that other apps might use.");
+        if ( flag != Channel.SEND_OPTIONS_ASYNCHRONOUS ) {
+          log.warn("Warning, you are overriding the asynchronous option flag, this will disable the Channel.SEND_OPTIONS_ASYNCHRONOUS that other apps might use.");
+        }
         super.setOptionFlag(flag);
     }
 
@@ -182,7 +186,10 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     public void run() {
         while ( run ) {
             LinkObject link = removeFromQueue();
-            if ( link == null ) continue; //should not happen unless we exceed wait time
+            if ( link == null )
+             {
+              continue; //should not happen unless we exceed wait time
+            }
             while ( link != null && run ) {
                 link = sendAsyncData(link);
             }//while
@@ -195,17 +202,26 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
         try {
             super.sendMessage(destination,msg,null);
             try {
-                if ( link.getHandler() != null ) link.getHandler().handleCompletion(new UniqueId(msg.getUniqueId()));
+                if ( link.getHandler() != null ) {
+                  link.getHandler().handleCompletion(new UniqueId(msg.getUniqueId()));
+                }
             } catch ( Exception ex ) {
                 log.error("Unable to report back completed message.",ex);
             }
         } catch ( Exception x ) {
             ChannelException cx = null;
-            if ( x instanceof ChannelException ) cx = (ChannelException)x;
-            else cx = new ChannelException(x);
-            if ( log.isDebugEnabled() ) log.debug("Error while processing async message.",x);
+            if ( x instanceof ChannelException ) {
+              cx = (ChannelException)x;
+            } else {
+              cx = new ChannelException(x);
+            }
+            if ( log.isDebugEnabled() ) {
+              log.debug("Error while processing async message.",x);
+            }
             try {
-                if (link.getHandler() != null) link.getHandler().handleError(cx, new UniqueId(msg.getUniqueId()));
+                if (link.getHandler() != null) {
+                  link.getHandler().handleError(cx, new UniqueId(msg.getUniqueId()));
+                }
             } catch ( Exception ex ) {
                 log.error("Unable to report back error message.",ex);
             }

@@ -611,8 +611,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 boolean legacyRenegSupported = false;
                 try {
                     legacyRenegSupported = SSL.hasOp(SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
-                    if (legacyRenegSupported)
-                        SSLContext.setOptions(sslContext, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
+                    if (legacyRenegSupported) {
+                      SSLContext.setOptions(sslContext, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
+                    }
                 } catch (UnsatisfiedLinkError e) {
                     // Ignore
                 }
@@ -628,8 +629,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 boolean orderCiphersSupported = false;
                 try {
                     orderCiphersSupported = SSL.hasOp(SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
-                    if (orderCiphersSupported)
-                        SSLContext.setOptions(sslContext, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                    if (orderCiphersSupported) {
+                      SSLContext.setOptions(sslContext, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                    }
                 } catch (UnsatisfiedLinkError e) {
                     // Ignore
                 }
@@ -645,8 +647,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 boolean disableCompressionSupported = false;
                 try {
                     disableCompressionSupported = SSL.hasOp(SSL.SSL_OP_NO_COMPRESSION);
-                    if (disableCompressionSupported)
-                        SSLContext.setOptions(sslContext, SSL.SSL_OP_NO_COMPRESSION);
+                    if (disableCompressionSupported) {
+                      SSLContext.setOptions(sslContext, SSL.SSL_OP_NO_COMPRESSION);
+                    }
                 } catch (UnsatisfiedLinkError e) {
                     // Ignore
                 }
@@ -850,10 +853,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         try {
 
             // 1: Set socket options: timeout, linger, etc
-            if (socketProperties.getSoLingerOn() && socketProperties.getSoLingerTime() >= 0)
-                Socket.optSet(socket, Socket.APR_SO_LINGER, socketProperties.getSoLingerTime());
-            if (socketProperties.getTcpNoDelay())
-                Socket.optSet(socket, Socket.APR_TCP_NODELAY, (socketProperties.getTcpNoDelay() ? 1 : 0));
+            if (socketProperties.getSoLingerOn() && socketProperties.getSoLingerTime() >= 0) {
+              Socket.optSet(socket, Socket.APR_SO_LINGER, socketProperties.getSoLingerTime());
+            }
+            if (socketProperties.getTcpNoDelay()) {
+              Socket.optSet(socket, Socket.APR_TCP_NODELAY, (socketProperties.getTcpNoDelay() ? 1 : 0));
+            }
             Socket.timeoutSet(socket, socketProperties.getSoTimeout() * 1000);
 
             // 2: SSL handshake

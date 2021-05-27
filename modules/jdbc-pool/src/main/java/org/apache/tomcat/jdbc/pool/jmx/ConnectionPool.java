@@ -83,8 +83,12 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         MBeanNotificationInfo[] pres = super.getNotificationInfo();
         MBeanNotificationInfo[] loc = getDefaultNotificationInfo();
         MBeanNotificationInfo[] aug = new MBeanNotificationInfo[pres.length + loc.length];
-        if (pres.length>0) System.arraycopy(pres, 0, aug, 0, pres.length);
-        if (loc.length >0) System.arraycopy(loc, 0, aug, pres.length, loc.length);
+        if (pres.length>0) {
+          System.arraycopy(pres, 0, aug, 0, pres.length);
+        }
+        if (loc.length >0) {
+          System.arraycopy(loc, 0, aug, pres.length, loc.length);
+        }
         return aug;
     }
 
@@ -601,8 +605,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
         //make sure pool cleaner starts/stops when it should
-        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
-        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
+        if (!wasEnabled && shouldBeEnabled) {
+          pool.initializePoolCleaner(getPoolProperties());
+        } else if (wasEnabled && !shouldBeEnabled) {
+          pool.terminatePoolCleaner();
+        }
     }
 
 
@@ -632,8 +639,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setRemoveAbandoned(removeAbandoned);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
         //make sure pool cleaner starts/stops when it should
-        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
-        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
+        if (!wasEnabled && shouldBeEnabled) {
+          pool.initializePoolCleaner(getPoolProperties());
+        } else if (wasEnabled && !shouldBeEnabled) {
+          pool.terminatePoolCleaner();
+        }
     }
 
 
@@ -643,8 +653,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setRemoveAbandonedTimeout(removeAbandonedTimeout);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
         //make sure pool cleaner starts/stops when it should
-        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
-        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
+        if (!wasEnabled && shouldBeEnabled) {
+          pool.initializePoolCleaner(getPoolProperties());
+        } else if (wasEnabled && !shouldBeEnabled) {
+          pool.terminatePoolCleaner();
+        }
     }
 
 
@@ -672,8 +685,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setTestWhileIdle(testWhileIdle);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
         //make sure pool cleaner starts/stops when it should
-        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
-        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
+        if (!wasEnabled && shouldBeEnabled) {
+          pool.initializePoolCleaner(getPoolProperties());
+        } else if (wasEnabled && !shouldBeEnabled) {
+          pool.terminatePoolCleaner();
+        }
     }
 
 

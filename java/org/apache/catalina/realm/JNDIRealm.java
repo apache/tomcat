@@ -1269,8 +1269,9 @@ public class JNDIRealm extends RealmBase {
                 containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
                 // close the connection so we know it will be reopened.
-                if (context != null)
-                    close(context);
+                if (context != null) {
+                  close(context);
+                }
 
                 // open a new directory context.
                 context = open();
@@ -2331,8 +2332,9 @@ public class JNDIRealm extends RealmBase {
             containerLog.error(sm.getString("jndiRealm.exception"), e);
 
             // Close the connection so that it gets reopened next time
-            if (context != null)
-                close(context);
+            if (context != null) {
+              close(context);
+            }
 
             // Return "not authenticated" for this request
             return null;

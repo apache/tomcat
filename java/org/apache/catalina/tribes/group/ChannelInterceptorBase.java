@@ -39,7 +39,9 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     }
 
     public boolean okToProcess(int messageFlags) {
-        if (this.optionFlag == 0 ) return true;
+        if (this.optionFlag == 0 ) {
+          return true;
+        }
         return ((optionFlag&messageFlags) == optionFlag);
     }
 
@@ -76,12 +78,16 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     @Override
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws
         ChannelException {
-        if (getNext() != null) getNext().sendMessage(destination, msg, payload);
+        if (getNext() != null) {
+          getNext().sendMessage(destination, msg, payload);
+        }
     }
 
     @Override
     public void messageReceived(ChannelMessage msg) {
-        if (getPrevious() != null) getPrevious().messageReceived(msg);
+        if (getPrevious() != null) {
+          getPrevious().messageReceived(msg);
+        }
     }
 
     public boolean accept(ChannelMessage msg) {
@@ -91,18 +97,24 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     @Override
     public void memberAdded(Member member) {
         //notify upwards
-        if (getPrevious() != null) getPrevious().memberAdded(member);
+        if (getPrevious() != null) {
+          getPrevious().memberAdded(member);
+        }
     }
 
     @Override
     public void memberDisappeared(Member member) {
         //notify upwards
-        if (getPrevious() != null) getPrevious().memberDisappeared(member);
+        if (getPrevious() != null) {
+          getPrevious().memberDisappeared(member);
+        }
     }
 
     @Override
     public void heartbeat() {
-        if (getNext() != null) getNext().heartbeat();
+        if (getNext() != null) {
+          getNext().heartbeat();
+        }
     }
 
     /**
@@ -110,8 +122,11 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
      */
     @Override
     public boolean hasMembers() {
-        if ( getNext()!=null )return getNext().hasMembers();
-        else return false;
+        if ( getNext()!=null ) {
+          return getNext().hasMembers();
+        } else {
+          return false;
+        }
     }
 
     /**
@@ -120,8 +135,11 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
      */
     @Override
     public Member[] getMembers() {
-        if ( getNext()!=null ) return getNext().getMembers();
-        else return null;
+        if ( getNext()!=null ) {
+          return getNext().getMembers();
+        } else {
+          return null;
+        }
     }
 
     /**
@@ -131,8 +149,11 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
      */
     @Override
     public Member getMember(Member mbr) {
-        if ( getNext()!=null) return getNext().getMember(mbr);
-        else return null;
+        if ( getNext()!=null) {
+          return getNext().getMember(mbr);
+        } else {
+          return null;
+        }
     }
 
     /**
@@ -142,8 +163,11 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
      */
     @Override
     public Member getLocalMember(boolean incAlive) {
-        if ( getNext()!=null ) return getNext().getLocalMember(incAlive);
-        else return null;
+        if ( getNext()!=null ) {
+          return getNext().getLocalMember(incAlive);
+        } else {
+          return null;
+        }
     }
 
     /**
@@ -159,7 +183,9 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
      */
     @Override
     public void start(int svc) throws ChannelException {
-        if ( getNext()!=null ) getNext().start(svc);
+        if ( getNext()!=null ) {
+          getNext().start(svc);
+        }
     }
 
     /**
@@ -175,7 +201,9 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
      */
     @Override
     public void stop(int svc) throws ChannelException {
-        if (getNext() != null) getNext().stop(svc);
+        if (getNext() != null) {
+          getNext().stop(svc);
+        }
         channel = null;
     }
 

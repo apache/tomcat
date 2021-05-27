@@ -95,8 +95,9 @@ public class ExpandWar {
         }
 
         // Create the new document base directory
-        if(!docBase.mkdir() && !docBase.isDirectory())
-            throw new IOException(sm.getString("expandWar.createFailed", docBase));
+        if(!docBase.mkdir() && !docBase.isDirectory()) {
+          throw new IOException(sm.getString("expandWar.createFailed", docBase));
+        }
 
         // Expand the WAR into the new document base directory
         FileUtil docBaseUtil = new FileUtil(docBase);
@@ -134,8 +135,9 @@ public class ExpandWar {
                 }
                 input = jarFile.getInputStream(jarEntry);
 
-                if(null == input)
-                    throw new ZipException(sm.getString("expandWar.missingJarEntry", jarEntry.getName()));
+                if(null == input) {
+                  throw new ZipException(sm.getString("expandWar.missingJarEntry", jarEntry.getName()));
+                }
 
                 // Bugzilla 33636
                 expand(input, expandedFile);
@@ -404,8 +406,9 @@ public class ExpandWar {
             byte buffer[] = new byte[2048];
             while (true) {
                 int n = input.read(buffer);
-                if (n <= 0)
-                    break;
+                if (n <= 0) {
+                  break;
+                }
                 output.write(buffer, 0, n);
             }
         } finally {

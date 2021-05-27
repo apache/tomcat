@@ -66,7 +66,9 @@ public class TrapException extends JdbcInterceptor {
 
     public boolean isDeclaredException(Method m, Class<?> clazz) {
         for (Class<?> cl : m.getExceptionTypes()) {
-            if (cl.equals(clazz) || cl.isAssignableFrom(clazz)) return true;
+            if (cl.equals(clazz) || cl.isAssignableFrom(clazz)) {
+              return true;
+            }
         }
         return false;
     }

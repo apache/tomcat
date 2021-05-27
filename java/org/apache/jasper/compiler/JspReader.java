@@ -166,9 +166,13 @@ class JspReader {
      */
     boolean hasMoreInput() throws JasperException {
         if (current.cursor >= current.stream.length) {
-            if (singleFile) return false;
+            if (singleFile) {
+              return false;
+            }
             while (popFile()) {
-                if (current.cursor < current.stream.length) return true;
+                if (current.cursor < current.stream.length) {
+                  return true;
+                }
             }
             return false;
         }
@@ -176,8 +180,9 @@ class JspReader {
     }
 
     int nextChar() throws JasperException {
-        if (!hasMoreInput())
-            return -1;
+        if (!hasMoreInput()) {
+          return -1;
+        }
 
         int ch = current.stream[current.cursor];
 
@@ -222,8 +227,9 @@ class JspReader {
      * and the cursor point to next character.
      */
     private Boolean indexOf(char c, Mark mark) throws JasperException {
-        if (!hasMoreInput())
-            return null;
+        if (!hasMoreInput()) {
+          return null;
+        }
 
         int end = current.stream.length;
         int ch;
@@ -369,11 +375,13 @@ class JspReader {
     boolean matchesETag(String tagName) throws JasperException {
         Mark mark = mark();
 
-        if (!matches("</" + tagName))
-            return false;
+        if (!matches("</" + tagName)) {
+          return false;
+        }
         skipSpaces();
-        if (nextChar() == '>')
-            return true;
+        if (nextChar() == '>') {
+          return true;
+        }
 
         setCurrent(mark);
         return false;
@@ -384,11 +392,13 @@ class JspReader {
     {
        Mark mark = mark();
 
-       if (!matches("/" + tagName))
-           return false;
+       if (!matches("/" + tagName)) {
+        return false;
+      }
        skipSpaces();
-       if (nextChar() == '>')
-           return true;
+       if (nextChar() == '>') {
+        return true;
+      }
 
        setCurrent(mark);
        return false;
@@ -492,10 +502,11 @@ class JspReader {
                 skipELExpression();
             } else if (ch == firstChar) {
                 for (int i = 1 ; i < limlen ; i++) {
-                    if (peekChar() == limit.charAt(i))
-                        nextChar();
-                    else
-                        continue skip;
+                    if (peekChar() == limit.charAt(i)) {
+                      nextChar();
+                    } else {
+                      continue skip;
+                    }
                 }
                 return ret;
             }
@@ -515,8 +526,9 @@ class JspReader {
         Mark ret = skipUntil("</" + tag);
         if (ret != null) {
             skipSpaces();
-            if (nextChar() != '>')
-                ret = null;
+            if (nextChar() != '>') {
+              ret = null;
+            }
         }
         return ret;
     }
@@ -592,8 +604,9 @@ class JspReader {
                 ch = nextChar();
                 for (ch = nextChar(); ch != -1 && ch != endQuote;
                          ch = nextChar()) {
-                    if (ch == '\\')
-                        ch = nextChar();
+                    if (ch == '\\') {
+                      ch = nextChar();
+                    }
                     StringBuilder.append((char) ch);
                 }
                 // Check end of quote, skip closing quote:
@@ -611,8 +624,9 @@ class JspReader {
                     // Take care of the quoting here.
                     if (ch == '\\') {
                         if (peekChar() == '"' || peekChar() == '\'' ||
-                               peekChar() == '>' || peekChar() == '%')
-                            ch = nextChar();
+                               peekChar() == '>' || peekChar() == '%') {
+                          ch = nextChar();
+                        }
                     }
                     StringBuilder.append((char) ch);
                 } while (!isDelimiter());
@@ -730,8 +744,9 @@ class JspReader {
         try {
             CharArrayWriter caw = new CharArrayWriter();
             char buf[] = new char[1024];
-            for (int i = 0 ; (i = reader.read(buf)) != -1 ;)
-                caw.write(buf, 0, i);
+            for (int i = 0 ; (i = reader.read(buf)) != -1 ;) {
+              caw.write(buf, 0, i);
+            }
             caw.close();
             if (current == null) {
                 current = new Mark(this, caw.toCharArray(), fileid,

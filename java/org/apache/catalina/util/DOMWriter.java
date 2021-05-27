@@ -115,12 +115,13 @@ public class DOMWriter {
     */
    @Deprecated
    public static void  setWriterEncoding( String encoding ) {
-      if( encoding.equalsIgnoreCase( "DEFAULT" ) )
-         PRINTWRITER_ENCODING  = "UTF8";
-      else if( encoding.equalsIgnoreCase( "UTF-16" ) )
-         PRINTWRITER_ENCODING  = "Unicode";
-      else
-         PRINTWRITER_ENCODING = MIME2Java.convert( encoding );
+      if( encoding.equalsIgnoreCase( "DEFAULT" ) ) {
+        PRINTWRITER_ENCODING  = "UTF8";
+      } else if( encoding.equalsIgnoreCase( "UTF-16" ) ) {
+        PRINTWRITER_ENCODING  = "Unicode";
+      } else {
+        PRINTWRITER_ENCODING = MIME2Java.convert( encoding );
+      }
    }// setWriterEncoding
 
 
@@ -129,9 +130,11 @@ public class DOMWriter {
     */
    @Deprecated
    public static boolean isValidJavaEncoding( String encoding ) {
-      for ( int i = 0; i < MIME2JAVA_ENCODINGS.length; i++ )
-         if ( encoding.equals( MIME2JAVA_ENCODINGS[i] ) )
-            return (true);
+      for ( int i = 0; i < MIME2JAVA_ENCODINGS.length; i++ ) {
+        if ( encoding.equals( MIME2JAVA_ENCODINGS[i] ) ) {
+          return (true);
+        }
+      }
 
       return (false);
    }// isValidJavaEncoding
@@ -151,12 +154,13 @@ public class DOMWriter {
          case Node.DOCUMENT_NODE: {
                if ( !canonical ) {
                   String  Encoding = getWriterEncoding();
-                  if( Encoding.equalsIgnoreCase( "DEFAULT" ) )
-                     Encoding = "UTF-8";
-                  else if( Encoding.equalsIgnoreCase( "Unicode" ) )
-                     Encoding = "UTF-16";
-                  else
-                     Encoding = MIME2Java.reverse( Encoding );
+                  if( Encoding.equalsIgnoreCase( "DEFAULT" ) ) {
+                    Encoding = "UTF-8";
+                  } else if( Encoding.equalsIgnoreCase( "Unicode" ) ) {
+                    Encoding = "UTF-16";
+                  } else {
+                    Encoding = MIME2Java.reverse( Encoding );
+                  }
 
                   out.println("<?xml version=\"1.0\" encoding=\""+
                            Encoding + "\"?>");

@@ -78,14 +78,20 @@ public class ExpressionParseTree {
             return;
         }
         while (true) {
-            if (oppStack.size() == 0) break;
+            if (oppStack.size() == 0) {
+              break;
+            }
             OppNode top = oppStack.get(0);
             // If the top is a spacer then don't pop
             // anything
-            if (top == null) break;
+            if (top == null) {
+              break;
+            }
             // If the top node has a lower precedence then
             // let it stay
-            if (top.getPrecedence() < node.getPrecedence()) break;
+            if (top.getPrecedence() < node.getPrecedence()) {
+              break;
+            }
             // Remove the top node
             oppStack.remove(0);
             // Let it fill its branches
@@ -124,8 +130,9 @@ public class ExpressionParseTree {
         ExpressionTokenizer et = new ExpressionTokenizer(expr);
         while (et.hasMoreTokens()) {
             int token = et.nextToken();
-            if (token != ExpressionTokenizer.TOKEN_STRING)
-                currStringNode = null;
+            if (token != ExpressionTokenizer.TOKEN_STRING) {
+              currStringNode = null;
+            }
             switch (token) {
                 case ExpressionTokenizer.TOKEN_STRING :
                     if (currStringNode == null) {
@@ -225,8 +232,9 @@ public class ExpressionParseTree {
          * Resolves any variable references and returns the value string.
          */
         public String getValue() {
-            if (resolved == null)
-                resolved = ssiMediator.substituteVariables(value.toString());
+            if (resolved == null) {
+              resolved = ssiMediator.substituteVariables(value.toString());
+            }
             return resolved;
         }
 
@@ -310,8 +318,9 @@ public class ExpressionParseTree {
     private final class AndNode extends OppNode {
         @Override
         public boolean evaluate() {
-            if (!left.evaluate()) // Short circuit
-                return false;
+            if (!left.evaluate()) {
+              return false;
+            }
             return right.evaluate();
         }
 
@@ -330,8 +339,9 @@ public class ExpressionParseTree {
     private final class OrNode extends OppNode {
         @Override
         public boolean evaluate() {
-            if (left.evaluate()) // Short circuit
-                return true;
+            if (left.evaluate()) {
+              return true;
+            }
             return right.evaluate();
         }
 

@@ -111,14 +111,18 @@ public class TestNamingContext extends TomcatBaseTest {
         // Register for clean-up
         addDeleteOnTearDown(tmpDir);
 
-        if(!tmpDir.mkdirs())
-            throw new IOException("Could not create temp directory " + tmpDir);
-        if(!docBase.mkdir())
-            throw new IOException("Could not create temp directory " + docBase);
-        if(!alternate1.mkdir())
-            throw new IOException("Could not create temp directory " + alternate1);
-        if(!alternate2.mkdir())
-            throw new IOException("Could not create temp directory " + alternate2);
+        if(!tmpDir.mkdirs()) {
+          throw new IOException("Could not create temp directory " + tmpDir);
+        }
+        if(!docBase.mkdir()) {
+          throw new IOException("Could not create temp directory " + docBase);
+        }
+        if(!alternate1.mkdir()) {
+          throw new IOException("Could not create temp directory " + alternate1);
+        }
+        if(!alternate2.mkdir()) {
+          throw new IOException("Could not create temp directory " + alternate2);
+        }
 
         // Create a file in each alternate directory that we can attempt to access
         FileOutputStream fos = new FileOutputStream(new File(alternate1, "test1.txt"));

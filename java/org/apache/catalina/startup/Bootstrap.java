@@ -92,8 +92,9 @@ public final class Bootstrap {
         throws Exception {
 
         String value = CatalinaProperties.getProperty(name + ".loader");
-        if ((value == null) || (value.equals("")))
-            return parent;
+        if ((value == null) || (value.equals(""))) {
+          return parent;
+        }
 
         value = replace(value);
 
@@ -195,16 +196,18 @@ public final class Bootstrap {
         SecurityClassLoad.securityClassLoad(catalinaLoader);
 
         // Load our startup class and call its process() method
-        if (log.isDebugEnabled())
-            log.debug("Loading startup class");
+        if (log.isDebugEnabled()) {
+          log.debug("Loading startup class");
+        }
         Class<?> startupClass =
             catalinaLoader.loadClass
             ("org.apache.catalina.startup.Catalina");
         Object startupInstance = startupClass.newInstance();
 
         // Set the shared extensions class loader
-        if (log.isDebugEnabled())
-            log.debug("Setting startup class properties");
+        if (log.isDebugEnabled()) {
+          log.debug("Setting startup class properties");
+        }
         String methodName = "setParentClassLoader";
         Class<?> paramTypes[] = new Class[1];
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
@@ -454,14 +457,16 @@ public final class Bootstrap {
      */
     private void setCatalinaBase() {
 
-        if (System.getProperty(Globals.CATALINA_BASE_PROP) != null)
-            return;
-        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
-            System.setProperty(Globals.CATALINA_BASE_PROP,
-                               System.getProperty(Globals.CATALINA_HOME_PROP));
-        else
-            System.setProperty(Globals.CATALINA_BASE_PROP,
-                               System.getProperty("user.dir"));
+        if (System.getProperty(Globals.CATALINA_BASE_PROP) != null) {
+          return;
+        }
+        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null) {
+          System.setProperty(Globals.CATALINA_BASE_PROP,
+                             System.getProperty(Globals.CATALINA_HOME_PROP));
+        } else {
+          System.setProperty(Globals.CATALINA_BASE_PROP,
+                             System.getProperty("user.dir"));
+        }
 
     }
 
@@ -472,8 +477,9 @@ public final class Bootstrap {
      */
     private void setCatalinaHome() {
 
-        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null)
-            return;
+        if (System.getProperty(Globals.CATALINA_HOME_PROP) != null) {
+          return;
+        }
         File bootstrapJar =
             new File(System.getProperty("user.dir"), "bootstrap.jar");
         if (bootstrapJar.exists()) {

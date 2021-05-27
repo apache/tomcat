@@ -81,8 +81,9 @@ public final class ClassLoaderFactory {
                                                 final ClassLoader parent)
         throws Exception {
 
-        if (log.isDebugEnabled())
-            log.debug("Creating new class loader");
+        if (log.isDebugEnabled()) {
+          log.debug("Creating new class loader");
+        }
 
         // Construct the "class path" for this class loader
         Set<URL> set = new LinkedHashSet<URL>();
@@ -159,8 +160,9 @@ public final class ClassLoaderFactory {
                                                 final ClassLoader parent)
         throws Exception {
 
-        if (log.isDebugEnabled())
-            log.debug("Creating new class loader");
+        if (log.isDebugEnabled()) {
+          log.debug("Creating new class loader");
+        }
 
         // Construct the "class path" for this class loader
         Set<URL> set = new LinkedHashSet<URL>();
@@ -169,8 +171,9 @@ public final class ClassLoaderFactory {
             for (Repository repository : repositories)  {
                 if (repository.getType() == RepositoryType.URL) {
                     URL url = buildClassLoaderUrl(repository.getLocation());
-                    if (log.isDebugEnabled())
-                        log.debug("  Including URL " + url);
+                    if (log.isDebugEnabled()) {
+                      log.debug("  Including URL " + url);
+                    }
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.DIR) {
                     File directory = new File(repository.getLocation());
@@ -179,8 +182,9 @@ public final class ClassLoaderFactory {
                         continue;
                     }
                     URL url = buildClassLoaderUrl(directory);
-                    if (log.isDebugEnabled())
-                        log.debug("  Including directory " + url);
+                    if (log.isDebugEnabled()) {
+                      log.debug("  Including directory " + url);
+                    }
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.JAR) {
                     File file=new File(repository.getLocation());
@@ -189,8 +193,9 @@ public final class ClassLoaderFactory {
                         continue;
                     }
                     URL url = buildClassLoaderUrl(file);
-                    if (log.isDebugEnabled())
-                        log.debug("  Including jar file " + url);
+                    if (log.isDebugEnabled()) {
+                      log.debug("  Including jar file " + url);
+                    }
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.GLOB) {
                     File directory=new File(repository.getLocation());
@@ -198,25 +203,28 @@ public final class ClassLoaderFactory {
                     if (!validateFile(directory, RepositoryType.GLOB)) {
                         continue;
                     }
-                    if (log.isDebugEnabled())
-                        log.debug("  Including directory glob "
-                            + directory.getAbsolutePath());
+                    if (log.isDebugEnabled()) {
+                      log.debug("  Including directory glob "
+                          + directory.getAbsolutePath());
+                    }
                     String filenames[] = directory.list();
                     if (filenames == null) {
                         continue;
                     }
                     for (String s : filenames) {
                         String filename = s.toLowerCase(Locale.ENGLISH);
-                        if (!filename.endsWith(".jar"))
-                            continue;
+                        if (!filename.endsWith(".jar")) {
+                          continue;
+                        }
                         File file = new File(directory, s);
                         file = file.getCanonicalFile();
                         if (!validateFile(file, RepositoryType.JAR)) {
                             continue;
                         }
-                        if (log.isDebugEnabled())
-                            log.debug("    Including glob jar file "
-                                    + file.getAbsolutePath());
+                        if (log.isDebugEnabled()) {
+                          log.debug("    Including glob jar file "
+                                  + file.getAbsolutePath());
+                        }
                         URL url = buildClassLoaderUrl(file);
                         set.add(url);
                     }
@@ -226,19 +234,21 @@ public final class ClassLoaderFactory {
 
         // Construct the class loader itself
         final URL[] array = set.toArray(new URL[0]);
-        if (log.isDebugEnabled())
-            for (int i = 0; i < array.length; i++) {
-                log.debug("  location " + i + " is " + array[i]);
-            }
+        if (log.isDebugEnabled()) {
+          for (int i = 0; i < array.length; i++) {
+              log.debug("  location " + i + " is " + array[i]);
+          }
+        }
 
         return AccessController.doPrivileged(
                 new PrivilegedAction<URLClassLoader>() {
                     @Override
                     public URLClassLoader run() {
-                        if (parent == null)
-                            return new URLClassLoader(array);
-                        else
-                            return new URLClassLoader(array, parent);
+                        if (parent == null) {
+                          return new URLClassLoader(array);
+                        } else {
+                          return new URLClassLoader(array, parent);
+                        }
                     }
                 });
     }

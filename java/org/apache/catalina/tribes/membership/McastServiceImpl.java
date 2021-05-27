@@ -201,7 +201,9 @@ public class McastServiceImpl
         receivePacket.setPort(port);
         member.setCommand(new byte[0]);
         member.getData(true, true);
-        if ( membership == null ) membership = new Membership(member);
+        if ( membership == null ) {
+          membership = new Membership(member);
+        }
     }
 
     protected void setupSocket() throws IOException {
@@ -223,19 +225,24 @@ public class McastServiceImpl
         }
         socket.setLoopbackMode(localLoopbackDisabled); //hint if we want disable loop back(local machine) messages
         if (mcastBindAddress != null) {
-            if(log.isInfoEnabled())
-                log.info("Setting multihome multicast interface to:" +mcastBindAddress);
+            if(log.isInfoEnabled()) {
+              log.info("Setting multihome multicast interface to:" +mcastBindAddress);
+            }
             socket.setInterface(mcastBindAddress);
         } //end if
         //force a so timeout so that we don't block forever
-        if ( mcastSoTimeout <= 0 ) mcastSoTimeout = (int)sendFrequency;
-        if(log.isInfoEnabled())
-            log.info("Setting cluster mcast soTimeout to "+mcastSoTimeout);
+        if ( mcastSoTimeout <= 0 ) {
+          mcastSoTimeout = (int)sendFrequency;
+        }
+        if(log.isInfoEnabled()) {
+          log.info("Setting cluster mcast soTimeout to "+mcastSoTimeout);
+        }
         socket.setSoTimeout(mcastSoTimeout);
 
         if ( mcastTTL >= 0 ) {
-            if(log.isInfoEnabled())
-                log.info("Setting cluster mcast TTL to " + mcastTTL);
+            if(log.isInfoEnabled()) {
+              log.info("Setting cluster mcast TTL to " + mcastTTL);
+            }
             socket.setTimeToLive(mcastTTL);
         }
     }
@@ -250,9 +257,13 @@ public class McastServiceImpl
     public synchronized void start(int level) throws IOException {
         boolean valid = false;
         if ( (level & Channel.MBR_RX_SEQ)==Channel.MBR_RX_SEQ ) {
-            if ( receiver != null ) throw new IllegalStateException("McastService.receive already running.");
+            if ( receiver != null ) {
+              throw new IllegalStateException("McastService.receive already running.");
+            }
             try {
-                if ( sender == null ) socket.joinGroup(address);
+                if ( sender == null ) {
+                  socket.joinGroup(address);
+                }
             }catch (IOException iox) {
                 log.error("Unable to join multicast group, make sure your system has multicasting enabled.");
                 throw iox;
@@ -264,8 +275,12 @@ public class McastServiceImpl
             valid = true;
         }
         if ( (level & Channel.MBR_TX_SEQ)==Channel.MBR_TX_SEQ ) {
-            if ( sender != null ) throw new IllegalStateException("McastService.send already running.");
-            if ( receiver == null ) socket.joinGroup(address);
+            if ( sender != null ) {
+              throw new IllegalStateException("McastService.send already running.");
+            }
+            if ( receiver == null ) {
+              socket.joinGroup(address);
+            }
             //make sure at least one packet gets out there
             send(false);
             doRunSender = true;
@@ -285,11 +300,13 @@ public class McastServiceImpl
 
     private void waitForMembers(int level) {
         long memberwait = sendFrequency*2;
-        if(log.isInfoEnabled())
-            log.info("Sleeping for "+memberwait+" milliseconds to establish cluster membership, start level:"+level);
+        if(log.isInfoEnabled()) {
+          log.info("Sleeping for "+memberwait+" milliseconds to establish cluster membership, start level:"+level);
+        }
         try {Thread.sleep(memberwait);}catch (InterruptedException ignore){}
-        if(log.isInfoEnabled())
-            log.info("Done sleeping, membership established, start level:"+level);
+        if(log.isInfoEnabled()) {
+          log.info("Done sleeping, membership established, start level:"+level);
+        }
     }
 
     /**
@@ -302,13 +319,17 @@ public class McastServiceImpl
         if ( (level & Channel.MBR_RX_SEQ)==Channel.MBR_RX_SEQ ) {
             valid = true;
             doRunReceiver = false;
-            if ( receiver !=null ) receiver.interrupt();
+            if ( receiver !=null ) {
+              receiver.interrupt();
+            }
             receiver = null;
         }
         if ( (level & Channel.MBR_TX_SEQ)==Channel.MBR_TX_SEQ ) {
             valid = true;
             doRunSender = false;
-            if ( sender != null )sender.interrupt();
+            if ( sender != null ) {
+              sender.interrupt();
+            }
             sender = null;
         }
 
@@ -356,15 +377,21 @@ public class McastServiceImpl
             //since the receive thread is the same thread
             //that does membership expiration
         }
-        if (checkexpired) checkExpired();
+        if (checkexpired) {
+          checkExpired();
+        }
     }
 
     private void memberDataReceived(byte[] data) {
         final MemberImpl m = MemberImpl.getMember(data);
-        if (log.isTraceEnabled()) log.trace("Mcast receive ping from member " + m);
+        if (log.isTraceEnabled()) {
+          log.trace("Mcast receive ping from member " + m);
+        }
         Runnable t = null;
         if (Arrays.equals(m.getCommand(), Member.SHUTDOWN_PAYLOAD)) {
-            if (log.isDebugEnabled()) log.debug("Member has shutdown:" + m);
+            if (log.isDebugEnabled()) {
+              log.debug("Member has shutdown:" + m);
+            }
             membership.removeMember(m);
             t = new Runnable() {
                 @Override
@@ -379,7 +406,9 @@ public class McastServiceImpl
                 }
             };
         } else if (membership.memberAlive(m)) {
-            if (log.isDebugEnabled()) log.debug("Mcast add member " + m);
+            if (log.isDebugEnabled()) {
+              log.debug("Mcast add member " + m);
+            }
             t = new Runnable() {
                 @Override
                 public void run() {
@@ -399,7 +428,9 @@ public class McastServiceImpl
     }
 
     private void memberBroadcastsReceived(final byte[] b) {
-        if (log.isTraceEnabled()) log.trace("Mcast received broadcasts.");
+        if (log.isTraceEnabled()) {
+          log.trace("Mcast received broadcasts.");
+        }
         XByteBuffer buffer = new XByteBuffer(b,true);
         if (buffer.countPackages(true)>0) {
             int count = buffer.countPackages();
@@ -448,8 +479,9 @@ public class McastServiceImpl
         synchronized (expiredMutex) {
             MemberImpl[] expired = membership.expire(timeToExpiration);
             for (final MemberImpl member : expired) {
-                if (log.isDebugEnabled())
-                    log.debug("Mcast expire  member " + member);
+                if (log.isDebugEnabled()) {
+                  log.debug("Mcast expire  member " + member);
+                }
                 try {
                     Runnable t = new Runnable() {
                         @Override
@@ -502,7 +534,9 @@ public class McastServiceImpl
         synchronized (sendLock) {
             socket.send(packet);
         }
-        if ( checkexpired ) checkExpired();
+        if ( checkexpired ) {
+          checkExpired();
+        }
     }
 
     public long getServiceStartTime() {
@@ -548,13 +582,18 @@ public class McastServiceImpl
                 } catch ( ArrayIndexOutOfBoundsException ax ) {
                     //we can ignore this, as it means we have an invalid package
                     //but we will log it to debug
-                    if ( log.isDebugEnabled() )
-                        log.debug("Invalid member mcast package.",ax);
+                    if ( log.isDebugEnabled() ) {
+                      log.debug("Invalid member mcast package.",ax);
+                    }
                 } catch ( Exception x ) {
-                    if (x instanceof InterruptedException) interrupted();
-                    else {
-                        if (errorCounter==0 && doRunReceiver) log.warn("Error receiving mcast package. Sleeping 500ms",x);
-                        else if (log.isDebugEnabled()) log.debug("Error receiving mcast package"+(doRunReceiver?". Sleeping 500ms":"."),x);
+                    if (x instanceof InterruptedException) {
+                      interrupted();
+                    } else {
+                        if (errorCounter==0 && doRunReceiver) {
+                          log.warn("Error receiving mcast package. Sleeping 500ms",x);
+                        } else if (log.isDebugEnabled()) {
+                          log.debug("Error receiving mcast package"+(doRunReceiver?". Sleeping 500ms":"."),x);
+                        }
                         if (doRunReceiver) {
                             try { Thread.sleep(500); } catch ( Exception ignore ){}
                             if ( (++errorCounter)>=recoveryCounter ) {
@@ -587,8 +626,11 @@ public class McastServiceImpl
                     send(true);
                     errorCounter = 0;
                 } catch ( Exception x ) {
-                    if (errorCounter==0) log.warn("Unable to send mcast message.",x);
-                    else log.debug("Unable to send mcast message.",x);
+                    if (errorCounter==0) {
+                      log.warn("Unable to send mcast message.",x);
+                    } else {
+                      log.debug("Unable to send mcast message.",x);
+                    }
                     if ( (++errorCounter)>=recoveryCounter ) {
                         errorCounter=0;
                         RecoveryThread.recover(McastServiceImpl.this);
@@ -603,9 +645,12 @@ public class McastServiceImpl
         static volatile boolean running = false;
 
         public static synchronized void recover(McastServiceImpl parent) {
-            if (running) return;
-            if (!parent.isRecoveryEnabled())
-                return;
+            if (running) {
+              return;
+            }
+            if (!parent.isRecoveryEnabled()) {
+              return;
+            }
 
             running = true;
 
@@ -651,17 +696,20 @@ public class McastServiceImpl
             int attempt = 0;
             try {
                 while (!success) {
-                    if(log.isInfoEnabled())
-                        log.info("Tribes membership, running recovery thread, multicasting is not functional.");
+                    if(log.isInfoEnabled()) {
+                      log.info("Tribes membership, running recovery thread, multicasting is not functional.");
+                    }
                     if (stopService() & startService()) {
                         success = true;
-                        if(log.isInfoEnabled())
-                            log.info("Membership recovery was successful.");
+                        if(log.isInfoEnabled()) {
+                          log.info("Membership recovery was successful.");
+                        }
                     }
                     try {
                         if (!success) {
-                            if(log.isInfoEnabled())
-                                log.info("Recovery attempt "+(++attempt)+" failed, trying again in " +parent.recoverySleepTime+ " seconds");
+                            if(log.isInfoEnabled()) {
+                              log.info("Recovery attempt "+(++attempt)+" failed, trying again in " +parent.recoverySleepTime+ " seconds");
+                            }
                             Thread.sleep(parent.recoverySleepTime);
                         }
                     }catch (InterruptedException ignore) {

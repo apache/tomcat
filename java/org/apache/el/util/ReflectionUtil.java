@@ -86,8 +86,9 @@ public class ReflectionUtil {
      * @throws ClassNotFoundException If a class of a given name cannot be found
      */
     public static Class<?>[] toTypeArray(String[] s) throws ClassNotFoundException {
-        if (s == null)
-            return null;
+        if (s == null) {
+          return null;
+        }
         Class<?>[] c = new Class[s.length];
         for (int i = 0; i < s.length; i++) {
             c[i] = forName(s[i]);
@@ -102,8 +103,9 @@ public class ReflectionUtil {
      *         result is the name of the class instance at index i in the input
      */
     public static String[] toTypeNameArray(Class<?>[] c) {
-        if (c == null)
-            return null;
+        if (c == null) {
+          return null;
+        }
         String[] s = new String[c.length];
         for (int i = 0; i < c.length; i++) {
             s[i] = c[i].getName();

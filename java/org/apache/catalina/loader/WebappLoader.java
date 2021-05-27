@@ -244,8 +244,9 @@ public class WebappLoader extends LifecycleMBeanBase
     public void setContainer(Container container) {
 
         // Deregister from the old Container (if any)
-        if ((this.container != null) && (this.container instanceof Context))
-            ((Context) this.container).removePropertyChangeListener(this);
+        if ((this.container != null) && (this.container instanceof Context)) {
+          ((Context) this.container).removePropertyChangeListener(this);
+        }
 
         // Process this property change
         Container oldContainer = this.container;
@@ -410,22 +411,27 @@ public class WebappLoader extends LifecycleMBeanBase
     @Override
     public void addRepository(String repository) {
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("webappLoader.addRepository", repository));
+        if (log.isDebugEnabled()) {
+          log.debug(sm.getString("webappLoader.addRepository", repository));
+        }
 
         for (int i = 0; i < repositories.length; i++) {
-            if (repository.equals(repositories[i]))
-                return;
+            if (repository.equals(repositories[i])) {
+              return;
+            }
         }
         String results[] = new String[repositories.length + 1];
-        for (int i = 0; i < repositories.length; i++)
-            results[i] = repositories[i];
+        for (int i = 0; i < repositories.length; i++) {
+          results[i] = repositories[i];
+        }
         results[repositories.length] = repository;
         repositories = results;
 
         if (getState().isAvailable() && (classLoader != null)) {
             classLoader.addRepository(repository);
-            if( loaderRepositories != null ) loaderRepositories.add(repository);
+            if( loaderRepositories != null ) {
+              loaderRepositories.add(repository);
+            }
             setClassPath();
         }
 
@@ -486,7 +492,9 @@ public class WebappLoader extends LifecycleMBeanBase
     }
 
     public String[] getLoaderRepositories() {
-        if( loaderRepositories==null ) return  null;
+        if( loaderRepositories==null ) {
+          return  null;
+        }
         String res[]=new String[ loaderRepositories.size()];
         loaderRepositories.toArray(res);
         return res;
@@ -553,8 +561,9 @@ public class WebappLoader extends LifecycleMBeanBase
     public String toString() {
 
         StringBuilder sb = new StringBuilder("WebappLoader[");
-        if (container != null)
-            sb.append(container.getName());
+        if (container != null) {
+          sb.append(container.getName());
+        }
         sb.append("]");
         return (sb.toString());
 
@@ -571,8 +580,9 @@ public class WebappLoader extends LifecycleMBeanBase
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("webappLoader.starting"));
+        if (log.isDebugEnabled()) {
+          log.debug(sm.getString("webappLoader.starting"));
+        }
 
         if (container.getResources() == null) {
             log.info("No resources for " + container);
@@ -673,8 +683,9 @@ public class WebappLoader extends LifecycleMBeanBase
     @Override
     protected void stopInternal() throws LifecycleException {
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("webappLoader.stopping"));
+        if (log.isDebugEnabled()) {
+          log.debug(sm.getString("webappLoader.stopping"));
+        }
 
         setState(LifecycleState.STOPPING);
 
@@ -721,8 +732,9 @@ public class WebappLoader extends LifecycleMBeanBase
     public void propertyChange(PropertyChangeEvent event) {
 
         // Validate the source of this event
-        if (!(event.getSource() instanceof Context))
-            return;
+        if (!(event.getSource() instanceof Context)) {
+          return;
+        }
 
         // Process a relevant property change
         if (event.getPropertyName().equals("reloadable")) {
@@ -770,10 +782,12 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     private void setPermissions() {
 
-        if (!Globals.IS_SECURITY_ENABLED)
-            return;
-        if (!(container instanceof Context))
-            return;
+        if (!Globals.IS_SECURITY_ENABLED) {
+          return;
+        }
+        if (!(container instanceof Context)) {
+          return;
+        }
 
         // Tell the class loader the root of the context
         ServletContext servletContext =
@@ -867,12 +881,14 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     private void setRepositories() throws IOException {
 
-        if (!(container instanceof Context))
-            return;
+        if (!(container instanceof Context)) {
+          return;
+        }
         ServletContext servletContext =
             ((Context) container).getServletContext();
-        if (servletContext == null)
-            return;
+        if (servletContext == null) {
+          return;
+        }
 
         loaderRepositories=new ArrayList<String>();
         // Loading the work directory
@@ -882,8 +898,9 @@ public class WebappLoader extends LifecycleMBeanBase
             log.info("No work dir for " + servletContext);
         }
 
-        if( log.isDebugEnabled() && workDir != null)
-            log.debug(sm.getString("webappLoader.deploy", workDir.getAbsolutePath()));
+        if( log.isDebugEnabled() && workDir != null) {
+          log.debug(sm.getString("webappLoader.deploy", workDir.getAbsolutePath()));
+        }
 
         classLoader.setWorkDir(workDir);
 
@@ -930,9 +947,10 @@ public class WebappLoader extends LifecycleMBeanBase
 
             }
 
-            if(log.isDebugEnabled())
-                log.debug(sm.getString("webappLoader.classDeploy", classesPath,
-                             classRepository.getAbsolutePath()));
+            if(log.isDebugEnabled()) {
+              log.debug(sm.getString("webappLoader.classDeploy", classesPath,
+                           classRepository.getAbsolutePath()));
+            }
 
 
             // Adding the repository to the class loader
@@ -951,8 +969,9 @@ public class WebappLoader extends LifecycleMBeanBase
         // Looking up directory /WEB-INF/lib in the context
         try {
             Object object = resources.lookup(libPath);
-            if (object instanceof DirContext)
-                libDir = (DirContext) object;
+            if (object instanceof DirContext) {
+              libDir = (DirContext) object;
+            }
         } catch(NamingException e) {
             // Silent catch: it's valid that no /WEB-INF/lib collection
             // exists
@@ -989,17 +1008,19 @@ public class WebappLoader extends LifecycleMBeanBase
             while (enumeration.hasMoreElements()) {
                 NameClassPair ncPair = enumeration.nextElement();
                 String filename = libPath + "/" + ncPair.getName();
-                if (!filename.endsWith(".jar"))
-                    continue;
+                if (!filename.endsWith(".jar")) {
+                  continue;
+                }
 
                 // Copy JAR in the work directory, always (the JAR file
                 // would get locked otherwise, which would make it
                 // impossible to update it or remove it at runtime)
                 File destFile = new File(destDir, ncPair.getName());
 
-                if( log.isDebugEnabled())
-                log.debug(sm.getString("webappLoader.jarDeploy", filename,
-                                 destFile.getAbsolutePath()));
+                if( log.isDebugEnabled()) {
+                  log.debug(sm.getString("webappLoader.jarDeploy", filename,
+                                   destFile.getAbsolutePath()));
+                }
 
                 // Bug 45403 - Explicitly call lookup() on the name to check
                 // that the resource is readable. We cannot use resources
@@ -1015,8 +1036,9 @@ public class WebappLoader extends LifecycleMBeanBase
                     throw ioe;
                 }
 
-                if (!(obj instanceof Resource))
-                    continue;
+                if (!(obj instanceof Resource)) {
+                  continue;
+                }
 
                 Resource jarResource = (Resource) obj;
 
@@ -1050,12 +1072,14 @@ public class WebappLoader extends LifecycleMBeanBase
     private void setClassPath() {
 
         // Validate our current state information
-        if (!(container instanceof Context))
-            return;
+        if (!(container instanceof Context)) {
+          return;
+        }
         ServletContext servletContext =
             ((Context) container).getServletContext();
-        if (servletContext == null)
-            return;
+        if (servletContext == null) {
+          return;
+        }
 
         if (container instanceof StandardContext) {
             String baseClasspath =
@@ -1107,18 +1131,21 @@ public class WebappLoader extends LifecycleMBeanBase
             URL repositories[] = ((URLClassLoader) loader).getURLs();
             for (URL url : repositories) {
                 String repository = url.toString();
-                if (repository.startsWith("file://"))
-                    repository = UDecoder.URLDecode(repository.substring(7), B2CConverter.ISO_8859_1);
-                else if (repository.startsWith("file:"))
-                    repository = UDecoder.URLDecode(repository.substring(5), B2CConverter.ISO_8859_1);
-                else if (repository.startsWith("jndi:"))
-                    repository = servletContext.getRealPath(repository.substring(5));
-                else
-                    continue;
-                if (repository == null)
-                    continue;
-                if (classpath.length() > 0)
-                    classpath.append(File.pathSeparator);
+                if (repository.startsWith("file://")) {
+                  repository = UDecoder.URLDecode(repository.substring(7), B2CConverter.ISO_8859_1);
+                } else if (repository.startsWith("file:")) {
+                  repository = UDecoder.URLDecode(repository.substring(5), B2CConverter.ISO_8859_1);
+                } else if (repository.startsWith("jndi:")) {
+                  repository = servletContext.getRealPath(repository.substring(5));
+                } else {
+                  continue;
+                }
+                if (repository == null) {
+                  continue;
+                }
+                if (classpath.length() > 0) {
+                  classpath.append(File.pathSeparator);
+                }
                 classpath.append(repository);
             }
         } else if (loader == ClassLoader.getSystemClassLoader()){
@@ -1156,17 +1183,21 @@ public class WebappLoader extends LifecycleMBeanBase
                 if (object instanceof Resource) {
                     InputStream is = ((Resource) object).streamContent();
                     OutputStream os = new FileOutputStream(currentFile);
-                    if (!copy(is, os))
-                        return false;
+                    if (!copy(is, os)) {
+                      return false;
+                    }
                 } else if (object instanceof InputStream) {
                     OutputStream os = new FileOutputStream(currentFile);
-                    if (!copy((InputStream) object, os))
-                        return false;
+                    if (!copy((InputStream) object, os)) {
+                      return false;
+                    }
                 } else if (object instanceof DirContext) {
-                    if (!currentFile.isDirectory() && !currentFile.mkdir())
-                        return false;
-                    if (!copyDir((DirContext) object, currentFile))
-                        return false;
+                    if (!currentFile.isDirectory() && !currentFile.mkdir()) {
+                      return false;
+                    }
+                    if (!copyDir((DirContext) object, currentFile)) {
+                      return false;
+                    }
                 }
             }
 
@@ -1191,8 +1222,9 @@ public class WebappLoader extends LifecycleMBeanBase
             byte[] buf = new byte[4096];
             while (true) {
                 int len = is.read(buf);
-                if (len < 0)
-                    break;
+                if (len < 0) {
+                  break;
+                }
                 os.write(buf, 0, len);
             }
             is.close();

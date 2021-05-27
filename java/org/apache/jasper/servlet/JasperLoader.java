@@ -97,8 +97,9 @@ public class JasperLoader extends URLClassLoader {
         // (0) Check our previously loaded class cache
         clazz = findLoadedClass(name);
         if (clazz != null) {
-            if (resolve)
-                resolveClass(clazz);
+            if (resolve) {
+              resolveClass(clazz);
+            }
             return (clazz);
         }
 
@@ -124,8 +125,9 @@ public class JasperLoader extends URLClassLoader {
             // Class is not in org.apache.jsp, therefore, have our
             // parent load it
             clazz = parent.loadClass(name);
-            if( resolve )
-                resolveClass(clazz);
+            if( resolve ) {
+              resolveClass(clazz);
+            }
             return clazz;
         }
 

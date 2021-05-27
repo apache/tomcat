@@ -140,7 +140,9 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     protected void stopInternal() throws LifecycleException {
 
         setState(LifecycleState.STOPPING);
-        if ( executor != null ) executor.shutdownNow();
+        if ( executor != null ) {
+          executor.shutdownNow();
+        }
         executor = null;
         taskqueue = null;
     }
@@ -169,9 +171,13 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
                 executor.execute(command);
             } catch (RejectedExecutionException rx) {
                 //there could have been contention around the queue
-                if ( !( (TaskQueue) executor.getQueue()).force(command) ) throw new RejectedExecutionException("Work queue full.");
+                if ( !( (TaskQueue) executor.getQueue()).force(command) ) {
+                  throw new RejectedExecutionException("Work queue full.");
+                }
             }
-        } else throw new IllegalStateException("StandardThreadPool not started.");
+        } else {
+          throw new IllegalStateException("StandardThreadPool not started.");
+        }
     }
 
     public void contextStopping() {
@@ -305,8 +311,9 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
     @Override
     public boolean resizePool(int corePoolSize, int maximumPoolSize) {
-        if (executor == null)
-            return false;
+        if (executor == null) {
+          return false;
+        }
 
         executor.setCorePoolSize(corePoolSize);
         executor.setMaximumPoolSize(maximumPoolSize);

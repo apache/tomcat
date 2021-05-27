@@ -62,7 +62,9 @@ public class NioChannel implements ByteChannel{
     }
 
     public int getBufferSize() {
-        if ( bufHandler == null ) return 0;
+        if ( bufHandler == null ) {
+          return 0;
+        }
         int size = 0;
         size += bufHandler.getReadBuffer()!=null?bufHandler.getReadBuffer().capacity():0;
         size += bufHandler.getWriteBuffer()!=null?bufHandler.getWriteBuffer().capacity():0;
@@ -97,7 +99,9 @@ public class NioChannel implements ByteChannel{
     }
 
     public void close(boolean force) throws IOException {
-        if (isOpen() || force ) close();
+        if (isOpen() || force ) {
+          close();
+        }
     }
     /**
      * Tells whether or not this channel is open.

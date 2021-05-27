@@ -172,8 +172,9 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     public void sendAck()
         throws IOException {
 
-        if (!committed)
-            outputStream.write(Constants.ACK_BYTES);
+        if (!committed) {
+          outputStream.write(Constants.ACK_BYTES);
+        }
 
     }
 

@@ -107,8 +107,9 @@ public class SerializablePrincipal  implements java.io.Serializable {
         if (roles != null) {
             this.roles = new String[roles.size()];
             this.roles = roles.toArray(this.roles);
-            if (this.roles.length > 1)
-                Arrays.sort(this.roles);
+            if (this.roles.length > 1) {
+              Arrays.sort(this.roles);
+            }
         }
         if (userPrincipal instanceof Serializable) {
             this.userPrincipal = userPrincipal;
@@ -188,7 +189,9 @@ public class SerializablePrincipal  implements java.io.Serializable {
 
     public static SerializablePrincipal createPrincipal(GenericPrincipal principal)
     {
-        if ( principal==null) return null;
+        if ( principal==null) {
+          return null;
+        }
         return new SerializablePrincipal(principal.getName(),
                                          principal.getPassword(),
                                          principal.getRoles()!=null?Arrays.asList(principal.getRoles()):null,
@@ -207,10 +210,14 @@ public class SerializablePrincipal  implements java.io.Serializable {
         String name = in.readUTF();
         boolean hasPwd = in.readBoolean();
         String pwd = null;
-        if ( hasPwd ) pwd = in.readUTF();
+        if ( hasPwd ) {
+          pwd = in.readUTF();
+        }
         int size = in.readInt();
         String[] roles = new String[size];
-        for ( int i=0; i<size; i++ ) roles[i] = in.readUTF();
+        for ( int i=0; i<size; i++ ) {
+          roles[i] = in.readUTF();
+        }
         Principal userPrincipal = null;
         boolean hasUserPrincipal = in.readBoolean();
         if (hasUserPrincipal) {
@@ -230,15 +237,23 @@ public class SerializablePrincipal  implements java.io.Serializable {
             throws IOException {
         out.writeUTF(p.getName());
         out.writeBoolean(p.getPassword()!=null);
-        if ( p.getPassword()!= null ) out.writeUTF(p.getPassword());
+        if ( p.getPassword()!= null ) {
+          out.writeUTF(p.getPassword());
+        }
         String[] roles = p.getRoles();
-        if ( roles == null ) roles = new String[0];
+        if ( roles == null ) {
+          roles = new String[0];
+        }
         out.writeInt(roles.length);
-        for ( int i=0; i<roles.length; i++ ) out.writeUTF(roles[i]);
+        for ( int i=0; i<roles.length; i++ ) {
+          out.writeUTF(roles[i]);
+        }
         boolean hasUserPrincipal = (p != p.getUserPrincipal() &&
                 p.getUserPrincipal() instanceof Serializable);
         out.writeBoolean(hasUserPrincipal);
-        if (hasUserPrincipal) out.writeObject(p.getUserPrincipal());
+        if (hasUserPrincipal) {
+          out.writeObject(p.getUserPrincipal());
+        }
     }
 
 

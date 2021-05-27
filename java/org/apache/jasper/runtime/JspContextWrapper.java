@@ -487,8 +487,9 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
      */
     private String findAlias(String varName) {
 
-        if (aliases == null)
-            return varName;
+        if (aliases == null) {
+          return varName;
+        }
 
         String alias = aliases.get(varName);
         if (alias == null) {

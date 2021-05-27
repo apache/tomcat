@@ -1354,7 +1354,9 @@ public class BasicDataSource implements DataSource {
      * create new connections
      */
     public void setConnectionProperties(String connectionProperties) {
-        if (connectionProperties == null) throw new NullPointerException("connectionProperties is null");
+        if (connectionProperties == null) {
+          throw new NullPointerException("connectionProperties is null");
+        }
 
         String[] entries = connectionProperties.split(";");
         Properties properties = new Properties();

@@ -156,9 +156,10 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
     }
 
     protected void processContainerAddChild(Container parent, Container child) {
-        if (log.isDebugEnabled())
-            log.debug("Process addChild[parent=" + parent + ",child=" + child +
-                "]");
+        if (log.isDebugEnabled()) {
+          log.debug("Process addChild[parent=" + parent + ",child=" + child +
+              "]");
+        }
 
         if (child instanceof Context) {
             registerContextListener((Context) child);
@@ -173,9 +174,10 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
     protected void processContainerRemoveChild(Container parent,
         Container child) {
 
-        if (log.isDebugEnabled())
-            log.debug("Process removeChild[parent=" + parent + ",child=" +
-                child + "]");
+        if (log.isDebugEnabled()) {
+          log.debug("Process removeChild[parent=" + parent + ",child=" +
+              child + "]");
+        }
 
         if (child instanceof Context) {
             Context context = (Context) child;
@@ -194,7 +196,9 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
      *            of its parent Service.
      */
     private void stopIdleThreads(Context context) {
-        if (serverStopping) return;
+        if (serverStopping) {
+          return;
+        }
 
         if (!(context instanceof StandardContext) ||
             !((StandardContext) context).getRenewThreadsWhenStoppingContext()) {

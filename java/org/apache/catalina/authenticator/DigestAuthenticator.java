@@ -82,8 +82,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
         super();
         setCache(false);
         try {
-            if (md5Helper == null)
-                md5Helper = MessageDigest.getInstance("MD5");
+            if (md5Helper == null) {
+              md5Helper = MessageDigest.getInstance("MD5");
+            }
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }
@@ -314,10 +315,12 @@ public class DigestAuthenticator extends AuthenticatorBase {
     protected String parseUsername(String authorization) {
 
         // Validate the authorization credentials format
-        if (authorization == null)
-            return (null);
-        if (!authorization.startsWith("Digest "))
-            return (null);
+        if (authorization == null) {
+          return (null);
+        }
+        if (!authorization.startsWith("Digest ")) {
+          return (null);
+        }
         authorization = authorization.substring(7).trim();
 
         StringTokenizer commaTokenizer =
@@ -326,14 +329,16 @@ public class DigestAuthenticator extends AuthenticatorBase {
         while (commaTokenizer.hasMoreTokens()) {
             String currentToken = commaTokenizer.nextToken();
             int equalSign = currentToken.indexOf('=');
-            if (equalSign < 0)
-                return null;
+            if (equalSign < 0) {
+              return null;
+            }
             String currentTokenName =
                 currentToken.substring(0, equalSign).trim();
             String currentTokenValue =
                 currentToken.substring(equalSign + 1).trim();
-            if ("username".equals(currentTokenName))
-                return (removeQuotes(currentTokenValue));
+            if ("username".equals(currentTokenName)) {
+              return (removeQuotes(currentTokenValue));
+            }
         }
 
         return (null);
@@ -444,8 +449,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         // Get the realm name
         String realmName = config.getRealmName();
-        if (realmName == null)
-            realmName = REALM_NAME;
+        if (realmName == null) {
+          realmName = REALM_NAME;
+        }
 
         String authenticateHeader;
         if (isNonceStale) {

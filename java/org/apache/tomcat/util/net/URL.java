@@ -128,8 +128,9 @@ public final class URL implements Serializable {
                 // compatibility and treat it as if the spec didn't contain
                 // the scheme; see 5.2.3 of RFC2396
                 if ((context.getPath() != null) &&
-                    (context.getPath().startsWith("/")))
-                    newProtocol = null;
+                    (context.getPath().startsWith("/"))) {
+                  newProtocol = null;
+                }
                 if (newProtocol == null) {
                     protocol = context.getProtocol();
                     authority = context.getAuthority();
@@ -138,15 +139,17 @@ public final class URL implements Serializable {
                     port = context.getPort();
                     file = context.getFile();
                     int question = file.lastIndexOf('?');
-                    if (question < 0)
-                        path = file;
-                    else
-                        path = file.substring(0, question);
+                    if (question < 0) {
+                      path = file;
+                    } else {
+                      path = file.substring(0, question);
+                    }
                 }
             }
 
-            if (protocol == null)
-                throw new MalformedURLException("no protocol: " + original);
+            if (protocol == null) {
+              throw new MalformedURLException("no protocol: " + original);
+            }
 
             // Parse out any ref portion of the spec
             i = spec.indexOf('#', start);
@@ -157,8 +160,9 @@ public final class URL implements Serializable {
 
             // Parse the remainder of the spec in a protocol-specific fashion
             parse(spec, start, limit);
-            if (context != null)
-                normalize();
+            if (context != null) {
+              normalize();
+            }
 
 
         } catch (MalformedURLException e) {
@@ -223,11 +227,13 @@ public final class URL implements Serializable {
         if (question >= 0) {
             query = file.substring(question + 1);
             path = file.substring(0, question);
-        } else
-            path = file;
+        } else {
+          path = file;
+        }
 
-        if ((host != null) && (host.length() > 0))
-            authority = (port == -1) ? host : host + ":" + port;
+        if ((host != null) && (host.length() > 0)) {
+          authority = (port == -1) ? host : host + ":" + port;
+        }
 
     }
 
@@ -305,11 +311,13 @@ public final class URL implements Serializable {
     @Override
     public boolean equals(Object obj) {
 
-        if (!(obj instanceof URL))
-            return (false);
+        if (!(obj instanceof URL)) {
+          return (false);
+        }
         URL other = (URL) obj;
-        if (!sameFile(other))
-            return (false);
+        if (!sameFile(other)) {
+          return (false);
+        }
         return (compare(ref, other.getRef()));
 
     }
@@ -347,8 +355,9 @@ public final class URL implements Serializable {
      */
     public String getFile() {
 
-        if (file == null)
-            return ("");
+        if (file == null) {
+          return ("");
+        }
         return (this.file);
 
     }
@@ -369,8 +378,9 @@ public final class URL implements Serializable {
      */
     public String getPath() {
 
-        if (this.path == null)
-            return ("");
+        if (this.path == null) {
+          return ("");
+        }
         return (this.path);
 
     }
@@ -441,10 +451,11 @@ public final class URL implements Serializable {
 
         // Special case for null path
         if (path == null) {
-            if (query != null)
-                file = "?" + query;
-            else
-                file = "";
+            if (query != null) {
+              file = "?" + query;
+            } else {
+              file = "";
+            }
             return;
         }
 
@@ -452,24 +463,28 @@ public final class URL implements Serializable {
         String normalized = path;
         if (normalized.equals("/.")) {
             path = "/";
-            if (query != null)
-                file = path + "?" + query;
-            else
-                file = path;
+            if (query != null) {
+              file = path + "?" + query;
+            } else {
+              file = path;
+            }
             return;
         }
 
         // Normalize the slashes and add leading slash if necessary
-        if (normalized.indexOf('\\') >= 0)
-            normalized = normalized.replace('\\', '/');
-        if (!normalized.startsWith("/"))
-            normalized = "/" + normalized;
+        if (normalized.indexOf('\\') >= 0) {
+          normalized = normalized.replace('\\', '/');
+        }
+        if (!normalized.startsWith("/")) {
+          normalized = "/" + normalized;
+        }
 
         // Resolve occurrences of "//" in the normalized path
         while (true) {
             int index = normalized.indexOf("//");
-            if (index < 0)
-                break;
+            if (index < 0) {
+              break;
+            }
             normalized = normalized.substring(0, index) +
                 normalized.substring(index + 1);
         }
@@ -477,8 +492,9 @@ public final class URL implements Serializable {
         // Resolve occurrences of "/./" in the normalized path
         while (true) {
             int index = normalized.indexOf("/./");
-            if (index < 0)
-                break;
+            if (index < 0) {
+              break;
+            }
             normalized = normalized.substring(0, index) +
                 normalized.substring(index + 2);
         }
@@ -486,36 +502,41 @@ public final class URL implements Serializable {
         // Resolve occurrences of "/../" in the normalized path
         while (true) {
             int index = normalized.indexOf("/../");
-            if (index < 0)
-                break;
-            if (index == 0)
-                throw new MalformedURLException
-                    ("Invalid relative URL reference");
+            if (index < 0) {
+              break;
+            }
+            if (index == 0) {
+              throw new MalformedURLException
+                  ("Invalid relative URL reference");
+            }
             int index2 = normalized.lastIndexOf('/', index - 1);
             normalized = normalized.substring(0, index2) +
                 normalized.substring(index + 3);
         }
 
         // Resolve occurrences of "/." at the end of the normalized path
-        if (normalized.endsWith("/."))
-            normalized = normalized.substring(0, normalized.length() - 1);
+        if (normalized.endsWith("/.")) {
+          normalized = normalized.substring(0, normalized.length() - 1);
+        }
 
         // Resolve occurrences of "/.." at the end of the normalized path
         if (normalized.endsWith("/..")) {
             int index = normalized.length() - 3;
             int index2 = normalized.lastIndexOf('/', index - 1);
-            if (index2 < 0)
-                throw new MalformedURLException
-                    ("Invalid relative URL reference");
+            if (index2 < 0) {
+              throw new MalformedURLException
+                  ("Invalid relative URL reference");
+            }
             normalized = normalized.substring(0, index2 + 1);
         }
 
         // Return the normalized path that we have completed
         path = normalized;
-        if (query != null)
-            file = path + "?" + query;
-        else
-            file = path;
+        if (query != null) {
+          file = path + "?" + query;
+        } else {
+          file = path;
+        }
 
     }
 
@@ -528,14 +549,18 @@ public final class URL implements Serializable {
      */
     public boolean sameFile(URL other) {
 
-        if (!compare(protocol, other.getProtocol()))
-            return (false);
-        if (!compare(host, other.getHost()))
-            return (false);
-        if (port != other.getPort())
-            return (false);
-        if (!compare(file, other.getFile()))
-            return (false);
+        if (!compare(protocol, other.getProtocol())) {
+          return (false);
+        }
+        if (!compare(host, other.getHost())) {
+          return (false);
+        }
+        if (port != other.getPort()) {
+          return (false);
+        }
+        if (!compare(file, other.getFile())) {
+          return (false);
+        }
         return (true);
 
     }
@@ -558,8 +583,9 @@ public final class URL implements Serializable {
             sb.append("//");
             sb.append(authority);
         }
-        if (path != null)
-            sb.append(path);
+        if (path != null) {
+          sb.append(path);
+        }
         if (query != null) {
             sb.append('?');
             sb.append(query);
@@ -617,15 +643,17 @@ public final class URL implements Serializable {
     private boolean compare(String first, String second) {
 
         if (first == null) {
-            if (second == null)
-                return (true);
-            else
-                return (false);
+            if (second == null) {
+              return (true);
+            } else {
+              return (false);
+            }
         } else {
-            if (second == null)
-                return (false);
-            else
-                return (first.equals(second));
+            if (second == null) {
+              return (false);
+            } else {
+              return (first.equals(second));
+            }
         }
 
     }
@@ -707,31 +735,36 @@ public final class URL implements Serializable {
         // Parse the path section
         if (spec.indexOf('/', start) == start) {     // Absolute path
             path = spec.substring(start, limit);
-            if (query != null)
-                file = path + "?" + query;
-            else
-                file = path;
+            if (query != null) {
+              file = path + "?" + query;
+            } else {
+              file = path;
+            }
             return;
         }
 
         // Resolve relative path against our context's file
         if (path == null) {
-            if (query != null)
-                file = "?" + query;
-            else
-                file = null;
+            if (query != null) {
+              file = "?" + query;
+            } else {
+              file = null;
+            }
             return;
         }
-        if (!path.startsWith("/"))
-            throw new MalformedURLException
-                ("Base path does not start with '/'");
-        if (!path.endsWith("/"))
-            path += "/../";
+        if (!path.startsWith("/")) {
+          throw new MalformedURLException
+              ("Base path does not start with '/'");
+        }
+        if (!path.endsWith("/")) {
+          path += "/../";
+        }
         path += spec.substring(start, limit);
-        if (query != null)
-            file = path + "?" + query;
-        else
-            file = path;
+        if (query != null) {
+          file = path + "?" + query;
+        } else {
+          file = path;
+        }
         return;
 
     }

@@ -141,9 +141,10 @@ public final class ResourceSet<T> extends HashSet<T> {
     @Override
     public boolean add(T o) {
 
-        if (locked)
-            throw new IllegalStateException
-              (sm.getString("resourceSet.locked"));
+        if (locked) {
+          throw new IllegalStateException
+            (sm.getString("resourceSet.locked"));
+        }
         return (super.add(o));
 
     }
@@ -157,9 +158,10 @@ public final class ResourceSet<T> extends HashSet<T> {
     @Override
     public void clear() {
 
-        if (locked)
-            throw new IllegalStateException
-              (sm.getString("resourceSet.locked"));
+        if (locked) {
+          throw new IllegalStateException
+            (sm.getString("resourceSet.locked"));
+        }
         super.clear();
 
     }
@@ -176,9 +178,10 @@ public final class ResourceSet<T> extends HashSet<T> {
     @Override
     public boolean remove(Object o) {
 
-        if (locked)
-            throw new IllegalStateException
-              (sm.getString("resourceSet.locked"));
+        if (locked) {
+          throw new IllegalStateException
+            (sm.getString("resourceSet.locked"));
+        }
         return (super.remove(o));
 
     }

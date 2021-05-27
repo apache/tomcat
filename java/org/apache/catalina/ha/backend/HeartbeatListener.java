@@ -83,10 +83,11 @@ public class HeartbeatListener
 
         if (Lifecycle.PERIODIC_EVENT.equals(event.getType())) {
             if (sender == null) {
-                if (proxyList == null)
-                    sender = new MultiCastSender();
-                else
-                    sender = new TcpSender();
+                if (proxyList == null) {
+                  sender = new MultiCastSender();
+                } else {
+                  sender = new TcpSender();
+                }
             }
 
             /* Read busy and ready */

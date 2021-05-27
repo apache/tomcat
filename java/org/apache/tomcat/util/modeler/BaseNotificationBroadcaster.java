@@ -98,7 +98,9 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
                             oldFilter.clear();
                         } else {
                             if (oldNames.length != 0) {
-                                for (String newName : newNames) oldFilter.addAttribute(newName);
+                                for (String newName : newNames) {
+                                  oldFilter.addAttribute(newName);
+                                }
                             }
                         }
                         return;
@@ -144,8 +146,9 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
                 entries.iterator();
             while (items.hasNext()) {
                 BaseNotificationBroadcasterEntry item = items.next();
-                if (item.listener == listener)
-                    items.remove();
+                if (item.listener == listener) {
+                  items.remove();
+                }
             }
         }
 
@@ -208,8 +211,9 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
             while (items.hasNext()) {
                 BaseNotificationBroadcasterEntry item = items.next();
                 if ((item.filter != null) &&
-                    (!item.filter.isNotificationEnabled(notification)))
-                    continue;
+                    (!item.filter.isNotificationEnabled(notification))) {
+                  continue;
+                }
                 item.listener.handleNotification(notification, item.handback);
             }
         }

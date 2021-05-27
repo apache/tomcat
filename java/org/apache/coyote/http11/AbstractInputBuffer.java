@@ -163,8 +163,9 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
             filter.setBuffer(inputStreamInputBuffer);
         } else {
             for (int i = 0; i <= lastActiveFilter; i++) {
-                if (activeFilters[i] == filter)
-                    return;
+                if (activeFilters[i] == filter) {
+                  return;
+                }
             }
             filter.setBuffer(activeFilters[lastActiveFilter]);
         }
@@ -311,10 +312,11 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     public int doRead(ByteChunk chunk, Request req)
         throws IOException {
 
-        if (lastActiveFilter == -1)
-            return inputStreamInputBuffer.doRead(chunk, req);
-        else
-            return activeFilters[lastActiveFilter].doRead(chunk,req);
+        if (lastActiveFilter == -1) {
+          return inputStreamInputBuffer.doRead(chunk, req);
+        } else {
+          return activeFilters[lastActiveFilter].doRead(chunk,req);
+        }
 
     }
 }

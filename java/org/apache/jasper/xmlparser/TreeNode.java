@@ -53,8 +53,9 @@ public class TreeNode {
         super();
         this.name = name;
         this.parent = parent;
-        if (this.parent != null)
-            this.parent.addChild(this);
+        if (this.parent != null) {
+          this.parent.addChild(this);
+        }
 
     }
 
@@ -105,8 +106,9 @@ public class TreeNode {
      */
     public void addAttribute(String name, String value) {
 
-        if (attributes == null)
-            attributes = new HashMap<String,String>();
+        if (attributes == null) {
+          attributes = new HashMap<String,String>();
+        }
         attributes.put(name, value);
 
     }
@@ -119,8 +121,9 @@ public class TreeNode {
      */
     public void addChild(TreeNode node) {
 
-        if (children == null)
-            children = new ArrayList<TreeNode>();
+        if (children == null) {
+          children = new ArrayList<TreeNode>();
+        }
         children.add(node);
 
     }
@@ -134,10 +137,11 @@ public class TreeNode {
      */
     public String findAttribute(String name) {
 
-        if (attributes == null)
-            return null;
-        else
-            return attributes.get(name);
+        if (attributes == null) {
+          return null;
+        } else {
+          return attributes.get(name);
+        }
 
     }
 
@@ -151,8 +155,9 @@ public class TreeNode {
         if (attributes == null) {
             List<String> empty = Collections.emptyList();
             return empty.iterator();
-        } else
-            return attributes.keySet().iterator();
+        } else {
+          return attributes.keySet().iterator();
+        }
 
     }
 
@@ -165,13 +170,15 @@ public class TreeNode {
      */
     public TreeNode findChild(String name) {
 
-        if (children == null)
-            return (null);
+        if (children == null) {
+          return (null);
+        }
         Iterator<TreeNode> items = children.iterator();
         while (items.hasNext()) {
             TreeNode item = items.next();
-            if (name.equals(item.getName()))
-                return (item);
+            if (name.equals(item.getName())) {
+              return (item);
+            }
         }
         return (null);
 
@@ -187,8 +194,9 @@ public class TreeNode {
         if (children == null) {
             List<TreeNode> empty = Collections.emptyList();
             return empty.iterator();
-        } else
-            return children.iterator();
+        } else {
+          return children.iterator();
+        }
 
     }
 
@@ -211,8 +219,9 @@ public class TreeNode {
         Iterator<TreeNode> items = children.iterator();
         while (items.hasNext()) {
             TreeNode item = items.next();
-            if (name.equals(item.getName()))
-                results.add(item);
+            if (name.equals(item.getName())) {
+              results.add(item);
+            }
         }
         return (results.iterator());
 
@@ -281,8 +290,9 @@ public class TreeNode {
         int indent2 = indent + 2;
 
         // Reconstruct an opening node
-        for (int i = 0; i < indent; i++)
-            sb.append(' ');
+        for (int i = 0; i < indent; i++) {
+          sb.append(' ');
+        }
         sb.append('<');
         sb.append(node.getName());
         Iterator<String> names = node.findAttributes();
@@ -300,8 +310,9 @@ public class TreeNode {
         // Reconstruct the body text of this node (if any)
         String body = node.getBody();
         if ((body != null) && (body.length() > 0)) {
-            for (int i = 0; i < indent2; i++)
-                sb.append(' ');
+            for (int i = 0; i < indent2; i++) {
+              sb.append(' ');
+            }
             sb.append(body);
             sb.append("\n");
         }
@@ -314,8 +325,9 @@ public class TreeNode {
         }
 
         // Reconstruct a closing node marker
-        for (int i = 0; i < indent; i++)
-            sb.append(' ');
+        for (int i = 0; i < indent; i++) {
+          sb.append(' ');
+        }
         sb.append("</");
         sb.append(node.getName());
         sb.append(">\n");

@@ -636,8 +636,9 @@ public class DefaultServlet extends HttpServlet {
             Resource oldResource = null;
             try {
                 Object obj = resources.lookup(path);
-                if (obj instanceof Resource)
-                    oldResource = (Resource) obj;
+                if (obj instanceof Resource) {
+                  oldResource = (Resource) obj;
+                }
             } catch (NamingException e) {
                 // Ignore
             }
@@ -790,8 +791,9 @@ public class DefaultServlet extends HttpServlet {
         int leftside = filesize / 1024;
         int rightside = (filesize % 1024) / 103;  // makes 1 digit
         // To avoid 0.0 for non-zero file, we bump to 0.1
-        if (leftside == 0 && rightside == 0 && filesize != 0)
-            rightside = 1;
+        if (leftside == 0 && rightside == 0 && filesize != 0) {
+          rightside = 1;
+        }
         buf.append(leftside).append(".").append(rightside);
         buf.append(" KB");
 
@@ -819,12 +821,13 @@ public class DefaultServlet extends HttpServlet {
         String path = getRelativePath(request, true);
 
         if (debug > 0) {
-            if (serveContent)
-                log("DefaultServlet.serveResource:  Serving resource '" +
-                    path + "' headers and data");
-            else
-                log("DefaultServlet.serveResource:  Serving resource '" +
-                    path + "' headers only");
+            if (serveContent) {
+              log("DefaultServlet.serveResource:  Serving resource '" +
+                  path + "' headers and data");
+            } else {
+              log("DefaultServlet.serveResource:  Serving resource '" +
+                  path + "' headers only");
+            }
         }
 
         if (path.length() == 0) {
@@ -969,16 +972,18 @@ public class DefaultServlet extends HttpServlet {
 
             // Set the appropriate output headers
             if (contentType != null) {
-                if (debug > 0)
-                    log("DefaultServlet.serveFile:  contentType='" +
-                        contentType + "'");
+                if (debug > 0) {
+                  log("DefaultServlet.serveFile:  contentType='" +
+                      contentType + "'");
+                }
                 response.setContentType(contentType);
             }
             if ((cacheEntry.resource != null) && (contentLength >= 0)
                     && (!serveContent || ostream != null)) {
-                if (debug > 0)
-                    log("DefaultServlet.serveFile:  contentLength=" +
-                        contentLength);
+                if (debug > 0) {
+                  log("DefaultServlet.serveFile:  contentLength=" +
+                      contentLength);
+                }
                 // Don't set a content length if something else has already
                 // written to the response.
                 if (contentWritten == 0) {
@@ -1011,8 +1016,9 @@ public class DefaultServlet extends HttpServlet {
                     // Silent catch
                 }
                 if (ostream != null) {
-                    if (!checkSendfile(request, response, cacheEntry, contentLength, null))
-                        copy(cacheEntry, renderResult, ostream);
+                    if (!checkSendfile(request, response, cacheEntry, contentLength, null)) {
+                      copy(cacheEntry, renderResult, ostream);
+                    }
                 } else {
                     copy(cacheEntry, renderResult, writer);
                 }
@@ -1020,8 +1026,9 @@ public class DefaultServlet extends HttpServlet {
 
         } else {
 
-            if ((ranges == null) || (ranges.isEmpty()))
-                return;
+            if ((ranges == null) || (ranges.isEmpty())) {
+              return;
+            }
 
             // Partial content response.
 
@@ -1043,9 +1050,10 @@ public class DefaultServlet extends HttpServlet {
                 }
 
                 if (contentType != null) {
-                    if (debug > 0)
-                        log("DefaultServlet.serveFile:  contentType='" +
-                            contentType + "'");
+                    if (debug > 0) {
+                      log("DefaultServlet.serveFile:  contentType='" +
+                          contentType + "'");
+                    }
                     response.setContentType(contentType);
                 }
 
@@ -1056,8 +1064,9 @@ public class DefaultServlet extends HttpServlet {
                         // Silent catch
                     }
                     if (ostream != null) {
-                        if (!checkSendfile(request, response, cacheEntry, range.end - range.start + 1, range))
-                            copy(cacheEntry, ostream, range);
+                        if (!checkSendfile(request, response, cacheEntry, range.end - range.start + 1, range)) {
+                          copy(cacheEntry, ostream, range);
+                        }
                     } else {
                         // we should not get here
                         throw new IllegalStateException();
@@ -1114,8 +1123,9 @@ public class DefaultServlet extends HttpServlet {
         // Retrieving the content-range header (if any is specified
         String rangeHeader = request.getHeader("Content-Range");
 
-        if (rangeHeader == null)
-            return null;
+        if (rangeHeader == null) {
+          return null;
+        }
 
         // bytes is the only range unit supported
         if (!rangeHeader.startsWith("bytes")) {
@@ -1145,7 +1155,7 @@ public class DefaultServlet extends HttpServlet {
             range.end =
                 Long.parseLong(rangeHeader.substring(dashPos + 1, slashPos));
             range.length = Long.parseLong
-                (rangeHeader.substring(slashPos + 1, rangeHeader.length()));
+                (rangeHeader.substring(slashPos + 1));
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return null;
@@ -1193,16 +1203,18 @@ public class DefaultServlet extends HttpServlet {
 
                 // If the ETag the client gave does not match the entity
                 // etag, then the entire entity is returned.
-                if (!eTag.equals(headerValue.trim()))
-                    return FULL;
+                if (!eTag.equals(headerValue.trim())) {
+                  return FULL;
+                }
 
             } else {
 
                 // If the timestamp of the entity the client got is older than
                 // the last modification date of the entity, the entire entity
                 // is returned.
-                if (lastModified > (headerValueTime + 1000))
-                    return FULL;
+                if (lastModified > (headerValueTime + 1000)) {
+                  return FULL;
+                }
 
             }
 
@@ -1273,12 +1285,13 @@ public class DefaultServlet extends HttpServlet {
                 try {
                     currentRange.start = Long.parseLong
                         (rangeDefinition.substring(0, dashPos));
-                    if (dashPos < rangeDefinition.length() - 1)
-                        currentRange.end = Long.parseLong
-                            (rangeDefinition.substring
-                             (dashPos + 1, rangeDefinition.length()));
-                    else
-                        currentRange.end = fileLength - 1;
+                    if (dashPos < rangeDefinition.length() - 1) {
+                      currentRange.end = Long.parseLong
+                          (rangeDefinition.substring
+                           (dashPos + 1));
+                    } else {
+                      currentRange.end = fileLength - 1;
+                    }
                 } catch (NumberFormatException e) {
                     response.addHeader("Content-Range",
                                        "bytes */" + fileLength);
@@ -1371,11 +1384,13 @@ public class DefaultServlet extends HttpServlet {
                 String trimmed = resourceName/*.substring(trim)*/;
                 if (trimmed.equalsIgnoreCase("WEB-INF") ||
                     trimmed.equalsIgnoreCase("META-INF") ||
-                    trimmed.equalsIgnoreCase(localXsltFile))
-                    continue;
+                    trimmed.equalsIgnoreCase(localXsltFile)) {
+                  continue;
+                }
 
-                if ((cacheEntry.name + trimmed).equals(contextXsltFile))
-                    continue;
+                if ((cacheEntry.name + trimmed).equals(contextXsltFile)) {
+                  continue;
+                }
 
                 CacheEntry childCacheEntry =
                     resources.lookupCache(cacheEntry.name + resourceName);
@@ -1403,8 +1418,9 @@ public class DefaultServlet extends HttpServlet {
 
                 sb.append(">");
                 sb.append(RequestUtil.filter(trimmed));
-                if (childCacheEntry.context != null)
-                    sb.append("/");
+                if (childCacheEntry.context != null) {
+                  sb.append("/");
+                }
                 sb.append("</entry>");
 
             }
@@ -1516,11 +1532,13 @@ public class DefaultServlet extends HttpServlet {
             String parent = name.substring(0, slash);
             sb.append(" - <a href=\"");
             sb.append(rewrittenContextPath);
-            if (parent.equals(""))
-                parent = "/";
+            if (parent.equals("")) {
+              parent = "/";
+            }
             sb.append(rewriteUrl(parent));
-            if (!parent.endsWith("/"))
-                sb.append("/");
+            if (!parent.endsWith("/")) {
+              sb.append("/");
+            }
             sb.append("\">");
             sb.append("<b>");
             sb.append(sm.getString("directory.parent", parent));
@@ -1559,8 +1577,9 @@ public class DefaultServlet extends HttpServlet {
                 String resourceName = ncPair.getName();
                 String trimmed = resourceName/*.substring(trim)*/;
                 if (trimmed.equalsIgnoreCase("WEB-INF") ||
-                    trimmed.equalsIgnoreCase("META-INF"))
-                    continue;
+                    trimmed.equalsIgnoreCase("META-INF")) {
+                  continue;
+                }
 
                 CacheEntry childCacheEntry =
                     resources.lookupCache(cacheEntry.name + resourceName);
@@ -1569,8 +1588,9 @@ public class DefaultServlet extends HttpServlet {
                 }
 
                 sb.append("<tr");
-                if (shade)
-                    sb.append(" bgcolor=\"#eeeeee\"");
+                if (shade) {
+                  sb.append(" bgcolor=\"#eeeeee\"");
+                }
                 sb.append(">\r\n");
                 shade = !shade;
 
@@ -1579,19 +1599,22 @@ public class DefaultServlet extends HttpServlet {
                 sb.append(rewrittenContextPath);
                 resourceName = rewriteUrl(name + resourceName);
                 sb.append(resourceName);
-                if (childCacheEntry.context != null)
-                    sb.append("/");
+                if (childCacheEntry.context != null) {
+                  sb.append("/");
+                }
                 sb.append("\"><tt>");
                 sb.append(RequestUtil.filter(trimmed));
-                if (childCacheEntry.context != null)
-                    sb.append("/");
+                if (childCacheEntry.context != null) {
+                  sb.append("/");
+                }
                 sb.append("</tt></a></td>\r\n");
 
                 sb.append("<td align=\"right\"><tt>");
-                if (childCacheEntry.context != null)
-                    sb.append("&nbsp;");
-                else
-                    sb.append(renderSize(childCacheEntry.attributes.getContentLength()));
+                if (childCacheEntry.context != null) {
+                  sb.append("&nbsp;");
+                } else {
+                  sb.append(renderSize(childCacheEntry.attributes.getContentLength()));
+                }
                 sb.append("</tt></td>\r\n");
 
                 sb.append("<td align=\"right\"><tt>");
@@ -1641,8 +1664,9 @@ public class DefaultServlet extends HttpServlet {
 
         long leftSide = size / 1024;
         long rightSide = (size % 1024) / 103;   // Makes 1 digit
-        if ((leftSide == 0) && (rightSide == 0) && (size > 0))
-            rightSide = 1;
+        if ((leftSide == 0) && (rightSide == 0) && (size > 0)) {
+          rightSide = 1;
+        }
 
         return ("" + leftSide + "." + rightSide + " kb");
 
@@ -1725,8 +1749,9 @@ public class DefaultServlet extends HttpServlet {
                     }
                 }
             } catch (NamingException e) {
-                if (debug > 10)
-                    log("localXsltFile '" + localXsltFile + "' not found", e);
+                if (debug > 10) {
+                  log("localXsltFile '" + localXsltFile + "' not found", e);
+                }
             }
         }
 
@@ -1741,8 +1766,9 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
 
-            if (debug > 10)
-                log("contextXsltFile '" + contextXsltFile + "' not found");
+            if (debug > 10) {
+              log("contextXsltFile '" + contextXsltFile + "' not found");
+            }
         }
 
         /*  Open and read in file in one fell swoop to reduce chance
@@ -2130,8 +2156,9 @@ public class DefaultServlet extends HttpServlet {
         istream.close();
 
         // Rethrow any exception that has occurred
-        if (exception != null)
-            throw exception;
+        if (exception != null) {
+          throw exception;
+        }
     }
 
 
@@ -2204,8 +2231,9 @@ public class DefaultServlet extends HttpServlet {
         istream.close();
 
         // Rethrow any exception that has occurred
-        if (exception != null)
-            throw exception;
+        if (exception != null) {
+          throw exception;
+        }
 
     }
 
@@ -2239,8 +2267,9 @@ public class DefaultServlet extends HttpServlet {
                 // Writing MIME header.
                 ostream.println();
                 ostream.println("--" + mimeSeparation);
-                if (contentType != null)
-                    ostream.println("Content-Type: " + contentType);
+                if (contentType != null) {
+                  ostream.println("Content-Type: " + contentType);
+                }
                 ostream.println("Content-Range: bytes " + currentRange.start
                                + "-" + currentRange.end + "/"
                                + currentRange.length);
@@ -2263,8 +2292,9 @@ public class DefaultServlet extends HttpServlet {
         ostream.print("--" + mimeSeparation + "--");
 
         // Rethrow any exception that has occurred
-        if (exception != null)
-            throw exception;
+        if (exception != null) {
+          throw exception;
+        }
 
     }
 
@@ -2288,8 +2318,9 @@ public class DefaultServlet extends HttpServlet {
         while (true) {
             try {
                 len = istream.read(buffer);
-                if (len == -1)
-                    break;
+                if (len == -1) {
+                  break;
+                }
                 ostream.write(buffer, 0, len);
             } catch (IOException e) {
                 exception = e;
@@ -2320,8 +2351,9 @@ public class DefaultServlet extends HttpServlet {
         while (true) {
             try {
                 len = reader.read(buffer);
-                if (len == -1)
-                    break;
+                if (len == -1) {
+                  break;
+                }
                 writer.write(buffer, 0, len);
             } catch (IOException e) {
                 exception = e;
@@ -2349,8 +2381,9 @@ public class DefaultServlet extends HttpServlet {
                                   ServletOutputStream ostream,
                                   long start, long end) {
 
-        if (debug > 10)
-            log("Serving bytes:" + start + "-" + end);
+        if (debug > 10) {
+          log("Serving bytes:" + start + "-" + end);
+        }
 
         long skipped = 0;
         try {
@@ -2382,8 +2415,9 @@ public class DefaultServlet extends HttpServlet {
                 exception = e;
                 len = -1;
             }
-            if (len < buffer.length)
-                break;
+            if (len < buffer.length) {
+              break;
+            }
         }
 
         return exception;
@@ -2403,8 +2437,9 @@ public class DefaultServlet extends HttpServlet {
          * @return true if the range is valid, otherwise false
          */
         public boolean validate() {
-            if (end >= length)
-                end = length - 1;
+            if (end >= length) {
+              end = length - 1;
+            }
             return (start >= 0) && (end >= 0) && (start <= end) && (length > 0);
         }
     }

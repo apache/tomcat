@@ -452,8 +452,9 @@ public class HostConfig
     protected File returnCanonicalPath(String path) {
         File file = new File(path);
         File base = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
-        if (!file.isAbsolute())
-            file = new File(base,path);
+        if (!file.isAbsolute()) {
+          file = new File(base,path);
+        }
         try {
             return file.getCanonicalFile();
         } catch (IOException e) {
@@ -596,8 +597,9 @@ public class HostConfig
         }
         // Deploy expanded folder
         File dir = new File(appBase, baseName);
-        if (dir.exists())
-            deployDirectory(cn, dir);
+        if (dir.exists()) {
+          deployDirectory(cn, dir);
+        }
     }
 
 
@@ -606,8 +608,9 @@ public class HostConfig
      */
     protected void deployDescriptors(File configBase, String[] files) {
 
-        if (files == null)
-            return;
+        if (files == null) {
+          return;
+        }
 
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<Future<?>>();
@@ -618,8 +621,9 @@ public class HostConfig
             if (file.toLowerCase(Locale.ENGLISH).endsWith(".xml")) {
                 ContextName cn = new ContextName(file, true);
 
-                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
-                    continue;
+                if (isServiced(cn.getName()) || deploymentExists(cn.getName())) {
+                  continue;
+                }
 
                 results.add(
                         es.submit(new DeployDescriptor(this, cn, contextXml)));
@@ -803,18 +807,21 @@ public class HostConfig
      */
     protected void deployWARs(File appBase, String[] files) {
 
-        if (files == null)
-            return;
+        if (files == null) {
+          return;
+        }
 
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<Future<?>>();
 
         for (String file : files) {
 
-            if (file.equalsIgnoreCase("META-INF"))
-                continue;
-            if (file.equalsIgnoreCase("WEB-INF"))
-                continue;
+            if (file.equalsIgnoreCase("META-INF")) {
+              continue;
+            }
+            if (file.equalsIgnoreCase("WEB-INF")) {
+              continue;
+            }
             File war = new File(appBase, file);
             if (file.toLowerCase(Locale.ENGLISH).endsWith(".war") &&
                     war.isFile() && !invalidWars.contains(file)) {
@@ -1171,24 +1178,28 @@ public class HostConfig
      */
     protected void deployDirectories(File appBase, String[] files) {
 
-        if (files == null)
-            return;
+        if (files == null) {
+          return;
+        }
 
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<Future<?>>();
 
         for (String file : files) {
 
-            if (file.equalsIgnoreCase("META-INF"))
-                continue;
-            if (file.equalsIgnoreCase("WEB-INF"))
-                continue;
+            if (file.equalsIgnoreCase("META-INF")) {
+              continue;
+            }
+            if (file.equalsIgnoreCase("WEB-INF")) {
+              continue;
+            }
             File dir = new File(appBase, file);
             if (dir.isDirectory()) {
                 ContextName cn = new ContextName(file, false);
 
-                if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
-                    continue;
+                if (isServiced(cn.getName()) || deploymentExists(cn.getName())) {
+                  continue;
+                }
 
                 results.add(es.submit(new DeployDirectory(this, cn, dir)));
             }
@@ -1261,12 +1272,16 @@ public class HostConfig
                         // Don't catch IOE - let the outer try/catch handle it
                     } finally {
                         try {
-                            if (is != null) is.close();
+                            if (is != null) {
+                              is.close();
+                            }
                         } catch (IOException e){
                             // Ignore
                         }
                         try {
-                            if (os != null) os.close();
+                            if (os != null) {
+                              os.close();
+                            }
                         } catch (IOException e){
                             // Ignore
                         }
@@ -1387,15 +1402,17 @@ public class HostConfig
                 if (docBase != null) {
                     resource = new File(docBaseFile, watchedResource);
                 } else {
-                    if (log.isDebugEnabled())
-                        log.debug("Ignoring non-existent WatchedResource '" +
-                                resource.getAbsolutePath() + "'");
+                    if (log.isDebugEnabled()) {
+                      log.debug("Ignoring non-existent WatchedResource '" +
+                              resource.getAbsolutePath() + "'");
+                    }
                     continue;
                 }
             }
-            if (log.isDebugEnabled())
-                log.debug("Watching WatchedResource '" +
-                        resource.getAbsolutePath() + "'");
+            if (log.isDebugEnabled()) {
+              log.debug("Watching WatchedResource '" +
+                      resource.getAbsolutePath() + "'");
+            }
             app.reloadResources.put(resource.getAbsolutePath(),
                     Long.valueOf(resource.lastModified()));
         }
@@ -1451,9 +1468,10 @@ public class HostConfig
                 System.currentTimeMillis() - FILE_MODIFICATION_RESOLUTION_MS;
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
-            if (log.isDebugEnabled())
-                log.debug("Checking context[" + app.name +
-                        "] redeploy resource " + resource);
+            if (log.isDebugEnabled()) {
+              log.debug("Checking context[" + app.name +
+                      "] redeploy resource " + resource);
+            }
             long lastModified =
                     app.redeployResources.get(resources[i]).longValue();
             if (resource.exists() || lastModified == 0) {
@@ -1564,8 +1582,9 @@ public class HostConfig
      *       ignored.
      */
     private void reload(DeployedApplication app, File fileToRemove, String newDocBase) {
-        if(log.isInfoEnabled())
-            log.info(sm.getString("hostConfig.reload", app.name));
+        if(log.isInfoEnabled()) {
+          log.info(sm.getString("hostConfig.reload", app.name));
+        }
         Context context = (Context) host.findChild(app.name);
         if (context.getState().isAvailable()) {
             if (fileToRemove != null && newDocBase != null) {
@@ -1591,8 +1610,9 @@ public class HostConfig
 
 
     private void undeploy(DeployedApplication app) {
-        if (log.isInfoEnabled())
-            log.info(sm.getString("hostConfig.undeploy", app.name));
+        if (log.isInfoEnabled()) {
+          log.info(sm.getString("hostConfig.undeploy", app.name));
+        }
         Container context = host.findChild(app.name);
         try {
             host.removeChild(context);
@@ -1725,8 +1745,9 @@ public class HostConfig
      */
     public void start() {
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("hostConfig.start"));
+        if (log.isDebugEnabled()) {
+          log.debug(sm.getString("hostConfig.start"));
+        }
 
         try {
             ObjectName hostON = host.getObjectName();
@@ -1745,8 +1766,9 @@ public class HostConfig
             host.setAutoDeploy(false);
         }
 
-        if (host.getDeployOnStartup())
-            deployApps();
+        if (host.getDeployOnStartup()) {
+          deployApps();
+        }
 
     }
 
@@ -1756,8 +1778,9 @@ public class HostConfig
      */
     public void stop() {
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("hostConfig.stop"));
+        if (log.isDebugEnabled()) {
+          log.debug(sm.getString("hostConfig.stop"));
+        }
 
         if (oname != null) {
             try {
@@ -1780,8 +1803,9 @@ public class HostConfig
             DeployedApplication[] apps =
                 deployed.values().toArray(new DeployedApplication[0]);
             for (DeployedApplication app : apps) {
-                if (!isServiced(app.name))
-                    checkResources(app, false);
+                if (!isServiced(app.name)) {
+                  checkResources(app, false);
+                }
             }
 
             // Check for old versions of applications that can now be undeployed
@@ -1877,8 +1901,9 @@ public class HostConfig
 
         String contextName = context.getName();
 
-        if (deployed.containsKey(contextName))
-            return;
+        if (deployed.containsKey(contextName)) {
+          return;
+        }
 
         DeployedApplication deployedApp =
                 new DeployedApplication(contextName, false);
