@@ -18,8 +18,9 @@ package org.apache.catalina.realm;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import javax.naming.Context;
 
@@ -28,7 +29,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
-import org.apache.catalina.Wrapper;
 import org.apache.naming.ContextBindings;
 import org.apache.tomcat.util.ExceptionUtils;
 
@@ -112,69 +112,6 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    // --------------------------------------------------------- Public Methods
-
-    /**
-     * Return <code>true</code> if the specified Principal has the specified
-     * security role, within the context of this Realm; otherwise return
-     * <code>false</code>. This implementation returns <code>true</code> if the
-     * <code>User</code> has the role, or if any <code>Group</code> that the
-     * <code>User</code> is a member of has the role.
-     *
-     * @param principal Principal for whom the role is to be checked
-     * @param role Security role to be checked
-     */
-    @Override
-    public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
-
-        UserDatabase database = getUserDatabase();
-        if (database == null) {
-            return false;
-        }
-
-        // Check for a role alias defined in a <security-role-ref> element
-        if (wrapper != null) {
-            String realRole = wrapper.findSecurityReference(role);
-            if (realRole != null) {
-                role = realRole;
-            }
-        }
-        if (principal instanceof GenericPrincipal) {
-            GenericPrincipal gp = (GenericPrincipal) principal;
-            if (gp.getUserPrincipal() instanceof UserDatabasePrincipal) {
-                principal = database.findUser(gp.getName());
-            }
-        }
-        if (!(principal instanceof User)) {
-            // Play nice with SSO and mixed Realms
-            // No need to pass the wrapper here because role mapping has been
-            // performed already a few lines above
-            return super.hasRole(null, principal, role);
-        }
-        if ("*".equals(role)) {
-            return true;
-        } else if (role == null) {
-            return false;
-        }
-        User user = (User) principal;
-        Role dbrole = database.findRole(role);
-        if (dbrole == null) {
-            return false;
-        }
-        if (user.isInRole(dbrole)) {
-            return true;
-        }
-        Iterator<Group> groups = user.getGroups();
-        while (groups.hasNext()) {
-            Group group = groups.next();
-            if (group.isInRole(dbrole)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     // ------------------------------------------------------ Protected Methods
 
     @Override
@@ -221,7 +158,7 @@ public class UserDatabaseRealm extends RealmBase {
             return null;
         }
 
-        List<String> roles = new ArrayList<>();
+        Set<String> roles = new HashSet<>();
         Iterator<Role> uroles = user.getRoles();
         while (uroles.hasNext()) {
             Role role = uroles.next();
@@ -235,9 +172,8 @@ public class UserDatabaseRealm extends RealmBase {
                 Role role = uroles.next();
                 roles.add(role.getName());
             }
-        }
-        return new GenericPrincipal(username, roles,
-                new UserDatabasePrincipal(username));
+		}
+		return new GenericPrincipal(username, new ArrayList<String>(roles));
     }
 
 
@@ -305,17 +241,5 @@ public class UserDatabaseRealm extends RealmBase {
 
         // Release reference to our user database
         database = null;
-    }
-
-
-    private static class UserDatabasePrincipal implements Principal {
-        private final String name;
-        private UserDatabasePrincipal(String name) {
-            this.name = name;
-        }
-        @Override
-        public String getName() {
-            return name;
-        }
     }
 }
