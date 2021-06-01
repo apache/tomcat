@@ -18,8 +18,9 @@ package org.apache.catalina.realm;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import javax.naming.Context;
 
@@ -221,7 +222,7 @@ public class UserDatabaseRealm extends RealmBase {
             return null;
         }
 
-        List<String> roles = new ArrayList<>();
+        Set<String> roles = new HashSet<>();
         Iterator<Role> uroles = user.getRoles();
         while (uroles.hasNext()) {
             Role role = uroles.next();
@@ -236,7 +237,7 @@ public class UserDatabaseRealm extends RealmBase {
                 roles.add(role.getName());
             }
         }
-        return new GenericPrincipal(username, roles,
+        return new GenericPrincipal(username, new ArrayList<String>(roles),
                 new UserDatabasePrincipal(username));
     }
 
