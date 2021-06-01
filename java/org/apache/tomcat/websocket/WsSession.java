@@ -74,7 +74,9 @@ public class WsSession implements Session {
     private static AtomicLong ids = new AtomicLong(0);
 
     static {
-        ServerEndpointConfig.Builder builder = ServerEndpointConfig.Builder.create(null, null);
+        // Use fake end point and path. They are never used, they just need to
+        // be sufficient to pass the validation tests.
+        ServerEndpointConfig.Builder builder = ServerEndpointConfig.Builder.create(Object.class, "/");
         ServerEndpointConfig sec = builder.build();
         SEC_CONFIGURATOR_USES_IMPL_DEFAULT =
                 sec.getConfigurator().getClass().equals(DefaultServerEndpointConfigurator.class);
