@@ -160,6 +160,18 @@
         AprLifecycleListener does not show dev version suffix for libtcnative
         and libapr. (michaelo)
       </fix>
+      <update>
+        <pr>420</pr>: Remove class <code>UserDatabasePrincipal</code> and the
+        <code>hasRole</code> override from class <code>UserDatabaseRealm</code>
+        in order to make the Realm work with cached roles only during a user's
+        login (according to the documentation). Submitted by Carsten Klein.
+        (remm)
+      </update>
+      <fix>
+        Ignore duplicates when collecting the effective roles list from Roles and
+        Groups in <code>UserDatabaseRealm.getPrincipal(String)</code>. Submitted
+        by Carsten Klein. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
