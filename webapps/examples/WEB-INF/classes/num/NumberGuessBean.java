@@ -18,7 +18,6 @@
 /*
  * Originally written by Jason Hunter, http://www.servlets.com.
  */
-
 package num;
 
 import java.io.Serializable;
