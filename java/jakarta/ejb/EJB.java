@@ -27,11 +27,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 
 public @interface EJB {
-   String name() default "";
-   String description() default "";
-   @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
-   Class beanInterface() default java.lang.Object.class;
-   String beanName() default "";
-   String mappedName() default "";
-   String lookup() default "";
+    String name() default "";
+    String description() default "";
+    @SuppressWarnings("rawtypes") // Can't use Class<?> because API needs to match specification
+    Class beanInterface() default java.lang.Object.class;
+    String beanName() default "";
+    String mappedName() default "";
+    String lookup() default "";
 }

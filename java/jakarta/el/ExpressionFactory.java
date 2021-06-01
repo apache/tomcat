@@ -42,8 +42,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public abstract class ExpressionFactory {
 
-    private static final boolean IS_SECURITY_ENABLED =
-        (System.getSecurityManager() != null);
+    private static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
 
     private static final String PROPERTY_NAME = "jakarta.el.ExpressionFactory";
 

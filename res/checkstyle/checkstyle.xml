@@ -78,7 +78,7 @@
     <module name="UnusedImports"/>
 
     <!-- Miscellaneous -->
-    <!-- ~5000 errors
+    <!-- ~5500 errors
     <module name="Indentation">
         <property name="lineWrappingIndentation" value="8"/>
     </module>
