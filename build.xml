@@ -979,7 +979,7 @@
       <classpath refid="compile.classpath" />
     </javac>
     <!-- Copy static resource files -->
-    <copy todir="${tomcat.classes}" encoding="ISO-8859-1">
+    <copy todir="${tomcat.classes}" encoding="UTF-8">
       <filterset refid="version.filters"/>
       <fileset dir="java">
         <include name="**/*.properties"/>
