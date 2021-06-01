@@ -238,6 +238,11 @@
         Update the <code>web-fragment.xml</code> included in
         <code>tomcat-websocket.jar</code>to use the Servlet 5.0 schema. (markt)
       </update>
+      <fix>
+        <bug>65342</bug>: Correct a regression introduced with the fix for
+        <bug>65262</bug> that meant Tomcat's WebSocket implementation would only
+        work with Tomcat's implementation of the Jakarta WebSocket API. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
