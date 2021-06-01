@@ -363,7 +363,7 @@ class Util {
                 throw new MethodNotFoundException(message(
                         null, "util.method.ambiguous", clazz, name,
                         paramString(paramTypes)));
-                }
+            }
         }
 
         // Handle case where no match at all was found
@@ -422,12 +422,11 @@ class Util {
         }
 
         for (Wrapper<T> c : candidates) {
-           if (c.getParameterTypes()[nonMatchIndex] ==
-                   paramTypes[nonMatchIndex]) {
-               // Methods have different non-matching parameters
-               // Result is ambiguous
-               return null;
-           }
+            if (c.getParameterTypes()[nonMatchIndex] == paramTypes[nonMatchIndex]) {
+                // Methods have different non-matching parameters
+                // Result is ambiguous
+                return null;
+            }
         }
 
         // Can't be null
@@ -630,11 +629,8 @@ class Util {
                             parameterTypes[i]);
                 }
                 // Last parameter is the varargs
-                Class<?> varArgClass =
-                    parameterTypes[varArgIndex].getComponentType();
-                final Object varargs = Array.newInstance(
-                    varArgClass,
-                    (paramCount - varArgIndex));
+                Class<?> varArgClass = parameterTypes[varArgIndex].getComponentType();
+                final Object varargs = Array.newInstance(varArgClass, (paramCount - varArgIndex));
                 for (int i = (varArgIndex); i < paramCount; i++) {
                     Array.set(varargs, i - varArgIndex,
                             factory.coerceToType(params[i], varArgClass));
