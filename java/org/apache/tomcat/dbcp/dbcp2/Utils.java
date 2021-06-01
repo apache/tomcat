@@ -15,7 +15,6 @@
  * limitations under the License.
  *
  */
-
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.sql.ResultSet;
