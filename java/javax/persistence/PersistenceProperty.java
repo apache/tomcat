@@ -25,6 +25,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 
 public @interface PersistenceProperty {
-   String name();
-   String value();
+    String name();
+    String value();
 }
