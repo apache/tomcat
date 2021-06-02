@@ -160,6 +160,10 @@
         AprLifecycleListener does not show dev version suffix for libtcnative
         and libapr. (michaelo)
       </fix>
+      <update>
+        Refactor principal handling in <code>UserDatabaseRealm</code> using
+        an inner class that extends <code>GenericPrincipal</code>. (remm)
+      </update>
       <fix>
         Ignore duplicates when collecting the effective roles list from Roles
         and Groups in <code>UserDatabaseRealm.getPrincipal(String)</code>.
