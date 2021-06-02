@@ -17,9 +17,10 @@
 package org.apache.catalina.realm;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import javax.naming.Context;
 
@@ -28,7 +29,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.users.MemoryUserDatabase;
 import org.apache.naming.ContextBindings;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -121,69 +121,6 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    // --------------------------------------------------------- Public Methods
-
-    /**
-     * Return <code>true</code> if the specified Principal has the specified
-     * security role, within the context of this Realm; otherwise return
-     * <code>false</code>. This implementation returns <code>true</code> if the
-     * <code>User</code> has the role, or if any <code>Group</code> that the
-     * <code>User</code> is a member of has the role.
-     *
-     * @param principal Principal for whom the role is to be checked
-     * @param role Security role to be checked
-     */
-    @Override
-    public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
-
-        UserDatabase database = getUserDatabase();
-        if (database == null) {
-            return false;
-        }
-
-        // Check for a role alias defined in a <security-role-ref> element
-        if (wrapper != null) {
-            String realRole = wrapper.findSecurityReference(role);
-            if (realRole != null) {
-                role = realRole;
-            }
-        }
-        if (principal instanceof GenericPrincipal) {
-            GenericPrincipal gp = (GenericPrincipal) principal;
-            if (gp.getUserPrincipal() instanceof User) {
-                principal = gp.getUserPrincipal();
-            }
-        }
-        if (!(principal instanceof User)) {
-            // Play nice with SSO and mixed Realms
-            // No need to pass the wrapper here because role mapping has been
-            // performed already a few lines above
-            return super.hasRole(null, principal, role);
-        }
-        if ("*".equals(role)) {
-            return true;
-        } else if (role == null) {
-            return false;
-        }
-        User user = (User) principal;
-        Role dbrole = database.findRole(role);
-        if (dbrole == null) {
-            return false;
-        }
-        if (user.isInRole(dbrole)) {
-            return true;
-        }
-        Iterator<Group> groups = user.getGroups();
-        while (groups.hasNext()) {
-            Group group = groups.next();
-            if (group.isInRole(dbrole)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     // ------------------------------------------------------ Protected Methods
 
     @Override
@@ -227,32 +164,7 @@ public class UserDatabaseRealm extends RealmBase {
      */
     @Override
     protected Principal getPrincipal(String username) {
-        UserDatabase database = getUserDatabase();
-        if (database == null) {
-            return null;
-        }
-
-        User user = database.findUser(username);
-        if (user == null) {
-            return null;
-        }
-
-        List<String> roles = new ArrayList<>();
-        Iterator<Role> uroles = user.getRoles();
-        while (uroles.hasNext()) {
-            Role role = uroles.next();
-            roles.add(role.getName());
-        }
-        Iterator<Group> groups = user.getGroups();
-        while (groups.hasNext()) {
-            Group group = groups.next();
-            uroles = group.getRoles();
-            while (uroles.hasNext()) {
-                Role role = uroles.next();
-                roles.add(role.getName());
-            }
-        }
-        return new GenericPrincipal(username, user.getPassword(), roles, user);
+        return new UserDatabasePrincipal(username);
     }
 
 
@@ -276,7 +188,9 @@ public class UserDatabaseRealm extends RealmBase {
                         database = (UserDatabase) context.lookup(resourceName);
                     } catch (Throwable e) {
                         ExceptionUtils.handleThrowable(e);
-                        containerLog.error(sm.getString("userDatabaseRealm.lookup", resourceName), e);
+                        if (containerLog != null) {
+                            containerLog.error(sm.getString("userDatabaseRealm.lookup", resourceName), e);
+                        }
                         database = null;
                     }
                 }
@@ -321,4 +235,68 @@ public class UserDatabaseRealm extends RealmBase {
         // Release reference to our user database
         database = null;
     }
+
+
+    public final class UserDatabasePrincipal extends GenericPrincipal {
+        private static final long serialVersionUID = 1L;
+        private final User user;
+
+        public UserDatabasePrincipal(String username) {
+            super(username, null, null);
+            UserDatabase database = getUserDatabase();
+            if (database == null) {
+                user = null;
+            } else {
+                user = database.findUser(username);
+            }
+        }
+
+        @Override
+        public String[] getRoles() {
+            if (user == null) {
+                return super.getRoles();
+            }
+            Set<String> roles = new HashSet<>();
+            Iterator<Role> uroles = user.getRoles();
+            while (uroles.hasNext()) {
+                Role role = uroles.next();
+                roles.add(role.getName());
+            }
+            Iterator<Group> groups = user.getGroups();
+            while (groups.hasNext()) {
+                Group group = groups.next();
+                uroles = group.getRoles();
+                while (uroles.hasNext()) {
+                    Role role = uroles.next();
+                    roles.add(role.getName());
+                }
+            }
+            return roles.toArray(new String[0]);
+        }
+
+        @Override
+        public boolean hasRole(String role) {
+            if ("*".equals(role)) {
+                return true;
+            } else if (role == null) {
+                return false;
+            }
+            UserDatabase database = getUserDatabase();
+            if (user == null || database == null) {
+                return super.hasRole(role);
+            }
+            Role dbrole = database.findRole(role);
+            if (dbrole == null) {
+                return false;
+            }
+            return user.isInRole(dbrole);
+        }
+
+        private Object writeReplace() {
+            // Replace with a static principal disconnected from the database
+            return new GenericPrincipal(getName(), null, Arrays.asList(getRoles()));
+        }
+
+    }
+
 }

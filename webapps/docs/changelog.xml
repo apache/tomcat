@@ -148,6 +148,10 @@
         AprLifecycleListener does not show dev version suffix for libtcnative
         and libapr. (michaelo)
       </fix>
+      <update>
+        Refactor principal handling in <code>UserDatabaseRealm</code> using
+        an inner class that extends <code>GenericPrincipal</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
