@@ -260,13 +260,14 @@ public class UserDatabaseRealm extends RealmBase {
 
         @Override
         public boolean hasRole(String role) {
-            if (user == null) {
-                return super.hasRole(role);
-            }
             if ("*".equals(role)) {
                 return true;
             } else if (role == null) {
                 return false;
+            }
+            UserDatabase database = getUserDatabase();
+            if (user == null || database == null) {
+                return super.hasRole(role);
             }
             Role dbrole = database.findRole(role);
             if (dbrole == null) {
