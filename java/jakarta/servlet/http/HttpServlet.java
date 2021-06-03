@@ -87,10 +87,8 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String HEADER_IFMODSINCE = "If-Modified-Since";
     private static final String HEADER_LASTMOD = "Last-Modified";
 
-    private static final String LSTRING_FILE =
-        "jakarta.servlet.http.LocalStrings";
-    private static final ResourceBundle lStrings =
-        ResourceBundle.getBundle(LSTRING_FILE);
+    private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     private final Object cachedAllowHeaderValueLock = new Object();
     private volatile String cachedAllowHeaderValue = null;
@@ -509,13 +507,9 @@ public abstract class HttpServlet extends GenericServlet {
         Method[] thisMethods = c.getDeclaredMethods();
 
         if ((parentMethods != null) && (parentMethods.length > 0)) {
-            Method[] allMethods =
-                new Method[parentMethods.length + thisMethods.length];
-            System.arraycopy(parentMethods, 0, allMethods, 0,
-                             parentMethods.length);
-            System.arraycopy(thisMethods, 0, allMethods, parentMethods.length,
-                             thisMethods.length);
-
+            Method[] allMethods = new Method[parentMethods.length + thisMethods.length];
+            System.arraycopy(parentMethods, 0, allMethods, 0, parentMethods.length);
+            System.arraycopy(thisMethods, 0, allMethods, parentMethods.length, thisMethods.length);
             thisMethods = allMethods;
         }
 
@@ -602,8 +596,8 @@ public abstract class HttpServlet extends GenericServlet {
         int responseLength;
 
         String CRLF = "\r\n";
-        StringBuilder buffer = new StringBuilder("TRACE ").append(req.getRequestURI())
-            .append(" ").append(req.getProtocol());
+        StringBuilder buffer =
+                new StringBuilder("TRACE ").append(req.getRequestURI()).append(" ").append(req.getProtocol());
 
         Enumeration<String> reqHeaderEnum = req.getHeaderNames();
 
@@ -908,10 +902,8 @@ class NoBodyResponse extends HttpServletResponseWrapper {
 // file private
 class NoBodyOutputStream extends ServletOutputStream {
 
-    private static final String LSTRING_FILE =
-        "jakarta.servlet.http.LocalStrings";
-    private static final ResourceBundle lStrings =
-        ResourceBundle.getBundle(LSTRING_FILE);
+    private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     private final HttpServletResponse response;
     private boolean flushed = false;
