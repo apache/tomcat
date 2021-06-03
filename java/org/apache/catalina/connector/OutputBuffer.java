@@ -545,7 +545,7 @@ public class OutputBuffer extends Writer {
         while (sOff < sEnd) {
             int n = transfer(s, sOff, sEnd - sOff, cb);
             sOff += n;
-            if (isFull(cb)) {
+            if (sOff < sEnd && isFull(cb)) {
                 flushCharBuffer();
             }
         }
@@ -746,7 +746,7 @@ public class OutputBuffer extends Writer {
             int n = transfer(src, off, len, bb);
             len = len - n;
             off = off + n;
-            if (isFull(bb)) {
+            if (len > 0 && isFull(bb)) {
                 flushByteBuffer();
                 appendByteArray(src, off, len);
             }
@@ -798,7 +798,7 @@ public class OutputBuffer extends Writer {
             appendByteBuffer(from);
         } else {
             transfer(from, bb);
-            if (isFull(bb)) {
+            if (from.hasRemaining() && isFull(bb)) {
                 flushByteBuffer();
                 appendByteBuffer(from);
             }
@@ -811,7 +811,7 @@ public class OutputBuffer extends Writer {
         }
 
         int limit = bb.capacity();
-        while (len >= limit) {
+        while (len > limit) {
             realWriteBytes(ByteBuffer.wrap(src, off, limit));
             len = len - limit;
             off = off + limit;
@@ -829,7 +829,7 @@ public class OutputBuffer extends Writer {
 
         int limit = bb.capacity();
         int fromLimit = from.limit();
-        while (from.remaining() >= limit) {
+        while (from.remaining() > limit) {
             from.limit(from.position() + limit);
             realWriteBytes(from.slice());
             from.position(from.limit());

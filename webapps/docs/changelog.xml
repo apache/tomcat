@@ -162,6 +162,14 @@
         <code>1#token</code> to ignore empty elements as per RFC 7230 section 7
         instead of treating the presence of empty elements as an error. (markt)
       </fix>
+      <fix>
+        Expand the unit tests for <code>HttpServlet.doHead()</code> and correct
+        the flushing of the response buffer. The buffer used to behave as if it
+        was one byte smaller than the configured size. The buffer was flushed
+        (and the response committed if required) when the buffer was full. The
+        buffer is now flushed (and the response committed if required) if the
+        buffer is full and there is more data to write. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
