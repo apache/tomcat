@@ -289,7 +289,17 @@ public class UserDatabaseRealm extends RealmBase {
             if (dbrole == null) {
                 return false;
             }
-            return user.isInRole(dbrole);
+            if (user.isInRole(dbrole)) {
+                return true;
+            }
+            Iterator<Group> groups = user.getGroups();
+            while (groups.hasNext()) {
+                Group group = groups.next();
+                if (group.isInRole(dbrole)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private Object writeReplace() {
