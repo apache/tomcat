@@ -800,167 +800,158 @@ public abstract class HttpServlet extends GenericServlet {
             return true;
         }
     }
-}
 
 
-/*
- * A response wrapper for use in (dumb) "HEAD" support.
- * This just swallows that body, counting the bytes in order to set
- * the content length appropriately.  All other methods delegate to the
- * wrapped HTTP Servlet Response object.
- */
-// file private
-class NoBodyResponse extends HttpServletResponseWrapper {
-    private final NoBodyOutputStream noBody;
-    private PrintWriter writer;
-    private boolean didSetContentLength;
+    /*
+     * A response wrapper for use in (dumb) "HEAD" support.
+     * This just swallows that body, counting the bytes in order to set
+     * the content length appropriately.  All other methods delegate to the
+     * wrapped HTTP Servlet Response object.
+     */
+    private static class NoBodyResponse extends HttpServletResponseWrapper {
+        private final NoBodyOutputStream noBody;
+        private PrintWriter writer;
+        private boolean didSetContentLength;
 
-    // file private
-    NoBodyResponse(HttpServletResponse r) {
-        super(r);
-        noBody = new NoBodyOutputStream(this);
-    }
-
-    // file private
-    void setContentLength() {
-        if (!didSetContentLength) {
-            if (writer != null) {
-                writer.flush();
-            }
-            super.setContentLength(noBody.getContentLength());
+        private NoBodyResponse(HttpServletResponse r) {
+            super(r);
+            noBody = new NoBodyOutputStream(this);
         }
-    }
+
+        private void setContentLength() {
+            if (!didSetContentLength) {
+                if (writer != null) {
+                    writer.flush();
+                }
+                super.setContentLength(noBody.getContentLength());
+            }
+        }
 
 
-    // SERVLET RESPONSE interface methods
-
-    @Override
-    public void setContentLength(int len) {
-        super.setContentLength(len);
-        didSetContentLength = true;
-    }
-
-    @Override
-    public void setContentLengthLong(long len) {
-        super.setContentLengthLong(len);
-        didSetContentLength = true;
-    }
-
-    @Override
-    public void setHeader(String name, String value) {
-        super.setHeader(name, value);
-        checkHeader(name);
-    }
-
-    @Override
-    public void addHeader(String name, String value) {
-        super.addHeader(name, value);
-        checkHeader(name);
-    }
-
-    @Override
-    public void setIntHeader(String name, int value) {
-        super.setIntHeader(name, value);
-        checkHeader(name);
-    }
-
-    @Override
-    public void addIntHeader(String name, int value) {
-        super.addIntHeader(name, value);
-        checkHeader(name);
-    }
-
-    private void checkHeader(String name) {
-        if ("content-length".equalsIgnoreCase(name)) {
+        @Override
+        public void setContentLength(int len) {
+            super.setContentLength(len);
             didSetContentLength = true;
         }
-    }
 
-    @Override
-    public ServletOutputStream getOutputStream() throws IOException {
-        return noBody;
-    }
-
-    @Override
-    public PrintWriter getWriter() throws UnsupportedEncodingException {
-
-        if (writer == null) {
-            OutputStreamWriter w;
-
-            w = new OutputStreamWriter(noBody, getCharacterEncoding());
-            writer = new PrintWriter(w);
-        }
-        return writer;
-    }
-}
-
-
-/*
- * Servlet output stream that gobbles up all its data.
- */
-
-// file private
-class NoBodyOutputStream extends ServletOutputStream {
-
-    private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
-    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
-
-    private final HttpServletResponse response;
-    private boolean flushed = false;
-    private int contentLength = 0;
-
-    // file private
-    NoBodyOutputStream(HttpServletResponse response) {
-        this.response = response;
-    }
-
-    // file private
-    int getContentLength() {
-        return contentLength;
-    }
-
-    @Override
-    public void write(int b) throws IOException {
-        contentLength++;
-        checkCommit();
-    }
-
-    @Override
-    public void write(byte buf[], int offset, int len) throws IOException {
-        if (buf == null) {
-            throw new NullPointerException(
-                    lStrings.getString("err.io.nullArray"));
+        @Override
+        public void setContentLengthLong(long len) {
+            super.setContentLengthLong(len);
+            didSetContentLength = true;
         }
 
-        if (offset < 0 || len < 0 || offset+len > buf.length) {
-            String msg = lStrings.getString("err.io.indexOutOfBounds");
-            Object[] msgArgs = new Object[3];
-            msgArgs[0] = Integer.valueOf(offset);
-            msgArgs[1] = Integer.valueOf(len);
-            msgArgs[2] = Integer.valueOf(buf.length);
-            msg = MessageFormat.format(msg, msgArgs);
-            throw new IndexOutOfBoundsException(msg);
+        @Override
+        public void setHeader(String name, String value) {
+            super.setHeader(name, value);
+            checkHeader(name);
         }
 
-        contentLength += len;
-        checkCommit();
+        @Override
+        public void addHeader(String name, String value) {
+            super.addHeader(name, value);
+            checkHeader(name);
+        }
+
+        @Override
+        public void setIntHeader(String name, int value) {
+            super.setIntHeader(name, value);
+            checkHeader(name);
+        }
+
+        @Override
+        public void addIntHeader(String name, int value) {
+            super.addIntHeader(name, value);
+            checkHeader(name);
+        }
+
+        private void checkHeader(String name) {
+            if ("content-length".equalsIgnoreCase(name)) {
+                didSetContentLength = true;
+            }
+        }
+
+        @Override
+        public ServletOutputStream getOutputStream() throws IOException {
+            return noBody;
+        }
+
+        @Override
+        public PrintWriter getWriter() throws UnsupportedEncodingException {
+
+            if (writer == null) {
+                OutputStreamWriter w;
+
+                w = new OutputStreamWriter(noBody, getCharacterEncoding());
+                writer = new PrintWriter(w);
+            }
+            return writer;
+        }
     }
 
-    @Override
-    public boolean isReady() {
-        // TODO SERVLET 3.1
-        return false;
-    }
 
-    @Override
-    public void setWriteListener(jakarta.servlet.WriteListener listener) {
-        // TODO SERVLET 3.1
-    }
+    /*
+     * Servlet output stream that gobbles up all its data.
+     */
+    private static class NoBodyOutputStream extends ServletOutputStream {
 
-    private void checkCommit() throws IOException {
-        if (!flushed && contentLength > response.getBufferSize()) {
-            response.flushBuffer();
-            flushed = true;
+        private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
+        private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
+
+        private final HttpServletResponse response;
+        private boolean flushed = false;
+        private int contentLength = 0;
+
+        private NoBodyOutputStream(HttpServletResponse response) {
+            this.response = response;
+        }
+
+        private int getContentLength() {
+            return contentLength;
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            contentLength++;
+            checkCommit();
+        }
+
+        @Override
+        public void write(byte buf[], int offset, int len) throws IOException {
+            if (buf == null) {
+                throw new NullPointerException(
+                        lStrings.getString("err.io.nullArray"));
+            }
+
+            if (offset < 0 || len < 0 || offset+len > buf.length) {
+                String msg = lStrings.getString("err.io.indexOutOfBounds");
+                Object[] msgArgs = new Object[3];
+                msgArgs[0] = Integer.valueOf(offset);
+                msgArgs[1] = Integer.valueOf(len);
+                msgArgs[2] = Integer.valueOf(buf.length);
+                msg = MessageFormat.format(msg, msgArgs);
+                throw new IndexOutOfBoundsException(msg);
+            }
+
+            contentLength += len;
+            checkCommit();
+        }
+
+        @Override
+        public boolean isReady() {
+            // TODO SERVLET 3.1
+            return false;
+        }
+
+        @Override
+        public void setWriteListener(jakarta.servlet.WriteListener listener) {
+            // TODO SERVLET 3.1
+        }
+
+        private void checkCommit() throws IOException {
+            if (!flushed && contentLength > response.getBufferSize()) {
+                response.flushBuffer();
+                flushed = true;
+            }
         }
     }
 }
