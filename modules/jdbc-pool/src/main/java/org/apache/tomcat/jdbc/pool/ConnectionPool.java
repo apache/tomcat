@@ -977,7 +977,7 @@ public class ConnectionPool {
                     return false;
                 }
             } catch(Exception e) {
-                log.error("Failed to re-connect connection ["+this+"] that expired because of maxAge",e);
+                log.debug("Failed to re-connect connection ["+this+"] that expired because of maxAge",e);
                 return false;
             }
         }
