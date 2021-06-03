@@ -176,6 +176,13 @@
       <update>
         Simplify AprEndpoint socket bind for all platforms. (michaelo)
       </update>
+      <fix>
+        <bug>65340</bug>: Add missing check for a negative return value for
+        <code>Hpack.decodeInteger</code> in the <code>HpackDecoder</code>,
+        which could cause a <code>NegativeArraySizeException</code> exception.
+        Submitted by Thomas, and verified the fix is present in the donated
+        hpack code in a further update. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

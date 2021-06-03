@@ -213,7 +213,7 @@ public class HpackDecoder {
         byte data = buffer.get(buffer.position());
 
         int length = Hpack.decodeInteger(buffer, 7);
-        if (buffer.remaining() < length) {
+        if (buffer.remaining() < length || length == -1) {
             return null;
         }
         boolean huffman = (data & 0b10000000) != 0;
