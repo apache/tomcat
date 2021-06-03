@@ -779,7 +779,7 @@ public abstract class HttpServlet extends GenericServlet {
                 if (writer != null) {
                     writer.flush();
                 }
-                super.setContentLength(noBody.getContentLength());
+                super.setContentLengthLong(noBody.getContentLength());
             }
         }
 
@@ -855,13 +855,13 @@ public abstract class HttpServlet extends GenericServlet {
 
         private final HttpServletResponse response;
         private boolean flushed = false;
-        private int contentLength = 0;
+        private long contentLength = 0;
 
         private NoBodyOutputStream(HttpServletResponse response) {
             this.response = response;
         }
 
-        private int getContentLength() {
+        private long getContentLength() {
             return contentLength;
         }
 

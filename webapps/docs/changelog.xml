@@ -152,6 +152,12 @@
         Refactor principal handling in <code>UserDatabaseRealm</code> using
         an inner class that extends <code>GenericPrincipal</code>. (remm)
       </update>
+      <fix>
+        Enable the default <code>doHead())</code> implementation in
+        <code>HttpServlet</code> to correctly handle responses where the content
+        length needs to be represented as a long since it is larger than the
+        maximum value that can be represented by an int. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
