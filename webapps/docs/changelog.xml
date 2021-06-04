@@ -170,6 +170,10 @@
         length needs to be represented as a long since it is larger than the
         maximum value that can be represented by an int. (markt)
       </fix>
+      <fix>
+        Avoid synchronization on roles verification for the memory
+        <code>UserDatabase</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
