@@ -117,20 +117,24 @@ public class TestHttpServlet extends TomcatBaseTest {
 
 
     @Test
-    public void testChunkingWithHead() throws Exception {
+    public void testHeadWithChunking() throws Exception {
+        doTestHead(new ChunkingServlet());
+    }
+
+
+    private void doTestHead(Servlet servlet) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
         StandardContext ctx = (StandardContext) tomcat.addContext("", null);
 
-        ChunkingServlet s = new ChunkingServlet();
-        Tomcat.addServlet(ctx, "ChunkingServlet", s);
-        ctx.addServletMappingDecoded("/chunking", "ChunkingServlet");
+        Tomcat.addServlet(ctx, "TestServlet", servlet);
+        ctx.addServletMappingDecoded("/test", "TestServlet");
 
         tomcat.start();
 
         Map<String,List<String>> getHeaders = new CaseInsensitiveKeyMap<>();
-        String path = "http://localhost:" + getPort() + "/chunking";
+        String path = "http://localhost:" + getPort() + "/test";
         ByteChunk out = new ByteChunk();
 
         int rc = getUrl(path, out, getHeaders);
