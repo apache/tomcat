@@ -162,6 +162,12 @@
         Avoid synchronization on roles verification for the memory
         <code>UserDatabase</code>. (remm)
       </fix>
+      <fix>
+        Fix the default <code>doHead())</code> implementation in
+        <code>HttpServlet</code> to correctly handle responses where the Servlet
+        calls <code>ServletResponse.reset()</code> and/or
+        <code>ServletResponse.resetBuffer()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

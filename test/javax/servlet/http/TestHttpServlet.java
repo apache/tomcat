@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -119,6 +120,30 @@ public class TestHttpServlet extends TomcatBaseTest {
     @Test
     public void testHeadWithChunking() throws Exception {
         doTestHead(new ChunkingServlet());
+    }
+
+
+    @Test
+    public void testHeadWithResetBufferWriter() throws Exception {
+        doTestHead(new ResetBufferServlet(true));
+    }
+
+
+    @Test
+    public void testHeadWithResetBufferStream() throws Exception {
+        doTestHead(new ResetBufferServlet(false));
+    }
+
+
+    @Test
+    public void testHeadWithResetWriter() throws Exception {
+        doTestHead(new ResetServlet(true));
+    }
+
+
+    @Test
+    public void testHeadWithResetStream() throws Exception {
+        doTestHead(new ResetServlet(false));
     }
 
 
@@ -342,6 +367,72 @@ public class TestHttpServlet extends TomcatBaseTest {
             // Trigger chunking
             pw.write(new char[8192 * 16]);
             pw.println("Data");
+        }
+    }
+
+
+    private static class ResetBufferServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final boolean useWriter;
+
+        public ResetBufferServlet(boolean useWriter) {
+            this.useWriter = useWriter;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            if (useWriter) {
+                PrintWriter pw = resp.getWriter();
+                pw.write(new char[4 * 1024]);
+                resp.resetBuffer();
+                pw.write(new char[4 * 1024]);
+            } else {
+                ServletOutputStream sos = resp.getOutputStream();
+                sos.write(new byte [4 * 1024]);
+                resp.resetBuffer();
+                sos.write(new byte [4 * 1024]);
+            }
+        }
+    }
+
+
+    private static class ResetServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final boolean useWriter;
+
+        public ResetServlet(boolean useWriter) {
+            this.useWriter = useWriter;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            if (useWriter) {
+                PrintWriter pw = resp.getWriter();
+                resp.addHeader("aaa", "bbb");
+                pw.write(new char[4 * 1024]);
+                resp.resetBuffer();
+                resp.addHeader("ccc", "ddd");
+                pw.write(new char[4 * 1024]);
+            } else {
+                ServletOutputStream sos = resp.getOutputStream();
+                resp.addHeader("aaa", "bbb");
+                sos.write(new byte [4 * 1024]);
+                resp.resetBuffer();
+                resp.addHeader("ccc", "ddd");
+                sos.write(new byte [4 * 1024]);
+            }
         }
     }
 
