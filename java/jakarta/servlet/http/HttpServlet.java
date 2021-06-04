@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -810,7 +811,7 @@ public abstract class HttpServlet extends GenericServlet {
      */
     private static class NoBodyResponse extends HttpServletResponseWrapper {
         private final NoBodyOutputStream noBody;
-        private PrintWriter writer;
+        private NoBodyPrintWriter writer;
         private boolean didSetContentLength;
 
         private NoBodyResponse(HttpServletResponse r) {
@@ -823,7 +824,7 @@ public abstract class HttpServlet extends GenericServlet {
                 if (writer != null) {
                     writer.flush();
                 }
-                super.setContentLengthLong(noBody.getContentLength());
+                super.setContentLengthLong(noBody.getWrittenByteCount());
             }
         }
 
@@ -879,12 +880,23 @@ public abstract class HttpServlet extends GenericServlet {
         public PrintWriter getWriter() throws UnsupportedEncodingException {
 
             if (writer == null) {
-                OutputStreamWriter w;
-
-                w = new OutputStreamWriter(noBody, getCharacterEncoding());
-                writer = new PrintWriter(w);
+                writer = new NoBodyPrintWriter(noBody, getCharacterEncoding());
             }
             return writer;
+        }
+
+        @Override
+        public void reset() {
+            super.reset();
+            resetBuffer();
+        }
+
+        @Override
+        public void resetBuffer() {
+            noBody.resetBuffer();
+            if (writer != null) {
+                writer.resetBuffer();
+            }
         }
     }
 
@@ -899,19 +911,19 @@ public abstract class HttpServlet extends GenericServlet {
 
         private final HttpServletResponse response;
         private boolean flushed = false;
-        private long contentLength = 0;
+        private long writtenByteCount = 0;
 
         private NoBodyOutputStream(HttpServletResponse response) {
             this.response = response;
         }
 
-        private long getContentLength() {
-            return contentLength;
+        private long getWrittenByteCount() {
+            return writtenByteCount;
         }
 
         @Override
         public void write(int b) throws IOException {
-            contentLength++;
+            writtenByteCount++;
             checkCommit();
         }
 
@@ -932,7 +944,7 @@ public abstract class HttpServlet extends GenericServlet {
                 throw new IndexOutOfBoundsException(msg);
             }
 
-            contentLength += len;
+            writtenByteCount += len;
             checkCommit();
         }
 
@@ -948,10 +960,184 @@ public abstract class HttpServlet extends GenericServlet {
         }
 
         private void checkCommit() throws IOException {
-            if (!flushed && contentLength > response.getBufferSize()) {
+            if (!flushed && writtenByteCount > response.getBufferSize()) {
                 response.flushBuffer();
                 flushed = true;
             }
+        }
+
+        private void resetBuffer() {
+            if (flushed) {
+                throw new IllegalStateException(lStrings.getString("err.state.commit"));
+            }
+            writtenByteCount = 0;
+        }
+    }
+
+
+    private static class NoBodyPrintWriter extends PrintWriter {
+
+        private final NoBodyOutputStream out;
+        private final String encoding;
+        private PrintWriter pw;
+
+        public NoBodyPrintWriter(NoBodyOutputStream out, String encoding) throws UnsupportedEncodingException {
+            super(out);
+            this.out = out;
+            this.encoding = encoding;
+
+            Writer osw = new OutputStreamWriter(out, encoding);
+            pw = new PrintWriter(osw);
+        }
+
+        private void resetBuffer() {
+            out.resetBuffer();
+
+            Writer osw = null;
+            try {
+                osw = new OutputStreamWriter(out, encoding);
+            } catch (UnsupportedEncodingException e) {
+                // Impossible.
+                // The same values were used in the constructor. If this method
+                // gets called then the constructor must have succeeded so the
+                // above call must also succeed.
+            }
+            pw = new PrintWriter(osw);
+        }
+
+        @Override
+        public void flush() {
+            pw.flush();
+        }
+
+        @Override
+        public void close() {
+            pw.close();
+        }
+
+        @Override
+        public boolean checkError() {
+            return pw.checkError();
+        }
+
+        @Override
+        public void write(int c) {
+            pw.write(c);
+        }
+
+        @Override
+        public void write(char[] buf, int off, int len) {
+            pw.write(buf, off, len);
+        }
+
+        @Override
+        public void write(char[] buf) {
+            pw.write(buf);
+        }
+
+        @Override
+        public void write(String s, int off, int len) {
+            pw.write(s, off, len);
+        }
+
+        @Override
+        public void write(String s) {
+            pw.write(s);
+        }
+
+        @Override
+        public void print(boolean b) {
+            pw.print(b);
+        }
+
+        @Override
+        public void print(char c) {
+            pw.print(c);
+        }
+
+        @Override
+        public void print(int i) {
+            pw.print(i);
+        }
+
+        @Override
+        public void print(long l) {
+            pw.print(l);
+        }
+
+        @Override
+        public void print(float f) {
+            pw.print(f);
+        }
+
+        @Override
+        public void print(double d) {
+            pw.print(d);
+        }
+
+        @Override
+        public void print(char[] s) {
+            pw.print(s);
+        }
+
+        @Override
+        public void print(String s) {
+            pw.print(s);
+        }
+
+        @Override
+        public void print(Object obj) {
+            pw.print(obj);
+        }
+
+        @Override
+        public void println() {
+            pw.println();
+        }
+
+        @Override
+        public void println(boolean x) {
+            pw.println(x);
+        }
+
+        @Override
+        public void println(char x) {
+            pw.println(x);
+        }
+
+        @Override
+        public void println(int x) {
+            pw.println(x);
+        }
+
+        @Override
+        public void println(long x) {
+            pw.println(x);
+        }
+
+        @Override
+        public void println(float x) {
+            pw.println(x);
+        }
+
+        @Override
+        public void println(double x) {
+            pw.println(x);
+        }
+
+        @Override
+        public void println(char[] x) {
+            pw.println(x);
+        }
+
+        @Override
+        public void println(String x) {
+            pw.println(x);
+        }
+
+        @Override
+        public void println(Object x) {
+            pw.println(x);
         }
     }
 }
