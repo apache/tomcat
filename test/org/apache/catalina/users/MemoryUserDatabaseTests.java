@@ -17,8 +17,12 @@
 package org.apache.catalina.users;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -30,6 +34,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.User;
+import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.realm.UserDatabaseRealm;
 
 public class MemoryUserDatabaseTests {
     private static File TEST_FILE = new File(System.getProperty("java.io.tmpdir"), "tomcat-users.xml");
@@ -178,6 +184,26 @@ public class MemoryUserDatabaseTests {
 
         assertPrincipalNames(new String[] { "testrole", "otherrole"}, user.getRoles());
         assertPrincipalNames(new String[] { "testgroup", "othergroup"}, user.getGroups());
+    }
+
+    @Test
+    public void testSerializePrincipal()
+        throws Exception {
+        UserDatabaseRealm realm = new UserDatabaseRealm();
+        User user = db.findUser("admin");
+        GenericPrincipal gpIn = realm.new UserDatabasePrincipal(user);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(gpIn);
+
+        byte[] data = bos.toByteArray();
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        GenericPrincipal gpOut =  (GenericPrincipal) ois.readObject();
+
+        Assert.assertEquals("admin", gpOut.getName());
+        assertPrincipalNames(gpOut.getRoles(), user.getRoles());
     }
 
     private void assertPrincipalNames(String[] expectedNames, Iterator<? extends Principal> i) {

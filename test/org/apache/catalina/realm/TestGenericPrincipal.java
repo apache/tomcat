@@ -56,13 +56,6 @@ public class TestGenericPrincipal {
         doTest(gpIn);
     }
 
-    @Test
-    public void testSerialize04() throws ClassNotFoundException, IOException {
-        UserDatabaseRealm realm = new UserDatabaseRealm();
-        GenericPrincipal gpIn = realm.new UserDatabasePrincipal(USER);
-        doTest(gpIn);
-    }
-
     private void doTest(GenericPrincipal gpIn)
             throws ClassNotFoundException, IOException {
         GenericPrincipal gpOut = serializeAndDeserialize(gpIn);

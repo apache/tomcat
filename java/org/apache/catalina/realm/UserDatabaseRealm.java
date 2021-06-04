@@ -148,7 +148,16 @@ public class UserDatabaseRealm extends RealmBase {
      */
     @Override
     protected Principal getPrincipal(String username) {
-        return new UserDatabasePrincipal(username);
+        UserDatabase database = getUserDatabase();
+        if (database == null) {
+            return null;
+        }
+        User user = database.findUser(username);
+        if (user == null) {
+            return null;
+        } else {
+            return new UserDatabasePrincipal(user);
+        }
     }
 
 
@@ -225,21 +234,13 @@ public class UserDatabaseRealm extends RealmBase {
         private static final long serialVersionUID = 1L;
         private final User user;
 
-        public UserDatabasePrincipal(String username) {
-            super(username);
-            UserDatabase database = getUserDatabase();
-            if (database == null) {
-                user = null;
-            } else {
-                user = database.findUser(username);
-            }
+        public UserDatabasePrincipal(User user) {
+            super(user.getName());
+            this.user = user;
         }
 
         @Override
         public String[] getRoles() {
-            if (user == null) {
-                return super.getRoles();
-            }
             Set<String> roles = new HashSet<>();
             Iterator<Role> uroles = user.getRoles();
             while (uroles.hasNext()) {
@@ -266,7 +267,7 @@ public class UserDatabaseRealm extends RealmBase {
                 return false;
             }
             UserDatabase database = getUserDatabase();
-            if (user == null || database == null) {
+            if (database == null) {
                 return super.hasRole(role);
             }
             Role dbrole = database.findRole(role);
