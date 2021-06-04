@@ -27,13 +27,15 @@ import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
 
+import javax.servlet.AsyncEvent;
+import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-
+import javax.servlet.WriteListener;
 
 /**
  * Provides an abstract class to be subclassed to create
@@ -110,7 +112,7 @@ public abstract class HttpServlet extends GenericServlet {
      * response, only the request header fields.
      *
      * <p>When overriding this method, read the request data,
-     * write the response headers, get the response's writer or
+     * write the response headers, get the response's noBodyWriter or
      * output stream object, and finally, write the response data.
      * It's best to include content type and encoding. When using
      * a <code>PrintWriter</code> object to return the response,
@@ -237,7 +239,11 @@ public abstract class HttpServlet extends GenericServlet {
         } else {
             NoBodyResponse response = new NoBodyResponse(resp);
             doGet(req, response);
-            response.setContentLength();
+            if (req.isAsyncStarted()) {
+                req.getAsyncContext().addListener(new NoBodyAsyncContextListener(response));
+            } else {
+                response.setContentLength();
+            }
         }
     }
 
@@ -252,7 +258,7 @@ public abstract class HttpServlet extends GenericServlet {
      * credit card numbers.
      *
      * <p>When overriding this method, read the request data,
-     * write the response headers, get the response's writer or output
+     * write the response headers, get the response's noBodyWriter or output
      * stream object, and finally, write the response data. It's best
      * to include content type and encoding. When using a
      * <code>PrintWriter</code> object to return the response, set the
@@ -766,21 +772,22 @@ public abstract class HttpServlet extends GenericServlet {
      * wrapped HTTP Servlet Response object.
      */
     private static class NoBodyResponse extends HttpServletResponseWrapper {
-        private final NoBodyOutputStream noBody;
-        private NoBodyPrintWriter writer;
+        private final NoBodyOutputStream noBodyOutputStream;
+        private ServletOutputStream originalOutputStream;
+        private NoBodyPrintWriter noBodyWriter;
         private boolean didSetContentLength;
 
         private NoBodyResponse(HttpServletResponse r) {
             super(r);
-            noBody = new NoBodyOutputStream(this);
+            noBodyOutputStream = new NoBodyOutputStream(this);
         }
 
         private void setContentLength() {
             if (!didSetContentLength) {
-                if (writer != null) {
-                    writer.flush();
+                if (noBodyWriter != null) {
+                    noBodyWriter.flush();
                 }
-                super.setContentLengthLong(noBody.getWrittenByteCount());
+                super.setContentLengthLong(noBodyOutputStream.getWrittenByteCount());
             }
         }
 
@@ -829,29 +836,31 @@ public abstract class HttpServlet extends GenericServlet {
 
         @Override
         public ServletOutputStream getOutputStream() throws IOException {
-            return noBody;
+            originalOutputStream = getResponse().getOutputStream();
+            return noBodyOutputStream;
         }
 
         @Override
         public PrintWriter getWriter() throws UnsupportedEncodingException {
 
-            if (writer == null) {
-                writer = new NoBodyPrintWriter(noBody, getCharacterEncoding());
+            if (noBodyWriter == null) {
+                noBodyWriter = new NoBodyPrintWriter(noBodyOutputStream, getCharacterEncoding());
             }
-            return writer;
+            return noBodyWriter;
         }
 
         @Override
         public void reset() {
             super.reset();
             resetBuffer();
+            originalOutputStream = null;
         }
 
         @Override
         public void resetBuffer() {
-            noBody.resetBuffer();
-            if (writer != null) {
-                writer.resetBuffer();
+            noBodyOutputStream.resetBuffer();
+            if (noBodyWriter != null) {
+                noBodyWriter.resetBuffer();
             }
         }
     }
@@ -865,11 +874,11 @@ public abstract class HttpServlet extends GenericServlet {
         private static final String LSTRING_FILE = "javax.servlet.http.LocalStrings";
         private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
-        private final HttpServletResponse response;
+        private final NoBodyResponse response;
         private boolean flushed = false;
         private long writtenByteCount = 0;
 
-        private NoBodyOutputStream(HttpServletResponse response) {
+        private NoBodyOutputStream(NoBodyResponse response) {
             this.response = response;
         }
 
@@ -906,13 +915,13 @@ public abstract class HttpServlet extends GenericServlet {
 
         @Override
         public boolean isReady() {
-            // TODO SERVLET 3.1
-            return false;
+            // Will always be ready as data is swallowed.
+            return true;
         }
 
         @Override
-        public void setWriteListener(javax.servlet.WriteListener listener) {
-            // TODO SERVLET 3.1
+        public void setWriteListener(WriteListener listener) {
+            response.originalOutputStream.setWriteListener(listener);
         }
 
         private void checkCommit() throws IOException {
@@ -931,6 +940,13 @@ public abstract class HttpServlet extends GenericServlet {
     }
 
 
+    /*
+     * On reset() and resetBuffer() need to clear the data buffered in the
+     * OutputStreamWriter. No easy way to do that so NoBodyPrintWriter wraps a
+     * PrintWriter than can be thrown away on reset()/resetBuffer() and a new
+     * one constructed while the application retains a reference to the
+     * NoBodyPrintWriter instance.
+     */
     private static class NoBodyPrintWriter extends PrintWriter {
 
         private final NoBodyOutputStream out;
@@ -1094,6 +1110,40 @@ public abstract class HttpServlet extends GenericServlet {
         @Override
         public void println(Object x) {
             pw.println(x);
+        }
+    }
+
+
+    /*
+     * Calls NoBodyResponse.setContentLength() once the async request is
+     * complete.
+     */
+    private static class NoBodyAsyncContextListener implements AsyncListener {
+
+        private final NoBodyResponse noBodyResponse;
+
+        public NoBodyAsyncContextListener(NoBodyResponse noBodyResponse) {
+            this.noBodyResponse = noBodyResponse;
+        }
+
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            noBodyResponse.setContentLength();
+        }
+
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            // NO-OP
         }
     }
 }
