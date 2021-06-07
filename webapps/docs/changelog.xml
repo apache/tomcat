@@ -204,6 +204,9 @@
         Submitted by Thomas, and verified the fix is present in the donated
         hpack code in a further update. (remm)
       </fix>
+      <add>
+        Add debug logging for HTTP/2 HPACK header decoding. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
