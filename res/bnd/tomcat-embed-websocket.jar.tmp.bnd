@@ -41,6 +41,18 @@ Provide-Capability: \
     Implementation-Version=1.1.${websocket.revision};\
     Implementation-Vendor='Apache Software Foundation'
 
+Require-Capability: \
+    osgi.extender;\
+        filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=javax.websocket.ContainerProvider)";\
+        osgi.serviceloader="javax.websocket.ContainerProvider",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=javax.websocket.server.ServerEndpointConfig$Configurator)";\
+        osgi.serviceloader="javax.websocket.server.ServerEndpointConfig$Configurator",\
+    osgi.ee;\
+        filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+
 -jpms-module-info: \
     ${module.name};\
         access=32;\
