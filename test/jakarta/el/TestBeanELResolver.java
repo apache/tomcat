@@ -593,9 +593,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    // Ambiguous because the Strings coerce to both Boolean and Integer hence
-    // both varargs methods match.
-    @Test(expected=MethodNotFoundException.class)
+    @Test
     public void testInvokeVarargsCoerce13() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -628,9 +626,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    // Ambiguous because the Strings coerce to both Boolean and Integer hence
-    // both varargs methods match.
-    @Test(expected=MethodNotFoundException.class)
+    @Test
     public void testInvokeVarargsCoerce16() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());

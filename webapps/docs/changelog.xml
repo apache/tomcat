@@ -209,6 +209,12 @@
         Update JspC to generate <code>web.xml</code> and
         <code>web-fragment.xml</code> files using Servlet 5.0 schemas. (markt)
       </fix>
+      <fix>
+        <bug>65358</bug>: Improve expression language method matching for
+        methods with varargs. Where multiple methods may match the provided
+        parameters, the method that requires the fewest varargs is preferred.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
