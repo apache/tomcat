@@ -244,6 +244,12 @@
         <code>MethodExpression.getParmetersProvided()</code> from the EL API to
         align with the current EL 5.0 development branch. (markt)
       </scode>
+      <fix>
+        <bug>65358</bug>: Improve expression language method matching for
+        methods with varargs. Where multiple methods may match the provided
+        parameters, the method that requires the fewest varargs is preferred.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
