@@ -253,6 +253,12 @@
       <add>
         Improvements to Korean translations. (woonsan)
       </add>
+      <fix>
+        <bug>65362</bug>: Correct a regression in the previous release. The
+        change to create OSGi <code>Require-Capability</code> sections in
+        manifests for Jakarta API JARs manually rather bnd annotations did not
+        add the necessary manual entries to the embedded JARs. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
