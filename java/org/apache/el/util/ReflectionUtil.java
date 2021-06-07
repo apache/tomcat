@@ -191,19 +191,22 @@ public class ReflectionUtil {
             int exactMatch = 0;
             int assignableMatch = 0;
             int coercibleMatch = 0;
+            int varArgsMatch = 0;
             boolean noMatch = false;
             for (int i = 0; i < mParamCount; i++) {
                 // Can't be null
                 if (m.isVarArgs() && i == (mParamCount - 1)) {
                     if (i == paramCount || (paramValues != null && paramValues.length == i)) {
-                        // Nothing is passed as varargs
-                        assignableMatch++;
+                        // Var args defined but nothing is passed as varargs
+                        // Use MAX_VALUE so this matches only if nothing else does
+                        varArgsMatch = Integer.MAX_VALUE;
                         break;
                     }
                     Class<?> varType = mParamTypes[i].getComponentType();
                     for (int j = i; j < paramCount; j++) {
                         if (isAssignableFrom(paramTypes[j], varType)) {
                             assignableMatch++;
+                            varArgsMatch++;
                         } else {
                             if (paramValues == null) {
                                 noMatch = true;
@@ -211,6 +214,7 @@ public class ReflectionUtil {
                             } else {
                                 if (isCoercibleFrom(ctx, paramValues[j], varType)) {
                                     coercibleMatch++;
+                                    varArgsMatch++;
                                 } else {
                                     noMatch = true;
                                     break;
@@ -246,18 +250,17 @@ public class ReflectionUtil {
             }
 
             // If a method is found where every parameter matches exactly,
-            // return it
-            if (exactMatch == paramCount) {
+            // and no vars args are present, return it
+            if (exactMatch == paramCount && varArgsMatch == 0) {
                 return getMethod(base.getClass(), base, m);
             }
 
-            candidates.put(m, new MatchResult(
-                    exactMatch, assignableMatch, coercibleMatch, m.isBridge()));
+            candidates.put(m, new MatchResult(exactMatch, assignableMatch, coercibleMatch, varArgsMatch, m.isBridge()));
         }
 
         // Look for the method that has the highest number of parameters where
         // the type matches exactly
-        MatchResult bestMatch = new MatchResult(0, 0, 0, false);
+        MatchResult bestMatch = new MatchResult(0, 0, 0, 0, false);
         Method match = null;
         boolean multiple = false;
         for (Map.Entry<Method, MatchResult> entry : candidates.entrySet()) {
@@ -511,12 +514,14 @@ public class ReflectionUtil {
         private final int exact;
         private final int assignable;
         private final int coercible;
+        private final int varArgs;
         private final boolean bridge;
 
-        public MatchResult(int exact, int assignable, int coercible, boolean bridge) {
+        public MatchResult(int exact, int assignable, int coercible, int varArgs, boolean bridge) {
             this.exact = exact;
             this.assignable = assignable;
             this.coercible = coercible;
+            this.varArgs = varArgs;
             this.bridge = bridge;
         }
 
@@ -532,6 +537,10 @@ public class ReflectionUtil {
             return coercible;
         }
 
+        public int getVarArgs() {
+            return varArgs;
+        }
+
         public boolean isBridge() {
             return bridge;
         }
@@ -544,11 +553,15 @@ public class ReflectionUtil {
                 if (cmp == 0) {
                     cmp = Integer.compare(this.getCoercible(), o.getCoercible());
                     if (cmp == 0) {
-                        // The nature of bridge methods is such that it actually
-                        // doesn't matter which one we pick as long as we pick
-                        // one. That said, pick the 'right' one (the non-bridge
-                        // one) anyway.
-                        cmp = Boolean.compare(o.isBridge(), this.isBridge());
+                        // Fewer var args matches are better
+                        cmp = Integer.compare(o.getVarArgs(), this.getVarArgs());
+                        if (cmp == 0) {
+                            // The nature of bridge methods is such that it actually
+                            // doesn't matter which one we pick as long as we pick
+                            // one. That said, pick the 'right' one (the non-bridge
+                            // one) anyway.
+                            cmp = Boolean.compare(o.isBridge(), this.isBridge());
+                        }
                     }
                 }
             }
@@ -556,27 +569,26 @@ public class ReflectionUtil {
         }
 
         @Override
-        public boolean equals(Object o)
-        {
-            return o == this
-                    || (null != o
-                    && this.getClass().equals(o.getClass())
-                    && ((MatchResult)o).getExact() == this.getExact()
-                    && ((MatchResult)o).getAssignable() == this.getAssignable()
-                    && ((MatchResult)o).getCoercible() == this.getCoercible()
-                    && ((MatchResult)o).isBridge() == this.isBridge()
-                    )
-                    ;
+        public boolean equals(Object o) {
+            return o == this || (null != o &&
+                    this.getClass().equals(o.getClass()) &&
+                    ((MatchResult)o).getExact() == this.getExact() &&
+                    ((MatchResult)o).getAssignable() == this.getAssignable() &&
+                    ((MatchResult)o).getCoercible() == this.getCoercible() &&
+                    ((MatchResult)o).getVarArgs() == this.getVarArgs() &&
+                    ((MatchResult)o).isBridge() == this.isBridge());
         }
 
         @Override
-        public int hashCode()
-        {
-            return (this.isBridge() ? 1 << 24 : 0)
-                    ^ this.getExact() << 16
-                    ^ this.getAssignable() << 8
-                    ^ this.getCoercible()
-                    ;
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + assignable;
+            result = prime * result + (bridge ? 1231 : 1237);
+            result = prime * result + coercible;
+            result = prime * result + exact;
+            result = prime * result + varArgs;
+            return result;
         }
     }
 }

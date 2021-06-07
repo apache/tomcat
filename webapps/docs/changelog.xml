@@ -209,6 +209,12 @@
         Refactor use of internal <code>ChildInfo</code> class to use compile
         time type checking rather than run time type checking. (markt)
       </scode>
+      <fix>
+        <bug>65358</bug>: Improve expression language method matching for
+        methods with varargs. Where multiple methods may match the provided
+        parameters, the method that requires the fewest varargs is preferred.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
