@@ -295,7 +295,7 @@
       </fix>
       <update>
         Update the <code>web-fragment.xml</code> included in
-        <code>tomcat-websocket.jar</code>to use the Servlet 5.0 schema. (markt)
+        <code>tomcat-websocket.jar</code> to use the Servlet 5.0 schema. (markt)
       </update>
       <fix>
         <bug>65342</bug>: Correct a regression introduced with the fix for
