@@ -84,7 +84,8 @@ public class TokenList {
             }
 
             if (fieldName.length() == 0) {
-                // No more data to read
+                // Unexpected EOF. Should have been a token.
+                invalid = true;
                 break;
             }
 
