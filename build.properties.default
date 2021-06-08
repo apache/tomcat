@@ -27,7 +27,7 @@ version.major=9
 version.minor=0
 version.build=47
 version.patch=0
-version.suffix=-dev
+version.suffix=
 
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds
