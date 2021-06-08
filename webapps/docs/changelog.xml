@@ -207,6 +207,12 @@
       <add>
         Add debug logging for HTTP/2 HPACK header decoding. (markt)
       </add>
+      <fix>
+        Correct parsing of HTTP headers consisting of a list of tokens so that a
+        header with an empty token is treated consistently regardless of whether
+        the empty token is at the start, middle or end of the list of tokens.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
