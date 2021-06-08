@@ -50,9 +50,14 @@ grant codeBase "file:${java.home}/lib/ext/-" {
         permission java.security.AllPermission;
 };
 
+// This permission is required when using javac to compile JSPs on Java 9
+// onwards
+//grant codeBase "jrt:/jdk.compiler" {
+//        permission java.security.AllPermission;
+//};
+
 
 // ========== CATALINA CODE PERMISSIONS =======================================
-
 
 // These permissions apply to the daemon code
 grant codeBase "file:${catalina.home}/bin/commons-daemon.jar" {
