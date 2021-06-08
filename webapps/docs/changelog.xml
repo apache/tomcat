@@ -297,6 +297,10 @@
         manifests for Jakarta API JARs manually rather bnd annotations did not
         add the necessary manual entries to the embedded JARs. (markt)
       </fix>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.30. Also
+        update the minimum recommended version to 1.2.30. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
