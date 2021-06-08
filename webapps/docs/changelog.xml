@@ -108,7 +108,7 @@
   <subsection name="General">
     <changelog>
       <scode>
-        This release contains all of the changes upto and including those in
+        This release contains all of the changes up to and including those in
         Apache Tomcat 10.0.6 plus the additional changes listed below. (markt)
       </scode>
       <scode>
