@@ -31,8 +31,8 @@ version.suffix=-dev
 
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds
-#2021-05-08T15:00:00Z
-#ant.tstamp.now=1620482400
+#2021-06-08T12:00:00Z
+#ant.tstamp.now=1623153600
 
 # ----- Source control flags -----
 git.branch=9.0.x
