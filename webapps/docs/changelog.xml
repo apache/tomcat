@@ -230,6 +230,13 @@
         parameters, the method that requires the fewest varargs is preferred.
         (markt)
       </fix>
+      <add>
+        <bug>65332</bug>: Add a commented out section in
+        <code>catalina.policy</code> that provides the necessary permissions to
+        compile JSPs with javac when running on Java 9 onwards with a security
+        manager. It is commented out as it will cause errors if used with
+        earlier Java versions. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
