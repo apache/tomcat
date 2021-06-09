@@ -284,6 +284,10 @@
         Update the packaged version of the Tomcat Native Library to 1.2.30. Also
         update the minimum recommended version to 1.2.30. (markt)
       </update>
+      <add>
+        Use JSign to integrate the build script with the code signing service to
+        enable release builds to be created on Linux as well as Windows. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
