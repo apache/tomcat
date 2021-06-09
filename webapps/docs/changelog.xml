@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Use JSign to integrate the build script with the code signing service to
+        enable release builds to be created on Linux as well as Windows. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.47 (remm)" rtext="not released">
   <subsection name="Catalina">

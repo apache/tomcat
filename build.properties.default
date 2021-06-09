@@ -77,9 +77,11 @@ org.apache.tomcat.util.net.NioSelectorShared=true
 gpg.exec=/path/to/gpg
 
 # Code signing of Windows installer
+# See https://infra.apache.org/digicert-use.html for setup instructions
 do.codesigning=false
-codesigning.exec=signtool.exe
-codesigning.certificate.thumbprint=5a606116432aba614c246d15e792f9e4bcf19cbf
+codesigning.pkcs11properties=${user.home}/.digicertone/pkcs11properties.cfg
+codesigning.alias=Tomcat-PMC-key-2021-04
+codesigning.digest=SHA-512
 
 # ----- Settings to use when downloading files -----
 trydownload.httpusecaches=true
@@ -311,3 +313,15 @@ osgi-annotations.checksum.value=153054f987534244f95a399539b11375|b6e802bceba0682
 osgi-annotations.home=${base.path}/osgi-annotations-${osgi-annotations.version}
 osgi-annotations.jar=${osgi-annotations.home}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar
 osgi-annotations.loc=${base-maven.loc}/org/osgi/org.osgi.annotation.bundle/${osgi-annotations.version}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar
+
+# ----- JSign, version 3.1 or later -----
+jsign.version=3.1
+
+# checksums for JSign 3.1
+jsign.checksum.enable=true
+jsign.checksum.algorithm=MD5|SHA-1
+jsign.checksum.value=ed924fc86b7abe1dfe22fd8fd7e4c417|5736035f64805b2760a41ebc1ff11523f666f2c7
+
+jsign.home=${base.path}/jsign-${jsign.version}
+jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
+jsign.loc=${base-maven.loc}/net/jsign/jsign/${jsign.version}/jsign-${jsign.version}.jar
