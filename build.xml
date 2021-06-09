@@ -2622,18 +2622,15 @@ skip.installer property in build.properties" />
   </target>
 
   <target name="-installer-sign-uninstaller"
-      unless="skip.installer" depends="-installer-create-uninstaller"
+      unless="skip.installer" depends="-installer-create-uninstaller,setup-jsign"
       if="${do.codesigning}">
-    <exec executable="${codesigning.exec}" failonerror="true">
-      <arg value="sign"/>
-      <arg value="/sha1"/>
-      <arg value="${codesigning.certificate.thumbprint}"/>
-      <arg value="/fd"/>
-      <arg value="sha512"/>
-      <arg value="/tr"/>
-      <arg value="http://timestamp.digicert.com"/>
-      <arg value="${tomcat.dist}/Uninstall.exe"/>
-    </exec>
+    <jsign file="${tomcat.dist}/Uninstall.exe"
+        keystore="${codesigning.pkcs11properties}"
+        storepass="NONE"
+        storetype="PKCS11"
+        alias="${codesigning.alias}"
+        alg="${codesigning.digest}"
+        tsaurl="http://timestamp.digicert.com"/>
   </target>
 
   <target name="-installer" unless="skip.installer"
@@ -2655,17 +2652,14 @@ skip.installer property in build.properties" />
 
   <target name="installer-sign"
       description="Builds and optionally signs the Windows installer"
-      depends="-installer" if="${do.codesigning}" >
-    <exec executable="${codesigning.exec}" failonerror="true">
-      <arg value="sign"/>
-      <arg value="/sha1"/>
-      <arg value="${codesigning.certificate.thumbprint}"/>
-      <arg value="/fd"/>
-      <arg value="sha512"/>
-      <arg value="/tr"/>
-      <arg value="http://timestamp.digicert.com"/>
-      <arg value="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
-    </exec>
+      depends="-installer,setup-jsign" if="${do.codesigning}" >
+    <jsign file="${tomcat.release}/v${version}/bin/${final.name}.exe"
+        keystore="${codesigning.pkcs11properties}"
+        storepass="NONE"
+        storetype="PKCS11"
+        alias="${codesigning.alias}"
+        alg="${codesigning.digest}"
+        tsaurl="http://timestamp.digicert.com"/>
     <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
@@ -3716,6 +3710,27 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
 
 
   <!-- ======================= Macros, Taskdefs etc ======================== -->
+
+  <target name="download-jsign" >
+    <!-- Download jsign -->
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${jsign.loc}"/>
+      <param name="destfile" value="${jsign.jar}"/>
+      <param name="destdir" value="${jsign.home}"/>
+      <param name="checksum.enabled" value="${jsign.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${jsign.checksum.algorithm}"/>
+      <param name="checksum.value" value="${jsign.checksum.value}"/>
+    </antcall>
+  </target>
+
+  <target name="setup-jsign" depends="download-jsign">
+    <!-- Add jsign tasks to project -->
+    <path id="jsign.classpath">
+      <fileset file="${jsign.jar}" />
+    </path>
+
+    <taskdef name="jsign" classname="net.jsign.JsignTask" classpathref="jsign.classpath" />
+  </target>
 
   <target name="download-bnd" >
     <!-- Download bnd -->
