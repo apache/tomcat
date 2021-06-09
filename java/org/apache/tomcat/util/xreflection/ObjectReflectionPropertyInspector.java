@@ -105,7 +105,6 @@ public final class ObjectReflectionPropertyInspector {
                         Class.forName("org.apache.tomcat.util.net.AprEndpoint"),
                         Class.forName("org.apache.tomcat.util.net.Nio2Endpoint"),
                         Class.forName("org.apache.tomcat.util.net.NioEndpoint"),
-                        Class.forName("org.apache.tomcat.util.net.NioSelectorPool"),
                         Class.forName("org.apache.tomcat.util.net.SocketProperties")
                     )
                 )
