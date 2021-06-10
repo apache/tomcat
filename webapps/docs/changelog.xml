@@ -108,6 +108,11 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>65368</bug>: Improve handling of clean closes of inbound TLS
+        connections. Treat them the same way as clean closes of non-TLS
+        connections rather than as unknown errors. (markt)
+      </fix>
+      <fix>
         Modify the HTTP/2 connector not to sent small updates for stream flow
         control windows to the user agent as, depending on how the user agent is
         written, this may trigger small writes from the user agent that in turn
