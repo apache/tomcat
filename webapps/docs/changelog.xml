@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M2 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>65368</bug>: Improve handling of clean closes of inbound TLS
+        connections. Treat them the same way as clean closes of non-TLS
+        connections rather than as unknown errors. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
