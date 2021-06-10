@@ -651,6 +651,14 @@ public class SecureNioChannel extends NioChannel {
                                 sm.getString("channel.nio.ssl.unwrapFailResize", unwrap.getStatus()));
                     }
                 }
+            } else if (unwrap.getStatus() == Status.CLOSED && netInBuffer.position() == 0 && read > 0) {
+                // Clean TLS close on input side but there is application data
+                // to process. Can't tell if the client closed the connection
+                // mid-request or if the client is performing a half-close after
+                // a complete request. Assume it is a half-close and allow
+                // processing to continue. If the connection has been closed
+                // mid-request then the next attempt to read will trigger an
+                // EOF.
             } else {
                 // Something else went wrong
                 throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
