@@ -120,6 +120,12 @@
         Use JSign to integrate the build script with the code signing service to
         enable release builds to be created on Linux as well as Windows. (markt)
       </add>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.23. (remm)
+      </update>
+      <update>
+        Update the CXF module to Apache CXF 3.4.4. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
