@@ -294,15 +294,16 @@ findbugs.home=${base.path}/spotbugs-${findbugs.version}
 findbugs.jar=${findbugs.home}/lib/spotbugs-ant.jar
 findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/spotbugs-${findbugs.version}.tgz
 
-# ----- JSign, version 2.1 -----
-# JSign 3.0 onwards required Java 8 so use 2.1
-jsign.version=2.1
+# ----- JSign, version 3.1 -----
+# JSign 3.0 onwards requires Java 8 by default
+# Use Java 7 build
+jsign.version=3.1
 
-# checksums for JSign 2.1
+# checksums for JSign 3.1
 jsign.checksum.enable=true
-jsign.checksum.algorithm=MD5|SHA-1
-jsign.checksum.value=3bfcdc43b6e3d6438af6907b79f2ae3a|473378d211a1ecd28400503f3c2556963da0e626
+jsign.checksum.algorithm=SHA-512
+jsign.checksum.value=481a6e7276688363106ee3492da52807577822b8114b13804df796cd143f479a50d0864215f63b9bb8120a85b2f6185b2845974872d11ff070407dd01879bb0e
 
-jsign.home=${base.path}/jsign-${jsign.version}
-jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
-jsign.loc=${base-maven.loc}/net/jsign/jsign/${jsign.version}/jsign-${jsign.version}.jar
+jsign.home=${base.path}/jsign-${jsign.version}-java7
+jsign.jar=${jsign.home}/jsign-${jsign.version}-java7.jar
+jsign.loc=https://github.com/ebourg/jsign/releases/download/${jsign.version}/jsign-${jsign.version}-java7.jar
