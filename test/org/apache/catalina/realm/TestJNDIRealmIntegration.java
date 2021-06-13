@@ -85,6 +85,9 @@ public class TestJNDIRealmIntegration {
                 "t=", "test", new String[] {"Test<Group*2", "Test>Group*3"}, userRoleAttribute });
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
                 "norole", "test", new String[0], userRoleAttribute });
+        // Bug 65373
+        parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
+                "<>+=\"#;,rrr", "<>+=\"#;,rrr", new String[0], userRoleAttribute });
     }
 
 
@@ -277,6 +280,18 @@ public class TestJNDIRealmIntegration {
                     "cn: TestGroup4",
                     "member: cn=testsub,ou=s\\;ub,ou=people,dc=example,dc=com");
             result = conn.processOperation(addGroupTest4);
+            Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
+
+            // Bug 65373
+            AddRequest addUserBug65373 = new AddRequest(
+                    "dn: cn=\\3C\\3E\\2B=\\22#\\3B\\2Crrr,ou=people,dc=example,dc=com",
+                    "objectClass: top",
+                    "objectClass: person",
+                    "objectClass: organizationalPerson",
+                    "cn: <>+=\"#;,rrr",
+                    "sn: Bug 65373",
+                    "userPassword: <>+=\"#;,rrr");
+            result = conn.processOperation(addUserBug65373);
             Assert.assertEquals(ResultCode.SUCCESS, result.getResultCode());
         }
     }
