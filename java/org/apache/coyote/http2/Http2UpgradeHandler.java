@@ -865,7 +865,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             do {
                 synchronized (this) {
                     if (!stream.canWrite()) {
-                        stream.doStreamCancel(sm.getString("upgradeHandler.stream.notWritable"), Http2Error.STREAM_CLOSED);
+                        stream.doStreamCancel(sm.getString("upgradeHandler.stream.notWritable",
+                                stream.getConnectionId(), stream.getIdAsString()), Http2Error.STREAM_CLOSED);
                     }
                     long windowSize = getWindowSize();
                     if (windowSize < 1 || backLogSize > 0) {
