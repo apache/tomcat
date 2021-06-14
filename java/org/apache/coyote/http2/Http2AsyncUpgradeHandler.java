@@ -231,22 +231,32 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     @Override
     void writeWindowUpdate(AbstractNonZeroStream stream, int increment, boolean applicationInitiated)
             throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.windowUpdateConnection",
+                    getConnectionId(), Integer.valueOf(increment)));
+        }
         // Build window update frame for stream 0
         byte[] frame = new byte[13];
         ByteUtil.setThreeBytes(frame, 0,  4);
         frame[3] = FrameType.WINDOW_UPDATE.getIdByte();
         ByteUtil.set31Bits(frame, 9, increment);
         // No need to send update from closed stream
-        if  (stream instanceof Stream && ((Stream) stream).canWrite()) {
-            // Change stream Id
-            byte[] frame2 = new byte[13];
-            ByteUtil.setThreeBytes(frame2, 0,  4);
-            frame2[3] = FrameType.WINDOW_UPDATE.getIdByte();
-            ByteUtil.set31Bits(frame2, 9, increment);
-            ByteUtil.set31Bits(frame2, 5, stream.getIdAsInt());
-            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
-                    ByteBuffer.wrap(frame), ByteBuffer.wrap(frame2));
+        if (stream instanceof Stream && ((Stream) stream).canWrite()) {
+            int streamIncrement = ((Stream) stream).getWindowUpdateSizeToWrite(increment);
+            if (streamIncrement > 0) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.windowUpdateStream",
+                            getConnectionId(), getIdAsString(), Integer.valueOf(streamIncrement)));
+                }
+                byte[] frame2 = new byte[13];
+                ByteUtil.setThreeBytes(frame2, 0,  4);
+                frame2[3] = FrameType.WINDOW_UPDATE.getIdByte();
+                ByteUtil.set31Bits(frame2, 9, streamIncrement);
+                ByteUtil.set31Bits(frame2, 5, stream.getIdAsInt());
+                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
+                        TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
+                        ByteBuffer.wrap(frame), ByteBuffer.wrap(frame2));
+            }
         } else {
             socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                     TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
