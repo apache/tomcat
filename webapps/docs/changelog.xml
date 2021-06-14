@@ -112,6 +112,16 @@
         connections. Treat them the same way as clean closes of non-TLS
         connections rather than as unknown errors. (markt)
       </fix>
+      <fix>
+        Modify the HTTP/2 connector not to sent small updates for stream flow
+        control windows to the user agent as, depending on how the user agent is
+        written, this may trigger small writes from the user agent that in turn
+        trigger the overhead protection. Small updates for stream flow control
+        windows are now combined with subsequent flow control window updates for
+        that stream to ensure that all stream flow control window updates sent
+        from Tomcat are larger than <code>overheadWindowUpdateThreshold</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
