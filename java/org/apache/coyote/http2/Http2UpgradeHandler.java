@@ -1400,7 +1400,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Http2Protocol.DEFAULT_OVERHEAD_REDUCTION_FACTOR. A simple browser
         // request is likely to have one non-overhead frame (HEADERS) and one
         // overhead frame (REPRIORITISE). With the default settings the overhead
-        // count will reduce by 1 for each simple request.
+        // count will reduce by 10 for each simple request.
         // Requests and responses with bodies will create additional
         // non-overhead frames, further reducing the overhead count.
         updateOverheadCount(frameType, Http2Protocol.DEFAULT_OVERHEAD_REDUCTION_FACTOR);
@@ -1410,10 +1410,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private void increaseOverheadCount(FrameType frameType) {
         // An overhead frame increases the overhead count by
         // overheadCountFactor. By default, this means an overhead frame
-        // increases the overhead count by 1. A simple browser request is
+        // increases the overhead count by 10. A simple browser request is
         // likely to have one non-overhead frame (HEADERS) and one overhead
         // frame (REPRIORITISE). With the default settings the overhead count
-        // will reduce by 1 for each simple request.
+        // will reduce by 10 for each simple request.
         updateOverheadCount(frameType, getProtocol().getOverheadCountFactor());
     }
 
