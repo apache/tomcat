@@ -82,6 +82,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private volatile StringBuilder cookieHeader = null;
 
+    private Object pendingWindowUpdateForStreamLock = new Object();
+    private int pendingWindowUpdateForStream = 0;
+
 
     Stream(Integer identifier, Http2UpgradeHandler handler) {
         this(identifier, handler, null);
@@ -741,6 +744,27 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     StreamException getResetException() {
         return streamOutputBuffer.reset;
+    }
+
+
+    int getWindowUpdateSizeToWrite(int increment) {
+        int result;
+        int threshold = handler.getProtocol().getOverheadWindowUpdateThreshold();
+        synchronized (pendingWindowUpdateForStreamLock) {
+            if (increment > threshold) {
+                result = increment + pendingWindowUpdateForStream;
+                pendingWindowUpdateForStream = 0;
+            } else {
+                pendingWindowUpdateForStream += increment;
+                if (pendingWindowUpdateForStream > threshold) {
+                    result = pendingWindowUpdateForStream;
+                    pendingWindowUpdateForStream = 0;
+                } else {
+                    result = 0;
+                }
+            }
+        }
+        return result;
     }
 
 
