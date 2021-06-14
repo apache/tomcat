@@ -141,6 +141,14 @@
         opens 10 overhead frames in a row will be required to trigger the
         overhead protection. (markt)
       </update>
+      <update>
+        Increase the default <code>overheadCountFactor</code> from
+        <code>1</code> to <code>10</code> and change the reduction in overhead
+        count for a non-overhead frame from <code>-2</code> to <code>-20</code>.
+        This allows for a larger range (0-20) to be used for
+        <code>overheadCountFactor</code> providing for finer-grained control.
+        (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
