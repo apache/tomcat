@@ -134,6 +134,13 @@
         1. This means that, over time, the overhead count for a well-behaved
         connection will trend downwards. (markt)
       </update>
+      <update>
+        Change the initial HTTP/2 overhead count from <code>-10</code> to
+        <code>-10 * overheadCountFactor</code>. This means that, regardless of
+        the value chosen for <code>overheadCountFactor</code>, when a connection
+        opens 10 overhead frames in a row will be required to trigger the
+        overhead protection. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
