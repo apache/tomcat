@@ -156,7 +156,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
 
     // Track 'overhead' frames vs 'request/response' frames
-    private final AtomicLong overheadCount = new AtomicLong(-10);
+    private final AtomicLong overheadCount;
     private volatile int lastNonFinalDataPayload;
     private volatile int lastWindowUpdate;
 
@@ -166,6 +166,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         this.protocol = protocol;
         this.adapter = adapter;
         this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
+
+        // Defaults to -10 * the count factor.
+        // i.e. when the connection opens, 10 'overhead' frames in a row will
+        // cause the connection to be closed.
+        // Over time the count should be a slowly decreasing negative number.
+        // Therefore, the longer a connection is 'well-behaved', the greater
+        // tolerance it will have for a period of 'bad' behaviour.
+        overheadCount = new AtomicLong(-10 * protocol.getOverheadCountFactor());
 
         lastNonFinalDataPayload = protocol.getOverheadDataThreshold() * 2;
         lastWindowUpdate = protocol.getOverheadWindowUpdateThreshold() * 2;
