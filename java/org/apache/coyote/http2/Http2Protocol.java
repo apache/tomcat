@@ -65,6 +65,9 @@ public class Http2Protocol implements UpgradeProtocol {
     static final int DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION = 20;
 
     static final int DEFAULT_OVERHEAD_COUNT_FACTOR = 1;
+    // Not currently configurable. This makes the practical limit for
+    // overheadCountFactor to be 2.
+    static final int DEFAULT_OVERHEAD_REDUCTION_FACTOR = -1;
     static final int DEFAULT_OVERHEAD_CONTINUATION_THRESHOLD = 1024;
     static final int DEFAULT_OVERHEAD_DATA_THRESHOLD = 1024;
     static final int DEFAULT_OVERHEAD_WINDOW_UPDATE_THRESHOLD = 1024;

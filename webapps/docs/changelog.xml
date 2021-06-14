@@ -117,6 +117,11 @@
         from Tomcat are larger than <code>overheadWindowUpdateThreshold</code>.
         (markt)
       </fix>
+      <add>
+        Add additional debug logging to track the current state of the HTTP/2
+        overhead count that Tomcat uses to detect and close potentially
+        malicious connections. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
