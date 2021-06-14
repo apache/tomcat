@@ -219,7 +219,7 @@
     <attribute name="overheadCountFactor" required="false">
       <p>The factor to apply when counting overhead frames to determine if a
       connection has too high an overhead and should be closed. The overhead
-      count starts at <code>-10</code>. The count is decreased for each
+      count starts at <code>-10</code>. The count is decreased by 2 for each
       data frame sent or received and each headers frame received. The count is
       increased by the <code>overheadCountFactor</code>for each setting
       received, priority frame received and ping received. If the overhead count

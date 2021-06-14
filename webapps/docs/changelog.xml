@@ -127,6 +127,13 @@
         overhead count that Tomcat uses to detect and close potentially
         malicious connections. (markt)
       </add>
+      <update>
+        Many HTTP/2 requests from browsers will trigger one overhead frame and
+        one non-overhead frame. Change the overhead calculation so that a
+        non-overhead frame reduces the current overhead count by 2 rather than
+        1. This means that, over time, the overhead count for a well-behaved
+        connection will trend downwards. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
