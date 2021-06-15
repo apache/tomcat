@@ -35,6 +35,9 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
     public void testDataFrame() throws Exception {
         http2Connect();
 
+        // Disable overhead protection for window update as it breaks the test
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+
         sendSimplePostRequest(3, null);
         readSimplePostResponse(false);
 
@@ -56,6 +59,10 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         LogManager.getLogManager().getLogger("org.apache.tomcat.util.net").setLevel(Level.ALL);
         try {
             http2Connect();
+
+            // Disable overhead protection for window update as it breaks the
+            // test
+            http2Protocol.setOverheadWindowUpdateThreshold(0);
 
             byte[] padding = new byte[8];
 
@@ -158,6 +165,9 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
     @Test
     public void testDataFrameWithZeroLengthPadding() throws Exception {
         http2Connect();
+
+        // Disable overhead protection for window update as it breaks the test
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
 
         byte[] padding = new byte[0];
 

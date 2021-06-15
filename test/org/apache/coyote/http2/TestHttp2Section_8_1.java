@@ -54,6 +54,9 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
             http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
         }
 
+        // Disable overhead protection for window update as it breaks some tests
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
         byte[] dataFrameHeader = new byte[9];
@@ -134,6 +137,9 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         // that a 100 Continue response is received. The unit tests for
         // Request verify that the various policies are implemented.
         http2Connect();
+
+        // Disable overhead protection for window update as it breaks some tests
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
 
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
