@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -625,8 +626,7 @@ public class RemoteIpValve extends ValveBase {
         if (isInternal || (trustedProxies != null &&
                 trustedProxies.matcher(originalRemoteAddr).matches())) {
             String remoteIp = null;
-            // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
-            LinkedList<String> proxiesHeaderValue = new LinkedList<>();
+            Deque<String> proxiesHeaderValue = new LinkedList<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
 
             for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
