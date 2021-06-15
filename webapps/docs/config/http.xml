@@ -568,14 +568,6 @@
       used.</p>
     </attribute>
 
-    <attribute name="noCompressionStrongETag" required="false">
-      <p>This flag configures whether resources with a strong ETag will be
-      considered for compression. If <code>true</code>, resources with a strong
-      ETag will not be compressed. The default value is <code>true</code>.</p>
-      <p>This attribute is deprecated. It will be removed in Tomcat 10 onwards
-      where it will be hard-coded to <code>true</code>.</p>
-    </attribute>
-
     <attribute name="noCompressionUserAgents" required="false">
       <p>The value is a regular expression (using <code>java.util.regex</code>)
       matching the <code>user-agent</code> header of HTTP clients for which
