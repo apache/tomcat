@@ -152,6 +152,9 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
     public void testWindowSizeAndSettingsFrame() throws Exception {
         http2Connect();
 
+        // Disable overhead protection for window update as it breaks the test
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
+
         // Set up a POST request that echoes the body back
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
