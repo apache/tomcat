@@ -474,6 +474,8 @@ public class TestHttp2Limits extends Http2TestBase {
         http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
         http2Protocol.setMaxTrailerCount(maxTrailerCount);
         http2Protocol.setMaxTrailerSize(maxTrailerSize);
+        // Disable overhead protection for window update as it breaks some tests
+        http2Protocol.setOverheadWindowUpdateThreshold(0);
 
         configureAndStartWebApplication();
         openClientConnection();
