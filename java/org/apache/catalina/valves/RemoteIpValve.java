@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletException;
@@ -374,32 +372,6 @@ public class RemoteIpValve extends ValveBase {
     protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
         return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0] : commaSeparatedValuesPattern
             .split(commaDelimitedStrings);
-    }
-
-    /**
-     * Convert an array of strings in a comma delimited string
-     * @param stringList The string list to convert
-     * @return The concatenated string
-     *
-     * @deprecated Unused. This will be removed in Tomcat 10.1.x onwards.
-     *             Use {@link StringUtils#join(java.util.Collection)} instead
-     */
-    @Deprecated
-    protected static String listToCommaDelimitedString(List<String> stringList) {
-        if (stringList == null) {
-            return "";
-        }
-        StringBuilder result = new StringBuilder();
-        for (Iterator<String> it = stringList.iterator(); it.hasNext();) {
-            Object element = it.next();
-            if (element != null) {
-                result.append(element);
-                if (it.hasNext()) {
-                    result.append(", ");
-                }
-            }
-        }
-        return result.toString();
     }
 
     private String hostHeader = null;
