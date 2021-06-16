@@ -157,6 +157,11 @@
         <code>overheadCountFactor</code> providing for finer-grained control.
         (markt)
       </update>
+      <fix>
+        Modify the parsing of HTTP header values that use the
+        <code>1#token</code> to ignore empty elements as per RFC 7230 section 7
+        instead of treating the presence of empty elements as an error. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
