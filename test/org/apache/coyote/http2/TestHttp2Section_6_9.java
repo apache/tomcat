@@ -193,6 +193,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         Assert.assertEquals(
                 "3-HeadersStart\n" +
                 "3-Header-[:status]-[200]\n" +
+                "3-Header-[content-length]-[8192]\n" +
                 "3-Header-[date]-["+ DEFAULT_DATE + "]\n" +
                 "3-HeadersEnd\n" +
                 "3-Body-4096\n", output.getTrace());
