@@ -184,6 +184,12 @@
       <update>
         Update the CXF module to Apache CXF 3.4.4. (remm)
       </update>
+      <fix>
+        <bug>65369</bug> / <pr>422</pr>: Add the additional
+        <code>--add-opens=...</code> options required for running Tomcat on Java
+        16 onwards to the <code>service.bat</code> script to align it with the
+        other start-up scripts. PR provided by MCMicS. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
