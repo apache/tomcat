@@ -197,7 +197,7 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary(",Host, Foo, Bar", expected, false);
+        doTestVary(",Host, Foo, Bar", expected, true);
     }
 
 
@@ -207,7 +207,7 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary("Host, Foo,,Bar", expected, false);
+        doTestVary("Host, Foo,,Bar", expected, true);
     }
 
 
@@ -217,6 +217,6 @@ public class TestTokenList {
         expected.add("bar");
         expected.add("foo");
         expected.add("host");
-        doTestVary("Host, Foo, Bar,", expected, false);
+        doTestVary("Host, Foo, Bar,", expected, true);
     }
 }
