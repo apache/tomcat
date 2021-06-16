@@ -168,7 +168,7 @@
         was one byte smaller than the configured size. The buffer was flushed
         (and the response committed if required) when the buffer was full. The
         buffer is now flushed (and the response committed if required) if the
-        buffer is full and there is more data to write. (markt) 
+        buffer is full and there is more data to write. (markt)
       </fix>
     </changelog>
   </subsection>
