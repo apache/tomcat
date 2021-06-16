@@ -180,6 +180,12 @@
         Update to the Java 7 compatible build of JSign 3.1 to pick up a fix for
         SHA-512 signatures. (markt)
       </update>
+      <fix>
+        <bug>65369</bug> / <pr>422</pr>: Add the additional
+        <code>--add-opens=...</code> options required for running Tomcat on Java
+        16 onwards to the <code>service.bat</code> script to align it with the
+        other start-up scripts. PR provided by MCMicS. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
