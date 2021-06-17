@@ -1025,12 +1025,16 @@ public abstract class SocketWrapperBase<E> {
                 }
                 if (complete) {
                     boolean notify = false;
-                    state.semaphore.release();
                     if (state.read) {
                         readOperation = null;
                     } else {
                         writeOperation = null;
                     }
+                    // Semaphore must be released after [read|write]Operation is cleared
+                    // to ensure that the next thread to hold the semaphore hasn't
+                    // written a new value to [read|write]Operation by the time it is
+                    // cleared.
+                    state.semaphore.release();
                     if (state.block == BlockingMode.BLOCK && currentState != CompletionState.INLINE) {
                         notify = true;
                     } else {
@@ -1066,12 +1070,16 @@ public abstract class SocketWrapperBase<E> {
             }
             setError(ioe);
             boolean notify = false;
-            state.semaphore.release();
             if (state.read) {
                 readOperation = null;
             } else {
                 writeOperation = null;
             }
+            // Semaphore must be released after [read|write]Operation is cleared
+            // to ensure that the next thread to hold the semaphore hasn't
+            // written a new value to [read|write]Operation by the time it is
+            // cleared.
+            state.semaphore.release();
             if (state.block == BlockingMode.BLOCK) {
                 notify = true;
             } else {
