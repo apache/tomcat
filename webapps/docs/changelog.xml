@@ -172,6 +172,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>65385</bug>: Correct the link in the documentation web application
+        the Maven Central repository. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.68 (schultz)" rtext="2021-06-15">
   <subsection name="Other">
