@@ -170,6 +170,11 @@
         buffer is now flushed (and the response committed if required) if the
         buffer is full and there is more data to write. (markt)
       </fix>
+      <fix>
+        Fix an issue where concurrent HTTP/2 writes (or concurrent reads) to the
+        same connection could hang and eventually timeout when async IO was
+        enabled (it is enabled by default). (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
