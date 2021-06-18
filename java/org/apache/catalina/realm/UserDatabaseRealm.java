@@ -291,11 +291,15 @@ public class UserDatabaseRealm extends RealmBase {
         if (user == null) {
             return null;
         } else {
+<<<<<<< Upstream, based on origin/main
             if (useStaticPrincipal) {
                 return new GenericPrincipal(username, Arrays.asList(getRoles(user)));
             } else {
                 return new UserDatabasePrincipal(user, database);
             }
+=======
+            return new UserDatabasePrincipal(user);
+>>>>>>> 5aac520 Adjust to latest version in main branch
         }
     }
 
@@ -391,17 +395,28 @@ public class UserDatabaseRealm extends RealmBase {
 
     public static final class UserDatabasePrincipal extends GenericPrincipal {
         private static final long serialVersionUID = 1L;
+<<<<<<< Upstream, based on origin/main
         private final transient UserDatabase database;
         private final List<String> userAttributesList;
+=======
+        private final User user;
+>>>>>>> 5aac520 Adjust to latest version in main branch
 
+<<<<<<< Upstream, based on origin/main
         public UserDatabasePrincipal(User user, UserDatabase database) {
             super(user.getName());
             this.database = database;
             userAttributesList = UserDatabaseRealm.this.getUserAttributesList();
+=======
+        public UserDatabasePrincipal(User user) {
+            super(user.getName());
+            this.user = user;
+>>>>>>> 5aac520 Adjust to latest version in main branch
         }
 
         @Override
         public String[] getRoles() {
+<<<<<<< Upstream, based on origin/main
             if (database == null) {
                 return new String[0];
             }
@@ -409,6 +424,8 @@ public class UserDatabaseRealm extends RealmBase {
             if (user == null) {
                 return new String[0];
             }
+=======
+>>>>>>> 5aac520 Adjust to latest version in main branch
             Set<String> roles = new HashSet<>();
             Iterator<Role> uroles = user.getRoles();
             while (uroles.hasNext()) {
@@ -434,6 +451,10 @@ public class UserDatabaseRealm extends RealmBase {
             } else if (role == null) {
                 return false;
             }
+<<<<<<< Upstream, based on origin/main
+=======
+            UserDatabase database = getUserDatabase();
+>>>>>>> 5aac520 Adjust to latest version in main branch
             if (database == null) {
                 return super.hasRole(role);
             }
@@ -460,6 +481,7 @@ public class UserDatabaseRealm extends RealmBase {
 
         @Override
         public Object getAttribute(String name) {
+            List<String> userAttributesList = getUserAttributesList();
             if (userAttributesList == null || !userAttributesList.contains(name)) {
                 // Return only requested attributes 
                 return null;
@@ -514,7 +536,7 @@ public class UserDatabaseRealm extends RealmBase {
 
         @Override
         public Enumeration<String> getAttributeNames() {
-            return Collections.enumeration(userAttributesList);
+            return Collections.enumeration(getUserAttributesList());
         }
 
         /**
@@ -531,6 +553,7 @@ public class UserDatabaseRealm extends RealmBase {
         }
 
         private Map<String, Object> getUserAttributesMap() {
+            List<String> userAttributesList = getUserAttributesList();
             if (userAttributesList == null) {
                 return null;
             }
