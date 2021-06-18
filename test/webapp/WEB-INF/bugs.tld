@@ -85,8 +85,8 @@
     <body-content>JSP</body-content>
   </tag>
   <tag>
-    <name>TryCatchFinallyTag</name>
-    <tag-class>org.apache.jasper.compiler.TestGenerator$TryCatchFinallyTag</tag-class>
+    <name>TryCatchFinallyBodyTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TryCatchFinallyBodyTag</tag-class>
     <body-content>JSP</body-content>
   </tag>
   <tag>
