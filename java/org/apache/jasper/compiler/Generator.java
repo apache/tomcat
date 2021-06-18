@@ -3322,6 +3322,10 @@ class Generator {
             boolean tmpIsFragment = isFragment;
             isFragment = true;
             String pushBodyCountVarSave = pushBodyCountVar;
+            if (pushBodyCountVar != null) {
+                // Use a fixed name for push body count, to simplify code gen
+                pushBodyCountVar = "_jspx_push_body_count";
+            }
             visitBody(n);
             out = outSave;
             parent = tmpParent;
