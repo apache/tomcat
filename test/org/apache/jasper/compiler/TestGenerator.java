@@ -434,6 +434,11 @@ public class TestGenerator extends TomcatBaseTest {
         Assert.assertNotEquals(ids[0], ids[1]);
     }
 
+    @Test
+    public void testTryCtachFinally02 () throws Exception {
+        doTestJsp("try-catch-finally-02.jsp");
+    }
+
     public static class JspIdTag extends TagSupport implements JspIdConsumer {
 
         private static final long serialVersionUID = 1L;
@@ -456,7 +461,7 @@ public class TestGenerator extends TomcatBaseTest {
         }
     }
 
-    public static class TryCatchFinallyTag extends BodyTagSupport implements TryCatchFinally {
+    public static class TryCatchFinallyBodyTag extends BodyTagSupport implements TryCatchFinally {
 
         private static final long serialVersionUID = 1L;
 
@@ -469,6 +474,21 @@ public class TestGenerator extends TomcatBaseTest {
             }
             return super.doStartTag();
         }
+
+        @Override
+        public void doCatch(Throwable t) throws Throwable {
+            // NO-OP
+        }
+
+        @Override
+        public void doFinally() {
+            // NO-OP
+        }
+    }
+
+    public static class TryCatchFinallyTag extends TagSupport implements TryCatchFinally {
+
+        private static final long serialVersionUID = 1L;
 
         @Override
         public void doCatch(Throwable t) throws Throwable {
@@ -820,7 +840,7 @@ public class TestGenerator extends TomcatBaseTest {
 
     @Test
     public void testCustomTag01() throws Exception {
-        doTestJsp("try-catch-finally.jsp");
+        doTestJsp("try-catch-finally-01.jsp");
     }
 
     @Test
