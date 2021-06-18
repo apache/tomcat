@@ -17,6 +17,7 @@
 package org.apache.catalina;
 
 import java.security.Principal;
+import java.util.Enumeration;
 
 import org.ietf.jgss.GSSCredential;
 
@@ -47,4 +48,58 @@ public interface TomcatPrincipal extends Principal {
      *                   exception to LoginContext
      */
     void logout() throws Exception;
+
+    /**
+     * Returns the value of the named attribute as an <code>Object</code>, or
+     * <code>null</code> if no attribute of the given name exists. May also
+     * return <code>null</code>, if the named attribute exists but cannot be
+     * returned in a way that ensures that changes made to the returned object
+     * are not reflected by objects returned by subsequent calls to this method.
+     * <p>
+     * Only the servlet container may set attributes to make available custom
+     * information about a Principal or the user it represents. For example,
+     * some of the Realm implementations can be configured to additionally query
+     * user attributes from the <i>user database</i>, which then are provided
+     * through the Principal's attributes map.
+     * <p>
+     * In order to keep the attributes map <i>immutable</i>, the objects
+     * returned by this method should always be <i>defensive copies</i> of the
+     * objects contained in the attributes map. Any changes applied to these
+     * objects must not be reflected by objects returned by subsequent calls to
+     * this method. If that cannot be guaranteed (e. g. there is no way to copy
+     * the object), the object's string representation (or even
+     * <code>null</code>) shall be returned.
+     * <p>
+     * Attribute names and naming conventions are maintained by the Tomcat
+     * components that contribute to this map, like some of the Realm
+     * implementations.
+     *
+     * @param name a <code>String</code> specifying the name of the attribute
+     * @return an <code>Object</code> containing the value of the attribute, or
+     *         <code>null</code> if the attribute does not exist, or the
+     *         object's string representation or <code>null</code> if its value
+     *         cannot be copied in order to keep the attributes immutable
+     */
+    Object getAttribute(String name);
+
+    /**
+     * Returns an <code>Enumeration</code> containing the names of the
+     * attributes available to this Principal. This method returns an empty
+     * <code>Enumeration</code> if the Principal has no attributes available to
+     * it.
+     *
+     * @return an <code>Enumeration</code> of strings containing the names of
+     *         the Principal's attributes
+     */
+    Enumeration<String> getAttributeNames();
+
+    /**
+     * Determines whether attribute names are case-insensitive. May be
+     * <code>true</code> if using <em>JNDIRealm</em> and then, depends on the
+     * configured directory server.
+     * 
+     * @return <code>true</code>, if attribute names are case-insensitive;
+     *         <code>false</code> otherwise
+     */
+    boolean isAttributesCaseIgnored();
 }

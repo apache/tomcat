@@ -15,6 +15,8 @@
   limitations under the License.
 --%>
 <%@ page import="java.util.Enumeration" %>
+<%@ page import="java.security.Principal" %>
+<%@ page import="org.apache.catalina.TomcatPrincipal" %>
 <%
   if (request.getParameter("logoff") != null) {
     session.invalidate();
@@ -71,6 +73,45 @@ enter it here:
 <input type="text" name="role" value="<%= util.HTMLFilter.filter(role) %>">
 <input type="submit" >
 </form>
+<br><br>
+
+<%
+  Principal p = request.getUserPrincipal();
+  if (!(p instanceof TomcatPrincipal)) {
+%>
+<p>The principal does not support attributes.</p>
+<%
+  } else {
+    TomcatPrincipal principal = (TomcatPrincipal) p;
+    boolean ignoreCase = principal.isAttributesCaseIgnored();
+%>
+<p>The principal contains the following attributes:</p>
+<table>
+<tr><th>Name <small>(case-<%= ignoreCase ? "in": "" %>sensitive)</small></th><th>Value</th><th>Type</th></tr>
+<%
+    Enumeration<String> names = principal.getAttributeNames();
+    while (names.hasMoreElements()) {
+      String name = names.nextElement();
+      Object value = principal.getAttribute(name);
+      String type = value != null ? value.getClass().getName() : "null";
+      if (value instanceof Object[]) {
+    	  Object[] values = (Object[]) value;
+    	  value = "";
+    	  for (int i = 0; i < values.length; i++) {
+    		  value += values[i] + "<br/>";
+    	  }
+    	  type = values[0].getClass().getName();
+      }
+      type = type.replaceFirst("^java\\.lang\\.", "");
+%>
+<tr><td><%= name %></td><td><%= value %></td><td><%= type %></td>
+<%
+    }
+%>
+</table>
+<%
+  }
+%>
 <br><br>
 
 To add some data to the authenticated session, enter it here:

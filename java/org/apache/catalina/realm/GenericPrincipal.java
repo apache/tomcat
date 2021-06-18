@@ -16,14 +16,29 @@
  */
 package org.apache.catalina.realm;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.security.auth.login.LoginContext;
 
 import org.apache.catalina.TomcatPrincipal;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.ietf.jgss.GSSCredential;
 
 /**
@@ -120,7 +135,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      */
     public GenericPrincipal(String name, List<String> roles,
             Principal userPrincipal, LoginContext loginContext) {
-        this(name, roles, userPrincipal, loginContext, null);
+        this(name, roles, userPrincipal, loginContext, null, null);
     }
 
     /**
@@ -140,7 +155,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     @Deprecated
     public GenericPrincipal(String name, String password, List<String> roles,
             Principal userPrincipal, LoginContext loginContext) {
-        this(name, roles, userPrincipal, loginContext, null);
+        this(name, roles, userPrincipal, loginContext, null, null);
     }
 
     /**
@@ -154,10 +169,12 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      * @param loginContext  - If provided, this will be used to log out the user
      *        at the appropriate time
      * @param gssCredential - If provided, the user's delegated credentials
+     * @param attributes - If provided, additional attributes associated with
+     *        this Principal
      */
     public GenericPrincipal(String name, List<String> roles,
             Principal userPrincipal, LoginContext loginContext,
-            GSSCredential gssCredential) {
+            GSSCredential gssCredential, Map<String, Object> attributes) {
         super();
         this.name = name;
         this.userPrincipal = userPrincipal;
@@ -171,6 +188,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         }
         this.loginContext = loginContext;
         this.gssCredential = gssCredential;
+        this.attributes = attributes;
     }
 
 
@@ -193,7 +211,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     public GenericPrincipal(String name, String password, List<String> roles,
             Principal userPrincipal, LoginContext loginContext,
             GSSCredential gssCredential) {
-        this(name, roles, userPrincipal, loginContext, gssCredential);
+        this(name, roles, userPrincipal, loginContext, gssCredential, null);
     }
 
 
@@ -253,6 +271,11 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     protected void setGssCredential(GSSCredential gssCredential) {
         this.gssCredential = gssCredential;
     }
+    
+    /**
+     * The additional attributes associated with this Principal.
+     */
+    protected final Map<String, Object> attributes;
 
 
     // ---------------------------------------------------------- Public Methods
@@ -283,10 +306,16 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("GenericPrincipal[");
+        boolean first = true;
         sb.append(this.name);
         sb.append('(');
         for (String role : roles) {
-            sb.append(role).append(',');
+            if (first) {
+                first = false;
+            } else {
+                sb.append(',');
+            }
+            sb.append(role);
         }
         sb.append(")]");
         return sb.toString();
@@ -304,10 +333,163 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     }
 
 
+    @Override
+    public Object getAttribute(String name) {
+        if (attributes == null) {
+            return null;
+        }
+        Object value = attributes.get(name);
+        if (value == null) {
+            return null;
+        }
+        Object copy = copyObject(value);
+        return copy != null ? copy : value.toString();
+    }
+
+
+    @Override
+    public Enumeration<String> getAttributeNames() {
+        if (attributes == null) {
+            return Collections.emptyEnumeration();
+        }
+        return Collections.enumeration(attributes.keySet());
+    }
+
+
+    @Override
+    public boolean isAttributesCaseIgnored() {
+        return (attributes instanceof CaseInsensitiveKeyMap<?>);
+    }
+
+
+    /**
+     * Creates and returns a deep copy of the specified object. Deep-copying
+     * works only for objects of a couple of <i>hard coded</i> types or, if the
+     * object implements <code>java.io.Serializable</code>. In all other cases,
+     * this method returns <code>null</code>.
+     * 
+     * @param obj the object to copy
+     * @return a deep copied clone of the specified object, or <code>null</code>
+     *         if deep-copying was not possible
+     */
+    private Object copyObject(Object obj) {
+
+        // first, try some commonly used object types
+        if (obj instanceof String) {
+            return new String((String) obj);
+
+        } else if (obj instanceof Integer) {
+            return Integer.valueOf((int) obj);
+
+        } else if (obj instanceof Long) {
+            return Long.valueOf((long) obj);
+
+        } else if (obj instanceof Boolean) {
+            return Boolean.valueOf((boolean) obj);
+
+        } else if (obj instanceof Double) {
+            return Double.valueOf((double) obj);
+
+        } else if (obj instanceof Float) {
+            return Float.valueOf((float) obj);
+
+        } else if (obj instanceof Character) {
+            return Character.valueOf((char) obj);
+
+        } else if (obj instanceof Byte) {
+            return Byte.valueOf((byte) obj); 
+
+        } else if (obj instanceof Short) {
+            return Short.valueOf((short) obj);
+
+        } else if (obj instanceof BigDecimal) {
+            return new BigDecimal(((BigDecimal) obj).toString());
+
+        } else if (obj instanceof BigInteger) {
+            return new BigInteger(((BigInteger) obj).toString());
+
+        }
+
+        // Date and JDBC date and time types
+        else if (obj instanceof java.sql.Date) {
+            return ((java.sql.Date) obj).clone();
+
+        } else if (obj instanceof java.sql.Time) {
+            return ((java.sql.Time) obj).clone();
+
+        } else if (obj instanceof java.sql.Timestamp) {
+            return ((java.sql.Timestamp) obj).clone();
+
+        } else if (obj instanceof Date) {
+            return ((Date) obj).clone();
+
+        }
+
+        // these types may come up as well
+        else if (obj instanceof URI) {
+            try {
+                return new URI(((URI) obj).toString());
+            } catch (URISyntaxException e) {
+                // not expected
+            }
+        } else if (obj instanceof URL) {
+            try {
+                return new URI(((URL) obj).toString());
+            } catch (URISyntaxException e) {
+                // not expected
+            }
+        } else if (obj instanceof UUID) {
+            return new UUID(((UUID) obj).getMostSignificantBits(),
+                    ((UUID) obj).getLeastSignificantBits());
+
+        }
+
+        // return a deep copy created by serialization/deserialization (if the
+        // specified object implements java.io.Serializable), null otherwise
+        return copySerializableObject(obj);
+    }
+
+
+    /**
+     * Creates and returns a deep copy of the specified object. This method
+     * tries to deep-copy the object by serializing and deserializing it to and
+     * from a memory buffer, respectively.
+     * <p>
+     * This method returns <code>null</code>, if
+     * <ul>
+     * <li>the specified object does not implement
+     * <code>java.io.Serializable</code></li>
+     * <li>an error occurred while the object was serialized to memory</li>
+     * <li>an error occurred while the object was deserialized from memory</li>
+     * </ul>
+     * 
+     * @param obj the object to copy
+     * @return a deep copied clone of the specified object or <code>null</code>,
+     *         if the specified object does not implement
+     *         <code>java.io.Serializable</code> or an error occurred while the
+     *         object was serialized/deserialized
+     */
+    private Object copySerializableObject(Object obj) {
+        if (!(obj instanceof Serializable)) {
+            return null;
+        }
+        try {
+            ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(outBuf);
+            out.writeObject(obj);
+            ByteArrayInputStream inBuf = new ByteArrayInputStream(outBuf.toByteArray());
+            ObjectInputStream in = new ObjectInputStream(inBuf);
+            return in.readObject();
+        } catch (Exception e) {
+            // no-op
+        }
+        return null;
+    }
+
     // ----------------------------------------------------------- Serialization
 
     private Object writeReplace() {
-        return new SerializablePrincipal(name, roles, userPrincipal);
+        return new SerializablePrincipal(name, roles, userPrincipal, attributes);
     }
 
     private static class SerializablePrincipal implements Serializable {
@@ -316,9 +498,10 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         private final String name;
         private final String[] roles;
         private final Principal principal;
+        private final Map<String, Object> attributes;
 
         public SerializablePrincipal(String name, String[] roles,
-                Principal principal) {
+                Principal principal, Map<String, Object> attributes) {
             this.name = name;
             this.roles = roles;
             if (principal instanceof Serializable) {
@@ -326,10 +509,12 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
             } else {
                 this.principal = null;
             }
+            this.attributes = attributes;
         }
 
         private Object readResolve() {
-            return new GenericPrincipal(name, Arrays.asList(roles), principal);
+            return new GenericPrincipal(name, Arrays.asList(roles), principal, null, null,
+                    attributes);
         }
     }
 }

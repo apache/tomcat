@@ -20,13 +20,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 
@@ -47,6 +51,18 @@ public class MemoryRealm  extends RealmBase {
 
     private static final Log log = LogFactory.getLog(MemoryRealm.class);
 
+    /**
+     * Contains the names of all user attributes available for this Realm.
+     */
+    private static final List<String> USER_ATTRIBUTES_AVAILABLE =
+            new ArrayList<>(Arrays.asList("username", "fullname", "roles"));
+
+    /**
+     * Contains the names of user attributes for which access is denied.
+     */
+    private static final List<String> USER_ATTRIBUTES_ACCESS_DENIED =
+            new ArrayList<>(Arrays.asList("password"));
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -61,6 +77,22 @@ public class MemoryRealm  extends RealmBase {
      * directory) of the XML file containing our database information.
      */
     private String pathname = "conf/tomcat-users.xml";
+
+
+    /**
+     * The comma separated names of user attributes to additionally query from the
+     * <code>User</code> entry of the read XML file. These will be provided to the
+     * user through the created Principal's <i>attributes</i> map.
+     */
+    private String userAttributes;
+
+
+    /**
+     * Generated list of names of user attributes to additionally query from the
+     * <code>User</code> entry of the read XML file. (parsed and with wildcards (*)
+     * resolved).
+     */
+    private List<String> userAttributesList;
 
 
     /**
@@ -97,6 +129,53 @@ public class MemoryRealm  extends RealmBase {
 
         this.pathname = pathname;
 
+    }
+
+
+    /**
+     * Return the comma separated names of user attributes to additionally query
+     * from the <code>User</code> entry of the read XML file
+     */
+    public String getUserAttributes() {
+
+        return userAttributes;
+    }
+
+    /**
+     * Set the comma separated names of user attributes to additionally query from
+     * the <code>User</code> entry of the read XML file. These will be provided to
+     * the user through the created Principal's <i>attributes</i> map. In this map,
+     * each attribute value is bound to the attributes's name, that is, the name of
+     * the attribute serves as the key of the mapping.
+     * <p>
+     * If set to the wildcard character, or, if the wildcard character is part of
+     * the comma separated list, all available attributes - except the
+     * <i>password</i> attribute - are queried. The wildcard character is defined by
+     * constant {@link RealmBase#USER_ATTRIBUTES_WILDCARD}. It defaults to the
+     * asterisk (*) character.
+     * <p>
+     * With the <code>MemoryRealm</code>, the only attribute names supported are:
+     * <table>
+     * <caption>&nbsp;</caption>
+     * <tr>
+     * <td>username</td>
+     * <td>The user's logon name</td>
+     * </tr>
+     * <tr>
+     * <td>fullname</td>
+     * <td>The user's full name (aka display name)</td>
+     * </tr>
+     * <tr>
+     * <td style="padding-right:10px">roles</td>
+     * <td>Comma separated list of roles explicitly assigned to the user</td>
+     * </tr>
+     * </table>
+     *
+     * @param userAttributes the comma separated names of user attributes
+     */
+    public void setUserAttributes(String userAttributes) {
+
+        this.userAttributes = userAttributes;
     }
 
 
@@ -167,10 +246,10 @@ public class MemoryRealm  extends RealmBase {
      * @param password User's password (clear text)
      * @param roles Comma-delimited set of roles associated with this user
      */
-    void addUser(String username, String password, String roles) {
+    void addUser(String username, String password, String roles, String fullname) {
 
         // Accumulate the list of roles for this user
-        List<String> list = new ArrayList<>();
+        Set<String> roleSet = new LinkedHashSet<>();
         roles += ",";
         while (true) {
             int comma = roles.indexOf(',');
@@ -178,12 +257,35 @@ public class MemoryRealm  extends RealmBase {
                 break;
             }
             String role = roles.substring(0, comma).trim();
-            list.add(role);
+            roleSet.add(role);
             roles = roles.substring(comma + 1);
         }
 
+        // Create the user attributes map for this user's principal
+        Map<String, Object> attributes = null;
+        if (userAttributesList != null) {
+            attributes = new LinkedHashMap<>();
+            for (String name : userAttributesList) {
+                switch (name) {
+                case "username":
+                case "name":
+                    attributes.put(name, new String(username));
+                    break;
+
+                case "fullname":
+                    attributes.put(name, new String(fullname));
+                    break;
+
+                case "roles":
+                    attributes.put(name, StringUtils.join(roleSet));
+                    break;
+                }
+            }
+        }
+
         // Construct and cache the Principal for this user
-        GenericPrincipal principal = new GenericPrincipal(username, list);
+        GenericPrincipal principal = new GenericPrincipal(username, new ArrayList<String>(roleSet),
+                null, null, null, attributes);
         principals.put(username, principal);
         credentials.put(username, password);
 
@@ -251,6 +353,12 @@ public class MemoryRealm  extends RealmBase {
             // Load the contents of the database file
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("memoryRealm.loadPath", pathName));
+            }
+
+            // User attributes must be set up before the Digester starts parsing
+            if (userAttributesList == null) {
+                userAttributesList = parseUserAttributes(userAttributes,
+                        USER_ATTRIBUTES_ACCESS_DENIED, USER_ATTRIBUTES_AVAILABLE, true);
             }
 
             Digester digester = getDigester();

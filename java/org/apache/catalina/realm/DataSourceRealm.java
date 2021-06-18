@@ -21,8 +21,15 @@ import java.security.Principal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.naming.Context;
 import javax.sql.DataSource;
@@ -43,6 +50,14 @@ import org.apache.naming.ContextBindings;
 */
 public class DataSourceRealm extends RealmBase {
 
+    /**
+     * String object signaling an empty list of user attributes, that is, no valid
+     * or existing user attributes to additionally query from the user table have
+     * been specified. Used to prevent entering the DCL lock in method
+     * <code>getUserAttributesStatement</code> every time in case there are no user
+     * attributes.
+     */
+    private static final String USER_ATTRIBUTES_NONE_REQUESTED = new String();
 
     // ----------------------------------------------------- Instance Variables
 
@@ -57,6 +72,18 @@ public class DataSourceRealm extends RealmBase {
      * The generated string for the credentials PreparedStatement
      */
     private String preparedCredentials = null;
+
+
+    /**
+     * The generated string for the user attributes PreparedStatement
+     */
+    private String preparedAttributesTail = null;
+
+
+    /**
+     * The generated string for the user attributes available PreparedStatement
+     */
+    private String preparedAttributesAvailable = null;
 
 
     /**
@@ -105,6 +132,22 @@ public class DataSourceRealm extends RealmBase {
      * Last connection attempt.
      */
     private volatile boolean connectionSuccess = true;
+
+
+	/**
+	 * The comma separated names of user attributes to additionally query from
+	 * the user table. These will be provided to the user through the created
+	 * Principal's <i>attributes</i> map.
+	 */
+	protected String userAttributes;
+
+
+    /**
+     * Generated SQL statement to query additional user attributes from the user
+     * table.
+     */
+	private volatile String userAttributesStatement;
+	private final Object userAttributesStatementLock = new Object();
 
 
     // ------------------------------------------------------------- Properties
@@ -223,6 +266,34 @@ public class DataSourceRealm extends RealmBase {
       this.userTable = userTable;
     }
 
+    /**
+	 * @return the comma separated names of user attributes to additionally
+	 *         query from the user table
+	 */
+	public String getUserAttributes() {
+		return userAttributes;
+	}
+
+    /**
+     * Set the comma separated names of user attributes to additionally query from
+     * the user table. These will be provided to the user through the created
+     * Principal's <i>attributes</i> map. In this map, each field value is bound to
+     * the field's name, that is, the name of the field serves as the key of the
+     * mapping.
+     * <p>
+     * If set to the wildcard character, or, if the wildcard character is part of
+     * the comma separated list, all available attributes - except the
+     * <i>password</i> attribute (as specified by <code>userCredCol</code>) - are
+     * queried. The wildcard character is defined by constant
+     * {@link RealmBase#USER_ATTRIBUTES_WILDCARD}. It defaults to the asterisk (*)
+     * character.
+     *
+     * @param userAttributes the comma separated names of user attributes
+     */
+	public void setUserAttributes(String userAttributes) {
+		this.userAttributes = userAttributes;
+	}
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -336,9 +407,10 @@ public class DataSourceRealm extends RealmBase {
         }
 
         ArrayList<String> list = getRoles(dbConnection, username);
+        Map<String, Object> attrs = getUserAttributesMap(dbConnection, username);
 
         // Create and return a suitable Principal for this user
-        return new GenericPrincipal(username, list);
+        return new GenericPrincipal(username, list, null, null, null, attrs);
     }
 
 
@@ -463,8 +535,8 @@ public class DataSourceRealm extends RealmBase {
             return new GenericPrincipal(username, null);
         }
         try {
-            return new GenericPrincipal(username,
-                    getRoles(dbConnection, username));
+            return new GenericPrincipal(username, getRoles(dbConnection, username), null, null,
+                    null, getUserAttributesMap(dbConnection, username));
         } finally {
             close(dbConnection);
         }
@@ -510,21 +582,22 @@ public class DataSourceRealm extends RealmBase {
             return null;
         }
 
-        ArrayList<String> list = null;
+        // Using a Set removes duplicate roles
+        Set<String> roles = null;
 
         try (PreparedStatement stmt = dbConnection.prepareStatement(preparedRoles)) {
             stmt.setString(1, username);
 
             try (ResultSet rs = stmt.executeQuery()) {
-                list = new ArrayList<>();
+                roles = new HashSet<>();
 
                 while (rs.next()) {
                     String role = rs.getString(1);
                     if (role != null) {
-                        list.add(role.trim());
+                        roles.add(role.trim());
                     }
                 }
-                return list;
+                return new ArrayList<String>(roles);
             }
         } catch(SQLException e) {
             containerLog.error(sm.getString("dataSourceRealm.getRoles.exception", username), e);
@@ -536,6 +609,156 @@ public class DataSourceRealm extends RealmBase {
 
     private boolean isRoleStoreDefined() {
         return userRoleTable != null || roleNameCol != null;
+    }
+
+
+	protected Map<String, Object> getUserAttributesMap(Connection dbConnection,
+			String username) {
+
+	    String preparedAttributes = getUserAttributesStatement(dbConnection);
+        if (preparedAttributes == null || preparedAttributes == USER_ATTRIBUTES_NONE_REQUESTED) {
+            // The above reference comparison is intentional. USER_ATTRIBUTES_NONE_REQUESTED
+            // is a tag object (empty String) to distinguish between null (not yet
+            // initialized) and empty (no attributes requested).
+	        // TODO Could as well be changed to `preparedAttributes.lenghth() = 0` 
+
+            // Return null if no user attributes are requested (or if the statement was not
+            // yet built successfully) 
+			return null;
+		}
+
+	    try (PreparedStatement stmt =
+				dbConnection.prepareStatement(preparedAttributes)) {
+			stmt.setString(1, username);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+
+			    if (rs.next()) {
+			        Map<String, Object> attrs = new LinkedHashMap<>();
+				    ResultSetMetaData md = rs.getMetaData();
+				    int ncols = md.getColumnCount();
+				    for (int columnIndex = 1; columnIndex <= ncols; columnIndex++) {
+				        String columnName = md.getColumnName(columnIndex);
+				        // Ignore case, database may have case-insensitive field names
+				        if (columnName.equalsIgnoreCase(userCredCol)) {
+                            // Always skip userCredCol (must be there if all columns
+                            // have been requested)  
+				            continue;
+				        }
+				        attrs.put(columnName, rs.getObject(columnIndex));
+					}
+				    return attrs.size() > 0 ? attrs : null;
+				}
+			}
+		} catch (SQLException e) {
+			containerLog.error(sm.getString(
+					"dataSourceRealm.getUserAttributes.exception", username), e);
+		}
+
+		return null;
+	}
+
+
+    /**
+     * Return the SQL statement for querying additional user attributes. The
+     * statement is lazily initialized (<i>lazily initialized singleton</i> with
+     * <i>double-checked locking, DCL</i>) since building it may require an extra
+     * database query under some conditions.
+     * 
+     * @param dbConnection connection for accessing the database
+     */
+    private String getUserAttributesStatement(Connection dbConnection) {
+        // DCL so userAttributesStatement MUST be volatile
+        if (userAttributesStatement == null) {
+            synchronized (userAttributesStatementLock) {
+                if (userAttributesStatement == null) {
+                    List<String> requestedAttributes = parseUserAttributes(userAttributes);
+                    if (requestedAttributes == null) {
+                        return USER_ATTRIBUTES_NONE_REQUESTED;
+                    }
+                    if (requestedAttributes.size() > 0
+                            && requestedAttributes.get(0).equals(USER_ATTRIBUTES_WILDCARD)) {
+                        userAttributesStatement = "SELECT *" + preparedAttributesTail;
+                        return userAttributesStatement;
+                    }
+                    List<String> availableUserAttributes = getAvailableUserAttributes(dbConnection);
+                    if (availableUserAttributes == null) {
+                        // Failed getting all available user attributes (this has already been
+                        // logged) so, just return, leaving userAttributesStatement null (aka
+                        // uninitialized, will try again next time).
+                        return null;
+                    }
+                    requestedAttributes = validateUserAttributes(requestedAttributes,
+                            getDeniedUserAttributes(), availableUserAttributes);
+                    StringBuilder sb = new StringBuilder("SELECT ");
+                    boolean first = true;
+                    for (String attr : requestedAttributes) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            sb.append(", ");
+                        }
+                        sb.append(attr);
+                    }
+                    userAttributesStatement = sb.append(preparedAttributesTail).toString();
+                }
+            }
+        }
+        return userAttributesStatement;
+    }
+
+
+    /**
+     * Return a list of all available user attributes. The list contains all field
+     * names of the user table, except for fields for which access is denied (e. g.
+     * field <code>userCredCol</code>).
+     * 
+     * @param dbConnection connection for accessing the database
+     */
+	private List<String> getAvailableUserAttributes(Connection dbConnection) {
+
+        try (PreparedStatement stmt =
+                dbConnection.prepareStatement(preparedAttributesAvailable)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                // Query is not expected to return any rows (...WHERE FALSE) so, must not call
+                // next(). ResultSetMetadata is available before calling next() anyway.  
+                List<String> result = new ArrayList<>();
+                ResultSetMetaData md = rs.getMetaData();
+                int ncols = md.getColumnCount();
+                for (int columnIndex = 1; columnIndex <= ncols; columnIndex++) {
+                    String columnName = md.getColumnName(columnIndex);
+                    // Ignore case, database may have case-insensitive field names
+                    if (columnName.equalsIgnoreCase(userCredCol)) {
+                        // always skip userCredCol
+                        continue;
+                    }
+                    result.add(columnName);
+                }
+                return result;
+            }
+        } catch (SQLException e) {
+            containerLog.error(sm.getString(
+                    "dataSourceRealm.getAvailableUserAttributes.exception"), e);
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Return a list of user attribute names for which access is denied or
+     * <code>null</code>, if no restricted columns are known. That list consists of
+     * the name of the <i>user credential</i> column specified in configuration
+     * attribute <code>userCredCol</code>.
+     */
+    private List<String> getDeniedUserAttributes() {
+        String attr = getUserCredCol();
+        if (attr != null && !attr.trim().isEmpty()) {
+            return Collections.singletonList(attr.trim());
+        }
+        return null;
     }
 
 
@@ -571,6 +794,21 @@ public class DataSourceRealm extends RealmBase {
         temp.append(userNameCol);
         temp.append(" = ?");
         preparedCredentials = temp.toString();
+
+        // Create the user attributes PreparedStatement string (only its tail w/o SELECT
+        // clause)
+        temp = new StringBuilder(" FROM ");
+        temp.append(userTable);
+        temp.append(" WHERE ");
+        temp.append(userNameCol);
+        temp.append(" = ?");
+        preparedAttributesTail = temp.toString();
+
+        // Create the available user attributes PreparedStatement string
+        temp = new StringBuilder("SELECT * FROM ");
+        temp.append(userTable);
+        temp.append(" WHERE FALSE");
+        preparedAttributesAvailable = temp.toString();
 
         super.startInternal();
     }

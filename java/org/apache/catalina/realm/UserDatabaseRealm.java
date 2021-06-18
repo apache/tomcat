@@ -18,9 +18,15 @@ package org.apache.catalina.realm;
 
 import java.io.ObjectStreamException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.naming.Context;
@@ -32,6 +38,7 @@ import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.naming.ContextBindings;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.StringUtils;
 
 /**
  * Implementation of {@link org.apache.catalina.Realm} that is based on an
@@ -44,6 +51,20 @@ import org.apache.tomcat.util.ExceptionUtils;
  * @since 4.1
  */
 public class UserDatabaseRealm extends RealmBase {
+
+    /**
+     * Contains the names of all user attributes available for this Realm.
+     */
+    private static final List<String> USER_ATTRIBUTES_AVAILABLE =
+            new ArrayList<>(Arrays.asList("username", "fullname", "groups",
+                    "roles", "effectiveRoles"));
+
+    /**
+     * Contains the names of user attributes for which access is denied.
+     */
+    private static final List<String> USER_ATTRIBUTES_ACCESS_DENIED =
+            new ArrayList<>(Arrays.asList("password"));
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -72,6 +93,21 @@ public class UserDatabaseRealm extends RealmBase {
      */
     private boolean useStaticPrincipal = false;
 
+    /**
+     * The comma separated names of user attributes to additionally query from
+     * the <code>User</code> entry of the underlying <code>UserDatabase</code>.
+     * These will be provided to the user through the created Principal's
+     * <i>attributes</i> map.
+     */
+    protected String userAttributes;
+
+    /**
+     * Generated list of names of user attributes to additionally query from the
+     * <code>User</code> entry of the underlying <code>UserDatabase</code>
+     * (parsed and with wildcards (*) resolved).
+     */
+    private volatile List<String> userAttributesList;
+    private final Object userAttributesListLock = new Object();
 
     // ------------------------------------------------------------- Properties
 
@@ -134,6 +170,60 @@ public class UserDatabaseRealm extends RealmBase {
      */
     public void setLocalJndiResource(boolean localJndiResource) {
         this.localJndiResource = localJndiResource;
+    }
+
+    /**
+     * Return the comma separated names of user attributes to additionally query
+     * from the <code>User</code> entry of the underlying <code>UserDatabase</code>
+     */
+    public String getUserAttributes() {
+        return userAttributes;
+    }
+
+    /**
+     * Set the comma separated names of user attributes to additionally query from
+     * the <code>User</code> entry of the underlying <code>UserDatabase</code>.
+     * These will be provided to the user through the created Principal's
+     * <i>attributes</i> map. In this map, each attribute value is bound to the
+     * attributes's name, that is, the name of the attribute serves as the key of
+     * the mapping.
+     * <p>
+     * If set to the wildcard character, or, if the wildcard character is part of
+     * the comma separated list, all available attributes - except the
+     * <i>password</i> attribute - are queried. The wildcard character is defined by
+     * constant {@link RealmBase#USER_ATTRIBUTES_WILDCARD}. It defaults to the
+     * asterisk (*) character.
+     * <p>
+     * With the <code>UserDatabaseRealm</code>, the only attribute names supported
+     * are:
+     * <table>
+     * <caption>&nbsp;</caption>
+     * <tr>
+     * <td>username</td>
+     * <td>The user's logon name</td>
+     * </tr>
+     * <tr>
+     * <td>fullname</td>
+     * <td>The user's full name (aka display name)</td>
+     * </tr>
+     * <tr>
+     * <td>groups</td>
+     * <td>Comma separated list of groups the user is a member of</td>
+     * </tr>
+     * <tr>
+     * <td>roles</td>
+     * <td>Comma separated list of roles explicitly assigned to the user</td>
+     * </tr>
+     * <tr>
+     * <td style="padding-right:10px">effectiveRoles</td>
+     * <td>Comma separated list of effective roles assigned to the user</td>
+     * </tr>
+     * </table>
+     *
+     * @param userAttributes the comma separated names of user attributes
+     */
+    public void setUserAttributes(String userAttributes) {
+        this.userAttributes = userAttributes;
     }
 
 
@@ -242,6 +332,20 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
+    private List<String> getUserAttributesList() {
+        // DCL so userAttributesList MUST be volatile
+        if (userAttributesList == null) {
+            synchronized (userAttributesListLock) {
+                if (userAttributesList == null) {
+                    userAttributesList = parseUserAttributes(userAttributes,
+                            USER_ATTRIBUTES_ACCESS_DENIED, USER_ATTRIBUTES_AVAILABLE, true);
+                }
+            }
+        }
+        return userAttributesList;
+    }
+
+
     // ------------------------------------------------------ Lifecycle Methods
 
     @Override
@@ -288,10 +392,12 @@ public class UserDatabaseRealm extends RealmBase {
     public static final class UserDatabasePrincipal extends GenericPrincipal {
         private static final long serialVersionUID = 1L;
         private final transient UserDatabase database;
+        private final List<String> userAttributesList;
 
         public UserDatabasePrincipal(User user, UserDatabase database) {
             super(user.getName());
             this.database = database;
+            userAttributesList = UserDatabaseRealm.this.getUserAttributesList();
         }
 
         @Override
@@ -352,6 +458,65 @@ public class UserDatabaseRealm extends RealmBase {
             return false;
         }
 
+        @Override
+        public Object getAttribute(String name) {
+            if (userAttributesList == null || !userAttributesList.contains(name)) {
+                // Return only requested attributes 
+                return null;
+            }
+            UserDatabase database = getUserDatabase();
+            if (user == null || database == null) {
+                return super.getAttribute(name);
+            }
+            StringBuilder sb;
+            boolean first = true;
+            switch (name) {
+            case "username":
+            case "name":
+                return new String(user.getUsername());
+
+            case "fullname":
+                return new String(user.getFullName());
+
+            case "groups":
+                sb = new StringBuilder();
+                Iterator<Group> groups = user.getGroups();
+                while (groups.hasNext()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(',');
+                    }
+                    Group group = groups.next();
+                    sb.append(group.getName());
+                }
+                return sb.toString();
+
+            case "roles":
+                sb = new StringBuilder();
+                Iterator<Role> roles = user.getRoles();
+                while (roles.hasNext()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(',');
+                    }
+                    Role role = roles.next();
+                    sb.append(role.getName());
+                }
+                return sb.toString();
+
+            case "effectiveRoles":
+                return StringUtils.join(getRoles());
+            }
+            return null;
+        }
+
+        @Override
+        public Enumeration<String> getAttributeNames() {
+            return Collections.enumeration(userAttributesList);
+        }
+
         /**
          * Magic method from {@link java.io.Serializable}.
          *
@@ -361,7 +526,19 @@ public class UserDatabaseRealm extends RealmBase {
          */
         private Object writeReplace() throws ObjectStreamException {
             // Replace with a static principal disconnected from the database
-            return new GenericPrincipal(getName(), Arrays.asList(getRoles()));
+            return new GenericPrincipal(getName(), Arrays.asList(getRoles()),
+                    null, null, null, getUserAttributesMap());
+        }
+
+        private Map<String, Object> getUserAttributesMap() {
+            if (userAttributesList == null) {
+                return null;
+            }
+            Map<String, Object> result = new LinkedHashMap<>();
+            for (String attr : userAttributesList) {
+                result.put(attr, getAttribute(attr));
+            }
+            return result;
         }
     }
 }

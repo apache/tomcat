@@ -27,8 +27,10 @@ import java.util.Set;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * A Map implementation that uses case-insensitive (using {@link
- * Locale#ENGLISH}) strings as keys.
+ * A Map implementation that uses case-insensitive (using
+ * {@link Locale#ENGLISH}) strings as keys. This class uses a
+ * <code>HashMap</code> as backing store. So this Map's behavior, except for
+ * case-insensitive key handling, is comparable with <code>HashMap</code>.
  * <p>
  * Keys must be instances of {@link String}. Note that this means that
  * <code>null</code> keys are not permitted.
@@ -36,14 +38,31 @@ import org.apache.tomcat.util.res.StringManager;
  * This implementation is not thread-safe.
  *
  * @param <V> Type of values placed in this Map.
+ * @see HashMap
  */
 public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
 
     private static final StringManager sm =
             StringManager.getManager(CaseInsensitiveKeyMap.class);
 
-    private final Map<Key,V> map = new HashMap<>();
+    private final Map<Key,V> map;
 
+    /**
+     * Constructs an empty CaseInsensitiveKeyMap with the default initial capacity
+     * (16) and the default load factor (0.75).
+     */
+    public CaseInsensitiveKeyMap() {
+        this(new HashMap<>());
+    }
+    
+    /**
+     * Allow initializing the backing store Map from subclasses.
+     * 
+     * @param map the map used as backing store  
+     */
+    protected CaseInsensitiveKeyMap(Map<Key,V> map) {
+        this.map = map;
+    }
 
     @Override
     public V get(Object key) {
@@ -164,7 +183,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
         }
     }
 
-    private static class Key {
+    protected static class Key {
 
         private final String key;
         private final String lcKey;

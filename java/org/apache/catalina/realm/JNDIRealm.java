@@ -28,8 +28,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -64,6 +69,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyLinkedMap;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
@@ -470,6 +476,19 @@ public class JNDIRealm extends RealmBase {
      * value.
      */
     protected boolean useContextClassLoader = true;
+
+    /**
+     * The comma separated names of user attributes to additionally query from the
+     * user's directory entry. These will be provided to the user through the
+     * created Principal's <i>attributes</i> map.
+     */
+    protected String userAttributes;
+
+    /**
+     * Generated list of names of user attributes to additionally query from the
+     * user's directory entry (parsed and with wildcards (*) resolved).
+     */
+    private List<String> userAttributesList;
 
 
     // ------------------------------------------------------------- Properties
@@ -1197,6 +1216,37 @@ public class JNDIRealm extends RealmBase {
         return useContextClassLoader;
     }
 
+    /**
+     * @return the comma separated names of user attributes to additionally
+     *         query from the user's directory entry
+     */
+    public String getUserAttributes() {
+        return userAttributes;
+    }
+
+    /**
+     * Set the comma separated names of user attributes to additionally query from
+     * the user's directory entry. These will be provided to the user through the
+     * created Principal's <i>attributes</i> map. In this map, each attribute value
+     * is bound to the attributes's name, that is, the name of the attribute serves
+     * as the key of the mapping.
+     * <p>
+     * If the directory's attribute names are case-insensitive, the keys used in the
+     * Principal's <i>attributes</i> map are case-insensitive as well.
+     * <p>
+     * If set to the wildcard character, or, if the wildcard character is part of
+     * the comma separated list, all available attributes - except the
+     * <i>password</i> attribute (as specified by <code>userPassword</code>) - are
+     * queried. The wildcard character is defined by constant
+     * {@link RealmBase#USER_ATTRIBUTES_WILDCARD}. It defaults to the asterisk (*)
+     * character.
+     *
+     * @param userAttributes the comma separated names of user attributes
+     */
+    public void setUserAttributes(String userAttributes) {
+        this.userAttributes = userAttributes;
+    }
+
 
     // ---------------------------------------------------------- Realm Methods
 
@@ -1347,7 +1397,8 @@ public class JNDIRealm extends RealmBase {
                                 if (containerLog.isDebugEnabled()) {
                                     containerLog.debug("Found roles: " + roles.toString());
                                 }
-                                return new GenericPrincipal(username, roles);
+                                return new GenericPrincipal(username, roles, null, null, null,
+                                        user.getAttributes());
                             }
                         } catch (InvalidNameException ine) {
                             // Log the problem for posterity
@@ -1379,7 +1430,7 @@ public class JNDIRealm extends RealmBase {
                 }
 
                 // Create and return a suitable Principal for this user
-                return new GenericPrincipal(username, roles);
+                return new GenericPrincipal(username, roles, null, null, null, user.getAttributes());
             }
         } finally {
             if (!isUseContextClassLoader()) {
@@ -1571,18 +1622,27 @@ public class JNDIRealm extends RealmBase {
         User user = null;
 
         // Get attributes to retrieve from user entry
-        List<String> list = new ArrayList<>();
-        if (userPassword != null) {
-            list.add(userPassword);
+        // Includes attributes required for authentication and authorization as well as
+        // user attributes to additionally query from the user's directory entry
+        String[] attrIds = null;
+        if (userAttributesList == null
+                || !userAttributesList.get(0).equals(USER_ATTRIBUTES_WILDCARD)) {
+            Set<String> list = new HashSet<>();
+            if (userPassword != null) {
+                list.add(userPassword);
+            }
+            if (userRoleName != null) {
+                list.add(userRoleName);
+            }
+            if (userRoleAttribute != null) {
+                list.add(userRoleAttribute);
+            }
+            if (userAttributesList != null) {
+                list.addAll(userAttributesList);
+            }
+            attrIds = new String[list.size()];
+            list.toArray(attrIds);
         }
-        if (userRoleName != null) {
-            list.add(userRoleName);
-        }
-        if (userRoleAttribute != null) {
-            list.add(userRoleAttribute);
-        }
-        String[] attrIds = new String[list.size()];
-        list.toArray(attrIds);
 
         // Use pattern or search for user entry
         if (userPatternArray != null && curUserPattern >= 0) {
@@ -1609,7 +1669,8 @@ public class JNDIRealm extends RealmBase {
         if (userPassword == null && credentials != null && user != null) {
             // The password is available. Insert it since it may be required for
             // role searches.
-            return new User(user.getUserName(), user.getDN(), credentials, user.getRoles(), user.getUserRoleId());
+            return new User(user.getUserName(), user.getDN(), credentials, user.getRoles(),
+                    user.getUserRoleId(), user.getAttributes());
         }
 
         return user;
@@ -1632,9 +1693,13 @@ public class JNDIRealm extends RealmBase {
     protected User getUserByPattern(DirContext context, String username, String[] attrIds, String dn)
             throws NamingException {
 
+        // TODO With additional user attributes it's quite legal to query ALL attributes
+        // from the user's directory entry (and if the wildcard character was specified)
+        // so, the following test has been modified to allow attrIds being null.
+
         // If no attributes are requested, no need to look for them
-        if (attrIds == null || attrIds.length == 0) {
-            return new User(username, dn, null, null,null);
+        if (attrIds != null && attrIds.length == 0) {
+            return new User(username, dn, null, null,null, null);
         }
 
         // Get required attributes from user entry
@@ -1665,7 +1730,12 @@ public class JNDIRealm extends RealmBase {
             roles = addAttributeValues(userRoleName, attrs, roles);
         }
 
-        return new User(username, dn, password, roles, userRoleAttrValue);
+        Map<String, Object> attributes = null;
+        if (userAttributesList != null) {
+            attributes = getUserAttributesMap(username, attrs);
+        }
+
+        return new User(username, dn, password, roles, userRoleAttrValue, attributes);
     }
 
 
@@ -1753,10 +1823,16 @@ public class JNDIRealm extends RealmBase {
         constraints.setCountLimit(sizeLimit);
         constraints.setTimeLimit(timeLimit);
 
+        // TODO With additional user attributes it's quite legal to query ALL attributes
+        // from the user's directory entry (and if the wildcard character was specified)
+        // so, the following code block must be removed in order to make that work.
+        // Remove that block permanently?
+
         // Specify the attributes to be retrieved
-        if (attrIds == null) {
-            attrIds = new String[0];
-        }
+        // if (attrIds == null) {
+        // attrIds = new String[0];
+        // }
+
         constraints.setReturningAttributes(attrIds);
 
         NamingEnumeration<SearchResult> results = connection.context.search(userBase, filter, constraints);
@@ -1821,12 +1897,172 @@ public class JNDIRealm extends RealmBase {
                 roles = addAttributeValues(userRoleName, attrs, roles);
             }
 
-            return new User(username, dn, password, roles, userRoleAttrValue);
+            Map<String, Object> attributes = null;
+            if (userAttributesList != null) {
+                attributes = getUserAttributesMap(username, attrs);
+            }
+
+            return new User(username, dn, password, roles, userRoleAttrValue, attributes);
         } finally {
             if (results != null) {
                 results.close();
             }
         }
+    }
+
+
+    /**
+     * Return the map containing all requested user attributes.
+     * 
+     * @param username The username (used for logging only)
+     * @param attrs Attributes containing the requested values
+     * @return the map containing all requested user attributes
+     * @throws NamingException if a directory server error occurs
+     */
+    private Map<String, Object> getUserAttributesMap(String username, Attributes attrs)
+            throws NamingException {
+
+        if (userAttributesList == null || userAttributesList.size() == 0 || attrs == null) {
+            return null;
+        }
+
+        boolean wildcard = userAttributesList.get(0).equals(USER_ATTRIBUTES_WILDCARD);
+        boolean caseIgnored = attrs.isCaseIgnored();
+        Set<String> receivedAttrIds = new LinkedHashSet<>();
+        Map<String, Object> result =
+                caseIgnored ? new CaseInsensitiveKeyLinkedMap<>() : new LinkedHashMap<>();
+
+        NamingEnumeration<String> ie = attrs.getIDs();
+        try {
+            while (ie.hasMore()) {
+                String attrId = ie.next();
+                if (isUserAttributeAccessDenied(attrId, caseIgnored)) {
+                    continue;
+                }
+                receivedAttrIds.add(caseIgnored ? attrId.toLowerCase(Locale.ENGLISH) : attrId);
+                Object value = getUserAttributeValue(attrId, attrs);
+                if (value != null) {
+                    result.put(attrId, value);
+                }
+            }
+        } catch (PartialResultException ex) {
+            if (!adCompat) {
+                throw ex;
+            }
+        } finally {
+            ie.close();
+
+            // Log both not existing and not explicitly requested attributes (in finally
+            // block, since we might have thrown an exception)
+            if (!wildcard) {
+
+                // Check (and count) not existing attributes
+                int missingAttrs = 0;
+                if (containerLog.isWarnEnabled()) {
+                    for (String attrId : userAttributesList) {
+                        if (!receivedAttrIds.contains(
+                                caseIgnored ? attrId.toLowerCase(Locale.ENGLISH) : attrId)) {
+                            containerLog.warn(sm.getString("jndiRealm.userAttributeNotFound",
+                                    attrId, username));
+                            missingAttrs++;
+                        }
+                    }
+                }
+
+                // Check not explicitly requested attributes
+                if (containerLog.isDebugEnabled()
+                        && (receivedAttrIds.size() > userAttributesList.size() - missingAttrs)) {
+                    // Prepare a possibly lower-case lookup structure (HashSet) 
+                    Set<String> requestedAttrIds;
+                    if (caseIgnored) {
+                        requestedAttrIds = new HashSet<>();
+                        for (String id : userAttributesList) {
+                            requestedAttrIds.add(id.toLowerCase(Locale.ENGLISH));
+                        }
+                    } else {
+                        requestedAttrIds = new HashSet<>(userAttributesList);
+                    }
+                    for (String attrId : receivedAttrIds) {
+                        if (!requestedAttrIds.contains(
+                                caseIgnored ? attrId.toLowerCase(Locale.ENGLISH) : attrId)) {
+                            containerLog.debug(sm.getString("jndiRealm.userAttributeNotRequested",
+                                    attrId, username));
+                        }
+                    }
+                }
+            }
+        }
+
+        return result.size() > 0 ? result : null;
+    }
+
+
+    /**
+     * Return an Object representing the value of the specified user attribute. If
+     * <code>attrId</code> denotes a multi-value attribute, return an array
+     * containing all its values.
+     *
+     * @param attrId Attribute name
+     * @param attrs Attributes containing the required value
+     * @return the attribute value
+     * @exception NamingException if a directory server error occurs
+     */
+    private Object getUserAttributeValue(String attrId, Attributes attrs) throws NamingException {
+
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace("  retrieving user attribute " + attrId);
+        }
+
+        Attribute attr = attrs.get(attrId);
+        if (attr == null) {
+            // Requested attribute was not found. Should not happen, since we always iterate
+            // over actually received attributes.
+            return null;
+        }
+
+        List<Object> values = new ArrayList<>();
+        NamingEnumeration<?> e = attr.getAll();
+        try {
+            while (e.hasMore()) {
+                values.add(e.next());
+            }
+        } catch (PartialResultException ex) {
+            if (!adCompat) {
+                throw ex;
+            }
+        } finally {
+            e.close();
+        }
+
+        return values.size() == 1 ? values.get(0) : values.toArray();
+    }
+
+
+    /**
+     * Determines whether access to the specified attribute is denied. Returns
+     * <code>true</code>, if the specified attribute name equals
+     * <code>userPassword</code>.
+     * 
+     * @param attrId Attribute name
+     * @param caseIgnored if <code>true</code>, compare names ignoring case
+     * @return <code>true</code>, if access to the specified attribute is denied;
+     *         <code>false</code> otherwise
+     */
+    private boolean isUserAttributeAccessDenied(String attrId, boolean caseIgnored) {
+        if (userPassword == null) {
+            return false;
+        }
+        boolean denied = false;
+        if (caseIgnored) {
+            denied = attrId.equalsIgnoreCase(userPassword); 
+        } else {
+            denied = attrId.equals(userPassword);
+        }
+        if (denied && containerLog != null && containerLog.isWarnEnabled()) {
+            // Caution! Uses the message key of RealmBase (should it better be duplicated?)
+            containerLog.warn(sm.getString("realmBase.userAttributeAccessDenied", attrId));
+        }
+        return denied;
     }
 
 
@@ -2516,7 +2752,8 @@ public class JNDIRealm extends RealmBase {
         }
 
         if (user != null) {
-            return new GenericPrincipal(user.getUserName(), roles, null, null, gssCredential);
+            return new GenericPrincipal(user.getUserName(), roles, null, null, gssCredential,
+                    user.getAttributes());
         }
 
         return null;
@@ -2826,6 +3063,8 @@ public class JNDIRealm extends RealmBase {
                 Thread.currentThread().setContextClassLoader(ocl);
             }
         }
+
+        userAttributesList = parseUserAttributes(userAttributes);
 
         super.startInternal();
     }
@@ -3165,8 +3404,10 @@ public class JNDIRealm extends RealmBase {
         private final String password;
         private final List<String> roles;
         private final String userRoleId;
+        private final Map<String, Object> attributes;
 
-        public User(String username, String dn, String password, List<String> roles, String userRoleId) {
+        public User(String username, String dn, String password, List<String> roles,
+                String userRoleId, Map<String, Object> attributes) {
             this.username = username;
             this.dn = dn;
             this.password = password;
@@ -3176,6 +3417,11 @@ public class JNDIRealm extends RealmBase {
                 this.roles = Collections.unmodifiableList(roles);
             }
             this.userRoleId = userRoleId;
+            if (attributes == null) {
+                this.attributes = Collections.emptyMap();
+            } else {
+                this.attributes = Collections.unmodifiableMap(attributes);
+            }
         }
 
         public String getUserName() {
@@ -3196,6 +3442,10 @@ public class JNDIRealm extends RealmBase {
 
         public String getUserRoleId() {
             return userRoleId;
+        }
+
+        public Map<String, Object> getAttributes() {
+            return attributes;
         }
     }
 

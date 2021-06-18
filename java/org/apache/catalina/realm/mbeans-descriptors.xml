@@ -57,6 +57,10 @@
                  type="java.lang.String"
                  writeable="false"/>
 
+    <attribute   name="userAttributes"
+          description="Comma separated list of user attributes (fields) to additionally query from the user table"
+                 type="java.lang.String"/>
+
     <attribute   name="userCredCol"
           description="The column in the user table that holds the user's credentials"
                  type="java.lang.String"/>
@@ -231,6 +235,10 @@
                  type="java.lang.String"
                  writeable="false"/>
 
+    <attribute   name="userAttributes"
+          description="Comma separated list of user attributes to additionally query from the user's directory entry"
+                 type="java.lang.String"/>
+
     <attribute   name="userBase"
           description="The base element for user searches"
                  type="java.lang.String"/>
@@ -299,6 +307,11 @@
                  type="java.lang.String"
                  writeable="false"/>
 
+    <attribute   name="userAttributes"
+          description="Comma separated list of user attributes to additionally query from the read XML file"
+                 type="java.lang.String"
+            writeable="false"/>
+
     <attribute   name="validate"
           description="The 'validate certificate chains' flag."
                  type="boolean"/>
@@ -341,6 +354,10 @@
           description="The name of the LifecycleState that this component is currently in"
                  type="java.lang.String"
                  writeable="false"/>
+
+    <attribute   name="userAttributes"
+          description="Comma separated list of user attributes to additionally query from the underlying user database"
+                 type="java.lang.String"/>
 
     <attribute   name="validate"
           description="The 'validate certificate chains' flag."
