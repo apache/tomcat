@@ -393,7 +393,7 @@ public class TestGenerator extends TomcatBaseTest {
         }
     }
 
-    public static class TryCatchFinallyTag extends BodyTagSupport implements TryCatchFinally {
+    public static class TryCatchFinallyBodyTag extends BodyTagSupport implements TryCatchFinally {
 
         private static final long serialVersionUID = 1L;
 

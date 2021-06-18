@@ -16,8 +16,8 @@
 --%>
 <%@ taglib uri="http://tomcat.apache.org/bugs" prefix="bugs" %>
 <bugs:TesterBodyTag>
-  <bugs:TryCatchFinallyTag>
+  <bugs:TryCatchFinallyBodyTag>
     <bugs:TesterBodyTag>
     </bugs:TesterBodyTag>
-  </bugs:TryCatchFinallyTag>
+  </bugs:TryCatchFinallyBodyTag>
 </bugs:TesterBodyTag>
