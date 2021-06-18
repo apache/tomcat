@@ -177,6 +177,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>65387</bug>: Correct a regression in the fix for <bug>65124</bug>
+        and restore the local definition of <code>out</code> for tags that
+        implement <code>TryCatchFinally</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

@@ -15,7 +15,8 @@
   limitations under the License.
 --%>
 <%@ taglib uri="http://tomcat.apache.org/bugs" prefix="bugs" %>
-<bugs:TryCatchFinallyTag>
-  <bugs:TryCatchFinallyTag>
-  </bugs:TryCatchFinallyTag>
-</bugs:TryCatchFinallyTag>
+<bugs:TryCatchFinallyBodyTag>
+  <bugs:TryCatchFinallyBodyTag>
+    <p>OK</p>
+  </bugs:TryCatchFinallyBodyTag>
+</bugs:TryCatchFinallyBodyTag>
