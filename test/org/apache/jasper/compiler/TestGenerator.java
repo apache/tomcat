@@ -435,7 +435,7 @@ public class TestGenerator extends TomcatBaseTest {
     }
 
     @Test
-    public void testTryCtachFinally02 () throws Exception {
+    public void testTryCtachFinally02() throws Exception {
         doTestJsp("try-catch-finally-02.jsp");
     }
 
@@ -968,6 +968,16 @@ public class TestGenerator extends TomcatBaseTest {
 
         rc = getUrl("http://localhost:" + getPort() + "/test/jsp/generator/info.jsp", body, null);
         Assert.assertEquals(body.toString(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+    }
+
+    @Test
+    public void testBug65390() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug65390.jsp", body, null);
+
+        Assert.assertEquals(body.toString(), HttpServletResponse.SC_OK, rc);
     }
 
     private void doTestJsp(String jspName) throws Exception {

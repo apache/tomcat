@@ -184,6 +184,11 @@
         and restore the local definition of <code>out</code> for tags that
         implement <code>TryCatchFinally</code>. (markt)
       </fix>
+      <fix>
+        <bug>65390</bug>: Correct a regression in the fix for <bug>65124</bug>
+        and restore code that was removed in error leading to JSP compilation
+        failures in some circumstances. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
