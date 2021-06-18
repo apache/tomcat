@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
@@ -93,12 +94,14 @@ public class TestFlowControl extends Http2TestBase {
             int start = trace.indexOf("[content-length]-[") + 18;
             int end = trace.indexOf("]", start);
             String contentLength = trace.substring(start, end);
+            // Language will depend on locale
+            String language = Locale.getDefault().getLanguage();
 
             Assert.assertEquals(
                     "3-HeadersStart\n" +
                     "3-Header-[:status]-[404]\n" +
                     "3-Header-[content-type]-[text/html;charset=utf-8]\n" +
-                    "3-Header-[content-language]-[en]\n" +
+                    "3-Header-[content-language]-[" + language + "]\n" +
                     "3-Header-[content-length]-[" + contentLength + "]\n" +
                     "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                     "3-HeadersEnd\n" +
