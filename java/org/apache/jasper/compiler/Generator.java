@@ -1860,7 +1860,7 @@ class Generator {
                     out.printil("jakarta.servlet.jsp.PageContext pageContext = _jspx_page_context;");
                 }
                 // Only need to define out if the tag has a non-empty body,
-                // implements TryCtachFinally or uses
+                // implements TryCatchFinally or uses
                 // <jsp:attribute>...</jsp:attribute> nodes
                 if (!n.hasEmptyBody() || n.implementsTryCatchFinally() || n.getNamedAttributeNodes().size() > 0) {
                     out.printil("jakarta.servlet.jsp.JspWriter out = _jspx_page_context.getOut();");
