@@ -435,7 +435,7 @@ public class TestGenerator extends TomcatBaseTest {
     }
 
     @Test
-    public void testTryCtachFinally02() throws Exception {
+    public void testTryCatchFinally02() throws Exception {
         doTestJsp("try-catch-finally-02.jsp");
     }
 
