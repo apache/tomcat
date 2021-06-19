@@ -134,20 +134,20 @@ public class DataSourceRealm extends RealmBase {
     private volatile boolean connectionSuccess = true;
 
 
-	/**
-	 * The comma separated names of user attributes to additionally query from
-	 * the user table. These will be provided to the user through the created
-	 * Principal's <i>attributes</i> map.
-	 */
-	protected String userAttributes;
+    /**
+     * The comma separated names of user attributes to additionally query from the
+     * user table. These will be provided to the user through the created
+     * Principal's <i>attributes</i> map.
+     */
+    protected String userAttributes;
 
 
     /**
      * Generated SQL statement to query additional user attributes from the user
      * table.
      */
-	private volatile String userAttributesStatement;
-	private final Object userAttributesStatementLock = new Object();
+    private volatile String userAttributesStatement;
+    private final Object userAttributesStatementLock = new Object();
 
 
     // ------------------------------------------------------------- Properties
@@ -267,12 +267,12 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-	 * @return the comma separated names of user attributes to additionally
-	 *         query from the user table
-	 */
-	public String getUserAttributes() {
-		return userAttributes;
-	}
+     * @return the comma separated names of user attributes to additionally query
+     *         from the user table
+     */
+    public String getUserAttributes() {
+        return userAttributes;
+    }
 
     /**
      * Set the comma separated names of user attributes to additionally query from
@@ -290,9 +290,9 @@ public class DataSourceRealm extends RealmBase {
      *
      * @param userAttributes the comma separated names of user attributes
      */
-	public void setUserAttributes(String userAttributes) {
-		this.userAttributes = userAttributes;
-	}
+    public void setUserAttributes(String userAttributes) {
+        this.userAttributes = userAttributes;
+    }
 
 
     // --------------------------------------------------------- Public Methods
@@ -612,51 +612,57 @@ public class DataSourceRealm extends RealmBase {
     }
 
 
-	protected Map<String, Object> getUserAttributesMap(Connection dbConnection,
-			String username) {
+    /**
+     * Return the specified user's requested user attributes as a map.
+     * 
+     * @param dbConnection The database connection to be used
+     * @param username User name for which to return user attributes
+     * 
+     * @return a map containing the specified user's requested user attributes
+     */
+    protected Map<String, Object> getUserAttributesMap(Connection dbConnection, String username) {
 
-	    String preparedAttributes = getUserAttributesStatement(dbConnection);
+        String preparedAttributes = getUserAttributesStatement(dbConnection);
         if (preparedAttributes == null || preparedAttributes == USER_ATTRIBUTES_NONE_REQUESTED) {
             // The above reference comparison is intentional. USER_ATTRIBUTES_NONE_REQUESTED
             // is a tag object (empty String) to distinguish between null (not yet
             // initialized) and empty (no attributes requested).
-	        // TODO Could as well be changed to `preparedAttributes.lenghth() = 0` 
+            // TODO Could as well be changed to `preparedAttributes.lenghth() = 0`
 
             // Return null if no user attributes are requested (or if the statement was not
-            // yet built successfully) 
-			return null;
-		}
+            // yet built successfully)
+            return null;
+        }
 
-	    try (PreparedStatement stmt =
-				dbConnection.prepareStatement(preparedAttributes)) {
-			stmt.setString(1, username);
+        try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAttributes)) {
+            stmt.setString(1, username);
 
-			try (ResultSet rs = stmt.executeQuery()) {
+            try (ResultSet rs = stmt.executeQuery()) {
 
-			    if (rs.next()) {
-			        Map<String, Object> attrs = new LinkedHashMap<>();
-				    ResultSetMetaData md = rs.getMetaData();
-				    int ncols = md.getColumnCount();
-				    for (int columnIndex = 1; columnIndex <= ncols; columnIndex++) {
-				        String columnName = md.getColumnName(columnIndex);
-				        // Ignore case, database may have case-insensitive field names
-				        if (columnName.equalsIgnoreCase(userCredCol)) {
+                if (rs.next()) {
+                    Map<String, Object> attrs = new LinkedHashMap<>();
+                    ResultSetMetaData md = rs.getMetaData();
+                    int ncols = md.getColumnCount();
+                    for (int columnIndex = 1; columnIndex <= ncols; columnIndex++) {
+                        String columnName = md.getColumnName(columnIndex);
+                        // Ignore case, database may have case-insensitive field names
+                        if (columnName.equalsIgnoreCase(userCredCol)) {
                             // Always skip userCredCol (must be there if all columns
-                            // have been requested)  
-				            continue;
-				        }
-				        attrs.put(columnName, rs.getObject(columnIndex));
-					}
-				    return attrs.size() > 0 ? attrs : null;
-				}
-			}
-		} catch (SQLException e) {
-			containerLog.error(sm.getString(
-					"dataSourceRealm.getUserAttributes.exception", username), e);
-		}
+                            // have been requested)
+                            continue;
+                        }
+                        attrs.put(columnName, rs.getObject(columnIndex));
+                    }
+                    return attrs.size() > 0 ? attrs : null;
+                }
+            }
+        } catch (SQLException e) {
+            containerLog.error(
+                    sm.getString("dataSourceRealm.getUserAttributes.exception", username), e);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
 
     /**
@@ -715,7 +721,7 @@ public class DataSourceRealm extends RealmBase {
      * 
      * @param dbConnection connection for accessing the database
      */
-	private List<String> getAvailableUserAttributes(Connection dbConnection) {
+    private List<String> getAvailableUserAttributes(Connection dbConnection) {
 
         try (PreparedStatement stmt =
                 dbConnection.prepareStatement(preparedAttributesAvailable)) {

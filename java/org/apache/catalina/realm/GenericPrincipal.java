@@ -369,6 +369,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      * this method returns <code>null</code>.
      * 
      * @param obj the object to copy
+     * 
      * @return a deep copied clone of the specified object, or <code>null</code>
      *         if deep-copying was not possible
      */
@@ -464,6 +465,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      * </ul>
      * 
      * @param obj the object to copy
+     * 
      * @return a deep copied clone of the specified object or <code>null</code>,
      *         if the specified object does not implement
      *         <code>java.io.Serializable</code> or an error occurred while the
