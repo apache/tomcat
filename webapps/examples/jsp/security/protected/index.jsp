@@ -100,7 +100,7 @@ enter it here:
     	  for (int i = 0; i < values.length; i++) {
     		  value += values[i] + "<br/>";
     	  }
-    	  type = values[0].getClass().getName();
+    	  type = values[0].getClass().getName() + "[]";
       }
       type = type.replaceFirst("^java\\.lang\\.", "");
 %>
