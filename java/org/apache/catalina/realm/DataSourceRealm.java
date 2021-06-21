@@ -18,23 +18,25 @@ package org.apache.catalina.realm;
 
 
 import java.security.Principal;
+import java.sql.Array;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import javax.naming.Context;
 import javax.sql.DataSource;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.TomcatPrincipal;
 import org.apache.naming.ContextBindings;
 
 /**
@@ -582,22 +584,21 @@ public class DataSourceRealm extends RealmBase {
             return null;
         }
 
-        // Using a Set removes duplicate roles
-        Set<String> roles = null;
+        ArrayList<String> list = null;
 
         try (PreparedStatement stmt = dbConnection.prepareStatement(preparedRoles)) {
             stmt.setString(1, username);
 
             try (ResultSet rs = stmt.executeQuery()) {
-                roles = new HashSet<>();
+                list = new ArrayList<>();
 
                 while (rs.next()) {
                     String role = rs.getString(1);
                     if (role != null) {
-                        roles.add(role.trim());
+                        list.add(role.trim());
                     }
                 }
-                return new ArrayList<String>(roles);
+                return list;
             }
         } catch(SQLException e) {
             containerLog.error(sm.getString("dataSourceRealm.getRoles.exception", username), e);
@@ -614,6 +615,25 @@ public class DataSourceRealm extends RealmBase {
 
     /**
      * Return the specified user's requested user attributes as a map.
+     * <p>
+     * This method does not support values of every possible SQL data type. Uses
+     * {@link ResultSet#getObject(int)} to get the attribute's value, except for
+     * columns of these SQL types:
+     * <ul>
+     * <li>{@link Types#ARRAY}</li>
+     * <li>{@link Types#BLOB}</li>
+     * <li>{@link Types#CLOB}</li>
+     * <li>{@link Types#NCLOB}</li>
+     * </ul>
+     * Other multivalued or complex types obtained from <code>getObject(int)</code>
+     * may not be serializable and so, cannot be defensively copied when being
+     * returned from {@link TomcatPrincipal#getAttribute(String)}. In that case,
+     * only a <code>String</code> with the object's string representation will be
+     * returned (in contrast to the object itself).
+     * <p>
+     * In other words, user attributes queried by <code>DataSourceRealm</code> works
+     * well with values of a simple <em>scalar</em> type as well as for SQL arrays,
+     * BLOBs, CLOBs and NCLOBs. Any other types are not fully supported.
      * 
      * @param dbConnection The database connection to be used
      * @param username User name for which to return user attributes
@@ -623,14 +643,9 @@ public class DataSourceRealm extends RealmBase {
     protected Map<String, Object> getUserAttributesMap(Connection dbConnection, String username) {
 
         String preparedAttributes = getUserAttributesStatement(dbConnection);
-        if (preparedAttributes == null || preparedAttributes == USER_ATTRIBUTES_NONE_REQUESTED) {
-            // The above reference comparison is intentional. USER_ATTRIBUTES_NONE_REQUESTED
-            // is a tag object (empty String) to distinguish between null (not yet
-            // initialized) and empty (no attributes requested).
-            // TODO Could as well be changed to `preparedAttributes.lenghth() = 0`
-
-            // Return null if no user attributes are requested (or if the statement was not
-            // yet built successfully)
+        if (preparedAttributes == null || preparedAttributes.isEmpty()) {
+            // Return null if no user attributes are requested (or if the SQL statement was
+            // not yet built successfully)
             return null;
         }
 
@@ -644,6 +659,7 @@ public class DataSourceRealm extends RealmBase {
                     ResultSetMetaData md = rs.getMetaData();
                     int ncols = md.getColumnCount();
                     for (int columnIndex = 1; columnIndex <= ncols; columnIndex++) {
+
                         String columnName = md.getColumnName(columnIndex);
                         // Ignore case, database may have case-insensitive field names
                         if (columnName.equalsIgnoreCase(userCredCol)) {
@@ -651,8 +667,45 @@ public class DataSourceRealm extends RealmBase {
                             // have been requested)
                             continue;
                         }
-                        attrs.put(columnName, rs.getObject(columnIndex));
+
+                        switch (md.getColumnType(columnIndex)) {
+                        case Types.BLOB:
+                            Blob blob = rs.getBlob(columnIndex);
+                            if (blob != null) {
+                                attrs.put(columnName, blob.getBytes(1, (int) blob.length()));
+                                blob.free();
+                            } else {
+                                attrs.put(columnName, null);
+                            }
+                            break;
+
+                        case Types.CLOB:
+                        case Types.NCLOB:
+                            Clob clob = rs.getClob(columnIndex);
+                            if (clob != null) {
+                                attrs.put(columnName, clob.getSubString(1, (int) clob.length()));
+                                clob.free();
+                            } else {
+                                attrs.put(columnName, null);
+                            }
+                            break;
+
+                        case Types.ARRAY:
+                            Array array = rs.getArray(columnIndex);
+                            if (array != null) {
+                                attrs.put(columnName, array.getArray());
+                                array.free();
+                            } else {
+                                attrs.put(columnName, null);
+                            }
+                            break;
+
+                        default:
+                            attrs.put(columnName, rs.getObject(columnIndex));
+                            break;
+                        }
                     }
+
                     return attrs.size() > 0 ? attrs : null;
                 }
             }
@@ -728,7 +781,7 @@ public class DataSourceRealm extends RealmBase {
 
             try (ResultSet rs = stmt.executeQuery()) {
 
-                // Query is not expected to return any rows (...WHERE FALSE) so, must not call
+                // Query is not expected to return any rows (...WHERE 1 = 2) so, must not call
                 // next(). ResultSetMetadata is available before calling next() anyway.  
                 List<String> result = new ArrayList<>();
                 ResultSetMetaData md = rs.getMetaData();
@@ -811,9 +864,14 @@ public class DataSourceRealm extends RealmBase {
         preparedAttributesTail = temp.toString();
 
         // Create the available user attributes PreparedStatement string
+        // With this statement, we only want to query the definitions of all fields of
+        // the user table. In other words, we want an empty ResultSet, which, however,
+        // still has its ResultSetMetadata describing all the column types. In order to
+        // prevent the database from sending any row, it uses a WHERE clause that always
+        // evaluates to false (WHERE 1 = 2).
         temp = new StringBuilder("SELECT * FROM ");
         temp.append(userTable);
-        temp.append(" WHERE FALSE");
+        temp.append(" WHERE 1 = 2");
         preparedAttributesAvailable = temp.toString();
 
         super.startInternal();

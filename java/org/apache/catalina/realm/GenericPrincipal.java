@@ -38,7 +38,6 @@ import java.util.UUID;
 import javax.security.auth.login.LoginContext;
 
 import org.apache.catalina.TomcatPrincipal;
-import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.ietf.jgss.GSSCredential;
 
 /**
@@ -335,7 +334,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
     @Override
     public Object getAttribute(String name) {
-        if (attributes == null) {
+        if (attributes == null || name == null) {
             return null;
         }
         Object value = attributes.get(name);
@@ -353,12 +352,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
             return Collections.emptyEnumeration();
         }
         return Collections.enumeration(attributes.keySet());
-    }
-
-
-    @Override
-    public boolean isAttributesCaseIgnored() {
-        return (attributes instanceof CaseInsensitiveKeyMap<?>);
     }
 
 

@@ -83,24 +83,27 @@ enter it here:
 <%
   } else {
     TomcatPrincipal principal = (TomcatPrincipal) p;
-    boolean ignoreCase = principal.isAttributesCaseIgnored();
 %>
 <p>The principal contains the following attributes:</p>
 <table>
-<tr><th>Name <small>(case-<%= ignoreCase ? "in": "" %>sensitive)</small></th><th>Value</th><th>Type</th></tr>
+<tr><th>Name</th><th>Value</th><th>Type</th></tr>
 <%
     Enumeration<String> names = principal.getAttributeNames();
     while (names.hasMoreElements()) {
       String name = names.nextElement();
       Object value = principal.getAttribute(name);
-      String type = value != null ? value.getClass().getName() : "null";
+      String type = value != null ? value.getClass().getName() : "unknown";
       if (value instanceof Object[]) {
-    	  Object[] values = (Object[]) value;
-    	  value = "";
-    	  for (int i = 0; i < values.length; i++) {
-    		  value += values[i] + "<br/>";
-    	  }
-    	  type = values[0].getClass().getName() + "[]";
+        Object[] values = (Object[]) value;
+        value = "";
+        for (int i = 0; i < values.length; i++) {
+          value += values[i] + "<br/>";
+        }
+        if (values.length > 0) {
+          type = values[0].getClass().getName() + "[]";
+        } else {
+          type = "unknown";
+        }
       }
       type = type.replaceFirst("^java\\.lang\\.", "");
 %>

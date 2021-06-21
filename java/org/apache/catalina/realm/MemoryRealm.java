@@ -23,10 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -55,13 +53,12 @@ public class MemoryRealm  extends RealmBase {
      * Contains the names of all user attributes available for this Realm.
      */
     private static final List<String> USER_ATTRIBUTES_AVAILABLE =
-            new ArrayList<>(Arrays.asList("username", "fullname", "roles"));
+            Arrays.asList("username", "fullname", "roles");
 
     /**
      * Contains the names of user attributes for which access is denied.
      */
-    private static final List<String> USER_ATTRIBUTES_ACCESS_DENIED =
-            new ArrayList<>(Arrays.asList("password"));
+    private static final List<String> USER_ATTRIBUTES_ACCESS_DENIED = Arrays.asList("password");
 
     // ----------------------------------------------------- Instance Variables
 
@@ -249,7 +246,7 @@ public class MemoryRealm  extends RealmBase {
     void addUser(String username, String password, String roles, String fullname) {
 
         // Accumulate the list of roles for this user
-        Set<String> roleSet = new LinkedHashSet<>();
+        List<String> list = new ArrayList<>();
         roles += ",";
         while (true) {
             int comma = roles.indexOf(',');
@@ -257,7 +254,7 @@ public class MemoryRealm  extends RealmBase {
                 break;
             }
             String role = roles.substring(0, comma).trim();
-            roleSet.add(role);
+            list.add(role);
             roles = roles.substring(comma + 1);
         }
 
@@ -269,23 +266,23 @@ public class MemoryRealm  extends RealmBase {
                 switch (name) {
                 case "username":
                 case "name":
-                    attributes.put(name, new String(username));
+                    attributes.put(name, username);
                     break;
 
                 case "fullname":
-                    attributes.put(name, new String(fullname));
+                    attributes.put(name, fullname);
                     break;
 
                 case "roles":
-                    attributes.put(name, StringUtils.join(roleSet));
+                    attributes.put(name, StringUtils.join(list));
                     break;
                 }
             }
         }
 
         // Construct and cache the Principal for this user
-        GenericPrincipal principal = new GenericPrincipal(username, new ArrayList<String>(roleSet),
-                null, null, null, attributes);
+        GenericPrincipal principal =
+                new GenericPrincipal(username, list, null, null, null, attributes);
         principals.put(username, principal);
         credentials.put(username, password);
 

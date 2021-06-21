@@ -1626,21 +1626,21 @@ public class JNDIRealm extends RealmBase {
         String[] attrIds = null;
         if (userAttributesList == null
                 || !userAttributesList.get(0).equals(USER_ATTRIBUTES_WILDCARD)) {
-            Set<String> list = new HashSet<>();
+            Set<String> attrSet = new HashSet<>();
             if (userPassword != null) {
-                list.add(userPassword);
+                attrSet.add(userPassword);
             }
             if (userRoleName != null) {
-                list.add(userRoleName);
+                attrSet.add(userRoleName);
             }
             if (userRoleAttribute != null) {
-                list.add(userRoleAttribute);
+                attrSet.add(userRoleAttribute);
             }
             if (userAttributesList != null) {
-                list.addAll(userAttributesList);
+                attrSet.addAll(userAttributesList);
             }
-            attrIds = new String[list.size()];
-            list.toArray(attrIds);
+            attrIds = new String[attrSet.size()];
+            attrSet.toArray(attrIds);
         }
 
         // Use pattern or search for user entry

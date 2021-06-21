@@ -18,7 +18,6 @@ package org.apache.catalina.realm;
 
 import java.io.ObjectStreamException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -56,14 +55,12 @@ public class UserDatabaseRealm extends RealmBase {
      * Contains the names of all user attributes available for this Realm.
      */
     private static final List<String> USER_ATTRIBUTES_AVAILABLE =
-            new ArrayList<>(Arrays.asList("username", "fullname", "groups",
-                    "roles", "effectiveRoles"));
+            Arrays.asList("username", "fullname", "groups", "roles", "effectiveRoles");
 
     /**
      * Contains the names of user attributes for which access is denied.
      */
-    private static final List<String> USER_ATTRIBUTES_ACCESS_DENIED =
-            new ArrayList<>(Arrays.asList("password"));
+    private static final List<String> USER_ATTRIBUTES_ACCESS_DENIED = Arrays.asList("password");
 
 
     // ----------------------------------------------------- Instance Variables
