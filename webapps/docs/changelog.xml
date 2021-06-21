@@ -217,6 +217,9 @@
         16 onwards to the <code>service.bat</code> script to align it with the
         other start-up scripts. PR provided by MCMicS. (markt)
       </fix>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
