@@ -111,6 +111,10 @@
         Refactor the <code>RemoteIpValve</code> to use the common utility method
         for list to comma separated string conversion. (markt)
       </scode>
+      <scode>
+        Refactor <code>JNDIRealm$JNDIConnection</code> so its fields are
+        accessible to sub-classes of <code>JNDIRealm</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

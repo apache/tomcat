@@ -3083,29 +3083,29 @@ public class JNDIRealm extends RealmBase {
          * The MessageFormat object associated with the current
          * <code>userSearch</code>.
          */
-        protected MessageFormat userSearchFormat = null;
+        public MessageFormat userSearchFormat = null;
 
         /**
          * An array of MessageFormat objects associated with the current
          * <code>userPatternArray</code>.
          */
-        protected MessageFormat[] userPatternFormatArray = null;
+        public MessageFormat[] userPatternFormatArray = null;
 
         /**
          * The MessageFormat object associated with the current
          * <code>roleBase</code>.
          */
-        protected MessageFormat roleBaseFormat = null;
+        public MessageFormat roleBaseFormat = null;
 
         /**
          * The MessageFormat object associated with the current
          * <code>roleSearch</code>.
          */
-        protected MessageFormat roleFormat = null;
+        public MessageFormat roleFormat = null;
 
         /**
          * The directory context linking us to our directory server.
          */
-        protected DirContext context = null;
+        public DirContext context = null;
     }
 }
