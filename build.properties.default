@@ -270,10 +270,10 @@ unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.vers
 # ----- Checkstyle, version 6.16 or later -----
 # Checkstyle 7 requires Java 8
 # Therefore, use checkstyle-backport-jre6
-checkstyle.version=8.22
+checkstyle.version=8.43
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=MD5|SHA-1
-checkstyle.checksum.value=03cb9ae24d4103134095ccd650b3bbb7|32d2996bedc97ee4e22c50e6ff5a8b571c8d816e
+checkstyle.checksum.value=e62de5cde6a85e90de1027c9c0593a99|94993f0d96460a80ba044c281872f479625a8d5a
 checkstyle.home=${base.path}/checkstyle-backport-jre6-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-checkstyle.loc}/com/puppycrawl/tools/checkstyle-backport-jre6/${checkstyle.version}/checkstyle-backport-jre6-${checkstyle.version}-all.jar
