@@ -194,6 +194,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update JUnit to version 4.13.2. (markt)
+      </update>
+      <update>
+        Update UnboundID to 6.0.0. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.68 (schultz)" rtext="2021-06-15">
   <subsection name="Other">
@@ -208,12 +218,6 @@
         16 onwards to the <code>service.bat</code> script to align it with the
         other start-up scripts. PR provided by MCMicS. (markt)
       </fix>
-      <update>
-        Update JUnit to version 4.13.2. (markt)
-      </update>
-      <update>
-        Update UnboundID to 6.0.0. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
