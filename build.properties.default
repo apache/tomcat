@@ -287,7 +287,8 @@ cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
 cobertura.loc=${base-sf.loc}/cobertura/cobertura-${cobertura.version}-bin.tar.gz
 
-# ----- Findbugs -----
+# ----- SpotBugs (originally FindBugs) -----
+# 3.1.12 is the last version that runs on Java 7
 findbugs.version=3.1.12
 findbugs.checksum.enabled=true
 findbugs.checksum.algorithm=MD5|SHA-1
