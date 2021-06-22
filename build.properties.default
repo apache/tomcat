@@ -230,6 +230,7 @@ hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
 hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest/${hamcrest.version}/hamcrest-${hamcrest.version}.jar
 
 # ----- EasyMock, version 3.6 or later -----
+# 3.6 is the last version that runs on Java 7
 easymock.version=3.6
 easymock.checksum.enabled=true
 easymock.checksum.algorithm=SHA-512
