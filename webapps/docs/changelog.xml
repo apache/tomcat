@@ -224,6 +224,9 @@
         16 onwards to the <code>service.bat</code> script to align it with the
         other start-up scripts. PR provided by MCMicS. (markt)
       </fix>
+      <update>
+        Update JUnit to version 4.13.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
