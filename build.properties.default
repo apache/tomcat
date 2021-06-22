@@ -303,13 +303,10 @@ bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.b
 
 # ----- OSGi annotations bundle, version 1.0.0 or later            -----
 # ----- required to avoid Javadoc error when using bnd annotations -----
-osgi-annotations.version=1.0.0
-
-# checksums for OSGi annotations, version 1.0.0
+osgi-annotations.version=1.1.0
 osgi-annotations.checksum.enabled=true
 osgi-annotations.checksum.algorithm=MD5|SHA-1
-osgi-annotations.checksum.value=153054f987534244f95a399539b11375|b6e802bceba0682353466abf8fadbbd662b2f7f8
-
+osgi-annotations.checksum.value=4777cc8253100d514365205d59bbef60|534cecc7af8d22a3f0919a6a8e42fe5822f6e6e1
 osgi-annotations.home=${base.path}/osgi-annotations-${osgi-annotations.version}
 osgi-annotations.jar=${osgi-annotations.home}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar
 osgi-annotations.loc=${base-maven.loc}/org/osgi/org.osgi.annotation.bundle/${osgi-annotations.version}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar

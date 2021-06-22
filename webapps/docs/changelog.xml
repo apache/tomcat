@@ -242,6 +242,9 @@
       <update>
         Update SpotBugs to 4.2.3. (markt)
       </update>
+      <update>
+        Update OSGi annotations to 1.1.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
