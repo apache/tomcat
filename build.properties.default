@@ -249,6 +249,7 @@ cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
 
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
+# 2.6 is the last version that runs on Java 7
 objenesis.version=2.6
 objenesis.checksum.enabled=true
 objenesis.checksum.algorithm=SHA-512
