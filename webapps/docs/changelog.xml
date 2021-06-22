@@ -193,6 +193,9 @@
         and restore code that was removed in error leading to JSP compilation
         failures in some circumstances. (markt)
       </fix>
+      <update>
+        Update to the Eclipse JDT compiler 4.20. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
