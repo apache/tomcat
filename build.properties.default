@@ -279,11 +279,11 @@ cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
 cobertura.loc=${base-sf.loc}/cobertura/cobertura-${cobertura.version}-bin.tar.gz
 
-# ----- Findbugs -----
-findbugs.version=3.1.12
+# ----- SpotBugs (originally FindBugs) -----
+findbugs.version=4.2.3
 findbugs.checksum.enabled=true
 findbugs.checksum.algorithm=MD5|SHA-1
-findbugs.checksum.value=8c54502a8e1b78ea6b173a186ce6f379|95114d9aaeeba7bd4ea5a3d6a2167cd6c87bb943
+findbugs.checksum.value=6eb4a01355a5770f02e136c80182baa6|37daf40c76f11f7ae31894ab8d8fefd7fcb9d07b
 findbugs.home=${base.path}/spotbugs-${findbugs.version}
 findbugs.jar=${findbugs.home}/lib/spotbugs-ant.jar
 findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/spotbugs-${findbugs.version}.tgz
