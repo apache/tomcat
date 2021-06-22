@@ -226,10 +226,10 @@ hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
 hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest/${hamcrest.version}/hamcrest-${hamcrest.version}.jar
 
 # ----- EasyMock, version 3.2 or later -----
-easymock.version=4.2
+easymock.version=4.3
 easymock.checksum.enabled=true
-easymock.checksum.algorithm=SHA-512
-easymock.checksum.value=6fbc3080c9f12aa8dcd1db8aa74e1621caa1d437c0fa64c70a3fe0d46ff74ac2d8d87ac544550487b7aaae98844d4d9d114c724bfc6d9a8873136353f87d8f2e
+easymock.checksum.algorithm=MD5|SHA-1
+easymock.checksum.value=f4d141b8c32c022def9089ee4f890c90|b0dbe2df1a71b8115835561f46a8f06cb168a94f
 easymock.home=${base.path}/easymock-${easymock.version}
 easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
 easymock.loc=${base-maven.loc}/org/easymock/easymock/${easymock.version}/easymock-${easymock.version}.jar
