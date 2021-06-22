@@ -239,6 +239,9 @@
       <update>
         Update CheckStyle to 8.43. (markt)
       </update>
+      <update>
+        Update SpotBugs to 4.2.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
