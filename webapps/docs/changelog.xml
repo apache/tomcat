@@ -233,6 +233,9 @@
       <update>
         Update Objenesis to 3.2. (markt)
       </update>
+      <update>
+        Update UnboundID to 6.0.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
