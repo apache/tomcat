@@ -236,6 +236,9 @@
       <update>
         Update EasyMock to 4.3. (markt)
       </update>
+      <update>
+        Update Objenesis to 3.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

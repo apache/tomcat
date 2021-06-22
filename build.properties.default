@@ -244,10 +244,10 @@ cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
 
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
-objenesis.version=3.1
+objenesis.version=3.2
 objenesis.checksum.enabled=true
-objenesis.checksum.algorithm=SHA-512
-objenesis.checksum.value=4dcfc065d6ccc1e0cb716fc86d844e81a347591d06f99b1840157c51c58a842bdebe86f6bcacee65996b64468d21bdf3bcf463a7f4ae5261440c8f0f6fac8ab3
+objenesis.checksum.algorithm=MD5|SHA-1
+objenesis.checksum.value=5c1ee20481a06561af295034ea89c4b4|7fadf57620c8b8abdf7519533e5527367cb51f09
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
