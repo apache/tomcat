@@ -233,6 +233,9 @@
       <update>
         Update JUnit to version 4.13.2. (markt)
       </update>
+      <update>
+        Update EasyMock to 4.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
