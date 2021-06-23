@@ -144,9 +144,6 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
         private final int validWriteCount;
         private final boolean explicitFlush;
 
-        private PrintWriter pw = null;
-        private OutputStream os = null;
-
         public HeadTestServlet(int bufferSize, boolean useWriter, int invalidWriteCount, ResetType resetType,
                 int validWriteCount, boolean explicitFlush) {
             this.bufferSize = bufferSize;
@@ -164,6 +161,8 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
 
+            PrintWriter pw = null;
+            OutputStream os = null;
             // Do this rather than repeated calls to getWriter() /
             // getOutputStream() to ensure that HEAD handling doesn't rely on
             // replacing the OutputStream / PrintWriter (an earlier
@@ -175,7 +174,7 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
             }
 
             for (int i = 0; i < invalidWriteCount; i++) {
-                write(INVALID);
+                write(INVALID, pw, os);
             }
 
             try {
@@ -193,11 +192,11 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
                     }
                 }
             } catch (IllegalStateException ise) {
-                write("\nIllegalStateException\n");
+                write("\nIllegalStateException\n", pw, os);
             }
 
             for (int i = 0; i < validWriteCount; i++) {
-                write(VALID);
+                write(VALID, pw, os);
             }
 
             if (explicitFlush) {
@@ -205,7 +204,7 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
             }
         }
 
-        private void write(String msg) throws IOException {
+        private void write(String msg, PrintWriter pw, OutputStream os) throws IOException {
             if (useWriter) {
                 pw.print(msg);
             } else {
