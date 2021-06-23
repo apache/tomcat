@@ -115,6 +115,10 @@
         Refactor <code>JNDIRealm$JNDIConnection</code> so its fields are
         accessible to sub-classes of <code>JNDIRealm</code>. (markt)
       </scode>
+      <fix>
+        Fix serialization warnings in <code>UserDatabasePrincipal</code>
+        reported by SpotBugs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

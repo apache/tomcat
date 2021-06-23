@@ -189,9 +189,8 @@ public class MemoryUserDatabaseTests {
     @Test
     public void testSerializePrincipal()
         throws Exception {
-        UserDatabaseRealm realm = new UserDatabaseRealm();
         User user = db.findUser("admin");
-        GenericPrincipal gpIn = realm.new UserDatabasePrincipal(user);
+        GenericPrincipal gpIn = new UserDatabaseRealm.UserDatabasePrincipal(user, db);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(gpIn);
