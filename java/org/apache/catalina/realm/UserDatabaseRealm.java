@@ -308,6 +308,8 @@ public class UserDatabaseRealm extends RealmBase {
         /**
          * Magic method from {@link java.io.Serializable}.
          *
+         * @return The object to serialize instead of this object
+         *
          * @throws ObjectStreamException Not thrown by this implementation
          */
         private Object writeReplace() throws ObjectStreamException {
