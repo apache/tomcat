@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.realm;
 
+import java.io.ObjectStreamException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -172,7 +173,7 @@ public class UserDatabaseRealm extends RealmBase {
         if (user == null) {
             return null;
         } else {
-            return new UserDatabasePrincipal(user);
+            return new UserDatabasePrincipal(user, database);
         }
     }
 
@@ -246,13 +247,15 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    public final class UserDatabasePrincipal extends GenericPrincipal {
+    public static final class UserDatabasePrincipal extends GenericPrincipal {
         private static final long serialVersionUID = 1L;
-        private final User user;
+        private final transient User user;
+        private final transient UserDatabase database;
 
-        public UserDatabasePrincipal(User user) {
+        public UserDatabasePrincipal(User user, UserDatabase database) {
             super(user.getName(), null, null);
             this.user = user;
+            this.database = database;
         }
 
         @Override
@@ -282,7 +285,6 @@ public class UserDatabaseRealm extends RealmBase {
             } else if (role == null) {
                 return false;
             }
-            UserDatabase database = getUserDatabase();
             if (database == null) {
                 return super.hasRole(role);
             }
@@ -303,11 +305,14 @@ public class UserDatabaseRealm extends RealmBase {
             return false;
         }
 
-        private Object writeReplace() {
+        /**
+         * Magic method from {@link java.io.Serializable}.
+         *
+         * @throws ObjectStreamException Not thrown by this implementation
+         */
+        private Object writeReplace() throws ObjectStreamException {
             // Replace with a static principal disconnected from the database
             return new GenericPrincipal(getName(), null, Arrays.asList(getRoles()));
         }
-
     }
-
 }

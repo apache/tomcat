@@ -111,6 +111,10 @@
         Refactor the <code>RemoteIpValve</code> to use the common utility method
         for list to comma separated string conversion. (markt)
       </scode>
+      <fix>
+        Fix serialization warnings in <code>UserDatabasePrincipal</code>
+        reported by SpotBugs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
