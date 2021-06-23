@@ -208,6 +208,12 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Random will be used multiple times if required. -->
+    <Class name="org.apache.catalina.core.StandardServer"/>
+    <Method name="await"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
     <!-- This could be optimised but a) the code would be less clear and -->
     <!-- b) SpotBugs still reports an error with the optimised code.     -->
     <Class name="org.apache.catalina.core.StandardServer"/>
@@ -249,6 +255,13 @@
     <Class name="org.apache.catalina.filters.CorsFilter" />
     <Method name="addStandardHeaders" />
     <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
+  </Match>
+  <Match>
+    <!-- Random will be SecureRandom by default and will be used multiple
+         times. -->
+    <Class name="org.apache.catalina.filters.CsrfPreventionFilterBase"/>
+    <Method name="generateNonce"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <!-- ParseException is ignored in loop but handled afterwards if all formats failed -->
@@ -364,6 +377,12 @@
       <Method name="roles" />
     </Or>
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
+  </Match>
+  <Match>
+    <!-- Random will be SecureRandom and will be used multiple times. -->
+    <Class name="org.apache.catalina.realm.DigestCredentialHandlerBase"/>
+    <Method name="mutate"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <!-- roles will be initialized in addAttributeValues -->
@@ -686,9 +705,24 @@
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
+    <!-- Random is SecureRandom and will be used multiple times. -->
+    <Class name="org.apache.catalina.tribes.util.UUIDGenerator"/>
+    <Or>
+      <Method name="&lt;clinit&gt;"/>
+      <Method name="nextBytes"/>
+    </Or>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.util.LifecycleBase" />
     <Method name="getState"/>
     <Bug code="UG" />
+  </Match>
+  <Match>
+    <!-- Random is SecureRandom and will be used multiple times. -->
+    <Class name="org.apache.catalina.util.SessionIdGeneratorBase"/>
+    <Method name="createSecureRandom"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <!-- the platform default encoding is a fallback -->
@@ -1559,10 +1593,28 @@
     <Bug pattern="WA_NOT_IN_LOOP" />
   </Match>
   <Match>
+    <!-- Random will be SecureRandom and will be used multiple times. -->
+    <Class name="org.apache.tomcat.websocket.DigestAuthenticator"/>
+    <Method name="getAuthorization"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- Random will be SecureRandom and will be used multiple times. -->
+    <Class name="org.apache.tomcat.websocket.Util"/>
+    <Method name="generateMask"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
     <!-- Object creation will trigger input processing. -->
     <Class name="org.apache.tomcat.websocket.WsWebSocketContainer" />
     <Method name="connectToServer" />
     <Bug code="DLS" />
+  </Match>
+  <Match>
+    <!-- Random will be used multiple times. -->
+    <Class name="org.apache.tomcat.websocket.WsWebSocketContainer"/>
+    <Method name="generateWsKeyValue"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <!-- Fall-through expected -->
