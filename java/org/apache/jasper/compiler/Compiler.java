@@ -316,7 +316,7 @@ public abstract class Compiler {
                     javaEncoding);
         }
 
-        if ((ctxt!=null) && ctxt.getOptions().getTrimSpaces().equals(TrimSpacesOption.EXTENDED)) {
+        if (ctxt.getOptions().getTrimSpaces().equals(TrimSpacesOption.EXTENDED)) {
             writer = new NewlineReductionServletWriter(new PrintWriter(osw));
         } else {
             writer = new ServletWriter(new PrintWriter(osw));
