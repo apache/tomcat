@@ -222,28 +222,20 @@ public class MemoryUser extends AbstractUser {
             sb.append(Escape.xml(fullName));
             sb.append("\"");
         }
-        synchronized (groups) {
-            if (groups.size() > 0) {
-                sb.append(" groups=\"");
-                StringUtils.join(groups, ',', new Function<Group>() {
-                    @Override public String apply(Group t) {
-                        return Escape.xml(t.getGroupname());
-                    }
-                }, sb);
-                sb.append("\"");
+        sb.append(" groups=\"");
+        StringUtils.join(groups, ',', new Function<Group>() {
+            @Override public String apply(Group t) {
+                return Escape.xml(t.getGroupname());
             }
-        }
-        synchronized (roles) {
-            if (roles.size() > 0) {
-                sb.append(" roles=\"");
-                StringUtils.join(roles, ',', new Function<Role>() {
-                    @Override public String apply(Role t) {
-                        return Escape.xml(t.getRolename());
-                    }
-                }, sb);
-                sb.append("\"");
+        }, sb);
+        sb.append("\"");
+        sb.append(" roles=\"");
+        StringUtils.join(roles, ',', new Function<Role>() {
+            @Override public String apply(Role t) {
+                return Escape.xml(t.getRolename());
             }
-        }
+        }, sb);
+        sb.append("\"");
         sb.append("/>");
         return sb.toString();
     }
@@ -263,28 +255,20 @@ public class MemoryUser extends AbstractUser {
             sb.append(Escape.xml(fullName));
             sb.append("\"");
         }
-        synchronized (groups) {
-            if (groups.size() > 0) {
-                sb.append(", groups=\"");
-                StringUtils.join(groups, ',', new Function<Group>() {
-                    @Override public String apply(Group t) {
-                        return Escape.xml(t.getGroupname());
-                    }
-                }, sb);
-                sb.append("\"");
+        sb.append(", groups=\"");
+        StringUtils.join(groups, ',', new Function<Group>() {
+            @Override public String apply(Group t) {
+                return Escape.xml(t.getGroupname());
             }
-        }
-        synchronized (roles) {
-            if (roles.size() > 0) {
-                sb.append(", roles=\"");
-                StringUtils.join(roles, ',', new Function<Role>() {
-                    @Override public String apply(Role t) {
-                        return Escape.xml(t.getRolename());
-                    }
-                }, sb);
-                sb.append("\"");
+        }, sb);
+        sb.append("\"");
+        sb.append(", roles=\"");
+        StringUtils.join(roles, ',', new Function<Role>() {
+            @Override public String apply(Role t) {
+                return Escape.xml(t.getRolename());
             }
-        }
+        }, sb);
+        sb.append("\"");
         return sb.toString();
     }
 }
