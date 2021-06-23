@@ -171,13 +171,9 @@ public class MemoryGroup extends AbstractGroup {
             sb.append(description);
             sb.append("\"");
         }
-        synchronized (roles) {
-            if (roles.size() > 0) {
-                sb.append(" roles=\"");
-                StringUtils.join(roles, ',', Role::getRolename, sb);
-                sb.append("\"");
-            }
-        }
+        sb.append(" roles=\"");
+        StringUtils.join(roles, ',', Role::getRolename, sb);
+        sb.append("\"");
         sb.append("/>");
         return sb.toString();
     }
