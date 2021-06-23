@@ -39,6 +39,12 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Null is not possible here -->
+    <Class name="javax.servlet.http.HttpServlet$NoBodyPrintWriter"/>
+    <Method name="resetBuffer"/>
+    <Bug pattern="NP_NULL_PARAM_DEREF"/>
+  </Match>
+  <Match>
     <!-- Only base null is handled by this resolver -->
     <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver"/>
     <Or>
