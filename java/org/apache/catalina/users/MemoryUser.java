@@ -221,20 +221,12 @@ public class MemoryUser extends AbstractUser {
             sb.append(Escape.xml(fullName));
             sb.append("\"");
         }
-        synchronized (groups) {
-            if (groups.size() > 0) {
-                sb.append(" groups=\"");
-                StringUtils.join(groups, ',', (x) -> Escape.xml(x.getGroupname()), sb);
-                sb.append("\"");
-            }
-        }
-        synchronized (roles) {
-            if (roles.size() > 0) {
-                sb.append(" roles=\"");
-                StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
-                sb.append("\"");
-            }
-        }
+        sb.append(" groups=\"");
+        StringUtils.join(groups, ',', (x) -> Escape.xml(x.getGroupname()), sb);
+        sb.append("\"");
+        sb.append(" roles=\"");
+        StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
+        sb.append("\"");
         sb.append("/>");
         return sb.toString();
     }
@@ -254,20 +246,12 @@ public class MemoryUser extends AbstractUser {
             sb.append(Escape.xml(fullName));
             sb.append("\"");
         }
-        synchronized (groups) {
-            if (groups.size() > 0) {
-                sb.append(", groups=\"");
-                StringUtils.join(groups, ',', (x) -> Escape.xml(x.getGroupname()), sb);
-                sb.append("\"");
-            }
-        }
-        synchronized (roles) {
-            if (roles.size() > 0) {
-                sb.append(", roles=\"");
-                StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
-                sb.append("\"");
-            }
-        }
+        sb.append(", groups=\"");
+        StringUtils.join(groups, ',', (x) -> Escape.xml(x.getGroupname()), sb);
+        sb.append("\"");
+        sb.append(", roles=\"");
+        StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
+        sb.append("\"");
         return sb.toString();
     }
 }
