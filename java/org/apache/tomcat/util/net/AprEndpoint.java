@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
@@ -299,6 +300,16 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     }
 
 
+    @Override
+    public String getId() {
+        if (getUnixDomainSocketPath() != null) {
+            return getUnixDomainSocketPath();
+        } else {
+            return null;
+        }
+    }
+
+
     // ----------------------------------------------- Public Lifecycle Methods
 
 
@@ -381,13 +392,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 FileAttribute<Set<PosixFilePermission>> attrs =
                          PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString(
                                  getUnixDomainSocketPathPermissions()));
-                Files.setAttribute(Paths.get(getUnixDomainSocketPath()), attrs.name(), attrs.value());
-            }
-            else {
-                java.io.File file = Paths.get(getUnixDomainSocketPath()).toFile();
-                file.setReadable(true, false);
-                file.setWritable(true, false);
-                file.setExecutable(false, false);
+                Path path = Paths.get(getUnixDomainSocketPath());
+                Files.setAttribute(path, attrs.name(), attrs.value());
             }
         } else {
             if (OS.IS_WIN32 || OS.IS_WIN64) {
