@@ -1634,6 +1634,18 @@
     <Bug code="HRS" />
   </Match>
   <Match>
+    <!-- As an example, this usage is fine -->
+    <Class name="async.Stockticker"/>
+    <Method name="run"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- The Random is re-used -->
+    <Class name="jsp2.examples.simpletag.ShuffleSimpleTag"/>
+    <Method name="doTag"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
     <!-- Not really unused as it registers itself during construction -->
     <Class name="nonblocking.ByteCounter" />
     <Method name="doPost" />
@@ -1644,6 +1656,21 @@
     <Class name="nonblocking.NumberWriter" />
     <Method name="doGet" />
     <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+  </Match>
+  <Match>
+    <!-- The Random is re-used -->
+    <Class name="num.NumberGuessBean"/>
+    <Method name="reset"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- The Random is re-used -->
+    <Class name="websocket.snake.SnakeAnnotation"/>
+    <Or>
+      <Method name="getRandomHexColor"/>
+      <Method name="getRandomLocation"/>
+    </Or>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
 
 
@@ -1718,6 +1745,12 @@
     <Class name="org.apache.catalina.connector.TestSendFile"/>
     <Method name="testBug60409"/>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
+    <!-- Single use of Random is deliberate -->
+    <Class name="org.apache.catalina.connector.TestSendFile$Bug60409Servlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <!-- Dead store is deliberate -->
@@ -1798,6 +1831,15 @@
     <Bug pattern="RR_NOT_CHECKED"/>
   </Match>
   <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.catalina.startup.FastNonSecureRandom"/>
+    <Or>
+      <Method name="nextBytes"/>
+      <Method name="setSeed"/>
+    </Or>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
     <!-- Deliberate hack for the purposes of the test -->
     <Class name="org.apache.catalina.startup.TesterServletWithAnnotations"/>
     <Or>
@@ -1866,12 +1908,30 @@
     </Or>
   </Match>
   <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.catalina.tribes.demos.LoadTest$LoadMessage"/>
+    <Method name="&lt;clinit&gt;"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.demos.LoadTest$SystemExit" />
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.catalina.tribes.demos.MapDemo$SimpleTableDemo" />
+    <Mehtod name="random"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.demos.MapDemo$SystemExit" />
     <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.catalina.tribes.group.TestGroupChannelSenderConnections$TestMsg" />
+    <Method name="&lt;init&gt;"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <Class name="org.apache.catalina.tribes.test.channel.TestChannelOptionFlag" />
@@ -1894,8 +1954,38 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.catalina.tribes.test.channel.TestDataIntegrity$Data" />
+    <Method name="createRandomData"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.catalina.tribes.test.channel.TestMulticastPackages$Data" />
+    <Method name="createRandomData"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.test.channel.TestRemoteProcessException" />
    <Bug code="Nm" />
+  </Match>
+  <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.catalina.tribes.test.channel.TestRemoteProcessException" />
+    <Method name="testDataSendSYNCACK"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.catalina.tribes.test.channel.TestRemoteProcessException$Data" />
+    <Method name="createRandomData"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.catalina.tribes.test.channel.TestUdpPackages$Data" />
+    <Method name="createRandomData"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <Class name="org.apache.catalina.tribes.test.interceptors.TestNonBlockingCoordinator" />
@@ -1984,16 +2074,28 @@
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
-    <!-- Test code - and e3choing a header should be safe anyway -->
+    <!-- Test code - and echoing a header should be safe anyway -->
     <Class name="org.apache.coyote.http11.upgrade.TestUpgrade$UpgradeServlet"/>
     <Method name="doGet"/>
     <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER"/>
+  </Match>
+  <Match>
+    <!-- Single use is OK for this test -->
+    <Class name="org.apache.coyote.http2.Http2TestBase$LargeHeaderServlet" />
+    <Method name="doGet"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <!-- Latch isn't essential so no need to check return -->
     <Class name="org.apache.coyote.http2.TestAsyncTimeout"/>
     <Method name="testTimeout"/>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
+    <!-- Single use is OK for this test -->
+    <Class name="org.apache.coyote.http2.TestHttp2Limits" />
+    <Method name="doTestHeaderLimits"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <!-- Result is negated to compare result when order is reversed -->
@@ -2015,6 +2117,12 @@
       <Field name="last" />
     </Or>
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
+    <!-- Not single use -->
+    <Class name="org.apache.juli.TestClassLoaderLogManager$LoggerCreateThread" />
+    <Method name="run"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
     <!-- Field set via injection-->
@@ -2041,6 +2149,12 @@
     <Bug code="ST" />
   </Match>
   <Match>
+    <!-- The name random is reused -->
+    <Class name="org.apache.tomcat.jdbc.test.CreateTestTable" />
+    <Method name="getRandom"/>
+    <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
+  </Match>
+  <Match>
     <!-- The name shadowing is deliberate -->
     <Or>
       <Class name="org.apache.tomcat.jdbc.test.driver.Connection" />
@@ -2057,7 +2171,7 @@
     <Bug pattern="RV_RETURN_VALUE_IGNORED" />
   </Match>
   <Match>
-    <!-- A number of the tests incude performance tests -->
+    <!-- A number of the tests include performance tests -->
     <Class name="org.apache.tomcat.jdbc.test.DefaultTestCase" />
     <Method name="tearDown" />
     <Bug pattern="DM_GC" />
@@ -2167,6 +2281,13 @@
     <Class name="org.apache.tomcat.util.net.TestTLSClientHelloExtractor" />
     <Method name="doTestInputMalformed" />
     <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+  </Match>
+  <Match>
+    <!-- Have to do this to get the set of scanned classes as we only
+         provide the SCI class name not an SCI instance. -->
+    <Class name="org.apache.tomcat.util.scan.FooSCI"/>
+    <Mehtod name="onStartup"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.threads.TestLimitLatch" />
