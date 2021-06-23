@@ -202,6 +202,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <scode>
+        Refactor the <code>DigestAuthenticator</code> to reuse a shared
+        <code>SecureRandom</code> instance rather than create a new one to
+        generate the <code>cnonce</code> if required. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
