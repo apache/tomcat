@@ -136,14 +136,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
                 // Typically means symlinks are in use but being ignored. Given
                 // the symlink was likely created for a reason, log a warning
                 // that it was ignored.
-                String msg = sm.getString("abstractFileResourceSet.canonicalfileCheckFailed",
-                        getRoot().getContext().getName(), absPath, canPath);
-                // Log issues with configuration files at a higher level
-                if(absPath.startsWith("/META-INF/") || absPath.startsWith("/WEB-INF/")) {
-                    log.error(msg);
-                } else {
-                    log.warn(msg);
-                }
+                logIgnoredSymlink(getRoot().getContext().getName(), absPath, canPath);
             }
             return null;
         }
@@ -151,6 +144,17 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         return file;
     }
 
+
+    protected void logIgnoredSymlink(String contextPath, String absPath, String canPath) {
+        String msg = sm.getString("abstractFileResourceSet.canonicalfileCheckFailed",
+                contextPath, absPath, canPath);
+        // Log issues with configuration files at a higher level
+        if(absPath.startsWith("/META-INF/") || absPath.startsWith("/WEB-INF/")) {
+            log.error(msg);
+        } else {
+            log.warn(msg);
+        }
+    }
 
     private boolean isInvalidWindowsFilename(String name) {
         final int len = name.length();
