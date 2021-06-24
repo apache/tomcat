@@ -195,6 +195,13 @@
       <update>
         Update to the Eclipse JDT compiler 4.20. (markt)
       </update>
+      <add>
+        Add support for specifying Java 17 (with the value <code>17</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the latest supported version will used.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
