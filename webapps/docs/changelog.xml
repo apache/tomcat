@@ -115,6 +115,14 @@
         Fix serialization warnings in <code>UserDatabasePrincipal</code>
         reported by SpotBugs. (markt)
       </fix>
+      <fix>
+        <bug>65397</bug>: Calls to
+        <code>ServletContext.getResourcePaths()</code> no longer include
+        symbolic links in the results unless <code>allowLinking</code> has been
+        set to <code>true</code>. If a resource is skipped because of this
+        change, a warning will be logged as this typically indicates a
+        configuration issue. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

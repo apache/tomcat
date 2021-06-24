@@ -157,6 +157,29 @@ public class DirResourceSet extends AbstractFileResourceSet {
                 File[] list = f.listFiles();
                 if (list != null) {
                     for (File entry : list) {
+                        // f has already been validated so the following checks
+                        // can be much simpler than those in file()
+                        if (!getRoot().getAllowLinking()) {
+                            // allow linking is disabled so need to check for
+                            // symlinks
+                            boolean symlink = true;
+                            String absPath = null;
+                            String canPath = null;
+                            try {
+                                absPath = entry.getAbsolutePath();
+                                canPath = entry.getCanonicalPath();
+                                if (absPath.equals(canPath)) {
+                                    symlink = false;
+                                }
+                            } catch (IOException ioe) {
+                                // Ignore the exception. Assume we have a symlink.
+                                canPath = "Unknown";
+                            }
+                            if (symlink) {
+                                logIgnoredSymlink(getRoot().getContext().getName(), absPath, canPath);
+                                continue;
+                            }
+                        }
                         StringBuilder sb = new StringBuilder(path);
                         if (path.charAt(path.length() - 1) != '/') {
                             sb.append('/');
