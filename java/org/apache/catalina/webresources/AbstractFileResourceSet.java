@@ -114,8 +114,8 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // Remove the fileBase location from the start of the paths since that
         // was not part of the requested path and the remaining check only
         // applies to the request path
-        absPath = absPath.substring(absoluteBase.length());
-        canPath = canPath.substring(canonicalBase.length());
+        absPath = removeAbsoluteBase(absPath);
+        canPath = removeCanonicalBase(canPath);
 
         // Case sensitivity check
         // The normalized requested path should be an exact match the equivalent
@@ -142,6 +142,16 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         }
 
         return file;
+    }
+
+
+    protected String removeAbsoluteBase(String absolutePath) {
+        return absolutePath.substring(absoluteBase.length());
+    }
+
+
+    protected String removeCanonicalBase(String canonicalPath) {
+        return canonicalPath.substring(canonicalBase.length());
     }
 
 
