@@ -166,8 +166,11 @@ public class DirResourceSet extends AbstractFileResourceSet {
                             String absPath = null;
                             String canPath = null;
                             try {
-                                absPath = entry.getAbsolutePath();
-                                canPath = entry.getCanonicalPath();
+                                // Base location may be inside a symlink. Only
+                                // need to check here if the requested path uses
+                                // symlinks so remove the base paths.
+                                absPath = removeAbsoluteBase(entry.getAbsolutePath());
+                                canPath = removeCanonicalBase(entry.getCanonicalPath());
                                 if (absPath.equals(canPath)) {
                                     symlink = false;
                                 }
