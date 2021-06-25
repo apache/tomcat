@@ -456,10 +456,10 @@ public class JspUtil {
                     + s + ", java.lang.Boolean.class)";
         } else {
             if (s == null || s.length() == 0) {
-                return "new java.lang.Boolean(false)";
+                return "java.lang.Boolean.FALSE";
             } else {
                 // Detect format error at translation time
-                return "new java.lang.Boolean(" + Boolean.valueOf(s).toString() + ")";
+                return "java.lang.Boolean.valueOf(" + Generator.quote(s) + ")";
             }
         }
     }
@@ -484,10 +484,10 @@ public class JspUtil {
                     + s + ", java.lang.Byte.class)";
         } else {
             if (s == null || s.length() == 0) {
-                return "new java.lang.Byte((byte) 0)";
+                return "java.lang.Byte.valueOf((byte) 0)";
             } else {
                 // Detect format error at translation time
-                return "new java.lang.Byte((byte)" + Byte.valueOf(s).toString() + ")";
+                return "java.lang.Byte.valueOf(" + Generator.quote(s) + ")";
             }
         }
     }
@@ -513,11 +513,11 @@ public class JspUtil {
                     + s + ", java.lang.Character.class)";
         } else {
             if (s == null || s.length() == 0) {
-                return "new java.lang.Character((char) 0)";
+                return "java.lang.Character.valueOf((char) 0)";
             } else {
                 char ch = s.charAt(0);
                 // this trick avoids escaping issues
-                return "new java.lang.Character((char) " + (int) ch + ")";
+                return "java.lang.Character.valueOf((char) " + (int) ch + ")";
             }
         }
     }
@@ -542,10 +542,10 @@ public class JspUtil {
                     + s + ", Double.class)";
         } else {
             if (s == null || s.length() == 0) {
-                return "new java.lang.Double(0)";
+                return "java.lang.Double.valueOf(0)";
             } else {
                 // Detect format error at translation time
-                return "new java.lang.Double(" + Double.valueOf(s).toString() + ")";
+                return "java.lang.Double.valueOf(" + Generator.quote(s) + ")";
             }
         }
     }
@@ -570,10 +570,10 @@ public class JspUtil {
                     + s + ", java.lang.Float.class)";
         } else {
             if (s == null || s.length() == 0) {
-                return "new java.lang.Float(0)";
+                return "java.lang.Float.valueOf(0)";
             } else {
                 // Detect format error at translation time
-                return "new java.lang.Float(" + Float.valueOf(s).toString() + "f)";
+                return "java.lang.Float.valueOf(" + Generator.quote(s) + ")";
             }
         }
     }
@@ -597,10 +597,10 @@ public class JspUtil {
                     + s + ", java.lang.Integer.class)";
         } else {
             if (s == null || s.length() == 0) {
-                return "new java.lang.Integer(0)";
+                return "java.lang.Integer.valueOf(0)";
             } else {
                 // Detect format error at translation time
-                return "new java.lang.Integer(" + Integer.valueOf(s).toString() + ")";
+                return "java.lang.Integer.valueOf(" + Generator.quote(s) + ")";
             }
         }
     }
@@ -625,10 +625,10 @@ public class JspUtil {
                     + s + ", java.lang.Short.class)";
         } else {
             if (s == null || s.length() == 0) {
-                return "new java.lang.Short((short) 0)";
+                return "java.lang.Short.valueOf((short) 0)";
             } else {
                 // Detect format error at translation time
-                return "new java.lang.Short(\"" + Short.valueOf(s).toString() + "\")";
+                return "java.lang.Short.valueOf(" + Generator.quote(s) + ")";
             }
         }
     }
@@ -653,10 +653,10 @@ public class JspUtil {
                     + s + ", java.lang.Long.class)";
         } else {
             if (s == null || s.length() == 0) {
-                return "new java.lang.Long(0)";
+                return "java.lang.Long.valueOf(0)";
             } else {
                 // Detect format error at translation time
-                return "new java.lang.Long(" + Long.valueOf(s).toString() + "l)";
+                return "java.lang.Long.valueOf(" + Generator.quote(s) + ")";
             }
         }
     }

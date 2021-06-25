@@ -203,6 +203,12 @@
         a warning will be logged and the latest supported version will used.
         (markt)
       </add>
+      <fix>
+        <bug>65377</bug>: Update the Java code generation for JSPs not to use
+        the boxed primitive constructors as they have been deprecated in Java 9
+        and marked for future removal in Java 16. <code>valueOf()</code> is now
+        used instead. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
