@@ -105,8 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.50 (remm)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Jakarta to Javax backport issue in tests. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
-<section name="Tomcat 9.0.49 (remm)" rtext="in progress">
+<section name="Tomcat 9.0.49 (remm)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <scode>
