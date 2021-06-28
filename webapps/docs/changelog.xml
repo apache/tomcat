@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M3 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When writing an HTTP/2 response via sendfile (only enabled when
+        <code>useAsyncIO</code> is true) the connection flow control window was
+        sometimes ignored leading to various error conditions. sendfile now
+        checks both the stream and connection flow control windows before
+        writing. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
