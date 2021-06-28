@@ -337,11 +337,11 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration<ObjectName> enumeration =
-                globalRequestProcessors.elements();
+            Enumeration<ObjectName> enumeration = globalRequestProcessors.elements();
+            // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
             while (enumeration.hasMoreElements()) {
                 ObjectName objectName = enumeration.nextElement();
-                if (name.equals(objectName.getKeyProperty("name"))) {
+                if (name.equals(objectName.getKeyProperty("name")) && objectName.getKeyProperty("Upgrade") == null) {
                     grpName = objectName;
                 }
             }
@@ -407,11 +407,11 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration<ObjectName> enumeration =
-                globalRequestProcessors.elements();
+            Enumeration<ObjectName> enumeration = globalRequestProcessors.elements();
+            // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
             while (enumeration.hasMoreElements()) {
                 ObjectName objectName = enumeration.nextElement();
-                if (name.equals(objectName.getKeyProperty("name"))) {
+                if (name.equals(objectName.getKeyProperty("name")) && objectName.getKeyProperty("Upgrade") == null) {
                     grpName = objectName;
                 }
             }
