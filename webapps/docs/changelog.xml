@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.9 (markt)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>65404</bug>: Correct a regression in the fix for <bug>63362</bug>
+        that caused the server status page in the Manager web application to be
+        truncated if HTTP upgrade was used such as when starting a WebSocket
+        connection. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.8 (markt)" rtext="release in progress">
   <subsection name="Catalina">
