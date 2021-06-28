@@ -226,6 +226,12 @@
         <bug>65385</bug>: Correct the link in the documentation web application
         the Maven Central repository. (markt)
       </fix>
+      <fix>
+        <bug>65404</bug>: Correct a regression in the fix for <bug>63362</bug>
+        that caused the server status page in the Manager web application to be
+        truncated if HTTP upgrade was used such as when starting a WebSocket
+        connection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
