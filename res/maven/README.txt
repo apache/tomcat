@@ -17,7 +17,8 @@
 
 General preparations before any publishing:
 1 - Generate a standard Tomcat release (ant release)
-2 - Copy mvn.properties.default to mvn.properties and adjust it as necessary.
+2 - cd res/maven
+3 - Copy mvn.properties.default to mvn.properties and adjust it as necessary.
     You will need to set asf.ldap.username and you'll probably need to set
     gpg.exec
     The other properties should be OK. Note: you will be prompted for your
