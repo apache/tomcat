@@ -2312,6 +2312,10 @@ public class JNDIRealm extends RealmBase {
             // Log the problem for posterity
             containerLog.error(sm.getString("jndiRealm.exception"), e);
 
+            // close the connection so we know it will be reopened.
+            close(connection);
+            closePooledConnections();
+
             // Return "not authenticated" for this request
             return null;
         }
