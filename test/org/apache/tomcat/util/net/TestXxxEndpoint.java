@@ -213,7 +213,9 @@ public class TestXxxEndpoint extends TomcatBaseTest {
                 c.getProtocolHandlerClassName().contains("NioProtocol")
                 && JreCompat.isJre16Available());
 
-        final String unixDomainSocketPath = "/tmp/testUnixDomainSocket";
+        File tempPath = File.createTempFile("tomcat", ".uds");
+        final String unixDomainSocketPath = tempPath.getAbsolutePath();
+        tempPath.delete();
         Assert.assertTrue(c.setProperty("unixDomainSocketPath", unixDomainSocketPath));
         tomcat.start();
 
