@@ -282,7 +282,7 @@ public abstract class ServletOutputStream extends OutputStream {
      * <code>false</code>, it will cause a callback to
      * {@link WriteListener#onWritePossible()} when the buffer has emptied. If
      * this method returns <code>false</code> no further data must be written
-     * until the contain calls {@link WriteListener#onWritePossible()}.
+     * until the container calls {@link WriteListener#onWritePossible()}.
      *
      * @return <code>true</code> if data can be written, else <code>false</code>
      *
