@@ -312,7 +312,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             } catch (IOException e) {
                 return SendfileState.ERROR;
             }
-            // Actually perform the write
+
+            // connectionReservation will always be smaller than or the same as
+            // streamReservation
             int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
             boolean finished = (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
@@ -374,7 +376,10 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 failed (e, sendfile);
                 return;
             }
-            int frameSize = Integer.min(getMaxFrameSize(), Integer.min(sendfile.streamReservation, sendfile.connectionReservation));
+
+            // connectionReservation will always be smaller than or the same as
+            // streamReservation
+            int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
             boolean finished = (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
             // Need to check this now since sending end of stream will change this.
