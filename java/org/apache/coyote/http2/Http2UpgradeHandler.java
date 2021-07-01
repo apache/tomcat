@@ -980,7 +980,17 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         synchronized (this) {
             long windowSize = getWindowSize();
             if (windowSize < 1 && windowSize + increment > 0) {
+                //  Connection window is completed exhausted. Assume there will
+                // be streams to notify. The overhead is minimal if there are
+                // none.
                 streamsToNotify = releaseBackLog((int) (windowSize +increment));
+            } else if (backLogSize > 0) {
+                // While windowSize is greater than zero, all of it has already
+                // been allocated to streams in the backlog (or just about to
+                // exit the backlog). If any of windowSize was unallocated or
+                // 'spare', backLogSize would be zero. Therefore, apply this
+                // addition allocation to the backlog.
+                streamsToNotify = releaseBackLog(increment);
             }
             super.incrementWindowSize(increment);
         }
@@ -1070,7 +1080,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Loop until we run out of allocation or recipients
         while (leftToAllocate > 0) {
             if (recipients.size() == 0) {
-                backLogStreams.remove(stream);
+                if (tracker.getUnusedAllocation() == 0) {
+                    backLogStreams.remove(stream);
+                }
                 return leftToAllocate;
             }
 
