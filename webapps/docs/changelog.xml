@@ -126,6 +126,13 @@
       <add>
         Add debug logging for writing an HTTP/2 response via sendfile. (markt)
       </add>
+      <fix>
+        Correct bugs in the HTTP/2 connection flow control management that meant
+        it was possible for a connection to stall waiting for a connection flow
+        control window update that had already arrived. Any streams on that
+        connection that were trying to write when this happened would time out.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
