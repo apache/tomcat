@@ -313,6 +313,11 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 return SendfileState.ERROR;
             }
 
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId, sendfile.stream.getIdAsString(),
+                        Integer.valueOf(sendfile.connectionReservation), Integer.valueOf(sendfile.streamReservation)));
+            }
+
             // connectionReservation will always be smaller than or the same as
             // streamReservation
             int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
@@ -331,6 +336,10 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 }
             }
             if (writeable) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
+                            Integer.toString(frameSize), Boolean.valueOf(finished)));
+                }
                 ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
@@ -377,6 +386,11 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 return;
             }
 
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId, sendfile.stream.getIdAsString(),
+                        Integer.valueOf(sendfile.connectionReservation), Integer.valueOf(sendfile.streamReservation)));
+            }
+
             // connectionReservation will always be smaller than or the same as
             // streamReservation
             int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
@@ -395,6 +409,10 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 }
             }
             if (writeable) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
+                            Integer.toString(frameSize), Boolean.valueOf(finished)));
+                }
                 ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),

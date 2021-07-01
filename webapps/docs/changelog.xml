@@ -123,6 +123,9 @@
         checks both the stream and connection flow control windows before
         writing. (markt)
       </fix>
+      <add>
+        Add debug logging for writing an HTTP/2 response via sendfile. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
