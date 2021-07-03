@@ -1294,7 +1294,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     // Don't try and remove Stream 0 as that is the connection
                     // Don't try and remove 'newer' streams. We'll get to them as we
                     // work through the ordered list of streams.
-                    while (toClose > 0 && parent.getIdAsInt() > 0 && parent.getIdAsInt() < stream.getIdAsInt() &&
+                    while (toClose > 0 && parent != null && parent.getIdAsInt() > 0 && parent.getIdAsInt() < stream.getIdAsInt() &&
                             parent.getChildStreams().isEmpty()) {
                         // This cast is safe since we know parent ID > 0 therefore
                         // this isn't the connection
