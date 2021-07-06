@@ -360,7 +360,7 @@ public class DataSourceRealm extends RealmBase {
                 dbConnection.commit();
             }
         } catch (SQLException e) {
-            containerLog.error("Exception committing connection before closing:", e);
+            containerLog.error(sm.getString("dataSourceRealm.commit"), e);
         }
 
         // Close this database connection, and log any errors
