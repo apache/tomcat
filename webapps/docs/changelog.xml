@@ -112,6 +112,13 @@
         <code>NamingException</code> occurs to avoid connection locking.
         Submitted by Ole Ostergaard. (remm)
       </fix>
+      <fix>
+        <bug>65433</bug>: Correct a regression in the fix for <bug>65397</bug>
+        where a <code>StringIndexOutOfBoundsException</code> could be triggered
+        if the canonical path of the target of a symlink was shorter than the
+        canonical path of the directory in which the symlink had been created.
+        Patch provided by Cedomir Igaly. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
