@@ -35,7 +35,7 @@ public class TestUtil {
     public void test02() {
         ELProcessor processor = new ELProcessor();
         processor.getELManager().importClass("java.util.Date");
-        Date result = (Date) processor.eval("Date(86400)");
+        Date result = processor.eval("Date(86400)");
         Assert.assertEquals(86400, result.getTime());
     }
 

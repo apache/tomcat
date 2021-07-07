@@ -606,7 +606,7 @@ public class TestMethodExpressionImpl {
         ELProcessor elp = new ELProcessor();
         elp.defineBean("apple", TesterEnum.APPLE);
         elp.defineBean("beanF", new TesterBeanF());
-        String elResult = (String) elp.eval(expression);
+        String elResult = elp.eval(expression);
         String javaResult = func.apply(new TesterBeanF());
         Assert.assertEquals(javaResult, elResult);
     }
@@ -676,7 +676,7 @@ public class TestMethodExpressionImpl {
         ELProcessor elp = new ELProcessor();
         elp.defineBean("apple", TesterEnum.APPLE);
         elp.defineBean("beanG", new TesterBeanG());
-        String elResult = (String) elp.eval(expression);
+        String elResult = elp.eval(expression);
         String javaResult = func.apply(new TesterBeanG());
         Assert.assertEquals(javaResult, elResult);
     }
@@ -745,7 +745,7 @@ public class TestMethodExpressionImpl {
         ELProcessor elp = new ELProcessor();
         elp.defineBean("apple", TesterEnum.APPLE);
         elp.defineBean("beanH", new TesterBeanH());
-        String elResult = (String) elp.eval(expression);
+        String elResult = elp.eval(expression);
         String javaResult = func.apply(new TesterBeanH());
         Assert.assertEquals(javaResult, elResult);
     }
