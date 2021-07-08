@@ -660,11 +660,8 @@ public class ELSupport {
         return false;
     }
 
-    /**
-     *
-     */
-    public ELSupport() {
-        super();
-    }
 
+    private ELSupport() {
+        // Uility class - hide default constructor;
+    }
 }

@@ -27,6 +27,7 @@ import jakarta.el.LambdaExpression;
 import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 
+import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 
@@ -180,14 +181,14 @@ public final class AstFunction extends SimpleNode {
                             Class<?> target = paramTypes[i].getComponentType();
                             for (int j = i; j < inputParameterCount; j++) {
                                 varargs[j-i] = parameters.jjtGetChild(j).getValue(ctx);
-                                varargs[j-i] = coerceToType(ctx, varargs[j-i], target);
+                                varargs[j-i] = ELSupport.coerceToType(ctx, varargs[j-i], target);
                             }
                             params[i] = varargs;
                         }
                     } else {
                         params[i] = parameters.jjtGetChild(i).getValue(ctx);
                     }
-                    params[i] = coerceToType(ctx, params[i], paramTypes[i]);
+                    params[i] = ELSupport.coerceToType(ctx, params[i], paramTypes[i]);
                 }
             } catch (ELException ele) {
                 throw new ELException(MessageFactory.get("error.function", this
