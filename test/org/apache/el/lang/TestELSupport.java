@@ -19,9 +19,11 @@ package org.apache.el.lang;
 import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.function.Predicate;
 
 import jakarta.el.ELException;
 import jakarta.el.ELManager;
+import jakarta.el.ELProcessor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -275,5 +277,79 @@ public class TestELSupport {
         VALA2,
         VALB1,
         VALB2
+    }
+
+
+    @Test
+    public void testCoercetoFunctionalInterface01() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateA");
+        Object result = elp.eval("testPredicateA(x -> x.equals('data'))");
+        Assert.assertEquals("PASS", result);
+    }
+
+
+    @Test
+    public void testCoercetoFunctionalInterface02() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateA");
+        Object result = elp.eval("testPredicateA(x -> !x.equals('data'))");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
+    @Test
+    public void testCoercetoFunctionalInterface03() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateB");
+        Object result = elp.eval("testPredicateB(x -> x > 50)");
+        Assert.assertEquals("PASS", result);
+    }
+
+
+    @Test
+    public void testCoercetoFunctionalInterface04() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateB");
+        Object result = elp.eval("testPredicateB(x -> x < 50)");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
+    @Test(expected = ELException.class)
+    public void testCoercetoFunctionalInterface05() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateC");
+        elp.eval("testPredicateC(x -> x > 50)");
+    }
+
+
+    public static String testPredicateA(Predicate<String> filter) {
+        String s = "data";
+        if (filter.test(s)) {
+            return "PASS";
+        } else {
+            return "BLOCK";
+        }
+    }
+
+
+    public static String testPredicateB(Predicate<Long> filter) {
+        Long l = Long.valueOf(100);
+        if (filter.test(l)) {
+            return "PASS";
+        } else {
+            return "BLOCK";
+        }
+    }
+
+
+    public static String testPredicateC(Predicate<String> filter) {
+        String s = "text";
+        if (filter.test(s)) {
+            return "PASS";
+        } else {
+            return "BLOCK";
+        }
     }
 }

@@ -148,6 +148,11 @@
         Add additional generics to the EL API to align with the latest changes
         in the EL specification project. (markt)
       </scode>
+      <add>
+        Enable EL lambda expressions to be coerced to functional interfaces.
+        This is an implementation of a proposed extension to the Jakarta
+        Expression Language specification. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
