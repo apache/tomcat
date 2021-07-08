@@ -19,6 +19,7 @@ package org.apache.el.lang;
 import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import jakarta.el.ELException;
@@ -324,6 +325,15 @@ public class TestELSupport {
     }
 
 
+    @Test
+    public void testCoercetoFunctionalInterface06() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testBiPredicateA");
+        Object result = elp.eval("testBiPredicateA((x,y) -> x.name().equals('VALA1') && y)");
+        Assert.assertEquals("PASS", result);
+    }
+
+
     public static String testPredicateA(Predicate<String> filter) {
         String s = "data";
         if (filter.test(s)) {
@@ -347,6 +357,16 @@ public class TestELSupport {
     public static String testPredicateC(Predicate<String> filter) {
         String s = "text";
         if (filter.test(s)) {
+            return "PASS";
+        } else {
+            return "BLOCK";
+        }
+    }
+
+
+    public static String testBiPredicateA(BiPredicate<TestEnumC,Boolean> filter) {
+        // Mainly interested in if these coerce correctly
+        if (filter.test(TestEnumC.VALA1, Boolean.TRUE)) {
             return "PASS";
         } else {
             return "BLOCK";
