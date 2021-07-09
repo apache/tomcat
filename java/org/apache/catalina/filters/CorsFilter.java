@@ -395,7 +395,7 @@ public class CorsFilter extends GenericFilter {
         final String method = request.getMethod();
         final String origin = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
 
-        if (!anyOriginAllowed) {
+        if (!isAnyOriginAllowed()) {
             // If only specific origins are allowed, the response will vary by
             // origin
             ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ORIGIN);
@@ -407,7 +407,7 @@ public class CorsFilter extends GenericFilter {
         // response to be cached for CORS and non-CORS requests.
 
         // Add a single Access-Control-Allow-Origin header.
-        if (anyOriginAllowed) {
+        if (isAnyOriginAllowed()) {
             // If any origin is allowed, return header with '*'.
             response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
         } else {
@@ -659,13 +659,13 @@ public class CorsFilter extends GenericFilter {
      *         otherwise.
      */
     private boolean isOriginAllowed(final String origin) {
-        if (anyOriginAllowed) {
+        if (isAnyOriginAllowed()) {
             return true;
         }
 
         // If 'Origin' header is a case-sensitive match of any of allowed
         // origins, then return true, else return false.
-        return allowedOrigins.contains(origin);
+        return getAllowedOrigins().contains(origin);
     }
 
 
