@@ -74,6 +74,11 @@ public class TestSlowClient extends WebSocketBaseTest {
         // BZ 64848 (non-container thread variant)
         // Confirm there are no waiting processors
         AbstractProtocol<?> protocol = (AbstractProtocol<?>) tomcat.getConnector().getProtocolHandler();
+        count = 0;
+        while (protocol.getWaitingProcessorCount() > 0 && count < 200) {
+            Thread.sleep(100);
+            count++;
+        }
         Assert.assertEquals(0, protocol.getWaitingProcessorCount());
     }
 
