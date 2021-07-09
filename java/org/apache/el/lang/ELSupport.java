@@ -631,7 +631,6 @@ public class ELSupport {
                 (Object obj, Method method, Object[] args) -> {
             // Functional interfaces have a single, abstract method
             if (!Modifier.isAbstract(method.getModifiers())) {
-                // TODO
                 throw new ELException(MessageFactory.get("elSupport.coerce.nonAbstract", type, method));
             }
             return lambdaExpression.invoke(ctx, args);
