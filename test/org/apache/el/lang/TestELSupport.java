@@ -19,6 +19,7 @@ package org.apache.el.lang;
 import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -371,5 +372,92 @@ public class TestELSupport {
         } else {
             return "BLOCK";
         }
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface01() {
+        Assert.assertTrue(ELSupport.isFunctionalInterface(Predicate.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface02() {
+        // Interface but more than one abstract method
+        Assert.assertFalse(ELSupport.isFunctionalInterface(Map.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface03() {
+        // Not an interface
+        Assert.assertFalse(ELSupport.isFunctionalInterface(String.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface04() {
+        // Extends a functional interface with no changes
+        Assert.assertTrue(ELSupport.isFunctionalInterface(FunctionalA.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface05() {
+        // Extends a functional interface with additional abstract method
+        Assert.assertFalse(ELSupport.isFunctionalInterface(FunctionalB.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface06() {
+        // Extends a functional interface with additional default method
+        Assert.assertTrue(ELSupport.isFunctionalInterface(FunctionalC.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface07() {
+        // Extends a functional interface and overrides method in Object
+        Assert.assertTrue(ELSupport.isFunctionalInterface(FunctionalD.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface08() {
+        // Extends a functional interface adds a method that looks like a
+        // method from Object
+        Assert.assertFalse(ELSupport.isFunctionalInterface(FunctionalE.class));
+    }
+
+
+    private static interface FunctionalA<T> extends Predicate<T> {
+    }
+
+
+    private static interface FunctionalB<T> extends Predicate<T> {
+        public void extra();
+    }
+
+
+    private static interface FunctionalC<T> extends Predicate<T> {
+        @SuppressWarnings("unused")
+        public default void extra() {
+        }
+    }
+
+
+    private static interface FunctionalD<T> extends Predicate<T> {
+        @Override
+        public String toString();
+        @Override
+        public int hashCode();
+        @Override
+        public boolean equals(Object o);
+    }
+
+
+    private static interface FunctionalE<T> extends Predicate<T> {
+        public boolean equals(String s);
     }
 }
