@@ -22,6 +22,7 @@ import java.math.BigInteger;
 
 import jakarta.el.ELException;
 
+import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
 
@@ -54,7 +55,7 @@ public final class AstNegative extends SimpleNode {
             return ((BigInteger) obj).negate();
         }
         if (obj instanceof String) {
-            if (isStringFloat((String) obj)) {
+            if (ELSupport.isStringFloat((String) obj)) {
                 return Double.valueOf(-Double.parseDouble((String) obj));
             }
             return Long.valueOf(-Long.parseLong((String) obj));
@@ -77,7 +78,7 @@ public final class AstNegative extends SimpleNode {
         if (obj instanceof Byte) {
             return Byte.valueOf((byte) -((Byte) obj).byteValue());
         }
-        Long num = (Long) coerceToNumber(ctx, obj, Long.class);
+        Long num = (Long) ELSupport.coerceToNumber(ctx, obj, Long.class);
         return Long.valueOf(-num.longValue());
     }
 }

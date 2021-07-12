@@ -50,8 +50,10 @@ public class ELProcessor {
     }
 
 
-    public Object eval(String expression) {
-        return getValue(expression, Object.class);
+    public <T> T eval(String expression) {
+        @SuppressWarnings("unchecked")
+        T result = (T) getValue(expression, Object.class);
+        return result;
     }
 
 

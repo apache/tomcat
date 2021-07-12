@@ -105,6 +105,22 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M3 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>65411</bug>: Always close the connection when an uncaught
+        <code>NamingException</code> occurs to avoid connection locking.
+        Submitted by Ole Ostergaard. (remm)
+      </fix>
+      <fix>
+        <bug>65433</bug>: Correct a regression in the fix for <bug>65397</bug>
+        where a <code>StringIndexOutOfBoundsException</code> could be triggered
+        if the canonical path of the target of a symlink was shorter than the
+        canonical path of the directory in which the symlink had been created.
+        Patch provided by Cedomir Igaly. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
@@ -114,6 +130,29 @@
         checks both the stream and connection flow control windows before
         writing. (markt)
       </fix>
+      <add>
+        Add debug logging for writing an HTTP/2 response via sendfile. (markt)
+      </add>
+      <fix>
+        Correct bugs in the HTTP/2 connection flow control management that meant
+        it was possible for a connection to stall waiting for a connection flow
+        control window update that had already arrived. Any streams on that
+        connection that were trying to write when this happened would time out.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <scode>
+        Add additional generics to the EL API to align with the latest changes
+        in the EL specification project. (markt)
+      </scode>
+      <add>
+        Enable EL lambda expressions to be coerced to functional interfaces.
+        This is an implementation of a proposed extension to the Jakarta
+        Expression Language specification. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -127,7 +166,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 10.1.0-M2 (markt)" rtext="release in progress">
+<section name="Tomcat 10.1.0-M2 (markt)" rtext="2021-07-02">
   <subsection name="Catalina">
     <changelog>
       <scode>

@@ -38,7 +38,7 @@ public class TestELArithmetic {
     @Test
     public void testAdd02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null + null");
+        Long result = processor.eval("null + null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 
@@ -51,7 +51,7 @@ public class TestELArithmetic {
     @Test
     public void testSubtract02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null - null");
+        Long result = processor.eval("null - null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 
@@ -64,7 +64,7 @@ public class TestELArithmetic {
     @Test
     public void testMultiply02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null * null");
+        Long result = processor.eval("null * null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 
@@ -77,7 +77,7 @@ public class TestELArithmetic {
     @Test
     public void testDivide02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null / null");
+        Long result = processor.eval("null / null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 
@@ -90,14 +90,14 @@ public class TestELArithmetic {
     @Test
     public void testMod02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null % null");
+        Long result = processor.eval("null % null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 
     @Test
     public void testUnaryMinus01() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("-null");
+        Long result = processor.eval("-null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 

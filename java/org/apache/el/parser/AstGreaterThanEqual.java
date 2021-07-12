@@ -19,6 +19,7 @@ package org.apache.el.parser;
 
 import jakarta.el.ELException;
 
+import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
 
@@ -41,6 +42,6 @@ public final class AstGreaterThanEqual extends BooleanNode {
         if (obj0 == null || obj1 == null) {
             return Boolean.FALSE;
         }
-        return (compare(ctx, obj0, obj1) >= 0) ? Boolean.TRUE : Boolean.FALSE;
+        return (ELSupport.compare(ctx, obj0, obj1) >= 0) ? Boolean.TRUE : Boolean.FALSE;
     }
 }
