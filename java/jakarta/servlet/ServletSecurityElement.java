@@ -71,6 +71,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
      * @param httpConstraintElement Default constraint
      * @param httpMethodConstraints Method constraints
      * @throws IllegalArgumentException if a method name is specified more than
+     * once
      */
     public ServletSecurityElement(HttpConstraintElement httpConstraintElement,
             Collection<HttpMethodConstraintElement> httpMethodConstraints) {
@@ -84,6 +85,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
      * Create from an annotation.
      * @param annotation Annotation to use as the basis for the new instance
      * @throws IllegalArgumentException if a method name is specified more than
+     * once
      */
     public ServletSecurityElement(ServletSecurity annotation) {
         this(new HttpConstraintElement(annotation.value().value(),
