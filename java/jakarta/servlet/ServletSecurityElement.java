@@ -84,7 +84,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
     /**
      * Create from an annotation.
      * @param annotation Annotation to use as the basis for the new instance
-     * @throws IllegalArgumentException if a method name is specified more than 
+     * @throws IllegalArgumentException if a method name is specified more than
      * once
      */
     public ServletSecurityElement(ServletSecurity annotation) {
