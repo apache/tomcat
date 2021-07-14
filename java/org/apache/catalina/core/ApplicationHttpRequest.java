@@ -92,6 +92,15 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
     private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
 
+    private static final boolean INHERIT_REQUEST_PARAMETERS;
+
+    /**
+     * Take parameters from {@link #getRequest()}.
+     */
+    static {
+        INHERIT_REQUEST_PARAMETERS = Boolean.parseBoolean(System.getProperty(
+                "org.apache.catalina.core.ApplicationHttpRequest.INHERIT_REQUEST_PARAMETERS", "true"));
+    }
 
     // ----------------------------------------------------------- Constructors
 
@@ -752,7 +761,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
 
         parameters = new ParameterMap<>();
-        parameters.putAll(getRequest().getParameterMap());
+        if (INHERIT_REQUEST_PARAMETERS) {
+            parameters.putAll(getRequest().getParameterMap());
+        }
         mergeParameters();
         ((ParameterMap<String,String[]>) parameters).setLocked(true);
         parsedParams = true;
