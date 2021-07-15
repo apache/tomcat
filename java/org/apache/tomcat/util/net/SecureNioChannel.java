@@ -801,6 +801,11 @@ public class SecureNioChannel extends NioChannel {
                 return 0;
             }
 
+            if (!src.hasRemaining()) {
+                // Nothing left to write
+                return 0;
+            }
+
             // The data buffer is empty, we can reuse the entire buffer.
             netOutBuffer.clear();
 

@@ -1364,7 +1364,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     n = getSocket().write(buffer);
                     if (n == -1) {
                         throw new EOFException();
-                    } else if (n == 0) {
+                    } else if (n == 0 && (buffer.hasRemaining() || getSocket().getOutboundRemaining() > 0)) {
+                        // n == 0 could be an incomplete write but it could also
+                        // indicate that a previous incomplete write of the
+                        // outbound buffer (for TLS) has now completed. Only
+                        // block if there is still data to write.
                         writeBlocking = true;
                         registerWriteInterest();
                         synchronized (writeLock) {
@@ -1387,7 +1391,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         timeout = getWriteTimeout();
                         startNanos = 0;
                     }
-                } while (buffer.hasRemaining());
+                } while (buffer.hasRemaining() || getSocket().getOutboundRemaining() > 0);
             } else {
                 do {
                     n = getSocket().write(buffer);
