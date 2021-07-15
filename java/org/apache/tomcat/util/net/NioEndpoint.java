@@ -1313,7 +1313,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                      * write it as part of a subsequent write call.
                      *
                      * Because of the above, when a timeout is triggered we need
-                     * so skip subsequent attempts to write as otherwise it will
+                     * to skip subsequent attempts to write as otherwise it will
                      * appear to the client as if some data was dropped just
                      * before the connection is lost. It is better if the client
                      * just sees the dropped connection.
@@ -1361,10 +1361,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         startNanos = 0;
                     }
                 } while (buffer.hasRemaining());
-                // If there is data left in the buffer the socket will be registered for
-                // write further up the stack. This is to ensure the socket is only
-                // registered for write once as both container and user code can trigger
-                // write registration.
             } else {
                 do {
                     n = getSocket().write(buffer);
@@ -1372,6 +1368,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         throw new EOFException();
                     }
                 } while (n > 0 && buffer.hasRemaining());
+                // If there is data left in the buffer the socket will be registered for
+                // write further up the stack. This is to ensure the socket is only
+                // registered for write once as both container and user code can trigger
+                // write registration.
             }
             updateLastWrite();
         }
