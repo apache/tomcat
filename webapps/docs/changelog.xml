@@ -140,6 +140,12 @@
         connection that were trying to write when this happened would time out.
         (markt)
       </fix>
+      <fix>
+        <bug>65448</bug>: When using TLS with NIO, it was possible for a
+        blocking response write to hang just before the final TLS packet
+        associated with the response until the connection timed out at which
+        point the final packet would be sent and the connection closed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
