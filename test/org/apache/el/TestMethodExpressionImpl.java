@@ -749,4 +749,16 @@ public class TestMethodExpressionImpl {
         String javaResult = func.apply(new TesterBeanH());
         Assert.assertEquals(javaResult, elResult);
     }
+
+
+    @Test
+    public void testPreferNoVarArgs() {
+        ELProcessor elp = new ELProcessor();
+        TesterBeanAAA bean = new TesterBeanAAA();
+        bean.setName("xyz");
+        elp.defineBean("bean2", bean);
+        elp.defineBean("bean1", new TesterBeanI());
+        String elResult = elp.eval("bean1.echo(bean2)");
+        Assert.assertEquals("No varargs: xyz", elResult);
+    }
 }
