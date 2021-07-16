@@ -758,7 +758,7 @@ public class TestMethodExpressionImpl {
         bean.setName("xyz");
         elp.defineBean("bean2", bean);
         elp.defineBean("bean1", new TesterBeanI());
-        String elResult = elp.eval("bean1.echo(bean2)");
+        String elResult = (String) elp.eval("bean1.echo(bean2)");
         Assert.assertEquals("No varargs: xyz", elResult);
     }
 }
