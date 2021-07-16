@@ -897,7 +897,20 @@ public class TestMethodExpressionImpl {
         Assert.assertEquals(javaResult, elResult);
     }
 
+
     private static interface Function<T, R> {
         public R apply(T t);
+    }
+
+
+    @Test
+    public void testPreferNoVarArgs() {
+        ELProcessor elp = new ELProcessor();
+        TesterBeanAAA bean = new TesterBeanAAA();
+        bean.setName("xyz");
+        elp.defineBean("bean2", bean);
+        elp.defineBean("bean1", new TesterBeanI());
+        String elResult = (String) elp.eval("bean1.echo(bean2)");
+        Assert.assertEquals("No varargs: xyz", elResult);
     }
 }
