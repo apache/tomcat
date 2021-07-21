@@ -158,6 +158,7 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
 
     @Override
+    @Deprecated
     public void execute(Runnable command, long timeout, TimeUnit unit) {
         if (executor != null) {
             executor.execute(command,timeout,unit);
