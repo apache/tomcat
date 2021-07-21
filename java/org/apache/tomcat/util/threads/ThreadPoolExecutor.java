@@ -148,49 +148,20 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      */
     @Override
     public void execute(Runnable command) {
-        execute(command,0,TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Executes the given command at some time in the future.  The command
-     * may execute in a new thread, in a pooled thread, or in the calling
-     * thread, at the discretion of the <code>Executor</code> implementation.
-     * If no threads are available, it will be added to the work queue.
-     * If the work queue is full, the system will wait for the specified
-     * time and it throw a RejectedExecutionException if the queue is still
-     * full after that.
-     *
-     * @param command the runnable task
-     * @param timeout A timeout for the completion of the task
-     * @param unit The timeout time unit
-     * @throws RejectedExecutionException if this task cannot be
-     * accepted for execution - the queue is full
-     * @throws NullPointerException if command or unit is null
-     *
-     * @deprecated This will be removed in Tomcat 10.1.x onwards
-     */
-    @Deprecated
-    public void execute(Runnable command, long timeout, TimeUnit unit) {
         submittedCount.incrementAndGet();
         try {
             super.execute(command);
         } catch (RejectedExecutionException rx) {
             if (super.getQueue() instanceof TaskQueue) {
                 final TaskQueue queue = (TaskQueue)super.getQueue();
-                try {
-                    if (!queue.force(command, timeout, unit)) {
-                        submittedCount.decrementAndGet();
-                        throw new RejectedExecutionException(sm.getString("threadPoolExecutor.queueFull"));
-                    }
-                } catch (InterruptedException x) {
+                if (!queue.force(command)) {
                     submittedCount.decrementAndGet();
-                    throw new RejectedExecutionException(x);
+                    throw new RejectedExecutionException(sm.getString("threadPoolExecutor.queueFull"));
                 }
             } else {
                 submittedCount.decrementAndGet();
                 throw rx;
             }
-
         }
     }
 
