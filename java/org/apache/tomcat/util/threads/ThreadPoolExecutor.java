@@ -1,24 +1,49 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 /*
+ * The original version of this file carried the following notice:
+ *
  * Written by Doug Lea with assistance from members of JCP JSR-166
  * Expert Group and released to the public domain, as explained at
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
-
-package java.util.concurrent;
+package org.apache.tomcat.util.threads;
 
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * An {@link ExecutorService} that executes each submitted task using
+ * An {@link java.util.concurrent.ExecutorService}
+ * that executes each submitted task using
  * one of possibly several pooled threads, normally configured
  * using {@link Executors} factory methods.
  *
@@ -132,7 +157,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * <ol>
  *
  * <li><em> Direct handoffs.</em> A good default choice for a work
- * queue is a {@link SynchronousQueue} that hands off tasks to threads
+ * queue is a {@link java.util.concurrent.SynchronousQueue}
+ * that hands off tasks to threads
  * without otherwise holding them. Here, an attempt to queue a task
  * will fail if no threads are immediately available to run it, so a
  * new thread will be constructed. This policy avoids lockups when
@@ -143,7 +169,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * arrive on average faster than they can be processed.
  *
  * <li><em> Unbounded queues.</em> Using an unbounded queue (for
- * example a {@link LinkedBlockingQueue} without a predefined
+ * example a {@link java.util.concurrent.LinkedBlockingQueue}
+ * without a predefined
  * capacity) will cause new tasks to wait in the queue when all
  * corePoolSize threads are busy. Thus, no more than corePoolSize
  * threads will ever be created. (And the value of the maximumPoolSize
@@ -156,7 +183,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * average faster than they can be processed.
  *
  * <li><em>Bounded queues.</em> A bounded queue (for example, an
- * {@link ArrayBlockingQueue}) helps prevent resource exhaustion when
+ * {@link java.util.concurrent.ArrayBlockingQueue})
+ * helps prevent resource exhaustion when
  * used with finite maximumPoolSizes, but can be more difficult to
  * tune and control.  Queue sizes and maximum pool sizes may be traded
  * off for each other: Using large queues and small pools minimizes
@@ -366,7 +394,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     private static final int TERMINATED =  3 << COUNT_BITS;
 
     // Packing and unpacking ctl
-    private static int runStateOf(int c)     { return c & ~COUNT_MASK; }
     private static int workerCountOf(int c)  { return c & COUNT_MASK; }
     private static int ctlOf(int rs, int wc) { return rs | wc; }
 
@@ -581,10 +608,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         private static final long serialVersionUID = 6138294804551838833L;
 
         /** Thread this worker is running in.  Null if factory fails. */
-        @SuppressWarnings("serial") // Unlikely to be serializable
         final Thread thread;
         /** Initial task to run.  Possibly null. */
-        @SuppressWarnings("serial") // Not statically typed as Serializable
         Runnable firstTask;
         /** Per-thread task counter */
         volatile long completedTasks;
@@ -603,6 +628,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         }
 
         /** Delegates main run loop to outer runWorker. */
+        @Override
         public void run() {
             runWorker(this);
         }
@@ -612,10 +638,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         // The value 0 represents the unlocked state.
         // The value 1 represents the locked state.
 
+        @Override
         protected boolean isHeldExclusively() {
             return getState() != 0;
         }
 
+        @Override
         protected boolean tryAcquire(int unused) {
             if (compareAndSetState(0, 1)) {
                 setExclusiveOwnerThread(Thread.currentThread());
@@ -624,6 +652,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             return false;
         }
 
+        @Override
         protected boolean tryRelease(int unused) {
             setExclusiveOwnerThread(null);
             setState(0);
@@ -1104,6 +1133,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *
      * @param w the worker
      */
+    @SuppressWarnings("null")  // task cannot be null
     final void runWorker(Worker w) {
         Thread wt = Thread.currentThread();
         Runnable task = w.firstTask;
@@ -1320,6 +1350,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *         cannot be accepted for execution
      * @throws NullPointerException if {@code command} is null
      */
+    @Override
     public void execute(Runnable command) {
         if (command == null) {
             throw new NullPointerException();
@@ -1375,6 +1406,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *
      * @throws SecurityException {@inheritDoc}
      */
+    @Override
     public void shutdown() {
         final ReentrantLock mainLock = this.mainLock;
         mainLock.lock();
@@ -1406,6 +1438,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *
      * @throws SecurityException {@inheritDoc}
      */
+    @Override
     public List<Runnable> shutdownNow() {
         List<Runnable> tasks;
         final ReentrantLock mainLock = this.mainLock;
@@ -1422,6 +1455,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         return tasks;
     }
 
+    @Override
     public boolean isShutdown() {
         return runStateAtLeast(ctl.get(), SHUTDOWN);
     }
@@ -1447,10 +1481,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         return runStateAtLeast(c, SHUTDOWN) && runStateLessThan(c, TERMINATED);
     }
 
+    @Override
     public boolean isTerminated() {
         return runStateAtLeast(ctl.get(), TERMINATED);
     }
 
+    @Override
     public boolean awaitTermination(long timeout, TimeUnit unit)
         throws InterruptedException {
         long nanos = unit.toNanos(timeout);
@@ -1468,18 +1504,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
             mainLock.unlock();
         }
     }
-
-    // Override without "throws Throwable" for compatibility with subclasses
-    // whose finalize method invokes super.finalize() (as is recommended).
-    // Before JDK 11, finalize() had a non-empty method body.
-
-    /**
-     * @implNote Previous versions of this class had a finalize method
-     * that shut down this executor, but in this version, finalize
-     * does nothing.
-     */
-    @Deprecated(since="9")
-    protected void finalize() {}
 
     /**
      * Sets the thread factory used to create new threads.
@@ -1923,6 +1947,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      *
      * @return a string identifying this pool, as well as its state
      */
+    @Override
     public String toString() {
         long ncompleted;
         int nworkers, nactive;
@@ -1985,7 +2010,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * beginning of this method.
      *
      * <p><b>Note:</b> When actions are enclosed in tasks (such as
-     * {@link FutureTask}) either explicitly or via methods such as
+     * {@link java.util.concurrent.FutureTask})
+     * either explicitly or via methods such as
      * {@code submit}, these task objects catch and maintain
      * computational exceptions, and so they do not cause abrupt
      * termination, and the internal exceptions are <em>not</em>
@@ -2053,6 +2079,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          * @param r the runnable task requested to be executed
          * @param e the executor attempting to execute this task
          */
+        @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
             if (!e.isShutdown()) {
                 r.run();
@@ -2080,6 +2107,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          * @param e the executor attempting to execute this task
          * @throws RejectedExecutionException always
          */
+        @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
             throw new RejectedExecutionException("Task " + r.toString() +
                                                  " rejected from " +
@@ -2103,6 +2131,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          * @param r the runnable task requested to be executed
          * @param e the executor attempting to execute this task
          */
+        @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
         }
     }
@@ -2140,11 +2169,33 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
          * @param r the runnable task requested to be executed
          * @param e the executor attempting to execute this task
          */
+        @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
             if (!e.isShutdown()) {
                 e.getQueue().poll();
                 e.execute(r);
             }
         }
+    }
+
+
+    public interface RejectedExecutionHandler {
+
+        /**
+         * Method that may be invoked by a {@link ThreadPoolExecutor} when
+         * {@link ThreadPoolExecutor#execute execute} cannot accept a
+         * task.  This may occur when no more threads or queue slots are
+         * available because their bounds would be exceeded, or upon
+         * shutdown of the Executor.
+         *
+         * <p>In the absence of other alternatives, the method may throw
+         * an unchecked {@link RejectedExecutionException}, which will be
+         * propagated to the caller of {@code execute}.
+         *
+         * @param r the runnable task requested to be executed
+         * @param executor the executor attempting to execute this task
+         * @throws RejectedExecutionException if there is no remedy
+         */
+        void rejectedExecution(Runnable r, ThreadPoolExecutor executor);
     }
 }
