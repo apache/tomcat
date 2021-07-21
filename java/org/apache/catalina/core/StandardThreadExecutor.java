@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.Executor;
@@ -160,14 +159,9 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     @Override
     public void execute(Runnable command) {
         if (executor != null) {
-            try {
-                executor.execute(command);
-            } catch (RejectedExecutionException rx) {
-                //there could have been contention around the queue
-                if (!((TaskQueue) executor.getQueue()).force(command)) {
-                    throw new RejectedExecutionException(sm.getString("standardThreadExecutor.queueFull"));
-                }
-            }
+            // Note any RejectedExecutionException due to the use of TaskQueue
+            // will be handled by the o.a.t.u.threads.ThreadPoolExecutor
+            executor.execute(command);
         } else {
             throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
         }
