@@ -37,6 +37,9 @@ public interface Executor extends java.util.concurrent.Executor, Lifecycle {
      * @throws java.util.concurrent.RejectedExecutionException if this task
      * cannot be accepted for execution - the queue is full
      * @throws NullPointerException if command or unit is null
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1.x onwards.
      */
+    @Deprecated
     void execute(Runnable command, long timeout, TimeUnit unit);
 }
