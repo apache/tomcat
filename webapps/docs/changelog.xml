@@ -146,6 +146,12 @@
         associated with the response until the connection timed out at which
         point the final packet would be sent and the connection closed. (markt)
       </fix>
+      <fix>
+        <bug>65454</bug>: Fix a race condition that could result in a delay to
+        a new request. The new request could be queued to wait for an existing
+        request to finish processing rather than the thread pool creating a new
+        thread to process the new request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

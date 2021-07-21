@@ -1050,8 +1050,14 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                 if (min == 0 && ! workQueue.isEmpty()) {
                     min = 1;
                 }
-                if (workerCountOf(c) >= min)
-                 {
+                // https://bz.apache.org/bugzilla/show_bug.cgi?id=65454
+                // If the work queue is not empty, it is likely that a task was
+                // added to the work queue between this thread timing out and
+                // the worker count being decremented a few lines above this
+                // comment. In this case, create a replacement worker so that
+                // the task isn't held in the queue waiting for one of the other
+                // workers to finish.
+                if (workerCountOf(c) >= min && workQueue.isEmpty()) {
                     return; // replacement not needed
                 }
             }
