@@ -176,6 +176,10 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
             super.execute(command);
         } catch (RejectedExecutionException rx) {
             if (super.getQueue() instanceof TaskQueue) {
+                // If the Executor is close to maximum pool size, concurrent
+                // calls to execute() may result (due to Tomcat's use of
+                // TaskQueue) in some tasks being rejected rather than queued.
+                // If this happens, add them to the queue.
                 final TaskQueue queue = (TaskQueue)super.getQueue();
                 try {
                     if (!queue.force(command, timeout, unit)) {
