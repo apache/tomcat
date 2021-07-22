@@ -429,7 +429,11 @@ class NamesEnumerator implements Enumeration<String> {
     private void findNext() {
         next=null;
         for(; pos< size; pos++ ) {
-            next=headers.getName( pos ).toString();
+            MessageBytes bytes=headers.getName( pos );
+            if ( bytes == null ) {
+                break;
+            }
+            next=bytes.toString();
             for( int j=0; j<pos ; j++ ) {
                 if( headers.getName( j ).equalsIgnoreCase( next )) {
                     // duplicate.
