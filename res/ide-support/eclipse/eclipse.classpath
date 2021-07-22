@@ -29,6 +29,6 @@
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/hamcrest-2.2/hamcrest-2.2.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/cglib-3.3.0/cglib-nodep-3.3.0.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/objenesis-2.6/objenesis-2.6.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/unboundid-5.1.4/unboundid-ldapsdk-5.1.4.jar"/>
+    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/unboundid-6.0.0/unboundid-ldapsdk-6.0.0.jar"/>
     <classpathentry kind="output" path=".settings/output"/>
 </classpath>

@@ -113,7 +113,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/unboundid-5.1.4/unboundid-ldapsdk-5.1.4.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/unboundid-6.0.0/unboundid-ldapsdk-6.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
