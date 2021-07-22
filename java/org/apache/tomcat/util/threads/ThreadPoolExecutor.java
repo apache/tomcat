@@ -2273,9 +2273,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     /**
      * A handler for rejected tasks that throws a
      * {@link RejectedExecutionException}.
-     *
-     * This is the default handler for {@link ThreadPoolExecutor} and
-     * {@link ScheduledThreadPoolExecutor}.
      */
     public static class AbortPolicy implements RejectedExecutionHandler {
         /**
