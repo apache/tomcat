@@ -582,7 +582,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     /**
      * The default rejected execution handler.
      */
-    private static final RejectedExecutionHandler defaultHandler = new RejectHandler();
+    private static final RejectedExecutionHandler defaultHandler = new RejectPolicy();
 
     /**
      * Permission required for callers of shutdown and shutdownNow.
@@ -1212,7 +1212,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * Creates a new {@code ThreadPoolExecutor} with the given initial
      * parameters, the
      * {@linkplain Executors#defaultThreadFactory default thread factory}
-     * and the {@linkplain ThreadPoolExecutor.AbortPolicy
+     * and the {@linkplain ThreadPoolExecutor.RejectPolicy
      * default rejected execution handler}.
      *
      * <p>It may be more convenient to use one of the {@link Executors}
@@ -1247,7 +1247,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     /**
      * Creates a new {@code ThreadPoolExecutor} with the given initial
-     * parameters and the {@linkplain ThreadPoolExecutor.AbortPolicy
+     * parameters and the {@linkplain ThreadPoolExecutor.RejectPolicy
      * default rejected execution handler}.
      *
      * @param corePoolSize the number of threads to keep in the pool, even
@@ -2332,7 +2332,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         }
     }
 
-    private static class RejectHandler implements RejectedExecutionHandler {
+    private static class RejectPolicy implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
             throw new RejectedExecutionException();
