@@ -41,8 +41,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @since 4.1
  */
-public class AprLifecycleListener
-    implements LifecycleListener {
+public class AprLifecycleListener implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(AprLifecycleListener.class);
     private static boolean instanceCreated = false;
@@ -56,8 +55,7 @@ public class AprLifecycleListener
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(AprLifecycleListener.class);
 
 
     // ---------------------------------------------- Constants

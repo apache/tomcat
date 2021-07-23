@@ -51,7 +51,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class StandardPipeline extends LifecycleBase implements Pipeline {
 
     private static final Log log = LogFactory.getLog(StandardPipeline.class);
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(StandardPipeline.class);
 
     // ----------------------------------------------------------- Constructors
 

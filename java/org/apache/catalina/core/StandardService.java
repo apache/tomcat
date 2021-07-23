@@ -51,6 +51,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class StandardService extends LifecycleMBeanBase implements Service {
 
     private static final Log log = LogFactory.getLog(StandardService.class);
+    private static final StringManager sm = StringManager.getManager(StandardService.class);
 
 
     // ----------------------------------------------------- Instance Variables
@@ -60,12 +61,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     private String name = null;
 
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
     /**
      * The <code>Server</code> that owns this Service, if any.

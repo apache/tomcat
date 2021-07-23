@@ -62,10 +62,10 @@ import org.apache.tomcat.util.res.StringManager;
 public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     private static final Log log = LogFactory.getLog(StandardServer.class);
+    private static final StringManager sm = StringManager.getManager(StandardServer.class);
 
 
     // ------------------------------------------------------------ Constructor
-
 
     /**
      * Construct a default instance of this class.
@@ -137,13 +137,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * The shutdown command string we are looking for.
      */
     private String shutdown = "SHUTDOWN";
-
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     /**

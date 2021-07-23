@@ -62,8 +62,7 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(ThreadLocalLeakPreventionListener.class);
 
     /**
      * Listens for {@link LifecycleEvent} for the start of the {@link Server} to

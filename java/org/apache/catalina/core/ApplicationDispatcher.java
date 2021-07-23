@@ -273,7 +273,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
     /**
      * The StringManager for this package.
      */
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(ApplicationDispatcher.class);
 
 
     /**
