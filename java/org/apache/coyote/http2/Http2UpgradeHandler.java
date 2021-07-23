@@ -826,6 +826,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             frame[3] = FrameType.WINDOW_UPDATE.getIdByte();
             ByteUtil.set31Bits(frame, 9, increment);
             socketWrapper.write(true, frame, 0, frame.length);
+            boolean needFlush = true;
             // No need to send update from closed stream
             if (stream instanceof Stream && ((Stream) stream).canWrite()) {
                 int streamIncrement = ((Stream) stream).getWindowUpdateSizeToWrite(increment);
@@ -840,6 +841,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     try {
                         socketWrapper.write(true, frame, 0, frame.length);
                         socketWrapper.flush(true);
+                        needFlush = false;
                     } catch (IOException ioe) {
                         if (applicationInitiated) {
                             handleAppInitiatedIOException(ioe);
@@ -848,7 +850,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                         }
                     }
                 }
-            } else {
+            }
+            if (needFlush) {
                 socketWrapper.flush(true);
             }
         }
