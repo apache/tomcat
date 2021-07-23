@@ -329,7 +329,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ThreadPoolExecutor extends AbstractExecutorService {
 
-    protected static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.threads.res");
+    protected static final StringManager sm = StringManager.getManager(ThreadPoolExecutor.class);
 
     /**
      * The main pool control state, ctl, is an atomic integer packing

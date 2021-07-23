@@ -33,8 +33,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {
 
     private static final long serialVersionUID = 1L;
-    protected static final StringManager sm = StringManager
-            .getManager("org.apache.tomcat.util.threads.res");
+    protected static final StringManager sm = StringManager.getManager(TaskQueue.class);
     private static final int DEFAULT_FORCED_REMAINING_CAPACITY = -1;
 
     private transient volatile ThreadPoolExecutor parent = null;
