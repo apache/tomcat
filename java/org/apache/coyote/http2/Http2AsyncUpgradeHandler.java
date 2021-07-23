@@ -240,6 +240,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         ByteUtil.setThreeBytes(frame, 0,  4);
         frame[3] = FrameType.WINDOW_UPDATE.getIdByte();
         ByteUtil.set31Bits(frame, 9, increment);
+        boolean neetToWriteConnectionUpdate = true;
         // No need to send update from closed stream
         if (stream instanceof Stream && ((Stream) stream).canWrite()) {
             int streamIncrement = ((Stream) stream).getWindowUpdateSizeToWrite(increment);
@@ -256,8 +257,10 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                         TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
                         ByteBuffer.wrap(frame), ByteBuffer.wrap(frame2));
+                neetToWriteConnectionUpdate = false;
             }
-        } else {
+        }
+        if (neetToWriteConnectionUpdate) {
             socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                     TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE, errorCompletion,
                     ByteBuffer.wrap(frame));
