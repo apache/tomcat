@@ -58,10 +58,8 @@ import org.w3c.dom.ls.DOMImplementationLS;
  */
 public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
-    private static final Log log =
-        LogFactory.getLog(JreMemoryLeakPreventionListener.class);
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final Log log = LogFactory.getLog(JreMemoryLeakPreventionListener.class);
+    private static final StringManager sm = StringManager.getManager(JreMemoryLeakPreventionListener.class);
 
     private static final String FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY =
             "java.util.concurrent.ForkJoinPool.common.threadFactory";

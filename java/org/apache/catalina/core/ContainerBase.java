@@ -126,8 +126,7 @@ import org.apache.tomcat.util.threads.InlineExecutorService;
  *
  * @author Craig R. McClanahan
  */
-public abstract class ContainerBase extends LifecycleMBeanBase
-        implements Container {
+public abstract class ContainerBase extends LifecycleMBeanBase implements Container {
 
     private static final Log log = LogFactory.getLog(ContainerBase.class);
 
@@ -241,8 +240,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(ContainerBase.class);
 
 
     /**
