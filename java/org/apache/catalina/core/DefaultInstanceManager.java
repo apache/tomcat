@@ -65,8 +65,7 @@ public class DefaultInstanceManager implements InstanceManager {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(DefaultInstanceManager.class);
 
     private static final boolean EJB_PRESENT;
     private static final boolean JPA_PRESENT;

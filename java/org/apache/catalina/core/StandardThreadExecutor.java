@@ -31,8 +31,7 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 public class StandardThreadExecutor extends LifecycleMBeanBase
         implements Executor, ResizableExecutor {
 
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(StandardThreadExecutor.class);
 
     // ---------------------------------------------- Properties
     /**
