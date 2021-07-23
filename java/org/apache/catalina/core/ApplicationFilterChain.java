@@ -97,8 +97,7 @@ public final class ApplicationFilterChain implements FilterChain {
     /**
      * The string manager for our package.
      */
-    private static final StringManager sm =
-      StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(ApplicationFilterChain.class);
 
 
     /**

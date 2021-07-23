@@ -38,7 +38,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class JniLifecycleListener implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(JniLifecycleListener.class);
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(JniLifecycleListener.class);
 
     private String libraryName = "";
     private String libraryPath = "";

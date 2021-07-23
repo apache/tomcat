@@ -52,26 +52,18 @@ import org.apache.tomcat.util.res.StringManager;
 final class StandardHostValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(StandardHostValve.class);
+    private static final StringManager sm = StringManager.getManager(StandardHostValve.class);
 
     // Saves a call to getClassLoader() on very request. Under high load these
     // calls took just long enough to appear as a hot spot (although a very
     // minor one) in a profiler.
-    private static final ClassLoader MY_CLASSLOADER =
-            StandardHostValve.class.getClassLoader();
+    private static final ClassLoader MY_CLASSLOADER = StandardHostValve.class.getClassLoader();
 
     //------------------------------------------------------ Constructor
+
     public StandardHostValve() {
         super(true);
     }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // --------------------------------------------------------- Public Methods

@@ -165,7 +165,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(ApplicationContext.class);
 
 
     /**
