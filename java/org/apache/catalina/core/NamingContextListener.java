@@ -56,7 +56,6 @@ import org.apache.naming.ResourceLinkRef;
 import org.apache.naming.ResourceRef;
 import org.apache.naming.ServiceRef;
 import org.apache.naming.TransactionRef;
-import org.apache.naming.factory.Constants;
 import org.apache.naming.factory.ResourceLinkFactory;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
@@ -82,6 +81,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class NamingContextListener implements LifecycleListener, PropertyChangeListener {
 
     private static final Log log = LogFactory.getLog(NamingContextListener.class);
+    protected static final StringManager sm = StringManager.getManager(NamingContextListener.class);
 
 
     // ----------------------------------------------------- Instance Variables
@@ -143,13 +143,6 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      * exception or if the request is ignored.
      */
     private boolean exceptionOnFailedWrite = true;
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------- Properties
