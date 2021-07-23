@@ -152,6 +152,13 @@
         request to finish processing rather than the thread pool creating a new
         thread to process the new request. (markt)
       </fix>
+      <fix>
+        <bug>65460</bug>: Correct a regression introduced in the previous
+        release in the change to reduce the number of small HTTP/2 window
+        updates sent for streams. A logic error meant that small window updates
+        for the connection were dropped. This meant that the connection flow
+        window slowly reduced over time until nothing could be sent. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
