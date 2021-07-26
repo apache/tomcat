@@ -119,6 +119,10 @@
         canonical path of the directory in which the symlink had been created.
         Patch provided by Cedomir Igaly. (markt)
       </fix>
+      <add>
+        <bug>65443</bug>: Refactor the <code>CorsFilter</code> to make it easier
+        to extend. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
