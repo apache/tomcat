@@ -74,13 +74,13 @@ import org.apache.tomcat.util.res.StringManager;
  * 'Access-Control-Request-Headers' header, for pre-flight request.</li>
  * </ul>
  *
- * @see <a href="http://www.w3.org/TR/cors/">CORS specification</a>
- *
  * If you extend this class and override one or more of the getXxx() methods,
  * consider whether you also need to override
  * {@link CorsFilter#doFilter(ServletRequest, ServletResponse, FilterChain)} and
  * add appropriate locking so that the {@code doFilter()} method executes with a
  * consistent configuration.
+ *
+ * @see <a href="http://www.w3.org/TR/cors/">CORS specification</a>
  */
 public class CorsFilter extends GenericFilter {
 
