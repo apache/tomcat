@@ -188,6 +188,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to Chinese translations contributed by ZhangJieWen and
+        chengzheyan. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M2 (markt)" rtext="2021-07-02">
   <subsection name="Catalina">
