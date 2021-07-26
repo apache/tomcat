@@ -175,6 +175,23 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to Chinese translations contributed by ZhangJieWen and
+        chengzheyan. (markt)
+      </add>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations contributed by tak7iji. (markt)
+      </add>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.8 (markt)" rtext="2021-07-02">
   <subsection name="Catalina">
