@@ -17,7 +17,8 @@
 package javax.servlet;
 
 /**
- * TODO SERVLET3 - Add comments
+ * Used to pass data to the methods of {@link AsyncListener}.
+ *
  * @since Servlet 3.0
  */
 public class AsyncEvent {
@@ -26,6 +27,11 @@ public class AsyncEvent {
     private final ServletResponse response;
     private final Throwable throwable;
 
+    /**
+     * Creates an instance using the provide parameters.
+     *
+     * @param context   The asynchronous context associated with the event
+     */
     public AsyncEvent(AsyncContext context) {
         this.context = context;
         this.request = null;
@@ -33,6 +39,13 @@ public class AsyncEvent {
         this.throwable = null;
     }
 
+    /**
+     * Creates an instance using the provide parameters.
+     *
+     * @param context   The asynchronous context associated with the event
+     * @param request   The request associated with the event
+     * @param response  The response associated with the event
+     */
     public AsyncEvent(AsyncContext context, ServletRequest request,
             ServletResponse response) {
         this.context = context;
@@ -41,6 +54,12 @@ public class AsyncEvent {
         this.throwable = null;
     }
 
+    /**
+     * Creates an instance using the provide parameters.
+     *
+     * @param context   The asynchronous context associated with the event
+     * @param throwable The throwable associated with the event
+     */
     public AsyncEvent(AsyncContext context, Throwable throwable) {
         this.context = context;
         this.throwable = throwable;
@@ -48,6 +67,14 @@ public class AsyncEvent {
         this.response = null;
     }
 
+    /**
+     * Creates an instance using the provide parameters.
+     *
+     * @param context   The asynchronous context associated with the event
+     * @param request   The request associated with the event
+     * @param response  The response associated with the event
+     * @param throwable The throwable associated with the event
+     */
     public AsyncEvent(AsyncContext context, ServletRequest request,
             ServletResponse response, Throwable throwable) {
         this.context = context;
@@ -56,18 +83,42 @@ public class AsyncEvent {
         this.throwable = throwable;
     }
 
+    /**
+     * Obtain the asynchronous context associated with the event.
+     *
+     * @return  The asynchronous context associated with the event or
+     *          {@code null} if one was not specified
+     */
     public AsyncContext getAsyncContext() {
         return context;
     }
 
+    /**
+     * Obtain the request associated with the event.
+     *
+     * @return  The request associated with the event or
+     *          {@code null} if one was not specified
+     */
     public ServletRequest getSuppliedRequest() {
         return request;
     }
 
+    /**
+     * Obtain the response associated with the event.
+     *
+     * @return  The response associated with the event or
+     *          {@code null} if one was not specified
+     */
     public ServletResponse getSuppliedResponse() {
         return response;
     }
 
+    /**
+     * Obtain the throwable associated with the event.
+     *
+     * @return  The throwable associated with the event or
+     *          {@code null} if one was not specified
+     */
     public Throwable getThrowable() {
         return throwable;
     }

@@ -17,12 +17,38 @@
 package javax.servlet;
 
 /**
+ * Enumeration of dispatcher types. Used both to define filter mappings and by
+ * Servlets to determine why they were called.
+ *
  * @since Servlet 3.0
  */
 public enum DispatcherType {
+
+    /**
+     * {@link RequestDispatcher#forward(ServletRequest, ServletResponse)}
+     */
     FORWARD,
+
+    /**
+     * {@link RequestDispatcher#include(ServletRequest, ServletResponse)}
+     */
     INCLUDE,
+
+    /**
+     * Normal (non-dispatched) requests.
+     */
     REQUEST,
+
+    /**
+     * {@link AsyncContext#dispatch()}, {@link AsyncContext#dispatch(String)}
+     * and
+     * {@link AsyncContext#addListener(AsyncListener, ServletRequest, ServletResponse)}
+     */
     ASYNC,
+
+    /**
+     * When the container has passed processing to the error handler mechanism
+     * such as a defined error page.
+     */
     ERROR
 }
