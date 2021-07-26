@@ -911,17 +911,6 @@ public class CorsFilter implements Filter {
     }
 
 
-    /*
-     * Log objects are not Serializable but this Filter is because it extends
-     * GenericFilter. Tomcat won't serialize a Filter but in case something else
-     * does...
-     */
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        ois.defaultReadObject();
-        log = LogFactory.getLog(CorsFilter.class);
-    }
-
-
     // -------------------------------------------------- CORS Response Headers
 
     /**
