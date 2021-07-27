@@ -107,6 +107,12 @@
 <section name="Tomcat 10.1.0-M3 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <scode>
+        Incremented the supported Jakarta Servlet version to 6.0 to align with
+        the current development branch of the Jakarta Servlet specification.
+        Plans have changed and the next iteration of the Servlet specification
+        will be 6.0 rather than 5.1. (markt)
+      </scode>
       <fix>
         <bug>65411</bug>: Always close the connection when an uncaught
         <code>NamingException</code> occurs to avoid connection locking.
@@ -440,7 +446,7 @@
       <add>
         Implement the new <code>Cookie</code> methods
         <code>setAttribute()</code>, <code>getAttribute()</code> and
-        <code>getAttributes()</code> introduced in Servlet 5.1. (markt)
+        <code>getAttributes()</code> introduced in Servlet 6.0. (markt)
       </add>
       <fix>
         AprLifecycleListener does not show dev version suffix for libtcnative

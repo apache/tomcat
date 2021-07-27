@@ -459,7 +459,7 @@ public class Cookie implements Cloneable, Serializable {
      * @throws NumberFormatException If the attribute is known to be numerical
      *         but the provided value cannot be parsed to a number.
      *
-     * @since Servlet 5.1
+     * @since Servlet 6.0
      */
     public void setAttribute(String name, String value) {
         if (name == null) {
@@ -506,7 +506,7 @@ public class Cookie implements Cloneable, Serializable {
      *
      * @return Value of specified attribute
      *
-     * @since Servlet 5.1
+     * @since Servlet 6.0
      */
     public String getAttribute(String name) {
         if (attributes == null) {
@@ -523,7 +523,7 @@ public class Cookie implements Cloneable, Serializable {
      *
      * @return A read-only Map of attributes to values, excluding version.
      *
-     * @since Servlet 5.1
+     * @since Servlet 6.0
      */
     public Map<String,String> getAttributes() {
         if (attributes == null) {

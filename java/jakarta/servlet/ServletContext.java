@@ -92,19 +92,19 @@ public interface ServletContext {
 
     /**
      * Returns the major version of the Java Servlet API that this servlet
-     * container supports. All implementations that comply with Version 5.1 must
-     * have this method return the integer 5.
+     * container supports. All implementations that comply with Version 6.0 must
+     * have this method return the integer 6.
      *
-     * @return 5
+     * @return 6
      */
     public int getMajorVersion();
 
     /**
      * Returns the minor version of the Servlet API that this servlet container
-     * supports. All implementations that comply with Version 5.1 must have this
-     * method return the integer 1.
+     * supports. All implementations that comply with Version 6.0 must have this
+     * method return the integer 0.
      *
-     * @return 1
+     * @return 0
      */
     public int getMinorVersion();
 
