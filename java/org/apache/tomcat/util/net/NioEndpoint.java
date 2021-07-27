@@ -1022,7 +1022,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             }
                         }
                     } catch (CancelledKeyException ckx) {
-                        socketWrapper.close();
+                        if (socketWrapper != null) {
+                            socketWrapper.close();
+                        }
                     }
                 }
             } catch (ConcurrentModificationException cme) {
