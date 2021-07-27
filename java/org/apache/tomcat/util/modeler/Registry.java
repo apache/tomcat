@@ -134,6 +134,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     public static synchronized Registry getRegistry(Object key, Object guard) {
         if (registry == null) {
             registry = new Registry();
+            registry.guard = guard;
         }
         if (registry.guard != null && registry.guard != guard) {
             return null;
