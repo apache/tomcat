@@ -2381,6 +2381,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      *
      * @return the loaded class, or null if the class isn't found
      */
+    /*
+     * The use of getPackage() is appropriate given that the code is checking
+     * if the package is sealed. Therefore, parent class loaders need to be
+     * checked.
+     */
+    @SuppressWarnings("deprecation")
     protected Class<?> findClassInternal(String name) {
 
         checkStateForResourceLoading(name);
@@ -2473,6 +2479,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 int pos = name.lastIndexOf('.');
                 if (pos != -1) {
                     String packageName = name.substring(0, pos);
+
                     Package pkg = getPackage(packageName);
 
                     // Define the package (if null)
