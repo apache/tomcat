@@ -2430,49 +2430,42 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 }
             }
 
-            // Looking up the package
-            String packageName = null;
-            int pos = name.lastIndexOf('.');
-            if (pos != -1) {
-                packageName = name.substring(0, pos);
-            }
-
-            Package pkg = null;
-
-            if (packageName != null) {
-                pkg = getPackage(packageName);
-                // Define the package (if null)
-                if (pkg == null) {
-                    try {
-                        if (manifest == null) {
-                            definePackage(packageName, null, null, null, null, null, null, null);
-                        } else {
-                            definePackage(packageName, manifest, codeBase);
-                        }
-                    } catch (IllegalArgumentException e) {
-                        // Ignore: normal error due to dual definition of package
-                    }
-                    pkg = getPackage(packageName);
-                }
-            }
-
             if (securityManager != null) {
+                // Looking up the package
+                int pos = name.lastIndexOf('.');
+                if (pos != -1) {
+                    String packageName = name.substring(0, pos);
+                    Package pkg = getPackage(packageName);
 
-                // Checking sealing
-                if (pkg != null) {
-                    boolean sealCheck = true;
-                    if (pkg.isSealed()) {
-                        sealCheck = pkg.isSealed(codeBase);
-                    } else {
-                        sealCheck = (manifest == null) || !isPackageSealed(packageName, manifest);
+                    // Define the package (if null)
+                    if (pkg == null) {
+                        try {
+                            if (manifest == null) {
+                                definePackage(packageName, null, null, null, null, null, null, null);
+                            } else {
+                                definePackage(packageName, manifest, codeBase);
+                            }
+                        } catch (IllegalArgumentException e) {
+                            // Ignore: normal error due to dual definition of package
+                        }
+                        pkg = getPackage(packageName);
                     }
-                    if (!sealCheck) {
-                        throw new SecurityException
-                            ("Sealing violation loading " + name + " : Package "
-                             + packageName + " is sealed.");
+
+                    // Checking sealing
+                    if (pkg != null) {
+                        boolean sealCheck = true;
+                        if (pkg.isSealed()) {
+                            sealCheck = pkg.isSealed(codeBase);
+                        } else {
+                            sealCheck = (manifest == null) || !isPackageSealed(packageName, manifest);
+                        }
+                        if (!sealCheck) {
+                            throw new SecurityException
+                                ("Sealing violation loading " + name + " : Package "
+                                 + packageName + " is sealed.");
+                        }
                     }
                 }
-
             }
 
             try {
