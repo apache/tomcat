@@ -558,8 +558,8 @@ public class Catalina {
             // Load loader
             String loaderClassName = generatedCodePackage + ".DigesterGeneratedCodeLoader";
             try {
-                Digester.GeneratedCodeLoader loader =
-                        (Digester.GeneratedCodeLoader) Catalina.class.getClassLoader().loadClass(loaderClassName).newInstance();
+                Digester.GeneratedCodeLoader loader = (Digester.GeneratedCodeLoader)
+                        Catalina.class.getClassLoader().loadClass(loaderClassName).getDeclaredConstructor().newInstance();
                 Digester.setGeneratedCodeLoader(loader);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
