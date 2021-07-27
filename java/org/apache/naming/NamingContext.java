@@ -843,9 +843,8 @@ public class NamingContext implements Context {
                 }
             } else if (entry.type == NamingEntry.REFERENCE) {
                 try {
-                    Object obj = NamingManager.getObjectInstance
-                        (entry.value, name, this, env);
-                    if(entry.value instanceof ResourceRef) {
+                    Object obj = NamingManager.getObjectInstance(entry.value, name, this, env);
+                    if (entry.value instanceof ResourceRef) {
                         boolean singleton = Boolean.parseBoolean(
                                     (String) ((ResourceRef) entry.value).get(
                                         "singleton").getContent());
