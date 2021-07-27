@@ -20,9 +20,9 @@ jobs:
       - arch: s390x
         jdk: openjdk11
       - arch: arm64
-        jdk: oraclejdk8
+        jdk: oraclejdk11
       - arch: ppc64le
-        jdk: oraclejdk8
+        jdk: oraclejdk11
 
 addons:
     apt:
@@ -40,13 +40,13 @@ addons:
 install:
     - ARCH=`uname -p`
     - echo $ARCH
-    - JDK_X64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u282-b08/OpenJDK8U-jdk_x64_linux_hotspot_8u282b08.tar.gz"
-    - JDK_ARM64="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u282-b08/OpenJDK8U-jdk_aarch64_linux_hotspot_jdk8u282-b08.tar.gz"
-    - JDK_s390x="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_s390x_linux_hotspot_11.0.10_9.tar.gz"
-    - JDK_ppc64le="https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u282-b08/OpenJDK8U-jdk_ppc64le_linux_hotspot_8u282b08.tar.gz"
+    - JDK_X64="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9/OpenJDK11U-jdk_x64_linux_hotspot_11.0.11_9.tar.gz"
+    - JDK_ARM64="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9/OpenJDK11U-jdk_aarch64_linux_hotspot_11.0.11_9.tar.gz"
+    - JDK_s390x="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9/OpenJDK11U-jdk_s390x_linux_hotspot_11.0.11_9.tar.gz"
+    - JDK_ppc64le="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9/OpenJDK11U-jdk_ppc64le_linux_hotspot_11.0.11_9.tar.gz"
     - if test "X$ARCH" = "Xaarch64"; then JDK_URL=$JDK_ARM64; elif test "$ARCH" = "ppc64le"; then JDK_URL=$JDK_ppc64le; elif test "$ARCH" = "s390x"; then JDK_URL=$JDK_s390x; else JDK_URL=$JDK_X64; fi
     - wget -q $JDK_URL && tar xzf OpenJDK*.tar.gz
-    - if test "$ARCH" = "s390x"; then mv jdk-11* jdk; else mv jdk8* jdk; fi
+    - mv jdk-11* jdk
     - export JAVA_HOME=`pwd`/jdk
     - wget -q https://mirrors.netix.net/apache/ant/binaries/apache-ant-1.10.11-bin.tar.gz && tar xzf apache-ant-*-bin.tar.gz
     - export ANT_HOME=`pwd`/apache-ant-1.10.11
