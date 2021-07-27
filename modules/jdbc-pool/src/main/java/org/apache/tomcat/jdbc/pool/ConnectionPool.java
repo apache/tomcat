@@ -361,6 +361,13 @@ public class ConnectionPool {
      * @return constructor used to instantiate the wrapper object
      * @throws NoSuchMethodException Failed to get a constructor
      */
+    /*
+     * Neither the class nor the constructor are exposed outside of jdbc-pool.
+     * Given the comments in the jdbc-pool code regarding caching for
+     * performance, continue to use Proxy.getProxyClass(). This will need to be
+     * revisited if that method is marked for removal.
+     */
+    @SuppressWarnings("deprecation")
     public Constructor<?> getProxyConstructor(boolean xa) throws NoSuchMethodException {
         //cache the constructor
         if (proxyClassConstructor == null ) {

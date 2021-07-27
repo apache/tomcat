@@ -54,6 +54,13 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         // nothing to do
     }
 
+    /*
+     * Neither the class nor the constructor are exposed outside of jdbc-pool.
+     * Given the comments in the jdbc-pool code regarding caching for
+     * performance, continue to use Proxy.getProxyClass(). This will need to be
+     * revisited if that method is marked for removal.
+     */
+    @SuppressWarnings("deprecation")
     protected Constructor<?> getResultSetConstructor() throws NoSuchMethodException {
         if (resultSetConstructor == null) {
             Class<?> proxyClass = Proxy.getProxyClass(StatementDecoratorInterceptor.class.getClassLoader(),
