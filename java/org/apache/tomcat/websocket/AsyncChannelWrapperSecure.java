@@ -411,9 +411,12 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             handshaking = false;
                             break;
                         }
-                        case NOT_HANDSHAKING: {
-                            throw new SSLException(
-                                    sm.getString("asyncChannelWrapperSecure.notHandshaking"));
+                        case NOT_HANDSHAKING:
+                            // Don't expect to see this during a handshake
+                        case NEED_UNWRAP_AGAIN: {
+                            // Only applies to DLTS
+                            throw new SSLException(sm.getString(
+                                    "asyncChannelWrapperSecure.unexpectedHandshakeState", handshakeStatus));
                         }
                     }
                 }
