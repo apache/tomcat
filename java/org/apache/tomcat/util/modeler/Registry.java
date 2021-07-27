@@ -141,6 +141,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             } else {
                 registry = new Registry();
             }
+            registry.guard = guard;
         }
         if (registry.guard != null && registry.guard != guard) {
             return null;
