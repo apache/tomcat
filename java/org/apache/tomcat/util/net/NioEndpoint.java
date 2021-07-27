@@ -676,10 +676,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 attachment.interestOps(ops);
                                 key.interestOps(ops);
                             } catch (CancelledKeyException ckx) {
-                                cancelledKey(key, socketWrapper);
+                                socketWrapper.close();
                             }
                         } else {
-                            cancelledKey(key, socketWrapper);
+                            socketWrapper.close();
                         }
                     }
                 }
@@ -709,35 +709,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 event.reset(socketWrapper, OP_REGISTER);
             }
             addEvent(event);
-        }
-
-        public void cancelledKey(SelectionKey sk, SocketWrapperBase<NioChannel> socketWrapper) {
-            if (JreCompat.isJre11Available() && socketWrapper != null) {
-                socketWrapper.close();
-            } else {
-                try {
-                    // If is important to cancel the key first, otherwise a deadlock may occur between the
-                    // poller select and the socket channel close which would cancel the key
-                    // This workaround is not needed on Java 11+
-                    // TODO: verify, if not fixed in Java 11+ then 14+ is needed, see BZ 64007
-                    // TODO: the cancelledKey method can be removed with Java 11 as minimum
-                    if (sk != null) {
-                        sk.attach(null);
-                        if (sk.isValid()) {
-                            sk.cancel();
-                        }
-                    }
-                } catch (Throwable e) {
-                    ExceptionUtils.handleThrowable(e);
-                    if (log.isDebugEnabled()) {
-                        log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
-                    }
-                } finally {
-                    if (socketWrapper != null) {
-                        socketWrapper.close();
-                    }
-                }
-            }
         }
 
         /**
@@ -809,7 +780,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         protected void processKey(SelectionKey sk, NioSocketWrapper socketWrapper) {
             try {
                 if (close) {
-                    cancelledKey(sk, socketWrapper);
+                    socketWrapper.close();
                 } else if (sk.isValid()) {
                     if (sk.isReadable() || sk.isWritable()) {
                         if (socketWrapper.getSendfileData() != null) {
@@ -847,16 +818,16 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 }
                             }
                             if (closeSocket) {
-                                cancelledKey(sk, socketWrapper);
+                                socketWrapper.close();
                             }
                         }
                     }
                 } else {
                     // Invalid key
-                    cancelledKey(sk, socketWrapper);
+                    socketWrapper.close();
                 }
             } catch (CancelledKeyException ckx) {
-                cancelledKey(sk, socketWrapper);
+                socketWrapper.close();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString("endpoint.nio.keyProcessingError"), t);
@@ -924,7 +895,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             if (log.isDebugEnabled()) {
                                 log.debug("Send file connection is being closed");
                             }
-                            poller.cancelledKey(sk, socketWrapper);
+                            socketWrapper.close();
                             break;
                         }
                         case PIPELINED: {
@@ -932,7 +903,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 log.debug("Connection is keep alive, processing pipe-lined data");
                             }
                             if (!processSocket(socketWrapper, SocketEvent.OPEN_READ, true)) {
-                                poller.cancelledKey(sk, socketWrapper);
+                                socketWrapper.close();
                             }
                             break;
                         }
@@ -962,13 +933,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     log.debug("Unable to complete sendfile request:", e);
                 }
                 if (!calledByProcessor && sc != null) {
-                    poller.cancelledKey(sk, socketWrapper);
+                    socketWrapper.close();
                 }
                 return SendfileState.ERROR;
             } catch (Throwable t) {
                 log.error(sm.getString("endpoint.sendfile.error"), t);
                 if (!calledByProcessor && sc != null) {
-                    poller.cancelledKey(sk, socketWrapper);
+                    socketWrapper.close();
                 }
                 return SendfileState.ERROR;
             }
@@ -1004,12 +975,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     try {
                         if (socketWrapper == null) {
                             // We don't support any keys without attachments
-                            cancelledKey(key, null);
+                            if (key.isValid()) {
+                                key.cancel();
+                            }
                         } else if (close) {
                             key.interestOps(0);
                             // Avoid duplicate stop calls
                             socketWrapper.interestOps(0);
-                            cancelledKey(key, socketWrapper);
+                            socketWrapper.close();
                         } else if ((socketWrapper.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ ||
                                   (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                             boolean readTimeout = false;
@@ -1037,19 +1010,19 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 socketWrapper.setError(new SocketTimeoutException());
                                 if (readTimeout && socketWrapper.readOperation != null) {
                                     if (!socketWrapper.readOperation.process()) {
-                                        cancelledKey(key, socketWrapper);
+                                        socketWrapper.close();
                                     }
                                 } else if (writeTimeout && socketWrapper.writeOperation != null) {
                                     if (!socketWrapper.writeOperation.process()) {
-                                        cancelledKey(key, socketWrapper);
+                                        socketWrapper.close();
                                     }
                                 } else if (!processSocket(socketWrapper, SocketEvent.ERROR, true)) {
-                                    cancelledKey(key, socketWrapper);
+                                    socketWrapper.close();
                                 }
                             }
                         }
                     } catch (CancelledKeyException ckx) {
-                        cancelledKey(key, socketWrapper);
+                        socketWrapper.close();
                     }
                 }
             } catch (ConcurrentModificationException cme) {
@@ -1702,23 +1675,23 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         state = getHandler().process(socketWrapper, event);
                     }
                     if (state == SocketState.CLOSED) {
-                        poller.cancelledKey(getSelectionKey(), socketWrapper);
+                        socketWrapper.close();
                     }
                 } else if (handshake == -1 ) {
                     getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
-                    poller.cancelledKey(getSelectionKey(), socketWrapper);
+                    socketWrapper.close();
                 } else if (handshake == SelectionKey.OP_READ){
                     socketWrapper.registerReadInterest();
                 } else if (handshake == SelectionKey.OP_WRITE){
                     socketWrapper.registerWriteInterest();
                 }
             } catch (CancelledKeyException cx) {
-                poller.cancelledKey(getSelectionKey(), socketWrapper);
+                socketWrapper.close();
             } catch (VirtualMachineError vme) {
                 ExceptionUtils.handleThrowable(vme);
             } catch (Throwable t) {
                 log.error(sm.getString("endpoint.processing.fail"), t);
-                poller.cancelledKey(getSelectionKey(), socketWrapper);
+                socketWrapper.close();
             } finally {
                 socketWrapper = null;
                 event = null;
@@ -1729,19 +1702,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
         }
 
-        private SelectionKey getSelectionKey() {
-            // Shortcut for Java 11 onwards
-            if (JreCompat.isJre11Available()) {
-                return null;
-            }
-
-            SocketChannel socketChannel = socketWrapper.getSocket().getIOChannel();
-            if (socketChannel == null) {
-                return null;
-            }
-
-            return socketChannel.keyFor(NioEndpoint.this.poller.getSelector());
-        }
     }
 
 

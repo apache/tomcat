@@ -181,6 +181,10 @@
         for the connection were dropped. This meant that the connection flow
         window slowly reduced over time until nothing could be sent. (markt)
       </fix>
+      <fix>
+        Remove NIO workarounds and code that is no longer needed with Java 11.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
