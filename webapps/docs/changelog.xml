@@ -129,6 +129,11 @@
         <bug>65443</bug>: Refactor the <code>CorsFilter</code> to make it easier
         to extend. (markt)
       </add>
+      <fix>
+        To avoid unnecessary cache revalidation, do not add an HTTP
+        <code>Expires</code> header when setting adding an HTTP header of
+        <code>CacheControl: private</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
