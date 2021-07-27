@@ -209,6 +209,12 @@
       <add>
         Improvements to Korean translations. (woonsan)
       </add>
+      <fix>
+        Use of GraalVM native images no longer automatically disables JMX
+        support. JMX support may still be disabled by calling
+        <code>org.apache.tomcat.util.modeler.Registry.disableRegistry()</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
