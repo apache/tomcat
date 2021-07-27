@@ -868,7 +868,7 @@ public class NamingContext implements Context {
                         // Note: This may need manual constructor reflection configuration
                         Reference reference = (Reference) entry.value;
                         Class<?> factoryClass = getClass().getClassLoader().loadClass(reference.getFactoryClassName());
-                        ObjectFactory factory = (ObjectFactory) factoryClass.newInstance();
+                        ObjectFactory factory = (ObjectFactory) factoryClass.getDeclaredConstructor().newInstance();
                         obj = factory.getObjectInstance(entry.value, name, this, env);
                     }
                     if (entry.value instanceof ResourceRef) {
