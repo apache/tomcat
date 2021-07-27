@@ -551,10 +551,10 @@ public abstract class AuthenticatorBase extends ValveBase
                 // Note: These can cause problems with downloading files with IE
                 response.setHeader("Pragma", "No-cache");
                 response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", DATE_ONE);
             } else {
                 response.setHeader("Cache-Control", "private");
             }
-            response.setHeader("Expires", DATE_ONE);
         }
 
         if (constraints != null) {
