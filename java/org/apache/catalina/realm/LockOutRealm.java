@@ -91,7 +91,7 @@ public class LockOutRealm extends CombinedRealm {
     protected synchronized void startInternal() throws LifecycleException {
         // Configure the list of failed users to delete the oldest entry once it
         // exceeds the specified size
-        failedUsers = new LinkedHashMap<String, LockRecord>(cacheSize, 0.75f,
+        failedUsers = new LinkedHashMap<>(cacheSize, 0.75f,
                 true) {
             private static final long serialVersionUID = 1L;
             @Override

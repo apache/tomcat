@@ -165,7 +165,7 @@ public final class DrawboardEndpoint extends Endpoint {
 
 
     private final MessageHandler.Whole<String> stringHandler =
-            new MessageHandler.Whole<String>() {
+            new MessageHandler.Whole<>() {
 
         @Override
         public void onMessage(final String message) {

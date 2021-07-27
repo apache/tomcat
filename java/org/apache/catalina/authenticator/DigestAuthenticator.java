@@ -383,7 +383,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             setOpaque(sessionIdGenerator.generateSessionId());
         }
 
-        nonces = new LinkedHashMap<String, DigestAuthenticator.NonceInfo>() {
+        nonces = new LinkedHashMap<>() {
 
             private static final long serialVersionUID = 1L;
             private static final long LOG_SUPPRESS_TIME = 5 * 60 * 1000;

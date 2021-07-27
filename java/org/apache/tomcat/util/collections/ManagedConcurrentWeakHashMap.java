@@ -214,7 +214,7 @@ public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implem
 
     @Override
     public Set<Map.Entry<K, V>> entrySet() {
-        return new AbstractSet<Map.Entry<K, V>>() {
+        return new AbstractSet<>() {
             @Override
             public boolean isEmpty() {
                 return map.isEmpty();
@@ -227,7 +227,7 @@ public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implem
 
             @Override
             public Iterator<Map.Entry<K, V>> iterator() {
-                return new Iterator<Map.Entry<K, V>>() {
+                return new Iterator<>() {
                     private final Iterator<Map.Entry<Key, V>> it = map
                             .entrySet().iterator();
 
@@ -238,7 +238,7 @@ public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implem
 
                     @Override
                     public Map.Entry<K, V> next() {
-                        return new Map.Entry<K, V>() {
+                        return new Map.Entry<>() {
                             private final Map.Entry<Key, V> en = it.next();
 
                             @SuppressWarnings("unchecked")

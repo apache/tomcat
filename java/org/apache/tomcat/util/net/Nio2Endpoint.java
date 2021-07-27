@@ -490,7 +490,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private boolean writeNotify = false;
 
         private CompletionHandler<Integer, SendfileData> sendfileHandler
-            = new CompletionHandler<Integer, SendfileData>() {
+            = new CompletionHandler<>() {
 
             @Override
             public void completed(Integer nWrite, SendfileData attachment) {
@@ -576,7 +576,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             nioChannels = endpoint.getNioChannels();
             socketBufferHandler = channel.getBufHandler();
 
-            this.readCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
+            this.readCompletionHandler = new CompletionHandler<>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
                     if (log.isDebugEnabled()) {
@@ -622,7 +622,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
             };
 
-            this.writeCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
+            this.writeCompletionHandler = new CompletionHandler<>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
                     writeNotify = false;
@@ -676,7 +676,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
             };
 
-            gatheringWriteCompletionHandler = new CompletionHandler<Long, ByteBuffer[]>() {
+            gatheringWriteCompletionHandler = new CompletionHandler<>() {
                 @Override
                 public void completed(Long nBytes, ByteBuffer[] attachment) {
                     writeNotify = false;

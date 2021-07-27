@@ -244,7 +244,7 @@ public class StringManager {
              * for removal needs to use one less than the maximum desired size
              *
              */
-            map = new LinkedHashMap<Locale,StringManager>(LOCALE_CACHE_SIZE, 1, true) {
+            map = new LinkedHashMap<>(LOCALE_CACHE_SIZE, 1, true) {
                 private static final long serialVersionUID = 1L;
                 @Override
                 protected boolean removeEldestEntry(

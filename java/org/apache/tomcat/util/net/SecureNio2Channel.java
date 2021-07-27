@@ -935,7 +935,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         if (!handshakeComplete) {
             throw new IllegalStateException(sm.getString("channel.nio.ssl.incompleteHandshake"));
         }
-        CompletionHandler<Integer, A> readCompletionHandler = new CompletionHandler<Integer, A>() {
+        CompletionHandler<Integer, A> readCompletionHandler = new CompletionHandler<>() {
             @Override
             public void completed(Integer nBytes, A attach) {
                 if (nBytes.intValue() < 0) {
@@ -1039,7 +1039,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         if (!handshakeComplete) {
             throw new IllegalStateException(sm.getString("channel.nio.ssl.incompleteHandshake"));
         }
-        CompletionHandler<Integer, A> readCompletionHandler = new CompletionHandler<Integer, A>() {
+        CompletionHandler<Integer, A> readCompletionHandler = new CompletionHandler<>() {
             @Override
             public void completed(Integer nBytes, A attach) {
                 if (nBytes.intValue() < 0) {

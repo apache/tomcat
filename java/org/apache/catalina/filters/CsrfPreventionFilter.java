@@ -294,7 +294,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         private final Map<T,T> cache;
 
         public LruCache(final int cacheSize) {
-            cache = new LinkedHashMap<T,T>() {
+            cache = new LinkedHashMap<>() {
                 private static final long serialVersionUID = 1L;
                 @Override
                 protected boolean removeEldestEntry(Map.Entry<T,T> eldest) {
