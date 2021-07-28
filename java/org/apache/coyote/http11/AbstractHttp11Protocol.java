@@ -518,7 +518,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         // ALPN
         String alpnName = upgradeProtocol.getAlpnName();
         if (alpnName != null && alpnName.length() > 0) {
-            if (getEndpoint().isAlpnSupported()) {
+            // ALPN is only available with TLS
+            if (getEndpoint().isSSLEnabled()) {
                 negotiatedProtocols.put(alpnName, upgradeProtocol);
                 getEndpoint().addNegotiatedProtocol(alpnName);
                 getLog().info(sm.getString("abstractHttp11Protocol.alpnConfigured",

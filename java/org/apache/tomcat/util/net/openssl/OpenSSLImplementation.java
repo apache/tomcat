@@ -38,10 +38,4 @@ public class OpenSSLImplementation extends SSLImplementation {
     public SSLUtil getSSLUtil(SSLHostConfigCertificate certificate) {
         return new OpenSSLUtil(certificate);
     }
-
-    @Override
-    public boolean isAlpnSupported() {
-        // OpenSSL supported ALPN
-        return true;
-    }
 }
