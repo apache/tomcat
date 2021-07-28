@@ -26,11 +26,11 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.zip.ZipFile;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.ResourceSet;
-import org.apache.tomcat.util.compat.JreCompat;
 
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
@@ -311,7 +311,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     protected JarFile openJarFile() throws IOException {
         synchronized (archiveLock) {
             if (archive == null) {
-                archive = JreCompat.getInstance().jarFileNewInstance(getBase());
+                archive = new JarFile(new File(getBase()), true, ZipFile.OPEN_READ, Runtime.version());
                 WebResourceRoot root = getRoot();
                 if ((root.getContext() != null) && root.getContext().getUseBloomFilterForArchives()) {
                     jarContents = new JarContents(archive);
