@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-import java.io.IOException;
 import java.net.URLConnection;
 import java.sql.DriverManager;
 import java.util.StringTokenizer;
@@ -28,7 +27,6 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -171,11 +169,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
                 // Set the default URL caching policy to not to cache
                 if (urlCacheProtection) {
-                    try {
-                        JreCompat.getInstance().disableCachingForJarUrlConnections();
-                    } catch (IOException e) {
-                        log.error(sm.getString("jreLeakListener.jarUrlConnCacheFail"), e);
-                    }
+                    URLConnection.setDefaultUseCaches("JAR", false);
                 }
 
                 if (classesToInitialize != null) {
