@@ -30,8 +30,6 @@ import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.tomcat.util.compat.JreCompat;
-
 public class TestImportHandlerStandardPackages {
 
     @Test
@@ -54,16 +52,10 @@ public class TestImportHandlerStandardPackages {
     private void checkPackageClassList(String packageName, Set<String> classNames) throws Exception {
 
         if ("java.lang".equals(packageName)) {
-            // The code below is designed to run on Java 9 so skip this check
-            // if running on Java 8. The test has previously been run with Java
-            // 9 (and later) so it is not necessary that this is executed on
-            // every test run. The intention is that it will catch new classes
-            // when the tests are run on a newer JRE.
+            // The intention is that this test will catch new classes when the
+            // tests are run on a newer JRE.
             // The latest version of the JRE where this test is known to pass is
-            // - OpenJDK 14 EA 27
-            if (!JreCompat.isJre9Available()) {
-                return;
-            }
+            // - OpenJDK 17 EA 28
             getJavaBaseClasses().filter(c -> (c.startsWith("java/lang/")))
                     .filter(c -> c.lastIndexOf('/') == 9)             // Exclude sub-packages
                     .filter(c -> c.endsWith(".class"))                // Exclude non-class resources
