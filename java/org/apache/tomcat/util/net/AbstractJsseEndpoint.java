@@ -28,7 +28,6 @@ import java.util.Set;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
 public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
@@ -123,7 +122,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
         SSLParameters sslParameters = engine.getSSLParameters();
         sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
-        if (JreCompat.isAlpnSupported() && clientRequestedApplicationProtocols != null
+        if (clientRequestedApplicationProtocols != null
                 && clientRequestedApplicationProtocols.size() > 0
                 && negotiableProtocols.size() > 0) {
             // Only try to negotiate if both client and server have at least
@@ -134,7 +133,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
             commonProtocols.retainAll(clientRequestedApplicationProtocols);
             if (commonProtocols.size() > 0) {
                 String[] commonProtocolsArray = commonProtocols.toArray(new String[0]);
-                JreCompat.getInstance().setApplicationProtocols(sslParameters, commonProtocolsArray);
+                sslParameters.setApplicationProtocols(commonProtocolsArray);
             }
         }
         switch (sslHostConfig.getCertificateVerification()) {
