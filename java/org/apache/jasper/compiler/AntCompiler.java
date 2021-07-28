@@ -177,22 +177,6 @@ public class AntCompiler extends Compiler {
             info.append("    extension dir=" + exts + "\n");
         }
 
-        // Add endorsed directories if any are specified and we're forking
-        // See Bugzilla 31257
-        if(ctxt.getOptions().getFork()) {
-            String endorsed = System.getProperty("java.endorsed.dirs");
-            if(endorsed != null) {
-                Javac.ImplementationSpecificArgument endorsedArg =
-                    javac.createCompilerArg();
-                endorsedArg.setLine("-J-Djava.endorsed.dirs=" +
-                        quotePathList(endorsed));
-                info.append("    endorsed dir=" + quotePathList(endorsed) +
-                        "\n");
-            } else {
-                info.append("    no endorsed dirs specified\n");
-            }
-        }
-
         // Configure the compiler object
         javac.setEncoding(javaEncoding);
         javac.setClasspath(path);

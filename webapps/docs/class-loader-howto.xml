@@ -178,9 +178,8 @@ class from the web application's <em>WebappX</em> class loader is processed,
 this class loader will look in the local repositories <strong>first</strong>,
 instead of delegating before looking.  There are exceptions. Classes which are
 part of the JRE base classes cannot be overridden. There are some exceptions
-such as the XML parser components which can be overridden using the appropriate
-JVM feature which is the endorsed standards override feature for Java &lt;= 8
-and the upgradeable modules feature for Java 9+.
+such as the XML parser components which can be overridden using the upgradeable
+modules feature for Java 9+.
 Lastly, the web application class loader will always delegate first for Jakarta
 EE API classes for the specifications implemented by Tomcat
 (Servlet, JSP, EL, WebSocket). All other class loaders in Tomcat follow the
@@ -224,23 +223,9 @@ when you are running modern versions of Java, because the usual class loader
 delegation process will always choose the implementation inside the JDK in
 preference to this one.</p>
 
-<p>Java &lt;= 8 supports a mechanism called the "Endorsed Standards Override
-Mechanism" to allow replacement of APIs created outside of the JCP
-(i.e. DOM and SAX from W3C).  It can also be used to update the XML parser
-implementation.  For more information, see:
-<a href="http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html">
-http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>. For
-Java 9+, use the upgradeable modules feature.</p>
-
-<p>Tomcat utilizes the endorsed mechanism by including the system property setting
-<code>-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS</code> in the
-command line that starts the container. The default value of this option is
-<em>$CATALINA_HOME/endorsed</em>. This <em>endorsed</em> directory is not
-created by default. Note that the endorsed feature is no longer supported
-with Java 9 and the above system property will only be set if either the
-directory <em>$CATALINA_HOME/endorsed</em> exists, or the variable
-<code>JAVA_ENDORSED_DIRS</code> has been set.
-</p>
+<p>Java 9+ supports a mechanism called upgradeable modules to allow replacement
+of APIs created outside of the JCP (i.e. DOM and SAX from W3C).  It can also be
+used to update the XML parser implementation.</p>
 
 <p>Note that overriding any JRE component carries risk. If the overriding
 component does not provide a 100% compatible API (e.g. the API provided by

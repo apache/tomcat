@@ -149,6 +149,10 @@
         remove Java 8 specific code now that the minimum Java version has been
         increased to 11. (markt)
       </scode>
+      <scode>
+        Remove all references to the endorsed standards override feature as it
+        is not supported in Java 11. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
