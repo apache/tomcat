@@ -106,7 +106,6 @@ import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.ErrorPageSupport;
-import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.juli.logging.Log;
@@ -4985,21 +4984,6 @@ public class StandardContext extends ContainerBase
 
         // Initialize character set mapper
         getCharsetMapper();
-
-        // Validate required extensions
-        boolean dependencyCheck = true;
-        try {
-            dependencyCheck = ExtensionValidator.validateApplication
-                (getResources(), this);
-        } catch (IOException ioe) {
-            log.error(sm.getString("standardContext.extensionValidationError"), ioe);
-            dependencyCheck = false;
-        }
-
-        if (!dependencyCheck) {
-            // do not make application available if dependency check fails
-            ok = false;
-        }
 
         // Reading the "catalina.useNaming" environment variable
         String useNamingProperty = System.getProperty("catalina.useNaming");

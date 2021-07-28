@@ -25,9 +25,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.security.AccessControlException;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -50,7 +47,6 @@ import org.apache.catalina.Service;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.mbeans.MBeanFactory;
 import org.apache.catalina.startup.Catalina;
-import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
@@ -1011,32 +1007,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         // Register the naming resources
         globalNamingResources.init();
 
-        // Populate the extension validator with JARs from common and shared
-        // class loaders
-        if (getCatalina() != null) {
-            ClassLoader cl = getCatalina().getParentClassLoader();
-            // Walk the class loader hierarchy. Stop at the system class loader.
-            // This will add the shared (if present) and common class loaders
-            while (cl != null && cl != ClassLoader.getSystemClassLoader()) {
-                if (cl instanceof URLClassLoader) {
-                    URL[] urls = ((URLClassLoader) cl).getURLs();
-                    for (URL url : urls) {
-                        if (url.getProtocol().equals("file")) {
-                            try {
-                                File f = new File (url.toURI());
-                                if (f.isFile() &&
-                                        f.getName().endsWith(".jar")) {
-                                    ExtensionValidator.addSystemResource(f);
-                                }
-                            } catch (URISyntaxException | IOException e) {
-                                // Ignore
-                            }
-                        }
-                    }
-                }
-                cl = cl.getParent();
-            }
-        }
         // Initialize our defined Services
         for (Service service : services) {
             service.init();

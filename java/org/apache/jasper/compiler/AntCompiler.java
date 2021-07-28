@@ -272,25 +272,6 @@ public class AntCompiler extends Compiler {
         }
     }
 
-    private String quotePathList(String list) {
-        StringBuilder result = new StringBuilder(list.length() + 10);
-        StringTokenizer st = new StringTokenizer(list, File.pathSeparator);
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            if (token.indexOf(' ') == -1) {
-                result.append(token);
-            } else {
-                result.append('\"');
-                result.append(token);
-                result.append('\"');
-            }
-            if (st.hasMoreTokens()) {
-                result.append(File.pathSeparatorChar);
-            }
-        }
-        return result.toString();
-    }
-
 
     protected static class SystemLogHandler extends PrintStream {
 
