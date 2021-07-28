@@ -40,11 +40,7 @@ public final class Library {
             try {
                 System.loadLibrary(NAMES[i]);
                 loaded = true;
-            } catch (ThreadDeath t) {
-                throw t;
-            } catch (VirtualMachineError t) {
-                // Don't use a Java 7 multiple exception catch so we can keep
-                // the JNI code identical between Tomcat 6/7/8/9
+            } catch (ThreadDeath | VirtualMachineError t) {
                 throw t;
             } catch (Throwable t) {
                 String name = System.mapLibraryName(NAMES[i]);
