@@ -796,7 +796,6 @@ public class RemoteIpFilter implements Filter {
         if (isInternal || (trustedProxies != null &&
                 trustedProxies.matcher(request.getRemoteAddr()).matches())) {
             String remoteIp = null;
-            // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
 
