@@ -496,7 +496,7 @@ public class ImportHandler {
     }
 
 
-    public static boolean isExported(Class<?> type) {
+    private static boolean isExported(Class<?> type) {
         String packageName = type.getPackage().getName();
         Module module = type.getModule();
         return module.isExported(packageName);
