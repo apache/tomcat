@@ -29,9 +29,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.tomcat.Jar;
-import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Implementation of {@link Jar} that is optimised for file based JAR URLs that
@@ -62,10 +62,10 @@ public class JarFileUrlJar implements Jar {
             } catch (URISyntaxException e) {
                 throw new IOException(e);
             }
-            jarFile = JreCompat.getInstance().jarFileNewInstance(f);
+            jarFile = new JarFile(f, true, ZipFile.OPEN_READ, Runtime.version());
             jarFileURL = url;
         }
-        multiRelease = JreCompat.getInstance().jarFileIsMultiRelease(jarFile);
+        multiRelease = jarFile.isMultiRelease();
     }
 
 
