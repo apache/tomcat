@@ -118,7 +118,7 @@ public class ELProcessor {
             if (!Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
-            if (!method.canAccess(null)) {
+            if (!Util.canAccess(null, method)) {
                 continue;
             }
             if (method.getName().equals(sig.getName())) {
@@ -191,8 +191,8 @@ public class ELProcessor {
 
         int modifiers = method.getModifiers();
 
-        // Check for static, public method and module access for Java 9+
-        if (!Modifier.isStatic(modifiers) || !method.canAccess(null)) {
+        // Check for static, public method and module access
+        if (!Modifier.isStatic(modifiers) || !Util.canAccess(null, method)) {
             throw new NoSuchMethodException(Util.message(context,
                     "elProcessor.defineFunctionInvalidMethod", method.getName(),
                     method.getDeclaringClass().getName()));

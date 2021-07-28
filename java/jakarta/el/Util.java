@@ -17,6 +17,7 @@
 package jakarta.el;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -547,7 +548,7 @@ class Util {
         // If base is non-null, method may be static or non-static
         if (m == null ||
                 (Modifier.isPublic(type.getModifiers()) &&
-                        (m.canAccess(base) || base != null && m.canAccess(null)))) {
+                        (canAccess(base, m) || base != null && canAccess(null, m)))) {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();
@@ -602,13 +603,22 @@ class Util {
 
         Constructor<?> constructor = wrapper.unWrap();
 
-        if (!Modifier.isPublic(clazz.getModifiers()) || !constructor.canAccess(null)) {
+        if (!Modifier.isPublic(clazz.getModifiers()) || !canAccess(null, constructor)) {
             throw new MethodNotFoundException(message(
                     null, "util.method.notfound", clazz, methodName,
                     paramString(paramTypes)));
         }
 
         return constructor;
+    }
+
+
+    static boolean canAccess(Object base, AccessibleObject accessibleObject) {
+        try {
+            return accessibleObject.canAccess(base);
+        } catch (IllegalArgumentException iae) {
+            return false;
+        }
     }
 
 

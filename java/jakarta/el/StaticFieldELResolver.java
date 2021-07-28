@@ -45,7 +45,7 @@ public class StaticFieldELResolver extends ELResolver {
                 int modifiers = field.getModifiers();
                 if (Modifier.isStatic(modifiers) &&
                         Modifier.isPublic(modifiers) &&
-                        field.canAccess(null)) {
+                        Util.canAccess(null, field)) {
                     return field.get(null);
                 }
             } catch (IllegalArgumentException | IllegalAccessException |
@@ -158,7 +158,7 @@ public class StaticFieldELResolver extends ELResolver {
                 int modifiers = field.getModifiers();
                 if (Modifier.isStatic(modifiers) &&
                         Modifier.isPublic(modifiers) &&
-                        field.canAccess(null)) {
+                        Util.canAccess(null, field)) {
                     return field.getType();
                 }
             } catch (IllegalArgumentException | NoSuchFieldException |
