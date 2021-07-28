@@ -28,7 +28,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-class Jre16Compat extends Jre9Compat {
+class Jre16Compat extends JreCompat {
 
     private static final Log log = LogFactory.getLog(Jre16Compat.class);
     private static final StringManager sm = StringManager.getManager(Jre16Compat.class);
@@ -65,6 +65,7 @@ class Jre16Compat extends Jre9Compat {
         return unixDomainSocketAddressClazz != null;
     }
 
+
     @Override
     public SocketAddress getUnixDomainSocketAddress(String path) {
         try {
@@ -74,6 +75,7 @@ class Jre16Compat extends Jre9Compat {
             throw new UnsupportedOperationException(e);
         }
     }
+
 
     @Override
     public ServerSocketChannel openUnixDomainServerSocketChannel() {
@@ -85,6 +87,7 @@ class Jre16Compat extends Jre9Compat {
         }
     }
 
+
     @Override
     public SocketChannel openUnixDomainSocketChannel() {
         try {
@@ -94,5 +97,4 @@ class Jre16Compat extends Jre9Compat {
             throw new UnsupportedOperationException(e);
         }
     }
-
 }
