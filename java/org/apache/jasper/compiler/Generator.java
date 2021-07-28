@@ -49,7 +49,6 @@ import jakarta.servlet.jsp.tagext.TagInfo;
 import jakarta.servlet.jsp.tagext.TagVariableInfo;
 import jakarta.servlet.jsp.tagext.VariableInfo;
 
-import org.apache.el.util.JreCompat;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -1350,13 +1349,12 @@ class Generator {
                     // Check the bean is public, not an interface, not abstract
                     // and (for Java 9+) in an exported module
                     int modifiers = bean.getModifiers();
-                    JreCompat jreCompat = JreCompat.getInstance();
                     // No need to test for being an interface here as the
                     // getConstructor() call above will have already failed for
                     // any interfaces.
                     if (!Modifier.isPublic(modifiers) ||
                             Modifier.isAbstract(modifiers) ||
-                            !jreCompat.canAccess(null, constructor) ) {
+                            !constructor.canAccess(null) ) {
                         throw new Exception(Localizer.getMessage("jsp.error.invalid.bean",
                                 Integer.valueOf(modifiers)));
                     }
