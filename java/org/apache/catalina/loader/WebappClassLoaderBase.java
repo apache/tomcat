@@ -1883,10 +1883,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 usingExecutor = true;
                             }
                         }
-                    } catch (/*SecurityException |*/ NoSuchFieldException | /*IllegalArgumentException |*/
-                            IllegalAccessException | RuntimeException e) {
-                        // FIXME: InaccessibleObjectException is only available in Java 9+,
-                        // swapped for RuntimeException for now
+                    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
+                            IllegalAccessException | InaccessibleObjectException e) {
                         log.warn(sm.getString("webappClassLoader.stopThreadFail",
                                 thread.getName(), getContextName()), e);
                     }
