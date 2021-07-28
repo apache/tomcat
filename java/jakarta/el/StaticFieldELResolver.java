@@ -115,10 +115,7 @@ public class StaticFieldELResolver extends ELResolver {
                 // Static method so base should be null
                 Method match = Util.findMethod(clazz, null, methodName, paramTypes, params);
 
-                // Note: On Java 9 and above, the isStatic check becomes
-                // unnecessary because the canAccess() call in Util.findMethod()
-                // effectively performs the same check
-                if (match == null || !Modifier.isStatic(match.getModifiers())) {
+                if (match == null) {
                     throw new MethodNotFoundException(Util.message(context,
                             "staticFieldELResolver.methodNotFound", methodName,
                             clazz.getName()));
