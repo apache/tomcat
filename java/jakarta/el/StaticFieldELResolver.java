@@ -43,10 +43,9 @@ public class StaticFieldELResolver extends ELResolver {
             try {
                 Field field = clazz.getField(name);
                 int modifiers = field.getModifiers();
-                JreCompat jreCompat = JreCompat.getInstance();
                 if (Modifier.isStatic(modifiers) &&
                         Modifier.isPublic(modifiers) &&
-                        jreCompat.canAccess(null, field)) {
+                        field.canAccess(null)) {
                     return field.get(null);
                 }
             } catch (IllegalArgumentException | IllegalAccessException |
@@ -157,10 +156,9 @@ public class StaticFieldELResolver extends ELResolver {
             try {
                 Field field = clazz.getField(name);
                 int modifiers = field.getModifiers();
-                JreCompat jreCompat = JreCompat.getInstance();
                 if (Modifier.isStatic(modifiers) &&
                         Modifier.isPublic(modifiers) &&
-                        jreCompat.canAccess(null, field)) {
+                        field.canAccess(field)) {
                     return field.getType();
                 }
             } catch (IllegalArgumentException | NoSuchFieldException |

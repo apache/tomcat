@@ -479,12 +479,11 @@ public class ImportHandler {
             return null;
         }
 
-        // Class must be public, non-abstract, not an interface and (for
-        // Java 9+) in an exported package
-        JreCompat jreCompat = JreCompat.getInstance();
+        // Class must be public, non-abstract, not an interface and in an
+        // exported package
         int modifiers = clazz.getModifiers();
         if (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) ||
-                Modifier.isInterface(modifiers) || !jreCompat.isExported(clazz)) {
+                Modifier.isInterface(modifiers) || !isExported(clazz)) {
             if (throwException) {
                 throw new ELException(Util.message(
                         null, "importHandler.invalidClass", name));
@@ -494,6 +493,13 @@ public class ImportHandler {
         }
 
         return clazz;
+    }
+
+
+    public static boolean isExported(Class<?> type) {
+        String packageName = type.getPackage().getName();
+        Module module = type.getModule();
+        return module.isExported(packageName);
     }
 
 
