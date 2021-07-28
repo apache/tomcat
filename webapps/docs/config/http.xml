@@ -1124,12 +1124,6 @@
   <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
 </Connector>]]></source>
 
-  <p>Because Java 8's TLS implementation does not support ALPN (which is
-     required for HTTP/2 over TLS), you must be using an OpenSSL based TLS
-     implementation to enable HTTP/2 support. See the
-     <code>sslImplementationName</code> attribute of the
-     <strong>Connector</strong>.</p>
-
   <p>Additional configuration attributes are available. See the
   <a href="http2.html">HTTP/2 Upgrade Protocol</a> documentation for details.</p>
 
