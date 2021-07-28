@@ -290,7 +290,7 @@ if [ "$USE_NOHUP" = "true" ]; then
     _NOHUP="nohup"
 fi
 
-# Add the JAVA 9 specific start-up parameters required by Tomcat
+# Add the module start-up parameters required by Tomcat
 JDK_JAVA_OPTIONS="$JDK_JAVA_OPTIONS --add-opens=java.base/java.lang=ALL-UNNAMED"
 JDK_JAVA_OPTIONS="$JDK_JAVA_OPTIONS --add-opens=java.base/java.io=ALL-UNNAMED"
 JDK_JAVA_OPTIONS="$JDK_JAVA_OPTIONS --add-opens=java.base/java.util=ALL-UNNAMED"
