@@ -17,15 +17,14 @@
 package jakarta.el;
 
 import java.io.File;
+import java.lang.module.ModuleFinder;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,7 +55,8 @@ public class TestImportHandlerStandardPackages {
             // tests are run on a newer JRE.
             // The latest version of the JRE where this test is known to pass is
             // - OpenJDK 17 EA 28
-            getJavaBaseClasses().filter(c -> (c.startsWith("java/lang/")))
+            ModuleFinder.ofSystem().find("java.base").get().open().list()
+                    .filter(c -> (c.startsWith("java/lang/")))
                     .filter(c -> c.lastIndexOf('/') == 9)             // Exclude sub-packages
                     .filter(c -> c.endsWith(".class"))                // Exclude non-class resources
                     .map(c -> c.substring(10, c.length() - 6))        // Extract class name
@@ -128,26 +128,5 @@ public class TestImportHandlerStandardPackages {
                 }
             }
         }
-    }
-
-
-    private static Stream<String> getJavaBaseClasses() throws Exception {
-        // While this code is only used on Java 9 and later, it needs to compile
-        // with Java 8 so use reflection for now.
-        Class<?> clazzModuleFinder = Class.forName("java.lang.module.ModuleFinder");
-        Class<?> clazzModuleReference = Class.forName("java.lang.module.ModuleReference");
-        Class<?> clazzModuleReader = Class.forName("java.lang.module.ModuleReader");
-
-        // Returns ModuleFinder
-        Object mf = clazzModuleFinder.getMethod("ofSystem").invoke(null);
-        // Returns ModuleReference
-        Object mRef = ((Optional<?>) clazzModuleFinder.getMethod(
-                "find", String.class).invoke(mf, "java.base")).get();
-        // Returns ModuleReader
-        Object mr = clazzModuleReference.getMethod("open").invoke(mRef);
-        // Returns the contents of the module
-        @SuppressWarnings("unchecked")
-        Stream<String> result = (Stream<String>) clazzModuleReader.getMethod("list").invoke(mr);
-        return result;
     }
 }
