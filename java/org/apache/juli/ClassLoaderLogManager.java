@@ -50,22 +50,10 @@ import java.util.logging.Logger;
  */
 public class ClassLoaderLogManager extends LogManager {
 
-    private static final boolean isJava9;
-
     private static ThreadLocal<Boolean> addingLocalRootLogger = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     public static final String DEBUG_PROPERTY =
             ClassLoaderLogManager.class.getName() + ".debug";
-
-    static {
-        Class<?> c = null;
-        try {
-            c = Class.forName("java.lang.Runtime$Version");
-        } catch (ClassNotFoundException e) {
-            // Must be Java 8
-        }
-        isJava9 = c != null;
-    }
 
     private final class Cleaner extends Thread {
 
@@ -494,8 +482,7 @@ public class ClassLoaderLogManager extends LogManager {
             }
             // Try the default JVM configuration
             if (is == null) {
-                File defaultFile = new File(new File(System.getProperty("java.home"),
-                                                     isJava9 ? "conf" : "lib"),
+                File defaultFile = new File(new File(System.getProperty("java.home"), "conf"),
                     "logging.properties");
                 try {
                     is = new FileInputStream(defaultFile);
