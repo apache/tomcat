@@ -31,8 +31,6 @@ import jakarta.websocket.server.ServerApplicationConfig;
 import jakarta.websocket.server.ServerEndpoint;
 import jakarta.websocket.server.ServerEndpointConfig;
 
-import org.apache.tomcat.util.compat.JreCompat;
-
 /**
  * Registers an interest in any class that is annotated with
  * {@link ServerEndpoint} so that Endpoint can be published via the WebSocket
@@ -62,12 +60,11 @@ public class WsSci implements ServletContainerInitializer {
             String wsPackage = ContainerProvider.class.getName();
             wsPackage = wsPackage.substring(0, wsPackage.lastIndexOf('.') + 1);
             for (Class<?> clazz : clazzes) {
-                JreCompat jreCompat = JreCompat.getInstance();
                 int modifiers = clazz.getModifiers();
                 if (!Modifier.isPublic(modifiers) ||
                         Modifier.isAbstract(modifiers) ||
                         Modifier.isInterface(modifiers) ||
-                        !jreCompat.isExported(clazz)) {
+                        isExported(clazz)) {
                     // Non-public, abstract, interface or not in an exported
                     // package (Java 9+) - skip it.
                     continue;
@@ -128,6 +125,13 @@ public class WsSci implements ServletContainerInitializer {
         } catch (DeploymentException e) {
             throw new ServletException(e);
         }
+    }
+
+
+    private static boolean isExported(Class<?> type) {
+        String packageName = type.getPackage().getName();
+        Module module = type.getModule();
+        return module.isExported(packageName);
     }
 
 
