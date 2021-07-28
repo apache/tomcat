@@ -141,6 +141,14 @@
         <code>Expires</code> header when setting adding an HTTP header of
         <code>CacheControl: private</code>. (markt)
       </fix>
+      <scode>
+        Refactor JULI's custom <code>LogManager</code>, the
+        web application class loader implementation, the web resources
+        implementation, the <code>JreLeakPreventionListener</code>
+        implementation and the <code>StandardJarScanner</code> implementation to
+        remove Java 8 specific code now that the minimum Java version has been
+        increased to 11. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -185,6 +193,10 @@
         Remove NIO workarounds and code that is no longer needed with Java 11.
         (remm)
       </fix>
+      <scode>
+        Refactor the endpoints to remove Java 8 specific code now that the
+        minimum Java version has been increased to 11. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -198,6 +210,18 @@
         This is an implementation of a proposed extension to the Jakarta
         Expression Language specification. (markt)
       </add>
+      <scode>
+        Refactor the EL API and implementation to remove Java 8 specific code
+        now that the minimum Java version has been increased to 11. (markt)
+      </scode>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <scode>
+        Refactor the WebSocket implementation to remove Java 8 specific code now
+        that the minimum Java version has been increased to 11. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Web applications">
