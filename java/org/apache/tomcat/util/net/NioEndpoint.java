@@ -62,8 +62,7 @@ import org.apache.tomcat.util.net.jsse.JSSESupport;
  * <li>Worker threads pool</li>
  * </ul>
  *
- * When switching to Java 5, there's an opportunity to use the virtual
- * machine's thread pool.
+ * TODO: Consider using the virtual machine's thread pool.
  *
  * @author Mladen Turk
  * @author Remy Maucherat
