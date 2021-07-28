@@ -369,10 +369,18 @@ are automatically compiled as part of the build process.
 At the jasper task you can use the option <code>addWebXmlMappings</code> for
 automatic merge the <code>${webapp.path}/WEB-INF/generated_web.xml</code>
 with the current web application deployment descriptor at
-<code>${webapp.path}/WEB-INF/web.xml</code>. When you want to use Java 6
-features inside your JSP's, add the following javac compiler task attributes:
-<code>source=&quot;1.6&quot; target=&quot;1.6&quot;</code>. For live
-applications you can also disable debug info with <code>debug=&quot;off&quot;</code>.
+<code>${webapp.path}/WEB-INF/web.xml</code>.
+</p>
+
+<p>
+When you want to use a specific version of Java for your JSP's, add the
+javac compiler task attributes <code>source</code> and <code>target</code> with
+appropriate values. For example, <code>16</code> to compile JSPs for Java 16.
+</p>
+
+<p>
+For production you may wish to disable debug info with
+<code>debug=&quot;off&quot;</code>.
 </p>
 
 <p>
