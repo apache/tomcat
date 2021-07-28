@@ -66,7 +66,7 @@ public class WsSci implements ServletContainerInitializer {
                         Modifier.isInterface(modifiers) ||
                         isExported(clazz)) {
                     // Non-public, abstract, interface or not in an exported
-                    // package (Java 9+) - skip it.
+                    // package - skip it.
                     continue;
                 }
                 // Protect against scanning the WebSocket API JARs

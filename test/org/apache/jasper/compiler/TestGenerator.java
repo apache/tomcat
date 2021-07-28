@@ -819,7 +819,7 @@ public class TestGenerator extends TomcatBaseTest {
     public void testUseBean05() throws Exception {
         // Whether this test passes or fails depends on the Java version used
         // and the JRE settings.
-        // For the test to pass use Java 9+ with --illegal-access=deny
+        // For the test to pass use --illegal-access=deny
         doTestJsp("usebean-05.jsp", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 

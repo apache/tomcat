@@ -113,15 +113,9 @@ if not exist "%JRE_HOME%\bin\java.exe" goto noJavaHome
 goto okJavaHome
 :gotJdkHome
 if not exist "%JAVA_HOME%\bin\javac.exe" goto noJavaHome
-rem Java 9 has a different directory structure
-if exist "%JAVA_HOME%\jre\bin\java.exe" goto preJava9Layout
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
 if not "%JRE_HOME%" == "" goto okJavaHome
 set "JRE_HOME=%JAVA_HOME%"
-goto okJavaHome
-:preJava9Layout
-if not "%JRE_HOME%" == "" goto okJavaHome
-set "JRE_HOME=%JAVA_HOME%\jre"
 goto okJavaHome
 :noJavaHome
 echo The JAVA_HOME environment variable is not defined correctly

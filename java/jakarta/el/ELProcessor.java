@@ -111,7 +111,7 @@ public class ELProcessor {
             function = sig.getName();
         }
 
-        // Only returns public methods. Java 9+ access is checked below.
+        // Only returns public methods. Module access is checked below.
         Method methods[] = clazz.getMethods();
 
         for (Method method : methods) {

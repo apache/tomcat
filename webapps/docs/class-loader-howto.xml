@@ -179,7 +179,7 @@ this class loader will look in the local repositories <strong>first</strong>,
 instead of delegating before looking.  There are exceptions. Classes which are
 part of the JRE base classes cannot be overridden. There are some exceptions
 such as the XML parser components which can be overridden using the upgradeable
-modules feature for Java 9+.
+modules feature.
 Lastly, the web application class loader will always delegate first for Jakarta
 EE API classes for the specifications implemented by Tomcat
 (Servlet, JSP, EL, WebSocket). All other class loaders in Tomcat follow the
@@ -223,7 +223,7 @@ when you are running modern versions of Java, because the usual class loader
 delegation process will always choose the implementation inside the JDK in
 preference to this one.</p>
 
-<p>Java 9+ supports a mechanism called upgradeable modules to allow replacement
+<p>Java supports a mechanism called upgradeable modules to allow replacement
 of APIs created outside of the JCP (i.e. DOM and SAX from W3C).  It can also be
 used to update the XML parser implementation.</p>
 

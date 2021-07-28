@@ -338,8 +338,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * Enables the RMI Target memory leak detection to be controlled. This is
-     * necessary since the detection can only work on Java 9 if some of the
-     * modularity checks are disabled.
+     * necessary since the detection can only work if some of the modularity
+     * checks are disabled.
      */
     private boolean clearReferencesRmiTargets = true;
 

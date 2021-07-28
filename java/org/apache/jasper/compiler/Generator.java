@@ -1347,7 +1347,7 @@ class Generator {
                     // Check that there is a 0 arg constructor
                     Constructor<?> constructor = bean.getConstructor(new Class[] {});
                     // Check the bean is public, not an interface, not abstract
-                    // and (for Java 9+) in an exported module
+                    // and in an exported module
                     int modifiers = bean.getModifiers();
                     // No need to test for being an interface here as the
                     // getConstructor() call above will have already failed for

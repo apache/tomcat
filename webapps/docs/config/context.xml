@@ -794,19 +794,18 @@
         serialization and clears any <code>SoftReference</code>s it finds. This
         feature uses reflection to identify the <code>SoftReference</code>s and
         therefore requires that the command line option
-        <code>-XaddExports:java.base/java.io=ALL-UNNAMED</code> is set
-        when running on Java 9 and above. If not specified, the default value of
-        <code>true</code> will be used.</p>
+        <code>-XaddExports:java.base/java.io=ALL-UNNAMED</code> is set. If not
+        specified, the default value of <code>true</code> will be used.</p>
       </attribute>
 
       <attribute name="clearReferencesRmiTargets" required="false">
         <p>If <code>true</code>, Tomcat looks for memory leaks associated with
         RMI Targets and clears any it finds. This feature uses reflection to
         identify the leaks and therefore requires that the command line option
-        <code>-XaddExports:java.rmi/sun.rmi.transport=ALL-UNNAMED</code> is set
-        when running on Java 9 and above. Applications without memory leaks
-        should operate correctly with this attribute set to <code>false</code>.
-        If not specified, the default value of <code>true</code> will be used.</p>
+        <code>-XaddExports:java.rmi/sun.rmi.transport=ALL-UNNAMED</code> is set.
+        Applications without memory leaks should operate correctly with this
+        attribute set to <code>false</code>. If not specified, the default value
+        of <code>true</code> will be used.</p>
       </attribute>
 
       <attribute name="clearReferencesStopThreads" required="false">
