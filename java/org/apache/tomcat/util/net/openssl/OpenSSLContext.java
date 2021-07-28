@@ -64,38 +64,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static final String defaultProtocol = "TLS";
 
-    private final SSLHostConfig sslHostConfig;
-    private final SSLHostConfigCertificate certificate;
-    private OpenSSLSessionContext sessionContext;
-    private X509TrustManager x509TrustManager;
-
-    private final List<String> negotiableProtocols;
-
-    private String enabledProtocol;
-
-    public String getEnabledProtocol() {
-        return enabledProtocol;
-    }
-
-    public void setEnabledProtocol(String protocol) {
-        enabledProtocol = (protocol == null) ? defaultProtocol : protocol;
-    }
-
-    private final long aprPool;
-    private final AtomicInteger aprPoolDestroyed = new AtomicInteger(0);
-
-    // OpenSSLConfCmd context
-    protected final long cctx;
-    // SSL context
-    protected final long ctx;
+    private static final String BEGIN_KEY = "-----BEGIN PRIVATE KEY-----\n";
+    private static final Object END_KEY = "\n-----END PRIVATE KEY-----";
 
     static final CertificateFactory X509_CERT_FACTORY;
-
-    private static final String BEGIN_KEY = "-----BEGIN PRIVATE KEY-----\n";
-
-    private static final Object END_KEY = "\n-----END PRIVATE KEY-----";
-    private boolean initialized = false;
-
     static {
         try {
             X509_CERT_FACTORY = CertificateFactory.getInstance("X.509");
@@ -103,6 +75,22 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             throw new IllegalStateException(sm.getString("openssl.X509FactoryError"), e);
         }
     }
+
+    private final SSLHostConfig sslHostConfig;
+    private final SSLHostConfigCertificate certificate;
+    private final List<String> negotiableProtocols;
+    private final long aprPool;
+    private final AtomicInteger aprPoolDestroyed = new AtomicInteger(0);
+    // OpenSSLConfCmd context
+    protected final long cctx;
+    // SSL context
+    protected final long ctx;
+
+    private OpenSSLSessionContext sessionContext;
+    private X509TrustManager x509TrustManager;
+    private String enabledProtocol;
+    private boolean initialized = false;
+
 
     public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols)
             throws SSLException {
@@ -180,6 +168,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
         }
     }
+
+
+    public String getEnabledProtocol() {
+        return enabledProtocol;
+    }
+
+
+    public void setEnabledProtocol(String protocol) {
+        enabledProtocol = (protocol == null) ? defaultProtocol : protocol;
+    }
+
 
     @Override
     public synchronized void destroy() {
