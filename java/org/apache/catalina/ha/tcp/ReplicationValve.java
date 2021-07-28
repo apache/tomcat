@@ -345,13 +345,11 @@ public class ReplicationValve
         } finally {
             // Array must be remove: Current master request send endAccess at recycle.
             // Don't register this request session again!
-            if(isCrossContext) {
+            if (isCrossContext) {
                 if(log.isDebugEnabled()) {
                     log.debug(sm.getString("ReplicationValve.crossContext.remove"));
                 }
-                // crossContextSessions.remove() only exist at Java 5
-                // register ArrayList at a pool
-                crossContextSessions.set(null);
+                crossContextSessions.remove();
             }
         }
     }
