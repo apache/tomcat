@@ -586,7 +586,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
                 classpath.append(repository);
             }
         } else if (loader == ClassLoader.getSystemClassLoader()){
-            // Java 9 onwards. The internal class loaders no longer extend
+            // From Java 9 the internal class loaders no longer extend
             // URLCLassLoader
             String cp = System.getProperty("java.class.path");
             if (cp != null && cp.length() > 0) {
