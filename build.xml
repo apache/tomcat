@@ -210,33 +210,6 @@
   <defaultexcludes remove="**/.gitignore" />
   <!--<defaultexcludes echo="true" />-->
 
-  <!-- Java 9 -->
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.javadoc.options"
-             value="-html5"/>
-  <property name="java9.javadoc.options" value=""/>
-
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.1"
-             value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
-  <property name="java9.test.option.1" value="-Dtest.1=1"/>
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.2"
-             value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
-  <property name="java9.test.option.2" value="-Dtest.2=2"/>
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.3"
-             value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
-  <property name="java9.test.option.3" value="-Dtest.3=3"/>
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.4"
-             value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
-  <property name="java9.test.option.4" value="-Dtest.4=4"/>
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.5"
-             value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
-  <property name="java9.test.option.5" value="-Dtest.5=5"/>
-
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${bnd.jar}"/>
@@ -1984,13 +1957,11 @@
         <jvmarg value="${test.formatter}"/>
         <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
         <jvmarg value="-Dorg.apache.tomcat.util.net.NioSelectorShared=${org.apache.tomcat.util.net.NioSelectorShared}"/>
-
-        <!-- Java 9 -->
-        <jvmarg value="${java9.test.option.1}"/>
-        <jvmarg value="${java9.test.option.2}"/>
-        <jvmarg value="${java9.test.option.3}"/>
-        <jvmarg value="${java9.test.option.4}"/>
-        <jvmarg value="${java9.test.option.5}"/>
+        <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+        <jvmarg value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
+        <jvmarg value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
+        <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+        <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
 
         <classpath refid="tomcat.test.run.classpath" />
 
@@ -2259,7 +2230,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
@@ -2281,7 +2252,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
@@ -2302,7 +2273,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
@@ -2323,7 +2294,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
@@ -2344,7 +2315,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
@@ -2384,7 +2355,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
+      additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.source}"
       maxmemory="512m"
       failonerror="true"
