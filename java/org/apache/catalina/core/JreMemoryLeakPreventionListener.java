@@ -163,8 +163,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  *
                  * https://bugs.openjdk.java.net/browse/JDK-8163449
                  *
-                 * Java 9 onwards disables caching for JAR URLConnections
-                 * Java 8 and earlier disables caching for all URLConnections
+                 * Disable caching for JAR URLConnections
                  */
 
                 // Set the default URL caching policy to not to cache
