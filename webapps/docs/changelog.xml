@@ -105,8 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.10 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Correct an error in some code clean-up that mean that web application
+        classes were not configured with the correct package. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
-<section name="Tomcat 10.0.9 (markt)" rtext="in development">
+<section name="Tomcat 10.0.9 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
