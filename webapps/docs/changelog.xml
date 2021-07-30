@@ -108,8 +108,9 @@
   <subsection name="Catalina">
     <changelog>
       <scode>
-        Correct an error in some code clean-up that mean that web application
-        classes were not configured with the correct package. (markt)
+        <bug>65476</bug>: Correct an error in some code clean-up that mean that
+        web application classes were not configured with the correct package.
+        (markt)
       </scode>
     </changelog>
   </subsection>
