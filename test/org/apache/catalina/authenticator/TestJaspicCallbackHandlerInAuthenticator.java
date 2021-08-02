@@ -115,9 +115,11 @@ public class TestJaspicCallbackHandlerInAuthenticator {
         PasswordValidationCallback pvc1 = new PasswordValidationCallback(clientSubject, "name1",
                 "password".toCharArray());
         callbackHandler.handle(new Callback[] { pvc1 });
+        Assert.assertTrue(pvc1.getResult());
         PasswordValidationCallback pvc2 = new PasswordValidationCallback(clientSubject, "name2",
                 "invalid".toCharArray());
         callbackHandler.handle(new Callback[] { pvc2 });
+        Assert.assertFalse(pvc2.getResult());
         Set<Object> credentials = clientSubject.getPrivateCredentials();
         Assert.assertTrue(credentials.size() == 1);
         GenericPrincipal gp = (GenericPrincipal) credentials.iterator().next();
