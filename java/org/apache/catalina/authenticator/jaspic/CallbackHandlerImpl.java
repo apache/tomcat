@@ -79,6 +79,7 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                         PasswordValidationCallback pvc = (PasswordValidationCallback) callback;
                         principal = container.getRealm().authenticate(pvc.getUsername(),
                                 String.valueOf(pvc.getPassword()));
+                        pvc.setResult(principal != null);
                         subject = pvc.getSubject();
                     }
                 } else {
