@@ -120,6 +120,13 @@
         body is no longer sent. This acts as an additional signal to the client
         that the request experienced an error. (markt)
       </fix>
+      <fix>
+        <bug>65479</bug>: When handling requests using JASPIC authentication,
+        ensure that <code>PasswordValidationCallback.getResult()</code> returns
+        the result of the password validation rather than always returning
+        <code>false</code>. Fixed via pull request <pr>438</pr> provided by
+        Robert Rodewald. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
