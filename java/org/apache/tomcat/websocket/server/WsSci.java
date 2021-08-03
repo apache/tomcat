@@ -64,7 +64,7 @@ public class WsSci implements ServletContainerInitializer {
                 if (!Modifier.isPublic(modifiers) ||
                         Modifier.isAbstract(modifiers) ||
                         Modifier.isInterface(modifiers) ||
-                        isExported(clazz)) {
+                        !isExported(clazz)) {
                     // Non-public, abstract, interface or not in an exported
                     // package - skip it.
                     continue;
