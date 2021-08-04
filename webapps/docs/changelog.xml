@@ -104,9 +104,19 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.0-M4 (markt)" rtext="in development">
+<section name="Tomcat 10.1.0-M5 (markt)" rtext="in development">
 </section>
-<section name="Tomcat 10.1.0-M3 (markt)" rtext="release in progress">
+<section name="Tomcat 10.1.0-M4 (markt)" rtext="release in progress">
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Correct a regression in the Java 8 to Java 11 changes made in 10.1.0-M3
+        that caused all WebSocket end points to fail to register. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 10.1.0-M3 (markt)" rtext="not released">
   <subsection name="General">
     <changelog>
       <update>
