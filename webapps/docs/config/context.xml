@@ -263,14 +263,14 @@
     <attributes>
 
       <attribute name="allowCasualMultipartParsing" required="false">
-        <p>Set to true if Tomcat should automatically parse
+        <p>Set to <code>true</code> if Tomcat should automatically parse
         multipart/form-data request bodies when HttpServletRequest.getPart*
         or HttpServletRequest.getParameter* is called, even when the
         target servlet isn't marked with the @MultipartConfig annotation
         (See Servlet Specification 3.0, Section 3.2 for details).
         Note that any setting other than <code>false</code> causes Tomcat
         to behave in a way that is not technically spec-compliant.
-        The default is <code>false</code></p>
+        The default is <code>false</code>.</p>
       </attribute>
 
       <attribute name="allowMultipleLeadingForwardSlashInPath" required="false">
@@ -480,7 +480,7 @@
         <p>Even when statically defining a Context in server.xml, this attribute
         must not be set unless either the docBase is not located under the
         <a href="host.html">Host</a>&apos;s <code>appBase</code> or both
-        <code>deployOnStartup</code> and <code>autoDeploy</code> are false. If
+        <code>deployOnStartup</code> and <code>autoDeploy</code> are <code>false</code>. If
         this rule is not followed, double deployment is likely to result.</p>
       </attribute>
 
@@ -594,7 +594,7 @@
       </attribute>
 
       <attribute name="swallowAbortedUploads" required="false">
-        <p>Set to false if Tomcat should <b>not</b> read any additional request
+        <p>Set to <code>false</code> if Tomcat should <b>not</b> read any additional request
         body data for aborted uploads and instead abort the client connection.
         This setting is used in the following situations:
         </p>
@@ -757,7 +757,7 @@
       </attribute>
 
       <attribute name="antiResourceLocking" required="false">
-        <p>If true, Tomcat will prevent any file locking.
+        <p>If <code>true</code>, Tomcat will prevent any file locking.
         This will significantly impact startup time of applications,
         but allows full webapp hot deploy and undeploy on platforms
         or configurations where file locking can occur.
@@ -768,7 +768,7 @@
         see <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=37668">
         Bugzilla 37668</a>.</p>
 
-        <p>Please note that setting this flag to true in applications that are
+        <p>Please note that setting this flag to <code>true</code> in applications that are
         outside the appBase for the Host (the <code>webapps</code> directory
         by default) will cause the application to be <strong>deleted</strong> on
         Tomcat shutdown.  You probably don't want to do this, so think twice
@@ -858,7 +858,7 @@
         createSubContext(), destroySubContext() or close() will trigger a
         <code>javax.naming.OperationNotSupportedException</code> as required by
         section EE.5.3.4 of the Jakarta EE specification. This exception can be
-        disabled by setting this attribute to false in which case any calls to
+        disabled by setting this attribute to <code>false</code> in which case any calls to
         modify the JNDI context will return <b>without</b> making any changes
         and methods that return values will return <code>null</code>. If not
         specified, the specification compliant default of <code>true</code> will
@@ -1264,7 +1264,7 @@
         it is no longer required. This is intended to speed up clean-up of
         resources that would otherwise happen as part of garbage collection.
         This attribute is ignored if the <code>singleton</code> attribute is
-        false.</p>
+        <code>false</code>.</p>
         <p>For <code>javax.sql.DataSource</code> and
         <code>javax.sql.XADataSource</code> resources that implement
         <code>AutoCloseable</code> such as Apache Commons DBCP 2 and the default
