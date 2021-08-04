@@ -844,7 +844,7 @@
         is deployed. On subsequent starts, the copied context XML descriptor
         will be used in preference to any context XML descriptor embedded inside
         the application even if the descriptor embedded inside the application
-        is more recent. The flag's value defaults to <code>false</code>. Note if
+        is more recent. The default is <code>false</code>. Note if
         the <strong>deployXML</strong> attribute of the owning
         <a href="host.html">Host</a> is <code>false</code> or if the
         <strong>copyXML</strong> attribute of the owning
