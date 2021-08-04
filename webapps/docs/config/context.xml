@@ -183,7 +183,7 @@
   <ul>
   <li>Disable autoDeploy and deployOnStartup and define all
   <strong>Context</strong>s in server.xml</li>
-  <li>Locate the WAR and/or directory outside of the Host&apos;s appBase and use
+  <li>Locate the WAR and/or directory outside of the Host&apos;s <code>appBase</code> and use
       a context.xml file with a docBase attribute to define it.</li>
   </ul>
   </subsection>
@@ -769,11 +769,11 @@
         Bugzilla 37668</a>.</p>
 
         <p>Please note that setting this flag to <code>true</code> in applications that are
-        outside the appBase for the Host (the <code>webapps</code> directory
+        outside the <code>appBase</code> for the Host (the <code>webapps</code> directory
         by default) will cause the application to be <strong>deleted</strong> on
         Tomcat shutdown.  You probably don't want to do this, so think twice
         before setting antiResourceLocking=true on a webapp that's outside the
-        appBase for its Host.</p>
+        <code>appBase</code> for its Host.</p>
       </attribute>
 
       <attribute name="clearReferencesHttpClientKeepAliveThread" required="false">
