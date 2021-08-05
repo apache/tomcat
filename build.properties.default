@@ -27,12 +27,13 @@ version.major=8
 version.minor=5
 version.build=70
 version.patch=0
-version.suffix=-dev
+version.suffix=
 
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds
 #2021-06-08T12:00:00Z
-#ant.tstamp.now=1623153600
+# 2021-08-05 08:50:00 -0400 = 1628167800000
+ant.tstamp.now=1628167800000
 
 # ----- Source control flags -----
 git.branch=8.5.x
