@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M5 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct a logic error that meant setting
+        <code>certificateKeystoreFile</code> to <code>NONE</code> did not have
+        the expected effect. <code>NONE</code> was incorrectly treated as a file
+        path. Patch provided by Mikael Sterner. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M4 (markt)" rtext="release in progress">
   <subsection name="WebSocket">
