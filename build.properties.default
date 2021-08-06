@@ -303,7 +303,7 @@ findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/
 jsign.version=3.1
 
 # checksums for JSign 3.1
-jsign.checksum.enable=true
+jsign.checksum.enabled=true
 jsign.checksum.algorithm=SHA-512
 jsign.checksum.value=481a6e7276688363106ee3492da52807577822b8114b13804df796cd143f479a50d0864215f63b9bb8120a85b2f6185b2845974872d11ff070407dd01879bb0e
 
