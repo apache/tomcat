@@ -115,6 +115,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Remove unnecessary Context settings from the examples web application.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.52 (remm)" rtext="in progress">
   <subsection name="Catalina">
