@@ -244,7 +244,7 @@
     <format property="today" pattern="MMM d yyyy" locale="en" timezone="UTC"/>
     <format property="today-iso-8601" pattern="yyyy-MM-dd" locale="en" timezone="UTC"/>
     <format property="tstamp" pattern="HH:mm:ss" locale="en" timezone="UTC"/>
-    <format property="tstamp.file" pattern="MM/dd/yyyy hh:mm:ss aa"/>
+    <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss"/>
   </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
@@ -1785,7 +1785,7 @@
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.embed}"/>
     </touch>
 
@@ -2556,7 +2556,7 @@ skip.installer property in build.properties" />
       <patternset refid="text.files" />
     </fixcrlf>
     <!-- Reproducible builds: consistent timestamps for installer files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
     </touch>
   </target>
@@ -2587,7 +2587,7 @@ skip.installer property in build.properties" />
       <arg value="${tomcat.dist}/tempinstaller.exe" />
     </exec>
     <!-- Reproducible builds: consistent timestamps for installer files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
     </touch>
   </target>
@@ -2822,7 +2822,7 @@ skip.installer property in build.properties" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
     </touch>
 
@@ -2875,7 +2875,7 @@ skip.installer property in build.properties" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
       <fileset dir="${tomcat.deployer}"/>
     </touch>
@@ -2904,7 +2904,7 @@ skip.installer property in build.properties" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
     </touch>
 
@@ -2956,7 +2956,7 @@ skip.installer property in build.properties" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
-    <touch datetime="${tstamp.file}" pattern="MM/dd/yyyy hh:mm:ss aa">
+    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
     </touch>
 
