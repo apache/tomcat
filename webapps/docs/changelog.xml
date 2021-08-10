@@ -151,6 +151,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Fix failing build when building on non-English locales. Pull request
+        <pr>441</pr> provided by Dachuan J. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M4 (markt)" rtext="release in progress">
   <subsection name="WebSocket">

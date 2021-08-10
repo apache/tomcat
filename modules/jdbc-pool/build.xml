@@ -86,7 +86,7 @@
 
   <!-- Version info filter set -->
   <tstamp>
-    <format property="tstamp.file" pattern="MM/dd/yyyy hh:mm:ss aa"/>
+    <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss"/>
   </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
