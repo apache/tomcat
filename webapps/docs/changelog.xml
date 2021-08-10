@@ -155,6 +155,11 @@
         Document default value for <code>unpackWARs</code> and related clean-up.
         Pull request <pr>439</pr> provided by Robert Rodewald. (markt)
       </fix>
+      <fix>
+        Clarify the documentation of the <code>compressionMinSize</code> and
+        <code>compressibleMimeType</code> HTTP <code>Connector</code>
+        attributes. Pull request <pr>442</pr> provided by crisgeek. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
