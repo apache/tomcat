@@ -127,6 +127,12 @@
         <code>false</code>. Fixed via pull request <pr>438</pr> provided by
         Robert Rodewald. (markt)
       </fix>
+      <scode>
+        Refactor the authenticators to delegate the check for preemptive
+        authentication to the individual authenticators where an authentication
+        scheme specific check can be performed. Based on pull request
+        <pr>444</pr> by Robert Rodewald. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
