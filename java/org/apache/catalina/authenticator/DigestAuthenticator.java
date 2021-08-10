@@ -31,6 +31,7 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.util.security.MD5Encoder;
@@ -364,6 +365,13 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         response.setHeader(AUTH_HEADER_NAME, authenticateHeader);
 
+    }
+
+
+    @Override
+    protected boolean isPreemptiveAuthPossible(Request request) {
+        MessageBytes authorizationHeader = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
+        return authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("digest ", 0);
     }
 
 

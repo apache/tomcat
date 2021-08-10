@@ -18,7 +18,6 @@ package org.apache.catalina.authenticator;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.security.cert.X509Certificate;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +61,6 @@ import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.catalina.valves.RemoteIpValve;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -597,15 +595,9 @@ public abstract class AuthenticatorBase extends ValveBase
             authRequired = true;
         }
 
-        if (!authRequired && context.getPreemptiveAuthentication()) {
-            authRequired =
-                    request.getCoyoteRequest().getMimeHeaders().getValue("authorization") != null;
-        }
-
         if (!authRequired && context.getPreemptiveAuthentication() &&
-                HttpServletRequest.CLIENT_CERT_AUTH.equals(getAuthMethod())) {
-            X509Certificate[] certs = getRequestCertificates(request);
-            authRequired = certs != null && certs.length > 0;
+                isPreemptiveAuthPossible(request)) {
+            authRequired = true;
         }
 
         JaspicState jaspicState = null;
@@ -861,35 +853,6 @@ public abstract class AuthenticatorBase extends ValveBase
         return false;
     }
 
-
-    /**
-     * Look for the X509 certificate chain in the Request under the key
-     * <code>jakarta.servlet.request.X509Certificate</code>. If not found, trigger
-     * extracting the certificate chain from the Coyote request.
-     *
-     * @param request
-     *            Request to be processed
-     *
-     * @return The X509 certificate chain if found, <code>null</code> otherwise.
-     */
-    protected X509Certificate[] getRequestCertificates(final Request request)
-            throws IllegalStateException {
-
-        X509Certificate certs[] =
-                (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
-
-        if ((certs == null) || (certs.length < 1)) {
-            try {
-                request.getCoyoteRequest().action(ActionCode.REQ_SSL_CERTIFICATE, null);
-                certs = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
-            } catch (IllegalStateException ise) {
-                // Request body was too large for save buffer
-                // Return null which will trigger an auth failure
-            }
-        }
-
-        return certs;
-    }
 
     /**
      * Associate the specified single sign on identifier with the specified
@@ -1387,6 +1350,7 @@ public abstract class AuthenticatorBase extends ValveBase
         super.startInternal();
     }
 
+
     /**
      * Stop this component and implement the requirements of
      * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
@@ -1401,6 +1365,20 @@ public abstract class AuthenticatorBase extends ValveBase
         super.stopInternal();
 
         sso = null;
+    }
+
+
+    /**
+     * Can the authenticator perform preemptive authentication for the given
+     * request?
+     *
+     * @param request
+     *
+     * @return {@code true} if preemptive authentication is possible, otherwise
+     *         {@code false}
+     */
+    protected boolean isPreemptiveAuthPossible(Request request) {
+        return false;
     }
 
 

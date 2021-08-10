@@ -132,6 +132,12 @@
         intermediate concrete implementation classes and allowing to do
         partial database updates on <code>save</code>. (remm)
       </update>
+      <scode>
+        Refactor the authenticators to delegate the check for preemptive
+        authentication to the individual authenticators where an authentication
+        scheme specific check can be performed. Based on pull request
+        <pr>444</pr> by Robert Rodewald. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

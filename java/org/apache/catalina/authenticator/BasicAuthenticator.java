@@ -127,9 +127,17 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
     }
 
+
     @Override
     protected String getAuthMethod() {
         return HttpServletRequest.BASIC_AUTH;
+    }
+
+
+    @Override
+    protected boolean isPreemptiveAuthPossible(Request request) {
+        MessageBytes authorizationHeader = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
+        return authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("basic ", 0);
     }
 
 
