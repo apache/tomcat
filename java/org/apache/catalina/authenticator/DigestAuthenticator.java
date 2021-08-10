@@ -366,6 +366,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     }
 
+    @Override
+    protected boolean isPreemptiveAuthRequest(Request request) {
+        return request.getCoyoteRequest().getMimeHeaders().getValue("authorization") != null;
+    }
 
     // ------------------------------------------------------- Lifecycle Methods
 

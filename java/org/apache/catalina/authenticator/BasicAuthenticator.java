@@ -132,6 +132,10 @@ public class BasicAuthenticator extends AuthenticatorBase {
         return HttpServletRequest.BASIC_AUTH;
     }
 
+    @Override
+    protected boolean isPreemptiveAuthRequest(Request request) {
+        return request.getCoyoteRequest().getMimeHeaders().getValue("authorization") != null;
+    }
 
     /**
      * Parser for an HTTP Authorization header for BASIC authentication

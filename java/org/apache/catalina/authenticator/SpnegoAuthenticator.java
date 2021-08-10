@@ -299,6 +299,10 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         return false;
     }
 
+    @Override
+    protected boolean isPreemptiveAuthRequest(Request request) {
+        return request.getCoyoteRequest().getMimeHeaders().getValue("authorization") != null;
+    }
 
     /**
      * This class gets a gss credential via a privileged action.
