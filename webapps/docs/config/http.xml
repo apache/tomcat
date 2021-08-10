@@ -397,7 +397,7 @@
       <code>
       text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
       </code>.
-      </p>
+      If you specify a type explicitly, the default is over-ridden.</p>
     </attribute>
 
     <attribute name="compression" required="false">
@@ -427,7 +427,8 @@
     <attribute name="compressionMinSize" required="false">
       <p>If <strong>compression</strong> is set to "on" then this attribute
       may be used to specify the minimum amount of data before the output is
-      compressed. If not specified, this attribute is defaults to "2048".</p>
+      compressed. If not specified, this attribute is defaults to "2048".
+      Units are in bytes.</p>
     </attribute>
 
     <attribute name="connectionLinger" required="false">
