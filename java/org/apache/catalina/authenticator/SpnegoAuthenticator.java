@@ -300,7 +300,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
     @Override
-    protected boolean isPreemptiveAuthRequest(Request request) {
+    protected boolean isPreemptiveAuthPossible(Request request) {
         return request.getCoyoteRequest().getMimeHeaders().getValue("authorization") != null;
     }
 

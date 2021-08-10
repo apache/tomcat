@@ -596,7 +596,7 @@ public abstract class AuthenticatorBase extends ValveBase
         }
 
         if (!authRequired && context.getPreemptiveAuthentication() &&
-                isPreemptiveAuthRequest(request)) {
+                isPreemptiveAuthPossible(request)) {
             authRequired = true;
         }
 
@@ -1366,7 +1366,7 @@ public abstract class AuthenticatorBase extends ValveBase
         sso = null;
     }
 
-    protected boolean isPreemptiveAuthRequest(Request request) {
+    protected boolean isPreemptiveAuthPossible(Request request) {
         return false;
     }
 
