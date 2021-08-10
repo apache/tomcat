@@ -23,7 +23,9 @@ import java.security.cert.X509Certificate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
+import org.apache.coyote.ActionCode;
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of authentication
@@ -99,5 +101,42 @@ public class SSLAuthenticator extends AuthenticatorBase {
     @Override
     protected String getAuthMethod() {
         return HttpServletRequest.CLIENT_CERT_AUTH;
+    }
+
+
+    @Override
+    protected boolean isPreemptiveAuthPossible(Request request) {
+        X509Certificate[] certs = getRequestCertificates(request);
+        return certs != null && certs.length > 0;
+    }
+
+
+    /**
+     * Look for the X509 certificate chain in the Request under the key
+     * <code>jakarta.servlet.request.X509Certificate</code>. If not found, trigger
+     * extracting the certificate chain from the Coyote request.
+     *
+     * @param request
+     *            Request to be processed
+     *
+     * @return The X509 certificate chain if found, <code>null</code> otherwise.
+     */
+    protected X509Certificate[] getRequestCertificates(final Request request)
+            throws IllegalStateException {
+
+        X509Certificate certs[] =
+                (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+
+        if ((certs == null) || (certs.length < 1)) {
+            try {
+                request.getCoyoteRequest().action(ActionCode.REQ_SSL_CERTIFICATE, null);
+                certs = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+            } catch (IllegalStateException ise) {
+                // Request body was too large for save buffer
+                // Return null which will trigger an auth failure
+            }
+        }
+
+        return certs;
     }
 }

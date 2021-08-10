@@ -304,6 +304,13 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
 
+    @Override
+    protected boolean isPreemptiveAuthPossible(Request request) {
+        MessageBytes authorizationHeader = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
+        return authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("negotiate ", 0);
+    }
+
+
     /**
      * This class gets a gss credential via a privileged action.
      */
