@@ -20,12 +20,12 @@ import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.coyote.ActionCode;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of authentication
@@ -103,12 +103,6 @@ public class SSLAuthenticator extends AuthenticatorBase {
         return HttpServletRequest.CLIENT_CERT_AUTH;
     }
 
-    @Override
-    protected boolean isPreemptiveAuthPossible(Request request) {
-        X509Certificate[] certs = getRequestCertificates(request);
-        return certs != null && certs.length > 0;
-    }
-    
     /**
      * Look for the X509 certificate chain in the Request under the key
      * <code>jakarta.servlet.request.X509Certificate</code>. If not found, trigger
