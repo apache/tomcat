@@ -127,6 +127,11 @@
         <code>false</code>. Fixed via pull request <pr>438</pr> provided by
         Robert Rodewald. (markt)
       </fix>
+      <update>
+        Improve the reusability of the <code>UserDatabase</code> by adding
+        intermediate concrete implementation classes and allowing to do
+        partial database updates on <code>save</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
