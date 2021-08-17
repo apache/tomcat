@@ -112,6 +112,14 @@
         not support <code>allow-java-encodings</code>. A warning will be logged
         if such an XML parser is detected. (markt)
       </fix>
+      <fix>
+        Change the behaviour of custom error pages. If an error occurs after the
+        response is committed, once the custom error page content has been added
+        to the response the connection is now closed immediately rather than
+        closed cleanly. i.e. the last chunk that marks the end of the response
+        body is no longer sent. This acts as an additional signal to the client
+        that the request experienced an error. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

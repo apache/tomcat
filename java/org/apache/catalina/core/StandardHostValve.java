@@ -366,6 +366,19 @@ final class StandardHostValve extends ValveBase {
                 // Response is committed - including the error page is the
                 // best we can do
                 rd.include(request.getRequest(), response.getResponse());
+
+                // Ensure the combined incomplete response and error page is
+                // written to the client
+                try {
+                    response.flushBuffer();
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                }
+
+                // Now close immediately as an additional signal to the client
+                // that something went wrong
+                response.getCoyoteResponse().action(ActionCode.CLOSE_NOW,
+                        request.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
             } else {
                 // Reset the response (keeping the real error code and message)
                 response.resetBuffer(true);

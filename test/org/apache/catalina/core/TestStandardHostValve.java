@@ -130,6 +130,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
         Assert.assertTrue(result.contains("Visit requestDestroyed"));
     }
 
+
     private void doTestErrorPageHandling(int error, String report)
             throws Exception {
 
@@ -142,6 +143,49 @@ public class TestStandardHostValve extends TomcatBaseTest {
         Assert.assertEquals(report, bc.toString());
     }
 
+
+    @Test
+    public void testIncompleteResponse() throws Exception {
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add the error page
+        Tomcat.addServlet(ctx, "error", new ExceptionServlet());
+        ctx.addServletMappingDecoded("/error", "error");
+
+        // Add the error handling page
+        Tomcat.addServlet(ctx, "report", new ReportServlet());
+        ctx.addServletMappingDecoded("/report/*", "report");
+
+        // And the handling for 500 responses
+        ErrorPage errorPage500 = new ErrorPage();
+        errorPage500.setErrorCode(Response.SC_INTERNAL_SERVER_ERROR);
+        errorPage500.setLocation("/report/500");
+        ctx.addErrorPage(errorPage500);
+
+        // And the default error handling
+        ErrorPage errorPageDefault = new ErrorPage();
+        errorPageDefault.setLocation("/report/default");
+        ctx.addErrorPage(errorPageDefault);
+
+        tomcat.start();
+
+        // Request a page that triggers an error
+        ByteChunk bc = new ByteChunk();
+        Throwable t = null;
+        try {
+            getUrl("http://localhost:" + getPort() + "/error", bc, null);
+            System.out.println(bc.toString());
+        } catch (IOException ioe) {
+            t = ioe;
+        }
+        Assert.assertNotNull(t);
+    }
+
+
     private static class ErrorServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -153,6 +197,20 @@ public class TestStandardHostValve extends TomcatBaseTest {
             resp.sendError(error);
         }
     }
+
+
+    private static class ExceptionServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.flushBuffer();
+            throw new IOException();
+        }
+    }
+
 
     private static class ReportServlet extends HttpServlet {
 
