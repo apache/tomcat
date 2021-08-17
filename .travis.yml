@@ -80,7 +80,7 @@ install:
 
 script:
     - ant -q clean
-    - travis_wait 120 "./.travis/antTest.sh"
+    - "./.travis/antTest.sh"
 
 after_failure:
     - tail -n 5000 ant-test.log
@@ -90,3 +90,6 @@ after_failure:
 notifications:
     email:
       - dev@tomcat.apache.org
+cache:
+  directories:
+  - $HOME/.m2
