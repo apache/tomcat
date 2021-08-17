@@ -17,11 +17,6 @@
 package org.apache.catalina.users;
 
 
-import java.util.Iterator;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.apache.catalina.Group;
-import org.apache.catalina.Role;
 import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.security.Escape;
@@ -33,10 +28,7 @@ import org.apache.tomcat.util.security.Escape;
  * @author Craig R. McClanahan
  * @since 4.1
  */
-public class MemoryUser extends AbstractUser {
-
-
-    // ----------------------------------------------------------- Constructors
+public class MemoryUser extends GenericUser<MemoryUserDatabase> {
 
 
     /**
@@ -50,153 +42,7 @@ public class MemoryUser extends AbstractUser {
      */
     MemoryUser(MemoryUserDatabase database, String username,
                String password, String fullName) {
-
-        super();
-        this.database = database;
-        setUsername(username);
-        setPassword(password);
-        setFullName(fullName);
-
-    }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The {@link MemoryUserDatabase} that owns this user.
-     */
-    protected final MemoryUserDatabase database;
-
-
-    /**
-     * The set of {@link Group}s that this user is a member of.
-     */
-    protected final CopyOnWriteArrayList<Group> groups = new CopyOnWriteArrayList<>();
-
-
-    /**
-     * The set of {@link Role}s associated with this user.
-     */
-    protected final CopyOnWriteArrayList<Role> roles = new CopyOnWriteArrayList<>();
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return the set of {@link Group}s to which this user belongs.
-     */
-    @Override
-    public Iterator<Group> getGroups() {
-        return groups.iterator();
-    }
-
-
-    /**
-     * Return the set of {@link Role}s assigned specifically to this user.
-     */
-    @Override
-    public Iterator<Role> getRoles() {
-        return roles.iterator();
-    }
-
-
-    /**
-     * Return the {@link UserDatabase} within which this User is defined.
-     */
-    @Override
-    public UserDatabase getUserDatabase() {
-        return this.database;
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Add a new {@link Group} to those this user belongs to.
-     *
-     * @param group The new group
-     */
-    @Override
-    public void addGroup(Group group) {
-        groups.addIfAbsent(group);
-    }
-
-
-    /**
-     * Add a new {@link Role} to those assigned specifically to this user.
-     *
-     * @param role The new role
-     */
-    @Override
-    public void addRole(Role role) {
-        roles.addIfAbsent(role);
-    }
-
-
-    /**
-     * Is this user in the specified group?
-     *
-     * @param group The group to check
-     */
-    @Override
-    public boolean isInGroup(Group group) {
-        return groups.contains(group);
-    }
-
-
-    /**
-     * Is this user specifically assigned the specified {@link Role}?  This
-     * method does <strong>NOT</strong> check for roles inherited based on
-     * {@link Group} membership.
-     *
-     * @param role The role to check
-     */
-    @Override
-    public boolean isInRole(Role role) {
-        return roles.contains(role);
-    }
-
-
-    /**
-     * Remove a {@link Group} from those this user belongs to.
-     *
-     * @param group The old group
-     */
-    @Override
-    public void removeGroup(Group group) {
-        groups.remove(group);
-    }
-
-
-    /**
-     * Remove all {@link Group}s from those this user belongs to.
-     */
-    @Override
-    public void removeGroups() {
-        groups.clear();
-    }
-
-
-    /**
-     * Remove a {@link Role} from those assigned to this user.
-     *
-     * @param role The old role
-     */
-    @Override
-    public void removeRole(Role role) {
-        roles.remove(role);
-    }
-
-
-    /**
-     * Remove all {@link Role}s from those assigned to this user.
-     */
-    @Override
-    public void removeRoles() {
-        roles.clear();
+        super(database, username, password, fullName, null, null);
     }
 
 

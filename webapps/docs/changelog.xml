@@ -133,6 +133,11 @@
         scheme specific check can be performed. Based on pull request
         <pr>444</pr> by Robert Rodewald. (markt)
       </scode>
+      <update>
+        Improve the reusability of the <code>UserDatabase</code> by adding
+        intermediate concrete implementation classes and allowing to do
+        partial database updates on <code>save</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
