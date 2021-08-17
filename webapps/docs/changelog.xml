@@ -168,6 +168,10 @@
         Fix failing build when building on non-English locales. Pull request
         <pr>441</pr> provided by Dachuan J. (markt)
       </fix>
+      <update>
+        Update to JSign version 4.0 to enable code signing without the need for
+        the installation of additional client tools. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
