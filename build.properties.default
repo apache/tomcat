@@ -82,6 +82,8 @@ do.codesigning=false
 codesigning.pkcs11properties=${user.home}/.digicertone/pkcs11properties.cfg
 codesigning.alias=Tomcat-PMC-key-2021-04
 codesigning.digest=SHA-512
+codesigning.storetype=PKCS11
+codesigning.storepass=NONE
 
 # ----- Settings to use when downloading files -----
 trydownload.httpusecaches=true

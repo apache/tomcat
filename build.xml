@@ -2597,8 +2597,8 @@ skip.installer property in build.properties" />
       if="${do.codesigning}">
     <jsign file="${tomcat.dist}/Uninstall.exe"
         keystore="${codesigning.pkcs11properties}"
-        storepass="NONE"
-        storetype="PKCS11"
+        storepass="${codesigning.storepass}"
+        storetype="${codesigning.storetype}"
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
         tsaurl="http://timestamp.digicert.com"/>
