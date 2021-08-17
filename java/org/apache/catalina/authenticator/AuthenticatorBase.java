@@ -1371,7 +1371,7 @@ public abstract class AuthenticatorBase extends ValveBase
      * Can the authenticator perform preemptive authentication for the given
      * request?
      *
-     * @param request
+     * @param request The request to check for credentials
      *
      * @return {@code true} if preemptive authentication is possible, otherwise
      *         {@code false}
