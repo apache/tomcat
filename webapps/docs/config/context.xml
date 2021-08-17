@@ -183,8 +183,9 @@
   <ul>
   <li>Disable autoDeploy and deployOnStartup and define all
   <strong>Context</strong>s in server.xml</li>
-  <li>Locate the WAR and/or directory outside of the Host&apos;s appBase and use
-      a context.xml file with a docBase attribute to define it.</li>
+  <li>Locate the WAR and/or directory outside of the Host&apos;s
+      <code>appBase</code> and use a context.xml file with a
+      <code>docBase</code> attribute to define it.</li>
   </ul>
   </subsection>
 
@@ -263,14 +264,14 @@
     <attributes>
 
       <attribute name="allowCasualMultipartParsing" required="false">
-        <p>Set to true if Tomcat should automatically parse
+        <p>Set to <code>true</code> if Tomcat should automatically parse
         multipart/form-data request bodies when HttpServletRequest.getPart*
         or HttpServletRequest.getParameter* is called, even when the
         target servlet isn't marked with the @MultipartConfig annotation
         (See Servlet Specification 3.0, Section 3.2 for details).
         Note that any setting other than <code>false</code> causes Tomcat
         to behave in a way that is not technically spec-compliant.
-        The default is <code>false</code></p>
+        The default is <code>false</code>.</p>
       </attribute>
 
       <attribute name="allowMultipleLeadingForwardSlashInPath" required="false">
@@ -393,8 +394,8 @@
         <p>The value of this field must not be set unless the Context element is
         defined in server.xml or the <code>docBase</code> is not located under
         the <a href="host.html">Host</a>&apos;s <code>appBase</code>.</p>
-        <p>If a symbolic link is used for docBase then changes to the
-        symbolic link will only be effective after a Tomcat restart or
+        <p>If a symbolic link is used for <code>docBase</code> then changes to
+        the symbolic link will only be effective after a Tomcat restart or
         by undeploying and redeploying the context. A context reload is not
         sufficient.</p>
       </attribute>
@@ -475,13 +476,15 @@
         will process all requests not assigned to other Contexts.</p>
         <p>This attribute must only be used when statically defining a Context
         in server.xml. In all other circumstances, the path will be inferred
-        from the filenames used for either the .xml context file or the docBase.
+        from the filenames used for either the .xml context file or the
+        <code>docBase</code>.
         </p>
         <p>Even when statically defining a Context in server.xml, this attribute
-        must not be set unless either the docBase is not located under the
-        <a href="host.html">Host</a>&apos;s <code>appBase</code> or both
-        <code>deployOnStartup</code> and <code>autoDeploy</code> are false. If
-        this rule is not followed, double deployment is likely to result.</p>
+        must not be set unless either the <code>docBase</code> is not located
+        under the <a href="host.html">Host</a>&apos;s <code>appBase</code> or
+        both <code>deployOnStartup</code> and <code>autoDeploy</code> are
+        <code>false</code>. If this rule is not followed, double deployment is
+        likely to result.</p>
       </attribute>
 
       <attribute name="preemptiveAuthentication" required="false">
@@ -594,9 +597,9 @@
       </attribute>
 
       <attribute name="swallowAbortedUploads" required="false">
-        <p>Set to false if Tomcat should <b>not</b> read any additional request
-        body data for aborted uploads and instead abort the client connection.
-        This setting is used in the following situations:
+        <p>Set to <code>false</code> if Tomcat should <b>not</b> read any
+        additional request body data for aborted uploads and instead abort the
+        client connection. This setting is used in the following situations:
         </p>
         <ul>
         <li>the size of the request body is larger than the
@@ -757,7 +760,7 @@
       </attribute>
 
       <attribute name="antiResourceLocking" required="false">
-        <p>If true, Tomcat will prevent any file locking.
+        <p>If <code>true</code>, Tomcat will prevent any file locking.
         This will significantly impact startup time of applications,
         but allows full webapp hot deploy and undeploy on platforms
         or configurations where file locking can occur.
@@ -768,12 +771,12 @@
         see <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=37668">
         Bugzilla 37668</a>.</p>
 
-        <p>Please note that setting this flag to true in applications that are
-        outside the appBase for the Host (the <code>webapps</code> directory
-        by default) will cause the application to be <strong>deleted</strong> on
-        Tomcat shutdown.  You probably don't want to do this, so think twice
-        before setting antiResourceLocking=true on a webapp that's outside the
-        appBase for its Host.</p>
+        <p>Please note that setting this flag to <code>true</code> in
+        applications that are outside the <code>appBase</code> for the Host (the
+        <code>webapps</code> directory by default) will cause the application to
+        be <strong>deleted</strong> on Tomcat shutdown.  You probably don't want
+        to do this, so think twice before setting antiResourceLocking=true on a
+        webapp that's outside the <code>appBase</code> for its Host.</p>
       </attribute>
 
       <attribute name="clearReferencesHttpClientKeepAliveThread" required="false">
@@ -844,7 +847,7 @@
         is deployed. On subsequent starts, the copied context XML descriptor
         will be used in preference to any context XML descriptor embedded inside
         the application even if the descriptor embedded inside the application
-        is more recent. The flag's value defaults to <code>false</code>. Note if
+        is more recent. The default is <code>false</code>. Note if
         the <strong>deployXML</strong> attribute of the owning
         <a href="host.html">Host</a> is <code>false</code> or if the
         <strong>copyXML</strong> attribute of the owning
@@ -858,11 +861,11 @@
         createSubContext(), destroySubContext() or close() will trigger a
         <code>javax.naming.OperationNotSupportedException</code> as required by
         section EE.5.3.4 of the Jakarta EE specification. This exception can be
-        disabled by setting this attribute to false in which case any calls to
-        modify the JNDI context will return <b>without</b> making any changes
-        and methods that return values will return <code>null</code>. If not
-        specified, the specification compliant default of <code>true</code> will
-        be used.</p>
+        disabled by setting this attribute to <code>false</code> in which case
+        any calls to modify the JNDI context will return <b>without</b> making
+        any changes and methods that return values will return
+        <code>null</code>. If not specified, the specification compliant default
+        of <code>true</code> will be used.</p>
       </attribute>
 
       <attribute name="renewThreadsWhenStoppingContext" required="false">
@@ -1264,7 +1267,7 @@
         it is no longer required. This is intended to speed up clean-up of
         resources that would otherwise happen as part of garbage collection.
         This attribute is ignored if the <code>singleton</code> attribute is
-        false.</p>
+        <code>false</code>.</p>
         <p>For <code>javax.sql.DataSource</code> and
         <code>javax.sql.XADataSource</code> resources that implement
         <code>AutoCloseable</code> such as Apache Commons DBCP 2 and the default
