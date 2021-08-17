@@ -78,9 +78,10 @@ gpg.exec=/path/to/gpg
 # Code signing of Windows installer
 # See https://infra.apache.org/digicert-use.html for setup instructions
 do.codesigning=false
-codesigning.pkcs11properties=${user.home}/.digicertone/pkcs11properties.cfg
-codesigning.alias=Tomcat-PMC-key-2021-04
+codesigning.alias=Tomcat-PMC-cert-2021-04
 codesigning.digest=SHA-512
+codesigning.storetype=DIGICERTONE
+codesigning.storepass=set-this-in-build.properties
 
 # ----- Settings to use when downloading files -----
 trydownload.httpusecaches=true
@@ -297,15 +298,15 @@ findbugs.home=${base.path}/spotbugs-${findbugs.version}
 findbugs.jar=${findbugs.home}/lib/spotbugs-ant.jar
 findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/spotbugs-${findbugs.version}.tgz
 
-# ----- JSign, version 3.1 -----
+# ----- JSign, version 4.0 -----
 # JSign 3.0 onwards requires Java 8 by default
 # Use Java 7 build
-jsign.version=3.1
+jsign.version=4.0
 
-# checksums for JSign 3.1
+# checksums for JSign 4.0
 jsign.checksum.enabled=true
 jsign.checksum.algorithm=SHA-512
-jsign.checksum.value=481a6e7276688363106ee3492da52807577822b8114b13804df796cd143f479a50d0864215f63b9bb8120a85b2f6185b2845974872d11ff070407dd01879bb0e
+jsign.checksum.value=14e4de1755df3a616ef2725f54542a532c7b86d6fdbc214e355554c554068471e74f348eeafebf3074afcbec53786e5b3219de61cb52ad9b01120f03c304a4e9
 
 jsign.home=${base.path}/jsign-${jsign.version}-java7
 jsign.jar=${jsign.home}/jsign-${jsign.version}-java7.jar
