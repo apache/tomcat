@@ -31,6 +31,8 @@ import org.apache.catalina.UserDatabase;
  * <p>Concrete implementation of {@link org.apache.catalina.Group} for a
  * {@link UserDatabase}.</p>
  *
+ * @param <UD> The specific type of UserDase with which this group is associated
+ *
  * @author Craig R. McClanahan
  */
 public class GenericGroup<UD extends UserDatabase> extends AbstractGroup {
