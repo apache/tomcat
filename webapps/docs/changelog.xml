@@ -145,6 +145,10 @@
         Remove unnecessary Context settings from the examples web application.
         (markt)
       </fix>
+      <fix>
+        Document default value for <code>unpackWARs</code> and related clean-up.
+        Pull request <pr>439</pr> provided by Robert Rodewald. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
