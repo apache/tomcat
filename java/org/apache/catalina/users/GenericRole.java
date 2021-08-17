@@ -24,6 +24,8 @@ import org.apache.catalina.UserDatabase;
  * <p>Concrete implementation of {@link org.apache.catalina.Role} for a
  * {@link UserDatabase}.</p>
  *
+ * @param <UD> The specific type of UserDase with which this role is associated
+ *
  * @author Craig R. McClanahan
  */
 public class GenericRole<UD extends UserDatabase> extends AbstractRole {
