@@ -184,6 +184,7 @@ public class StatusManagerServlet
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
      */
+    @SuppressWarnings("deprecation")
     @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)

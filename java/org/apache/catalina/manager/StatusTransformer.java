@@ -150,7 +150,10 @@ public class StatusTransformer {
      * @param mode Mode <code>0</code> will generate HTML.
      *             Mode <code>1</code> will generate XML.
      * @param args I18n labels for the OS state values
+     *
+     * @deprecated This method will be removed in Tomcat 10.1.x onwards
      */
+    @Deprecated
     public static void writeOSState(PrintWriter writer, int mode, Object[] args) {
         long[] result = new long[16];
         boolean ok = false;
