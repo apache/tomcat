@@ -23,7 +23,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,9 +45,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -56,7 +65,29 @@ import org.apache.tomcat.websocket.server.WsContextListener;
  * generated using a test CA the files for which are in the Tomcat PMC private
  * repository since not all of them are AL2 licensed.
  */
+@RunWith(Parameterized.class)
 public class TestSsl extends TomcatBaseTest {
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        List<Object[]> parameterSets = new ArrayList<>();
+        parameterSets.add(new Object[] {
+                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+
+        return parameterSets;
+    }
+
+    @Parameter(0)
+    public String connectorName;
+
+    @Parameter(1)
+    public boolean needApr;
+
+    @Parameter(2)
+    public String sslImplementationName;
+
 
     @Test
     public void testSimpleSsl() throws Exception {
@@ -70,6 +101,14 @@ public class TestSsl extends TomcatBaseTest {
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
+        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+
+        if (needApr) {
+            AprLifecycleListener listener = new AprLifecycleListener();
+            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
+        }
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -93,8 +132,17 @@ public class TestSsl extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         TesterSupport.initSsl(tomcat);
+        Connector connector = tomcat.getConnector();
         // Increase timeout as default (3s) can be too low for some CI systems
-        Assert.assertTrue(tomcat.getConnector().setProperty("connectionTimeout", "20000"));
+        Assert.assertTrue(connector.setProperty("connectionTimeout", "20000"));
+        Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
+
+        if (needApr) {
+            AprLifecycleListener listener = new AprLifecycleListener();
+            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
+        }
 
         Context ctxt = tomcat.addContext("", null);
         Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
@@ -178,6 +226,15 @@ public class TestSsl extends TomcatBaseTest {
         TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
                 TesterSupport.JKS_PASS, TesterSupport.JKS_KEY_PASS);
 
+        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+
+        if (needApr) {
+            AprLifecycleListener listener = new AprLifecycleListener();
+            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
+        }
+
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
@@ -191,8 +248,19 @@ public class TestSsl extends TomcatBaseTest {
     public void testRenegotiateWorks() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
+        TesterSupport.initSsl(tomcat);
+
+        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isClientRenegotiationSupported(getTomcatInstance()));
+
+        if (needApr) {
+            AprLifecycleListener listener = new AprLifecycleListener();
+            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
+        }
 
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w =
@@ -200,19 +268,15 @@ public class TestSsl extends TomcatBaseTest {
         w.setAsyncSupported(true);
         root.addServletMappingDecoded("/", "tester");
 
-        TesterSupport.initSsl(tomcat);
 
         tomcat.start();
 
         SSLContext sslCtx;
-        if (TesterSupport.isDefaultTLSProtocolForTesting13(tomcat.getConnector())) {
-            // Force TLS 1.2 if TLS 1.3 is available as JSSE's TLS 1.3
-            // implementation doesn't support Post Handshake Authentication
-            // which is required for this test to pass.
-            sslCtx = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
-        } else {
-            sslCtx = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
-        }
+        // Force TLS 1.2 if TLS 1.3 is available as JSSE's TLS 1.3
+        // implementation doesn't support Post Handshake Authentication
+        // which is required for this test to pass.
+        sslCtx = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
+
         sslCtx.init(null, TesterSupport.getTrustManagers(), null);
         SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",

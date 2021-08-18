@@ -60,11 +60,11 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.LibraryNotFoundError;
 import org.apache.tomcat.jni.SSL;
-import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
+import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 
 public final class TesterSupport {
 
@@ -220,14 +220,10 @@ public final class TesterSupport {
     }
 
     protected static boolean isClientRenegotiationSupported(Tomcat tomcat) {
-        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.contains("NioProtocol") || (protocol.contains("Nio2Protocol") && JrePlatform.IS_MAC_OS)) {
-            // Doesn't work on all platforms - see BZ 56448.
-            return false;
-        }
-        String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
-        if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)) {
-            // Assume custom SSL is not supporting this
+        // Disabled for Tomcat Native (part if response to CVE-2009-3555)
+        // Only JRE provided JSSE implementation supports this
+        String sslImplementation = (String) tomcat.getConnector().getProperty("sslImplementationName");
+        if (!JSSEImplementation.class.getName().equals(sslImplementation)) {
             return false;
         }
 
@@ -641,37 +637,5 @@ public final class TesterSupport {
             }
             return socket;
         }
-    }
-
-
-    /*
-     * We want to use TLS 1.3 where we can but this requires TLS 1.3 to be
-     * supported on the client and the server.
-     */
-    public static String getDefaultTLSProtocolForTesting(Connector connector) {
-        // Clients always use JSSE
-        if (!TLSV13_AVAILABLE) {
-            // Client doesn't support TLS 1.3 so we have to use TLS 1.2
-            return Constants.SSL_PROTO_TLSv1_2;
-        }
-
-        if (connector.getProtocolHandlerClassName().contains("Apr")) {
-            // APR connector so OpenSSL is used for TLS.
-            if (SSL.version() >= 0x1010100f) {
-                return Constants.SSL_PROTO_TLSv1_3;
-            } else {
-                return Constants.SSL_PROTO_TLSv1_2;
-            }
-        } else {
-            // NIO or NIO2. Tests do not use JSSE+OpenSSL so JSSE will be used.
-            // Due to check above, it is known that TLS 1.3 is available
-            return Constants.SSL_PROTO_TLSv1_3;
-        }
-    }
-
-
-    public static boolean isDefaultTLSProtocolForTesting13(Connector connector) {
-        return Constants.SSL_PROTO_TLSv1_3.equals(
-                TesterSupport.getDefaultTLSProtocolForTesting(connector));
     }
 }
