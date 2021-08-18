@@ -150,6 +150,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>65506</bug>: Fix write timeout check that was using the read
+        timeout value. Patch submitted by Gustavo Mahlow. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
