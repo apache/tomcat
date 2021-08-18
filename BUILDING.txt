@@ -295,12 +295,15 @@ You can build them by using the following commands:
         codesigning.storepass=request-via-pmc
 
     Release managers will be provided with the necessary credentials by the PMC.
-    It will also be necessary to enable TLS 1.1 and TLS 1.2 by default (they are
-    disabled by default on Java 7) for the build process to communicate with the
-    code signing service. The simplest way is by setting the ANT_OPTS
-    environment variable. E.g. (for Windows):
+    It will also be necessary to enable TLS 1.2 and the correct cipher suite to
+    for the build process to communicate with the code signing service. The
+    simplest way is by setting the ANT_OPTS environment variable.
+    E.g. (for Windows):
 
-    set ANT_OPTS=-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2
+    set ANT_OPTS=-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -Dhttps.cipherSuites=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+
+    You will also need to download and install the Java 7 unlimited strength
+    jurisdiction policy files in order to use the above cipher suite.
 
  4. Build the release:
 
