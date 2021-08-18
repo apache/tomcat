@@ -1030,7 +1030,7 @@ public class WsSession implements Session {
 
         if (timeoutRead > 0 && (currentTime - lastActiveRead) > timeoutRead) {
             key = "wsSession.timeoutRead";
-        } else if (timeoutWrite > 0 && (currentTime - lastActiveWrite) > timeoutRead) {
+        } else if (timeoutWrite > 0 && (currentTime - lastActiveWrite) > timeoutWrite) {
             key = "wsSession.timeoutWrite";
         } else if (timeout > 0 && (currentTime - lastActiveRead) > timeout &&
                 (currentTime - lastActiveWrite) > timeout) {
