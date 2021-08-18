@@ -32,6 +32,4 @@ Deferred until 10.1.x:
     We might want to park this one until we see what is available direct from
     the JRE with project Panama.
 
- 2. Remove APR connector.
-
- 3. Review code forked from Commons projects and consider removing unused code.
+ 2. Review code forked from Commons projects and consider removing unused code.

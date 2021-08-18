@@ -216,7 +216,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             dispatchNonBlockingRead();
         } else if (status == SocketEvent.ERROR) {
             // An I/O error occurred on a non-container thread. This includes:
-            // - read/write timeouts fired by the Poller (NIO & APR)
+            // - read/write timeouts fired by the Poller in NIO
             // - completion handler failures in NIO2
 
             if (request.getAttribute(RequestDispatcher.ERROR_EXCEPTION) == null) {
@@ -872,7 +872,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                  * onWritePossible() and/or onDataAvailable() as appropriate are made by
                  * the container.
                  *
-                 * Processing the dispatches requires (for APR/native at least)
+                 * Processing the dispatches requires (TODO confirm applies without APR)
                  * that the socket has been added to the waitingRequests queue. This may
                  * not have occurred by the time that the non-container thread completes
                  * triggering the call to this method. Therefore, the coded syncs on the

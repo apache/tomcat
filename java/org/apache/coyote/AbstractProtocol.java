@@ -176,7 +176,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * instances of {@link java.security.cert.X509Certificate} it needs to be
      * converted before it can be used and this property controls which JSSE
      * provider is used to perform the conversion. For example it is used with
-     * the AJP connectors, the HTTP APR connector and with the
+     * the AJP connectors and with the
      * {@link org.apache.catalina.valves.SSLValve}. If not specified, the
      * default provider will be used.
      *
@@ -192,12 +192,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
     public void setMaxHeaderCount(int maxHeaderCount) {
         this.maxHeaderCount = maxHeaderCount;
-    }
-
-
-    @Override
-    public boolean isAprRequired() {
-        return false;
     }
 
 

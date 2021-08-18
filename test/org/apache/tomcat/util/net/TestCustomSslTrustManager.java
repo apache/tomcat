@@ -21,7 +21,6 @@ import java.net.SocketException;
 import javax.net.ssl.SSLException;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
@@ -63,9 +62,6 @@ public class TestCustomSslTrustManager extends TomcatBaseTest {
             throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
-
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(tomcat));
 
         TesterSupport.configureClientCertContext(tomcat);
 

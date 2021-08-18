@@ -147,29 +147,22 @@ public final class TesterSupport {
         sslHostConfig.addCertificate(certificate);
         connector.addSslHostConfig(sslHostConfig);
 
-        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (!protocol.contains("Apr")) {
-            String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
-            if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)) {
-                StandardServer server = (StandardServer) tomcat.getServer();
-                AprLifecycleListener listener = new AprLifecycleListener();
-                listener.setSSLRandomSeed("/dev/urandom");
-                server.addLifecycleListener(listener);
-                Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementation));
-            }
-            sslHostConfig.setSslProtocol("tls");
-            certificate.setCertificateKeystoreFile(new File(keystore).getAbsolutePath());
-            sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
-            if (keystorePass != null) {
-                certificate.setCertificateKeystorePassword(keystorePass);
-            }
-            if (keyPass != null) {
-                certificate.setCertificateKeyPassword(keyPass);
-            }
-        } else {
-            certificate.setCertificateFile(new File(LOCALHOST_RSA_CERT_PEM).getAbsolutePath());
-            certificate.setCertificateKeyFile(new File(LOCALHOST_RSA_KEY_PEM).getAbsolutePath());
-            sslHostConfig.setCaCertificateFile(new File(CA_CERT_PEM).getAbsolutePath());
+        String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
+        if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)) {
+            StandardServer server = (StandardServer) tomcat.getServer();
+            AprLifecycleListener listener = new AprLifecycleListener();
+            listener.setSSLRandomSeed("/dev/urandom");
+            server.addLifecycleListener(listener);
+            Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementation));
+        }
+        sslHostConfig.setSslProtocol("tls");
+        certificate.setCertificateKeystoreFile(new File(keystore).getAbsolutePath());
+        sslHostConfig.setTruststoreFile(new File(CA_JKS).getAbsolutePath());
+        if (keystorePass != null) {
+            certificate.setCertificateKeystorePassword(keystorePass);
+        }
+        if (keyPass != null) {
+            certificate.setCertificateKeyPassword(keyPass);
         }
     }
 
@@ -226,22 +219,8 @@ public final class TesterSupport {
         return ks;
     }
 
-    public static boolean isRenegotiationSupported(Tomcat tomcat) {
-        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.contains("Apr")) {
-            // Disabled by default in 1.1.20 windows binary (2010-07-27)
-            return false;
-        }
-
-        return true;
-    }
-
     protected static boolean isClientRenegotiationSupported(Tomcat tomcat) {
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.contains("Apr")) {
-            // Disabled by default in 1.1.20 windows binary (2010-07-27)
-            return false;
-        }
         if (protocol.contains("NioProtocol") || (protocol.contains("Nio2Protocol") && JrePlatform.IS_MAC_OS)) {
             // Doesn't work on all platforms - see BZ 56448.
             return false;

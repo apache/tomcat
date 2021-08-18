@@ -57,14 +57,11 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
         TesterSupport.initSsl(tomcat);
 
-        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        // The tests are only supported for APR and OpenSSL
-        if (!protocol.contains("Apr")) {
-            String sslImplementation = String.valueOf(
-                    tomcat.getConnector().getProperty("sslImplementationName"));
-            Assume.assumeTrue("This test is only for OpenSSL based SSL connectors",
-                    sslImplementation.contains("openssl"));
-        }
+        // The tests are only supported for OpenSSL
+        String sslImplementation = String.valueOf(
+                tomcat.getConnector().getProperty("sslImplementationName"));
+        Assume.assumeTrue("This test is only for OpenSSL based SSL connectors",
+                sslImplementation.contains("openssl"));
 
         OpenSSLConf conf = new OpenSSLConf();
         for (int i = 0; i < commands.length;) {

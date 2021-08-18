@@ -148,6 +148,12 @@
         the expected effect. <code>NONE</code> was incorrectly treated as a file
         path. Patch provided by Mikael Sterner. (markt)
       </fix>
+      <scode>
+        Remove the deprecated APR/Native connector which includes the HTTP APR
+        and the AJP APR connector. Also remove the Java interfaces to the
+        APR/Native library that are not used by the OpenSSL integration for the
+        NIO and NIO2 connectors. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

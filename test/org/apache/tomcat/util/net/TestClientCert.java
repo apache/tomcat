@@ -19,7 +19,6 @@ package org.apache.tomcat.util.net;
 import java.util.Arrays;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -45,9 +44,6 @@ public class TestClientCert extends TomcatBaseTest {
     }
 
     private void doTestClientCertGet(boolean preemptive) throws Exception {
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
-
         if (preemptive) {
             Tomcat tomcat = getTomcatInstance();
             // Only one context deployed
@@ -120,9 +116,6 @@ public class TestClientCert extends TomcatBaseTest {
 
     private void doTestClientCertPost(int bodySize, boolean expectProtectedFail)
             throws Exception {
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
-
         getTomcatInstance().start();
 
         byte[] body = new byte[bodySize];

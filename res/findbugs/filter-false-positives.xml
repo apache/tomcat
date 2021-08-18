@@ -821,38 +821,10 @@
     <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
   </Match>
   <Match>
-    <!-- Locks are always released. Non-standard pattern is required because -->
-    <!-- of lock upgrade that is used. -->
-    <Class name="org.apache.coyote.http11.upgrade.AprServletInputStream" />
-    <Method name="doRead"/>
-    <Bug code="UL" />
-  </Match>
-  <Match>
-    <!-- Locks are always released. Non-standard pattern is required because -->
-    <!-- of lock upgrade that is used. -->
-    <Class name="org.apache.coyote.http11.upgrade.AprServletOutputStream" />
-    <Method name="doWrite"/>
-    <Bug code="UL"  />
-  </Match>
-  <Match>
     <!-- Fall-through expected -->
     <Class name="org.apache.coyote.http11.Http11Processor" />
     <Method name="service"/>
     <Bug code="SF" />
-  </Match>
-  <Match>
-    <!-- Locks are always released. Non-standard pattern is required because -->
-    <!-- of lock upgrade that is used. -->
-    <Class name="org.apache.coyote.http11.InternalAprInputBuffer" />
-    <Method name="doReadSocket"/>
-    <Bug code="UL" />
-  </Match>
-  <Match>
-    <!-- Locks are always released. Non-standard pattern is required because -->
-    <!-- of lock upgrade that is used. -->
-    <Class name="org.apache.coyote.http11.InternalAprOutputBuffer" />
-    <Method name="writeToSocket"/>
-    <Bug code="UL" />
   </Match>
   <Match>
     <!-- HpackDecoder is used by multiple streams but not concurrently. -->
@@ -1413,82 +1385,6 @@
     <Class name="org.apache.tomcat.util.modeler.NotificationInfo"/>
     <Field name="info" />
     <Bug code="MF" />
-  </Match>
-  <Match>
-    <!-- See wait() call in destroy() -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
-    <Method name="run"/>
-    <Bug code="NN" />
-  </Match>
-  <Match>
-    <!-- There is only a single wait in run() when the poller is idle -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
-    <Or>
-      <Method name="add"/>
-      <Method name="close"/>
-      <Method name="stop"/>
-    </Or>
-    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
-  </Match>
-  <Match>
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
-    <Method name="run"/>
-    <Or>
-      <!-- see wait() call in destroy() -->
-      <Bug code="NN" />
-      <!-- notify() is called from add() -->
-      <Bug code="UW" />
-    </Or>
-  </Match>
-  <Match>
-    <!-- There is only a single wait in run() when the poller is idle -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
-    <Or>
-      <Method name="add"/>
-      <Method name="stop"/>
-    </Or>
-    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
-  </Match>
-  <Match>
-    <!-- Sync is there to protect referenced object not field -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketEventProcessor"/>
-    <Method name="run"/>
-    <Bug code="ML" />
-  </Match>
-  <Match>
-    <!-- Modifications to SocketLists are always protected by syncs -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketList"/>
-    <Or>
-      <Method name="add"/>
-      <Method name="remove"/>
-    </Or>
-    <Bug pattern="VO_VOLATILE_INCREMENT"/>
-  </Match>
-  <Match>
-    <!-- Object is only ever set to null, sync therefore is still valid -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketProcessor"/>
-    <Method name="run"/>
-    <Bug code="ML"/>
-  </Match>
-  <Match>
-    <!-- Sync is there to protect referenced object not field -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketWithOptionsProcessor"/>
-    <Method name="run"/>
-    <Bug code="ML" />
-  </Match>
-  <Match>
-    <!-- Sync is on closed to ensure that actions taken because the socket  -->
-    <!-- open remain valid until the action is completed.                   -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint$AprSocketWrapper"/>
-    <Field name="closed"/>
-    <Bug pattern="JLM_JSR166_UTILCONCURRENT_MONITORENTER"/>
-  </Match>
-  <Match>
-    <!-- Return value is ignored at this point but logic further up call     -->
-    <!-- stack will ensure that a SocketTimeoutException is thrown           -->
-    <Class name="org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper"/>
-    <Method name="awaitLatch"/>
-    <Bug code="RV"/>
   </Match>
   <Match>
     <!-- Object is only ever set to null, sync therefore is still valid -->

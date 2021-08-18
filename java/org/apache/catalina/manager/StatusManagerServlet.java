@@ -284,17 +284,6 @@ public class StatusManagerServlet
 
         try {
 
-            // Display operating system statistics using APR if available
-            args = new Object[7];
-            args[0] = smClient.getString("htmlManagerServlet.osPhysicalMemory");
-            args[1] = smClient.getString("htmlManagerServlet.osAvailableMemory");
-            args[2] = smClient.getString("htmlManagerServlet.osTotalPageFile");
-            args[3] = smClient.getString("htmlManagerServlet.osFreePageFile");
-            args[4] = smClient.getString("htmlManagerServlet.osMemoryLoad");
-            args[5] = smClient.getString("htmlManagerServlet.osKernelTime");
-            args[6] = smClient.getString("htmlManagerServlet.osUserTime");
-            StatusTransformer.writeOSState(writer, mode, args);
-
             // Display virtual machine statistics
             args = new Object[9];
             args[0] = smClient.getString("htmlManagerServlet.jvmFreeMemory");

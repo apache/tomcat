@@ -507,12 +507,9 @@
     <!-- Remove connectors that are not default -->
     <exclude name="**/AbstractAjpProtocol.class"/>
     <exclude name="**/Ajp*.class"/>
-    <exclude name="**/AjpApr*.class"/>
-    <exclude name="**/Http11Apr*.class"/>
     <exclude name="**/Http11Nio2*.class"/>
     <exclude name="**/JniLifecycleListener.class"/>
     <exclude name="org/apache/tomcat/**/*Nio2*.class"/>
-    <exclude name="org/apache/tomcat/**/Apr*.class"/>
 
     <!-- Minimize bundles to the default set -->
     <exclude name="org/apache/**/LocalStrings_*.properties"/>
@@ -1837,10 +1834,10 @@
   <property name="junit.formatter.extension" value=".txt" />
 
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-nio,test-nio2,test-apr,cobertura-report,test-status" />
+          depends="test-nio,test-nio2,cobertura-report,test-status" />
 
   <target name="test-only" description="Runs the JUnit test cases without additional processing"
-          depends="test-only-nio,test-only-nio2,test-only-apr,test-status" />
+          depends="test-only-nio,test-only-nio2,test-status" />
 
   <target name="test-status"
           description="Analyses logs directory and reports on skipped tests, test failures and test errors">
@@ -1899,19 +1896,6 @@
           depends="cobertura-disabled,test-openssl-exists" if="${execute.test.nio2}">
     <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
               extension=".NIO2" />
-  </target>
-
-  <target name="test-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
-          depends="test-compile,deploy,test-apr-exists,cobertura-instrument,test-openssl-exists"
-          if="${apr.exists}">
-    <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
-              extension=".APR" />
-  </target>
-
-  <target name="test-only-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
-          depends="cobertura-disabled,test-openssl-exists" if="${execute.test.apr}">
-    <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
-              extension=".APR" />
   </target>
 
   <target name="test-apr-exists" description="Checks for APR lib"
@@ -2095,7 +2079,7 @@
   </target>
 
   <target name="cobertura-report" if="${cobertura.enabled}"
-          depends="test-nio,test-nio2,test-apr"
+          depends="test-nio,test-nio2"
           description="Creates report from gathered Cobertura results">
 
     <cobertura-report srcdir="${basedir}/java" destdir="${cobertura.out}"

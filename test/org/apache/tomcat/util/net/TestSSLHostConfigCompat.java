@@ -56,9 +56,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
             parameterSets.add(new Object[] {"NIO-OpenSSL", "org.apache.coyote.http11.Http11NioProtocol",
                     "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
-
-            parameterSets.add(new Object[] { "APR/Native", "org.apache.coyote.http11.Http11AprProtocol",
-                    "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
         }
 
         return parameterSets;
@@ -323,10 +320,6 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         connector.setScheme("https");
         connector.setSecure(true);
         Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
-        if (!connector.getProtocolHandlerClassName().contains("Apr")) {
-            // Skip this for APR. It is not supported.
-            Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
-        }
         sslHostConfig.setProtocols("TLSv1.2");
         connector.addSslHostConfig(sslHostConfig);
 

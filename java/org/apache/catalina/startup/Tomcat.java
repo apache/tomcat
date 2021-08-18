@@ -552,9 +552,7 @@ public class Tomcat {
             return service.findConnectors()[0];
         }
         // The same as in standard Tomcat configuration.
-        // This creates an APR HTTP connector if AprLifecycleListener has been
-        // configured (created) and Tomcat Native library is available.
-        // Otherwise it creates a NIO HTTP connector.
+        // This creates a NIO HTTP connector.
         Connector connector = new Connector("HTTP/1.1");
         connector.setPort(port);
         service.addConnector(connector);
