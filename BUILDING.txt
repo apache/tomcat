@@ -289,12 +289,10 @@ You can build them by using the following commands:
     file:
 
         # Location of GPG executable (used only for releases)
+        gpg.exec=/path/to/gpg
         # Code signing of Windows installer
         do.codesigning=true
-        codesigning.user=request-via-pmc
-        codesigning.pwd=request-via-pmc
-        codesigning.partnercode=request-via-pmc
-        codesigning.service=Microsoft Windows Signing
+        codesigning.storepass=request-via-pmc
 
     Release managers will be provided with the necessary credentials by the PMC.
     It will also be necessary to enable TLS 1.1 and TLS 1.2 by default (they are
