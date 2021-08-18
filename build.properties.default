@@ -81,7 +81,8 @@ do.codesigning=false
 codesigning.alias=Tomcat-PMC-cert-2021-04
 codesigning.digest=SHA-512
 codesigning.storetype=DIGICERTONE
-codesigning.storepass=set-this-in-build.properties
+# Set codesigning.storepass in build.properties with the following syntax
+#codesigning.storepass=<api-key>|/path/to/Certificate_pkcs12.p12|<password>
 
 # ----- Settings to use when downloading files -----
 trydownload.httpusecaches=true
