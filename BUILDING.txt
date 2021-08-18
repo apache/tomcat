@@ -256,7 +256,7 @@ You can build them by using the following commands:
     environment, the build scripts assume that Wine is available. If this is not
     the case, the skip.installer property may be set to skip the creation of the
     Windows installer.
-    
+
     Provided that Wine is available on non-Windows platforms, a full release
     build may be made on Windows, Linux or MacOS.
 
