@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
