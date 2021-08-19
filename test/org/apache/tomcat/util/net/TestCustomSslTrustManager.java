@@ -123,7 +123,8 @@ public class TestCustomSslTrustManager extends TomcatBaseTest {
 
         if (trustType.equals(TrustType.NONE)) {
             Assert.assertTrue(rc != 200);
-            Assert.assertNull(res.toString());
+            Assert.assertNotNull(res);
+            Assert.assertTrue(res.toString().isEmpty());
         } else {
             Assert.assertEquals(200, rc);
             Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
