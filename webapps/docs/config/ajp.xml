@@ -36,9 +36,6 @@
 
 <section name="Introduction">
 
-  <p><strong>Note: The APR/Native AJP Connector is deprecated and will be
-  removed in Tomcat 10.1.x onwards.</strong></p>
-
   <p>The <strong>AJP Connector</strong> element represents a
   <strong>Connector</strong> component that communicates with a web
   connector via the <code>AJP</code> protocol.  This is used for cases
@@ -202,8 +199,6 @@
         - non blocking Java NIO connector.<br/>
         <code>org.apache.coyote.ajp.AjpNio2Protocol</code>
         - non blocking Java NIO2 connector.<br/>
-        <code>org.apache.coyote.ajp.AjpAprProtocol</code>
-        - the APR/native connector (deprecated - will be removed in 10.1.x).<br/>
         Custom implementations may also be used.<br/>
         Take a look at our <a href="#Connector_Comparison">Connector
         Comparison</a> chart.
@@ -288,9 +283,8 @@
 
   <p>To use AJP, you must specify the protocol attribute (see above).</p>
 
-  <p>The standard AJP connectors (NIO, NIO2 and APR/native) all support the
-  following attributes in addition to the common Connector attributes listed
-  above.</p>
+  <p>The standard AJP connectors (NIO and NIO2) both support the following
+  attributes in addition to the common Connector attributes listed above.</p>
 
   <attributes>
 
@@ -325,11 +319,7 @@
       default, the connector will listen on the loopback address. Unless the JVM
       is configured otherwise using system properties, the Java based connectors
       (NIO, NIO2) will listen on both IPv4 and IPv6 addresses when configured
-      with either <code>0.0.0.0</code> or <code>::</code>. The APR/native
-      connector will only listen on IPv4 addresses if configured with
-      <code>0.0.0.0</code> and will listen on IPv6 addresses (and optionally
-      IPv4 addresses depending on the setting of <strong>ipv6v6only</strong>) if
-      configured with <code>::</code>.</p>
+      with either <code>0.0.0.0</code> or <code>::</code>.</p>
     </attribute>
 
     <attribute name="allowedRequestAttributesPattern" required="false">
@@ -371,10 +361,7 @@
       <p>When client certificate information is presented in a form other than
       instances of <code>java.security.cert.X509Certificate</code> it needs to
       be converted before it can be used and this property controls which JSSE
-      provider is used to perform the conversion. For example it is used with
-      the AJP connectors, the <a href="http.html">HTTP APR connector</a> and
-      with the <a href="valve.html#SSL_Authenticator_Valve">
-      org.apache.catalina.valves.SSLValve</a>.If not specified, the default
+      provider is used to perform the conversion. If not specified, the default
       provider will be used.</p>
     </attribute>
 
@@ -771,34 +758,6 @@
     </attributes>
   </subsection>
 
-  <subsection name="APR/native specific configuration">
-
-    <p><strong>Note: The APR/Native AJP Connector is deprecated and will be
-    removed in Tomcat 10.1.x onwards.</strong></p>
-
-    <p>The APR/native implementation supports the following attributes in
-    addition to the common Connector and AJP attributes listed above.</p>
-
-    <attributes>
-      <attribute name="ipv6v6only" required="false">
-        <p>If listening on an IPv6 address on a dual stack system, should the
-        connector only listen on the IPv6 address? If not specified the default
-        is <code>false</code> and the connector will listen on the IPv6 address
-        and the equivalent IPv4 address if present.</p>
-      </attribute>
-
-      <attribute name="pollTime" required="false">
-        <p>Duration of a poll call in microseconds. Lowering this value will
-        slightly decrease latency of connections being kept alive in some cases
-        , but will use more CPU as more poll calls are being made. The default
-        value is 2000 (2ms).
-        </p>
-    </attribute>
-
-    </attributes>
-
-  </subsection>
-
 </section>
 
 
@@ -836,23 +795,19 @@
         <th />
         <th style="text-align: center;">Java Nio Connector<br />NIO</th>
         <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
-        <th style="text-align: center;">APR/native Connector<br />APR<br />(deprecated)</th>
       </tr>
       <tr>
         <th>Classname</th>
         <td><code class="noHighlight">AjpNioProtocol</code></td>
         <td><code class="noHighlight">AjpNio2Protocol</code></td>
-        <td><code class="noHighlight">AjpAprProtocol</code></td>
       </tr>
       <tr>
         <th>Tomcat Version</th>
         <td>7.x onwards</td>
         <td>8.x onwards</td>
-        <td>5.5.x onwards</td>
       </tr>
       <tr>
         <th>Support Polling</th>
-        <td>YES</td>
         <td>YES</td>
         <td>YES</td>
       </tr>
@@ -860,11 +815,9 @@
         <th>Polling Size</th>
         <td><code class="noHighlight">maxConnections</code></td>
         <td><code class="noHighlight">maxConnections</code></td>
-        <td><code class="noHighlight">maxConnections</code></td>
       </tr>
       <tr>
         <th>Read Request Headers</th>
-        <td>Blocking</td>
         <td>Blocking</td>
         <td>Blocking</td>
       </tr>
@@ -872,11 +825,9 @@
         <th>Read Request Body</th>
         <td>Blocking</td>
         <td>Blocking</td>
-        <td>Blocking</td>
       </tr>
       <tr>
         <th>Write Response Headers and Body</th>
-        <td>Blocking</td>
         <td>Blocking</td>
         <td>Blocking</td>
       </tr>
@@ -884,11 +835,9 @@
         <th>Wait for next Request</th>
         <td>Non Blocking</td>
         <td>Non Blocking</td>
-        <td>Non Blocking</td>
       </tr>
       <tr>
         <th>Max Connections</th>
-        <td><code class="noHighlight">maxConnections</code></td>
         <td><code class="noHighlight">maxConnections</code></td>
         <td><code class="noHighlight">maxConnections</code></td>
       </tr>

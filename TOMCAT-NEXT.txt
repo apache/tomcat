@@ -33,3 +33,7 @@ Deferred until 10.1.x:
     the JRE with project Panama.
 
  2. Review code forked from Commons projects and consider removing unused code.
+
+ 3. Implement OCSP checks for client certs with NIO/NIO2.
+    Useful reference:
+    https://stackoverflow.com/questions/5161504/ocsp-revocation-on-client-certificate

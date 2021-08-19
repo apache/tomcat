@@ -373,10 +373,9 @@ If you do use them, do not forget to read their documentation.
 Apache Tomcat Native library
 -----------------------------
 
-It is a library that allows to use the "Apr" variant of HTTP and AJP
-protocol connectors in Apache Tomcat. It is built around OpenSSL and Apache
-Portable Runtime (APR) libraries. Those are the same libraries as used by
-Apache HTTPD Server project.
+It is a library that allows to use the OpenSSL variant of the TLS implementation
+for the HTTP connector in Apache Tomcat. It is built around OpenSSL and Apache
+Portable Runtime (APR) libraries.
 
 This feature was especially important in the old days when Java performance
 was poor. It is less important nowadays, but it is still used and respected
@@ -390,12 +389,9 @@ For further reading:
 
       https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/apr.html
 
-    * Documentation for the HTTP and AJP protocol connectors in the Tomcat
-      Configuration Reference
+    * Documentation for the HTTP connector in the Tomcat Configuration Reference
 
       https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/http.html
-
-      https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/ajp.html
 
  - Apache Tomcat Native project home
 

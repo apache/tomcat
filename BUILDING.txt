@@ -326,29 +326,29 @@ directory:
 
     output/build/logs
 
-By default the testsuite is run three times to test 3 different
-implementations of Tomcat connectors: NIO, NIO2 and APR. (If you are not
-familiar with Tomcat connectors, see config/http.html in documentation for
-details).
+By default the testsuite is run twice to test the 2 different implementations
+of Tomcat connectors: NIO and NIO2. (If you are not familiar with Tomcat
+connectors, see config/http.html in documentation for details).
 
-The 3 runs are enabled and disabled individually by the following
+The 2 runs are enabled and disabled individually by the following
 properties, which all are "true" by default:
 
     execute.test.nio=true
     execute.test.nio2=true
-    execute.test.apr=true
 
-The APR connector can be tested only if Tomcat-Native library binaries are
-found by the testsuite. The "test.apr.loc" property specifies the directory
-where the library binaries are located.
+The SSL tests will be run twice. Once with the JSSE implementation and once
+with the OpenSSL implementation. The OpenSSL implementation can only can be
+tested if Tomcat-Native library binaries are found by the testsuite. The
+"test.apr.loc" property specifies the directory where the library binaries are
+located.
 
 By default the "test.apr.loc" property specifies the following location:
 
     output/build/bin/native/
 
-If you are on Windows and want to test the APR connector you can put the
-tcnative-1.dll file into ${tomcat.source}/bin/native/ and it will be copied
-into the above directory when the build runs.
+If you are on Windows and want to test the OpenSSL TLS implementation you can
+put the tcnative-1.dll file into ${tomcat.source}/bin/native/ and it will be
+copied into the above directory when the build runs.
 
 The unit tests include tests of the clustering functionality which require
 multicast to be enabled. There is a simple application provided in the Tomcat

@@ -146,7 +146,7 @@ Var ServiceInstallLog
   LangString DESC_SecTomcat ${LANG_ENGLISH} "Install the Tomcat Servlet container as a Windows service."
   LangString DESC_SecTomcatCore ${LANG_ENGLISH} "Install the Tomcat Servlet container core and create the Windows service."
   LangString DESC_SecTomcatService ${LANG_ENGLISH} "Automatically start the Tomcat service when the computer is started."
-  LangString DESC_SecTomcatNative ${LANG_ENGLISH} "Install APR based Tomcat native .dll for better performance and scalability in production environments."
+  LangString DESC_SecTomcatNative ${LANG_ENGLISH} "Install APR based Tomcat native .dll to enable the OpenSSL based TLS implementation for HTTP connectors."
   LangString DESC_SecMenu ${LANG_ENGLISH} "Create a Start Menu program group for Tomcat."
   LangString DESC_SecDocs ${LANG_ENGLISH} "Install the Tomcat documentation bundle. This includes documentation on the servlet container and its configuration options, on the Jasper JSP page compiler, as well as on the native webserver connectors."
   LangString DESC_SecManager ${LANG_ENGLISH} "Install the Tomcat Manager administrative web application."

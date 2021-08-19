@@ -291,9 +291,9 @@ public class TestHttp2Limits extends Http2TestBase {
             String limitMessage = sm.getString("http2Parser.headerLimitSize", "\\d++", "3");
             limitMessage = limitMessage.replace("[", "\\[").replace("]", "\\]");
             // Connection reset. Connection ID will vary so use a pattern
-            // On some platform / Connector combinations (e.g. Windows / APR),
-            // the TCP connection close will be processed before the client gets
-            // a chance to read the connection close frame which will trigger an
+            // On some platform / Connector combinations the TCP connection close
+            // will be processed before the client gets a chance to read the
+            // connection close frame which will trigger an
             // IOException when we try to read the frame.
             // Note: Some platforms will allow the read if if the write fails
             //       above.
