@@ -337,7 +337,7 @@ public class TesterOpenSSL {
             // Explicit OpenSSL path may also need explicit lib path
             // (e.g. Gump needs this)
             openSSLLibPath = openSSLPath.substring(0, openSSLPath.lastIndexOf('/'));
-            openSSLLibPath = openSSLLibPath + "/../lib";
+            openSSLLibPath = openSSLLibPath + "/../lib:" + openSSLLibPath + "/../lib64";
         }
         List<String> cmd = new ArrayList<>();
         cmd.add(openSSLPath);
