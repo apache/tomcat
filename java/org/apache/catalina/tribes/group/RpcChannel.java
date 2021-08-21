@@ -189,12 +189,6 @@ public class RpcChannel implements ChannelListener {
     }
 
     @Override
-    public void finalize() throws Throwable {
-        breakdown();
-        super.finalize();
-    }
-
-    @Override
     public boolean accept(Serializable msg, Member sender) {
         if ( msg instanceof RpcMessage ) {
             RpcMessage rmsg = (RpcMessage)msg;
