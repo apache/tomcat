@@ -212,11 +212,7 @@ then the order becomes:</p>
 
 <section name="XML Parsers and Java">
 
-<p>Starting with Java 1.4 a copy of JAXP APIs and an XML parser are packed
-inside the JRE.  This has impacts on applications that wish to use their own
-XML parser.</p>
-
-<p>In old versions of Tomcat, you could simply replace the XML parser
+<p>In older versions of Tomcat, you could simply replace the XML parser
 in the Tomcat libraries directory to change the parser
 used by all web applications.  However, this technique will not be effective
 when you are running modern versions of Java, because the usual class loader
