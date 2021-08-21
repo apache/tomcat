@@ -396,15 +396,6 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
     @Override
-    public void finalize() throws Throwable {
-        try {
-            breakdown();
-        } finally {
-            super.finalize();
-        }
-    }
-
-    @Override
     public int hashCode() {
         return Arrays.hashCode(this.mapContextName);
     }
