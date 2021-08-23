@@ -220,7 +220,7 @@ public final class TesterSupport {
     }
 
     protected static boolean isClientRenegotiationSupported(Tomcat tomcat) {
-        // Disabled for Tomcat Native (part if response to CVE-2009-3555)
+        // Disabled for Tomcat Native (part of response to CVE-2009-3555)
         // Only JRE provided JSSE implementation supports this
         String sslImplementation = (String) tomcat.getConnector().getProperty("sslImplementationName");
         if (!JSSEImplementation.class.getName().equals(sslImplementation)) {
