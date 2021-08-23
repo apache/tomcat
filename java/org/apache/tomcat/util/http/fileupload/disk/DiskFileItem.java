@@ -545,6 +545,7 @@ public class DiskFileItem
     /**
      * Removes the file contents from the temporary storage.
      */
+    @SuppressWarnings("deprecation") // Need Commons FileUpload to address this
     @Override
     protected void finalize() throws Throwable {
         if (dfos == null || dfos.isInMemory()) {
