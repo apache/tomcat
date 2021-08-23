@@ -154,6 +154,10 @@
         APR/Native library that are not used by the OpenSSL integration for the
         NIO and NIO2 connectors. (markt)
       </scode>
+      <scode>
+        Refactor the JSSE/OpenSSL integration to avoid the use of
+        <code>finalize()</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
