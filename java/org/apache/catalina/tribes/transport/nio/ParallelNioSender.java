@@ -323,21 +323,20 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
 
     private synchronized void close() throws ChannelException  {
         ChannelException x = null;
-        Object[] members = nioSenders.keySet().toArray();
-        for (Object member : members) {
-            Member mbr = (Member) member;
+        Iterator<Map.Entry<Member,NioSender>> iter = nioSenders.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Member,NioSender> entry = iter.next();
             try {
-                NioSender sender = nioSenders.get(mbr);
-                sender.disconnect();
+                entry.getValue().disconnect();
             } catch (Exception e) {
                 if (x == null) {
                     x = new ChannelException(e);
                 }
-                x.addFaultyMember(mbr, e);
+                x.addFaultyMember(entry.getKey(), e);
             }
-            nioSenders.remove(mbr);
+            iter.remove();
         }
-        if ( x != null ) {
+        if (x != null) {
             throw x;
         }
     }
