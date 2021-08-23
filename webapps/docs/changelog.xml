@@ -185,6 +185,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <scode>
+        Refactor the <code>ParallelNioSender</code> to avoid the use of
+        <code>finalize()</code>. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
