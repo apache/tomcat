@@ -214,4 +214,40 @@ public class TestResponseUtil {
         }
         Assert.assertEquals(expected, result);
     }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=65505
+     */
+    @Test
+    public void testAddVaryHeaderOrder() {
+        MimeHeaders responseHeaders = new MimeHeaders();
+        responseHeaders.addValue("Vary").setString("Origin");
+        responseHeaders.addValue("Vary").setString("Access-Control-Request-Method");
+        responseHeaders.addValue("Vary").setString("Access-Control-Request-Headers");
+        responseHeaders.addValue("Access-Control-Allow-Origin").setString("https://xxxx");
+        responseHeaders.addValue("Access-Control-Allow-Credentials").setString("true");
+        responseHeaders.addValue("Set-Cookie").setString("rememberMe=deleteMe; Path=/; Max-Age=0; Expires=Tue, 17-Aug-2021 11:19:04 GMT; SameSite=lax");
+        responseHeaders.addValue("Set-Cookie").setString("rememberMe=rememberMeData; Path=/; Max-Age=1296000; Expires=Thu, 02-Sep-2021 11:19:04 GMT; HttpOnly; SameSite=lax");
+
+        String cookiesBefore = getHeaderValues(responseHeaders, "Set-Cookie");
+
+        ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
+
+        String cookiesAfter = getHeaderValues(responseHeaders, "Set-Cookie");
+
+        Assert.assertEquals(cookiesBefore, cookiesAfter);
+    }
+
+
+    private String getHeaderValues(MimeHeaders headers, String headerName) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < headers.size(); i++) {
+            if (headers.getName(i).equals(headerName)) {
+                sb.append(headers.getValue(i));
+                sb.append('\n');
+            }
+        }
+        return sb.toString();
+    }
 }
