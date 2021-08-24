@@ -143,6 +143,10 @@
         the expected effect. <code>NONE</code> was incorrectly treated as a file
         path. Patch provided by Mikael Sterner. (markt)
       </fix>
+      <fix>
+        <bug>65505</bug>: When an HTTP header value is removed, ensure that the
+        order of the remaining header values is unchanged. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
