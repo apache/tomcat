@@ -158,6 +158,10 @@
         Refactor the JSSE/OpenSSL integration to avoid the use of
         <code>finalize()</code>. (markt)
       </scode>
+      <fix>
+        <bug>65505</bug>: When an HTTP header value is removed, ensure that the
+        order of the remaining header values is unchanged. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
