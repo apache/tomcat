@@ -231,6 +231,12 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
+    @Override
+    public boolean isAvailable() {
+        return (database == null) ? false : database.isAvailable();
+    }
+
+
     public static final class UserDatabasePrincipal extends GenericPrincipal {
         private static final long serialVersionUID = 1L;
         private final transient User user;
