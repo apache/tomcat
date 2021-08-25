@@ -168,6 +168,11 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
             throw new IllegalArgumentException(sm.getString("globalResources.createError.userDatabase", name), e);
         }
 
+        if (database.isSparse()) {
+            // Avoid loading all the database as mbeans
+            return;
+        }
+
         // Create the MBeans for each defined Role
         Iterator<Role> roles = database.getRoles();
         while (roles.hasNext()) {

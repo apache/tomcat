@@ -198,4 +198,26 @@ public interface UserDatabase {
     public default void backgroundProcess() {
         // NO-OP by default
     }
+
+
+    /**
+     * Is the database available.
+     *
+     * @return true
+     */
+    public default boolean isAvailable() {
+        return true;
+    }
+
+
+    /**
+     * Is the database data loaded on demand. This is used to avoid eager
+     * loading of the full database data, for example for JMX registration of
+     * all objects.
+     *
+     * @return false
+     */
+    public default boolean isSparse() {
+        return false;
+    }
 }
