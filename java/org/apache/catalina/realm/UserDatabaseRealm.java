@@ -202,7 +202,7 @@ public class UserDatabaseRealm extends RealmBase {
             return null;
         } else {
             if (useStaticPrincipal) {
-                return new GenericPrincipal(username, Arrays.asList(getRoles(user))); 
+                return new GenericPrincipal(username, Arrays.asList(getRoles(user)));
             } else {
                 return new UserDatabasePrincipal(user, database);
             }
