@@ -138,6 +138,16 @@
         intermediate concrete implementation classes and allowing to do
         partial database updates on <code>save</code>. (remm)
       </update>
+      <add>
+        Add a <code>UserDatabase</code> implementation as a superset of the
+        <code>DataSourceRealm</code> functionality. (remm)
+      </add>
+      <fix>
+        Make sure the dynamic Principal returned by
+        <code>UserDatabaseRealm</code> stays up to date with the database
+        contents, and add an option to have it be static, similar to the other
+        realms. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
