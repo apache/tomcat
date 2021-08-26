@@ -59,10 +59,19 @@ public interface AsyncContext {
     public static final String ASYNC_QUERY_STRING =
             "javax.servlet.async.query_string";
 
+    /**
+     * @return a reference to the ServletRequest object
+     */
     ServletRequest getRequest();
 
+    /**
+     * @return a reference to the ServletResponse object
+     */
     ServletResponse getResponse();
 
+    /**
+     * @return true if the Request and Response are the original ones
+     */
     boolean hasOriginalRequestAndResponse();
 
     /**

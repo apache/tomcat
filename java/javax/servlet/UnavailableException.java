@@ -42,9 +42,20 @@ public class UnavailableException extends ServletException {
 
     private static final long serialVersionUID = 1L;
 
-    private final Servlet servlet; // what's unavailable
-    private final boolean permanent; // needs admin action?
-    private final int seconds; // unavailability estimate
+    /**
+     * The Servlet that is unavailable.
+     */
+    private final Servlet servlet;
+
+    /**
+     * Is the issue permanent - i.e. is administrator action required?
+     */
+    private final boolean permanent;
+
+    /**
+     * The estimate of how long the Servlet will be unavailable.
+     */
+    private final int seconds;
 
     /**
      * @param servlet

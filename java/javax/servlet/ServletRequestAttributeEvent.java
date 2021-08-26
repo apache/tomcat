@@ -26,7 +26,14 @@ package javax.servlet;
 public class ServletRequestAttributeEvent extends ServletRequestEvent {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Attribute name.
+     */
     private final String name;
+
+    /**
+     * Attribute value.
+     */
     private final Object value;
 
     /**

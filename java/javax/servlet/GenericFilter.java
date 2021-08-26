@@ -30,6 +30,9 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The filter configuration.
+     */
     private volatile FilterConfig filterConfig;
 
 

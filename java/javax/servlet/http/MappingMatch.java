@@ -23,9 +23,31 @@ package javax.servlet.http;
  */
 public enum MappingMatch {
 
+    /**
+     * The request was mapped to the servlet via the context root URL pattern of
+     * {@code ""}.
+     */
     CONTEXT_ROOT,
+
+    /**
+     * The request was mapped to the servlet via the default servlet URL pattern
+     * of {@code "/"} .
+     */
     DEFAULT,
+
+    /**
+     * The request was mapped to the servlet using an exact URL pattern match.
+     */
     EXACT,
+
+    /**
+     * The request was mapped to the servlet using an extension URL pattern
+     * match.
+     */
     EXTENSION,
+
+    /**
+     * The request was mapped to the servlet using a path URL pattern.
+     */
     PATH
 }

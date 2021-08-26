@@ -51,9 +51,16 @@ import javax.servlet.descriptor.JspConfigDescriptor;
  */
 public interface ServletContext {
 
+    /**
+     * The name of the ServletContext attribute that holds the temporary file
+     * location for the web application.
+     */
     public static final String TEMPDIR = "javax.servlet.context.tempdir";
 
     /**
+     * The name of the ServletContext attribute that holds the ordered list of
+     * web fragments for this web application.
+     *
      * @since Servlet 3.0
      */
     public static final String ORDERED_LIBS = "javax.servlet.context.orderedLibs";
