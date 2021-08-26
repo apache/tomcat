@@ -122,20 +122,48 @@ public class Cookie implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Cookie name.
+     */
     private final String name;
+
+    /**
+     * Cookie value.
+     */
     private String value;
 
-    private int version = 0; // ;Version=1 ... means RFC 2109 style
+    /**
+     * Cookie version value. {@code ;Version=1 ...} means RFC 2109 style.
+     */
+    private int version = 0;
 
     //
     // Attributes encoded in the header's cookie fields.
     //
-    private String comment; // ;Comment=VALUE ... describes cookie's use
-    private String domain; // ;Domain=VALUE ... domain that sees cookie
-    private int maxAge = -1; // ;Max-Age=VALUE ... cookies auto-expire
-    private String path; // ;Path=VALUE ... URLs that see the cookie
-    private boolean secure; // ;Secure ... e.g. use SSL
-    private boolean httpOnly; // Not in cookie specs, but supported by browsers
+    /**
+     * {@code ;Comment=VALUE ...} describes cookie's use.
+     */
+    private String comment;
+    /**
+     * {@code ;Domain=VALUE ...} domain that sees cookie
+     */
+    private String domain;
+    /**
+     * {@code ;Max-Age=VALUE ...} cookies auto-expire
+     */
+    private int maxAge = -1;
+    /**
+     * {@code ;Path=VALUE ...} URLs that see the cookie
+     */
+    private String path;
+    /**
+     * {@code ;Secure ...} e.g. use SSL
+     */
+    private boolean secure;
+    /**
+     * Not in cookie specs, but supported by browsers.
+     */
+    private boolean httpOnly;
 
     /**
      * Constructs a cookie with a specified name and value.

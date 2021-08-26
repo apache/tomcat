@@ -18,24 +18,52 @@ package javax.servlet;
 
 /**
  * TODO SERVLET3 - Add comments
- * @since Servlet 3.0
  */
 public interface AsyncContext {
+
+    /**
+     * The attribute name for the URI of the async request
+     */
     public static final String ASYNC_REQUEST_URI =
             "javax.servlet.async.request_uri";
+
+    /**
+     * The attribute name for the Context Path of the async request
+     */
     public static final String ASYNC_CONTEXT_PATH  =
             "javax.servlet.async.context_path";
+
+    /**
+     * The attribute name for the Path Info of the async request
+     */
     public static final String ASYNC_PATH_INFO =
             "javax.servlet.async.path_info";
+
+    /**
+     * The attribute name for the Servlet Path of the async request
+     */
     public static final String ASYNC_SERVLET_PATH =
             "javax.servlet.async.servlet_path";
+
+    /**
+     * The attribute name for the Query String of the async request
+     */
     public static final String ASYNC_QUERY_STRING =
             "javax.servlet.async.query_string";
 
+    /**
+     * @return a reference to the ServletRequest object
+     */
     ServletRequest getRequest();
 
+    /**
+     * @return a reference to the ServletResponse object
+     */
     ServletResponse getResponse();
 
+    /**
+     * @return true if the Request and Response are the original ones
+     */
     boolean hasOriginalRequestAndResponse();
 
     /**
@@ -77,15 +105,43 @@ public interface AsyncContext {
      */
     void dispatch(ServletContext context, String path);
 
+    /**
+     * Completes the async request processing and closes the response stream
+     */
     void complete();
 
+    /**
+     * Starts a new thread to process the asynchronous request
+     *
+     * @param run a Runnable that the new thread will run
+     */
     void start(Runnable run);
 
+    /**
+     * Adds an event listener that will be called for different AsyncEvents fire
+     *
+     * @param listener an AsyncListener that will be called with AsyncEvent objects
+     */
     void addListener(AsyncListener listener);
 
+    /**
+     * Adds an event listener that will be called when different AsyncEvents fire
+     *
+     * @param listener an AsyncListener that will be called with AsyncEvent objects
+     * @param request the ServletRequest that will be passed with the AsyncEvent
+     * @param response the ServletResponse that will be passed with the AsyncEvent
+     */
     void addListener(AsyncListener listener, ServletRequest request,
             ServletResponse response);
 
+    /**
+     * Creates and returns an AsyncListener object
+     *
+     * @param <T> The type to create that extends AsyncListener
+     * @param clazz The class to instantiate to create the listener
+     * @return the newly created AsyncListener object
+     * @throws ServletException if the listener cannot be created
+     */
     <T extends AsyncListener> T createListener(Class<T> clazz)
     throws ServletException;
 

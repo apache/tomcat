@@ -17,10 +17,23 @@
 package javax.servlet;
 
 /**
+ * Defines the permitted options for configuring the session tracking mode.
+ *
  * @since Servlet 3.0
  */
 public enum SessionTrackingMode {
+    /**
+     * Use HTTP cookies.
+     */
     COOKIE,
+
+    /**
+     * Use url rewriting (also known as path parameter)
+     */
     URL,
+
+    /**
+     * Use SSL session.
+     */
     SSL
 }

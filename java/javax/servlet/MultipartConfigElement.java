@@ -19,8 +19,11 @@ package javax.servlet;
 import javax.servlet.annotation.MultipartConfig;
 
 /**
+ * The programmatic equivalent of
+ * {@link javax.servlet.annotation.MultipartConfig} used to configure
+ * multi-part handling for a Servlet when registering a Servlet via code.
+ *
  * @since Servlet 3.0
- * TODO SERVLET3 - Add comments
  */
 public class MultipartConfigElement {
 
@@ -29,6 +32,12 @@ public class MultipartConfigElement {
     private final long maxRequestSize;// = -1;
     private final int fileSizeThreshold;// = 0;
 
+    /**
+     * Create a programmatic multi-part configuration with a specific location
+     * and defaults for the remaining configuration elements.
+     *
+     * @param location          The temporary location to store files
+     */
     public MultipartConfigElement(String location) {
         // Keep empty string default if location is null
         if (location != null) {
@@ -41,6 +50,17 @@ public class MultipartConfigElement {
         this.fileSizeThreshold = 0;
     }
 
+    /**
+     * Create a programmatic multi-part configuration from the individual
+     * configuration elements.
+     *
+     * @param location          The temporary location to store files
+     * @param maxFileSize       The maximum permitted size for a single file
+     * @param maxRequestSize    The maximum permitted size for a request
+     * @param fileSizeThreshold The size above which the file is save in the
+     *                              temporary location rather than retained in
+     *                              memory.
+     */
     public MultipartConfigElement(String location, long maxFileSize,
             long maxRequestSize, int fileSizeThreshold) {
         // Keep empty string default if location is null
@@ -60,6 +80,12 @@ public class MultipartConfigElement {
         }
     }
 
+    /**
+     * Create a programmatic configuration from an annotation.
+     *
+     * @param annotation The source annotation to copy to create the
+     *                   programmatic equivalent.
+     */
     public MultipartConfigElement(MultipartConfig annotation) {
         location = annotation.location();
         maxFileSize = annotation.maxFileSize();
@@ -67,18 +93,40 @@ public class MultipartConfigElement {
         fileSizeThreshold = annotation.fileSizeThreshold();
     }
 
+    /**
+     * Obtain the location where temporary files should be stored.
+     *
+     * @return the location where temporary files should be stored.
+     */
     public String getLocation() {
         return location;
     }
 
+    /**
+     * Obtain the maximum permitted size for a single file.
+     *
+     * @return the maximum permitted size for a single file.
+     */
     public long getMaxFileSize() {
         return maxFileSize;
     }
 
+    /**
+     * Obtain the maximum permitted size for a single request.
+     *
+     * @return the maximum permitted size for a single request.
+     */
     public long getMaxRequestSize() {
         return maxRequestSize;
     }
 
+    /**
+     * Obtain the size above which the file is save in the temporary location
+     * rather than retained in memory.
+     *
+     * @return the size above which the file is save in the temporary location
+     * rather than retained in memory.
+     */
     public int getFileSizeThreshold() {
         return fileSizeThreshold;
     }

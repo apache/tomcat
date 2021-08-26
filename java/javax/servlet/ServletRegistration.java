@@ -58,6 +58,13 @@ public interface ServletRegistration extends Registration {
      */
     public Collection<String> getMappings();
 
+    /**
+     * Obtain the name of the user / group under which the Servlet has been
+     * configured to run.
+     *
+     * @return the name of the user / group or {@code null} if none has been
+     *         specified
+     */
     public String getRunAsRole();
 
     /**
@@ -65,9 +72,42 @@ public interface ServletRegistration extends Registration {
      * methods on ServletContext may be further configured.
      */
     public static interface Dynamic extends ServletRegistration, Registration.Dynamic {
+
+        /**
+         * Set the loadOnStartup order for the Servlet
+         *
+         * @param loadOnStartup The position in the order the Servlet should be
+         *                      started (higher numbers are started after lower
+         *                      numbers)
+         */
         public void setLoadOnStartup(int loadOnStartup);
+
+        /**
+         * Add security constraints to this Servlet.
+         *
+         * @param constraint new security constraints for this Servlet
+         *
+         * @return urls currently mapped to this registration that are already
+         *         present in web.xml
+         */
         public Set<String> setServletSecurity(ServletSecurityElement constraint);
+
+        /**
+         * Set the multi-part configuration for the associated Servlet. To clear
+         * the multi-part configuration specify <code>null</code> as the new
+         * value.
+         *
+         * @param multipartConfig The configuration to associate with the
+         *                        Servlet
+         */
         public void setMultipartConfig(MultipartConfigElement multipartConfig);
+
+        /**
+         * Set the name of the user / group under which the Servlet should be
+         * configured to run.
+         *
+         * @param roleName name of the user / group or {@code null} if none
+         */
         public void setRunAsRole(String roleName);
     }
 }
