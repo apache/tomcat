@@ -207,7 +207,7 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
         }
         try {
             ObjectName oname = MBeanUtils.createObjectName(managedGroup.getDomain(), group);
-            if (!mserver.isRegistered(oname)) {
+            if (database.isSparse() && !mserver.isRegistered(oname)) {
                 MBeanUtils.createMBean(group);
             }
             return oname.toString();
@@ -232,7 +232,7 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
         }
         try {
             ObjectName oname = MBeanUtils.createObjectName(managedRole.getDomain(), role);
-            if (!mserver.isRegistered(oname)) {
+            if (database.isSparse() && !mserver.isRegistered(oname)) {
                 MBeanUtils.createMBean(role);
             }
             return oname.toString();
@@ -258,7 +258,7 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
         }
         try {
             ObjectName oname = MBeanUtils.createObjectName(managedUser.getDomain(), user);
-            if (!mserver.isRegistered(oname)) {
+            if (database.isSparse() && !mserver.isRegistered(oname)) {
                 MBeanUtils.createMBean(user);
             }
             return oname.toString();
@@ -334,33 +334,34 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
     public void save() {
         try {
             UserDatabase database = (UserDatabase) this.resource;
-            ObjectName query = null;
-            Set<ObjectName> results = null;
+            if (database.isSparse()) {
+                ObjectName query = null;
+                Set<ObjectName> results = null;
 
-            // Groups
-            query = new ObjectName(
-                    "Users:type=Group,database=" + database.getId() + ",*");
-            results = mserver.queryNames(query, null);
-            for (ObjectName result : results) {
-                mserver.unregisterMBean(result);
+                // Groups
+                query = new ObjectName(
+                        "Users:type=Group,database=" + database.getId() + ",*");
+                results = mserver.queryNames(query, null);
+                for (ObjectName result : results) {
+                    mserver.unregisterMBean(result);
+                }
+
+                // Roles
+                query = new ObjectName(
+                        "Users:type=Role,database=" + database.getId() + ",*");
+                results = mserver.queryNames(query, null);
+                for (ObjectName result : results) {
+                    mserver.unregisterMBean(result);
+                }
+
+                // Users
+                query = new ObjectName(
+                        "Users:type=User,database=" + database.getId() + ",*");
+                results = mserver.queryNames(query, null);
+                for (ObjectName result : results) {
+                    mserver.unregisterMBean(result);
+                }
             }
-
-            // Roles
-            query = new ObjectName(
-                    "Users:type=Role,database=" + database.getId() + ",*");
-            results = mserver.queryNames(query, null);
-            for (ObjectName result : results) {
-                mserver.unregisterMBean(result);
-            }
-
-            // Users
-            query = new ObjectName(
-                    "Users:type=User,database=" + database.getId() + ",*");
-            results = mserver.queryNames(query, null);
-            for (ObjectName result : results) {
-                mserver.unregisterMBean(result);
-            }
-
             database.save();
         } catch (Exception e) {
             throw new IllegalArgumentException(sm.getString("userMBean.saveError"), e);
