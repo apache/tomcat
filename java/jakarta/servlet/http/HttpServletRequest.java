@@ -171,6 +171,11 @@ public interface HttpServletRequest extends ServletRequest {
      */
     public int getIntHeader(String name);
 
+    /**
+     * Obtain the mapping information for this request.
+     *
+     * @return the mapping information for this request
+     */
     public default HttpServletMapping getHttpServletMapping() {
         return new HttpServletMapping() {
 

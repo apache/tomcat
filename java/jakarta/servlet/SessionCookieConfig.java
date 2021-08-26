@@ -34,6 +34,11 @@ public interface SessionCookieConfig {
      */
     public void setName(String name);
 
+    /**
+     * Obtain the name to use for the session cookies.
+     *
+     * @return the name to use for session cookies.
+     */
     public String getName();
 
     /**
@@ -46,6 +51,11 @@ public interface SessionCookieConfig {
      */
     public void setDomain(String domain);
 
+    /**
+     * Obtain the domain to use for session cookies.
+     *
+     * @return the domain to use for session cookies.
+     */
     public String getDomain();
 
     /**
@@ -58,6 +68,12 @@ public interface SessionCookieConfig {
      */
     public void setPath(String path);
 
+    /**
+     * Obtain the path to use for session cookies. This is normally the context
+     * path.
+     *
+     * @return The path to use for session cookies.
+     */
     public String getPath();
 
     /**
@@ -70,6 +86,11 @@ public interface SessionCookieConfig {
      */
     public void setComment(String comment);
 
+    /**
+     * Obtain the comment to use for session cookies.
+     *
+     * @return the comment to use for session cookies.
+     */
     public String getComment();
 
     /**
@@ -82,6 +103,11 @@ public interface SessionCookieConfig {
      */
     public void setHttpOnly(boolean httpOnly);
 
+    /**
+     * Will session cookies be created with the httpOnly flag set?
+     *
+     * @return {@code true} if the flag should be set, otherwise {@code false}
+     */
     public boolean isHttpOnly();
 
     /**
@@ -94,6 +120,11 @@ public interface SessionCookieConfig {
      */
     public void setSecure(boolean secure);
 
+    /**
+     * Will session cookies be created with the secure flag set?
+     *
+     * @return {@code true} if the flag should be set, otherwise {@code false}
+     */
     public boolean isSecure();
 
     /**
@@ -105,6 +136,10 @@ public interface SessionCookieConfig {
      */
     public void setMaxAge(int MaxAge);
 
+    /**
+     * Obtain the maximum age to set for a session cookie.
+     *
+     * @return the maximum age in seconds
+     */
     public int getMaxAge();
-
 }

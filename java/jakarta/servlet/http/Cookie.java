@@ -110,12 +110,24 @@ public class Cookie implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 2L;
 
+    /**
+     * Cookie name.
+     */
     private final String name;
+
+    /**
+     * Cookie value.
+     */
     private String value;
 
-    private int version = 0; // ;Version=1 ... means RFC 2109 style
+    /**
+     * Cookie version value. {@code ;Version=1 ...} means RFC 2109 style.
+     */
+    private int version = 0;
 
-    // Attributes encoded in the header's cookie fields.
+    /**
+     * Attributes encoded in the header's cookie fields.
+     */
     private volatile Map<String,String> attributes;
 
     private static final String COMMENT = "Comment";
