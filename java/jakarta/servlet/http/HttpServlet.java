@@ -94,7 +94,10 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
     private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
-    private final Object cachedAllowHeaderValueLock = new Object();
+    private final transient Object cachedAllowHeaderValueLock = new Object();
+    /**
+     * Cached value of the HTTP {@code Allow} header for this servlet.
+     */
     private volatile String cachedAllowHeaderValue = null;
 
 
