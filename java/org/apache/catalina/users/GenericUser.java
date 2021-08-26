@@ -244,4 +244,14 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
         super.setUsername(username);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof GenericUser) {
+            GenericUser<?> user = (GenericUser<?>) obj;
+            return user.database == database && username.equals(user.getUsername());
+        }
+        return super.equals(obj);
+    }
+
+
 }
