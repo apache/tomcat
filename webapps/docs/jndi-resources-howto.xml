@@ -428,14 +428,14 @@ public class MyBean2 {
   </subsection>
 
 
-  <subsection name="UserDatabase Resources">
+  <subsection name="Memory UserDatabase Resources">
 
     <h5>0.  Introduction</h5>
 
     <p>UserDatabase resources are typically configured as global resources for
     use by a UserDatabase realm. Tomcat includes a UserDatabaseFactory that
     creates UserDatabase resources backed by an XML file - usually
-    <code>tomcat-users.xml</code></p>
+    <code>tomcat-users.xml</code>.</p>
 
     <p>The steps required to set up a global UserDatabase resource are described
     below.</p>
@@ -495,6 +495,206 @@ public class MyBean2 {
 
   </subsection>
 
+
+  <subsection name="DataSource UserDatabase Resources">
+
+    <h5>0.  Introduction</h5>
+
+    <p>Tomcat also include a <code>UserDatabase</code> that uses a
+    <code>DataSource</code> resource as the backend. The backend resource
+    must be declared in the same JNDI context as the user database that will use
+    it.</p>
+
+    <p>The steps required to set up a global UserDatabase resource are described
+    below.</p>
+
+    <h5>1. Database schema</h5>
+
+    <p>The database shema for the user database is flexible. It can be the same
+    as the schema used for the <code>DataSourceRealm</code>, with only a table
+    for users (user name, password), and another one listing the roles
+    associated with each user. To support the full <code>UserDatabase</code>
+    features, it must include additional tables for groups, and is
+    compatible with referential integrity between users, groups and roles.</p>
+
+    <p>The full featured schema with groups and referential integrity
+    could be:</p>
+
+<source><![CDATA[create table users (
+  user_name         varchar(32) not null primary key,
+  user_pass         varchar(64) not null,
+  user_fullname     varchar(128)
+  -- Add more attributes as needed
+);
+
+create table roles (
+  role_name         varchar(32) not null primary key,
+  role_description  varchar(128)
+);
+
+create table groups (
+  group_name        varchar(32) not null primary key,
+  group_description varchar(128)
+);
+
+create table user_roles (
+  user_name         varchar(32) references users(user_name),
+  role_name         varchar(32) references roles(role_name),
+  primary key (user_name, role_name)
+);
+
+create table user_groups (
+  user_name         varchar(32) references users(user_name),
+  group_name        varchar(32) references groups(group_name),
+  primary key (user_name, group_name)
+);
+
+create table group_roles (
+  group_name        varchar(32) references groups(group_name),
+  role_name         varchar(32) references roles(role_name),
+  primary key (group_name, role_name)
+);
+]]></source>
+
+    <p>The minimal schema without the ability to use groups will be
+    (it is the same as for the <code>DataSourceRealm</code>):</p>
+
+<source><![CDATA[create table users (
+  user_name         varchar(32) not null primary key,
+  user_pass         varchar(64) not null,
+  -- Add more attributes as needed
+);
+
+create table user_roles (
+  user_name         varchar(32),
+  role_name         varchar(32),
+  primary key (user_name, role_name)
+);
+]]></source>
+
+    <h5>2.  Declare Your Resource</h5>
+
+    <p>Next, modify <code>$CATALINA_BASE/conf/server.xml</code> to create the
+    UserDatabase resource based on your <code>DataSource</code> and its schema.
+    It should look something like this:</p>
+
+<source><![CDATA[<Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+              description="User database that can be updated and saved"
+              factory="org.apache.catalina.users.DataSourceUserDatabaseFactory"
+              dataSourceName="jdbc/authority" readonly="false"
+              userTable="users" userNameCol="user_name" userCredCol="user_pass"
+              userRoleTable="user_roles" roleNameCol="role_name"
+              roleTable="roles" groupTable="groups" userGroupTable="user_groups"
+              groupRoleTable="group_roles" groupNameCol="group_name" />]]></source>
+
+    <p>The <code>dataSourceName</code> attribute is the JNDI name of the
+    <code>DataSource</code> that will be the backend for the
+    <code>UserDatabase</code>. It must be declared in the same JNDI
+    <code>Context</code> as the <code>UserDatabase</code>. Please refer to the
+    <a href="#JDBC_Data_Sources"><code>DataSource</code> resources</a>
+    documentation for further instructions.</p>
+
+    <p>The <code>readonly</code> attribute is optional and defaults to
+    <code>true</code> if not supplied. If the database is writeable then changes
+    made through the Tomcat management to the <code>UserDatabase</code> can
+    be persisted to the database using the <code>save</code> operation.</p>
+
+    <p>Alternately, changes can also be made directly to the backend database.
+    </p>
+
+    <h5>3.  Resource configuration</h5>
+
+    <attributes>
+
+      <attribute name="dataSourceName" required="true">
+        <p>The name of the JNDI JDBC DataSource for this UserDatabase.</p>
+      </attribute>
+
+      <attribute name="groupNameCol" required="false">
+        <p>Name of the column, in the "groups", "group roles" and "user groups"
+        tables, that contains the group's name.</p>
+      </attribute>
+
+      <attribute name="groupRoleTable" required="false">
+        <p>Name of the "group roles" table, which must contain columns
+        named by the <code>groupNameCol</code> and <code>roleNameCol</code>
+        attributes.</p>
+      </attribute>
+
+      <attribute name="groupTable" required="false">
+        <p>Name of the "groups" table, which must contain columns named
+        by the <code>groupNameCol</code> attribute.</p>
+      </attribute>
+
+      <attribute name="readonly" required="false">
+        <p>If this is set to <code>true</code>, then changes to the
+        <code>UserDatabase</code> can be persisted to the
+        <code>DataSource</code> by using the <code>save</code> method.
+        The default value is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="roleAndGroupDescriptionCol" required="false">
+        <p>Name of the column, in the "roles" and "groups" tables, that contains
+        the description for the roles and groups.</p>
+      </attribute>
+
+      <attribute name="roleNameCol" required="true">
+        <p>Name of the column, in the "roles", "user roles" and "group roles"
+        tables, which contains a role name assigned to the corresponding
+        user.</p>
+      </attribute>
+
+      <attribute name="roleTable" required="false">
+        <p>Name of the "roles" table, which must contain columns named
+        by the <code>roleNameCol</code> attribute.</p>
+      </attribute>
+
+      <attribute name="userCredCol" required="true">
+        <p>Name of the column, in the "users" table, which contains
+        the user's credentials (i.e. password).  If a
+        <code>CredentialHandler</code> is specified, this component
+        will assume that the passwords have been encoded with the
+        specified algorithm.  Otherwise, they will be assumed to be
+        in clear text.</p>
+      </attribute>
+
+      <attribute name="userGroupTable" required="false">
+        <p>Name of the "user groups" table, which must contain columns
+        named by the <code>userNameCol</code> and <code>groupNameCol</code>
+        attributes.</p>
+      </attribute>
+
+      <attribute name="userNameCol" required="true">
+        <p>Name of the column, in the "users", "user groups" and "user roles"
+        tables, that contains the user's username.</p>
+      </attribute>
+
+      <attribute name="userFullNameCol" required="false">
+        <p>Name of the column, in the "users" table, that contains the user's
+        full name.</p>
+      </attribute>
+
+      <attribute name="userRoleTable" required="true">
+        <p>Name of the "user roles" table, which must contain columns
+        named by the <code>userNameCol</code> and <code>roleNameCol</code>
+        attributes.</p>
+      </attribute>
+
+      <attribute name="userTable" required="true">
+        <p>Name of the "users" table, which must contain columns named
+        by the <code>userNameCol</code> and <code>userCredCol</code>
+        attributes.</p>
+      </attribute>
+
+    </attributes>
+
+    <h5>4.  Configure the Realm</h5>
+
+    <p>Configure a UserDatabase Realm to use this resource as described in the
+    <a href="config/realm.html">Realm configuration documentation</a>.</p>
+
+  </subsection>
 
   <subsection name="JavaMail Sessions">
 
