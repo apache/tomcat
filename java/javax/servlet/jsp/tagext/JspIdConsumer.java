@@ -16,6 +16,16 @@
  */
 package javax.servlet.jsp.tagext;
 
+/**
+ * Interface that allows tag handlers to be provided with a unique (within the
+ * scope of the web application) ID.
+ */
 public interface JspIdConsumer {
+
+    /**
+     * Set the unique ID for the tag handler.
+     *
+     * @param jspId The unique Id
+     */
     public void setJspId(String jspId);
 }
