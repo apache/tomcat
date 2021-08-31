@@ -128,7 +128,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     /**
      * The generated string for the groups PreparedStatement
      */
-    private String preparedGroupsR = null;
+    private String preparedGroupRoles = null;
 
 
     /**
@@ -640,7 +640,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                         ArrayList<Role> groupRoles = new ArrayList<>();
                         if (groupName != null) {
                             groupName = groupName.trim();
-                            try (PreparedStatement stmt2 = dbConnection.prepareStatement(preparedGroupsR)) {
+                            try (PreparedStatement stmt2 = dbConnection.prepareStatement(preparedGroupRoles)) {
                                 stmt2.setString(1, groupName);
                                 try (ResultSet rs2 = stmt2.executeQuery()) {
                                     while (rs2.next()) {
@@ -869,7 +869,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             temp.append(" = ?");
             preparedRoles = temp.toString();
 
-            if (userGroupTable != null && userGroupTable.length() > 0) {
+            if (userGroupTable != null) {
                 temp = new StringBuilder("SELECT ");
                 temp.append(groupNameCol);
                 temp.append(" FROM ");
@@ -880,15 +880,15 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 preparedGroups = temp.toString();
             }
 
-            if (groupRoleTable != null && groupRoleTable.length() > 0) {
+            if (groupRoleTable != null) {
                 temp = new StringBuilder("SELECT ");
-                temp.append(groupNameCol);
+                temp.append(roleNameCol);
                 temp.append(" FROM ");
                 temp.append(groupRoleTable);
                 temp.append(" WHERE ");
                 temp.append(groupNameCol);
                 temp.append(" = ?");
-                preparedGroupsR = temp.toString();
+                preparedGroupRoles = temp.toString();
             }
 
             temp = new StringBuilder("SELECT ");
@@ -909,7 +909,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             temp.append(userTable);
             preparedAllUsers = temp.toString();
 
-            if (groupTable != null && groupTable.length() > 0) {
+            if (groupTable != null) {
                 temp = new StringBuilder("SELECT ");
                 temp.append(groupNameCol);
                 if (roleAndGroupDescriptionCol != null) {
@@ -929,7 +929,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 preparedAllGroups = temp.toString();
             }
 
-            if (roleTable != null && roleTable.length() > 0) {
+            if (roleTable != null) {
                 // Create the role PreparedStatement string
                 temp = new StringBuilder("SELECT ");
                 temp.append(roleNameCol);
@@ -948,6 +948,16 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 temp.append(" FROM ");
                 temp.append(roleTable);
                 preparedAllRoles = temp.toString();
+            } else {
+                // Validate roles existence from the user <-> roles table
+                temp = new StringBuilder("SELECT ");
+                temp.append(roleNameCol);
+                temp.append(" FROM ");
+                temp.append(userRoleTable);
+                temp.append(" WHERE ");
+                temp.append(roleNameCol);
+                temp.append(" = ?");
+                preparedRole = temp.toString();
             }
 
         } finally {
