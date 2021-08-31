@@ -333,3 +333,27 @@ jsign.checksum.value=50982facf864df4f08a051b43f7d2e42|3d203fbffdc45e837f98b7c9c5
 jsign.home=${base.path}/jsign-${jsign.version}
 jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
 jsign.loc=${base-maven.loc}/net/jsign/jsign/${jsign.version}/jsign-${jsign.version}.jar
+
+# ----- Derby, used by unit tests -----
+derby.version=10.15.2.0
+
+# checksums for Derby 10.15.2.0
+derby.checksum.enabled=true
+derby.checksum.algorithm=MD5|SHA-1
+derby.checksum.value=abff01351b19bc62a188bac08a8bb58b|b64da6681994f33ba5783ffae55cdb44885b9e70
+derby-shared.checksum.enabled=true
+derby-shared.checksum.algorithm=MD5|SHA-1
+derby-shared.checksum.value=2cb9ab8b9cfb06c2da5a1d3825d04344|ff2dfb3e2a92d593cf111baad242d156947abbc1
+derby-tools.checksum.enabled=true
+derby-tools.checksum.algorithm=MD5|SHA-1
+derby-tools.checksum.value=d41578eeb336b0e479be8f30bfd9ab9b|d63722381e0e893d797e4d531e219e2917898364
+
+derby.home=${base.path}/derby-${derby.version}
+derby.jar=${derby.home}/derby-${derby.version}.jar
+derby.loc=${base-maven.loc}/org/apache/derby/derby/${derby.version}/derby-${derby.version}.jar
+derby-shared.jar=${derby.home}/derby-shared-${derby.version}.jar
+derby-shared.loc=${base-maven.loc}/org/apache/derby/derbyshared/${derby.version}/derbyshared-${derby.version}.jar
+derby-tools.jar=${derby.home}/derby-tools-${derby.version}.jar
+derby-tools.loc=${base-maven.loc}/org/apache/derby/derbytools/${derby.version}/derbytools-${derby.version}.jar
+
+

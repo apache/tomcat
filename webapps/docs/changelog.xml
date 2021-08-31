@@ -199,6 +199,10 @@
         Update to JSign version 4.0 to enable code signing without the need for
         the installation of additional client tools. (markt)
       </update>
+      <update>
+        Add Apache Derby 10.15.2.0 to the testsuite dependencies, for JDBC
+        and DataSource testing. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
