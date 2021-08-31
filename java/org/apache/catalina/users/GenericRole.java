@@ -98,4 +98,12 @@ public class GenericRole<UD extends UserDatabase> extends AbstractRole {
     }
 
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((database == null) ? 0 : database.hashCode());
+        result = prime * result + ((rolename == null) ? 0 : rolename.hashCode());
+        return result;
+    }
 }
