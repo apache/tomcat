@@ -559,7 +559,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     public Group createGroup(String groupname, String description) {
         readLock.lock();
         try {
-            Group group = new GenericGroup<DataSourceUserDatabase>(this, groupname, description, null);
+            Group group = new GenericGroup<>(this, groupname, description, null);
             createdGroups.put(groupname, group);
             modifiedGroups.remove(groupname);
             removedGroups.remove(groupname);
@@ -573,7 +573,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     public Role createRole(String rolename, String description) {
         readLock.lock();
         try {
-            Role role = new GenericRole<DataSourceUserDatabase>(this, rolename, description);
+            Role role = new GenericRole<>(this, rolename, description);
             createdRoles.put(rolename, role);
             modifiedRoles.remove(rolename);
             removedRoles.remove(rolename);
@@ -587,7 +587,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     public User createUser(String username, String password, String fullName) {
         readLock.lock();
         try {
-            User user = new GenericUser<DataSourceUserDatabase>(this, username, password, fullName, null, null);
+            User user = new GenericUser<>(this, username, password, fullName, null, null);
             createdUsers.put(username, user);
             modifiedUsers.remove(username);
             removedUsers.remove(username);
@@ -657,7 +657,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                                 log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                             }
                         }
-                        group = new GenericGroup<DataSourceUserDatabase>(this, groupName, description, groupRoles);
+                        group = new GenericGroup<>(this, groupName, description, groupRoles);
                     }
                 }
             }
@@ -707,7 +707,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 if (rs.next()) {
                     if (rs.getString(1) != null) {
                         String description = (roleAndGroupDescriptionCol != null) ? rs.getString(2) : null;
-                        role = new GenericRole<DataSourceUserDatabase>(this, roleName, description);
+                        role = new GenericRole<>(this, roleName, description);
                     }
                 }
             }
@@ -811,8 +811,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             }
         }
 
-        User user = new GenericUser<DataSourceUserDatabase>(this, userName, dbCredentials,
-                fullName, groups, roles);
+        User user = new GenericUser<>(this, userName, dbCredentials, fullName, groups, roles);
         return user;
     }
 
