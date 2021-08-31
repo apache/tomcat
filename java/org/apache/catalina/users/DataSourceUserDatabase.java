@@ -1092,11 +1092,13 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 tempRelationDelete2.append(roleNameCol);
                 tempRelationDelete2.append(" = ?");
                 for (Role role : removedRoles.values()) {
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete.toString())) {
-                        stmt.setString(1, role.getRolename());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    if (tempRelationDelete != null) {
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete.toString())) {
+                            stmt.setString(1, role.getRolename());
+                            stmt.executeUpdate();
+                        } catch (SQLException e) {
+                            log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                        }
                     }
                     try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete2.toString())) {
                         stmt.setString(1, role.getRolename());
@@ -1180,7 +1182,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     temp.append(" = ?");
                 }
                 for (Group group : modifiedGroups.values()) {
-                    if (roleAndGroupDescriptionCol != null) {
+                    if (temp != null) {
                         try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
                             stmt.setString(1, group.getDescription());
                             stmt.setString(2, group.getGroupname());
