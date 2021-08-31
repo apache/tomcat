@@ -39,6 +39,7 @@ import jakarta.servlet.jsp.JspContext;
 import jakarta.servlet.jsp.PageContext;
 
 /**
+ * Provides resolution in EL for the implicit variables of a JSP page.
  *
  * @since 2.1
  */
@@ -71,6 +72,9 @@ public class ImplicitObjectELResolver extends ELResolver {
 
     private static final int SESSION_SCOPE = 10;
 
+    /**
+     * Creates an instance of the implicit object resolver for EL.
+     */
     public ImplicitObjectELResolver() {
         super();
     }

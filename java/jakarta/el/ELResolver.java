@@ -118,8 +118,27 @@ public abstract class ELResolver {
     public abstract boolean isReadOnly(ELContext context, Object base,
             Object property);
 
+    /**
+     * Obtain the feature descriptors for the resolvable properties of the given
+     * object.
+     *
+     * @param context The context in which the examination takes place
+     * @param base The object to examine
+     *
+     * @return An iterator, possibly empty, of feature descriptors of the given
+     *         object
+     */
     public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
 
+    /**
+     * Obtain the most common type that is acceptable for the given base object.
+     *
+     * @param context The context in which the examination takes place
+     * @param base The object to examine
+     *
+     * @return {code null} if the most common type cannot be determine,
+     *         otherwise the most common type
+     */
     public abstract Class<?> getCommonPropertyType(ELContext context,
             Object base);
 

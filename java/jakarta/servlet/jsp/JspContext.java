@@ -227,7 +227,12 @@ public abstract class JspContext {
     @Deprecated
     public abstract jakarta.servlet.jsp.el.ExpressionEvaluator getExpressionEvaluator();
 
-
+    /**
+     * Obtain the ELContext for this JSPContext. Each JSPContext has a dedicated
+     * ELCOntext.
+     *
+     * @return the ELContext for this JSPContext
+     */
     public abstract ELContext getELContext();
 
     /**
