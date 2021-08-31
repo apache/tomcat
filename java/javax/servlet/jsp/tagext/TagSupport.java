@@ -272,16 +272,20 @@ public class TagSupport implements IterationTag, Serializable {
         return values.keys();
     }
 
-    // private fields
+    /**
+     * The parent, if any, of thsi tag.
+     */
+    private Tag parent;
 
-    private   Tag         parent;
-    private   Hashtable<String, Object>   values;
+    /**
+     * Map of object values keyed by Strings for this tag.
+     */
+    private Hashtable<String, Object> values;
+
     /**
      * The value of the id attribute of this tag; or null.
      */
-    protected String      id;
-
-    // protected fields
+    protected String id;
 
     /**
      * The PageContext.
