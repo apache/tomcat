@@ -158,8 +158,8 @@ public final class ClassParser {
         if ((accessFlags & Const.ACC_INTERFACE) != 0) {
             accessFlags |= Const.ACC_ABSTRACT;
         }
-        if (((accessFlags & Const.ACC_ABSTRACT) != 0)
-                && ((accessFlags & Const.ACC_FINAL) != 0)) {
+        if ((accessFlags & Const.ACC_ABSTRACT) != 0
+                && (accessFlags & Const.ACC_FINAL) != 0) {
             throw new ClassFormatException("Class can't be both final and abstract");
         }
 
