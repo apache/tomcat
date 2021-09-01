@@ -14,25 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.util.http.fileupload.util.mime;
 
 /**
- * @since 1.3
+ * Implementations and exceptions utils.
  */
-final class ParseException extends Exception {
-
-    /**
-     * The UID to use when serializing this instance.
-     */
-    private static final long serialVersionUID = 5355281266579392077L;
-
-    /**
-     * Constructs a new exception with the specified detail message.
-     *
-     * @param message the detail message.
-     */
-    ParseException(final String message) {
-        super(message);
-    }
-
-}
+package org.apache.tomcat.util.http.fileupload.impl;

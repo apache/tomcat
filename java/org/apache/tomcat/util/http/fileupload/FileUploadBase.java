@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.tomcat.util.http.fileupload.impl.FileItemIteratorImpl;
-import org.apache.tomcat.util.http.fileupload.impl.FileItemStreamImpl;
 import org.apache.tomcat.util.http.fileupload.impl.FileUploadIOException;
 import org.apache.tomcat.util.http.fileupload.impl.IOFileUploadException;
 import org.apache.tomcat.util.http.fileupload.util.FileItemHeadersImpl;
@@ -70,10 +69,7 @@ public abstract class FileUploadBase {
         if (contentType == null) {
             return false;
         }
-        if (contentType.toLowerCase(Locale.ENGLISH).startsWith(MULTIPART)) {
-            return true;
-        }
-        return false;
+        return contentType.toLowerCase(Locale.ENGLISH).startsWith(MULTIPART);
     }
 
     // ----------------------------------------------------- Manifest constants
@@ -278,12 +274,13 @@ public abstract class FileUploadBase {
         boolean successful = false;
         try {
             final FileItemIterator iter = getItemIterator(ctx);
-            final FileItemFactory fileItemFactory = Objects.requireNonNull(getFileItemFactory(), "No FileItemFactory has been set.");
+            final FileItemFactory fileItemFactory = Objects.requireNonNull(getFileItemFactory(),
+                    "No FileItemFactory has been set.");
             final byte[] buffer = new byte[Streams.DEFAULT_BUFFER_SIZE];
             while (iter.hasNext()) {
                 final FileItemStream item = iter.next();
                 // Don't use getName() here to prevent an InvalidFileNameException.
-                final String fileName = ((FileItemStreamImpl) item).getName();
+                final String fileName = item.getName();
                 final FileItem fileItem = fileItemFactory.createItem(item.getFieldName(), item.getContentType(),
                                                    item.isFormField(), fileName);
                 items.add(fileItem);
@@ -337,12 +334,7 @@ public abstract class FileUploadBase {
 
         for (final FileItem fileItem : items) {
             final String fieldName = fileItem.getFieldName();
-            List<FileItem> mappedItems = itemsMap.get(fieldName);
-
-            if (mappedItems == null) {
-                mappedItems = new ArrayList<>();
-                itemsMap.put(fieldName, mappedItems);
-            }
+            List<FileItem> mappedItems = itemsMap.computeIfAbsent(fieldName, k -> new ArrayList<>());
 
             mappedItems.add(fileItem);
         }

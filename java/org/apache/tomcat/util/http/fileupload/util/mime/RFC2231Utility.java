@@ -22,7 +22,8 @@ import java.io.UnsupportedEncodingException;
  * Utility class to decode/encode character set on HTTP Header fields based on RFC 2231.
  * This implementation adheres to RFC 5987 in particular, which was defined for HTTP headers
  *
- * RFC 5987 builds on RFC 2231, but has lesser scope like <a href="https://tools.ietf.org/html/rfc5987#section-3.2">mandatory charset definition</a>
+ * RFC 5987 builds on RFC 2231, but has lesser scope like
+ * <a href="https://tools.ietf.org/html/rfc5987#section-3.2">mandatory charset definition</a>
  * and <a href="https://tools.ietf.org/html/rfc5987#section-4">no parameter continuation</a>
  *
  * <p>
@@ -30,10 +31,22 @@ import java.io.UnsupportedEncodingException;
  * @see <a href="https://tools.ietf.org/html/rfc5987">RFC 5987</a>
  */
 public final class RFC2231Utility {
-
+    /**
+     * The Hexadecimal values char array.
+     */
     private static final char[] HEX_DIGITS = "0123456789ABCDEF".toCharArray();
-
-    private static final byte[] HEX_DECODE = new byte[0x80];
+    /**
+     * The Hexadecimal representation of 127.
+     */
+    private static final byte MASK = 0x7f;
+    /**
+     * The Hexadecimal representation of 128.
+     */
+    private static final int MASK_128 = 0x80;
+    /**
+     * The Hexadecimal decode value.
+     */
+    private static final byte[] HEX_DECODE = new byte[MASK_128];
 
     // create a ASCII decoded array of Hexadecimal values
     static {
@@ -44,8 +57,15 @@ public final class RFC2231Utility {
     }
 
     /**
+     * Private constructor so that no instances can be created. This class
+     * contains only static utility methods.
+     */
+    private RFC2231Utility() {
+    }
+
+    /**
      * Checks if Asterisk (*) at the end of parameter name to indicate,
-     * if it has charset and language information to decode the value
+     * if it has charset and language information to decode the value.
      * @param paramName The parameter, which is being checked.
      * @return {@code true}, if encoded as per RFC 2231, {@code false} otherwise
      */
@@ -58,7 +78,7 @@ public final class RFC2231Utility {
 
     /**
      * If {@code paramName} has Asterisk (*) at the end, it will be stripped off,
-     * else the passed value will be returned
+     * else the passed value will be returned.
      * @param paramName The parameter, which is being inspected.
      * @return stripped {@code paramName} of Asterisk (*), if RFC2231 encoded
      */
@@ -83,7 +103,8 @@ public final class RFC2231Utility {
      * <b>Eg 3.</b> {@code UTF-8''%c2%a3%20and%20%e2%82%ac%20rates}
      * will be decoded to {@code £ and € rates}.
      *
-     * @param encodedText - Text to be decoded has a format of {@code <charset>'<language>'<encoded_value>} and ASCII only
+     * @param encodedText - Text to be decoded has a format of {@code <charset>'<language>'<encoded_value>}
+     * and ASCII only
      * @return Decoded text based on charset encoding
      * @throws UnsupportedEncodingException The requested character set wasn't found.
      */
@@ -104,11 +125,12 @@ public final class RFC2231Utility {
     }
 
     /**
-     * Convert {@code text} to their corresponding Hex value
+     * Convert {@code text} to their corresponding Hex value.
      * @param text - ASCII text input
      * @return Byte array of characters decoded from ASCII table
      */
     private static byte[] fromHex(final String text) {
+        final int shift = 4;
         final ByteArrayOutputStream out = new ByteArrayOutputStream(text.length());
         for (int i = 0; i < text.length();) {
             final char c = text.charAt(i++);
@@ -116,9 +138,9 @@ public final class RFC2231Utility {
                 if (i > text.length() - 2) {
                     break; // unterminated sequence
                 }
-                final byte b1 = HEX_DECODE[text.charAt(i++) & 0x7f];
-                final byte b2 = HEX_DECODE[text.charAt(i++) & 0x7f];
-                out.write((b1 << 4) | b2);
+                final byte b1 = HEX_DECODE[text.charAt(i++) & MASK];
+                final byte b2 = HEX_DECODE[text.charAt(i++) & MASK];
+                out.write((b1 << shift) | b2);
             } else {
                 out.write((byte) c);
             }

@@ -33,6 +33,11 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * Default implementation of {@link FileItemStream}.
  */
 public class FileItemStreamImpl implements FileItemStream {
+    /**
+     * The File Item iterator implementation.
+     *
+     * @see FileItemIteratorImpl
+     */
     private final FileItemIteratorImpl fileItemIteratorImpl;
 
     /**
@@ -48,7 +53,7 @@ public class FileItemStreamImpl implements FileItemStream {
     /**
      * The file items file name.
      */
-    final String name;
+    private final String name;
 
     /**
      * Whether the file item is a form field.
@@ -87,18 +92,16 @@ public class FileItemStreamImpl implements FileItemStream {
         contentType = pContentType;
         formField = pFormField;
         final long fileSizeMax = fileItemIteratorImpl.getFileSizeMax();
-        if (fileSizeMax != -1) { // Check if limit is already exceeded
-            if (pContentLength != -1
-                    && pContentLength > fileSizeMax) {
-                final FileSizeLimitExceededException e =
-                        new FileSizeLimitExceededException(
-                                String.format("The field %s exceeds its maximum permitted size of %s bytes.",
-                                        fieldName, Long.valueOf(fileSizeMax)),
-                                pContentLength, fileSizeMax);
-                e.setFileName(pName);
-                e.setFieldName(pFieldName);
-                throw new FileUploadIOException(e);
-            }
+        if (fileSizeMax != -1 && pContentLength != -1
+                && pContentLength > fileSizeMax) {
+            final FileSizeLimitExceededException e =
+                    new FileSizeLimitExceededException(
+                            String.format("The field %s exceeds its maximum permitted size of %s bytes.",
+                                    fieldName, Long.valueOf(fileSizeMax)),
+                            pContentLength, fileSizeMax);
+            e.setFileName(pName);
+            e.setFieldName(pFieldName);
+            throw new FileUploadIOException(e);
         }
         // OK to construct stream now
         final ItemInputStream itemStream = fileItemIteratorImpl.getMultiPartStream().newInputStream();
