@@ -323,7 +323,7 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      * @return The amount of buffered data available for reading.
      */
     int available(final Context context) {  // package protected for access from I/O streams
-        return context.buffer != null ? context.pos - context.readPos : 0;
+        return hasData(context) ? context.pos - context.readPos : 0;
     }
 
     /**
@@ -553,7 +553,7 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      * @return true if there is data still available for reading.
      */
     boolean hasData(final Context context) {  // package protected for access from I/O streams
-        return context.buffer != null;
+        return context.pos > context.readPos;
     }
 
     /**
@@ -616,12 +616,16 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      * @return The number of bytes successfully extracted into the provided byte[] array.
      */
     int readResults(final byte[] b, final int bPos, final int bAvail, final Context context) {
-        if (context.buffer != null) {
+        if (hasData(context)) {
             final int len = Math.min(available(context), bAvail);
             System.arraycopy(context.buffer, context.readPos, b, bPos, len);
             context.readPos += len;
-            if (context.readPos >= context.pos) {
-                context.buffer = null; // so hasData() will return false, and this method can return -1
+            if (!hasData(context)) {
+                // All data read.
+                // Reset position markers but do not set buffer to null to allow its reuse.
+                // hasData(context) will still return false, and this method will return 0 until
+                // more data is available, or -1 if EOF.
+                context.pos = context.readPos = 0;
             }
             return len;
         }
