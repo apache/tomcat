@@ -261,7 +261,6 @@
     <pathelement location="${objenesis.jar}"/>
     <pathelement location="${unboundid.jar}"/>
     <pathelement location="${derby.jar}"/>
-    <pathelement location="${derby-shared.jar}"/>
     <pathelement location="${derby-tools.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
@@ -3257,15 +3256,6 @@ skip.installer property in build.properties" />
       <param name="checksum.enabled" value="${derby.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${derby.checksum.algorithm}"/>
       <param name="checksum.value" value="${derby.checksum.value}"/>
-    </antcall>
-
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${derby-shared.loc}"/>
-      <param name="destfile" value="${derby-shared.jar}"/>
-      <param name="destdir" value="${derby.home}"/>
-      <param name="checksum.enabled" value="${derby-shared.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${derby-shared.checksum.algorithm}"/>
-      <param name="checksum.value" value="${derby-shared.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">

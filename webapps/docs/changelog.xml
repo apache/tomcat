@@ -210,7 +210,7 @@
       </add>
 =======
       <update>
-        Add Apache Derby 10.15.2.0 to the testsuite dependencies, for JDBC
+        Add Apache Derby 10.14.2.0 to the testsuite dependencies, for JDBC
         and DataSource testing. (remm)
       </update>
 >>>>>>> 86177f0839 (Add Derby for the testsuite)
