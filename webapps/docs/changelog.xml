@@ -229,6 +229,10 @@
         Update the internal fork of Apache Commons Codec to fd44e6b (2021-09-01,
         1.16-SNAPSHOT). Minor refactoring. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons FileUpload to 33d2d79
+        (2021-09-01, 2.0-SNAPSHOT). Refactoring and code clean-up. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

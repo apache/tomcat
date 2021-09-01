@@ -233,8 +233,8 @@ public class ParameterParser {
         char separator = separators[0];
         if (str != null) {
             int idx = str.length();
-            for (char separator2 : separators) {
-                int tmp = str.indexOf(separator2);
+            for (final char separator2 : separators) {
+                final int tmp = str.indexOf(separator2);
                 if (tmp != -1 && tmp < idx) {
                     idx = tmp;
                     separator = separator2;
@@ -299,12 +299,12 @@ public class ParameterParser {
             return new HashMap<>();
         }
         final HashMap<String, String> params = new HashMap<>();
-        this.chars = charArray;
+        this.chars = charArray.clone();
         this.pos = offset;
         this.len = length;
 
-        String paramName = null;
-        String paramValue = null;
+        String paramName;
+        String paramValue;
         while (hasChar()) {
             paramName = parseToken(new char[] {
                     '=', separator });
@@ -326,7 +326,7 @@ public class ParameterParser {
             if (hasChar() && (charArray[pos] == separator)) {
                 pos++; // skip separator
             }
-            if ((paramName != null) && (paramName.length() > 0)) {
+            if ((paramName != null) && !paramName.isEmpty()) {
                 paramName = RFC2231Utility.stripDelimiter(paramName);
                 if (this.lowerCaseNames) {
                     paramName = paramName.toLowerCase(Locale.ENGLISH);

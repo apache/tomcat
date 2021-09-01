@@ -19,6 +19,7 @@ package org.apache.tomcat.util.http.fileupload.util.mime;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -31,11 +32,6 @@ import org.apache.tomcat.util.codec.binary.Base64;
  * @since 1.3
  */
 public final class MimeUtility {
-
-    /**
-     * The {@code US-ASCII} charset identifier constant.
-     */
-    private static final String US_ASCII_CHARSET = "US-ASCII";
 
     /**
      * The marker to indicate text is encoded with BASE64 algorithm.
@@ -68,8 +64,15 @@ public final class MimeUtility {
     private static final Map<String, String> MIME2JAVA = new HashMap<>();
 
     static {
+        MIME2JAVA.put("iso-2022-cn", "ISO2022CN");
+        MIME2JAVA.put("iso-2022-kr", "ISO2022KR");
+        MIME2JAVA.put("utf-8", "UTF8");
+        MIME2JAVA.put("utf8", "UTF8");
         MIME2JAVA.put("ja_jp.iso2022-7", "ISO2022JP");
         MIME2JAVA.put("ja_jp.eucjp", "EUCJIS");
+        MIME2JAVA.put("euc-kr", "KSC5601");
+        MIME2JAVA.put("euckr", "KSC5601");
+        MIME2JAVA.put("us-ascii", "ISO-8859-1");
         MIME2JAVA.put("x-us-ascii", "ISO-8859-1");
     }
 
@@ -117,14 +120,13 @@ public final class MimeUtility {
                 while (offset < endOffset) {
                     // step over the white space characters.
                     ch = text.charAt(offset);
-                    if (LINEAR_WHITESPACE.indexOf(ch) != -1) { // whitespace found
-                        offset++;
-                    } else {
+                    if (LINEAR_WHITESPACE.indexOf(ch) == -1) {
                         // record the location of the first non lwsp and drop down to process the
                         // token characters.
                         endWhiteSpace = offset;
                         break;
                     }
+                    offset++;
                 }
             } else {
                 // we have a word token.  We need to scan over the word and then try to parse it.
@@ -133,11 +135,10 @@ public final class MimeUtility {
                 while (offset < endOffset) {
                     // step over the non white space characters.
                     ch = text.charAt(offset);
-                    if (LINEAR_WHITESPACE.indexOf(ch) == -1) { // not white space
-                        offset++;
-                    } else {
+                    if (LINEAR_WHITESPACE.indexOf(ch) != -1) {
                         break;
                     }
+                    offset++;
 
                     //NB:  Trailing whitespace on these header strings will just be discarded.
                 }
@@ -151,7 +152,7 @@ public final class MimeUtility {
 
                         // are any whitespace characters significant?  Append 'em if we've got 'em.
                         if (!previousTokenEncoded && startWhiteSpace != -1) {
-                            decodedText.append(text.substring(startWhiteSpace, endWhiteSpace));
+                            decodedText.append(text, startWhiteSpace, endWhiteSpace);
                             startWhiteSpace = -1;
                         }
                         // this is definitely a decoded token.
@@ -169,7 +170,7 @@ public final class MimeUtility {
                 // this is a normal token, so it doesn't matter what the previous token was.  Add the white space
                 // if we have it.
                 if (startWhiteSpace != -1) {
-                    decodedText.append(text.substring(startWhiteSpace, endWhiteSpace));
+                    decodedText.append(text, startWhiteSpace, endWhiteSpace);
                     startWhiteSpace = -1;
                 }
                 // this is not a decoded token.
@@ -190,8 +191,8 @@ public final class MimeUtility {
      * @param word   The possibly encoded word value.
      *
      * @return The decoded word.
-     * @throws ParseException
-     * @throws UnsupportedEncodingException
+     * @throws ParseException in case of a parse error of the RFC 2047
+     * @throws UnsupportedEncodingException Thrown when Invalid RFC 2047 encoding was found
      */
     private static String decodeWord(final String word) throws ParseException, UnsupportedEncodingException {
         // encoded words start with the characters "=?".  If this not an encoded word, we throw a
@@ -226,7 +227,7 @@ public final class MimeUtility {
         final String encodedText = word.substring(encodingPos + 1, encodedTextPos);
 
         // seems a bit silly to encode a null string, but easy to deal with.
-        if (encodedText.length() == 0) {
+        if (encodedText.isEmpty()) {
             return "";
         }
 
@@ -239,7 +240,7 @@ public final class MimeUtility {
             if (encoding.equals(BASE64_ENCODING_MARKER)) {
                 decodedData = Base64.decodeBase64(encodedText);
             } else if (encoding.equals(QUOTEDPRINTABLE_ENCODING_MARKER)) { // maybe quoted printable.
-                byte[] encodedData = encodedText.getBytes(US_ASCII_CHARSET);
+                byte[] encodedData = encodedText.getBytes(StandardCharsets.US_ASCII);
                 QuotedPrintableDecoder.decode(encodedData, out);
                 decodedData = out.toByteArray();
             } else {
