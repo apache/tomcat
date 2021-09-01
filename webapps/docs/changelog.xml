@@ -211,6 +211,10 @@
         Add Apache Derby 10.14.2.0 to the testsuite dependencies, for JDBC
         and DataSource testing. (remm)
       </update>
+      <add>
+        Update the internal fork of Apache Commons FileUpload to 33d2d79
+        (2021-09-01, 2.0-SNAPSHOT). Refactoring and code clean-up. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

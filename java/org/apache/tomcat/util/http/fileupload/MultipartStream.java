@@ -401,7 +401,7 @@ public class MultipartStream {
     public boolean readBoundary()
             throws FileUploadIOException, MalformedStreamException {
         final byte[] marker = new byte[2];
-        boolean nextChunk = false;
+        boolean nextChunk;
 
         head += boundaryLength;
         try {
@@ -532,7 +532,7 @@ public class MultipartStream {
             baos.write(b);
         }
 
-        String headers = null;
+        String headers;
         if (headerEncoding != null) {
             try {
                 headers = baos.toString(headerEncoding);

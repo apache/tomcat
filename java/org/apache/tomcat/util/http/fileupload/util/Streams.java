@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 
 /**
@@ -63,7 +62,8 @@ public final class Streams {
      * @return Number of bytes, which have been copied.
      * @throws IOException An I/O error occurred.
      */
-    public static long copy(final InputStream inputStream, final OutputStream outputStream, final boolean closeOutputStream)
+    public static long copy(final InputStream inputStream, final OutputStream outputStream,
+                            final boolean closeOutputStream)
             throws IOException {
         return copy(inputStream, outputStream, closeOutputStream, new byte[DEFAULT_BUFFER_SIZE]);
     }
@@ -90,9 +90,8 @@ public final class Streams {
             final OutputStream outputStream, final boolean closeOutputStream,
             final byte[] buffer)
     throws IOException {
-        OutputStream out = outputStream;
-        InputStream in = inputStream;
-        try {
+        try (OutputStream out = outputStream;
+              InputStream in = inputStream) {
             long total = 0;
             for (;;) {
                 final int res = in.read(buffer);
@@ -112,16 +111,9 @@ public final class Streams {
                 } else {
                     out.flush();
                 }
-                out = null;
             }
             in.close();
-            in = null;
             return total;
-        } finally {
-            IOUtils.closeQuietly(in);
-            if (closeOutputStream) {
-                IOUtils.closeQuietly(out);
-            }
         }
     }
 

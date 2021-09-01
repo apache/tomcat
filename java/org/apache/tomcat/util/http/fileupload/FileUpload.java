@@ -43,7 +43,7 @@ public class FileUpload
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Constructs an uninitialised instance of this class.
+     * Constructs an uninitialized instance of this class.
      *
      * A factory must be
      * configured, using {@code setFileItemFactory()}, before attempting

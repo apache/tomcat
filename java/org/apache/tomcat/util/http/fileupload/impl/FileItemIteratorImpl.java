@@ -42,9 +42,24 @@ import org.apache.tomcat.util.http.fileupload.util.LimitedInputStream;
  * {@link FileUploadBase#getItemIterator(RequestContext)}.
  */
 public class FileItemIteratorImpl implements FileItemIterator {
+    /**
+     * The file uploads processing utility.
+     * @see FileUploadBase
+     */
     private final FileUploadBase fileUploadBase;
+    /**
+     * The request context.
+     * @see RequestContext
+     */
     private final RequestContext ctx;
-    private long sizeMax, fileSizeMax;
+    /**
+     * The maximum allowed size of a complete request.
+     */
+    private long sizeMax;
+    /**
+     * The maximum allowed size of a single uploaded file.
+     */
+    private long fileSizeMax;
 
 
     @Override
@@ -326,7 +341,8 @@ public class FileItemIteratorImpl implements FileItemIterator {
         final List<FileItem> items = new ArrayList<>();
         while (hasNext()) {
             final FileItemStream fis = next();
-            final FileItem fi = fileUploadBase.getFileItemFactory().createItem(fis.getFieldName(), fis.getContentType(), fis.isFormField(), fis.getName());
+            final FileItem fi = fileUploadBase.getFileItemFactory().createItem(fis.getFieldName(),
+                    fis.getContentType(), fis.isFormField(), fis.getName());
             items.add(fi);
         }
         return items;

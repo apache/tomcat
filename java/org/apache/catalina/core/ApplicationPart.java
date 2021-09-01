@@ -123,7 +123,7 @@ public class ApplicationPart implements Part {
         }
     }
 
-    public String getString(String encoding) throws UnsupportedEncodingException {
+    public String getString(String encoding) throws UnsupportedEncodingException, IOException {
         return fileItem.getString(encoding);
     }
 
