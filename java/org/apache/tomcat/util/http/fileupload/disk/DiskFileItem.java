@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -191,7 +192,7 @@ public class DiskFileItem
     public InputStream getInputStream()
         throws IOException {
         if (!isInMemory()) {
-            return new FileInputStream(dfos.getFile());
+            return Files.newInputStream(dfos.getFile().toPath());
         }
 
         if (cachedContent == null) {
@@ -268,13 +269,14 @@ public class DiskFileItem
     public long getSize() {
         if (size >= 0) {
             return size;
-        } else if (cachedContent != null) {
-            return cachedContent.length;
-        } else if (dfos.isInMemory()) {
-            return dfos.getData().length;
-        } else {
-            return dfos.getFile().length();
         }
+        if (cachedContent != null) {
+            return cachedContent.length;
+        }
+        if (dfos.isInMemory()) {
+            return dfos.getData().length;
+        }
+        return dfos.getFile().length();
     }
 
     /**
@@ -284,28 +286,23 @@ public class DiskFileItem
      *
      * @return The contents of the file as an array of bytes
      * or {@code null} if the data cannot be read
+     *
+     * @throws IOException if an I/O error occurs
      */
     @Override
-    public byte[] get() {
+    public byte[] get() throws IOException {
         if (isInMemory()) {
             if (cachedContent == null && dfos != null) {
                 cachedContent = dfos.getData();
             }
-            return cachedContent;
+            return cachedContent != null ? cachedContent.clone() : new byte[0];
         }
 
         byte[] fileData = new byte[(int) getSize()];
-        InputStream fis = null;
 
-        try {
-            fis = new FileInputStream(dfos.getFile());
+        try (InputStream fis = Files.newInputStream(dfos.getFile().toPath())) {
             IOUtils.readFully(fis, fileData);
-        } catch (final IOException e) {
-            fileData = null;
-        } finally {
-            IOUtils.closeQuietly(fis);
         }
-
         return fileData;
     }
 
@@ -323,7 +320,7 @@ public class DiskFileItem
      */
     @Override
     public String getString(final String charset)
-        throws UnsupportedEncodingException {
+        throws UnsupportedEncodingException, IOException {
         return new String(get(), charset);
     }
 
@@ -338,15 +335,15 @@ public class DiskFileItem
      */
     @Override
     public String getString() {
-        final byte[] rawdata = get();
-        String charset = getCharSet();
-        if (charset == null) {
-            charset = defaultCharset;
-        }
         try {
-            return new String(rawdata, charset);
-        } catch (final UnsupportedEncodingException e) {
-            return new String(rawdata);
+            byte[] rawData = get();
+            String charset = getCharSet();
+            if (charset == null) {
+                charset = defaultCharset;
+            }
+            return new String(rawData, charset);
+        } catch (final IOException e) {
+            return new String(new byte[0]);
         }
     }
 
@@ -373,52 +370,44 @@ public class DiskFileItem
     @Override
     public void write(final File file) throws Exception {
         if (isInMemory()) {
-            FileOutputStream fout = null;
-            try {
-                fout = new FileOutputStream(file);
+            try (OutputStream fout = Files.newOutputStream(file.toPath())) {
                 fout.write(get());
-                fout.close();
-            } finally {
-                IOUtils.closeQuietly(fout);
+            } catch (IOException e) {
+                throw new IOException("Unexpected output data");
             }
         } else {
             final File outputFile = getStoreLocation();
-            if (outputFile != null) {
-                // Save the length of the file
-                size = outputFile.length();
-                /*
-                 * The uploaded file is being stored on disk
-                 * in a temporary location so move it to the
-                 * desired file.
-                 */
-                if (file.exists()) {
-                    if (!file.delete()) {
-                        throw new FileUploadException(
-                                "Cannot write uploaded file to disk!");
-                    }
-                }
-                if (!outputFile.renameTo(file)) {
-                    BufferedInputStream in = null;
-                    BufferedOutputStream out = null;
-                    try {
-                        in = new BufferedInputStream(
-                            new FileInputStream(outputFile));
-                        out = new BufferedOutputStream(
-                                new FileOutputStream(file));
-                        IOUtils.copy(in, out);
-                        out.close();
-                    } finally {
-                        IOUtils.closeQuietly(in);
-                        IOUtils.closeQuietly(out);
-                    }
-                }
-            } else {
+            if (outputFile == null) {
                 /*
                  * For whatever reason we cannot write the
                  * file to disk.
                  */
                 throw new FileUploadException(
                     "Cannot write uploaded file to disk!");
+            }
+            // Save the length of the file
+            size = outputFile.length();
+            /*
+             * The uploaded file is being stored on disk
+             * in a temporary location so move it to the
+             * desired file.
+             */
+            if (file.exists() && !file.delete()) {
+                throw new FileUploadException(
+                        "Cannot write uploaded file to disk!");
+            }
+            if (!outputFile.renameTo(file)) {
+                BufferedInputStream in = null;
+                BufferedOutputStream out = null;
+                try {
+                    in = new BufferedInputStream(new FileInputStream(outputFile));
+                    out = new BufferedOutputStream(new FileOutputStream(file));
+                    IOUtils.copy(in, out);
+                    out.close();
+                } finally {
+                    IOUtils.closeQuietly(in);
+                    IOUtils.closeQuietly(out);
+                }
             }
         }
     }
@@ -503,11 +492,9 @@ public class DiskFileItem
      * @return An {@link java.io.OutputStream OutputStream} that can be used
      *         for storing the contents of the file.
      *
-     * @throws IOException if an error occurs.
      */
     @Override
-    public OutputStream getOutputStream()
-        throws IOException {
+    public OutputStream getOutputStream() {
         if (dfos == null) {
             final File outputFile = getTempFile();
             dfos = new DeferredFileOutputStream(sizeThreshold, outputFile);

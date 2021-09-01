@@ -104,8 +104,10 @@ public interface FileItem extends FileItemHeadersSupport {
      * Returns the contents of the file item as an array of bytes.
      *
      * @return The contents of the file item as an array of bytes.
+     *
+     * @throws IOException if an I/O error occurs
      */
-    byte[] get();
+    byte[] get() throws IOException;
 
     /**
      * Returns the contents of the file item as a String, using the specified
@@ -118,8 +120,9 @@ public interface FileItem extends FileItemHeadersSupport {
      *
      * @throws UnsupportedEncodingException if the requested character
      *                                      encoding is not available.
+     * @throws IOException if an I/O error occurs
      */
-    String getString(String encoding) throws UnsupportedEncodingException;
+    String getString(String encoding) throws UnsupportedEncodingException, IOException;
 
     /**
      * Returns the contents of the file item as a String, using the default
