@@ -203,6 +203,10 @@
         Add Apache Derby 10.14.2.0 to the testsuite dependencies, for JDBC
         and DataSource testing. (remm)
       </update>
+      <add>
+        Update the internal fork of Apache Commons BCEL to 40d5eb4 (2021-09-01,
+        6.6.0-SNAPSHOT). Code clean-up only. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

@@ -60,7 +60,7 @@ public class ConstantPool {
              */
             if (constantPool[i] != null) {
                 byte tag = constantPool[i].getTag();
-                if ((tag == Const.CONSTANT_Double) || (tag == Const.CONSTANT_Long)) {
+                if (tag == Const.CONSTANT_Double || tag == Const.CONSTANT_Long) {
                     i++;
                 }
             }

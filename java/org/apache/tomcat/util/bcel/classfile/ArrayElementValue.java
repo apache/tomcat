@@ -40,7 +40,7 @@ public class ArrayElementValue extends ElementValue
         for (int i = 0; i < elementValues.length; i++)
         {
             sb.append(elementValues[i].stringifyValue());
-            if ((i + 1) < elementValues.length) {
+            if (i + 1 < elementValues.length) {
                 sb.append(',');
             }
         }
