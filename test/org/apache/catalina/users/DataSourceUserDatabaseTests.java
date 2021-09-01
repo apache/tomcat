@@ -16,11 +16,13 @@
  */
 package org.apache.catalina.users;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Iterator;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -109,6 +111,11 @@ public class DataSourceUserDatabaseTests extends LoggingBaseTest {
 
     private DerbyUserDatabase db;
 
+    @AfterClass
+    public static void derbyCleanup() {
+        System.out.println("Deleted derby.log: " + (new File("derby.log")).delete());
+    }
+
     @Test
     public void testBasicUserRoleDatabase()
         throws Exception {
@@ -156,6 +163,7 @@ public class DataSourceUserDatabaseTests extends LoggingBaseTest {
         Assert.assertFalse("Unexpected role for user", tomcatUser.isInRole(managerRole));
 
         db.close();
+
     }
 
     @Test
@@ -224,5 +232,6 @@ public class DataSourceUserDatabaseTests extends LoggingBaseTest {
         Assert.assertTrue("No group for user", randomUser.isInGroup(userGroup));
 
         db.close();
+
     }
 }
