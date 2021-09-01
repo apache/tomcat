@@ -207,6 +207,10 @@
         Update the internal fork of Apache Commons BCEL to 40d5eb4 (2021-09-01,
         6.6.0-SNAPSHOT). Code clean-up only. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons Codec to fd44e6b (2021-09-01,
+        1.16-SNAPSHOT). Minor refactoring. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
