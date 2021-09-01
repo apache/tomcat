@@ -184,6 +184,10 @@
         Update to JSign version 4.0 to enable code signing without the need for
         the installation of additional client tools. (markt)
       </update>
+      <add>
+        Update the internal fork of Apache Commons BCEL to 40d5eb4 (2021-09-01,
+        6.6.0-SNAPSHOT). Code clean-up only. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
