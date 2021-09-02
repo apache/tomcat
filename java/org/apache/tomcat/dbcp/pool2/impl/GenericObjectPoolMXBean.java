@@ -41,6 +41,48 @@ public interface GenericObjectPoolMXBean {
     boolean getBlockWhenExhausted();
 
     /**
+     * See {@link GenericObjectPool#getBorrowedCount()}
+     * @return See {@link GenericObjectPool#getBorrowedCount()}
+     */
+    long getBorrowedCount();
+
+    /**
+     * See {@link GenericObjectPool#getCreatedCount()}
+     * @return See {@link GenericObjectPool#getCreatedCount()}
+     */
+    long getCreatedCount();
+
+    /**
+     * See {@link GenericObjectPool#getCreationStackTrace()}
+     * @return See {@link GenericObjectPool#getCreationStackTrace()}
+     */
+    String getCreationStackTrace();
+
+    /**
+     * See {@link GenericObjectPool#getDestroyedByBorrowValidationCount()}
+     * @return See {@link GenericObjectPool#getDestroyedByBorrowValidationCount()}
+     */
+    long getDestroyedByBorrowValidationCount();
+
+    /**
+     * See {@link GenericObjectPool#getDestroyedByEvictorCount()}
+     * @return See {@link GenericObjectPool#getDestroyedByEvictorCount()}
+     */
+    long getDestroyedByEvictorCount();
+
+    /**
+     * See {@link GenericObjectPool#getDestroyedCount()}
+     * @return See {@link GenericObjectPool#getDestroyedCount()}
+     */
+    long getDestroyedCount();
+
+    /**
+     * See {@link GenericObjectPool#getFactoryType()}
+     * @return See {@link GenericObjectPool#getFactoryType()}
+     */
+    String getFactoryType();
+
+    /**
      * See {@link GenericObjectPool#getLifo()}
      * @return See {@link GenericObjectPool#getLifo()}
      */
@@ -51,6 +93,18 @@ public interface GenericObjectPoolMXBean {
      * @return See {@link GenericObjectPool#getFairness()}
      */
     boolean getLifo();
+
+    /**
+     * See {@link GenericObjectPool#getLogAbandoned()}
+     * @return See {@link GenericObjectPool#getLogAbandoned()}
+     */
+    boolean getLogAbandoned();
+
+    /**
+     * See {@link GenericObjectPool#getMaxBorrowWaitTimeMillis()}
+     * @return See {@link GenericObjectPool#getMaxBorrowWaitTimeMillis()}
+     */
+    long getMaxBorrowWaitTimeMillis();
 
     /**
      * See {@link GenericObjectPool#getMaxIdle()}
@@ -65,14 +119,34 @@ public interface GenericObjectPoolMXBean {
     int getMaxTotal();
 
     /**
-     * See {@link GenericObjectPool#getMaxWaitMillis()}
-     * @return See {@link GenericObjectPool#getMaxWaitMillis()}
+     * See {@link GenericObjectPool#getMaxWaitDuration()}
+     * @return See {@link GenericObjectPool#getMaxWaitDuration()}
      */
     long getMaxWaitMillis();
 
     /**
-     * See {@link GenericObjectPool#getMinEvictableIdleTimeMillis()}
-     * @return See {@link GenericObjectPool#getMinEvictableIdleTimeMillis()}
+     * See {@link GenericObjectPool#getMeanActiveTimeMillis()}
+     * @return See {@link GenericObjectPool#getMeanActiveTimeMillis()}
+     */
+    long getMeanActiveTimeMillis();
+
+    /**
+     * See {@link GenericObjectPool#getMeanBorrowWaitTimeMillis()}
+     * @return See {@link GenericObjectPool#getMeanBorrowWaitTimeMillis()}
+     */
+    long getMeanBorrowWaitTimeMillis();
+
+    // Getters for monitoring attributes
+
+    /**
+     * See {@link GenericObjectPool#getMeanIdleTimeMillis()}
+     * @return See {@link GenericObjectPool#getMeanIdleTimeMillis()}
+     */
+    long getMeanIdleTimeMillis();
+
+    /**
+     * See {@link GenericObjectPool#getMinEvictableIdleDuration()}
+     * @return See {@link GenericObjectPool#getMinEvictableIdleDuration()}
      */
     long getMinEvictableIdleTimeMillis();
 
@@ -101,129 +175,10 @@ public interface GenericObjectPoolMXBean {
     int getNumTestsPerEvictionRun();
 
     /**
-     * See {@link GenericObjectPool#getTestOnCreate()}
-     * @return See {@link GenericObjectPool#getTestOnCreate()}
-     * @since 2.2
-     */
-    boolean getTestOnCreate();
-
-    /**
-     * See {@link GenericObjectPool#getTestOnBorrow()}
-     * @return See {@link GenericObjectPool#getTestOnBorrow()}
-     */
-    boolean getTestOnBorrow();
-
-    /**
-     * See {@link GenericObjectPool#getTestOnReturn()}
-     * @return See {@link GenericObjectPool#getTestOnReturn()}
-     */
-    boolean getTestOnReturn();
-
-    /**
-     * See {@link GenericObjectPool#getTestWhileIdle()}
-     * @return See {@link GenericObjectPool#getTestWhileIdle()}
-     */
-    boolean getTestWhileIdle();
-
-    /**
-     * See {@link GenericObjectPool#getTimeBetweenEvictionRunsMillis()}
-     * @return See {@link GenericObjectPool#getTimeBetweenEvictionRunsMillis()}
-     */
-    long getTimeBetweenEvictionRunsMillis();
-
-    /**
-     * See {@link GenericObjectPool#isClosed()}
-     * @return See {@link GenericObjectPool#isClosed()}
-     */
-    boolean isClosed();
-
-    // Getters for monitoring attributes
-
-    /**
-     * See {@link GenericObjectPool#getBorrowedCount()}
-     * @return See {@link GenericObjectPool#getBorrowedCount()}
-     */
-    long getBorrowedCount();
-
-    /**
-     * See {@link GenericObjectPool#getReturnedCount()}
-     * @return See {@link GenericObjectPool#getReturnedCount()}
-     */
-    long getReturnedCount();
-
-    /**
-     * See {@link GenericObjectPool#getCreatedCount()}
-     * @return See {@link GenericObjectPool#getCreatedCount()}
-     */
-    long getCreatedCount();
-
-    /**
-     * See {@link GenericObjectPool#getDestroyedCount()}
-     * @return See {@link GenericObjectPool#getDestroyedCount()}
-     */
-    long getDestroyedCount();
-
-    /**
-     * See {@link GenericObjectPool#getDestroyedByEvictorCount()}
-     * @return See {@link GenericObjectPool#getDestroyedByEvictorCount()}
-     */
-    long getDestroyedByEvictorCount();
-
-    /**
-     * See {@link GenericObjectPool#getDestroyedByBorrowValidationCount()}
-     * @return See {@link GenericObjectPool#getDestroyedByBorrowValidationCount()}
-     */
-    long getDestroyedByBorrowValidationCount();
-
-    /**
-     * See {@link GenericObjectPool#getMeanActiveTimeMillis()}
-     * @return See {@link GenericObjectPool#getMeanActiveTimeMillis()}
-     */
-    long getMeanActiveTimeMillis();
-
-    /**
-     * See {@link GenericObjectPool#getMeanIdleTimeMillis()}
-     * @return See {@link GenericObjectPool#getMeanIdleTimeMillis()}
-     */
-    long getMeanIdleTimeMillis();
-
-    /**
-     * See {@link GenericObjectPool#getMeanBorrowWaitTimeMillis()}
-     * @return See {@link GenericObjectPool#getMeanBorrowWaitTimeMillis()}
-     */
-    long getMeanBorrowWaitTimeMillis();
-
-    /**
-     * See {@link GenericObjectPool#getMaxBorrowWaitTimeMillis()}
-     * @return See {@link GenericObjectPool#getMaxBorrowWaitTimeMillis()}
-     */
-    long getMaxBorrowWaitTimeMillis();
-
-    /**
-     * See {@link GenericObjectPool#getCreationStackTrace()}
-     * @return See {@link GenericObjectPool#getCreationStackTrace()}
-     */
-    String getCreationStackTrace();
-
-    /**
      * See {@link GenericObjectPool#getNumWaiters()}
      * @return See {@link GenericObjectPool#getNumWaiters()}
      */
     int getNumWaiters();
-
-    // Getters for abandoned object removal configuration
-
-    /**
-     * See {@link GenericObjectPool#isAbandonedConfig()}
-     * @return See {@link GenericObjectPool#isAbandonedConfig()}
-     */
-    boolean isAbandonedConfig();
-
-    /**
-     * See {@link GenericObjectPool#getLogAbandoned()}
-     * @return See {@link GenericObjectPool#getLogAbandoned()}
-     */
-    boolean getLogAbandoned();
 
     /**
      * See {@link GenericObjectPool#getRemoveAbandonedOnBorrow()}
@@ -238,16 +193,61 @@ public interface GenericObjectPoolMXBean {
     boolean getRemoveAbandonedOnMaintenance();
 
     /**
-     * See {@link GenericObjectPool#getRemoveAbandonedTimeout()}
-     * @return See {@link GenericObjectPool#getRemoveAbandonedTimeout()}
+     * See {@link GenericObjectPool#getRemoveAbandonedTimeoutDuration()}
+     * @return See {@link GenericObjectPool#getRemoveAbandonedTimeoutDuration()}
      */
     int getRemoveAbandonedTimeout();
 
     /**
-     * See {@link GenericObjectPool#getFactoryType()}
-     * @return See {@link GenericObjectPool#getFactoryType()}
+     * See {@link GenericObjectPool#getReturnedCount()}
+     * @return See {@link GenericObjectPool#getReturnedCount()}
      */
-    String getFactoryType();
+    long getReturnedCount();
+
+    /**
+     * See {@link GenericObjectPool#getTestOnBorrow()}
+     * @return See {@link GenericObjectPool#getTestOnBorrow()}
+     */
+    boolean getTestOnBorrow();
+
+    // Getters for abandoned object removal configuration
+
+    /**
+     * See {@link GenericObjectPool#getTestOnCreate()}
+     * @return See {@link GenericObjectPool#getTestOnCreate()}
+     * @since 2.2
+     */
+    boolean getTestOnCreate();
+
+    /**
+     * See {@link GenericObjectPool#getTestOnReturn()}
+     * @return See {@link GenericObjectPool#getTestOnReturn()}
+     */
+    boolean getTestOnReturn();
+
+    /**
+     * See {@link GenericObjectPool#getTestWhileIdle()}
+     * @return See {@link GenericObjectPool#getTestWhileIdle()}
+     */
+    boolean getTestWhileIdle();
+
+    /**
+     * See {@link GenericObjectPool#getDurationBetweenEvictionRuns()}
+     * @return See {@link GenericObjectPool#getDurationBetweenEvictionRuns()}
+     */
+    long getTimeBetweenEvictionRunsMillis();
+
+    /**
+     * See {@link GenericObjectPool#isAbandonedConfig()}
+     * @return See {@link GenericObjectPool#isAbandonedConfig()}
+     */
+    boolean isAbandonedConfig();
+
+    /**
+     * See {@link GenericObjectPool#isClosed()}
+     * @return See {@link GenericObjectPool#isClosed()}
+     */
+    boolean isClosed();
 
     /**
      * See {@link GenericObjectPool#listAllObjects()}

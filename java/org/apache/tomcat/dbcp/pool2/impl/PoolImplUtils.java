@@ -19,6 +19,11 @@ package org.apache.tomcat.dbcp.pool2.impl;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.tomcat.dbcp.pool2.PooledObjectFactory;
 
@@ -32,8 +37,7 @@ class PoolImplUtils {
     /**
      * Identifies the concrete type of object that an object factory creates.
      *
-     * @param factoryClass
-     *            The factory to examine
+     * @param factoryClass The factory to examine
      *
      * @return the type of object the factory creates
      */
@@ -48,7 +52,8 @@ class PoolImplUtils {
             // A bit hackish, but we must handle cases when getGenericType() does not return a concrete types.
             final ParameterizedType pi = getParameterizedType(type, factoryClass);
             if (pi != null) {
-                final Type[] bounds = ((TypeVariable) pi.getActualTypeArguments()[((Integer) genericType).intValue()]).getBounds();
+                final Type[] bounds = ((TypeVariable) pi.getActualTypeArguments()[((Integer) genericType).intValue()])
+                        .getBounds();
                 if (bounds != null && bounds.length > 0) {
                     final Type bound0 = bounds[0];
                     if (bound0 instanceof Class) {
@@ -63,14 +68,11 @@ class PoolImplUtils {
     }
 
     /**
-     * Obtains the concrete type used by an implementation of an interface that uses a generic type.
+     * Gets the concrete type used by an implementation of an interface that uses a generic type.
      *
-     * @param type
-     *            The interface that defines a generic type
-     * @param clazz
-     *            The class that implements the interface with a concrete type
-     * @param <T>
-     *            The interface type
+     * @param type The interface that defines a generic type
+     * @param clazz The class that implements the interface with a concrete type
+     * @param <T> The interface type
      *
      * @return concrete type used by the implementation
      */
@@ -94,25 +96,23 @@ class PoolImplUtils {
         if (result instanceof Class<?>) {
             // Superclass implements interface and defines explicit type for generic
             return result;
-        } else if (result instanceof Integer) {
+        }
+        if (result instanceof Integer) {
             // Superclass implements interface and defines unknown type for generic
             // Map that unknown type to the generic types defined in this class
             final ParameterizedType superClassType = (ParameterizedType) clazz.getGenericSuperclass();
             return getTypeParameter(clazz, superClassType.getActualTypeArguments()[((Integer) result).intValue()]);
-        } else {
-            // Error will be logged further up the call stack
-            return null;
         }
+        // Error will be logged further up the call stack
+        return null;
     }
 
     /**
      * Gets the matching parameterized type or null.
-     * @param type
-     *            The interface that defines a generic type.
-     * @param clazz
-     *            The class that implements the interface with a concrete type.
-     * @param <T>
-     *            The interface type.
+     *
+     * @param type The interface that defines a generic type.
+     * @param clazz The class that implements the interface with a concrete type.
+     * @param <T> The interface type.
      * @return the matching parameterized type or null.
      */
     private static <T> ParameterizedType getParameterizedType(final Class<T> type, final Class<? extends T> clazz) {
@@ -133,10 +133,8 @@ class PoolImplUtils {
      * For a generic parameter, return either the Class used or if the type is unknown, the index for the type in
      * definition of the class
      *
-     * @param clazz
-     *            defining class
-     * @param argType
-     *            the type argument of interest
+     * @param clazz defining class
+     * @param argType the type argument of interest
      *
      * @return An instance of {@link Class} representing the type used by the type parameter or an instance of
      *         {@link Integer} representing the index for the type in the definition of the defining class
@@ -153,4 +151,83 @@ class PoolImplUtils {
         }
         return null;
     }
+
+    static boolean isPositive(final Duration delay) {
+        return delay != null && !delay.isNegative() && !delay.isZero();
+    }
+
+    /**
+     * Returns the greater of two {@code Instant} values. That is, the result is the argument closer to the value of
+     * {@link Instant#MAX}. If the arguments have the same value, the result is that same value.
+     *
+     * @param a an argument.
+     * @param b another argument.
+     * @return the larger of {@code a} and {@code b}.
+     */
+    static Instant max(final Instant a, final Instant b) {
+        return a.compareTo(b) > 0 ? a : b;
+    }
+
+    /**
+     * Returns the smaller of two {@code Instant} values. That is, the result is the argument closer to the value of
+     * {@link Instant#MIN}. If the arguments have the same value, the result is that same value.
+     *
+     * @param a an argument.
+     * @param b another argument.
+     * @return the smaller of {@code a} and {@code b}.
+     */
+    static Instant min(final Instant a, final Instant b) {
+        return a.compareTo(b) < 0 ? a : b;
+    }
+
+    /**
+     * Returns a non-null duration, value if non-null, otherwise defaultValue.
+     *
+     * @param value May be null.
+     * @param defaultValue May not be null/
+     * @return value if non-null, otherwise defaultValue.
+     */
+    static Duration nonNull(final Duration value, final Duration defaultValue) {
+        return value != null ? value : Objects.requireNonNull(defaultValue, "defaultValue");
+    }
+
+    /**
+     * Converts a {@link TimeUnit} to a {@link ChronoUnit}.
+     *
+     * @param timeUnit A TimeUnit.
+     * @return The corresponding ChronoUnit.
+     */
+    static ChronoUnit toChronoUnit(final TimeUnit timeUnit) {
+        // TODO when using Java >= 9: Use TimeUnit.toChronoUnit().
+        switch (Objects.requireNonNull(timeUnit)) {
+        case NANOSECONDS:
+            return ChronoUnit.NANOS;
+        case MICROSECONDS:
+            return ChronoUnit.MICROS;
+        case MILLISECONDS:
+            return ChronoUnit.MILLIS;
+        case SECONDS:
+            return ChronoUnit.SECONDS;
+        case MINUTES:
+            return ChronoUnit.MINUTES;
+        case HOURS:
+            return ChronoUnit.HOURS;
+        case DAYS:
+            return ChronoUnit.DAYS;
+        default:
+            throw new IllegalArgumentException(timeUnit.toString());
+        }
+    }
+
+    /**
+     * Converts am amount and TimeUnit into a Duration.
+     *
+     * @param amount the amount of the duration, measured in terms of the unit, positive or negative
+     * @param timeUnit the unit that the duration is measured in, must have an exact duration, not null
+     * @return a Duration.
+     */
+    static Duration toDuration(final long amount, final TimeUnit timeUnit) {
+        return Duration.of(amount, PoolImplUtils.toChronoUnit(timeUnit));
+    }
+
 }

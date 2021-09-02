@@ -36,6 +36,21 @@ public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
         implements KeyedPooledObjectFactory<K, V> {
 
     /**
+     * Reinitialize an instance to be returned by the pool.
+     * <p>
+     * The default implementation is a no-op.
+     * </p>
+     *
+     * @param key the key used when selecting the object
+     * @param p a {@code PooledObject} wrapping the instance to be activated
+     */
+    @Override
+    public void activateObject(final K key, final PooledObject<V> p)
+        throws Exception {
+        // The default implementation is a no-op.
+    }
+
+    /**
      * Create an instance that can be served by the pool.
      *
      * @param key the key used when constructing the object
@@ -48,21 +63,6 @@ public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
         throws Exception;
 
     /**
-     * Wrap the provided instance with an implementation of
-     * {@link PooledObject}.
-     *
-     * @param value the instance to wrap
-     *
-     * @return The provided instance, wrapped by a {@link PooledObject}
-     */
-    public abstract PooledObject<V> wrap(V value);
-
-    @Override
-    public PooledObject<V> makeObject(final K key) throws Exception {
-        return wrap(create(key));
-    }
-
-    /**
      * Destroy an instance no longer needed by the pool.
      * <p>
      * The default implementation is a no-op.
@@ -73,6 +73,26 @@ public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
      */
     @Override
     public void destroyObject(final K key, final PooledObject<V> p)
+        throws Exception {
+        // The default implementation is a no-op.
+    }
+
+    @Override
+    public PooledObject<V> makeObject(final K key) throws Exception {
+        return wrap(create(key));
+    }
+
+    /**
+     * Uninitialize an instance to be returned to the idle object pool.
+     * <p>
+     * The default implementation is a no-op.
+     * </p>
+     *
+     * @param key the key used when selecting the object
+     * @param p a {@code PooledObject} wrapping the instance to be passivated
+     */
+    @Override
+    public void passivateObject(final K key, final PooledObject<V> p)
         throws Exception {
         // The default implementation is a no-op.
     }
@@ -93,32 +113,12 @@ public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
     }
 
     /**
-     * Reinitialize an instance to be returned by the pool.
-     * <p>
-     * The default implementation is a no-op.
-     * </p>
+     * Wrap the provided instance with an implementation of
+     * {@link PooledObject}.
      *
-     * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the instance to be activated
-     */
-    @Override
-    public void activateObject(final K key, final PooledObject<V> p)
-        throws Exception {
-        // The default implementation is a no-op.
-    }
-
-    /**
-     * Uninitialize an instance to be returned to the idle object pool.
-     * <p>
-     * The default implementation is a no-op.
-     * </p>
+     * @param value the instance to wrap
      *
-     * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the instance to be passivated
+     * @return The provided instance, wrapped by a {@link PooledObject}
      */
-    @Override
-    public void passivateObject(final K key, final PooledObject<V> p)
-        throws Exception {
-        // The default implementation is a no-op.
-    }
+    public abstract PooledObject<V> wrap(V value);
 }

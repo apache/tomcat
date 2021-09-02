@@ -62,7 +62,7 @@ Pool2
 Sub-tree
 src/main/java/org/apache/commons/pool2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-a38c52529beb04bf0815b7d95fb4a393ea110dee
+rel/commons-pool-2.11.1 (2021-08-17)
 
 DBCP2
 Sub-tree
