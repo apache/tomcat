@@ -17,7 +17,9 @@
  */
 package org.apache.tomcat.dbcp.dbcp2;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Properties;
@@ -36,8 +38,11 @@ public final class Utils {
 
     /**
      * Whether the security manager is enabled.
+     *
+     * @deprecated No replacement.
      */
-    public static final boolean IS_SECURITY_ENABLED = System.getSecurityManager() != null;
+    @Deprecated
+    public static final boolean IS_SECURITY_ENABLED = isSecurityEnabled();
 
     /** Any SQL_STATE starting with this value is considered a fatal disconnect */
     public static final String DISCONNECTION_SQL_CODE_PREFIX = "08";
@@ -55,9 +60,9 @@ public final class Utils {
      */
     public static final Set<String> DISCONNECTION_SQL_CODES;
 
-    static final ResultSet[] EMPTY_RESULT_SET_ARRAY = new ResultSet[0];
-    static final String[] EMPTY_STRING_ARRAY = new String[0];
+    static final ResultSet[] EMPTY_RESULT_SET_ARRAY = {};
 
+    static final String[] EMPTY_STRING_ARRAY = {};
     static {
         DISCONNECTION_SQL_CODES = new HashSet<>();
         DISCONNECTION_SQL_CODES.add("57P01"); // Admin shutdown
@@ -88,8 +93,8 @@ public final class Utils {
     public static Properties cloneWithoutCredentials(final Properties properties) {
         if (properties != null) {
             final Properties temp = (Properties) properties.clone();
-            temp.remove("user");
-            temp.remove("password");
+            temp.remove(Constants.KEY_USER);
+            temp.remove(Constants.KEY_PASSWORD);
             return temp;
         }
         return properties;
@@ -109,6 +114,39 @@ public final class Utils {
                 // ignored
             }
         }
+    }
+
+    /**
+     * Closes the Connection (which may be null).
+     *
+     * @param connection a Connection, may be {@code null}
+     * @deprecated Use {@link #closeQuietly(AutoCloseable)}.
+     */
+    @Deprecated
+    public static void closeQuietly(final Connection connection) {
+        closeQuietly((AutoCloseable) connection);
+    }
+
+    /**
+     * Closes the ResultSet (which may be null).
+     *
+     * @param resultSet a ResultSet, may be {@code null}
+     * @deprecated Use {@link #closeQuietly(AutoCloseable)}.
+     */
+    @Deprecated
+    public static void closeQuietly(final ResultSet resultSet) {
+        closeQuietly((AutoCloseable) resultSet);
+    }
+
+    /**
+     * Closes the Statement (which may be null).
+     *
+     * @param statement a Statement, may be {@code null}.
+     * @deprecated Use {@link #closeQuietly(AutoCloseable)}.
+     */
+    @Deprecated
+    public static void closeQuietly(final Statement statement) {
+        closeQuietly((AutoCloseable) statement);
     }
 
     /**
@@ -135,6 +173,10 @@ public final class Utils {
         }
         final MessageFormat mf = new MessageFormat(msg);
         return mf.format(args, new StringBuffer(), null).toString();
+    }
+
+    static boolean isSecurityEnabled() {
+        return System.getSecurityManager() != null;
     }
 
     /**

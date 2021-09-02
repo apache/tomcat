@@ -28,11 +28,6 @@ public class SharedPoolDataSourceFactory extends InstanceKeyDataSourceFactory {
     private static final String SHARED_POOL_CLASSNAME = SharedPoolDataSource.class.getName();
 
     @Override
-    protected boolean isCorrectClass(final String className) {
-        return SHARED_POOL_CLASSNAME.equals(className);
-    }
-
-    @Override
     protected InstanceKeyDataSource getNewInstance(final Reference ref) {
         final SharedPoolDataSource spds = new SharedPoolDataSource();
         final RefAddr ra = ref.get("maxTotal");
@@ -40,5 +35,10 @@ public class SharedPoolDataSourceFactory extends InstanceKeyDataSourceFactory {
             spds.setMaxTotal(Integer.parseInt(ra.getContent().toString()));
         }
         return spds;
+    }
+
+    @Override
+    protected boolean isCorrectClass(final String className) {
+        return SHARED_POOL_CLASSNAME.equals(className);
     }
 }

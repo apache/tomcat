@@ -1,19 +1,18 @@
 /*
-
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.tomcat.dbcp.dbcp2.managed;
 
@@ -38,6 +37,7 @@ import org.apache.tomcat.dbcp.dbcp2.ConnectionFactory;
  * @since 2.0
  */
 public class LocalXAConnectionFactory implements XAConnectionFactory {
+
     /**
      * LocalXAResource is a fake XAResource for non-XA connections. When a transaction is started the connection
      * auto-commit is turned off. When the connection is committed or rolled back, the commit or rollback method is
@@ -46,17 +46,24 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
      * The LocalXAResource also respects the connection read-only setting. If the connection is read-only the commit
      * method will not be called, and the prepare method returns the XA_RDONLY.
      * </p>
+     * <p>
      * It is assumed that the wrapper around a managed connection disables the setAutoCommit(), commit(), rollback() and
      * setReadOnly() methods while a transaction is in progress.
+     * </p>
      *
      * @since 2.0
      */
     protected static class LocalXAResource implements XAResource {
-        private static final Xid[] EMPTY_XID_ARRAY = new Xid[0];
+        private static final Xid[] EMPTY_XID_ARRAY = {};
         private final Connection connection;
         private Xid currentXid; // @GuardedBy("this")
         private boolean originalAutoCommit; // @GuardedBy("this")
 
+        /**
+         * Construct a new instance for a given connection.
+         *
+         * @param localTransaction A connection.
+         */
         public LocalXAResource(final Connection localTransaction) {
             this.connection = localTransaction;
         }

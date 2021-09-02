@@ -237,6 +237,10 @@
         Update the internal fork of Apache Commons Pool to 2.11.1 (2021-08-17).
         Improvements, code clean-up and refactoring. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons DBCP to 2.9.0 (2021-08-03).
+        Improvements, code clean-up and refactoring. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

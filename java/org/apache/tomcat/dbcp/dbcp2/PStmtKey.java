@@ -852,7 +852,7 @@ public class PStmtKey {
      * @return An array of column indexes.
      */
     public int[] getColumnIndexes() {
-        return columnIndexes;
+        return columnIndexes == null ? null : columnIndexes.clone();
     }
 
     /**
@@ -861,7 +861,7 @@ public class PStmtKey {
      * @return An array of column names.
      */
     public String[] getColumnNames() {
-        return columnNames;
+        return columnNames == null ? null : columnNames.clone();
     }
 
     /**
