@@ -73,4 +73,8 @@ Sub-tree
 src/main/java/org/apache/commons/dbcp2
 src/main/resources/org/apache/commons/dbcp2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-e24196a95bbbc531eb3c5f1b19e1dc42fd78a783 (2021-01-15)
+1a0e9e8a61b7e8327a159516907778cd74da7a3b (2021-06-05)
+Note: Commits after this point started to make extensive use of the java.time.*
+      package which is not available in Java 7. It is anticipated that further
+      changes to the DBCP 2 fork in Tomcat 8.5.x will be limited to on-demand
+      back-port of bug fixes.

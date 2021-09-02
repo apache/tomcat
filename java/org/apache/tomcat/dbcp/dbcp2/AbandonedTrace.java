@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.tomcat.dbcp.pool2.TrackedUse;
 
 /**
- * Tracks db connection usage for recovering and reporting abandoned db connections.
+ * Tracks connection usage for recovering and reporting abandoned connections.
  * <p>
  * The JDBC Connection, Statement, and ResultSet classes extend this class.
  * </p>
@@ -38,7 +38,7 @@ public class AbandonedTrace implements TrackedUse {
     private final List<WeakReference<AbandonedTrace>> traceList = new ArrayList<>();
 
     /** Last time this connection was used. */
-    private volatile long lastUsedMillis = 0;
+    private volatile long lastUsedMillis;
 
     /**
      * Creates a new AbandonedTrace without config and without doing abandoned tracing.
@@ -153,7 +153,8 @@ public class AbandonedTrace implements TrackedUse {
                 if (trace != null && trace.equals(traceInList)) {
                     iter.remove();
                     break;
-                } else if (traceInList == null) {
+                }
+                if (traceInList == null) {
                     // Clean-up since we are here anyway
                     iter.remove();
                 }

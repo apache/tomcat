@@ -654,10 +654,10 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
 
     private void validateLifetime(final PooledObject<PoolableConnection> p) throws Exception {
         if (maxConnLifetimeMillis > 0) {
-            final long lifetime = System.currentTimeMillis() - p.getCreateTime();
-            if (lifetime > maxConnLifetimeMillis) {
+            final long lifetimeMillis = System.currentTimeMillis() - p.getCreateTime();
+            if (lifetimeMillis > maxConnLifetimeMillis) {
                 throw new LifetimeExceededException(Utils.getMessage("connectionFactory.lifetimeExceeded",
-                        Long.valueOf(lifetime), Long.valueOf(maxConnLifetimeMillis)));
+                        Long.valueOf(lifetimeMillis), Long.valueOf(maxConnLifetimeMillis)));
             }
         }
     }

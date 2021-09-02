@@ -200,6 +200,10 @@
         Update the internal fork of Apache Commons Pool to 0da5c54
         (2021-02-02, 2.9.1-SNAPSHOT). Refactoring and code clean-up. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons DBCP to c6d5cd9
+        (2021-06-05, 2.9.0-SNAPSHOT). Refactoring and code clean-up. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

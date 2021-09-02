@@ -37,6 +37,7 @@ import javax.sql.ConnectionPoolDataSource;
 import javax.sql.PooledConnection;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
+import org.apache.tomcat.dbcp.dbcp2.Constants;
 import org.apache.tomcat.dbcp.dbcp2.DelegatingPreparedStatement;
 import org.apache.tomcat.dbcp.dbcp2.PStmtKey;
 import org.apache.tomcat.dbcp.dbcp2.Utils;
@@ -76,10 +77,6 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPoolConfig;
  * @since 2.0
  */
 public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceable, Serializable, ObjectFactory {
-
-    private static final String KEY_USER = "user";
-
-    private static final String KEY_PASSWORD = "password";
 
     private static final long serialVersionUID = -4820523787212147844L;
 
@@ -267,11 +264,11 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
                 if (isNotEmpty(ra)) {
                     setUrl(getStringContent(ra));
                 }
-                ra = ref.get(KEY_USER);
+                ra = ref.get(Constants.KEY_USER);
                 if (isNotEmpty(ra)) {
                     setUser(getStringContent(ra));
                 }
-                ra = ref.get(KEY_PASSWORD);
+                ra = ref.get(Constants.KEY_PASSWORD);
                 if (isNotEmpty(ra)) {
                     setPassword(getStringContent(ra));
                 }
@@ -336,7 +333,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * @since 2.4.0
      */
     public char[] getPasswordCharArray() {
-        return userPassword;
+        return userPassword == null ? null : userPassword.clone();
     }
 
     /**
@@ -358,11 +355,11 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         throws SQLException {
         getConnectionCalled = true;
         PooledConnectionImpl pooledConnection = null;
-        // Workaround for buggy WebLogic 5.1 classloader - ignore the exception upon first invocation.
+        // Workaround for buggy WebLogic 5.1 class loader - ignore the exception upon first invocation.
         try {
             if (connectionProperties != null) {
-                update(connectionProperties, KEY_USER, pooledUserName);
-                update(connectionProperties, KEY_PASSWORD, pooledUserPassword);
+                update(connectionProperties, Constants.KEY_USER, pooledUserName);
+                update(connectionProperties, Constants.KEY_PASSWORD, pooledUserPassword);
                 pooledConnection = new PooledConnectionImpl(
                     DriverManager.getConnection(getUrl(), connectionProperties));
             } else {
@@ -388,13 +385,13 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
             config.setMaxWaitMillis(0);
             config.setMaxIdlePerKey(getMaxIdle());
             if (getMaxPreparedStatements() <= 0) {
-                // since there is no limit, create a prepared statement pool with an eviction thread;
+                // Since there is no limit, create a prepared statement pool with an eviction thread;
                 // evictor settings are the same as the connection pool settings.
                 config.setTimeBetweenEvictionRunsMillis(getTimeBetweenEvictionRunsMillis());
                 config.setNumTestsPerEvictionRun(getNumTestsPerEvictionRun());
                 config.setMinEvictableIdleTimeMillis(getMinEvictableIdleTimeMillis());
             } else {
-                // since there is a limit, create a prepared statement pool without an eviction thread;
+                // Since there is a limit, create a prepared statement pool without an eviction thread;
                 // pool has LRU functionality so when the limit is reached, 15% of the pool is cleared.
                 // see org.apache.commons.pool2.impl.GenericKeyedObjectPool.clearOldest method
                 config.setMaxTotal(getMaxPreparedStatements());
@@ -421,8 +418,8 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         ref.add(new StringRefAddr("description", getDescription()));
         ref.add(new StringRefAddr("driver", getDriver()));
         ref.add(new StringRefAddr("loginTimeout", String.valueOf(getLoginTimeout())));
-        ref.add(new StringRefAddr(KEY_PASSWORD, getPassword()));
-        ref.add(new StringRefAddr(KEY_USER, getUser()));
+        ref.add(new StringRefAddr(Constants.KEY_PASSWORD, getPassword()));
+        ref.add(new StringRefAddr(Constants.KEY_USER, getUser()));
         ref.add(new StringRefAddr("url", getUrl()));
 
         ref.add(new StringRefAddr("poolPreparedStatements", String.valueOf(isPoolPreparedStatements())));
@@ -518,11 +515,11 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         assertInitializationAllowed();
         connectionProperties = props;
         if (connectionProperties != null) {
-            if (connectionProperties.containsKey(KEY_USER)) {
-                setUser(connectionProperties.getProperty(KEY_USER));
+            if (connectionProperties.containsKey(Constants.KEY_USER)) {
+                setUser(connectionProperties.getProperty(Constants.KEY_USER));
             }
-            if (connectionProperties.containsKey(KEY_PASSWORD)) {
-                setPassword(connectionProperties.getProperty(KEY_PASSWORD));
+            if (connectionProperties.containsKey(Constants.KEY_PASSWORD)) {
+                setPassword(connectionProperties.getProperty(Constants.KEY_PASSWORD));
             }
         }
     }
@@ -531,25 +528,25 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      * Sets the value of description. This property is here for use by the code which will deploy this datasource. It is
      * not used internally.
      *
-     * @param v Value to assign to description.
+     * @param description Value to assign to description.
      */
-    public void setDescription(final String v) {
-        this.description = v;
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     /**
      * Sets the driver class name. Setting the driver class name cause the driver to be registered with the
      * DriverManager.
      *
-     * @param v Value to assign to driver.
+     * @param driver Value to assign to driver.
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      * @throws ClassNotFoundException if the class cannot be located
      */
-    public void setDriver(final String v) throws ClassNotFoundException {
+    public void setDriver(final String driver) throws ClassNotFoundException {
         assertInitializationAllowed();
-        this.driver = v;
+        this.driver = driver;
         // make sure driver is registered
-        Class.forName(v);
+        Class.forName(driver);
     }
 
     /**
@@ -558,15 +555,15 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
      */
     @Override
     public void setLoginTimeout(final int seconds) {
-        loginTimeout = seconds;
+        this.loginTimeout = seconds;
     }
 
     /**
      * Sets the log writer for this data source. NOT USED.
      */
     @Override
-    public void setLogWriter(final PrintWriter out) {
-        logWriter = out;
+    public void setLogWriter(final PrintWriter logWriter) {
+        this.logWriter = logWriter;
     }
 
     /**
@@ -631,7 +628,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     public void setPassword(final char[] userPassword) {
         assertInitializationAllowed();
         this.userPassword = Utils.clone(userPassword);
-        update(connectionProperties, KEY_PASSWORD, Utils.toString(this.userPassword));
+        update(connectionProperties, Constants.KEY_PASSWORD, Utils.toString(this.userPassword));
     }
 
     /**
@@ -643,7 +640,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     public void setPassword(final String userPassword) {
         assertInitializationAllowed();
         this.userPassword = Utils.toCharArray(userPassword);
-        update(connectionProperties, KEY_PASSWORD, userPassword);
+        update(connectionProperties, Constants.KEY_PASSWORD, userPassword);
     }
 
     /**
@@ -674,24 +671,24 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
     /**
      * Sets the value of URL string used to locate the database for this datasource.
      *
-     * @param v Value to assign to url.
+     * @param url Value to assign to url.
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
-    public void setUrl(final String v) {
+    public void setUrl(final String url) {
         assertInitializationAllowed();
-        this.url = v;
+        this.url = url;
     }
 
     /**
      * Sets the value of default user (login or user name).
      *
-     * @param v Value to assign to user.
+     * @param userName Value to assign to user.
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
-    public void setUser(final String v) {
+    public void setUser(final String userName) {
         assertInitializationAllowed();
-        this.userName = v;
-        update(connectionProperties, KEY_USER, v);
+        this.userName = userName;
+        update(connectionProperties, Constants.KEY_USER, userName);
     }
 
     /**

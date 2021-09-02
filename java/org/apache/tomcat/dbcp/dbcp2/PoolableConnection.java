@@ -64,7 +64,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * Indicate that unrecoverable SQLException was thrown when using this connection. Such a connection should be
      * considered broken and not pass validation in the future.
      */
-    private boolean fatalSqlExceptionThrown = false;
+    private boolean fatalSqlExceptionThrown;
 
     /**
      * SQL_STATE codes considered to signal fatal conditions. Overrides the defaults in
@@ -240,7 +240,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * @since 2.9.0
      */
     @Override
-    public void abort(Executor executor) throws SQLException {
+    public void abort(final Executor executor) throws SQLException {
         if (jmxObjectName != null) {
             jmxObjectName.unregisterMBean();
         }
@@ -278,7 +278,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
             throw new SQLException(Utils.getMessage("poolableConnection.validate.fastFail"));
         }
 
-        if (sql == null || sql.length() == 0) {
+        if (sql == null || sql.isEmpty()) {
             if (timeoutSeconds < 0) {
                 timeoutSeconds = 0;
             }

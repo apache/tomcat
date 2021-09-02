@@ -20,13 +20,14 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import org.apache.tomcat.dbcp.dbcp2.Utils;
+import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
 
 /**
  * <p>
- * Holds a user name and password pair. Serves as a poolable object key for the KeyedObjectPool backing a
- * SharedPoolDataSource. Two instances with the same user name are considered equal. This ensures that there will be
- * only one keyed pool for each user in the pool. The password is used (along with the user name) by the
- * KeyedCPDSConnectionFactory when creating new connections.
+ * Holds a user name and password pair. Serves as a poolable object key for the {@link KeyedObjectPool} backing a
+ * {@link SharedPoolDataSource}. Two instances with the same user name are considered equal. This ensures that there
+ * will be only one keyed pool for each user in the pool. The password is used (along with the user name) by the
+ * {@code KeyedCPDSConnectionFactory} when creating new connections.
  * </p>
  *
  * <p>
@@ -83,7 +84,7 @@ class UserPassKey implements Serializable {
      *
      * @return value of password.
      */
-    public String getPassword() {
+    String getPassword() {
         return Utils.toString(userPassword);
     }
 
@@ -92,7 +93,7 @@ class UserPassKey implements Serializable {
      *
      * @return value of password.
      */
-    public char[] getPasswordCharArray() {
+    char[] getPasswordCharArray() {
         return userPassword;
     }
 
@@ -101,7 +102,7 @@ class UserPassKey implements Serializable {
      *
      * @return value of user name.
      */
-    public String getUsername() {
+    String getUserName() {
         return userName;
     }
 

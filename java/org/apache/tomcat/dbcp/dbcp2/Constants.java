@@ -17,7 +17,7 @@
 package org.apache.tomcat.dbcp.dbcp2;
 
 /**
- * Constants for use with JMX.
+ * Constants.
  *
  * @since 2.0
  */
@@ -31,4 +31,18 @@ public class Constants {
 
     public static final String JMX_STATEMENT_POOL_BASE_EXT = JMX_CONNECTION_BASE_EXT;
     public static final String JMX_STATEMENT_POOL_PREFIX = ",statementpool=statements";
+
+    /**
+     * JDBC properties and URL key for passwords.
+     *
+     * @since 2.9.0
+     */
+    public static final String KEY_PASSWORD = "password";
+
+    /**
+     * JDBC properties and URL key for users.
+     *
+     * @since 2.9.0
+     */
+    public static final String KEY_USER = "user";
 }

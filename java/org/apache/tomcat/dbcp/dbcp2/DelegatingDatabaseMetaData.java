@@ -971,11 +971,10 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     }
 
     protected void handleException(final SQLException e) throws SQLException {
-        if (connection != null) {
-            connection.handleException(e);
-        } else {
+        if (connection == null) {
             throw e;
         }
+        connection.handleException(e);
     }
 
     @Override
@@ -1012,11 +1011,11 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
         if (iface.isAssignableFrom(getClass())) {
             return true;
-        } else if (iface.isAssignableFrom(databaseMetaData.getClass())) {
-            return true;
-        } else {
-            return databaseMetaData.isWrapperFor(iface);
         }
+        if (iface.isAssignableFrom(databaseMetaData.getClass())) {
+            return true;
+        }
+        return databaseMetaData.isWrapperFor(iface);
     }
 
     @Override
@@ -1779,8 +1778,6 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
         }
     }
 
-    /* JDBC_4_ANT_KEY_BEGIN */
-
     @Override
     public boolean supportsSubqueriesInComparisons() throws SQLException {
         try {
@@ -1877,11 +1874,11 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     public <T> T unwrap(final Class<T> iface) throws SQLException {
         if (iface.isAssignableFrom(getClass())) {
             return iface.cast(this);
-        } else if (iface.isAssignableFrom(databaseMetaData.getClass())) {
-            return iface.cast(databaseMetaData);
-        } else {
-            return databaseMetaData.unwrap(iface);
         }
+        if (iface.isAssignableFrom(databaseMetaData.getClass())) {
+            return iface.cast(databaseMetaData);
+        }
+        return databaseMetaData.unwrap(iface);
     }
 
     @Override

@@ -112,24 +112,24 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
      */
     @Override
     public synchronized PooledObject<PooledConnectionAndInfo> makeObject(final UserPassKey upkey) throws Exception {
-        PooledConnection pc = null;
-        final String userName = upkey.getUsername();
+        PooledConnection pooledConnection = null;
+        final String userName = upkey.getUserName();
         final String password = upkey.getPassword();
         if (userName == null) {
-            pc = cpds.getPooledConnection();
+            pooledConnection = cpds.getPooledConnection();
         } else {
-            pc = cpds.getPooledConnection(userName, password);
+            pooledConnection = cpds.getPooledConnection(userName, password);
         }
 
-        if (pc == null) {
+        if (pooledConnection == null) {
             throw new IllegalStateException("Connection pool data source returned null from getPooledConnection");
         }
 
         // should we add this object as a listener or the pool.
         // consider the validateObject method in decision
-        pc.addConnectionEventListener(this);
-        final PooledConnectionAndInfo pci = new PooledConnectionAndInfo(pc, userName, upkey.getPasswordCharArray());
-        pcMap.put(pc, pci);
+        pooledConnection.addConnectionEventListener(this);
+        final PooledConnectionAndInfo pci = new PooledConnectionAndInfo(pooledConnection, userName, upkey.getPasswordCharArray());
+        pcMap.put(pooledConnection, pci);
 
         return new DefaultPooledObject<>(pci);
     }
@@ -139,10 +139,10 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
      */
     @Override
     public void destroyObject(final UserPassKey key, final PooledObject<PooledConnectionAndInfo> p) throws Exception {
-        final PooledConnection pc = p.getObject().getPooledConnection();
-        pc.removeConnectionEventListener(this);
-        pcMap.remove(pc);
-        pc.close();
+        final PooledConnection pooledConnection = p.getObject().getPooledConnection();
+        pooledConnection.removeConnectionEventListener(this);
+        pcMap.remove(pooledConnection);
+        pooledConnection.close();
     }
 
     @Override
@@ -340,9 +340,9 @@ class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserPassKey
 
     private void validateLifetime(final PooledObject<PooledConnectionAndInfo> p) throws Exception {
         if (maxConnLifetimeMillis > 0) {
-            final long lifetime = System.currentTimeMillis() - p.getCreateTime();
-            if (lifetime > maxConnLifetimeMillis) {
-                throw new Exception(Utils.getMessage("connectionFactory.lifetimeExceeded", Long.valueOf(lifetime),
+            final long lifetimeMillis = System.currentTimeMillis() - p.getCreateTime();
+            if (lifetimeMillis > maxConnLifetimeMillis) {
+                throw new Exception(Utils.getMessage("connectionFactory.lifetimeExceeded", Long.valueOf(lifetimeMillis),
                         Long.valueOf(maxConnLifetimeMillis)));
             }
         }

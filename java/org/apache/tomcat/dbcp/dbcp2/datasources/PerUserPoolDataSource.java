@@ -134,7 +134,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
 
     @Override
     protected PooledConnectionManager getConnectionManager(final UserPassKey upKey) {
-        return managers.get(getPoolKey(upKey.getUsername()));
+        return managers.get(getPoolKey(upKey.getUserName()));
     }
 
     private ObjectPool<PooledConnectionAndInfo> getCPDSConnectionFactoryPool(final PooledConnectionManager manager) {

@@ -105,15 +105,17 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
         this.accessToUnderlyingConnectionAllowed = allow;
     }
 
-    /* JDBC_4_ANT_KEY_BEGIN */
     @Override
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
-        return false;
+        return iface != null && iface.isInstance(this);
     }
 
     @Override
     public <T> T unwrap(final Class<T> iface) throws SQLException {
-        throw new SQLException("PoolingDataSource is not a wrapper.");
+        if (isWrapperFor(iface)) {
+            return iface.cast(this);
+        }
+        throw new SQLException(this + " is not a wrapper for " + iface);
     }
     /* JDBC_4_ANT_KEY_END */
 
@@ -204,7 +206,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     }
 
     /** My log writer. */
-    private PrintWriter logWriter = null;
+    private PrintWriter logWriter;
 
     private final ObjectPool<C> pool;
 
@@ -249,7 +251,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
 
         @Override
         public boolean isClosed() throws SQLException {
-            return getDelegateInternal() == null ? true : super.isClosed();
+            return getDelegateInternal() == null || super.isClosed();
         }
     }
 }

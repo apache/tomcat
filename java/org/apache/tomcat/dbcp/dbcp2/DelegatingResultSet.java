@@ -101,15 +101,15 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
      * Private to ensure all construction is {@link #wrapResultSet(Connection, ResultSet)}
      * </p>
      *
-     * @param conn
+     * @param connection
      *            Connection which created this ResultSet
-     * @param res
+     * @param resultSet
      *            ResultSet to wrap
      */
-    private DelegatingResultSet(final Connection conn, final ResultSet res) {
-        super((AbandonedTrace) conn);
-        this.connection = conn;
-        this.resultSet = res;
+    private DelegatingResultSet(final Connection connection, final ResultSet resultSet) {
+        super((AbandonedTrace) connection);
+        this.connection = connection;
+        this.resultSet = resultSet;
     }
 
     /**
@@ -1116,11 +1116,11 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
         if (iface.isAssignableFrom(getClass())) {
             return true;
-        } else if (iface.isAssignableFrom(resultSet.getClass())) {
-            return true;
-        } else {
-            return resultSet.isWrapperFor(iface);
         }
+        if (iface.isAssignableFrom(resultSet.getClass())) {
+            return true;
+        }
+        return resultSet.isWrapperFor(iface);
     }
 
     @Override
@@ -1247,11 +1247,11 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     public <T> T unwrap(final Class<T> iface) throws SQLException {
         if (iface.isAssignableFrom(getClass())) {
             return iface.cast(this);
-        } else if (iface.isAssignableFrom(resultSet.getClass())) {
-            return iface.cast(resultSet);
-        } else {
-            return resultSet.unwrap(iface);
         }
+        if (iface.isAssignableFrom(resultSet.getClass())) {
+            return iface.cast(resultSet);
+        }
+        return resultSet.unwrap(iface);
     }
 
     @Override

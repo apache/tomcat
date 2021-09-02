@@ -55,8 +55,8 @@ public final class Utils {
      */
     public static final Set<String> DISCONNECTION_SQL_CODES;
 
-    static final ResultSet[] EMPTY_RESULT_SET_ARRAY = new ResultSet[0];
-    static final String[] EMPTY_STRING_ARRAY = new String[0];
+    static final ResultSet[] EMPTY_RESULT_SET_ARRAY = {};
+    static final String[] EMPTY_STRING_ARRAY = {};
 
     static {
         DISCONNECTION_SQL_CODES = new HashSet<>();
@@ -88,8 +88,8 @@ public final class Utils {
     public static Properties cloneWithoutCredentials(final Properties properties) {
         if (properties != null) {
             final Properties temp = (Properties) properties.clone();
-            temp.remove("user");
-            temp.remove("password");
+            temp.remove(Constants.KEY_USER);
+            temp.remove(Constants.KEY_PASSWORD);
             return temp;
         }
         return properties;

@@ -21,7 +21,7 @@ import javax.sql.PooledConnection;
 import org.apache.tomcat.dbcp.dbcp2.Utils;
 
 /**
- * Immutable poolable object holding a PooledConnection along with the user name and password used to create the
+ * Immutable poolable object holding a {@link PooledConnection} along with the user name and password used to create the
  * connection.
  *
  * @since 2.0
@@ -33,6 +33,8 @@ final class PooledConnectionAndInfo {
     private final UserPassKey upKey;
 
     /**
+     * Constructs a new instance.
+     *
      * @since 2.4.0
      */
     PooledConnectionAndInfo(final PooledConnection pc, final String userName, final char[] userPassword) {
@@ -43,6 +45,8 @@ final class PooledConnectionAndInfo {
     }
 
     /**
+     * Constructs a new instance.
+     *
      * @deprecated Since 2.4.0
      */
     @Deprecated
@@ -50,6 +54,11 @@ final class PooledConnectionAndInfo {
         this(pc, userName, Utils.toCharArray(userPassword));
     }
 
+    /**
+     * Gets the pooled connection.
+     *
+     * @return the pooled connection.
+     */
     PooledConnection getPooledConnection() {
         return pooledConnection;
     }
