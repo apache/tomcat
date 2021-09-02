@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /**
  * <p><b>NOTE:</b> This code has been copied from commons-fileupload trunk
  * 1.3 and commons-io 1.4 and package renamed to avoid clashes with
