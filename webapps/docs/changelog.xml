@@ -223,6 +223,10 @@
         Update the internal fork of Apache Commons DBCP to 2.9.0 (2021-08-03).
         Improvements, code clean-up and refactoring. (markt)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.31 to
+        pick up Windows binaries built with OpenSSL 1.1.1l.(markt)
+      </update>
     </changelog>
   </subsection>
 </section>
