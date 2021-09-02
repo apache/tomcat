@@ -110,7 +110,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     /**
      * The generated string for the roles PreparedStatement
      */
-    private String preparedRoles = null;
+    private String preparedUserRoles = null;
 
 
     /**
@@ -122,7 +122,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     /**
      * The generated string for the groups PreparedStatement
      */
-    private String preparedGroups = null;
+    private String preparedUserGroups = null;
 
 
     /**
@@ -615,14 +615,18 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 return null;
             }
 
-            Connection dbConnection = openConnection();
-            if (dbConnection == null) {
+            if (isGroupStoreDefined()) {
+                Connection dbConnection = openConnection();
+                if (dbConnection == null) {
+                    return null;
+                }
+                try {
+                    return findGroupInternal(dbConnection, groupname);
+                } finally {
+                    close(dbConnection);
+                }
+            } else {
                 return null;
-            }
-            try {
-                return findGroupInternal(dbConnection, groupname);
-            } finally {
-                close(dbConnection);
             }
         } finally {
             readLock.unlock();
@@ -685,14 +689,18 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 return null;
             }
 
-            Connection dbConnection = openConnection();
-            if (dbConnection == null) {
+            if (userRoleTable != null && roleNameCol != null) {
+                Connection dbConnection = openConnection();
+                if (dbConnection == null) {
+                    return null;
+                }
+                try {
+                    return findRoleInternal(dbConnection, rolename);
+                } finally {
+                    close(dbConnection);
+                }
+            } else {
                 return null;
-            }
-            try {
-                return findRoleInternal(dbConnection, rolename);
-            } finally {
-                close(dbConnection);
             }
         } finally {
             readLock.unlock();
@@ -773,7 +781,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         // Lookup groups
         ArrayList<Group> groups = new ArrayList<>();
         if (isGroupStoreDefined()) {
-            try (PreparedStatement stmt = dbConnection.prepareStatement(preparedGroups)) {
+            try (PreparedStatement stmt = dbConnection.prepareStatement(preparedUserGroups)) {
                 stmt.setString(1, userName);
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
@@ -792,8 +800,8 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         }
 
         ArrayList<Role> roles = new ArrayList<>();
-        if (isRoleStoreDefined()) {
-            try (PreparedStatement stmt = dbConnection.prepareStatement(preparedRoles)) {
+        if (userRoleTable != null && roleNameCol != null) {
+            try (PreparedStatement stmt = dbConnection.prepareStatement(preparedUserRoles)) {
                 stmt.setString(1, userName);
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
@@ -857,41 +865,18 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     @Override
     public void open() throws Exception {
 
+        if (log.isDebugEnabled()) {
+            // As there are lots of parameters to configure, log some debug to help out
+            log.debug("DataSource UserDatabase features: User<->Role ["
+                    + Boolean.toString(userRoleTable != null && roleNameCol != null)
+                    + "], Roles [" + Boolean.toString(isRoleStoreDefined())
+                    + "], Groups [" + Boolean.toString(isRoleStoreDefined()) + "]");
+        }
+
         writeLock.lock();
         try {
 
             StringBuilder temp = new StringBuilder("SELECT ");
-            temp.append(roleNameCol);
-            temp.append(" FROM ");
-            temp.append(userRoleTable);
-            temp.append(" WHERE ");
-            temp.append(userNameCol);
-            temp.append(" = ?");
-            preparedRoles = temp.toString();
-
-            if (userGroupTable != null) {
-                temp = new StringBuilder("SELECT ");
-                temp.append(groupNameCol);
-                temp.append(" FROM ");
-                temp.append(userGroupTable);
-                temp.append(" WHERE ");
-                temp.append(userNameCol);
-                temp.append(" = ?");
-                preparedGroups = temp.toString();
-            }
-
-            if (groupRoleTable != null) {
-                temp = new StringBuilder("SELECT ");
-                temp.append(roleNameCol);
-                temp.append(" FROM ");
-                temp.append(groupRoleTable);
-                temp.append(" WHERE ");
-                temp.append(groupNameCol);
-                temp.append(" = ?");
-                preparedGroupRoles = temp.toString();
-            }
-
-            temp = new StringBuilder("SELECT ");
             temp.append(userCredCol);
             if (userFullNameCol != null) {
                 temp.append(",").append(userFullNameCol);
@@ -909,7 +894,34 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             temp.append(userTable);
             preparedAllUsers = temp.toString();
 
-            if (groupTable != null) {
+            temp = new StringBuilder("SELECT ");
+            temp.append(roleNameCol);
+            temp.append(" FROM ");
+            temp.append(userRoleTable);
+            temp.append(" WHERE ");
+            temp.append(userNameCol);
+            temp.append(" = ?");
+            preparedUserRoles = temp.toString();
+
+            if (isGroupStoreDefined()) {
+                temp = new StringBuilder("SELECT ");
+                temp.append(groupNameCol);
+                temp.append(" FROM ");
+                temp.append(userGroupTable);
+                temp.append(" WHERE ");
+                temp.append(userNameCol);
+                temp.append(" = ?");
+                preparedUserGroups = temp.toString();
+
+                temp = new StringBuilder("SELECT ");
+                temp.append(roleNameCol);
+                temp.append(" FROM ");
+                temp.append(groupRoleTable);
+                temp.append(" WHERE ");
+                temp.append(groupNameCol);
+                temp.append(" = ?");
+                preparedGroupRoles = temp.toString();
+
                 temp = new StringBuilder("SELECT ");
                 temp.append(groupNameCol);
                 if (roleAndGroupDescriptionCol != null) {
@@ -929,7 +941,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 preparedAllGroups = temp.toString();
             }
 
-            if (roleTable != null) {
+            if (isRoleStoreDefined()) {
                 // Create the role PreparedStatement string
                 temp = new StringBuilder("SELECT ");
                 temp.append(roleNameCol);
@@ -948,7 +960,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 temp.append(" FROM ");
                 temp.append(roleTable);
                 preparedAllRoles = temp.toString();
-            } else {
+            } else if (userRoleTable != null && roleNameCol != null) {
                 // Validate roles existence from the user <-> roles table
                 temp = new StringBuilder("SELECT ");
                 temp.append(roleNameCol);
@@ -1034,7 +1046,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         StringBuilder tempRelation = null;
         StringBuilder tempRelationDelete = null;
 
-        if (roleTable != null) {
+        if (isRoleStoreDefined()) {
 
             // Created roles
             if (!createdRoles.isEmpty()) {
@@ -1125,9 +1137,25 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 removedRoles.clear();
             }
 
+        } else if (userRoleTable != null && roleNameCol != null) {
+            // Only remove role from users
+            tempRelationDelete = new StringBuilder("DELETE FROM ");
+            tempRelationDelete.append(userRoleTable);
+            tempRelationDelete.append(" WHERE ");
+            tempRelationDelete.append(roleNameCol);
+            tempRelationDelete.append(" = ?");
+            for (Role role : removedRoles.values()) {
+                try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete.toString())) {
+                    stmt.setString(1, role.getRolename());
+                    stmt.executeUpdate();
+                } catch (SQLException e) {
+                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                }
+            }
+            removedRoles.clear();
         }
 
-        if (groupTable != null && groupRoleTable != null) {
+        if (isGroupStoreDefined()) {
 
             tempRelation = new StringBuilder("INSERT INTO ");
             tempRelation.append(groupRoleTable);
@@ -1257,22 +1285,26 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
         }
 
-        tempRelation = new StringBuilder("INSERT INTO ");
-        tempRelation.append(userRoleTable);
-        tempRelation.append('(').append(userNameCol).append(", ");
-        tempRelation.append(roleNameCol);
-        tempRelation.append(") VALUES (?, ?)");
-        String userRoleRelation = tempRelation.toString();
-        // Always drop and recreate all user <-> role relations
-        tempRelationDelete = new StringBuilder("DELETE FROM ");
-        tempRelationDelete.append(userRoleTable);
-        tempRelationDelete.append(" WHERE ");
-        tempRelationDelete.append(userNameCol);
-        tempRelationDelete.append(" = ?");
-        String userRoleRelationDelete = tempRelationDelete.toString();
+        String userRoleRelation = null;
+        String userRoleRelationDelete = null;
+        if (userRoleTable != null && roleNameCol != null) {
+            tempRelation = new StringBuilder("INSERT INTO ");
+            tempRelation.append(userRoleTable);
+            tempRelation.append('(').append(userNameCol).append(", ");
+            tempRelation.append(roleNameCol);
+            tempRelation.append(") VALUES (?, ?)");
+            userRoleRelation = tempRelation.toString();
+            // Always drop and recreate all user <-> role relations
+            tempRelationDelete = new StringBuilder("DELETE FROM ");
+            tempRelationDelete.append(userRoleTable);
+            tempRelationDelete.append(" WHERE ");
+            tempRelationDelete.append(userNameCol);
+            tempRelationDelete.append(" = ?");
+            userRoleRelationDelete = tempRelationDelete.toString();
+        }
         String userGroupRelation = null;
         String userGroupRelationDelete = null;
-        if (userGroupTable != null) {
+        if (isGroupStoreDefined()) {
             tempRelation = new StringBuilder("INSERT INTO ");
             tempRelation.append(userGroupTable);
             tempRelation.append('(').append(userNameCol).append(", ");
@@ -1313,15 +1345,17 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 } catch (SQLException e) {
                     log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 }
-                Iterator<Role> roles = user.getRoles();
-                while (roles.hasNext()) {
-                    Role role = roles.next();
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelation)) {
-                        stmt.setString(1, user.getUsername());
-                        stmt.setString(2, role.getRolename());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                if (userRoleRelation != null) {
+                    Iterator<Role> roles = user.getRoles();
+                    while (roles.hasNext()) {
+                        Role role = roles.next();
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelation)) {
+                            stmt.setString(1, user.getUsername());
+                            stmt.setString(2, role.getRolename());
+                            stmt.executeUpdate();
+                        } catch (SQLException e) {
+                            log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                        }
                     }
                 }
                 if (userGroupRelation != null) {
@@ -1365,11 +1399,13 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 } catch (SQLException e) {
                     log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 }
-                try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelationDelete)) {
-                    stmt.setString(1, user.getUsername());
-                    stmt.executeUpdate();
-                } catch (SQLException e) {
-                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                if (userRoleRelationDelete != null) {
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelationDelete)) {
+                        stmt.setString(1, user.getUsername());
+                        stmt.executeUpdate();
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    }
                 }
                 if (userGroupRelationDelete != null) {
                     try (PreparedStatement stmt = dbConnection.prepareStatement(userGroupRelationDelete)) {
@@ -1379,26 +1415,30 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                         log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                     }
                 }
-                Iterator<Role> roles = user.getRoles();
-                while (roles.hasNext()) {
-                    Role role = roles.next();
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelation)) {
-                        stmt.setString(1, user.getUsername());
-                        stmt.setString(2, role.getRolename());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                if (userRoleRelation != null) {
+                    Iterator<Role> roles = user.getRoles();
+                    while (roles.hasNext()) {
+                        Role role = roles.next();
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelation)) {
+                            stmt.setString(1, user.getUsername());
+                            stmt.setString(2, role.getRolename());
+                            stmt.executeUpdate();
+                        } catch (SQLException e) {
+                            log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                        }
                     }
                 }
-                Iterator<Group> groups = user.getGroups();
-                while (groups.hasNext()) {
-                    Group group = groups.next();
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(userGroupRelation)) {
-                        stmt.setString(1, user.getUsername());
-                        stmt.setString(2, group.getGroupname());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                if (userGroupRelation != null) {
+                    Iterator<Group> groups = user.getGroups();
+                    while (groups.hasNext()) {
+                        Group group = groups.next();
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(userGroupRelation)) {
+                            stmt.setString(1, user.getUsername());
+                            stmt.setString(2, group.getGroupname());
+                            stmt.executeUpdate();
+                        } catch (SQLException e) {
+                            log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                        }
                     }
                 }
             }
@@ -1443,13 +1483,22 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
         return connectionSuccess;
     }
 
-    private boolean isGroupStoreDefined() {
-        return userGroupTable != null || groupNameCol != null;
+    /**
+     * Only use groups if the tables are fully defined.
+     * @return true when groups are used
+     */
+    protected boolean isGroupStoreDefined() {
+        return groupTable != null && userGroupTable != null && groupNameCol != null
+                && groupRoleTable != null && isRoleStoreDefined();
     }
 
 
-    private boolean isRoleStoreDefined() {
-        return userRoleTable != null || roleNameCol != null;
+    /**
+     * Only use roles if the tables are fully defined.
+     * @return true when roles are used
+     */
+    protected boolean isRoleStoreDefined() {
+        return roleTable != null && userRoleTable != null && roleNameCol != null;
     }
 
 

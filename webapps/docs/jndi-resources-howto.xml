@@ -630,7 +630,7 @@ create table user_roles (
         <p>If this is set to <code>true</code>, then changes to the
         <code>UserDatabase</code> can be persisted to the
         <code>DataSource</code> by using the <code>save</code> method.
-        The default value is <code>false</code>.</p>
+        The default value is <code>true</code>.</p>
       </attribute>
 
       <attribute name="roleAndGroupDescriptionCol" required="false">
@@ -638,10 +638,13 @@ create table user_roles (
         the description for the roles and groups.</p>
       </attribute>
 
-      <attribute name="roleNameCol" required="true">
+      <attribute name="roleNameCol" required="false">
         <p>Name of the column, in the "roles", "user roles" and "group roles"
         tables, which contains a role name assigned to the corresponding
         user.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute of the
+        associated realm for a rare case when it can be omitted.</p>
       </attribute>
 
       <attribute name="roleTable" required="false">
@@ -674,10 +677,13 @@ create table user_roles (
         full name.</p>
       </attribute>
 
-      <attribute name="userRoleTable" required="true">
+      <attribute name="userRoleTable" required="false">
         <p>Name of the "user roles" table, which must contain columns
         named by the <code>userNameCol</code> and <code>roleNameCol</code>
         attributes.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute of the
+        associated realm for a rare case when it can be omitted.</p>
       </attribute>
 
       <attribute name="userTable" required="true">
