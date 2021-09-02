@@ -1,19 +1,18 @@
 /*
-
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.tomcat.dbcp.dbcp2.managed;
 
@@ -47,6 +46,14 @@ public class TransactionRegistry {
     private final TransactionSynchronizationRegistry transactionSynchronizationRegistry;
 
     /**
+     * Provided for backwards compatibility
+     * @param transactionManager the transaction manager used to enlist connections
+     */
+    public TransactionRegistry(final TransactionManager transactionManager) {
+        this (transactionManager, null);
+    }
+
+    /**
      * Creates a TransactionRegistry for the specified transaction manager.
      *
      * @param transactionManager
@@ -58,48 +65,6 @@ public class TransactionRegistry {
     public TransactionRegistry(final TransactionManager transactionManager, final TransactionSynchronizationRegistry transactionSynchronizationRegistry) {
         this.transactionManager = transactionManager;
         this.transactionSynchronizationRegistry = transactionSynchronizationRegistry;
-    }
-
-    /**
-     * Provided for backwards compatibility
-     * @param transactionManager the transaction manager used to enlist connections
-     */
-    public TransactionRegistry(final TransactionManager transactionManager) {
-        this (transactionManager, null);
-    }
-
-    /**
-     * Registers the association between a Connection and a XAResource. When a connection is enlisted in a transaction,
-     * it is actually the XAResource that is given to the transaction manager.
-     *
-     * @param connection
-     *            The JDBC connection.
-     * @param xaResource
-     *            The XAResource which managed the connection within a transaction.
-     */
-    public synchronized void registerConnection(final Connection connection, final XAResource xaResource) {
-        Objects.requireNonNull(connection, "connection is null");
-        Objects.requireNonNull(xaResource, "xaResource is null");
-        xaResources.put(connection, xaResource);
-    }
-
-    /**
-     * Gets the XAResource registered for the connection.
-     *
-     * @param connection
-     *            the connection
-     * @return The XAResource registered for the connection; never null.
-     * @throws SQLException
-     *             Thrown when the connection does not have a registered XAResource.
-     */
-    public synchronized XAResource getXAResource(final Connection connection) throws SQLException {
-        Objects.requireNonNull(connection, "connection is null");
-        final Connection key = getConnectionKey(connection);
-        final XAResource xaResource = xaResources.get(key);
-        if (xaResource == null) {
-            throw new SQLException("Connection does not have a registered XAResource " + connection);
-        }
-        return xaResource;
     }
 
     /**
@@ -136,17 +101,6 @@ public class TransactionRegistry {
         }
     }
 
-    /**
-     * Unregisters a destroyed connection from {@link TransactionRegistry}.
-     *
-     * @param connection
-     *            A destroyed connection from {@link TransactionRegistry}.
-     */
-    public synchronized void unregisterConnection(final Connection connection) {
-        final Connection key = getConnectionKey(connection);
-        xaResources.remove(key);
-    }
-
     private Connection getConnectionKey(final Connection connection) {
         final Connection result;
         if (connection instanceof DelegatingConnection) {
@@ -155,5 +109,49 @@ public class TransactionRegistry {
             result = connection;
         }
         return result;
+    }
+
+    /**
+     * Gets the XAResource registered for the connection.
+     *
+     * @param connection
+     *            the connection
+     * @return The XAResource registered for the connection; never null.
+     * @throws SQLException
+     *             Thrown when the connection does not have a registered XAResource.
+     */
+    public synchronized XAResource getXAResource(final Connection connection) throws SQLException {
+        Objects.requireNonNull(connection, "connection is null");
+        final Connection key = getConnectionKey(connection);
+        final XAResource xaResource = xaResources.get(key);
+        if (xaResource == null) {
+            throw new SQLException("Connection does not have a registered XAResource " + connection);
+        }
+        return xaResource;
+    }
+
+    /**
+     * Registers the association between a Connection and a XAResource. When a connection is enlisted in a transaction,
+     * it is actually the XAResource that is given to the transaction manager.
+     *
+     * @param connection
+     *            The JDBC connection.
+     * @param xaResource
+     *            The XAResource which managed the connection within a transaction.
+     */
+    public synchronized void registerConnection(final Connection connection, final XAResource xaResource) {
+        Objects.requireNonNull(connection, "connection is null");
+        Objects.requireNonNull(xaResource, "xaResource is null");
+        xaResources.put(connection, xaResource);
+    }
+
+    /**
+     * Unregisters a destroyed connection from {@link TransactionRegistry}.
+     *
+     * @param connection
+     *            A destroyed connection from {@link TransactionRegistry}.
+     */
+    public synchronized void unregisterConnection(final Connection connection) {
+        xaResources.remove(getConnectionKey(connection));
     }
 }

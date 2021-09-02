@@ -44,7 +44,7 @@ class ConnectionFactoryFactory {
         // Set up the driver connection factory we will use
         final String user = basicDataSource.getUsername();
         if (user != null) {
-            connectionProperties.put("user", user);
+            connectionProperties.put(Constants.KEY_USER, user);
         } else {
             basicDataSource.log("DBCP DataSource configured without a 'username'");
         }

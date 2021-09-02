@@ -77,6 +77,29 @@ public class Jdbc41Bridge {
     }
 
     /**
+     * Delegates to {@link Statement#closeOnCompletion()} without throwing an {@link AbstractMethodError}.
+     * <p>
+     * If the JDBC driver does not implement {@link Statement#closeOnCompletion()}, then just check that the connection
+     * is closed to then throw an SQLException.
+     * </p>
+     *
+     * @param statement
+     *            See {@link Statement#closeOnCompletion()}
+     * @throws SQLException
+     *             See {@link Statement#closeOnCompletion()}
+     * @see Statement#closeOnCompletion()
+     */
+    public static void closeOnCompletion(final Statement statement) throws SQLException {
+        try {
+            statement.closeOnCompletion();
+        } catch (final AbstractMethodError e) {
+            if (statement.isClosed()) {
+                throw new SQLException("Statement closed");
+            }
+        }
+    }
+
+    /**
      * Delegates to {@link DatabaseMetaData#generatedKeyAlwaysReturned()} without throwing a
      * {@link AbstractMethodError}.
      * <p>
@@ -315,6 +338,26 @@ public class Jdbc41Bridge {
     }
 
     /**
+     * Delegates to {@link CommonDataSource#getParentLogger()} without throwing an {@link AbstractMethodError}.
+     * <p>
+     * If the JDBC driver does not implement {@link CommonDataSource#getParentLogger()}, then return null.
+     * </p>
+     *
+     * @param commonDataSource
+     *            See {@link CommonDataSource#getParentLogger()}
+     * @return See {@link CommonDataSource#getParentLogger()}
+     * @throws SQLFeatureNotSupportedException
+     *             See {@link CommonDataSource#getParentLogger()}
+     */
+    public static Logger getParentLogger(final CommonDataSource commonDataSource) throws SQLFeatureNotSupportedException {
+        try {
+            return commonDataSource.getParentLogger();
+        } catch (final AbstractMethodError e) {
+            throw new SQLFeatureNotSupportedException("javax.sql.CommonDataSource#getParentLogger()");
+        }
+    }
+
+    /**
      * Delegates to {@link DatabaseMetaData#getPseudoColumns(String, String, String, String)} without throwing a
      * {@link AbstractMethodError}.
      * <p>
@@ -371,6 +414,31 @@ public class Jdbc41Bridge {
     }
 
     /**
+     * Delegates to {@link Statement#isCloseOnCompletion()} without throwing an {@link AbstractMethodError}.
+     * <p>
+     * If the JDBC driver does not implement {@link Statement#isCloseOnCompletion()}, then just check that the
+     * connection is closed to then throw an SQLException.
+     * </p>
+     *
+     * @param statement
+     *            See {@link Statement#isCloseOnCompletion()}
+     * @return See {@link Statement#isCloseOnCompletion()}
+     * @throws SQLException
+     *             See {@link Statement#isCloseOnCompletion()}
+     * @see Statement#closeOnCompletion()
+     */
+    public static boolean isCloseOnCompletion(final Statement statement) throws SQLException {
+        try {
+            return statement.isCloseOnCompletion();
+        } catch (final AbstractMethodError e) {
+            if (statement.isClosed()) {
+                throw new SQLException("Statement closed");
+            }
+            return false;
+        }
+    }
+
+    /**
      * Delegates to {@link Connection#setNetworkTimeout(Executor, int)} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Connection#setNetworkTimeout(Executor, int)}, then do nothing.
@@ -414,74 +482,6 @@ public class Jdbc41Bridge {
             connection.setSchema(schema);
         } catch (final AbstractMethodError e) {
             // do nothing
-        }
-    }
-
-    /**
-     * Delegates to {@link Statement#closeOnCompletion()} without throwing an {@link AbstractMethodError}.
-     * <p>
-     * If the JDBC driver does not implement {@link Statement#closeOnCompletion()}, then just check that the connection
-     * is closed to then throw an SQLException.
-     * </p>
-     *
-     * @param statement
-     *            See {@link Statement#closeOnCompletion()}
-     * @throws SQLException
-     *             See {@link Statement#closeOnCompletion()}
-     * @see Statement#closeOnCompletion()
-     */
-    public static void closeOnCompletion(final Statement statement) throws SQLException {
-        try {
-            statement.closeOnCompletion();
-        } catch (final AbstractMethodError e) {
-            if (statement.isClosed()) {
-                throw new SQLException("Statement closed");
-            }
-        }
-    }
-
-    /**
-     * Delegates to {@link Statement#isCloseOnCompletion()} without throwing an {@link AbstractMethodError}.
-     * <p>
-     * If the JDBC driver does not implement {@link Statement#isCloseOnCompletion()}, then just check that the
-     * connection is closed to then throw an SQLException.
-     * </p>
-     *
-     * @param statement
-     *            See {@link Statement#isCloseOnCompletion()}
-     * @return See {@link Statement#isCloseOnCompletion()}
-     * @throws SQLException
-     *             See {@link Statement#isCloseOnCompletion()}
-     * @see Statement#closeOnCompletion()
-     */
-    public static boolean isCloseOnCompletion(final Statement statement) throws SQLException {
-        try {
-            return statement.isCloseOnCompletion();
-        } catch (final AbstractMethodError e) {
-            if (statement.isClosed()) {
-                throw new SQLException("Statement closed");
-            }
-            return false;
-        }
-    }
-
-    /**
-     * Delegates to {@link CommonDataSource#getParentLogger()} without throwing an {@link AbstractMethodError}.
-     * <p>
-     * If the JDBC driver does not implement {@link CommonDataSource#getParentLogger()}, then return null.
-     * </p>
-     *
-     * @param commonDataSource
-     *            See {@link CommonDataSource#getParentLogger()}
-     * @return See {@link CommonDataSource#getParentLogger()}
-     * @throws SQLFeatureNotSupportedException
-     *             See {@link CommonDataSource#getParentLogger()}
-     */
-    public static Logger getParentLogger(final CommonDataSource commonDataSource) throws SQLFeatureNotSupportedException {
-        try {
-            return commonDataSource.getParentLogger();
-        } catch (final AbstractMethodError e) {
-            throw new SQLFeatureNotSupportedException("javax.sql.CommonDataSource#getParentLogger()");
         }
     }
 

@@ -49,7 +49,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
      */
     private final K key;
 
-    private volatile boolean batchAdded = false;
+    private volatile boolean batchAdded;
 
     /**
      * Constructor.
@@ -72,6 +72,15 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         // Remove from trace now because this statement will be
         // added by the activate method.
         removeThisTrace(getConnectionInternal());
+    }
+
+    @Override
+    public void activate() throws SQLException {
+        setClosedInternal(false);
+        if (getConnectionInternal() != null) {
+            getConnectionInternal().addTrace(this);
+        }
+        super.activate();
     }
 
     /**
@@ -107,15 +116,6 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
                 throw new SQLException("Cannot close preparedstatement (return to pool failed)", e);
             }
         }
-    }
-
-    @Override
-    public void activate() throws SQLException {
-        setClosedInternal(false);
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().addTrace(this);
-        }
-        super.activate();
     }
 
     @Override

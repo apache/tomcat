@@ -71,6 +71,21 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
     }
 
     /**
+     * Activates after retrieval from the pool. Adds a trace for this CallableStatement to the Connection that created
+     * it.
+     *
+     * @since 2.4.0 made public, was protected in 2.3.0.
+     */
+    @Override
+    public void activate() throws SQLException {
+        setClosedInternal(false);
+        if (getConnectionInternal() != null) {
+            getConnectionInternal().addTrace(this);
+        }
+        super.activate();
+    }
+
+    /**
      * Returns the CallableStatement to the pool. If {{@link #isClosed()}, this is a No-op.
      */
     @Override
@@ -85,21 +100,6 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
                 throw new SQLException("Cannot close CallableStatement (return to pool failed)", e);
             }
         }
-    }
-
-    /**
-     * Activates after retrieval from the pool. Adds a trace for this CallableStatement to the Connection that created
-     * it.
-     *
-     * @since 2.4.0 made public, was protected in 2.3.0.
-     */
-    @Override
-    public void activate() throws SQLException {
-        setClosedInternal(false);
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().addTrace(this);
-        }
-        super.activate();
     }
 
     /**

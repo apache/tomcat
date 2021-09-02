@@ -64,7 +64,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
     /** Pool of {@link PreparedStatement}s. and {@link CallableStatement}s */
     private KeyedObjectPool<PStmtKey, DelegatingPreparedStatement> pstmtPool;
 
-    private boolean clearStatementPoolOnReturn = false;
+    private boolean clearStatementPoolOnReturn;
 
     /**
      * Constructor.
@@ -144,21 +144,6 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      */
     protected PStmtKey createKey(final String sql) {
         return new PStmtKey(normalizeSQL(sql), getCatalogOrNull(), getSchemaOrNull());
-    }
-
-    /**
-     * Creates a PStmtKey for the given arguments.
-     *
-     * @param sql
-     *            the SQL string used to define the statement
-     * @param columnIndexes
-     *            An array of column indexes indicating the columns that should be returned from the inserted row or
-     *            rows.
-     *
-     * @return the PStmtKey created for the given arguments.
-     */
-    protected PStmtKey createKey(final String sql, final int[] columnIndexes) {
-        return new PStmtKey(normalizeSQL(sql), getCatalogOrNull(), getSchemaOrNull(), columnIndexes);
     }
 
     /**
@@ -251,6 +236,21 @@ public class PoolingConnection extends DelegatingConnection<Connection>
     protected PStmtKey createKey(final String sql, final int resultSetType, final int resultSetConcurrency,
             final StatementType statementType) {
         return new PStmtKey(normalizeSQL(sql), getCatalogOrNull(), getSchemaOrNull(), resultSetType, resultSetConcurrency, statementType);
+    }
+
+    /**
+     * Creates a PStmtKey for the given arguments.
+     *
+     * @param sql
+     *            the SQL string used to define the statement
+     * @param columnIndexes
+     *            An array of column indexes indicating the columns that should be returned from the inserted row or
+     *            rows.
+     *
+     * @return the PStmtKey created for the given arguments.
+     */
+    protected PStmtKey createKey(final String sql, final int[] columnIndexes) {
+        return new PStmtKey(normalizeSQL(sql), getCatalogOrNull(), getSchemaOrNull(), columnIndexes);
     }
 
     /**
@@ -507,24 +507,6 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *
      * @param sql
      *            the SQL string used to define the PreparedStatement
-     * @param columnIndexes
-     *            An array of column indexes indicating the columns that should be returned from the inserted row or
-     *            rows.
-     * @return a {@link PoolablePreparedStatement}
-     * @throws SQLException
-     *             Wraps an underlying exception.
-     *
-     */
-    @Override
-    public PreparedStatement prepareStatement(final String sql, final int[] columnIndexes) throws SQLException {
-        return prepareStatement(createKey(sql, columnIndexes));
-    }
-
-    /**
-     * Creates or obtains a {@link PreparedStatement} from the pool.
-     *
-     * @param sql
-     *            the SQL string used to define the PreparedStatement
      * @param resultSetType
      *            result set type
      * @param resultSetConcurrency
@@ -558,6 +540,24 @@ public class PoolingConnection extends DelegatingConnection<Connection>
     public PreparedStatement prepareStatement(final String sql, final int resultSetType, final int resultSetConcurrency,
             final int resultSetHoldability) throws SQLException {
         return prepareStatement(createKey(sql, resultSetType, resultSetConcurrency, resultSetHoldability));
+    }
+
+    /**
+     * Creates or obtains a {@link PreparedStatement} from the pool.
+     *
+     * @param sql
+     *            the SQL string used to define the PreparedStatement
+     * @param columnIndexes
+     *            An array of column indexes indicating the columns that should be returned from the inserted row or
+     *            rows.
+     * @return a {@link PoolablePreparedStatement}
+     * @throws SQLException
+     *             Wraps an underlying exception.
+     *
+     */
+    @Override
+    public PreparedStatement prepareStatement(final String sql, final int[] columnIndexes) throws SQLException {
+        return prepareStatement(createKey(sql, columnIndexes));
     }
 
     /**
