@@ -55,6 +55,30 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
 
     private int minIdle = DEFAULT_MIN_IDLE;
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public GenericObjectPoolConfig<T> clone() {
+        try {
+            return (GenericObjectPoolConfig<T>) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            throw new AssertionError(); // Can't happen
+        }
+    }
+
+    /**
+     * Get the value for the {@code maxIdle} configuration attribute
+     * for pools created with this configuration instance.
+     *
+     * @return  The current setting of {@code maxIdle} for this
+     *          configuration instance
+     *
+     * @see GenericObjectPool#getMaxIdle()
+     */
+    public int getMaxIdle() {
+        return maxIdle;
+    }
+
+
     /**
      * Get the value for the {@code maxTotal} configuration attribute
      * for pools created with this configuration instance.
@@ -66,6 +90,33 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
      */
     public int getMaxTotal() {
         return maxTotal;
+    }
+
+    /**
+     * Get the value for the {@code minIdle} configuration attribute
+     * for pools created with this configuration instance.
+     *
+     * @return  The current setting of {@code minIdle} for this
+     *          configuration instance
+     *
+     * @see GenericObjectPool#getMinIdle()
+     */
+    public int getMinIdle() {
+        return minIdle;
+    }
+
+
+    /**
+     * Set the value for the {@code maxIdle} configuration attribute for
+     * pools created with this configuration instance.
+     *
+     * @param maxIdle The new setting of {@code maxIdle}
+     *        for this configuration instance
+     *
+     * @see GenericObjectPool#setMaxIdle(int)
+     */
+    public void setMaxIdle(final int maxIdle) {
+        this.maxIdle = maxIdle;
     }
 
     /**
@@ -81,47 +132,6 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
         this.maxTotal = maxTotal;
     }
 
-
-    /**
-     * Get the value for the {@code maxIdle} configuration attribute
-     * for pools created with this configuration instance.
-     *
-     * @return  The current setting of {@code maxIdle} for this
-     *          configuration instance
-     *
-     * @see GenericObjectPool#getMaxIdle()
-     */
-    public int getMaxIdle() {
-        return maxIdle;
-    }
-
-    /**
-     * Set the value for the {@code maxIdle} configuration attribute for
-     * pools created with this configuration instance.
-     *
-     * @param maxIdle The new setting of {@code maxIdle}
-     *        for this configuration instance
-     *
-     * @see GenericObjectPool#setMaxIdle(int)
-     */
-    public void setMaxIdle(final int maxIdle) {
-        this.maxIdle = maxIdle;
-    }
-
-
-    /**
-     * Get the value for the {@code minIdle} configuration attribute
-     * for pools created with this configuration instance.
-     *
-     * @return  The current setting of {@code minIdle} for this
-     *          configuration instance
-     *
-     * @see GenericObjectPool#getMinIdle()
-     */
-    public int getMinIdle() {
-        return minIdle;
-    }
-
     /**
      * Set the value for the {@code minIdle} configuration attribute for
      * pools created with this configuration instance.
@@ -133,16 +143,6 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
      */
     public void setMinIdle(final int minIdle) {
         this.minIdle = minIdle;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public GenericObjectPoolConfig<T> clone() {
-        try {
-            return (GenericObjectPoolConfig<T>) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // Can't happen
-        }
     }
 
     @Override

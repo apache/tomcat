@@ -19,37 +19,36 @@ package org.apache.tomcat.dbcp.pool2.impl;
 import org.apache.tomcat.dbcp.pool2.PooledObject;
 
 /**
- * Provides the default implementation of {@link EvictionPolicy} used by the
- * pools. Objects will be evicted if the following conditions are met:
+ * Provides the default implementation of {@link EvictionPolicy} used by the pools.
+ * <p>
+ * Objects will be evicted if the following conditions are met:
+ * </p>
  * <ul>
- * <li>the object has been idle longer than
- *     {@link GenericObjectPool#getMinEvictableIdleTimeMillis()} /
- *     {@link GenericKeyedObjectPool#getMinEvictableIdleTimeMillis()}</li>
- * <li>there are more than {@link GenericObjectPool#getMinIdle()} /
+ * <li>The object has been idle longer than
+ *     {@link GenericObjectPool#getMinEvictableIdleDuration()} /
+ *     {@link GenericKeyedObjectPool#getMinEvictableIdleDuration()}</li>
+ * <li>There are more than {@link GenericObjectPool#getMinIdle()} /
  *     {@link GenericKeyedObjectPoolConfig#getMinIdlePerKey()} idle objects in
  *     the pool and the object has been idle for longer than
- *     {@link GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} /
- *     {@link GenericKeyedObjectPool#getSoftMinEvictableIdleTimeMillis()}
+ *     {@link GenericObjectPool#getSoftMinEvictableIdleDuration()} /
+ *     {@link GenericKeyedObjectPool#getSoftMinEvictableIdleDuration()}
  * </ul>
  * <p>
  * This class is immutable and thread-safe.
  * </p>
  *
- * @param <T> the type of objects in the pool
+ * @param <T> the type of objects in the pool.
  *
  * @since 2.0
  */
 public class DefaultEvictionPolicy<T> implements EvictionPolicy<T> {
 
     @Override
-    public boolean evict(final EvictionConfig config, final PooledObject<T> underTest,
-            final int idleCount) {
-
-        if ((config.getIdleSoftEvictTime() < underTest.getIdleTimeMillis() &&
+    public boolean evict(final EvictionConfig config, final PooledObject<T> underTest, final int idleCount) {
+        // @formatter:off
+        return (config.getIdleSoftEvictDuration().compareTo(underTest.getIdleDuration()) < 0 &&
                 config.getMinIdle() < idleCount) ||
-                config.getIdleEvictTime() < underTest.getIdleTimeMillis()) {
-            return true;
-        }
-        return false;
+                config.getIdleEvictDuration().compareTo(underTest.getIdleDuration()) < 0;
+        // @formatter:on
     }
 }
