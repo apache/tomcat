@@ -227,6 +227,10 @@
         Update the packaged version of the Tomcat Native Library to 1.2.31 to
         pick up Windows binaries built with OpenSSL 1.1.1l.(markt)
       </update>
+      <update>
+        Switch to the CDN as the primary download location for ASF dependencies.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
