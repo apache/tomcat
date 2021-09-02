@@ -38,10 +38,10 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
     private final T object;
     private PooledObjectState state = PooledObjectState.IDLE; // @GuardedBy("this") to ensure transitions are valid
-    private final long createTime = System.currentTimeMillis();
-    private volatile long lastBorrowTime = createTime;
-    private volatile long lastUseTime = createTime;
-    private volatile long lastReturnTime = createTime;
+    private final long createTimeMillis = System.currentTimeMillis();
+    private volatile long lastBorrowTimeMillis = createTimeMillis;
+    private volatile long lastUseTimeMillis = createTimeMillis;
+    private volatile long lastReturnTimeMillis = createTimeMillis;
     private volatile boolean logAbandoned = false;
     private volatile CallStack borrowedBy = NoOpCallStack.INSTANCE;
     private volatile CallStack usedBy = NoOpCallStack.INSTANCE;
@@ -64,14 +64,14 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
     @Override
     public long getCreateTime() {
-        return createTime;
+        return createTimeMillis;
     }
 
     @Override
     public long getActiveTimeMillis() {
         // Take copies to avoid threading issues
-        final long rTime = lastReturnTime;
-        final long bTime = lastBorrowTime;
+        final long rTime = lastReturnTimeMillis;
+        final long bTime = lastBorrowTimeMillis;
 
         if (rTime > bTime) {
             return rTime - bTime;
@@ -81,7 +81,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
     @Override
     public long getIdleTimeMillis() {
-        final long elapsed = System.currentTimeMillis() - lastReturnTime;
+        final long elapsed = System.currentTimeMillis() - lastReturnTimeMillis;
         // elapsed may be negative if:
         // - another thread updates lastReturnTime during the calculation window
         // - System.currentTimeMillis() is not monotonic (e.g. system time is set back)
@@ -90,12 +90,12 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
     @Override
     public long getLastBorrowTime() {
-        return lastBorrowTime;
+        return lastBorrowTimeMillis;
     }
 
     @Override
     public long getLastReturnTime() {
-        return lastReturnTime;
+        return lastReturnTimeMillis;
     }
 
     /**
@@ -120,9 +120,9 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     @Override
     public long getLastUsedTime() {
         if (object instanceof TrackedUse) {
-            return Math.max(((TrackedUse) object).getLastUsed(), lastUseTime);
+            return Math.max(((TrackedUse) object).getLastUsed(), lastUseTimeMillis);
         }
-        return lastUseTime;
+        return lastUseTimeMillis;
     }
 
     @Override
@@ -187,8 +187,8 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     public synchronized boolean allocate() {
         if (state == PooledObjectState.IDLE) {
             state = PooledObjectState.ALLOCATED;
-            lastBorrowTime = System.currentTimeMillis();
-            lastUseTime = lastBorrowTime;
+            lastBorrowTimeMillis = System.currentTimeMillis();
+            lastUseTimeMillis = lastBorrowTimeMillis;
             borrowedCount++;
             if (logAbandoned) {
                 borrowedBy.fillInStackTrace();
@@ -217,7 +217,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         if (state == PooledObjectState.ALLOCATED ||
                 state == PooledObjectState.RETURNING) {
             state = PooledObjectState.IDLE;
-            lastReturnTime = System.currentTimeMillis();
+            lastReturnTimeMillis = System.currentTimeMillis();
             borrowedBy.clear();
             return true;
         }
@@ -235,7 +235,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
     @Override
     public void use() {
-        lastUseTime = System.currentTimeMillis();
+        lastUseTimeMillis = System.currentTimeMillis();
         usedBy.fillInStackTrace();
     }
 

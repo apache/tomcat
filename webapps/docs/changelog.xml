@@ -196,6 +196,10 @@
         Update the internal fork of Apache Commons FileUpload to 33d2d79
         (2021-09-01, 2.0-SNAPSHOT). Refactoring and code clean-up. (markt)
       </add>
+      <add>
+        Update the internal fork of Apache Commons Pool to 0da5c54
+        (2021-02-02, 2.9.1-SNAPSHOT). Refactoring and code clean-up. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

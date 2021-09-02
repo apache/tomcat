@@ -58,7 +58,7 @@ public class ThrowableCallStack implements CallStack {
             message = messageFormat;
         } else {
             synchronized (dateFormat) {
-                message = dateFormat.format(Long.valueOf(snapshotRef.timestamp));
+                message = dateFormat.format(Long.valueOf(snapshotRef.timestampMillis));
             }
         }
         writer.println(message);
@@ -81,6 +81,6 @@ public class ThrowableCallStack implements CallStack {
      */
     private static class Snapshot extends Throwable {
         private static final long serialVersionUID = 1L;
-        private final long timestamp = System.currentTimeMillis();
+        private final long timestampMillis = System.currentTimeMillis();
     }
 }

@@ -337,7 +337,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
         final boolean blockWhenExhausted = getBlockWhenExhausted();
 
         boolean create;
-        final long waitTime = System.currentTimeMillis();
+        final long waitTimeMillis = System.currentTimeMillis();
         final ObjectDeque<T> objectDeque = register(key);
 
         try {
@@ -420,7 +420,7 @@ public class GenericKeyedObjectPool<K, T> extends BaseGenericObjectPool<T>
             deregister(key);
         }
 
-        updateStatsBorrow(p, System.currentTimeMillis() - waitTime);
+        updateStatsBorrow(p, System.currentTimeMillis() - waitTimeMillis);
 
         return p.getObject();
     }
