@@ -231,6 +231,16 @@
         Switch to the CDN as the primary download location for ASF dependencies.
         (markt)
       </update>
+      <add>
+        Improvements to Chinese translations contributed by syseal, wolibo and
+        ZhangJieWen. (markt)
+      </add>
+      <add>
+        Improvements to Japanese translations contributed by tak7iji. (markt)
+      </add>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
     </changelog>
   </subsection>
 </section>
