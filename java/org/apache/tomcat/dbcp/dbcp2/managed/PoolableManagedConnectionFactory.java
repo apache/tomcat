@@ -17,6 +17,7 @@
 package org.apache.tomcat.dbcp.dbcp2.managed;
 
 import java.sql.Connection;
+import java.time.Duration;
 
 import javax.management.ObjectName;
 
@@ -81,7 +82,7 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
             final GenericKeyedObjectPoolConfig<DelegatingPreparedStatement> config = new GenericKeyedObjectPoolConfig<>();
             config.setMaxTotalPerKey(-1);
             config.setBlockWhenExhausted(false);
-            config.setMaxWaitMillis(0);
+            config.setMaxWait(Duration.ZERO);
             config.setMaxIdlePerKey(1);
             config.setMaxTotal(getMaxOpenPreparedStatements());
             final ObjectName dataSourceJmxName = getDataSourceJmxName();

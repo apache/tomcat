@@ -43,7 +43,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     /** The connection that created me. **/
     private DelegatingConnection<?> connection;
 
-    private boolean closed = false;
+    private boolean closed;
 
     /**
      * Create a wrapper for the Statement which traces this Statement to the Connection which created it and the code
@@ -624,11 +624,10 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     protected void handleException(final SQLException e) throws SQLException {
-        if (connection != null) {
-            connection.handleException(e);
-        } else {
+        if (connection == null) {
             throw e;
         }
+        connection.handleException(e);
     }
 
     /*
@@ -669,11 +668,11 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     public boolean isWrapperFor(final Class<?> iface) throws SQLException {
         if (iface.isAssignableFrom(getClass())) {
             return true;
-        } else if (iface.isAssignableFrom(statement.getClass())) {
-            return true;
-        } else {
-            return statement.isWrapperFor(iface);
         }
+        if (iface.isAssignableFrom(statement.getClass())) {
+            return true;
+        }
+        return statement.isWrapperFor(iface);
     }
 
     /**
@@ -815,10 +814,10 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     public <T> T unwrap(final Class<T> iface) throws SQLException {
         if (iface.isAssignableFrom(getClass())) {
             return iface.cast(this);
-        } else if (iface.isAssignableFrom(statement.getClass())) {
-            return iface.cast(statement);
-        } else {
-            return statement.unwrap(iface);
         }
+        if (iface.isAssignableFrom(statement.getClass())) {
+            return iface.cast(statement);
+        }
+        return statement.unwrap(iface);
     }
 }
