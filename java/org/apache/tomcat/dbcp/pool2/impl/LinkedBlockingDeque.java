@@ -17,6 +17,7 @@
 package org.apache.tomcat.dbcp.pool2.impl;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.AbstractQueue;
 import java.util.Collection;
 import java.util.Deque;
@@ -91,7 +92,148 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * implementation, so a lot of method specs are duplicated here.
      */
 
-    private static final long serialVersionUID = -387911632671998426L;
+    /**
+     * Base class for Iterators for LinkedBlockingDeque
+     */
+    private abstract class AbstractItr implements Iterator<E> {
+        /**
+         * The next node to return in next()
+         */
+         Node<E> next;
+
+        /**
+         * nextItem holds on to item fields because once we claim that
+         * an element exists in hasNext(), we must return item read
+         * under lock (in advance()) even if it was in the process of
+         * being removed when hasNext() was called.
+         */
+        E nextItem;
+
+        /**
+         * Node returned by most recent call to next. Needed by remove.
+         * Reset to null if this element is deleted by a call to remove.
+         */
+        private Node<E> lastRet;
+
+        /**
+         * Constructs a new iterator. Sets the initial position.
+         */
+        AbstractItr() {
+            // set to initial position
+            lock.lock();
+            try {
+                next = firstNode();
+                nextItem = next == null ? null : next.item;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        /**
+         * Advances next.
+         */
+        void advance() {
+            lock.lock();
+            try {
+                // assert next != null;
+                next = succ(next);
+                nextItem = next == null ? null : next.item;
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        /**
+         * Obtain the first node to be returned by the iterator.
+         *
+         * @return first node
+         */
+        abstract Node<E> firstNode();
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        @Override
+        public E next() {
+            if (next == null) {
+                throw new NoSuchElementException();
+            }
+            lastRet = next;
+            final E x = nextItem;
+            advance();
+            return x;
+        }
+
+        /**
+         * For a given node, obtain the next node to be returned by the
+         * iterator.
+         *
+         * @param n given node
+         *
+         * @return next node
+         */
+        abstract Node<E> nextNode(Node<E> n);
+
+        @Override
+        public void remove() {
+            final Node<E> n = lastRet;
+            if (n == null) {
+                throw new IllegalStateException();
+            }
+            lastRet = null;
+            lock.lock();
+            try {
+                if (n.item != null) {
+                    unlink(n);
+                }
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        /**
+         * Returns the successor node of the given non-null, but
+         * possibly previously deleted, node.
+         *
+         * @param n node whose successor is sought
+         * @return successor node
+         */
+        private Node<E> succ(Node<E> n) {
+            // Chains of deleted nodes ending in null or self-links
+            // are possible if multiple interior nodes are removed.
+            for (;;) {
+                final Node<E> s = nextNode(n);
+                if (s == null) {
+                    return null;
+                }
+                if (s.item != null) {
+                    return s;
+                }
+                if (s == n) {
+                    return firstNode();
+                }
+                n = s;
+            }
+        }
+    }
+
+    /** Descending iterator */
+    private class DescendingItr extends AbstractItr {
+        @Override
+        Node<E> firstNode() { return last; }
+        @Override
+        Node<E> nextNode(final Node<E> n) { return n.prev; }
+    }
+
+    /** Forward iterator */
+    private class Itr extends AbstractItr {
+        @Override
+        Node<E> firstNode() { return first; }
+        @Override
+        Node<E> nextNode(final Node<E> n) { return n.next; }
+        }
 
     /**
      * Doubly-linked list node class.
@@ -121,7 +263,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         Node<E> next;
 
         /**
-         * Create a new list node.
+         * Constructs a new list node.
          *
          * @param x The list item
          * @param p Previous item
@@ -133,6 +275,8 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
             next = n;
         }
     }
+
+    private static final long serialVersionUID = -387911632671998426L;
 
     /**
      * Pointer to first node.
@@ -181,6 +325,34 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         this(Integer.MAX_VALUE, fairness);
     }
 
+
+    // Basic linking and unlinking operations, called only while holding lock
+
+    /**
+     * Creates a {@code LinkedBlockingDeque} with a capacity of
+     * {@link Integer#MAX_VALUE}, initially containing the elements of
+     * the given collection, added in traversal order of the
+     * collection's iterator.
+     *
+     * @param c the collection of elements to initially contain
+     * @throws NullPointerException if the specified collection or any
+     *         of its elements are null
+     */
+    public LinkedBlockingDeque(final Collection<? extends E> c) {
+        this(Integer.MAX_VALUE);
+        lock.lock(); // Never contended, but necessary for visibility
+        try {
+            for (final E e : c) {
+                Objects.requireNonNull(e);
+                if (!linkLast(e)) {
+                    throw new IllegalStateException("Deque full");
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
     /**
      * Creates a {@code LinkedBlockingDeque} with the given (fixed) capacity.
      *
@@ -211,542 +383,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
     }
 
     /**
-     * Creates a {@code LinkedBlockingDeque} with a capacity of
-     * {@link Integer#MAX_VALUE}, initially containing the elements of
-     * the given collection, added in traversal order of the
-     * collection's iterator.
-     *
-     * @param c the collection of elements to initially contain
-     * @throws NullPointerException if the specified collection or any
-     *         of its elements are null
-     */
-    public LinkedBlockingDeque(final Collection<? extends E> c) {
-        this(Integer.MAX_VALUE);
-        lock.lock(); // Never contended, but necessary for visibility
-        try {
-            for (final E e : c) {
-                Objects.requireNonNull(e);
-                if (!linkLast(e)) {
-                    throw new IllegalStateException("Deque full");
-                }
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-
-
-    // Basic linking and unlinking operations, called only while holding lock
-
-    /**
-     * Links provided element as first element, or returns false if full.
-     *
-     * @param e The element to link as the first element.
-     *
-     * @return {@code true} if successful, otherwise {@code false}
-     */
-    private boolean linkFirst(final E e) {
-        // assert lock.isHeldByCurrentThread();
-        if (count >= capacity) {
-            return false;
-        }
-        final Node<E> f = first;
-        final Node<E> x = new Node<>(e, null, f);
-        first = x;
-        if (last == null) {
-            last = x;
-        } else {
-            f.prev = x;
-        }
-        ++count;
-        notEmpty.signal();
-        return true;
-    }
-
-    /**
-     * Links provided element as last element, or returns false if full.
-     *
-     * @param e The element to link as the last element.
-     *
-     * @return {@code true} if successful, otherwise {@code false}
-     */
-    private boolean linkLast(final E e) {
-        // assert lock.isHeldByCurrentThread();
-        if (count >= capacity) {
-            return false;
-        }
-        final Node<E> l = last;
-        final Node<E> x = new Node<>(e, l, null);
-        last = x;
-        if (first == null) {
-            first = x;
-        } else {
-            l.next = x;
-        }
-        ++count;
-        notEmpty.signal();
-        return true;
-    }
-
-    /**
-     * Removes and returns the first element, or null if empty.
-     *
-     * @return The first element or {@code null} if empty
-     */
-    private E unlinkFirst() {
-        // assert lock.isHeldByCurrentThread();
-        final Node<E> f = first;
-        if (f == null) {
-            return null;
-        }
-        final Node<E> n = f.next;
-        final E item = f.item;
-        f.item = null;
-        f.next = f; // help GC
-        first = n;
-        if (n == null) {
-            last = null;
-        } else {
-            n.prev = null;
-        }
-        --count;
-        notFull.signal();
-        return item;
-    }
-
-    /**
-     * Removes and returns the last element, or null if empty.
-     *
-     * @return The first element or {@code null} if empty
-     */
-    private E unlinkLast() {
-        // assert lock.isHeldByCurrentThread();
-        final Node<E> l = last;
-        if (l == null) {
-            return null;
-        }
-        final Node<E> p = l.prev;
-        final E item = l.item;
-        l.item = null;
-        l.prev = l; // help GC
-        last = p;
-        if (p == null) {
-            first = null;
-        } else {
-            p.next = null;
-        }
-        --count;
-        notFull.signal();
-        return item;
-    }
-
-    /**
-     * Unlinks the provided node.
-     *
-     * @param x The node to unlink
-     */
-    private void unlink(final Node<E> x) {
-        // assert lock.isHeldByCurrentThread();
-        final Node<E> p = x.prev;
-        final Node<E> n = x.next;
-        if (p == null) {
-            unlinkFirst();
-        } else if (n == null) {
-            unlinkLast();
-        } else {
-            p.next = n;
-            n.prev = p;
-            x.item = null;
-            // Don't mess with x's links.  They may still be in use by
-            // an iterator.
-        --count;
-            notFull.signal();
-        }
-    }
-
-    // BlockingDeque methods
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addFirst(final E e) {
-        if (!offerFirst(e)) {
-            throw new IllegalStateException("Deque full");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addLast(final E e) {
-        if (!offerLast(e)) {
-            throw new IllegalStateException("Deque full");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean offerFirst(final E e) {
-        Objects.requireNonNull(e, "e");
-        lock.lock();
-        try {
-            return linkFirst(e);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean offerLast(final E e) {
-        Objects.requireNonNull(e, "e");
-        lock.lock();
-        try {
-            return linkLast(e);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Links the provided element as the first in the queue, waiting until there
-     * is space to do so if the queue is full.
-     *
-     * @param e element to link
-     *
-     * @throws NullPointerException if e is null
-     * @throws InterruptedException if the thread is interrupted whilst waiting
-     *         for space
-     */
-    public void putFirst(final E e) throws InterruptedException {
-        Objects.requireNonNull(e, "e");
-        lock.lock();
-        try {
-            while (!linkFirst(e)) {
-                notFull.await();
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Links the provided element as the last in the queue, waiting until there
-     * is space to do so if the queue is full.
-     *
-     * @param e element to link
-     *
-     * @throws NullPointerException if e is null
-     * @throws InterruptedException if the thread is interrupted whilst waiting
-     *         for space
-     */
-    public void putLast(final E e) throws InterruptedException {
-        Objects.requireNonNull(e, "e");
-        lock.lock();
-        try {
-            while (!linkLast(e)) {
-                notFull.await();
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Links the provided element as the first in the queue, waiting up to the
-     * specified time to do so if the queue is full.
-     *
-     * @param e         element to link
-     * @param timeout   length of time to wait
-     * @param unit      units that timeout is expressed in
-     *
-     * @return {@code true} if successful, otherwise {@code false}
-     *
-     * @throws NullPointerException if e is null
-     * @throws InterruptedException if the thread is interrupted whilst waiting
-     *         for space
-     */
-    public boolean offerFirst(final E e, final long timeout, final TimeUnit unit)
-        throws InterruptedException {
-        Objects.requireNonNull(e, "e");
-        long nanos = unit.toNanos(timeout);
-        lock.lockInterruptibly();
-        try {
-            while (!linkFirst(e)) {
-                if (nanos <= 0) {
-                    return false;
-                }
-                nanos = notFull.awaitNanos(nanos);
-            }
-            return true;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Links the provided element as the last in the queue, waiting up to the
-     * specified time to do so if the queue is full.
-     *
-     * @param e         element to link
-     * @param timeout   length of time to wait
-     * @param unit      units that timeout is expressed in
-     *
-     * @return {@code true} if successful, otherwise {@code false}
-     *
-     * @throws NullPointerException if e is null
-     * @throws InterruptedException if the thread is interrupted whist waiting
-     *         for space
-     */
-    public boolean offerLast(final E e, final long timeout, final TimeUnit unit)
-        throws InterruptedException {
-        Objects.requireNonNull(e, "e");
-        long nanos = unit.toNanos(timeout);
-        lock.lockInterruptibly();
-        try {
-            while (!linkLast(e)) {
-                if (nanos <= 0) {
-                    return false;
-                }
-                nanos = notFull.awaitNanos(nanos);
-            }
-            return true;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public E removeFirst() {
-        final E x = pollFirst();
-        if (x == null) {
-            throw new NoSuchElementException();
-        }
-        return x;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public E removeLast() {
-        final E x = pollLast();
-        if (x == null) {
-            throw new NoSuchElementException();
-        }
-        return x;
-    }
-
-    @Override
-    public E pollFirst() {
-        lock.lock();
-        try {
-            return unlinkFirst();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public E pollLast() {
-        lock.lock();
-        try {
-            return unlinkLast();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Unlinks the first element in the queue, waiting until there is an element
-     * to unlink if the queue is empty.
-     *
-     * @return the unlinked element
-     * @throws InterruptedException if the current thread is interrupted
-     */
-    public E takeFirst() throws InterruptedException {
-        lock.lock();
-        try {
-            E x;
-            while ( (x = unlinkFirst()) == null) {
-                notEmpty.await();
-            }
-            return x;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Unlinks the last element in the queue, waiting until there is an element
-     * to unlink if the queue is empty.
-     *
-     * @return the unlinked element
-     * @throws InterruptedException if the current thread is interrupted
-     */
-    public E takeLast() throws InterruptedException {
-        lock.lock();
-        try {
-            E x;
-            while ( (x = unlinkLast()) == null) {
-                notEmpty.await();
-            }
-            return x;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Unlinks the first element in the queue, waiting up to the specified time
-     * to do so if the queue is empty.
-     *
-     * @param timeout   length of time to wait
-     * @param unit      units that timeout is expressed in
-     *
-     * @return the unlinked element
-     * @throws InterruptedException if the current thread is interrupted
-     */
-    public E pollFirst(final long timeout, final TimeUnit unit)
-        throws InterruptedException {
-        long nanos = unit.toNanos(timeout);
-        lock.lockInterruptibly();
-        try {
-            E x;
-            while ( (x = unlinkFirst()) == null) {
-                if (nanos <= 0) {
-                    return null;
-                }
-                nanos = notEmpty.awaitNanos(nanos);
-            }
-            return x;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Unlinks the last element in the queue, waiting up to the specified time
-     * to do so if the queue is empty.
-     *
-     * @param timeout   length of time to wait
-     * @param unit      units that timeout is expressed in
-     *
-     * @return the unlinked element
-     * @throws InterruptedException if the current thread is interrupted
-     */
-    public E pollLast(final long timeout, final TimeUnit unit)
-        throws InterruptedException {
-        long nanos = unit.toNanos(timeout);
-        lock.lockInterruptibly();
-        try {
-            E x;
-            while ( (x = unlinkLast()) == null) {
-                if (nanos <= 0) {
-                    return null;
-                }
-                nanos = notEmpty.awaitNanos(nanos);
-            }
-            return x;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public E getFirst() {
-        final E x = peekFirst();
-        if (x == null) {
-            throw new NoSuchElementException();
-        }
-        return x;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public E getLast() {
-        final E x = peekLast();
-        if (x == null) {
-            throw new NoSuchElementException();
-        }
-        return x;
-    }
-
-    @Override
-    public E peekFirst() {
-        lock.lock();
-        try {
-            return first == null ? null : first.item;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public E peekLast() {
-        lock.lock();
-        try {
-            return last == null ? null : last.item;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public boolean removeFirstOccurrence(final Object o) {
-        if (o == null) {
-            return false;
-        }
-        lock.lock();
-        try {
-            for (Node<E> p = first; p != null; p = p.next) {
-                if (o.equals(p.item)) {
-                    unlink(p);
-                    return true;
-                }
-            }
-            return false;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public boolean removeLastOccurrence(final Object o) {
-        if (o == null) {
-            return false;
-        }
-        lock.lock();
-        try {
-            for (Node<E> p = last; p != null; p = p.prev) {
-                if (o.equals(p.item)) {
-                    unlink(p);
-                    return true;
-                }
-            }
-            return false;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    // BlockingQueue methods
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -759,136 +395,79 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * {@inheritDoc}
      */
     @Override
-    public boolean offer(final E e) {
-        return offerLast(e);
+    public void addFirst(final E e) {
+        if (!offerFirst(e)) {
+            throw new IllegalStateException("Deque full");
+        }
     }
 
-    /**
-     * Links the provided element as the last in the queue, waiting until there
-     * is space to do so if the queue is full.
-     *
-     * <p>This method is equivalent to {@link #putLast(Object)}.
-     *
-     * @param e element to link
-     *
-     * @throws NullPointerException if e is null
-     * @throws InterruptedException if the thread is interrupted whilst waiting
-     *         for space
-     */
-    public void put(final E e) throws InterruptedException {
-        putLast(e);
-    }
+    // BlockingDeque methods
 
     /**
-     * Links the provided element as the last in the queue, waiting up to the
-     * specified time to do so if the queue is full.
-     * <p>
-     * This method is equivalent to {@link #offerLast(Object, long, TimeUnit)}
-     *
-     * @param e         element to link
-     * @param timeout   length of time to wait
-     * @param unit      units that timeout is expressed in
-     *
-     * @return {@code true} if successful, otherwise {@code false}
-     *
-     * @throws NullPointerException if e is null
-     * @throws InterruptedException if the thread is interrupted whilst waiting
-     *         for space
-     */
-    public boolean offer(final E e, final long timeout, final TimeUnit unit)
-        throws InterruptedException {
-        return offerLast(e, timeout, unit);
-    }
-
-    /**
-     * Retrieves and removes the head of the queue represented by this deque.
-     * This method differs from {@link #poll poll} only in that it throws an
-     * exception if this deque is empty.
-     *
-     * <p>This method is equivalent to {@link #removeFirst() removeFirst}.
-     *
-     * @return the head of the queue represented by this deque
-     * @throws NoSuchElementException if this deque is empty
+     * {@inheritDoc}
      */
     @Override
-    public E remove() {
-        return removeFirst();
-    }
-
-    @Override
-    public E poll() {
-        return pollFirst();
+    public void addLast(final E e) {
+        if (!offerLast(e)) {
+            throw new IllegalStateException("Deque full");
+        }
     }
 
     /**
-     * Unlinks the first element in the queue, waiting until there is an element
-     * to unlink if the queue is empty.
-     *
-     * <p>This method is equivalent to {@link #takeFirst()}.
-     *
-     * @return the unlinked element
-     * @throws InterruptedException if the current thread is interrupted
-     */
-    public E take() throws InterruptedException {
-        return takeFirst();
-    }
-
-    /**
-     * Unlinks the first element in the queue, waiting up to the specified time
-     * to do so if the queue is empty.
-     *
-     * <p>This method is equivalent to {@link #pollFirst(long, TimeUnit)}.
-     *
-     * @param timeout   length of time to wait
-     * @param unit      units that timeout is expressed in
-     *
-     * @return the unlinked element
-     * @throws InterruptedException if the current thread is interrupted
-     */
-    public E poll(final long timeout, final TimeUnit unit) throws InterruptedException {
-        return pollFirst(timeout, unit);
-    }
-
-    /**
-     * Retrieves, but does not remove, the head of the queue represented by
-     * this deque.  This method differs from {@link #peek peek} only in that
-     * it throws an exception if this deque is empty.
-     *
-     * <p>This method is equivalent to {@link #getFirst() getFirst}.
-     *
-     * @return the head of the queue represented by this deque
-     * @throws NoSuchElementException if this deque is empty
+     * Atomically removes all of the elements from this deque.
+     * The deque will be empty after this call returns.
      */
     @Override
-    public E element() {
-        return getFirst();
-    }
-
-    @Override
-    public E peek() {
-        return peekFirst();
-    }
-
-    /**
-     * Returns the number of additional elements that this deque can ideally
-     * (in the absence of memory or resource constraints) accept without
-     * blocking. This is always equal to the initial capacity of this deque
-     * less the current {@code size} of this deque.
-     *
-     * <p>Note that you <em>cannot</em> always tell if an attempt to insert
-     * an element will succeed by inspecting {@code remainingCapacity}
-     * because it may be the case that another thread is about to
-     * insert or remove an element.
-     *
-     * @return The number of additional elements the queue is able to accept
-     */
-    public int remainingCapacity() {
+    public void clear() {
         lock.lock();
         try {
-            return capacity - count;
+            for (Node<E> f = first; f != null;) {
+                f.item = null;
+                final Node<E> n = f.next;
+                f.prev = null;
+                f.next = null;
+                f = n;
+            }
+            first = last = null;
+            count = 0;
+            notFull.signalAll();
         } finally {
             lock.unlock();
         }
+    }
+
+    /**
+     * Returns {@code true} if this deque contains the specified element.
+     * More formally, returns {@code true} if and only if this deque contains
+     * at least one element {@code e} such that {@code o.equals(e)}.
+     *
+     * @param o object to be checked for containment in this deque
+     * @return {@code true} if this deque contains the specified element
+     */
+    @Override
+    public boolean contains(final Object o) {
+        if (o == null) {
+            return false;
+        }
+        lock.lock();
+        try {
+            for (Node<E> p = first; p != null; p = p.next) {
+                if (o.equals(p.item)) {
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<E> descendingIterator() {
+        return new DescendingItr();
     }
 
     /**
@@ -944,14 +523,489 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         }
     }
 
-    // Stack methods
+    /**
+     * Retrieves, but does not remove, the head of the queue represented by
+     * this deque.  This method differs from {@link #peek peek} only in that
+     * it throws an exception if this deque is empty.
+     *
+     * <p>This method is equivalent to {@link #getFirst() getFirst}.
+     *
+     * @return the head of the queue represented by this deque
+     * @throws NoSuchElementException if this deque is empty
+     */
+    @Override
+    public E element() {
+        return getFirst();
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void push(final E e) {
-        addFirst(e);
+    public E getFirst() {
+        final E x = peekFirst();
+        if (x == null) {
+            throw new NoSuchElementException();
+        }
+        return x;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public E getLast() {
+        final E x = peekLast();
+        if (x == null) {
+            throw new NoSuchElementException();
+        }
+        return x;
+    }
+
+    /**
+     * Gets the length of the queue of threads waiting to take instances from this deque. See disclaimer on accuracy
+     * in {@link java.util.concurrent.locks.ReentrantLock#getWaitQueueLength(Condition)}.
+     *
+     * @return number of threads waiting on this deque's notEmpty condition.
+     */
+    public int getTakeQueueLength() {
+        lock.lock();
+        try {
+           return lock.getWaitQueueLength(notEmpty);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns true if there are threads waiting to take instances from this deque. See disclaimer on accuracy in
+     * {@link java.util.concurrent.locks.ReentrantLock#hasWaiters(Condition)}.
+     *
+     * @return true if there is at least one thread waiting on this deque's notEmpty condition.
+     */
+    public boolean hasTakeWaiters() {
+        lock.lock();
+        try {
+            return lock.hasWaiters(notEmpty);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Interrupts the threads currently waiting to take an object from the pool. See disclaimer on accuracy in
+     * {@link java.util.concurrent.locks.ReentrantLock#getWaitingThreads(Condition)}.
+     */
+    public void interuptTakeWaiters() {
+        lock.lock();
+        try {
+            lock.interruptWaiters(notEmpty);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns an iterator over the elements in this deque in proper sequence.
+     * The elements will be returned in order from first (head) to last (tail).
+     * The returned {@code Iterator} is a "weakly consistent" iterator that
+     * will never throw {@link java.util.ConcurrentModificationException
+     * ConcurrentModificationException},
+     * and guarantees to traverse elements as they existed upon
+     * construction of the iterator, and may (but is not guaranteed to)
+     * reflect any modifications subsequent to construction.
+     *
+     * @return an iterator over the elements in this deque in proper sequence
+     */
+    @Override
+    public Iterator<E> iterator() {
+        return new Itr();
+    }
+
+    /**
+     * Links provided element as first element, or returns false if full.
+     *
+     * @param e The element to link as the first element.
+     *
+     * @return {@code true} if successful, otherwise {@code false}
+     */
+    private boolean linkFirst(final E e) {
+        // assert lock.isHeldByCurrentThread();
+        if (count >= capacity) {
+            return false;
+        }
+        final Node<E> f = first;
+        final Node<E> x = new Node<>(e, null, f);
+        first = x;
+        if (last == null) {
+            last = x;
+        } else {
+            f.prev = x;
+        }
+        ++count;
+        notEmpty.signal();
+        return true;
+    }
+
+    /**
+     * Links provided element as last element, or returns false if full.
+     *
+     * @param e The element to link as the last element.
+     *
+     * @return {@code true} if successful, otherwise {@code false}
+     */
+    private boolean linkLast(final E e) {
+        // assert lock.isHeldByCurrentThread();
+        if (count >= capacity) {
+            return false;
+        }
+        final Node<E> l = last;
+        final Node<E> x = new Node<>(e, l, null);
+        last = x;
+        if (first == null) {
+            first = x;
+        } else {
+            l.next = x;
+        }
+        ++count;
+        notEmpty.signal();
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean offer(final E e) {
+        return offerLast(e);
+    }
+
+    /**
+     * Links the provided element as the last in the queue, waiting up to the
+     * specified time to do so if the queue is full.
+     * <p>
+     * This method is equivalent to {@link #offerLast(Object, long, TimeUnit)}
+     *
+     * @param e         element to link
+     * @param timeout   length of time to wait
+     *
+     * @return {@code true} if successful, otherwise {@code false}
+     *
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
+     */
+    boolean offer(final E e, final Duration timeout) throws InterruptedException {
+        return offerLast(e, timeout);
+    }
+
+    /**
+     * Links the provided element as the last in the queue, waiting up to the
+     * specified time to do so if the queue is full.
+     * <p>
+     * This method is equivalent to {@link #offerLast(Object, long, TimeUnit)}
+     *
+     * @param e         element to link
+     * @param timeout   length of time to wait
+     * @param unit      units that timeout is expressed in
+     *
+     * @return {@code true} if successful, otherwise {@code false}
+     *
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
+     */
+    public boolean offer(final E e, final long timeout, final TimeUnit unit) throws InterruptedException {
+        return offerLast(e, timeout, unit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean offerFirst(final E e) {
+        Objects.requireNonNull(e, "e");
+        lock.lock();
+        try {
+            return linkFirst(e);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Links the provided element as the first in the queue, waiting up to the
+     * specified time to do so if the queue is full.
+     *
+     * @param e         element to link
+     * @param timeout   length of time to wait
+     *
+     * @return {@code true} if successful, otherwise {@code false}
+     *
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
+     */
+    public boolean offerFirst(final E e, final Duration timeout) throws InterruptedException {
+        Objects.requireNonNull(e, "e");
+        long nanos = timeout.toNanos();
+        lock.lockInterruptibly();
+        try {
+            while (!linkFirst(e)) {
+                if (nanos <= 0) {
+                    return false;
+                }
+                nanos = notFull.awaitNanos(nanos);
+            }
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Links the provided element as the first in the queue, waiting up to the
+     * specified time to do so if the queue is full.
+     *
+     * @param e         element to link
+     * @param timeout   length of time to wait
+     * @param unit      units that timeout is expressed in
+     *
+     * @return {@code true} if successful, otherwise {@code false}
+     *
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
+     */
+    public boolean offerFirst(final E e, final long timeout, final TimeUnit unit) throws InterruptedException {
+        return offerFirst(e, PoolImplUtils.toDuration(timeout, unit));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean offerLast(final E e) {
+        Objects.requireNonNull(e, "e");
+        lock.lock();
+        try {
+            return linkLast(e);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Links the provided element as the last in the queue, waiting up to the
+     * specified time to do so if the queue is full.
+     *
+     * @param e         element to link
+     * @param timeout   length of time to wait
+     *
+     * @return {@code true} if successful, otherwise {@code false}
+     *
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whist waiting
+     *         for space
+     */
+    boolean offerLast(final E e, final Duration timeout) throws InterruptedException {
+        Objects.requireNonNull(e, "e");
+        long nanos = timeout.toNanos();
+        lock.lockInterruptibly();
+        try {
+            while (!linkLast(e)) {
+                if (nanos <= 0) {
+                    return false;
+                }
+                nanos = notFull.awaitNanos(nanos);
+            }
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Links the provided element as the last in the queue, waiting up to the
+     * specified time to do so if the queue is full.
+     *
+     * @param e         element to link
+     * @param timeout   length of time to wait
+     * @param unit      units that timeout is expressed in
+     *
+     * @return {@code true} if successful, otherwise {@code false}
+     *
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whist waiting
+     *         for space
+     */
+    public boolean offerLast(final E e, final long timeout, final TimeUnit unit) throws InterruptedException {
+        return offerLast(e, PoolImplUtils.toDuration(timeout, unit));
+    }
+
+    @Override
+    public E peek() {
+        return peekFirst();
+    }
+
+    // BlockingQueue methods
+
+    @Override
+    public E peekFirst() {
+        lock.lock();
+        try {
+            return first == null ? null : first.item;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public E peekLast() {
+        lock.lock();
+        try {
+            return last == null ? null : last.item;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public E poll() {
+        return pollFirst();
+    }
+
+    /**
+     * Unlinks the first element in the queue, waiting up to the specified time
+     * to do so if the queue is empty.
+     *
+     * <p>This method is equivalent to {@link #pollFirst(long, TimeUnit)}.
+     *
+     * @param timeout   length of time to wait
+     *
+     * @return the unlinked element
+     * @throws InterruptedException if the current thread is interrupted
+     */
+    E poll(final Duration timeout) throws InterruptedException {
+        return pollFirst(timeout);
+    }
+
+    /**
+     * Unlinks the first element in the queue, waiting up to the specified time
+     * to do so if the queue is empty.
+     *
+     * <p>This method is equivalent to {@link #pollFirst(long, TimeUnit)}.
+     *
+     * @param timeout   length of time to wait
+     * @param unit      units that timeout is expressed in
+     *
+     * @return the unlinked element
+     * @throws InterruptedException if the current thread is interrupted
+     */
+    public E poll(final long timeout, final TimeUnit unit) throws InterruptedException {
+        return pollFirst(timeout, unit);
+    }
+
+    @Override
+    public E pollFirst() {
+        lock.lock();
+        try {
+            return unlinkFirst();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Unlinks the first element in the queue, waiting up to the specified time
+     * to do so if the queue is empty.
+     *
+     * @param timeout   length of time to wait
+     *
+     * @return the unlinked element
+     * @throws InterruptedException if the current thread is interrupted
+     */
+    E pollFirst(final Duration timeout) throws InterruptedException {
+        long nanos = timeout.toNanos();
+        lock.lockInterruptibly();
+        try {
+            E x;
+            while ((x = unlinkFirst()) == null) {
+                if (nanos <= 0) {
+                    return null;
+                }
+                nanos = notEmpty.awaitNanos(nanos);
+            }
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Unlinks the first element in the queue, waiting up to the specified time
+     * to do so if the queue is empty.
+     *
+     * @param timeout   length of time to wait
+     * @param unit      units that timeout is expressed in
+     *
+     * @return the unlinked element
+     * @throws InterruptedException if the current thread is interrupted
+     */
+    public E pollFirst(final long timeout, final TimeUnit unit) throws InterruptedException {
+        return pollFirst(PoolImplUtils.toDuration(timeout, unit));
+    }
+
+    @Override
+    public E pollLast() {
+        lock.lock();
+        try {
+            return unlinkLast();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Unlinks the last element in the queue, waiting up to the specified time
+     * to do so if the queue is empty.
+     *
+     * @param timeout   length of time to wait
+     *
+     * @return the unlinked element
+     * @throws InterruptedException if the current thread is interrupted
+     */
+    public E pollLast(final Duration timeout)
+        throws InterruptedException {
+        long nanos = timeout.toNanos();
+        lock.lockInterruptibly();
+        try {
+            E x;
+            while ( (x = unlinkLast()) == null) {
+                if (nanos <= 0) {
+                    return null;
+                }
+                nanos = notEmpty.awaitNanos(nanos);
+            }
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Unlinks the last element in the queue, waiting up to the specified time
+     * to do so if the queue is empty.
+     *
+     * @param timeout   length of time to wait
+     * @param unit      units that timeout is expressed in
+     *
+     * @return the unlinked element
+     * @throws InterruptedException if the current thread is interrupted
+     */
+    public E pollLast(final long timeout, final TimeUnit unit)
+        throws InterruptedException {
+        return pollLast(PoolImplUtils.toDuration(timeout, unit));
     }
 
     /**
@@ -962,7 +1016,143 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         return removeFirst();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void push(final E e) {
+        addFirst(e);
+    }
+
+    /**
+     * Links the provided element as the last in the queue, waiting until there
+     * is space to do so if the queue is full.
+     *
+     * <p>
+     * This method is equivalent to {@link #putLast(Object)}.
+     * </p>
+     *
+     * @param e element to link
+     *
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
+     */
+    public void put(final E e) throws InterruptedException {
+        putLast(e);
+    }
+
+    /**
+     * Links the provided element as the first in the queue, waiting until there
+     * is space to do so if the queue is full.
+     *
+     * @param e element to link
+     *
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
+     */
+    public void putFirst(final E e) throws InterruptedException {
+        Objects.requireNonNull(e, "e");
+        lock.lock();
+        try {
+            while (!linkFirst(e)) {
+                notFull.await();
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Links the provided element as the last in the queue, waiting until there
+     * is space to do so if the queue is full.
+     *
+     * @param e element to link
+     *
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
+     */
+    public void putLast(final E e) throws InterruptedException {
+        Objects.requireNonNull(e, "e");
+        lock.lock();
+        try {
+            while (!linkLast(e)) {
+                notFull.await();
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    // Stack methods
+
+    /**
+     * Reconstitutes this deque from a stream (that is,
+     * deserialize it).
+     * @param s the stream
+     */
+    private void readObject(final java.io.ObjectInputStream s)
+        throws java.io.IOException, ClassNotFoundException {
+        s.defaultReadObject();
+        count = 0;
+        first = null;
+        last = null;
+        // Read in all elements and place in queue
+        for (;;) {
+            @SuppressWarnings("unchecked")
+            final
+            E item = (E)s.readObject();
+            if (item == null) {
+                break;
+            }
+            add(item);
+        }
+    }
+
+    /**
+     * Returns the number of additional elements that this deque can ideally
+     * (in the absence of memory or resource constraints) accept without
+     * blocking. This is always equal to the initial capacity of this deque
+     * less the current {@code size} of this deque.
+     *
+     * <p>
+     * Note that you <em>cannot</em> always tell if an attempt to insert
+     * an element will succeed by inspecting {@code remainingCapacity}
+     * because it may be the case that another thread is about to
+     * insert or remove an element.
+     * </p>
+     *
+     * @return The number of additional elements the queue is able to accept
+     */
+    public int remainingCapacity() {
+        lock.lock();
+        try {
+            return capacity - count;
+        } finally {
+            lock.unlock();
+        }
+    }
+
     // Collection methods
+
+    /**
+     * Retrieves and removes the head of the queue represented by this deque.
+     * This method differs from {@link #poll poll} only in that it throws an
+     * exception if this deque is empty.
+     *
+     * <p>
+     * This method is equivalent to {@link #removeFirst() removeFirst}.
+     * </p>
+     *
+     * @return the head of the queue represented by this deque
+     * @throws NoSuchElementException if this deque is empty
+     */
+    @Override
+    public E remove() {
+        return removeFirst();
+    }
 
     /**
      * Removes the first occurrence of the specified element from this deque.
@@ -972,8 +1162,10 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * Returns {@code true} if this deque contained the specified element
      * (or equivalently, if this deque changed as a result of the call).
      *
-     * <p>This method is equivalent to
+     * <p>
+     * This method is equivalent to
      * {@link #removeFirstOccurrence(Object) removeFirstOccurrence}.
+     * </p>
      *
      * @param o element to be removed from this deque, if present
      * @return {@code true} if this deque changed as a result of the call
@@ -984,44 +1176,15 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
     }
 
     /**
-     * Returns the number of elements in this deque.
-     *
-     * @return the number of elements in this deque
+     * {@inheritDoc}
      */
     @Override
-    public int size() {
-        lock.lock();
-        try {
-            return count;
-        } finally {
-            lock.unlock();
+    public E removeFirst() {
+        final E x = pollFirst();
+        if (x == null) {
+            throw new NoSuchElementException();
         }
-    }
-
-    /**
-     * Returns {@code true} if this deque contains the specified element.
-     * More formally, returns {@code true} if and only if this deque contains
-     * at least one element {@code e} such that {@code o.equals(e)}.
-     *
-     * @param o object to be checked for containment in this deque
-     * @return {@code true} if this deque contains the specified element
-     */
-    @Override
-    public boolean contains(final Object o) {
-        if (o == null) {
-            return false;
-        }
-        lock.lock();
-        try {
-            for (Node<E> p = first; p != null; p = p.next) {
-                if (o.equals(p.item)) {
-                    return true;
-                }
-            }
-            return false;
-        } finally {
-            lock.unlock();
-        }
+        return x;
     }
 
     /*
@@ -1065,16 +1228,139 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
 //         }
 //     }
 
+    @Override
+    public boolean removeFirstOccurrence(final Object o) {
+        if (o == null) {
+            return false;
+        }
+        lock.lock();
+        try {
+            for (Node<E> p = first; p != null; p = p.next) {
+                if (o.equals(p.item)) {
+                    unlink(p);
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public E removeLast() {
+        final E x = pollLast();
+        if (x == null) {
+            throw new NoSuchElementException();
+        }
+        return x;
+    }
+
+    @Override
+    public boolean removeLastOccurrence(final Object o) {
+        if (o == null) {
+            return false;
+        }
+        lock.lock();
+        try {
+            for (Node<E> p = last; p != null; p = p.prev) {
+                if (o.equals(p.item)) {
+                    unlink(p);
+                    return true;
+                }
+            }
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Returns the number of elements in this deque.
+     *
+     * @return the number of elements in this deque
+     */
+    @Override
+    public int size() {
+        lock.lock();
+        try {
+            return count;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Unlinks the first element in the queue, waiting until there is an element
+     * to unlink if the queue is empty.
+     *
+     * <p>
+     * This method is equivalent to {@link #takeFirst()}.
+     * </p>
+     *
+     * @return the unlinked element
+     * @throws InterruptedException if the current thread is interrupted
+     */
+    public E take() throws InterruptedException {
+        return takeFirst();
+    }
+
+    /**
+     * Unlinks the first element in the queue, waiting until there is an element
+     * to unlink if the queue is empty.
+     *
+     * @return the unlinked element
+     * @throws InterruptedException if the current thread is interrupted
+     */
+    public E takeFirst() throws InterruptedException {
+        lock.lock();
+        try {
+            E x;
+            while ( (x = unlinkFirst()) == null) {
+                notEmpty.await();
+            }
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Unlinks the last element in the queue, waiting until there is an element
+     * to unlink if the queue is empty.
+     *
+     * @return the unlinked element
+     * @throws InterruptedException if the current thread is interrupted
+     */
+    public E takeLast() throws InterruptedException {
+        lock.lock();
+        try {
+            E x;
+            while ( (x = unlinkLast()) == null) {
+                notEmpty.await();
+            }
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+
     /**
      * Returns an array containing all of the elements in this deque, in
      * proper sequence (from first to last element).
      *
-     * <p>The returned array will be "safe" in that no references to it are
+     * <p>
+     * The returned array will be "safe" in that no references to it are
      * maintained by this deque.  (In other words, this method must allocate
      * a new array).  The caller is thus free to modify the returned array.
-     *
-     * <p>This method acts as bridge between array-based and collection-based
+     * </p>
+     * <p>
+     * This method acts as bridge between array-based and collection-based
      * APIs.
+     * </p>
      *
      * @return an array containing all of the elements in this deque
      */
@@ -1129,193 +1415,81 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
     }
 
     /**
-     * Atomically removes all of the elements from this deque.
-     * The deque will be empty after this call returns.
-     */
-    @Override
-    public void clear() {
-        lock.lock();
-        try {
-            for (Node<E> f = first; f != null;) {
-                f.item = null;
-                final Node<E> n = f.next;
-                f.prev = null;
-                f.next = null;
-                f = n;
-            }
-            first = last = null;
-            count = 0;
-            notFull.signalAll();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Returns an iterator over the elements in this deque in proper sequence.
-     * The elements will be returned in order from first (head) to last (tail).
-     * The returned {@code Iterator} is a "weakly consistent" iterator that
-     * will never throw {@link java.util.ConcurrentModificationException
-     * ConcurrentModificationException},
-     * and guarantees to traverse elements as they existed upon
-     * construction of the iterator, and may (but is not guaranteed to)
-     * reflect any modifications subsequent to construction.
+     * Unlinks the provided node.
      *
-     * @return an iterator over the elements in this deque in proper sequence
+     * @param x The node to unlink
      */
-    @Override
-    public Iterator<E> iterator() {
-        return new Itr();
+    private void unlink(final Node<E> x) {
+        // assert lock.isHeldByCurrentThread();
+        final Node<E> p = x.prev;
+        final Node<E> n = x.next;
+        if (p == null) {
+            unlinkFirst();
+        } else if (n == null) {
+            unlinkLast();
+        } else {
+            p.next = n;
+            n.prev = p;
+            x.item = null;
+            // Don't mess with x's links.  They may still be in use by
+            // an iterator.
+        --count;
+            notFull.signal();
+        }
+    }
+
+    // Monitoring methods
+
+    /**
+     * Removes and returns the first element, or null if empty.
+     *
+     * @return The first element or {@code null} if empty
+     */
+    private E unlinkFirst() {
+        // assert lock.isHeldByCurrentThread();
+        final Node<E> f = first;
+        if (f == null) {
+            return null;
+        }
+        final Node<E> n = f.next;
+        final E item = f.item;
+        f.item = null;
+        f.next = f; // help GC
+        first = n;
+        if (n == null) {
+            last = null;
+        } else {
+            n.prev = null;
+        }
+        --count;
+        notFull.signal();
+        return item;
     }
 
     /**
-     * {@inheritDoc}
+     * Removes and returns the last element, or null if empty.
+     *
+     * @return The first element or {@code null} if empty
      */
-    @Override
-    public Iterator<E> descendingIterator() {
-        return new DescendingItr();
-    }
-
-    /**
-     * Base class for Iterators for LinkedBlockingDeque
-     */
-    private abstract class AbstractItr implements Iterator<E> {
-        /**
-         * The next node to return in next()
-         */
-         Node<E> next;
-
-        /**
-         * nextItem holds on to item fields because once we claim that
-         * an element exists in hasNext(), we must return item read
-         * under lock (in advance()) even if it was in the process of
-         * being removed when hasNext() was called.
-         */
-        E nextItem;
-
-        /**
-         * Node returned by most recent call to next. Needed by remove.
-         * Reset to null if this element is deleted by a call to remove.
-         */
-        private Node<E> lastRet;
-
-        /**
-         * Obtain the first node to be returned by the iterator.
-         *
-         * @return first node
-         */
-        abstract Node<E> firstNode();
-
-        /**
-         * For a given node, obtain the next node to be returned by the
-         * iterator.
-         *
-         * @param n given node
-         *
-         * @return next node
-         */
-        abstract Node<E> nextNode(Node<E> n);
-
-        /**
-         * Create a new iterator. Sets the initial position.
-         */
-        AbstractItr() {
-            // set to initial position
-            lock.lock();
-            try {
-                next = firstNode();
-                nextItem = next == null ? null : next.item;
-            } finally {
-                lock.unlock();
-            }
+    private E unlinkLast() {
+        // assert lock.isHeldByCurrentThread();
+        final Node<E> l = last;
+        if (l == null) {
+            return null;
         }
-
-        /**
-         * Returns the successor node of the given non-null, but
-         * possibly previously deleted, node.
-         *
-         * @param n node whose successor is sought
-         * @return successor node
-         */
-        private Node<E> succ(Node<E> n) {
-            // Chains of deleted nodes ending in null or self-links
-            // are possible if multiple interior nodes are removed.
-            for (;;) {
-                final Node<E> s = nextNode(n);
-                if (s == null) {
-                    return null;
-                } else if (s.item != null) {
-                    return s;
-                } else if (s == n) {
-                    return firstNode();
-                } else {
-                    n = s;
-                }
-            }
+        final Node<E> p = l.prev;
+        final E item = l.item;
+        l.item = null;
+        l.prev = l; // help GC
+        last = p;
+        if (p == null) {
+            first = null;
+        } else {
+            p.next = null;
         }
-
-        /**
-         * Advances next.
-         */
-        void advance() {
-            lock.lock();
-            try {
-                // assert next != null;
-                next = succ(next);
-                nextItem = next == null ? null : next.item;
-            } finally {
-                lock.unlock();
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            return next != null;
-        }
-
-        @Override
-        public E next() {
-            if (next == null) {
-                throw new NoSuchElementException();
-            }
-            lastRet = next;
-            final E x = nextItem;
-            advance();
-            return x;
-        }
-
-        @Override
-        public void remove() {
-            final Node<E> n = lastRet;
-            if (n == null) {
-                throw new IllegalStateException();
-            }
-            lastRet = null;
-            lock.lock();
-            try {
-                if (n.item != null) {
-                    unlink(n);
-                }
-            } finally {
-                lock.unlock();
-            }
-        }
-    }
-
-    /** Forward iterator */
-    private class Itr extends AbstractItr {
-        @Override
-        Node<E> firstNode() { return first; }
-        @Override
-        Node<E> nextNode(final Node<E> n) { return n.next; }
-        }
-
-    /** Descending iterator */
-    private class DescendingItr extends AbstractItr {
-        @Override
-        Node<E> firstNode() { return last; }
-        @Override
-        Node<E> nextNode(final Node<E> n) { return n.prev; }
+        --count;
+        notFull.signal();
+        return item;
     }
 
     /**
@@ -1325,8 +1499,7 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * {@code Object}) in the proper order, followed by a null
      * @param s the stream
      */
-    private void writeObject(final java.io.ObjectOutputStream s)
-        throws java.io.IOException {
+    private void writeObject(final java.io.ObjectOutputStream s) throws java.io.IOException {
         lock.lock();
         try {
             // Write out capacity and any hidden stuff
@@ -1337,74 +1510,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
             }
             // Use trailing null as sentinel
             s.writeObject(null);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Reconstitutes this deque from a stream (that is,
-     * deserialize it).
-     * @param s the stream
-     */
-    private void readObject(final java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        s.defaultReadObject();
-        count = 0;
-        first = null;
-        last = null;
-        // Read in all elements and place in queue
-        for (;;) {
-            @SuppressWarnings("unchecked")
-            final
-            E item = (E)s.readObject();
-            if (item == null) {
-                break;
-            }
-            add(item);
-        }
-    }
-
-    // Monitoring methods
-
-    /**
-     * Returns true if there are threads waiting to take instances from this deque. See disclaimer on accuracy in
-     * {@link java.util.concurrent.locks.ReentrantLock#hasWaiters(Condition)}.
-     *
-     * @return true if there is at least one thread waiting on this deque's notEmpty condition.
-     */
-    public boolean hasTakeWaiters() {
-        lock.lock();
-        try {
-            return lock.hasWaiters(notEmpty);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Returns the length of the queue of threads waiting to take instances from this deque. See disclaimer on accuracy
-     * in {@link java.util.concurrent.locks.ReentrantLock#getWaitQueueLength(Condition)}.
-     *
-     * @return number of threads waiting on this deque's notEmpty condition.
-     */
-    public int getTakeQueueLength() {
-        lock.lock();
-        try {
-           return lock.getWaitQueueLength(notEmpty);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Interrupts the threads currently waiting to take an object from the pool. See disclaimer on accuracy in
-     * {@link java.util.concurrent.locks.ReentrantLock#getWaitingThreads(Condition)}.
-     */
-    public void interuptTakeWaiters() {
-        lock.lock();
-        try {
-           lock.interruptWaiters(notEmpty);
         } finally {
             lock.unlock();
         }

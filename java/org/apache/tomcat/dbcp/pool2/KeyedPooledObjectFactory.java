@@ -77,21 +77,20 @@ package org.apache.tomcat.dbcp.pool2;
 public interface KeyedPooledObjectFactory<K, V> {
 
     /**
-     * Create an instance that can be served by the pool and
-     * wrap it in a {@link PooledObject} to be managed by the pool.
+     * Reinitializes an instance to be returned by the pool.
      *
-     * @param key the key used when constructing the object
+     * @param key the key used when selecting the object
+     * @param p a {@code PooledObject} wrapping the instance to be activated
      *
-     * @return a {@code PooledObject} wrapping an instance that can
-     * be served by the pool.
+     * @throws Exception if there is a problem activating {@code obj},
+     *    this exception may be swallowed by the pool.
      *
-     * @throws Exception if there is a problem creating a new instance,
-     *    this will be propagated to the code requesting an object.
+     * @see #destroyObject
      */
-    PooledObject<V> makeObject(K key) throws Exception;
+    void activateObject(K key, PooledObject<V> p) throws Exception;
 
     /**
-     * Destroy an instance no longer needed by the pool.
+     * Destroys an instance no longer needed by the pool.
      * <p>
      * It is important for implementations of this method to be aware that there
      * is no guarantee about what state {@code obj} will be in and the
@@ -114,11 +113,11 @@ public interface KeyedPooledObjectFactory<K, V> {
     void destroyObject(K key, PooledObject<V> p) throws Exception;
 
     /**
-     * Destroy an instance no longer needed by the pool, using the provided {@link DestroyMode}.
+     * Destroys an instance no longer needed by the pool, using the provided {@link DestroyMode}.
      *
      * @param key the key used when selecting the instance
      * @param p a {@code PooledObject} wrapping the instance to be destroyed
-     * @param mode DestroyMode providing context to the factory
+     * @param destroyMode DestroyMode providing context to the factory
      *
      * @throws Exception should be avoided as it may be swallowed by
      *    the pool implementation.
@@ -129,9 +128,36 @@ public interface KeyedPooledObjectFactory<K, V> {
      * @see DestroyMode
      * @since 2.9.0
      */
-    default void destroyObject(final K key, final PooledObject<V> p, final DestroyMode mode) throws Exception {
+    default void destroyObject(final K key, final PooledObject<V> p, final DestroyMode destroyMode) throws Exception {
         destroyObject(key, p);
     }
+
+    /**
+     * Creates an instance that can be served by the pool and
+     * wrap it in a {@link PooledObject} to be managed by the pool.
+     *
+     * @param key the key used when constructing the object
+     *
+     * @return a {@code PooledObject} wrapping an instance that can
+     * be served by the pool.
+     *
+     * @throws Exception if there is a problem creating a new instance,
+     *    this will be propagated to the code requesting an object.
+     */
+    PooledObject<V> makeObject(K key) throws Exception;
+
+    /**
+     * Uninitializes an instance to be returned to the idle object pool.
+     *
+     * @param key the key used when selecting the object
+     * @param p a {@code PooledObject} wrapping the instance to be passivated
+     *
+     * @throws Exception if there is a problem passivating {@code obj},
+     *    this exception may be swallowed by the pool.
+     *
+     * @see #destroyObject
+     */
+    void passivateObject(K key, PooledObject<V> p) throws Exception;
 
     /**
      * Ensures that the instance is safe to be returned by the pool.
@@ -143,31 +169,5 @@ public interface KeyedPooledObjectFactory<K, V> {
      *         be dropped from the pool, {@code true} otherwise.
      */
     boolean validateObject(K key, PooledObject<V> p);
-
-    /**
-     * Reinitialize an instance to be returned by the pool.
-     *
-     * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the instance to be activated
-     *
-     * @throws Exception if there is a problem activating {@code obj},
-     *    this exception may be swallowed by the pool.
-     *
-     * @see #destroyObject
-     */
-    void activateObject(K key, PooledObject<V> p) throws Exception;
-
-    /**
-     * Uninitialize an instance to be returned to the idle object pool.
-     *
-     * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the instance to be passivated
-     *
-     * @throws Exception if there is a problem passivating {@code obj},
-     *    this exception may be swallowed by the pool.
-     *
-     * @see #destroyObject
-     */
-    void passivateObject(K key, PooledObject<V> p) throws Exception;
 }
 
