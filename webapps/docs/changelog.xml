@@ -148,6 +148,10 @@
         contents, and add an option to have it be static, similar to the other
         realms. (remm)
       </fix>
+      <add>
+        Add <code>derby-*.jar</code> to the list of JARs to skip when scanning
+        for TLDs, web fragments and annotations. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
