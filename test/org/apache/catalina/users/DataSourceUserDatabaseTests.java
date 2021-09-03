@@ -89,7 +89,7 @@ public class DataSourceUserDatabaseTests extends LoggingBaseTest {
             return connection;
         }
         @Override
-        protected void close(Connection dbConnection) {
+        protected void closeConnection(Connection dbConnection) {
         }
         @Override
         public void close() throws Exception {
