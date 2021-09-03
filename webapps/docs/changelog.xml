@@ -133,6 +133,10 @@
         scheme specific check can be performed. Based on pull request
         <pr>444</pr> by Robert Rodewald. (markt)
       </scode>
+      <add>
+        Add <code>derby-*.jar</code> to the list of JARs to skip when scanning
+        for TLDs, web fragments and annotations. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
