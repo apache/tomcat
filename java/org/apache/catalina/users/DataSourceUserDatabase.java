@@ -74,6 +74,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     protected final ConcurrentHashMap<String, Role> modifiedRoles = new ConcurrentHashMap<>();
     protected final ConcurrentHashMap<String, Role> removedRoles = new ConcurrentHashMap<>();
 
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -470,7 +471,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 } catch (SQLException e) {
                     log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 } finally {
-                    close(dbConnection);
+                    closeConnection(dbConnection);
                 }
             }
             return groups.values().iterator();
@@ -506,7 +507,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 } catch (SQLException e) {
                     log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 } finally {
-                    close(dbConnection);
+                    closeConnection(dbConnection);
                 }
             }
             return roles.values().iterator();
@@ -542,7 +543,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 } catch (SQLException e) {
                     log.error(sm.getString("dataSourceUserDatabase.exception"), e);
                 } finally {
-                    close(dbConnection);
+                    closeConnection(dbConnection);
                 }
             }
             return users.values().iterator();
@@ -623,7 +624,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 try {
                     return findGroupInternal(dbConnection, groupname);
                 } finally {
-                    close(dbConnection);
+                    closeConnection(dbConnection);
                 }
             } else {
                 return null;
@@ -697,7 +698,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 try {
                     return findRoleInternal(dbConnection, rolename);
                 } finally {
-                    close(dbConnection);
+                    closeConnection(dbConnection);
                 }
             } else {
                 return null;
@@ -750,7 +751,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             try {
                 return findUserInternal(dbConnection, username);
             } finally {
-                close(dbConnection);
+                closeConnection(dbConnection);
             }
         } finally {
             readLock.unlock();
@@ -1033,7 +1034,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             try {
                 saveInternal(dbConnection);
             } finally {
-                close(dbConnection);
+                closeConnection(dbConnection);
             }
         } finally {
             writeLock.unlock();
@@ -1527,7 +1528,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      *
      * @param dbConnection The connection to be closed
      */
-    protected void close(Connection dbConnection) {
+    protected void closeConnection(Connection dbConnection) {
 
         // Do nothing if the database connection is already closed
         if (dbConnection == null) {
