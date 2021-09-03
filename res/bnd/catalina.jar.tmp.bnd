@@ -33,7 +33,6 @@ Export-Package: \
     org.apache.catalina.security,\
     org.apache.catalina.servlets,\
     org.apache.catalina.session,\
-    org.apache.catalina.ssi,\
     org.apache.catalina.startup,\
     org.apache.catalina.users,\
     org.apache.catalina.util,\
