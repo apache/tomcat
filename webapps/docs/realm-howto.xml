@@ -809,8 +809,8 @@ configuration documentation.</p>
 
 <h5>User File Format</h5>
 
-<p>The users file uses the same format as the
-<a href="#MemoryRealm">MemoryRealm</a>.</p>
+<p>For the XML file based <code>UserDatabase</code>, the users file uses the
+same format as the <a href="#MemoryRealm">MemoryRealm</a>.</p>
 
 <h5>Example</h5>
 
@@ -836,12 +836,20 @@ to all virtual hosts and web applications.  The default contents of the
 <li>When a user attempts to access a protected resource for the first time,
     Tomcat will call the <code>authenticate()</code> method of this
     <code>Realm</code>.</li>
-<li>Once a user has been authenticated, the user (and their associated
-    roles) are cached within Tomcat for the duration of the user's login.
+<li>Once a user has been authenticated, the user becomes associated within
+    Tomcat for the duration of the user's login.
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
-    closes their browser).  The cached user is <strong>not</strong> saved and
-    restored across sessions serialisations.</li>
+    closes their browser). However, the user roles will still reflect the
+    <code>UserDatabase</code> contents, unlike for the other realms. If a user
+    is removed from the database, it will be considered to have no roles.
+    The <code>useStaticPrincipal</code> attribute of the
+    <code>UserDatabaseRealm</code> can be used to instead cache the user along
+    with all its roles. The cached user is <strong>not</strong> saved and
+    restored across sessions serialisations. When the user's principal object
+    is serialized for any reason, it will also be replaced by a static
+    equivalent object with roles that will no longer reflect the databse
+    contents.</li>
 </ul>
 
 
