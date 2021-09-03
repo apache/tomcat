@@ -152,6 +152,10 @@
         Add <code>derby-*.jar</code> to the list of JARs to skip when scanning
         for TLDs, web fragments and annotations. (markt)
       </add>
+      <fix>
+        <pr>447</pr>. Correct JPMS metadata for catalina.jar. Pull request
+        provided by Hui Wang. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
