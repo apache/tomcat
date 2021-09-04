@@ -1092,7 +1092,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else {
             keptAlive = socketWrapper.isKeptAlive();
         }
-
+        // 是否禁用KeepAlive
         if (disableKeepAlive()) {
             socketWrapper.setKeepAliveLeft(0);
         }
@@ -1104,7 +1104,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // Parsing the request header
             try {
                 setRequestLineReadTimeout();
-
+                // 解析请求行
                 if (!getInputBuffer().parseRequestLine(keptAlive)) {
                     if (handleIncompleteRequestLineRead()) {
                         break;
@@ -1127,6 +1127,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     request.getCookies().setLimit(getMaxCookieCount());
                     // Currently only NIO will ever return false here
                     // Don't parse headers for HTTP/0.9
+                    // 解析请求头
                     if (!http09 && !getInputBuffer().parseHeaders()) {
                         // We've read part of the request, don't recycle it
                         // instead associate it with the socket
@@ -1173,7 +1174,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 // Setting up filters, and parse some request headers
                 rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
                 try {
-                    prepareRequest();
+                    prepareRequest(); // 解析请求
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     if (getLog().isDebugEnabled()) {
@@ -1187,10 +1188,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 }
             }
 
+            // 如果最大的活跃Http请求数量仅仅只能为1的话，那么设置keepAlive为false，则不会继续从该socket中获取Http请求了
             if (maxKeepAliveRequests == 1) {
                 keepAlive = false;
-            } else if (maxKeepAliveRequests > 0 &&
-                    socketWrapper.decrementKeepAlive() <= 0) {
+            }
+            // 如果已经达到了keepAlive的最大限制，也设置为false，则不会继续从该socket中获取http请求了
+            else if (maxKeepAliveRequests > 0 &&  socketWrapper.decrementKeepAlive() <= 0) {
                 keepAlive = false;
             }
 
@@ -1198,7 +1201,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (!getErrorState().isError()) {
                 try {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-                    adapter.service(request, response);
+                    adapter.service(request, response); // 交给容器处理请求
                     // Handle when the response was committed before a serious
                     // error occurred.  Throwing a ServletException should both
                     // set the status to 500 and set the errorException.

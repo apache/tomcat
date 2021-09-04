@@ -36,6 +36,8 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 
 /**
+ * BIO执行器 -> 一个请求 一个线程
+ *
  * Handle incoming TCP connections.
  *
  * This class implement a simple server model: one listener thread accepts on a socket and
@@ -300,10 +302,13 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             boolean launch = false;
             synchronized (socket) {
                 try {
+                    // 开始处理socket
+                    // Socket默认状态为 OPEN
                     SocketState state = SocketState.OPEN;
 
                     try {
                         // SSL handshake
+                        // SSL 握手
                         serverSocketFactory.handshake(socket.getSocket());
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
@@ -313,7 +318,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                         // Tell to close the socket
                         state = SocketState.CLOSED;
                     }
-
+                    // Socket不是关闭状态时，处理Socket
                     if ((state != SocketState.CLOSED)) {
                         if (status == null) {
                             state = handler.process(socket, SocketStatus.OPEN_READ);
@@ -513,6 +518,9 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
 
     /**
+     *
+     * <h2>处理来自新客户机的新连接。包装套接字，以便跟踪keep-alive和其他属性，然后将套接字传递给执行器进行处理</h2>
+     *
      * Process a new connection from a new client. Wraps the socket so
      * keep-alive and other attributes can be tracked and then passes the socket
      * to the executor for processing.
@@ -535,6 +543,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             if (!running) {
                 return false;
             }
+            // 使用业务线程执行处理socket
             getExecutor().execute(new SocketProcessor(wrapper));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
