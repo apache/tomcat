@@ -154,7 +154,7 @@
       </add>
       <fix>
         <pr>447</pr>. Correct JPMS metadata for catalina.jar. Pull request
-        provided by Hui Wang.
+        provided by Hui Wang. (markt)
       </fix>
     </changelog>
   </subsection>
