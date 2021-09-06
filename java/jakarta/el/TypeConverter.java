@@ -45,6 +45,7 @@ public abstract class TypeConverter extends ELResolver {
         return false;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
             Object base) {

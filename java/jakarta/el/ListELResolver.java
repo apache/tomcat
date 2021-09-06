@@ -121,6 +121,7 @@ public class ListELResolver extends ELResolver {
         return this.readOnly;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         return null;

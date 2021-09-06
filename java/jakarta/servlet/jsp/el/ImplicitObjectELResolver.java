@@ -160,6 +160,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         return false;
     }
 
+    @Deprecated(forRemoval = true, since = "JSP 3.1")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         List<FeatureDescriptor> feats = new ArrayList<>(SCOPE_NAMES.length);

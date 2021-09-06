@@ -519,6 +519,7 @@ public class TestArrayELResolver {
     }
 
 
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     @Test
     public void testGetFeatureDescriptors() {
         // Should always return null

@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M6 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <scode>
+        Deprecate <code>ELResolver.getFeatureDescriptors</code> to align Tomcat
+        with recent updates in the Jakarta EL specification project. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M5 (markt)" rtext="release in progress">
   <subsection name="Catalina">

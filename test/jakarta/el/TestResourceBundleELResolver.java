@@ -229,6 +229,7 @@ public class TestResourceBundleELResolver {
      * Tests that a valid FeatureDescriptors are not returned if base is not
      * ResourceBundle.
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     @Test
     public void testGetFeatureDescriptors01() {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
@@ -244,6 +245,7 @@ public class TestResourceBundleELResolver {
     /**
      * Tests that a valid FeatureDescriptors are returned.
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     @Test
     public void testGetFeatureDescriptors02() {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();

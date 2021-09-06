@@ -170,6 +170,7 @@ public class BeanELResolver extends ELResolver {
         return this.readOnly || this.property(context, base, property).isReadOnly(base);
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         if (base == null) {

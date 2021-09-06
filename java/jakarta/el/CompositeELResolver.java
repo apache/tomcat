@@ -132,6 +132,7 @@ public class CompositeELResolver extends ELResolver {
         return false;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         return new FeatureIterator(context, base, this.resolvers, this.size);
@@ -163,6 +164,7 @@ public class CompositeELResolver extends ELResolver {
         return null;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     private static final class FeatureIterator implements Iterator<FeatureDescriptor> {
 
         private final ELContext context;
