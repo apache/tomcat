@@ -27,6 +27,8 @@ public class ListELResolver extends ELResolver {
 
     private final boolean readOnly;
 
+    // TODO - Handle the Lists created by List.of(). Multiple package private
+    //        classes. Java 9 + so a back-port would require JreCompat.
     private static final Class<?> UNMODIFIABLE = Collections.unmodifiableList(new ArrayList<>()).getClass();
 
     public ListELResolver() {
