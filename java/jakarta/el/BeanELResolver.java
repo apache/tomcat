@@ -215,11 +215,13 @@ public class BeanELResolver extends ELResolver {
                 for (PropertyDescriptor pd: pds) {
                     this.properties.put(pd.getName(), new BeanProperty(type, pd));
                 }
-                if (System.getSecurityManager() != null) {
-                    // When running with SecurityManager, some classes may be
-                    // not accessible, but have accessible interfaces.
-                    populateFromInterfaces(type);
-                }
+                /**
+                 * Populating from any interfaces solves two distinct problems:
+                 * 1. When running under a security manager, classes may be
+                 *    unaccessible but have accessible interfaces.
+                 * 2. It causes default methods to be included.
+                 */
+                populateFromInterfaces(type);
             } catch (IntrospectionException ie) {
                 throw new ELException(ie);
             }

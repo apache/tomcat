@@ -111,6 +111,11 @@
         Deprecate <code>ELResolver.getFeatureDescriptors</code> to align Tomcat
         with recent updates in the Jakarta EL specification project. (markt)
       </scode>
+      <add>
+        Add support for default methods to <code>BeanRELResolver</code> to align
+        Tomcat with recent updates in the Jakarta EL specification project.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

@@ -939,13 +939,36 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    private static class Bean {
+    /**
+     * Tests that a valid property implemented by a default method is resolved.
+     */
+    @Test
+    public void testGetDefaultValue() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.getValue(context, new Bean(), PROPERTY02_NAME);
+
+        Assert.assertEquals("Default", result);
+        Assert.assertTrue(context.isPropertyResolved());
+    }
+
+
+    private static class Bean implements MyInterface {
 
         @SuppressWarnings("unused")
         public void setValueA(String valueA) {
             // NOOP
         }
     }
+
+
+    public interface MyInterface {
+        default String getValueB() {
+            return "Default";
+        }
+    }
+
 
     private void doNegativeTest(Object base, Object trigger, MethodUnderTest method,
             boolean checkResult) {
