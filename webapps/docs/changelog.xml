@@ -1081,8 +1081,10 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
-        Remove the restriction that prevented the Manager web application
-        deploying different web applications in parallel. (markt)
+        <bug>65136</bug>: Remove the restriction that prevented the Manager web
+        application deploying different web applications in parallel. This
+        required some refactoring, most notably to
+        <code>HostConfig.check()</code> and how it is used. (markt)
       </fix>
     </changelog>
   </subsection>
