@@ -27,6 +27,7 @@ import jakarta.el.FunctionMapper;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
+import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.el.VariableMapper;
 
@@ -314,5 +315,15 @@ public final class MethodExpressionImpl extends MethodExpression implements
     @Override
     public boolean isParametersProvided() {
         return this.getNode().isParametersProvided();
+    }
+
+
+    @Override
+    public MethodReference getMethodReference(ELContext context) {
+        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper, this.varMapper);
+        ctx.notifyBeforeEvaluation(getExpressionString());
+        MethodReference methodReference = this.getNode().getMethodReference(ctx);
+        ctx.notifyAfterEvaluation(getExpressionString());
+        return methodReference;
     }
 }

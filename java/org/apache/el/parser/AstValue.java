@@ -25,6 +25,7 @@ import jakarta.el.ELException;
 import jakarta.el.ELResolver;
 import jakarta.el.LambdaExpression;
 import jakarta.el.MethodInfo;
+import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.el.ValueReference;
 
@@ -257,6 +258,25 @@ public final class AstValue extends SimpleNode {
             throw new ELException(cause);
         }
         return result;
+    }
+
+    @Override
+    public MethodReference getMethodReference(EvaluationContext ctx) {
+        Target t = getTarget(ctx);
+        Method m = null;
+        Object[] values = null;
+        Class<?>[] types = null;
+        if (isParametersProvided()) {
+            values = ((AstMethodParameters) this.jjtGetChild(
+                    this.jjtGetNumChildren() - 1)).getParameters(ctx);
+            types = getTypesFromValues(values);
+        }
+        m = ReflectionUtil.getMethod(ctx, t.base, t.property, types, values);
+
+        // Handle varArgs and any coercion required
+        values = convertArgs(ctx, values, m);
+
+        return new MethodReference(t.base, getMethodInfo(ctx, types), m.getAnnotations(), values);
     }
 
     private Object[] convertArgs(EvaluationContext ctx, Object[] src, Method m) {

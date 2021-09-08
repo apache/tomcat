@@ -16,6 +16,8 @@
  */
 package jakarta.el;
 
+import java.beans.BeanProperty;
+
 public class TesterBean {
 
     private String name;
@@ -61,5 +63,10 @@ public class TesterBean {
 
     public Integer[] getValueC() {
         return valueC;
+    }
+
+    @BeanProperty
+    public String getValueD() {
+        return "";
     }
 }

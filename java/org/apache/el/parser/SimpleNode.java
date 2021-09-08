@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import jakarta.el.ELException;
 import jakarta.el.MethodInfo;
+import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.el.ValueReference;
 
@@ -157,6 +158,10 @@ public abstract class SimpleNode implements Node {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public MethodReference getMethodReference(EvaluationContext ctx) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public int hashCode() {

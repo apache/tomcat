@@ -116,6 +116,11 @@
         Tomcat with recent updates in the Jakarta EL specification project.
         (markt)
       </add>
+      <add>
+        Add support for <code>MethodReference</code> and the associated getter
+        on <code>MehtodExpression</code> to align Tomcat with recent updates in
+        the Jakarta EL specification project. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

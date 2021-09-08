@@ -64,4 +64,31 @@ public abstract class MethodExpression extends Expression {
         // Expected to be over-ridden by implementation
         return false;
     }
+
+    /**
+     * Obtain the {@link MethodReference} for the method to which this method
+     * expression resolves.
+     *
+     * @param context The EL context for this evaluation
+     *
+     * @return This default implementation always returns <code>null</code>
+     *
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If a property/variable resolution failed because no match
+     *              was found or a match was found but was not readable
+     * @throws MethodNotFoundException
+     *              If no matching method can be found
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving the property
+     *
+     * @since EL 5.0
+     */
+    public MethodReference getMethodReference(ELContext context) {
+        // Expected to be over-ridden by implementation
+        context.notifyBeforeEvaluation(getExpressionString());
+        context.notifyAfterEvaluation(getExpressionString());
+        return null;
+    }
 }

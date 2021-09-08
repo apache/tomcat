@@ -22,6 +22,7 @@ import jakarta.el.ELException;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
+import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.el.ValueExpression;
 import jakarta.el.ValueReference;
@@ -168,6 +169,11 @@ public final class AstIdentifier extends SimpleNode {
     public MethodInfo getMethodInfo(EvaluationContext ctx,
             Class<?>[] paramTypes) throws ELException {
         return this.getMethodExpression(ctx).getMethodInfo(ctx.getELContext());
+    }
+
+    @Override
+    public MethodReference getMethodReference(EvaluationContext ctx) {
+        return this.getMethodExpression(ctx).getMethodReference(ctx.getELContext());
     }
 
     @Override
