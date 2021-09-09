@@ -71,11 +71,6 @@ public class ContentRange {
             return null;
         }
 
-        // Must be followed by '='
-        if (HttpParser.skipConstant(input, "=") == SkipResult.NOT_FOUND) {
-            return null;
-        }
-
         // Start
         long start = HttpParser.readLong(input);
 
