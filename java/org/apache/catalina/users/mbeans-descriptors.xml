@@ -298,7 +298,8 @@
 
     <attribute   name="dataSourceName"
           description="The name of the JNDI JDBC DataSource"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+            writeable="false"/>
 
     <attribute   name="groups"
           description="Names of all defined groups"

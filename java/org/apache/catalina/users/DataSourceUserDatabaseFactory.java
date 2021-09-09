@@ -24,6 +24,7 @@ import javax.naming.Name;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
+import javax.sql.DataSource;
 
 
 /**
@@ -78,15 +79,20 @@ public class DataSourceUserDatabaseFactory implements ObjectFactory {
             return null;
         }
 
-        // Create and configure a MemoryUserDDataSourceUserDatabaseatabase instance based on the
-        // RefAddr values associated with this Reference
-        DataSourceUserDatabase database = new DataSourceUserDatabase(nameCtx, name.toString());
+        DataSource dataSource = null;
+        String dataSourceName = null;
         RefAddr ra = null;
 
         ra = ref.get("dataSourceName");
         if (ra != null) {
-            database.setDataSourceName(ra.getContent().toString());
+            dataSourceName = ra.getContent().toString();
+            dataSource = (DataSource) nameCtx.lookup(dataSourceName);
         }
+
+        // Create and configure a DataSourceUserDatabase instance based on the
+        // RefAddr values associated with this Reference
+        DataSourceUserDatabase database = new DataSourceUserDatabase(dataSource, name.toString());
+        database.setDataSourceName(dataSourceName);
 
         ra = ref.get("readonly");
         if (ra != null) {
