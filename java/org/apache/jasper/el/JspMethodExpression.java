@@ -99,6 +99,11 @@ public final class JspMethodExpression extends MethodExpression implements
     }
 
     @Override
+    public boolean isParametersProvided() {
+        return this.target.isParametersProvided();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return this.target.equals(obj);
     }
