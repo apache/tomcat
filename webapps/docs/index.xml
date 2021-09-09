@@ -35,7 +35,7 @@
 
 <p>This is the top-level entry point of the documentation bundle for the
 <strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version
-<version-major-minor/> implements the Servlet 6.0 and JavaServer Pages 3.0
+<version-major-minor/> implements the Servlet 6.0 and JavaServer Pages 3.1
 <a href="https://wiki.apache.org/tomcat/Specifications">specifications</a> from
 <a href="https://jakarta.ee/">Jakarta EE</a>, and includes many
 additional features that make it a useful platform for developing and deploying
@@ -164,16 +164,16 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     - Complete documentation and HOWTOs on the JK native webserver connector,
       used to interface Apache Tomcat with servers like Apache HTTPd, IIS
       and others.</li>
-<li>Servlet 5.0
-    <a href="https://jakarta.ee/specifications/servlet/5.0/">
+<li>Servlet 6.0
+    <a href="https://jakarta.ee/specifications/servlet/6.0/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/servlet/5.0/apidocs">
+    <a href="https://jakarta.ee/specifications/servlet/6.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>JSP 3.0
-    <a href="https://jakarta.ee/specifications/pages/3.0/">
+<li>JSP 3.1
+    <a href="https://jakarta.ee/specifications/pages/3.1/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/pages/3.0/apidocs">
+    <a href="https://jakarta.ee/specifications/pages/3.1/apidocs">
     <strong>Javadoc</strong></a>
     </li>
 <li>EL 4.0

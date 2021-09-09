@@ -54,8 +54,8 @@
   <!-- Exact spec versions (for the manifests etc.) -->
   <property name="servlet.spec.version"    value="6.0" />
   <property name="servlet.revision"        value="-SNAPSHOT" />
-  <property name="jsp.spec.version"        value="3.0" />
-  <property name="jsp.revision"            value="0" />
+  <property name="jsp.spec.version"        value="3.1" />
+  <property name="jsp.revision"            value="-SNAPSHOT" />
   <property name="el.spec.version"         value="5.0" />
   <property name="el.revision"             value="-SNAPSHOT" />
   <property name="websocket.spec.version"  value="2.0" />

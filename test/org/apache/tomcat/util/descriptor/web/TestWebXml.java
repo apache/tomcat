@@ -177,6 +177,11 @@ public class TestWebXml {
         doTestValidateVersion("4.0");
     }
 
+    @Test
+    public void testValidateVersion50() throws IOException, SAXException {
+        doTestValidateVersion("5.0");
+    }
+
     private void doTestValidateVersion(String version) throws IOException, SAXException {
         WebXml webxml = new WebXml();
 

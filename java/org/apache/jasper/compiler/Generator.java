@@ -818,7 +818,7 @@ class Generator {
         out.println(");");
 
         if (ctxt.getOptions().isXpoweredBy()) {
-            out.printil("response.addHeader(\"X-Powered-By\", \"JSP/3.0\");");
+            out.printil("response.addHeader(\"X-Powered-By\", \"JSP/3.1\");");
         }
 
         out.printil("pageContext = _jspxFactory.getPageContext(this, request, response,");

@@ -84,7 +84,7 @@
         <item name="Configuration"         href="config/index.html"/>
         <item name="Tomcat Javadocs"       href="api/index.html"/>
         <item name="Servlet 6.0 Javadocs"  href="servletapi/index.html"/>
-        <item name="JSP 3.0 Javadocs"      href="jspapi/index.html"/>
+        <item name="JSP 3.1 Javadocs"      href="jspapi/index.html"/>
         <item name="EL 5.0 Javadocs"       href="elapi/index.html"/>
         <item name="WebSocket 2.0 Javadocs"
               href="websocketapi/index.html"/>

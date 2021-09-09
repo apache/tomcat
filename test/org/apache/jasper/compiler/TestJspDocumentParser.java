@@ -183,7 +183,17 @@ public class TestJspDocumentParser extends TomcatBaseTest {
 
     @Test
     public void testDocument_3_1() throws Exception {
-        doTestDocument(false, "3.1");
+        doTestDocument(true, "3.1");
+    }
+
+    @Test
+    public void testDocument_3_2() throws Exception {
+        doTestDocument(false, "3.2");
+    }
+
+    @Test
+    public void testDocument_4_0() throws Exception {
+        doTestDocument(false, "4.0");
     }
 
     @Test

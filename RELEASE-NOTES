@@ -77,7 +77,7 @@ for use by web applications (by placing them in "lib"):
 * el-api.jar (EL 5.0 API)
 * jasper.jar (Jasper 2 Compiler and Runtime)
 * jasper-el.jar (Jasper 2 EL implementation)
-* jsp-api.jar (JSP 3.0 API)
+* jsp-api.jar (JSP 3.1 API)
 * servlet-api.jar (Servlet 6.0 API)
 * tomcat-api.jar (Interfaces shared by Catalina and Jasper)
 * tomcat-coyote.jar (Tomcat connectors and utility classes)
