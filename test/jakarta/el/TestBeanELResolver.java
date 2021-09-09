@@ -38,6 +38,7 @@ public class TestBeanELResolver {
     private static final String PROPERTY01_NAME = "valueA";
     private static final String PROPERTY02_NAME = "valueB";
     private static final String PROPERTY03_NAME = "name";
+    private static final String PROPERTY04_NAME = "valueC";
     private static final String PROPERTY_VALUE = "test1";
 
     @Test
@@ -947,7 +948,7 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.getValue(context, new Bean(), PROPERTY02_NAME);
+        Object result = resolver.getValue(context, new Bean(), PROPERTY04_NAME);
 
         Assert.assertEquals("Default", result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -964,7 +965,7 @@ public class TestBeanELResolver {
 
 
     public interface MyInterface {
-        default String getValueB() {
+        default String getValueC() {
             return "Default";
         }
     }
