@@ -71,10 +71,10 @@ public class ContentRange {
             return null;
         }
 
-        // Must be followed by '='
-        if (HttpParser.skipConstant(input, "=") == SkipResult.NOT_FOUND) {
-            return null;
-        }
+        // Must be followed by SP. Parser is lenient and accepts any LWS here.
+        // No need for explicit check as something must have terminated the
+        // token and if that something was anything other than LWS the following
+        // call to readLong() will fail.
 
         // Start
         long start = HttpParser.readLong(input);
