@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.naming.Context;
 import javax.sql.DataSource;
 
 import org.apache.catalina.Group;
@@ -45,16 +44,16 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     private static final Log log = LogFactory.getLog(DataSourceUserDatabase.class);
     private static final StringManager sm = StringManager.getManager(DataSourceUserDatabase.class);
 
-    public DataSourceUserDatabase(Context namingContext, String id) {
-        this.namingContext = namingContext;
+    public DataSourceUserDatabase(DataSource dataSource, String id) {
+        this.dataSource = dataSource;
         this.id = id;
     }
 
 
     /**
-     * Associated naming context (will be used to bet the DataSource).
+     * DataSource to use.
      */
-    protected final Context namingContext;
+    protected final DataSource dataSource;
 
 
     /**
@@ -243,7 +242,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      * @param dataSourceName the name of the JNDI JDBC DataSource
      */
     public void setDataSourceName(String dataSourceName) {
-      this.dataSourceName = dataSourceName;
+        this.dataSourceName = dataSourceName;
     }
 
     /**
@@ -1509,9 +1508,10 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      * @return Connection to the database
      */
     protected Connection openConnection() {
+        if (dataSource == null) {
+            return null;
+        }
         try {
-            Context context = namingContext;
-            DataSource dataSource = (DataSource) context.lookup(dataSourceName);
             Connection connection = dataSource.getConnection();
             connectionSuccess = true;
             return connection;
