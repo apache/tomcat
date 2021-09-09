@@ -240,7 +240,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
 
     /**
      * Handles the given exception by throwing it.
-     * 
+     *
      * @param e the exception to throw.
      * @throws SQLException the exception to throw.
      */
