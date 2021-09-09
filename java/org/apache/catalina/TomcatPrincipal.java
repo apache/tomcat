@@ -52,23 +52,13 @@ public interface TomcatPrincipal extends Principal {
     /**
      * Returns the value of the named attribute as an <code>Object</code>, or
      * <code>null</code> if no attribute of the given name exists, or if
-     * <code>null</code> has been specified as the attribute's name. May also return
-     * <code>null</code>, if the named attribute exists but cannot be returned in a
-     * way that ensures that changes made to the returned object are not reflected
-     * by objects returned by subsequent calls to this method.
+     * <code>null</code> has been specified as the attribute's name.
      * <p>
      * Only the servlet container may set attributes to make available custom
      * information about a Principal or the user it represents. For example, some of
      * the Realm implementations can be configured to additionally query user
      * attributes from the <i>user database</i>, which then are provided through the
      * Principal's attributes map.
-     * <p>
-     * In order to keep the attributes map <i>immutable</i>, the objects returned by
-     * this method should always be <i>defensive copies</i> of the objects contained
-     * in the attributes map. Any changes applied to these objects must not be
-     * reflected by objects returned by subsequent calls to this method. If that
-     * cannot be guaranteed (e. g. there is no way to copy the object), the object's
-     * string representation (or even <code>null</code>) shall be returned.
      * <p>
      * Attribute names and naming conventions are maintained by the Tomcat
      * components that contribute to this map, like some of the Realm
@@ -77,9 +67,7 @@ public interface TomcatPrincipal extends Principal {
      * @param name a <code>String</code> specifying the name of the attribute
      * @return an <code>Object</code> containing the value of the attribute, or
      *         <code>null</code> if the attribute does not exist, or if
-     *         <code>null</code> has been specified as the attribute's name, or the
-     *         object's string representation or <code>null</code> if its value
-     *         cannot be copied in order to keep the attributes immutable
+     *         <code>null</code> has been specified as the attribute's name
      */
     Object getAttribute(String name);
 
