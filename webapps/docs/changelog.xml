@@ -104,7 +104,9 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 8.5.71 (schultz)" rtext="in development">
+<section name="Tomcat 8.5.72 (schultz)" rtext="in development">
+</section>
+<section name="Tomcat 8.5.71 (schultz)" rtext="release vote in progress">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -152,7 +154,7 @@
         order of the remaining header values is unchanged. (markt)
       </fix>
       <fix>
-        <bug>65563</bug>: Correct parsing of HTTP <code>Content-Rnage</code>
+        <bug>65563</bug>: Correct parsing of HTTP <code>Content-Range</code>
         headers. Tomcat was incorrectly requiring an <code>=</code> character
         after <code>bytes</code>. Fix based on pull request <pr>449</pr> by
         Thierry Guérin. (markt)
@@ -235,7 +237,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 8.5.70 (schultz)" rtext="2021-08-16">
+<section name="Tomcat 8.5.70 (markt)" rtext="2021-08-16">
   <subsection name="Catalina">
     <changelog>
       <fix>
