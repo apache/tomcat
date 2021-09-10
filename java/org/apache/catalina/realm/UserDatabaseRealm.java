@@ -492,10 +492,10 @@ public class UserDatabaseRealm extends RealmBase {
             switch (name) {
             case "username":
             case "name":
-                return new String(user.getUsername());
+                return user.getUsername();
 
             case "fullname":
-                return new String(user.getFullName());
+                return user.getFullName();
 
             case "groups":
                 sb = new StringBuilder();
