@@ -121,6 +121,10 @@
         after <code>bytes</code>. Fix based on pull request <pr>449</pr> by
         Thierry Guérin. (markt)
       </fix>
+      <fix>
+        Correct a potential <code>StackOverflowException</code> with HTTP/2 and
+        sendfile. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

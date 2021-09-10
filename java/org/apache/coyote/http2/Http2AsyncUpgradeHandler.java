@@ -36,6 +36,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.SendfileState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
+import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 
 public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
@@ -363,70 +364,84 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     protected class SendfileCompletionHandler implements CompletionHandler<Long, SendfileData> {
         @Override
         public void completed(Long nBytes, SendfileData sendfile) {
+            CompletionState completionState = null;
             long bytesWritten = nBytes.longValue() - 9;
-            sendfile.left -= bytesWritten;
-            if (sendfile.left == 0) {
-                try {
-                    sendfile.stream.getOutputBuffer().end();
-                } catch (IOException e) {
-                    failed(e, sendfile);
-                }
-                return;
-            }
-            sendfile.streamReservation -= bytesWritten;
-            sendfile.connectionReservation -= bytesWritten;
-            sendfile.pos += bytesWritten;
-            try {
-                if (sendfile.connectionReservation == 0) {
-                    if (sendfile.streamReservation == 0) {
-                        int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) (sendfile.end - sendfile.pos);
-                        sendfile.streamReservation = sendfile.stream.reserveWindowSize(reservation, true);
+
+            /*
+             * Loop for in-line writes only. Avoids a possible stack-overflow of
+             * chained completion handlers with a long series of in-line writes.
+             */
+            do {
+                sendfile.left -= bytesWritten;
+                if (sendfile.left == 0) {
+                    try {
+                        sendfile.stream.getOutputBuffer().end();
+                    } catch (IOException e) {
+                        failed(e, sendfile);
                     }
-                    sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
+                    return;
                 }
-            } catch (IOException e) {
-                failed (e, sendfile);
-                return;
-            }
-
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId, sendfile.stream.getIdAsString(),
-                        Integer.valueOf(sendfile.connectionReservation), Integer.valueOf(sendfile.streamReservation)));
-            }
-
-            // connectionReservation will always be smaller than or the same as
-            // streamReservation
-            int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
-            boolean finished = (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
-
-            // Need to check this now since sending end of stream will change this.
-            boolean writeable = sendfile.stream.canWrite();
-            byte[] header = new byte[9];
-            ByteUtil.setThreeBytes(header, 0, frameSize);
-            header[3] = FrameType.DATA.getIdByte();
-            if (finished) {
-                header[4] = FLAG_END_OF_STREAM;
-                sendfile.stream.sentEndOfStream();
-                if (!sendfile.stream.isActive()) {
-                    setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
-                }
-            }
-            if (writeable) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
-                            Integer.toString(frameSize), Boolean.valueOf(finished)));
-                }
-                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
-                sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
-                socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                        TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
-                        this, ByteBuffer.wrap(header), sendfile.mappedBuffer);
+                sendfile.streamReservation -= bytesWritten;
+                sendfile.connectionReservation -= bytesWritten;
+                sendfile.pos += bytesWritten;
                 try {
-                    handleAsyncException();
+                    if (sendfile.connectionReservation == 0) {
+                        if (sendfile.streamReservation == 0) {
+                            int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) (sendfile.end - sendfile.pos);
+                            sendfile.streamReservation = sendfile.stream.reserveWindowSize(reservation, true);
+                        }
+                        sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
+                    }
                 } catch (IOException e) {
-                    failed(e, sendfile);
+                    failed (e, sendfile);
+                    return;
                 }
-            }
+
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.sendfile.reservation", connectionId, sendfile.stream.getIdAsString(),
+                            Integer.valueOf(sendfile.connectionReservation), Integer.valueOf(sendfile.streamReservation)));
+                }
+
+                // connectionReservation will always be smaller than or the same as
+                // streamReservation
+                int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
+                boolean finished = (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
+
+                // Need to check this now since sending end of stream will change this.
+                boolean writeable = sendfile.stream.canWrite();
+                byte[] header = new byte[9];
+                ByteUtil.setThreeBytes(header, 0, frameSize);
+                header[3] = FrameType.DATA.getIdByte();
+                if (finished) {
+                    header[4] = FLAG_END_OF_STREAM;
+                    sendfile.stream.sentEndOfStream();
+                    if (!sendfile.stream.isActive()) {
+                        setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
+                    }
+                }
+                if (writeable) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
+                                Integer.toString(frameSize), Boolean.valueOf(finished)));
+                    }
+                    ByteUtil.set31Bits(header, 5, sendfile.stream.getIdAsInt());
+                    sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
+                    // Note: Completion handler not called in the write
+                    //       completes in-line. The wrote will continue via the
+                    //       surrounding loop.
+                    completionState = socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
+                            TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE,
+                            this, ByteBuffer.wrap(header), sendfile.mappedBuffer);
+                    try {
+                        handleAsyncException();
+                    } catch (IOException e) {
+                        failed(e, sendfile);
+                        return;
+                    }
+                }
+                // Update bytesWritten for start of next loop iteration
+                bytesWritten = frameSize;
+            } while (completionState == CompletionState.INLINE);
         }
 
         @Override
