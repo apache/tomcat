@@ -40,9 +40,6 @@ abstract class AbstractStream {
     private final Set<AbstractNonZeroStream> childStreams = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
-    volatile int remainingReservation;
-    volatile int unusedAllocation;
-    volatile boolean notifyInProgress;
 
     AbstractStream(Integer identifier) {
         this.identifier = identifier;
@@ -160,66 +157,4 @@ abstract class AbstractStream {
     abstract String getConnectionId();
 
     abstract int getWeight();
-
-
-    /**
-     * @return The number of bytes requiring an allocation from the
-     *         Connection flow control window
-     */
-    public int getRemainingReservation() {
-        return remainingReservation;
-    }
-
-    /**
-     *
-     * @return The number of bytes allocated from the Connection flow
-     *         control window but not yet written
-     */
-    public int getUnusedAllocation() {
-        return unusedAllocation;
-    }
-
-    /**
-     * The purpose of this is to avoid the incorrect triggering of a timeout
-     * for the following sequence of events:
-     * <ol>
-     * <li>window update 1</li>
-     * <li>allocation 1</li>
-     * <li>notify 1</li>
-     * <li>window update 2</li>
-     * <li>allocation 2</li>
-     * <li>act on notify 1 (using allocation 1 and 2)</li>
-     * <li>notify 2</li>
-     * <li>act on notify 2 (timeout due to no allocation)</li>
-     * </ol>
-     *
-     * @return {@code true} if a notify has been issued but the associated
-     *         allocation has not been used, otherwise {@code false}
-     */
-    public boolean isNotifyInProgress() {
-        return notifyInProgress;
-    }
-
-    public void useAllocation() {
-        unusedAllocation = 0;
-        notifyInProgress = false;
-    }
-
-    public void startNotify() {
-        notifyInProgress = true;
-    }
-
-    protected int allocate(int allocation) {
-        if (remainingReservation >= allocation) {
-            remainingReservation -= allocation;
-            unusedAllocation += allocation;
-            return 0;
-        }
-
-        int left = allocation - remainingReservation;
-        unusedAllocation += remainingReservation;
-        remainingReservation = 0;
-
-        return left;
-    }
 }
