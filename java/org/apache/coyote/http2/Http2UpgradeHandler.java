@@ -1024,27 +1024,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private synchronized Set<AbstractStream> releaseBackLog(int increment) {
         Set<AbstractStream> result = new HashSet<>();
-        if (backLogSize < increment) {
-            // Can clear the whole backlog
-            result.addAll(backLogStreams);
-            backLogStreams.clear();
-            backLogSize = 0;
-        } else {
-            int leftToAllocate = increment;
-            while (leftToAllocate > 0) {
-                leftToAllocate = allocate(this, leftToAllocate);
-            }
-            for (AbstractStream stream : backLogStreams) {
-                int allocation = stream.getUnusedAllocation();
-                if (allocation > 0) {
-                    backLogSize -= allocation;
-                    if (!stream.isNotifyInProgress()) {
-                        result.add(stream);
-                        stream.startNotify();
-                    }
+
+        int leftToAllocate = allocate(this, increment);
+        for (AbstractStream stream : backLogStreams) {
+            int allocation = stream.getUnusedAllocation();
+            if (allocation > 0) {
+                backLogSize -= allocation;
+                if (!stream.isNotifyInProgress()) {
+                    result.add(stream);
+                    stream.startNotify();
                 }
             }
         }
+
         return result;
     }
 
