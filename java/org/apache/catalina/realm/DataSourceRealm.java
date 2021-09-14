@@ -735,7 +735,7 @@ public class DataSourceRealm extends RealmBase {
                     if (requestedAttributes == null) {
                         return USER_ATTRIBUTES_NONE_REQUESTED;
                     }
-                    if (requestedAttributes.size() > 0
+                    if (requestedAttributes.size() == 1
                             && requestedAttributes.get(0).equals(USER_ATTRIBUTES_WILDCARD)) {
                         userAttributesStatement = "SELECT *" + preparedAttributesTail;
                         return userAttributesStatement;
@@ -747,8 +747,13 @@ public class DataSourceRealm extends RealmBase {
                         // uninitialized, will try again next time).
                         return null;
                     }
-                    requestedAttributes = validateUserAttributes(requestedAttributes,
+                    requestedAttributes = validateUserAttributes(containerLog, requestedAttributes,
                             getDeniedUserAttributes(), availableUserAttributes);
+                    if (requestedAttributes.size() == 0) {
+                        // None of the requested attributes are actually available. Do not query any
+                        // attributes for now. 
+                        return USER_ATTRIBUTES_NONE_REQUESTED;
+                    }
                     StringBuilder sb = new StringBuilder("SELECT ");
                     boolean first = true;
                     for (String attr : requestedAttributes) {
