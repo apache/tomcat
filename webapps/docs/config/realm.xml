@@ -606,6 +606,8 @@
         user's entry and the password presented by the user, with a
         successful bind being interpreted as an authenticated
         user.</p>
+        <p>For security reasons, the attribute named by this attribute
+        cannot be used as an <i>Additional User Attribute</i>.</p>
       </attribute>
 
       <attribute name="userPattern" required="false">
