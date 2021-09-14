@@ -166,6 +166,34 @@
         name. If not specified, the default is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="userAttributes" required="false">
+        <p>Comma separated list of names of columns to additionally query from
+        the "users" table named by the <code>userTable</code> attribute. These
+        are provided to the application as <i>Additional User Attributes</i>
+        through the Principal's attributes map (with configured column names
+        used as the keys). This attribute also supports the wildcard character
+        <code>*</code>, which means to query <i>all</i> columns (except, for
+        security reasons, the column containing the user's credentials).</p>
+        <p>Any of the "users" table's columns can be specified, except the
+        column containing the user's credentials (i.e. password) named by the
+        <code>userCredCol</code> attribute. If the credentials column is
+        explicitly specified, it will be ignored and a warning will be logged.
+        </p>
+        <p>Specified columns that are not present in the "users" table are
+        dropped from the list and a warning is logged, one for each missing
+        column. However, these checks are performed only once while the Realm
+        processes its first login attempt. If the structure of the "users"
+        table significantly changes after that point in time (i.e. a specified
+        column gets removed), an exception is likely the result for each
+        subsequent login attempt until the Realm gets restarted. Even so,
+        exceptions caused by user attribute queries do not prevent the user
+        from loggin in, but only cause the associated Principal's attributes
+        map being empty.</p>
+        <p>See the <a href="../realm-howto.html#Additional_User_Attributes">
+        Additional User Attributes How-To</a> for more information on how
+        additional user attributes can be access from your application.</p>
+      </attribute>
+
       <attribute name="userCredCol" required="true">
         <p>Name of the column, in the "users" table, which contains
         the user's credentials (i.e. password).  If a
@@ -173,6 +201,8 @@
         will assume that the passwords have been encoded with the
         specified algorithm.  Otherwise, they will be assumed to be
         in clear text.</p>
+        <p>For security reasons, the column named by this attribute cannot
+        be used as an <i>Additional User Attribute</i>.</p>
       </attribute>
 
       <attribute name="userNameCol" required="true">
@@ -192,7 +222,10 @@
       <attribute name="userTable" required="true">
         <p>Name of the "users" table, which must contain columns named
         by the <code>userNameCol</code> and <code>userCredCol</code>
-        attributes.</p>
+        attributes. More columns containing needful user information could
+        freely be added. These can be provided to the application as
+        <i>Additional User Attributes</i> configured by the
+        <code>userAttributes</code> attribute.</p>
       </attribute>
 
       <attribute name="X509UsernameRetrieverClassName" required="false">
@@ -523,6 +556,37 @@
         <code>true</code> is used.</p>
       </attribute>
 
+      <attribute name="userAttributes" required="false">
+        <p>Comma separated list of names of attributes to additionally query
+        from the user's directory entry. These are provided to the application
+        as <i>Additional User Attributes</i> through the Principal's attributes
+        map (with configured attributes names used as the keys). This attribute
+        also supports the wildcard character <code>*</code>, which means to
+        query <i>all</i> attributes (except, for security reasons, the
+        attribute containing the user's password, if it's specified).</p>
+        <p>Any of the attributes in the user's entry can be specified, except
+        the attribute containing the user's password named by the
+        <code>userPassword</code> attribute (if present). If the password
+        attribute is explicitly specified, it will be ignored and a warning
+        will be logged.</p>
+        <p>The LDAP v3 allows <i>options</i> to be appended to an attribute
+        name (i.e. ";binary" to force an attribute to be returned as 
+        <code>byte[]</code> instead of <code>String</code>). If such an option
+        is present in a requested attribute's name, it will also be part of the
+        attribute's key in the Principal's attributes map. Since attribute
+        names in LDAP are always case-insensitive, the attributes map provided
+        through the user's Principal is also case-insensitive. That is, its
+        keys are comparared ignoring case.</p>
+        <p>Specified attributes that are not present in the user's directory
+        entry are ignored and a warning is logged, one for each missing
+        attribute. However, since in a directory, every user entry could have
+        its own set of attributes, invalid attributes (if any) are logged on
+        every login attempt.</p>
+        <p>See the <a href="../realm-howto.html#Additional_User_Attributes">
+        Additional User Attributes How-To</a> for more information on how
+        additional user attributes can be access from your application.</p>
+      </attribute>
+
       <attribute name="userBase" required="false">
         <p>The base element for user searches performed using the
         <code>userSearch</code> expression.  Not used if you are using
@@ -684,6 +748,38 @@
            specified, the default value of <code>302</code> is used.</p>
       </attribute>
 
+      <attribute name="userAttributes" required="false">
+        <p>Comma separated list of names of attributes to additionally query
+        from the user's entry in the UserDatabase. These are provided to the
+        application as <i>Additional User Attributes</i> through the
+        Principal's attributes map (with configured attributes names used as
+        the keys). This attribute also supports the wildcard character
+        <code>*</code>, which means to query <i>all</i> attributes (except, for
+        security reasons, the <code>password</code> attribute).</p>
+        <p>Except the <code>password</code> attribute, any of the user entry's
+        attributes that are defined by and used by the UserDatabase can be
+        specified: <code>username</code> (or its alias <code>name</code>),
+        <code>fullName</code> (or its alias <code>fullname</code>),
+        <code>groups</code> and <code>roles</code>, as well as extra attribute
+        <code>effectiveRoles</code>, which contains a comma separated list of
+        the user's effective roles. All these are also referred to as
+        <i>core attributes</i>, which are always available (thought they could
+        be <code>null</code> or empty).</p>
+        <p>Additionally, and in contrast to <i>core attributes</i>, more
+        arbitrary XML attributes could be added to the users' entries
+        <code>&lt;user ...</code>, like <code>room</code>, <code>email</code>
+        and <code>phone</code>. The only purpose of these <i>non-core</i>
+        attributes is to be queried as user attributes. Specified
+        <i>non-core</i> attributes that are not present in the user's entry in
+        the UserDatabase are ignored and a warning is logged, one for each
+        missing attribute. However, since in the UserDatabase, every user entry
+        could have its own set of attributes, invalid attributes (if any) are
+        logged on every login attempt.</p>
+        <p>See the <a href="../realm-howto.html#Additional_User_Attributes">
+        Additional User Attributes How-To</a> for more information on how
+        additional user attributes can be access from your application.</p>
+      </attribute>
+
       <attribute name="X509UsernameRetrieverClassName" required="false">
         <p>When using X509 client certificates, this specifies the class name
         that will be used to retrieve the user name from the certificate.
@@ -752,6 +848,24 @@
            specified, the default value of <code>302</code> is used.</p>
       </attribute>
 
+      <attribute name="userAttributes" required="false">
+        <p>Comma separated list of names of attributes to additionally query
+        from the user's entry in the XML file specified by the
+        <code>pathname</code> attribute. These are provided to the application
+        as <i>Additional User Attributes</i> through the Principal's attributes
+        map (with configured attributes names used as the keys). This attribute
+        also supports the wildcard character <code>*</code>, which means to
+        query <i>all</i> attributes (except, for security reasons, the
+        <code>password</code> attribute).</p>
+        <p>In contrast to other Realms, this Realm only supports a fixed and
+        quite limited set of queryable user attributes: <code>username</code>
+        (or its alias <code>name</code>), <code>fullName</code> (or its alias
+        <code>fullname</code>) and  <code>roles</code>.</p>
+        <p>See the <a href="../realm-howto.html#Additional_User_Attributes">
+        Additional User Attributes How-To</a> for more information on how
+        additional user attributes can be access from your application.</p>
+      </attribute>
+
       <attribute name="X509UsernameRetrieverClassName" required="false">
         <p>When using X509 client certificates, this specifies the class name
         that will be used to retrieve the user name from the certificate.
@@ -780,6 +894,14 @@
             clear text).</li>
         <li><strong>roles</strong> - Comma-delimited list of the role names
             assigned to this user.</li>
+        </ul></li>
+    <li>Each <code>&lt;user&gt;</code> element may have the following
+        attribute:
+        <ul>
+        <li><strong>fullName</strong> - User-friendly name of this user (aka
+            display name).<br/>
+            For compatibility, it is allowed to use <strong>fullname</strong>
+            as an alternative name for this attribute.</li>
         </ul></li>
     </ul>
 

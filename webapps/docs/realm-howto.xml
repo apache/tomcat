@@ -254,6 +254,81 @@ simplified to <code>{digest}</code>.</p>
 
 
 
+<subsection name="Additional User Attributes">
+<p>Some of the Realm implementations, namely <code>DataSourceRealm</code>,
+<code>JNDIRealn</code>, <code>MemoryRealm</code> and
+<code>UserDatabaseRealm</code>, support a feature called
+<i>Additional User Attributes</i>. With that, the Realm additionally queries a
+configurable list of attributes from the user's entry in the associated user
+database. Depending on the Realm, the latter is either a JDBC database, a
+JDNI directory, an XML file or a Tomcat UserDatabase resource. The purpose of
+this feature is to provide extra user-related information, like e-mail address,
+department, room number, phone number etc., to the application with only a
+configured list of attribute names (like the SELECT clause of an SQL
+statement).</p>
+
+<p>Additional user attributes are provided to the application through the
+<code>Principal</code> instance, which is associated with each authenticated
+request. Principals created by the Realms noted above all maintain a set of
+read-only <i>named attributes</i>, accessible by these well-known methods:
+
+<source>java.lang.Object getAttribute(java.lang.String name);
+
+java.util.Enumeration&lt;java.lang.String&gt; getAttributeNames();
+</source>
+
+This set of attributes is populated by the Realm with the queried additional
+user attributes. The configured names of the attributes to query additionally
+also serve as the names of the attributes. These are the real names of the user
+table's columns in the JDBC database (when using <code>DataSourceRealm</code>)
+or the real names of the user entry's attributes in either the JNDI directory
+(when using <code>JNDIRealm</code>) or the <code>tomcat-users.xml</code> file
+(when using <code>MemoryRealm</code> or <code>UserDatabaseRealm</code>).</p>
+
+<p>The Principal returned for a request by method
+<code>HttpServletRequest.getUserPrincipal()</code> is of type
+<code>java.security.Principal</code>. The methods to access the Principal's
+attributes, however, are actually declared in the
+<code>org.apache.catalina.TomcatPrincipal</code> interface, which extends
+<code>java.security.Principal</code> and is the base type for all Principal
+classes used in Tomcat. So, in order to actually access the Principal's
+attributes, an <code>instanceof</code> check and casting is required. Have a
+look at this simple example, which dumps all available additional user
+attributes:
+
+<source>Principal p = request.getUserPrincipal();
+if (p instanceof TomcatPrincipal) {
+
+    TomcatPrincipal principal = (TomcatPrincipal) p;
+  
+    out.writeln("Principal contains these attributes:");
+  
+    Enumeration&lt;String&gt; names = principal.getAttributeNames();
+    while (names.hasMoreElements()) {
+        String name = names.nextElement();
+        Object value = principal.getAttribute(name);
+    
+        out.writeln(name + ": " + value.toString());
+    }
+} else {
+    out.writeln("Principal does not support attributes.")
+}
+</source>
+
+The JSP example application referred to in the next section also lists the
+Principal's attributes. However, ensure that the <code>userAttributes</code>
+attribute of the default
+<a href="config/realm.html#UserDatabase_Realm_-_org.apache.catalina.realm.UserDatabaseRealm">UserDatabaseRealm</a>
+is configured to query some additional user attributes.</p>
+
+<p><strong>Security alert:</strong> Please note, that this feature, when
+configured inappropriately and, depending on the user related data available in
+ the Realm's user database, could leak sensitive user data. 
+</p>
+</subsection>
+
+
+
 <subsection name="Example Application">
 
 <p>The example application shipped with Tomcat includes an area that is

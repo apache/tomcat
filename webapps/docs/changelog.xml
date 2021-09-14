@@ -120,6 +120,15 @@
         Add recycling check in the input and output stream isReady to try to
         give a more informative ISE when the facade has been recycled. (remm)
       </fix>
+      <add>
+        <!--  please, add this to the latest "in development" section ("Tomcat 10.1.0-M6 (markt)")
+              I just didn't want to merge my branch with your latest upstream :-) 
+        -->
+        Add support for querying configured additional user attributes to  
+        <code>DataSourceRealm</code>, <code>JNDIRealm</code>,
+        <code>MemoryRelam</code> and <code>UserDatabaseRealm</code>. Patch
+        provided by Carsten Klein. (friendlycommitter)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
