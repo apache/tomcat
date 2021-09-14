@@ -192,7 +192,7 @@ public class WsSession implements Session {
      * @param wsRemoteEndpoint     The other / remote end point
      * @param wsWebSocketContainer The container that created this session
      * @param requestUri           The URI used to connect to this end point or
-     *                             <code>null</code> is this is a client session
+     *                             <code>null</code> if this is a client session
      * @param requestParameterMap  The parameters associated with the request
      *                             that initiated this session or
      *                             <code>null</code> if this is a client session
