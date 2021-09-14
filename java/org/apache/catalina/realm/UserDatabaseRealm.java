@@ -18,6 +18,7 @@ package org.apache.catalina.realm;
 
 import java.io.ObjectStreamException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -52,10 +53,17 @@ import org.apache.tomcat.util.buf.StringUtils;
 public class UserDatabaseRealm extends RealmBase {
 
     /**
-     * Contains the names of all user attributes available for this Realm.
+     * Contains the names of all user attributes available with this Realm.
      */
     private static final List<String> USER_ATTRIBUTES_AVAILABLE =
-            Arrays.asList("username", "fullname", "groups", "roles", "effectiveRoles");
+            Arrays.asList("username", "fullName", "groups", "roles", "effectiveRoles");
+
+    /**
+     * Contains the alias names for some of the user attributes available with this
+     * Realm.
+     */
+    private static final List<String> USER_ATTRIBUTES_ALIASES =
+            Arrays.asList("name", "fullname");
 
     /**
      * Contains the names of user attributes for which access is denied.
@@ -104,7 +112,7 @@ public class UserDatabaseRealm extends RealmBase {
      * (parsed and with wildcards (*) resolved).
      */
     private volatile List<String> userAttributesList;
-    private final Object userAttributesListLock = new Object();
+
 
     // ------------------------------------------------------------- Properties
 
@@ -288,15 +296,11 @@ public class UserDatabaseRealm extends RealmBase {
         if (user == null) {
             return null;
         } else {
-<<<<<<< Upstream, based on origin/main
             if (useStaticPrincipal) {
                 return new GenericPrincipal(username, Arrays.asList(getRoles(user)));
             } else {
                 return new UserDatabasePrincipal(user, database);
             }
-=======
-            return new UserDatabasePrincipal(user);
->>>>>>> 5aac520 Adjust to latest version in main branch
         }
     }
 
@@ -333,17 +337,34 @@ public class UserDatabaseRealm extends RealmBase {
     }
 
 
-    private List<String> getUserAttributesList() {
-        // DCL so userAttributesList MUST be volatile
+    /**
+     * Resolve or validate and return the list of requested user attributes,
+     * including attributes actually available for the specified user. This method
+     * is called once per login, that is, once for every authenticated user.
+     * 
+     * @param user the user logging in
+     * @return the list of requested and valid user attributes
+     */
+    private List<String> getUserAttributesList(User user) {
         if (userAttributesList == null) {
-            synchronized (userAttributesListLock) {
-                if (userAttributesList == null) {
-                    userAttributesList = parseUserAttributes(userAttributes,
-                            USER_ATTRIBUTES_ACCESS_DENIED, USER_ATTRIBUTES_AVAILABLE, true);
-                }
-            }
+            return null;
         }
-        return userAttributesList;
+        List<String> availableAttrs = new ArrayList<>(USER_ATTRIBUTES_AVAILABLE);
+        Iterator<String> attrIter = user.getAttributesNames();
+        while (attrIter.hasNext()) {
+            availableAttrs.add(attrIter.next());
+        }
+        if (userAttributesList.size() == 1
+                && userAttributesList.get(0).equals(USER_ATTRIBUTES_WILDCARD)) {
+            // Here, availableAttrs contains all attribute names required for the wildcard
+            // case. If we've got a wildcard, just return that list.
+            return availableAttrs;
+        }
+        // Otherwise, add aliases and validate (including error logging) and return the
+        // validated list.
+        availableAttrs.addAll(USER_ATTRIBUTES_ALIASES);
+        return validateUserAttributes(containerLog, userAttributesList,
+                USER_ATTRIBUTES_ACCESS_DENIED, availableAttrs);
     }
 
 
@@ -360,6 +381,8 @@ public class UserDatabaseRealm extends RealmBase {
                 throw new LifecycleException(sm.getString("userDatabaseRealm.noDatabase", resourceName));
             }
         }
+        
+        userAttributesList = parseUserAttributes(userAttributes);
 
         super.startInternal();
     }
@@ -392,28 +415,17 @@ public class UserDatabaseRealm extends RealmBase {
 
     public static final class UserDatabasePrincipal extends GenericPrincipal {
         private static final long serialVersionUID = 1L;
-<<<<<<< Upstream, based on origin/main
         private final transient UserDatabase database;
         private final List<String> userAttributesList;
-=======
-        private final User user;
->>>>>>> 5aac520 Adjust to latest version in main branch
 
-<<<<<<< Upstream, based on origin/main
         public UserDatabasePrincipal(User user, UserDatabase database) {
             super(user.getName());
             this.database = database;
-            userAttributesList = UserDatabaseRealm.this.getUserAttributesList();
-=======
-        public UserDatabasePrincipal(User user) {
-            super(user.getName());
-            this.user = user;
->>>>>>> 5aac520 Adjust to latest version in main branch
+            this.userAttributesList = getUserAttributesList(user);
         }
 
         @Override
         public String[] getRoles() {
-<<<<<<< Upstream, based on origin/main
             if (database == null) {
                 return new String[0];
             }
@@ -421,8 +433,6 @@ public class UserDatabaseRealm extends RealmBase {
             if (user == null) {
                 return new String[0];
             }
-=======
->>>>>>> 5aac520 Adjust to latest version in main branch
             Set<String> roles = new HashSet<>();
             Iterator<Role> uroles = user.getRoles();
             while (uroles.hasNext()) {
@@ -448,10 +458,6 @@ public class UserDatabaseRealm extends RealmBase {
             } else if (role == null) {
                 return false;
             }
-<<<<<<< Upstream, based on origin/main
-=======
-            UserDatabase database = getUserDatabase();
->>>>>>> 5aac520 Adjust to latest version in main branch
             if (database == null) {
                 return super.hasRole(role);
             }
@@ -478,9 +484,8 @@ public class UserDatabaseRealm extends RealmBase {
 
         @Override
         public Object getAttribute(String name) {
-            List<String> userAttributesList = getUserAttributesList();
             if (userAttributesList == null || !userAttributesList.contains(name)) {
-                // Return only requested attributes 
+                // Return only requested attributes
                 return null;
             }
             UserDatabase database = getUserDatabase();
@@ -494,6 +499,7 @@ public class UserDatabaseRealm extends RealmBase {
             case "name":
                 return user.getUsername();
 
+            case "fullName":
             case "fullname":
                 return user.getFullName();
 
@@ -528,12 +534,15 @@ public class UserDatabaseRealm extends RealmBase {
             case "effectiveRoles":
                 return StringUtils.join(getRoles());
             }
-            return null;
+            return user.getAttribute(name);
         }
 
         @Override
         public Enumeration<String> getAttributeNames() {
-            return Collections.enumeration(getUserAttributesList());
+            if (userAttributesList == null) {
+                return Collections.emptyEnumeration();
+            }
+            return Collections.enumeration(userAttributesList);
         }
 
         /**
@@ -550,7 +559,6 @@ public class UserDatabaseRealm extends RealmBase {
         }
 
         private Map<String, Object> getUserAttributesMap() {
-            List<String> userAttributesList = getUserAttributesList();
             if (userAttributesList == null) {
                 return null;
             }

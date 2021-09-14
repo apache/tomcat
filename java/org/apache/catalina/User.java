@@ -19,6 +19,7 @@ package org.apache.catalina;
 
 import java.security.Principal;
 import java.util.Iterator;
+import java.util.Set;
 
 
 /**
@@ -167,6 +168,44 @@ public interface User extends Principal {
      * Remove all {@link Role}s from those assigned to this user.
      */
     public void removeRoles();
+
+
+    /**
+     * Return the value of the attribute identified by the specified name or
+     * <code>null</code>, if the specified attribute does not exist.
+     * 
+     * @param name the name of the attribute for which to return its value
+     */
+    public String getAttribute(String name);
+
+
+    /**
+     * Set the value of the attribute identified by the specified name. Return the
+     * value previously assigned to the attribute identified by the specified name
+     * or <code>null</code>, if no such attribute exists.
+     * 
+     * @param name the name of the attribute to set the value for
+     * @param value the new value to set
+     */
+    public String setAttribute(String name, String value);
+
+
+    /**
+     * Remove all attributes from this user. 
+     */
+    public void removeAttributes();
+
+
+    /**
+     * @return the set of attributes names assigned to this user.
+     */
+    public Iterator<String> getAttributesNames();
+
+
+    /**
+     * Return a set of reserved names that cannot be used as attribute names.
+     */
+    public Set<String> getReservedAttributeNames();
 
 
 }

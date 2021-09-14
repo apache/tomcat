@@ -113,11 +113,14 @@ final class MemoryUserRule extends Rule {
         }
         String password = attributes.getValue("password");
         String roles = attributes.getValue("roles");
-        String fullname = attributes.getValue("fullname");
+        String fullName = attributes.getValue("fullName");
+        if (fullName == null) {
+            fullName = attributes.getValue("fullname");
+        }
 
         MemoryRealm realm =
             (MemoryRealm) digester.peek(digester.getCount() - 1);
-        realm.addUser(username, password, roles, fullname);
+        realm.addUser(username, password, roles, fullName);
 
     }
 

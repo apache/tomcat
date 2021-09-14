@@ -17,7 +17,10 @@
 package org.apache.catalina.users;
 
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.catalina.Group;
 import org.apache.catalina.Role;
@@ -52,6 +55,12 @@ public abstract class AbstractUser implements User {
      * The logon username of this user.
      */
     protected String username = null;
+
+
+    /**
+     * Additional attributes of this user. 
+     */
+    protected Map<String, String> attributes = new HashMap<>(); 
 
 
     // ------------------------------------------------------------- Properties
@@ -208,6 +217,68 @@ public abstract class AbstractUser implements User {
      */
     @Override
     public abstract void removeRoles();
+
+
+    /**
+     * Return the value of the attribute identified by the specified name or
+     * <code>null</code>, if the specified attribute does not exist.
+     * 
+     * @param name the name of the attribute for which to return its value
+     */
+    @Override
+    public String getAttribute(String name) {
+        return attributes.get(name);
+    }
+
+
+    /**
+     * Set the value of the attribute identified by the specified name. Return the
+     * value previously assigned to the attribute identified by the specified name
+     * or <code>null</code>, if no such attribute exists.
+     * <p>
+     * If the specified name is a <i>reserved name</i>, according to the set
+     * returned by {@link #getReservedAttributeNames()}, this method does nothing
+     * and returns <code>null</code>. Reserved named are those used to store the
+     * user's well-defined basic properties <code>username</code>,
+     * <code>password</code>, <code>fullname</code>, <code>groups</code> and
+     * <code>roles</code> as well as alias property names <code>name</code> and
+     * <code>fullName</code>.
+     * 
+     * @param name the name of the attribute to set the value for
+     * @param value the new value to set
+     */
+    @Override
+    public String setAttribute(String name, String value) {
+        if (getReservedAttributeNames().contains(name)) {
+            return null;
+        }
+        return attributes.put(name, value);
+    }
+
+
+    /**
+     * Remove all attributes from this user. 
+     */
+    @Override
+    public void removeAttributes() {
+        attributes.clear();
+    }
+
+
+    /**
+     * Return the set of attributes names assigned to this user.
+     */
+    @Override
+    public Iterator<String> getAttributesNames() {
+        return attributes.keySet().iterator();
+    }
+
+
+    /**
+     * Return a set of reserved names that cannot be used as attribute names.
+     */
+    @Override
+    public abstract Set<String> getReservedAttributeNames();
 
 
     // ------------------------------------------------------ Principal Methods

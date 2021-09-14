@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -864,6 +865,13 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                     }
                     user.addRole(role);
                 }
+            }
+        }
+        Set<String> reservedNames = user.getReservedAttributeNames();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            String attrName = attributes.getLocalName(i);
+            if (!reservedNames.contains(attrName)) {
+                user.setAttribute(attrName, attributes.getValue(i));
             }
         }
         return user;

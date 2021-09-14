@@ -50,10 +50,17 @@ public class MemoryRealm  extends RealmBase {
     private static final Log log = LogFactory.getLog(MemoryRealm.class);
 
     /**
-     * Contains the names of all user attributes available for this Realm.
+     * Contains the names of all user attributes available with this Realm.
      */
     private static final List<String> USER_ATTRIBUTES_AVAILABLE =
-            Arrays.asList("username", "fullname", "roles");
+            Arrays.asList("username", "fullName", "roles");
+
+    /**
+     * Contains the alias names for some of the user attributes available with this
+     * Realm.
+     */
+    private static final List<String> USER_ATTRIBUTES_ALIASES =
+            Arrays.asList("name", "fullname");
 
     /**
      * Contains the names of user attributes for which access is denied.
@@ -223,6 +230,7 @@ public class MemoryRealm  extends RealmBase {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("memoryRealm.authenticateSuccess", username));
             }
+            System.out.println("authenticate: " + userAttributesList);
             return principal;
         } else {
             if (log.isDebugEnabled()) {
@@ -243,7 +251,7 @@ public class MemoryRealm  extends RealmBase {
      * @param password User's password (clear text)
      * @param roles Comma-delimited set of roles associated with this user
      */
-    void addUser(String username, String password, String roles, String fullname) {
+    void addUser(String username, String password, String roles, String fullName) {
 
         // Accumulate the list of roles for this user
         List<String> list = new ArrayList<>();
@@ -269,8 +277,9 @@ public class MemoryRealm  extends RealmBase {
                     attributes.put(name, username);
                     break;
 
+                case "fullName":
                 case "fullname":
-                    attributes.put(name, fullname);
+                    attributes.put(name, fullName);
                     break;
 
                 case "roles":
@@ -333,7 +342,34 @@ public class MemoryRealm  extends RealmBase {
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
+    // ------------------------------------------------------ Private Methods
+
+
+    /**
+     * Parse, resolve or validate and return the list of requested user attributes.
+     * This method is called only once in the Realm's lifecycle.
+     * 
+     * @return the list of requested and valid user attributes
+     */
+    private List<String> getUserAttributesList() {
+        List<String> userAttrsList = parseUserAttributes(userAttributes);
+        if (userAttrsList == null) {
+            return null;
+        }
+        List<String> availableAttrs = new ArrayList<>(USER_ATTRIBUTES_AVAILABLE);
+        if (userAttrsList.size() == 1 && userAttrsList.get(0).equals(USER_ATTRIBUTES_WILDCARD)) {
+            // Here, availableAttrs contains all attribute names required for the wildcard
+            // case. If we've got a wildcard, just return that list.
+            return availableAttrs;
+        }
+        // Otherwise, add aliases and validate (including error logging) and return the
+        // validated list.
+        availableAttrs.addAll(USER_ATTRIBUTES_ALIASES);
+        return validateUserAttributes(log, userAttrsList, USER_ATTRIBUTES_ACCESS_DENIED,
+                availableAttrs);
+    }
+
+// ------------------------------------------------------ Lifecycle Methods
 
     /**
      * Prepare for the beginning of active use of the public methods of this
@@ -353,10 +389,7 @@ public class MemoryRealm  extends RealmBase {
             }
 
             // User attributes must be set up before the Digester starts parsing
-            if (userAttributesList == null) {
-                userAttributesList = parseUserAttributes(userAttributes,
-                        USER_ATTRIBUTES_ACCESS_DENIED, USER_ATTRIBUTES_AVAILABLE, true);
-            }
+            userAttributesList = getUserAttributesList();
 
             Digester digester = getDigester();
             try {

@@ -1307,64 +1307,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         return null;
     }
 
-    /**
-     * Parse the specified delimiter separated names of attributes and return a list
-     * of that names or <code>null</code>, if no attributes have been specified.
-     * Resolve wildcard characters (if any), remove duplicate names and optionally
-     * skip invalid attributes or attributes for which access is denied.
-     * <p>
-     * If a wildcard character is found, return <code>availableAttributes</code> or,
-     * in case the latter is <code>null</code> (that is, we don't know which
-     * attributes are available in advance) or <code>resolveWildcard</code> is
-     * <code>false</code>, a list consisting of a single wildcard character only
-     * (that is, we want the <i>raw</i> wildcard character unresolved).
-     * <p>
-     * If <code>deniedAttributes</code> is not <code>null</code>, log an
-     * <i>userAttributeAccessDenied</i> message for each specified attribute
-     * <b>contained</b> in that list.
-     * <p>
-     * If <code>availableAttributes</code> is not <code>null</code>, log an
-     * <i>userAttributeNotFound</i> message for each specified attribute <b>not
-     * contained</b> in that list.
-     * 
-     * @param userAttributes comma separated names of attributes to parse
-     * @param deniedAttributes list of attribute names for which access is denied
-     * @param availableAttributes list of available (aka valid) attribute names
-     * @param resolveWildcard if <code>true</code>, return <code>availableAttributes</code>
-     *            if a wildcard character was found and <code>availableAttributes</code>
-     *            is not <code>null</code>; otherwise return a list consisting of a
-     *            single wildcard character only
-     * @return a list containing the parsed attribute names or <code>null</code>, if
-     *         no attributes have been specified
-     */
-    protected List<String> parseUserAttributes(String userAttributes,
-            List<String> deniedAttributes, List<String> availableAttributes,
-            boolean resolveWildcard) {
-        if (userAttributes == null) {
-            return null;
-        }
-        List<String> attrs = new ArrayList<>();
-        for (String name : userAttributes.split(USER_ATTRIBUTES_DELIMITER)) {
-            name = name.trim();
-            if (name.length() == 0) {
-                continue;
-            }
-            if (name.equals(USER_ATTRIBUTES_WILDCARD)) {
-                return (availableAttributes != null && resolveWildcard) ? availableAttributes
-                        : Collections.singletonList(USER_ATTRIBUTES_WILDCARD);
-            }
-            if (attrs.contains(name)) {
-                // skip duplicates
-                continue;
-            }
-            attrs.add(name);
-        }
-        if (deniedAttributes != null || availableAttributes != null) {
-            return validateUserAttributes(attrs, deniedAttributes, availableAttributes);
-        }
-        return attrs.size() > 0 ? attrs : null;
-    }
-
 
     /**
      * Parse the specified delimiter separated attribute names and return a list of
@@ -1378,7 +1320,25 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *         no attributes have been specified
      */
     protected List<String> parseUserAttributes(String userAttributes) {
-        return parseUserAttributes(userAttributes, null, null, false);
+        if (userAttributes == null) {
+            return null;
+        }
+        List<String> attrs = new ArrayList<>();
+        for (String name : userAttributes.split(USER_ATTRIBUTES_DELIMITER)) {
+            name = name.trim();
+            if (name.length() == 0) {
+                continue;
+            }
+            if (name.equals(USER_ATTRIBUTES_WILDCARD)) {
+                return Collections.singletonList(USER_ATTRIBUTES_WILDCARD);
+            }
+            if (attrs.contains(name)) {
+                // skip duplicates
+                continue;
+            }
+            attrs.add(name);
+        }
+        return attrs.size() > 0 ? attrs : null;
     }
 
 
@@ -1394,13 +1354,14 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * <i>userAttributeAccessDenied</i> message for each specified attribute
      * <b>contained</b> in that list.
      * 
+     * @param log the logger used for logging invalid attributes names
      * @param userAttributes list of attribute names to validate
      * @param deniedAttributes list of attribute names for which access is denied
      * @param availableAttributes list of available (aka valid) attribute names
      * @return the validated attribute names as a list or <code>null</code>, if
      *         there are no valid attributes
      */
-    protected List<String> validateUserAttributes(List<String> userAttributes,
+    protected List<String> validateUserAttributes(Log log, List<String> userAttributes,
             List<String> deniedAttributes, List<String> availableAttributes) {
         if (userAttributes == null || userAttributes.size() == 0) {
             return null;
@@ -1411,13 +1372,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         List<String> attrs = new ArrayList<>();
         for (String name : userAttributes) {
             if (deniedAttributes != null && deniedAttributes.contains(name)) {
-                if (containerLog != null && containerLog.isWarnEnabled()) {
-                    containerLog.warn(sm.getString("realmBase.userAttributeAccessDenied", name));
+                if (log != null && log.isWarnEnabled()) {
+                    log.warn(sm.getString("realmBase.userAttributeAccessDenied", name));
                 }
                 continue;
             } else if (availableAttributes != null && !availableAttributes.contains(name)) {
-                if (containerLog != null && containerLog.isWarnEnabled()) {
-                    containerLog.warn(sm.getString("realmBase.userAttributeNotFound", name));
+                if (log != null && log.isWarnEnabled()) {
+                    log.warn(sm.getString("realmBase.userAttributeNotFound", name));
                 }
                 continue;
             } else if (name.equals(USER_ATTRIBUTES_WILDCARD)) {

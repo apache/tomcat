@@ -17,6 +17,16 @@
 package org.apache.catalina.users;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
+
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.apache.catalina.Group;
+import org.apache.catalina.Role;
 import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.security.Escape;
@@ -30,6 +40,9 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class MemoryUser extends GenericUser<MemoryUserDatabase> {
 
+
+    private static final Set<String> RESERVED_ATTRIBUTE_NAMES = new HashSet<>(Arrays
+            .asList("username", "name", "password", "fullname", "fullName", "groups", "roles"));
 
     /**
      * Package-private constructor used by the factory method in
@@ -73,6 +86,13 @@ public class MemoryUser extends GenericUser<MemoryUserDatabase> {
         sb.append(" roles=\"");
         StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
         sb.append("\"");
+        for (Entry<String, String> attr : attributes.entrySet()) {
+            sb.append(" ");
+            sb.append(Escape.xml(attr.getKey()));
+            sb.append("=\"");
+            sb.append(Escape.xml(attr.getValue()));
+            sb.append("\"");
+        }
         sb.append("/>");
         return sb.toString();
     }
@@ -98,6 +118,19 @@ public class MemoryUser extends GenericUser<MemoryUserDatabase> {
         sb.append(", roles=\"");
         StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
         sb.append("\"");
+        for (Entry<String, String> attr : attributes.entrySet()) {
+            sb.append(", ");
+            sb.append(Escape.xml(attr.getKey()));
+            sb.append("=\"");
+            sb.append(Escape.xml(attr.getValue()));
+            sb.append("\"");
+        }
         return sb.toString();
+    }
+
+
+    @Override
+    public Set<String> getReservedAttributeNames() {
+        return RESERVED_ATTRIBUTE_NAMES;
     }
 }
