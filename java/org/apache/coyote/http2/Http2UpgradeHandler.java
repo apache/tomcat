@@ -1046,7 +1046,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private int allocate(AbstractStream stream, int allocation) {
+    private synchronized int allocate(AbstractStream stream, int allocation) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.allocate.debug", getConnectionId(),
                     stream.getIdAsString(), Integer.toString(allocation)));
