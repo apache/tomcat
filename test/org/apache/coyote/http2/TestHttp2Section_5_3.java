@@ -177,6 +177,11 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
             output.clearTrace();
         }
 
+        // Need to give both server side threads enough time to request an
+        // allocation from the connection flow control window before sending
+        // the next window update.
+        Thread.sleep(1000);
+
         sendWindowUpdate(0, 1024);
         parser.readFrame(true);
 
