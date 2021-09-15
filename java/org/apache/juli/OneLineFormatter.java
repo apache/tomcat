@@ -43,7 +43,7 @@ public class OneLineFormatter extends Formatter {
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
     private static final int THREAD_NAME_CACHE_SIZE = 10000;
-    private static ThreadLocal<ThreadNameCache> threadNameCache =
+    private static final ThreadLocal<ThreadNameCache> threadNameCache =
             ThreadLocal.withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
 
     /* Timestamp format */
@@ -221,11 +221,7 @@ public class OneLineFormatter extends Formatter {
      */
     private static String getThreadName(int logRecordThreadId) {
         Map<Integer,String> cache = threadNameCache.get();
-        String result = null;
-
-        if (logRecordThreadId > (Integer.MAX_VALUE / 2)) {
-            result = cache.get(Integer.valueOf(logRecordThreadId));
-        }
+        String result = cache.get(Integer.valueOf(logRecordThreadId));
 
         if (result != null) {
             return result;
