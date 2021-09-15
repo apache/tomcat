@@ -172,12 +172,13 @@ class WindowAllocationManager {
 
 
     private void notify(int notifyTarget) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("windowAllocationManager.notify", stream.getConnectionId(),
-                    stream.getIdAsString(), Integer.toString(waitingFor), Integer.toString(notifyTarget)));
-        }
 
         synchronized (stream) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("windowAllocationManager.notify", stream.getConnectionId(),
+                        stream.getIdAsString(), Integer.toString(waitingFor), Integer.toString(notifyTarget)));
+            }
+
             if ((notifyTarget & waitingFor) > NONE) {
                 // Reset this here so multiple notifies (possible with a
                 // backlog containing multiple streams and small window updates)
