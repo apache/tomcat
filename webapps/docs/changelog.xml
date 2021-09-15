@@ -112,6 +112,10 @@
         <a href="https://bugs.openjdk.java.net/browse/JDK-8273874">JRE bug</a>
         that can trigger a memory leak when using the JNDI realm. (markt)
       </fix>
+      <fix>
+        <pr>451</pr>: Improve the usefulness of the thread name cache used in
+        JULI. Pull request provided by t-gergely. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
