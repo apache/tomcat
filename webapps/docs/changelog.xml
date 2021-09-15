@@ -125,6 +125,12 @@
         Correct a potential <code>StackOverflowException</code> with HTTP/2 and
         sendfile. (markt)
       </fix>
+      <fix>
+        Further improvements in the management of the connection flow control
+        window. This addresses various bugs that what cause streams to
+        incorrectly report that they had timed out waiting for an allocation
+        from the connection flow control window. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -20,10 +20,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
@@ -132,7 +131,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private final AtomicInteger nextLocalStreamId = new AtomicInteger(2);
     private final PingManager pingManager = getPingManager();
     private volatile int newStreamsSinceLastPrune = 0;
-    private final Map<AbstractStream, BacklogTracker> backLogStreams = new ConcurrentHashMap<>();
+    private final Set<AbstractStream> backLogStreams = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private long backLogSize = 0;
     // The time at which the connection will timeout unless data arrives before
     // then. -1 means no timeout.
@@ -873,101 +872,81 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // this thread until after this thread enters wait()
         int allocation = 0;
         synchronized (stream) {
-            do {
-                synchronized (this) {
-                    if (!stream.canWrite()) {
-                        stream.doStreamCancel(sm.getString("upgradeHandler.stream.notWritable",
-                                stream.getConnectionId(), stream.getIdAsString()), Http2Error.STREAM_CLOSED);
+            synchronized (this) {
+                if (!stream.canWrite()) {
+                    stream.doStreamCancel(sm.getString("upgradeHandler.stream.notWritable",
+                            stream.getConnectionId(), stream.getIdAsString()), Http2Error.STREAM_CLOSED);
+                }
+                long windowSize = getWindowSize();
+                if (stream.getConnectionAllocationMade() > 0) {
+                    allocation = stream.getConnectionAllocationMade();
+                    stream.setConnectionAllocationMade(0);
+                } else  if (windowSize < 1) {
+                    // Has this stream been granted an allocation
+                    if (stream.getConnectionAllocationMade() == 0) {
+                        stream.setConnectionAllocationRequested(reservation);
+                        backLogSize += reservation;
+                        backLogStreams.add(stream);
+                        // Add the parents as well
+                        AbstractStream parent = stream.getParentStream();
+                        while (parent != null && backLogStreams.add(parent)) {
+                            parent = parent.getParentStream();
+                        }
                     }
-                    long windowSize = getWindowSize();
-                    if (windowSize < 1 || backLogSize > 0) {
+                } else if (windowSize < reservation) {
+                    allocation = (int) windowSize;
+                    decrementWindowSize(allocation);
+                } else {
+                    allocation = reservation;
+                    decrementWindowSize(allocation);
+                }
+            }
+            if (allocation == 0) {
+                if (block) {
+                    try {
+                        // Connection level window is empty. Although this
+                        // request is for a stream, use the connection
+                        // timeout
+                        long writeTimeout = protocol.getWriteTimeout();
+                        stream.waitForConnectionAllocation(writeTimeout);
                         // Has this stream been granted an allocation
-                        BacklogTracker tracker = backLogStreams.get(stream);
-                        if (tracker == null) {
-                            tracker = new BacklogTracker(reservation);
-                            backLogStreams.put(stream, tracker);
-                            backLogSize += reservation;
-                            // Add the parents as well
-                            AbstractStream parent = stream.getParentStream();
-                            while (parent != null && backLogStreams.putIfAbsent(parent, new BacklogTracker()) == null) {
-                                parent = parent.getParentStream();
+                        if (stream.getConnectionAllocationMade() == 0) {
+                            String msg;
+                            Http2Error error;
+                            if (stream.isActive()) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug(sm.getString("upgradeHandler.noAllocation",
+                                            connectionId, stream.getIdAsString()));
+                                }
+                                // No allocation
+                                // Close the connection. Do this first since
+                                // closing the stream will raise an exception.
+                                close();
+                                msg = sm.getString("stream.writeTimeout");
+                                error = Http2Error.ENHANCE_YOUR_CALM;
+                            } else {
+                                msg = sm.getString("stream.clientCancel");
+                                error = Http2Error.STREAM_CLOSED;
                             }
+                            // Close the stream
+                            // This thread is in application code so need
+                            // to signal to the application that the
+                            // stream is closing
+                            stream.doStreamCancel(msg, error);
                         } else {
-                            if (tracker.getUnusedAllocation() > 0) {
-                                allocation = tracker.getUnusedAllocation();
-                                decrementWindowSize(allocation);
-                                if (tracker.getRemainingReservation() == 0) {
-                                    // The reservation has been fully allocated
-                                    // so this stream can be removed from the
-                                    // backlog.
-                                    backLogStreams.remove(stream);
-                                } else {
-                                    // This allocation has been used. Leave the
-                                    // stream on the backlog as it still has
-                                    // more bytes to write.
-                                    tracker.useAllocation();
-                                }
-                            }
+                            allocation = stream.getConnectionAllocationMade();
+                            stream.setConnectionAllocationMade(0);
                         }
-                    } else if (windowSize < reservation) {
-                        allocation = (int) windowSize;
-                        decrementWindowSize(allocation);
-                    } else {
-                        allocation = reservation;
-                        decrementWindowSize(allocation);
+                    } catch (InterruptedException e) {
+                        throw new IOException(sm.getString(
+                                "upgradeHandler.windowSizeReservationInterrupted", connectionId,
+                                stream.getIdAsString(), Integer.toString(reservation)), e);
                     }
+                } else {
+                    stream.waitForConnectionAllocationNonBlocking();
+                    return 0;
                 }
-                if (allocation == 0) {
-                    if (block) {
-                        try {
-                            // Connection level window is empty. Although this
-                            // request is for a stream, use the connection
-                            // timeout
-                            long writeTimeout = protocol.getWriteTimeout();
-                            stream.waitForConnectionAllocation(writeTimeout);
-                            // Has this stream been granted an allocation
-                            // Note: If the stream in not in this Map then the
-                            //       requested write has been fully allocated
-                            BacklogTracker tracker;
-                            // Ensure allocations made in other threads are visible
-                            synchronized (this) {
-                                tracker = backLogStreams.get(stream);
-                            }
-                            if (tracker != null && tracker.getUnusedAllocation() == 0) {
-                                String msg;
-                                Http2Error error;
-                                if (stream.isActive()) {
-                                    if (log.isDebugEnabled()) {
-                                        log.debug(sm.getString("upgradeHandler.noAllocation",
-                                                connectionId, stream.getIdAsString()));
-                                    }
-                                    // No allocation
-                                    // Close the connection. Do this first since
-                                    // closing the stream will raise an exception.
-                                    close();
-                                    msg = sm.getString("stream.writeTimeout");
-                                    error = Http2Error.ENHANCE_YOUR_CALM;
-                                } else {
-                                    msg = sm.getString("stream.clientCancel");
-                                    error = Http2Error.STREAM_CLOSED;
-                                }
-                                // Close the stream
-                                // This thread is in application code so need
-                                // to signal to the application that the
-                                // stream is closing
-                                stream.doStreamCancel(msg, error);
-                            }
-                        } catch (InterruptedException e) {
-                            throw new IOException(sm.getString(
-                                    "upgradeHandler.windowSizeReservationInterrupted", connectionId,
-                                    stream.getIdAsString(), Integer.toString(reservation)), e);
-                        }
-                    } else {
-                        stream.waitForConnectionAllocationNonBlocking();
-                        return 0;
-                    }
-                }
-            } while (allocation == 0);
+            }
         }
         return allocation;
     }
@@ -983,19 +962,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         synchronized (this) {
             long windowSize = getWindowSize();
             if (windowSize < 1 && windowSize + increment > 0) {
-                //  Connection window is completed exhausted. Assume there will
-                // be streams to notify. The overhead is minimal if there are
-                // none.
+                // Connection window is exhausted. Assume there will be streams
+                // to notify. The overhead is minimal if there are none.
                 streamsToNotify = releaseBackLog((int) (windowSize +increment));
-            } else if (backLogSize > 0) {
-                // While windowSize is greater than zero, all of it has already
-                // been allocated to streams in the backlog (or just about to
-                // exit the backlog). If any of windowSize was unallocated or
-                // 'spare', backLogSize would be zero. Therefore, apply this
-                // addition allocation to the backlog.
-                streamsToNotify = releaseBackLog(increment);
+            } else {
+                super.incrementWindowSize(increment);
             }
-            super.incrementWindowSize(increment);
         }
 
         if (streamsToNotify != null) {
@@ -1029,26 +1001,34 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private synchronized Set<AbstractStream> releaseBackLog(int increment) {
+    private synchronized Set<AbstractStream> releaseBackLog(int increment) throws Http2Exception {
         Set<AbstractStream> result = new HashSet<>();
-        if (backLogSize < increment) {
+        int remaining = increment;
+        if (backLogSize < remaining) {
             // Can clear the whole backlog
-            result.addAll(backLogStreams.keySet());
-            backLogStreams.clear();
-            backLogSize = 0;
-        } else {
-            int leftToAllocate = increment;
-            while (leftToAllocate > 0) {
-                leftToAllocate = allocate(this, leftToAllocate);
+            for (AbstractStream stream : backLogStreams) {
+                if (stream.getConnectionAllocationRequested() > 0) {
+                    stream.setConnectionAllocationMade(stream.getConnectionAllocationRequested());
+                    stream.setConnectionAllocationRequested(0);
+                }
             }
-            for (Entry<AbstractStream,BacklogTracker> entry : backLogStreams.entrySet()) {
-                int allocation = entry.getValue().getUnusedAllocation();
-                if (allocation > 0) {
-                    backLogSize -= allocation;
-                    if (!entry.getValue().isNotifyInProgress()) {
-                        result.add(entry.getKey());
-                        entry.getValue().startNotify();
-                    }
+            remaining -= backLogSize;
+            backLogSize = 0;
+            super.incrementWindowSize(remaining);
+
+            result.addAll(backLogStreams);
+            backLogStreams.clear();
+        } else {
+            allocate(this, remaining);
+            Iterator<AbstractStream> streamIter = backLogStreams.iterator();
+            while (streamIter.hasNext()) {
+                AbstractStream stream = streamIter.next();
+                if (stream.getConnectionAllocationMade() > 0) {
+                    backLogSize -= stream.getConnectionAllocationMade();
+                    backLogSize -= stream.getConnectionAllocationRequested();
+                    stream.setConnectionAllocationRequested(0);
+                    result.add(stream);
+                    streamIter.remove();
                 }
             }
         }
@@ -1061,10 +1041,20 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             log.debug(sm.getString("upgradeHandler.allocate.debug", getConnectionId(),
                     stream.getIdAsString(), Integer.toString(allocation)));
         }
-        // Allocate to the specified stream
-        BacklogTracker tracker = backLogStreams.get(stream);
 
-        int leftToAllocate = tracker.allocate(allocation);
+        int leftToAllocate = allocation;
+
+        if (stream.getConnectionAllocationRequested() > 0) {
+            int allocatedThisTime;
+            if (allocation >= stream.getConnectionAllocationRequested()) {
+                allocatedThisTime = stream.getConnectionAllocationRequested();
+            } else {
+                allocatedThisTime = allocation;
+            }
+            stream.setConnectionAllocationRequested(stream.getConnectionAllocationRequested() - allocatedThisTime);
+            stream.setConnectionAllocationMade(stream.getConnectionAllocationMade() + allocatedThisTime);
+            leftToAllocate = leftToAllocate - allocatedThisTime;
+        }
 
         if (leftToAllocate == 0) {
             return 0;
@@ -1078,13 +1068,16 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Recipients are children of the current stream that are in the
         // backlog.
         Set<AbstractStream> recipients = new HashSet<>(stream.getChildStreams());
-        recipients.retainAll(backLogStreams.keySet());
+        recipients.retainAll(backLogStreams);
 
         // Loop until we run out of allocation or recipients
         while (leftToAllocate > 0) {
             if (recipients.size() == 0) {
-                if (tracker.getUnusedAllocation() == 0) {
+                if (stream.getConnectionAllocationMade() == 0) {
                     backLogStreams.remove(stream);
+                }
+                if (stream.getIdAsInt() == 0) {
+                    throw new IllegalStateException();
                 }
                 return leftToAllocate;
             }
@@ -1832,8 +1825,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (average < overheadThreshold) {
                 // For Streams, client might only release the minimum so check
                 // against current demand
-                BacklogTracker tracker = backLogStreams.get(stream);
-                if (tracker == null || increment < tracker.getRemainingReservation()) {
+                if (increment < stream.getConnectionAllocationRequested()) {
                     // The smaller the increment, the larger the overhead
                     increaseOverheadCount(FrameType.WINDOW_UPDATE, overheadThreshold / average);
                 }
@@ -2042,82 +2034,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         @Override
         public void expandPayload() {
             payload = ByteBuffer.allocate(payload.capacity() * 2);
-        }
-    }
-
-
-    private static class BacklogTracker {
-
-        private int remainingReservation;
-        private int unusedAllocation;
-        private boolean notifyInProgress;
-
-        public BacklogTracker() {
-        }
-
-        public BacklogTracker(int reservation) {
-            remainingReservation = reservation;
-        }
-
-        /**
-         * @return The number of bytes requiring an allocation from the
-         *         Connection flow control window
-         */
-        public int getRemainingReservation() {
-            return remainingReservation;
-        }
-
-        /**
-         *
-         * @return The number of bytes allocated from the Connection flow
-         *         control window but not yet written
-         */
-        public int getUnusedAllocation() {
-            return unusedAllocation;
-        }
-
-        /**
-         * The purpose of this is to avoid the incorrect triggering of a timeout
-         * for the following sequence of events:
-         * <ol>
-         * <li>window update 1</li>
-         * <li>allocation 1</li>
-         * <li>notify 1</li>
-         * <li>window update 2</li>
-         * <li>allocation 2</li>
-         * <li>act on notify 1 (using allocation 1 and 2)</li>
-         * <li>notify 2</li>
-         * <li>act on notify 2 (timeout due to no allocation)</li>
-         * </ol>
-         *
-         * @return {@code true} if a notify has been issued but the associated
-         *         allocation has not been used, otherwise {@code false}
-         */
-        public boolean isNotifyInProgress() {
-            return notifyInProgress;
-        }
-
-        public void useAllocation() {
-            unusedAllocation = 0;
-            notifyInProgress = false;
-        }
-
-        public void startNotify() {
-            notifyInProgress = true;
-        }
-
-        private int allocate(int allocation) {
-            if (remainingReservation >= allocation) {
-                remainingReservation -= allocation;
-                unusedAllocation += allocation;
-                return 0;
-            }
-
-            int left = allocation - remainingReservation;
-            unusedAllocation += remainingReservation;
-            remainingReservation = 0;
-
-            return left;
         }
     }
 }
