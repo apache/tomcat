@@ -41,6 +41,9 @@ abstract class AbstractStream {
             Collections.newSetFromMap(new ConcurrentHashMap<AbstractNonZeroStream,Boolean>());
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
+    private volatile int connectionAllocationRequested = 0;
+    private volatile int connectionAllocationMade = 0;
+
 
     AbstractStream(Integer identifier) {
         this.identifier = identifier;
@@ -152,6 +155,30 @@ abstract class AbstractStream {
             log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(),
                     getIdAsString(), Integer.toString(decrement), Long.toString(windowSize)));
         }
+    }
+
+
+    final int getConnectionAllocationRequested() {
+        return connectionAllocationRequested;
+    }
+
+
+    final void setConnectionAllocationRequested(int connectionAllocationRequested) {
+        log.debug(sm.getString("abstractStream.setConnectionAllocationRequested", getConnectionId(), getIdAsString(),
+                Integer.toString(this.connectionAllocationRequested), Integer.toString(connectionAllocationRequested)));
+        this.connectionAllocationRequested = connectionAllocationRequested;
+    }
+
+
+    final int getConnectionAllocationMade() {
+        return connectionAllocationMade;
+    }
+
+
+    final void setConnectionAllocationMade(int connectionAllocationMade) {
+        log.debug(sm.getString("abstractStream.setConnectionAllocationMade", getConnectionId(), getIdAsString(),
+                Integer.toString(this.connectionAllocationMade), Integer.toString(connectionAllocationMade)));
+        this.connectionAllocationMade = connectionAllocationMade;
     }
 
 

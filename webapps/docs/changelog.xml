@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.72 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Further improvements in the management of the connection flow control
+        window. This addresses various bugs that what cause streams to
+        incorrectly report that they had timed out waiting for an allocation
+        from the connection flow control window. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.71 (schultz)" rtext="2021-09-13">
   <subsection name="Catalina">
