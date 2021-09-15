@@ -78,7 +78,8 @@ class WindowAllocationManager {
     void waitForConnection(long timeout) throws InterruptedException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("windowAllocationManager.waitFor.connection",
-                    stream.getConnectionId(), stream.getIdAsString(), Long.toString(timeout)));
+                    stream.getConnectionId(), stream.getIdAsString(),
+                    Integer.toString(stream.getConnectionAllocationRequested()), Long.toString(timeout)));
         }
 
         waitFor(CONNECTION, timeout);
