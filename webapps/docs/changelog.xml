@@ -149,6 +149,13 @@
         on <code>MehtodExpression</code> to align Tomcat with recent updates in
         the Jakarta EL specification project. (markt)
       </add>
+      <add>
+        Refactor <code>ScopedAttributeELResolver</code> to separate out the
+        functionality that is unrelated to scoped attributes into two new
+        resolvers: <code>ImportELResolver</code> and
+        <code>NotFoundELResolver</code>. This aligns Tomcat with recent updates
+        to the Jakarta Server Pages specification. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

@@ -32,6 +32,8 @@ import org.apache.jasper.runtime.JspRuntimeLibrary;
 
 public class TestJasperELResolver {
 
+    private static final int STANDARD_RESOLVERS_COUNT = 11;
+
     @Test
     public void testConstructorNone() throws Exception {
         doTestConstructor(0);
@@ -61,9 +63,9 @@ public class TestJasperELResolver {
 
         Assert.assertEquals(Integer.valueOf(count),
                 getField("appResolversSize", resolver));
-        Assert.assertEquals(9 + adjustedForGraalCount,
+        Assert.assertEquals(STANDARD_RESOLVERS_COUNT + adjustedForGraalCount,
                 ((ELResolver[])getField("resolvers", resolver)).length);
-        Assert.assertEquals(Integer.valueOf(9 + adjustedForGraalCount),
+        Assert.assertEquals(Integer.valueOf(STANDARD_RESOLVERS_COUNT + adjustedForGraalCount),
                 Integer.valueOf(((AtomicInteger) getField("resolversSize", resolver)).get()));
     }
 

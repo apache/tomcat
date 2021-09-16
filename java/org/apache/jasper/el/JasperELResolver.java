@@ -34,6 +34,8 @@ import jakarta.el.PropertyNotFoundException;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import jakarta.servlet.jsp.el.ImplicitObjectELResolver;
+import jakarta.servlet.jsp.el.ImportELResolver;
+import jakarta.servlet.jsp.el.NotFoundELResolver;
 import jakarta.servlet.jsp.el.ScopedAttributeELResolver;
 
 import org.apache.jasper.runtime.ExceptionUtils;
@@ -45,7 +47,8 @@ import org.apache.jasper.runtime.JspRuntimeLibrary;
  */
 public class JasperELResolver extends CompositeELResolver {
 
-    private static final int STANDARD_RESOLVERS_COUNT = 9;
+    // Keep aligned with class under test
+    private static final int STANDARD_RESOLVERS_COUNT = 11;
 
     private AtomicInteger resolversSize = new AtomicInteger(0);
     private volatile ELResolver[] resolvers;
@@ -71,6 +74,8 @@ public class JasperELResolver extends CompositeELResolver {
         }
         add(new BeanELResolver());
         add(new ScopedAttributeELResolver());
+        add(new ImportELResolver());
+        add(new NotFoundELResolver());
     }
 
     @Override
