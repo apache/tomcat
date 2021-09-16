@@ -131,6 +131,10 @@
         incorrectly report that they had timed out waiting for an allocation
         from the connection flow control window. (markt)
       </fix>
+      <fix>
+        <bug>65577</bug>: Fix a <code>AccessControlException</code> reporting
+        when running an NIO2 connector with TLS enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
