@@ -194,6 +194,8 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.net.SocketWrapperBase$CompletionHandlerCall");
         loader.loadClass(basePackage + "util.net.SocketWrapperBase$CompletionState");
         loader.loadClass(basePackage + "util.net.SocketWrapperBase$VectoredIOCompletionHandler");
+        loader.loadClass(basePackage + "util.net.TLSClientHelloExtractor");
+        loader.loadClass(basePackage + "util.net.TLSClientHelloExtractor$ExtractorResult");
         // security
         loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");
         loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");
