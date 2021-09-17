@@ -215,13 +215,11 @@ public final class AstValue extends SimpleNode {
         Target t = getTarget(ctx);
         Class<?>[] types = null;
         if (isParametersProvided()) {
-            if (isParametersProvided()) {
-                Object[] values = ((AstMethodParameters) this.jjtGetChild(
-                        this.jjtGetNumChildren() - 1)).getParameters(ctx);
-                types = getTypesFromValues(values);
-            } else {
-                types = paramTypes;
-            }
+            Object[] values = ((AstMethodParameters) this.jjtGetChild(
+                    this.jjtGetNumChildren() - 1)).getParameters(ctx);
+            types = getTypesFromValues(values);
+        } else {
+            types = paramTypes;
         }
         Method m = ReflectionUtil.getMethod(ctx, t.base, t.property, types, null);
         return new MethodInfo(m.getName(), m.getReturnType(), m.getParameterTypes());
