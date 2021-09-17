@@ -22,6 +22,7 @@ import jakarta.el.ELContext;
 import jakarta.el.ELProcessor;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.MethodExpression;
+import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
 import jakarta.el.ValueExpression;
 
@@ -760,5 +761,18 @@ public class TestMethodExpressionImpl {
         elp.defineBean("bean1", new TesterBeanI());
         String elResult = elp.eval("bean1.echo(bean2)");
         Assert.assertEquals("No varargs: xyz", elResult);
+    }
+
+
+    @Test
+    public void testGetMethodInfo01() throws Exception {
+        MethodExpression me = factory.createMethodExpression(context,
+                "#{beanA.setName('New value')}", null, null);
+        // This is the call that failed
+        MethodInfo mi = me.getMethodInfo(context);
+        // The rest is to check it worked correctly
+        Assert.assertEquals(void.class, mi.getReturnType());
+        Assert.assertEquals(1, mi.getParamTypes().length);
+        Assert.assertEquals(String.class, mi.getParamTypes()[0]);
     }
 }
