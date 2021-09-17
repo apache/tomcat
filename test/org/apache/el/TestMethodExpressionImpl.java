@@ -20,6 +20,7 @@ import javax.el.ELContext;
 import javax.el.ELProcessor;
 import javax.el.ExpressionFactory;
 import javax.el.MethodExpression;
+import javax.el.MethodInfo;
 import javax.el.MethodNotFoundException;
 import javax.el.ValueExpression;
 
@@ -912,5 +913,18 @@ public class TestMethodExpressionImpl {
         elp.defineBean("bean1", new TesterBeanI());
         String elResult = (String) elp.eval("bean1.echo(bean2)");
         Assert.assertEquals("No varargs: xyz", elResult);
+    }
+
+
+    @Test
+    public void testGetMethodInfo01() throws Exception {
+        MethodExpression me = factory.createMethodExpression(context,
+                "#{beanA.setName('New value')}", null, null);
+        // This is the call that failed
+        MethodInfo mi = me.getMethodInfo(context);
+        // The rest is to check it worked correctly
+        Assert.assertEquals(void.class, mi.getReturnType());
+        Assert.assertEquals(1, mi.getParamTypes().length);
+        Assert.assertEquals(String.class, mi.getParamTypes()[0]);
     }
 }
