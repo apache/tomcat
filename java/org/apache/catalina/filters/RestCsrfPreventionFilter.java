@@ -31,6 +31,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.util.RequestUtil;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * Provides basic CSRF protection for REST APIs. The filter assumes that the
  * clients have adapted the transfer of the nonce through the 'X-CSRF-Token'
@@ -78,7 +82,8 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     private enum MethodType {
         NON_MODIFYING_METHOD, MODIFYING_METHOD
     }
-
+    private final Log log = LogFactory.getLog(RestCsrfPreventionFilter.class);
+    
     private static final Pattern NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
 
     private Set<String> pathsAcceptingParams = new HashSet<>();
@@ -155,10 +160,13 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         @Override
         public boolean apply(HttpServletRequest request, HttpServletResponse response)
                 throws IOException {
+            String nonceFromRequest = extractNonceFromRequest(request);
+            HttpSession session = request.getSession(false);
+            String nonceFromSession = extractNonceFromSession(session,
+                    Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
             if (isValidStateChangingRequest(
-                    extractNonceFromRequest(request),
-                    extractNonceFromSession(request.getSession(false),
-                            Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))) {
+                    nonceFromRequest,
+                    nonceFromSession)) {
                 return true;
             }
 
@@ -166,6 +174,15 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
                     Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
             response.sendError(getDenyStatus(),
                     sm.getString("restCsrfPreventionFilter.invalidNonce"));
+            if (log.isErrorEnabled()) {
+                log.error("CSRF validation for REST failed! Request with method [" + request.getMethod() + "] and URI ["
+                        + RequestUtil.filter(request.getRequestURI())
+                        + "] will be rejected. Details: request has sessionid ["
+                        + (request.getRequestedSessionId() != null)
+                        + "]; requested session exists [" + (session != null )
+                        + "]; crft nonce in request exists ["   + (nonceFromRequest != null)
+                        + "]; csrf nonce in session exists [" + (nonceFromSession != null) + "].");
+            }
             return false;
         }
 
@@ -192,6 +209,10 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
                 String nonce = params[0];
                 for (String param : params) {
                     if (!Objects.equals(param, nonce)) {
+                        if (log.isErrorEnabled()) {
+                            log.error("Different CSRF nonces are sent as request paramaters, none of them will be used." 
+                                    + "Request is with method: [" + request.getMethod() + "] and URI [" + RequestUtil.filter(request.getRequestURI()) + "].");
+                        }
                         return null;
                     }
                 }
@@ -217,6 +238,10 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
                 }
                 storeNonceToResponse(response, Constants.CSRF_REST_NONCE_HEADER_NAME,
                         nonceFromSessionStr);
+                if (log.isDebugEnabled()) {
+                    log.debug("CSRF Fetch request is succesfully handled - nonce is added to the response."
+                            + "Request is with method: [" + request.getMethod() + "] and URI [" + RequestUtil.filter(request.getRequestURI() + "]."));
+                }
             }
             return true;
         }
