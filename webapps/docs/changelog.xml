@@ -137,6 +137,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Fix the implementation of <code>MethodExpression.getMethodInfo()</code>
+        so that it returns the expected value rather than failing when the
+        method expression is defined with the parameter values in the expression
+        rather than the types being passed explicitly to
+        <code>ExpressionFactory.createMethodExpression()</code>. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.53 (remm)" rtext="2021-09-10">
   <subsection name="Catalina">
