@@ -126,7 +126,7 @@
         so that it returns the expected value rather than failing when the
         method expression is defined with the parameter values in the expression
         rather than the types being passed explicitly to
-        <code>ExpressionFactory.createMethodExpression()</code>. (markt) 
+        <code>ExpressionFactory.createMethodExpression()</code>. (markt)
       </fix>
     </changelog>
   </subsection>
