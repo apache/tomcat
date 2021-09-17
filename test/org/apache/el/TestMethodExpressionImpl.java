@@ -775,4 +775,17 @@ public class TestMethodExpressionImpl {
         Assert.assertEquals(1, mi.getParamTypes().length);
         Assert.assertEquals(String.class, mi.getParamTypes()[0]);
     }
+
+
+    @Test
+    public void testGetMethodInfo02() throws Exception {
+        MethodExpression me = factory.createMethodExpression(context,
+                "#{beanA.setName}", null, new Class[] { String.class } );
+        // This is the call that failed
+        MethodInfo mi = me.getMethodInfo(context);
+        // The rest is to check it worked correctly
+        Assert.assertEquals(void.class, mi.getReturnType());
+        Assert.assertEquals(1, mi.getParamTypes().length);
+        Assert.assertEquals(String.class, mi.getParamTypes()[0]);
+    }
 }
