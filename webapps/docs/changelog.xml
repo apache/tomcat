@@ -116,7 +116,7 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
-        <bug>65563</bug>: Correct parsing of HTTP <code>Content-Rnage</code>
+        <bug>65563</bug>: Correct parsing of HTTP <code>Content-Range</code>
         headers. Tomcat was incorrectly requiring an <code>=</code> character
         after <code>bytes</code>. Fix based on pull request <pr>449</pr> by
         Thierry Guérin. (markt)
