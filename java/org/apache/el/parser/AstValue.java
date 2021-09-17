@@ -212,10 +212,18 @@ public final class AstValue extends SimpleNode {
             @SuppressWarnings("rawtypes") Class[] paramTypes)
             throws ELException {
         Target t = getTarget(ctx);
-        Method m = ReflectionUtil.getMethod(
-                ctx, t.base, t.property, paramTypes, null);
-        return new MethodInfo(m.getName(), m.getReturnType(), m
-                .getParameterTypes());
+        Class<?>[] types = null;
+        if (isParametersProvided()) {
+            if (isParametersProvided()) {
+                Object[] values = ((AstMethodParameters) this.jjtGetChild(
+                        this.jjtGetNumChildren() - 1)).getParameters(ctx);
+                types = getTypesFromValues(values);
+            } else {
+                types = paramTypes;
+            }
+        }
+        Method m = ReflectionUtil.getMethod(ctx, t.base, t.property, types, null);
+        return new MethodInfo(m.getName(), m.getReturnType(), m.getParameterTypes());
     }
 
     @Override
