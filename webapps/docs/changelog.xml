@@ -111,6 +111,10 @@
         Provide the DataSource in the constructor of
         <code>DataSourceUserDatabase</code>, since it is always global. (remm)
       </fix>
+      <fix>
+        Fix delete then create object manipulations with
+        <code>DataSourceUserDatabase</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

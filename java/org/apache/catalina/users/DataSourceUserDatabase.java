@@ -562,7 +562,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             Group group = new GenericGroup<>(this, groupname, description, null);
             createdGroups.put(groupname, group);
             modifiedGroups.remove(groupname);
-            removedGroups.remove(groupname);
             return group;
         } finally {
             readLock.unlock();
@@ -576,7 +575,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             Role role = new GenericRole<>(this, rolename, description);
             createdRoles.put(rolename, role);
             modifiedRoles.remove(rolename);
-            removedRoles.remove(rolename);
             return role;
         } finally {
             readLock.unlock();
@@ -590,7 +588,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             User user = new GenericUser<>(this, username, password, fullName, null, null);
             createdUsers.put(username, user);
             modifiedUsers.remove(username);
-            removedUsers.remove(username);
             return user;
         } finally {
             readLock.unlock();
@@ -1048,6 +1045,49 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
         if (isRoleStoreDefined()) {
 
+            // Removed roles
+            if (!removedRoles.isEmpty()) {
+                temp = new StringBuilder("DELETE FROM ");
+                temp.append(roleTable);
+                temp.append(" WHERE ").append(roleNameCol);
+                temp.append(" = ?");
+                if (groupRoleTable != null) {
+                    tempRelationDelete = new StringBuilder("DELETE FROM ");
+                    tempRelationDelete.append(groupRoleTable);
+                    tempRelationDelete.append(" WHERE ");
+                    tempRelationDelete.append(roleNameCol);
+                    tempRelationDelete.append(" = ?");
+                }
+                StringBuilder tempRelationDelete2 = new StringBuilder("DELETE FROM ");
+                tempRelationDelete2.append(userRoleTable);
+                tempRelationDelete2.append(" WHERE ");
+                tempRelationDelete2.append(roleNameCol);
+                tempRelationDelete2.append(" = ?");
+                for (Role role : removedRoles.values()) {
+                    if (tempRelationDelete != null) {
+                        try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete.toString())) {
+                            stmt.setString(1, role.getRolename());
+                            stmt.executeUpdate();
+                        } catch (SQLException e) {
+                            log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                        }
+                    }
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete2.toString())) {
+                        stmt.setString(1, role.getRolename());
+                        stmt.executeUpdate();
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    }
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
+                        stmt.setString(1, role.getRolename());
+                        stmt.executeUpdate();
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    }
+                }
+                removedRoles.clear();
+            }
+
             // Created roles
             if (!createdRoles.isEmpty()) {
                 temp = new StringBuilder("INSERT INTO ");
@@ -1094,49 +1134,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 modifiedRoles.clear();
             }
 
-            // Removed roles
-            if (!removedRoles.isEmpty()) {
-                temp = new StringBuilder("DELETE FROM ");
-                temp.append(roleTable);
-                temp.append(" WHERE ").append(roleNameCol);
-                temp.append(" = ?");
-                if (groupRoleTable != null) {
-                    tempRelationDelete = new StringBuilder("DELETE FROM ");
-                    tempRelationDelete.append(groupRoleTable);
-                    tempRelationDelete.append(" WHERE ");
-                    tempRelationDelete.append(roleNameCol);
-                    tempRelationDelete.append(" = ?");
-                }
-                StringBuilder tempRelationDelete2 = new StringBuilder("DELETE FROM ");
-                tempRelationDelete2.append(userRoleTable);
-                tempRelationDelete2.append(" WHERE ");
-                tempRelationDelete2.append(roleNameCol);
-                tempRelationDelete2.append(" = ?");
-                for (Role role : removedRoles.values()) {
-                    if (tempRelationDelete != null) {
-                        try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete.toString())) {
-                            stmt.setString(1, role.getRolename());
-                            stmt.executeUpdate();
-                        } catch (SQLException e) {
-                            log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                        }
-                    }
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete2.toString())) {
-                        stmt.setString(1, role.getRolename());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    }
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
-                        stmt.setString(1, role.getRolename());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    }
-                }
-                removedRoles.clear();
-            }
-
         } else if (userRoleTable != null && roleNameCol != null) {
             // Only remove role from users
             tempRelationDelete = new StringBuilder("DELETE FROM ");
@@ -1170,6 +1167,40 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             tempRelationDelete.append(groupNameCol);
             tempRelationDelete.append(" = ?");
             String groupRoleRelationDelete = tempRelationDelete.toString();
+
+            // Removed groups
+            if (!removedGroups.isEmpty()) {
+                temp = new StringBuilder("DELETE FROM ");
+                temp.append(groupTable);
+                temp.append(" WHERE ").append(groupNameCol);
+                temp.append(" = ?");
+                StringBuilder tempRelationDelete2 = new StringBuilder("DELETE FROM ");
+                tempRelationDelete2.append(userGroupTable);
+                tempRelationDelete2.append(" WHERE ");
+                tempRelationDelete2.append(groupNameCol);
+                tempRelationDelete2.append(" = ?");
+                for (Group group : removedGroups.values()) {
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(groupRoleRelationDelete)) {
+                        stmt.setString(1, group.getGroupname());
+                        stmt.executeUpdate();
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    }
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete2.toString())) {
+                        stmt.setString(1, group.getGroupname());
+                        stmt.executeUpdate();
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    }
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
+                        stmt.setString(1, group.getGroupname());
+                        stmt.executeUpdate();
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    }
+                }
+                removedGroups.clear();
+            }
 
             // Created groups
             if (!createdGroups.isEmpty()) {
@@ -1249,40 +1280,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 modifiedGroups.clear();
             }
 
-            // Removed groups
-            if (!removedGroups.isEmpty()) {
-                temp = new StringBuilder("DELETE FROM ");
-                temp.append(groupTable);
-                temp.append(" WHERE ").append(groupNameCol);
-                temp.append(" = ?");
-                StringBuilder tempRelationDelete2 = new StringBuilder("DELETE FROM ");
-                tempRelationDelete2.append(userGroupTable);
-                tempRelationDelete2.append(" WHERE ");
-                tempRelationDelete2.append(groupNameCol);
-                tempRelationDelete2.append(" = ?");
-                for (Group group : removedGroups.values()) {
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(groupRoleRelationDelete)) {
-                        stmt.setString(1, group.getGroupname());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    }
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(tempRelationDelete2.toString())) {
-                        stmt.setString(1, group.getGroupname());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    }
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
-                        stmt.setString(1, group.getGroupname());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    }
-                }
-                removedGroups.clear();
-            }
-
         }
 
         String userRoleRelation = null;
@@ -1318,6 +1315,39 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             tempRelationDelete.append(userNameCol);
             tempRelationDelete.append(" = ?");
             userGroupRelationDelete = tempRelationDelete.toString();
+        }
+
+        // Removed users
+        if (!removedUsers.isEmpty()) {
+            temp = new StringBuilder("DELETE FROM ");
+            temp.append(userTable);
+            temp.append(" WHERE ").append(userNameCol);
+            temp.append(" = ?");
+            for (User user : removedUsers.values()) {
+                if (userRoleRelationDelete != null) {
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelationDelete)) {
+                        stmt.setString(1, user.getUsername());
+                        stmt.executeUpdate();
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    }
+                }
+                if (userGroupRelationDelete != null) {
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(userGroupRelationDelete)) {
+                        stmt.setString(1, user.getUsername());
+                        stmt.executeUpdate();
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    }
+                }
+                try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
+                    stmt.setString(1, user.getUsername());
+                    stmt.executeUpdate();
+                } catch (SQLException e) {
+                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                }
+            }
+            removedUsers.clear();
         }
 
         // Created users
@@ -1443,37 +1473,6 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 }
             }
             modifiedGroups.clear();
-        }
-
-        // Removed users
-        if (!removedUsers.isEmpty()) {
-            temp = new StringBuilder("DELETE FROM ");
-            temp.append(userTable);
-            temp.append(" WHERE ").append(userNameCol);
-            temp.append(" = ?");
-            for (User user : removedUsers.values()) {
-                try (PreparedStatement stmt = dbConnection.prepareStatement(userRoleRelationDelete)) {
-                    stmt.setString(1, user.getUsername());
-                    stmt.executeUpdate();
-                } catch (SQLException e) {
-                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                }
-                if (userGroupRelationDelete != null) {
-                    try (PreparedStatement stmt = dbConnection.prepareStatement(userGroupRelationDelete)) {
-                        stmt.setString(1, user.getUsername());
-                        stmt.executeUpdate();
-                    } catch (SQLException e) {
-                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                    }
-                }
-                try (PreparedStatement stmt = dbConnection.prepareStatement(temp.toString())) {
-                    stmt.setString(1, user.getUsername());
-                    stmt.executeUpdate();
-                } catch (SQLException e) {
-                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                }
-            }
-            removedUsers.clear();
         }
 
     }
