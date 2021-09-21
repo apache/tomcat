@@ -65,7 +65,6 @@ public class ImportHandler {
         servletClassNames.add("ServletRequestListener");
         servletClassNames.add("ServletResponse");
         servletClassNames.add("SessionCookieConfig");
-        servletClassNames.add("SingleThreadModel");
         servletClassNames.add("WriteListener");
         // Classes
         servletClassNames.add("AsyncEvent");
@@ -101,7 +100,6 @@ public class ImportHandler {
         servletHttpClassNames.add("HttpSessionActivationListener");
         servletHttpClassNames.add("HttpSessionAttributeListener");
         servletHttpClassNames.add("HttpSessionBindingListener");
-        servletHttpClassNames.add("HttpSessionContext");
         servletHttpClassNames.add("HttpSessionIdListener");
         servletHttpClassNames.add("HttpSessionListener");
         servletHttpClassNames.add("HttpUpgradeHandler");

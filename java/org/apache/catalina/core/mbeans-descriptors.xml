@@ -1630,12 +1630,6 @@
                type="java.lang.String"
                writeable="false" />
 
-    <attribute name="singleThreadModel"
-               description="Does this servlet implement the SingleThreadModel interface?"
-               type="java.lang.Boolean"
-               is="true"
-               writeable="false" />
-
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
