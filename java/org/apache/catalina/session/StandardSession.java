@@ -223,14 +223,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     /**
-     * The HTTP session context associated with this session.
-     */
-    @Deprecated
-    protected static volatile
-            jakarta.servlet.http.HttpSessionContext sessionContext = null;
-
-
-    /**
      * The property change support for this component.  NOTE:  This value
      * is not included in the serialized version of this object.
      */
@@ -1104,25 +1096,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     }
 
 
-    /**
-     * Return the session context with which this session is associated.
-     *
-     * @deprecated As of Version 2.1, this method is deprecated and has no
-     *  replacement.  It will be removed in a future version of the
-     *  Java Servlet API.
-     */
-    @Override
-    @Deprecated
-    public jakarta.servlet.http.HttpSessionContext getSessionContext() {
-        if (sessionContext == null) {
-            sessionContext = new StandardSessionContext();
-        }
-        return sessionContext;
-    }
-
-
     // ----------------------------------------------HttpSession Public Methods
-
 
     /**
      * Return the object bound with the specified name in this session, or
@@ -1169,49 +1143,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     /**
-     * Return the object bound with the specified name in this session, or
-     * <code>null</code> if no object is bound with that name.
-     *
-     * @param name Name of the value to be returned
-     *
-     * @exception IllegalStateException if this method is called on an
-     *  invalidated session
-     *
-     * @deprecated As of Version 2.2, this method is replaced by
-     *  <code>getAttribute()</code>
-     */
-    @Override
-    @Deprecated
-    public Object getValue(String name) {
-
-        return getAttribute(name);
-
-    }
-
-
-    /**
-     * Return the set of names of objects bound to this session.  If there
-     * are no such objects, a zero-length array is returned.
-     *
-     * @exception IllegalStateException if this method is called on an
-     *  invalidated session
-     *
-     * @deprecated As of Version 2.2, this method is replaced by
-     *  <code>getAttributeNames()</code>
-     */
-    @Override
-    @Deprecated
-    public String[] getValueNames() {
-        if (!isValidInternal()) {
-            throw new IllegalStateException
-                (sm.getString("standardSession.getValueNames.ise"));
-        }
-
-        return keys();
-    }
-
-
-    /**
      * Invalidates this session and unbinds any objects bound to it.
      *
      * @exception IllegalStateException if this method is called on
@@ -1249,33 +1180,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
         }
 
         return this.isNew;
-    }
-
-
-    /**
-     * Bind an object to this session, using the specified name.  If an object
-     * of the same name is already bound to this session, the object is
-     * replaced.
-     * <p>
-     * After this method executes, and if the object implements
-     * <code>HttpSessionBindingListener</code>, the container calls
-     * <code>valueBound()</code> on the object.
-     *
-     * @param name Name to which the object is bound, cannot be null
-     * @param value Object to be bound, cannot be null
-     *
-     * @exception IllegalStateException if this method is called on an
-     *  invalidated session
-     *
-     * @deprecated As of Version 2.2, this method is replaced by
-     *  <code>setAttribute()</code>
-     */
-    @Override
-    @Deprecated
-    public void putValue(String name, Object value) {
-
-        setAttribute(name, value);
-
     }
 
 
@@ -1326,32 +1230,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
         }
 
         removeAttributeInternal(name, notify);
-
-    }
-
-
-    /**
-     * Remove the object bound with the specified name from this session.  If
-     * the session does not have an object bound with this name, this method
-     * does nothing.
-     * <p>
-     * After this method executes, and if the object implements
-     * <code>HttpSessionBindingListener</code>, the container calls
-     * <code>valueUnbound()</code> on the object.
-     *
-     * @param name Name of the object to remove from this session.
-     *
-     * @exception IllegalStateException if this method is called on an
-     *  invalidated session
-     *
-     * @deprecated As of Version 2.2, this method is replaced by
-     *  <code>removeAttribute()</code>
-     */
-    @Override
-    @Deprecated
-    public void removeValue(String name) {
-
-        removeAttribute(name);
 
     }
 
@@ -1895,58 +1773,5 @@ public class StandardSession implements HttpSession, Session, Serializable {
         public StandardSessionFacade run(){
             return new StandardSessionFacade(session);
         }
-    }
-}
-
-
-// ------------------------------------------------------------ Protected Class
-
-
-/**
- * This class is a dummy implementation of the <code>HttpSessionContext</code>
- * interface, to conform to the requirement that such an object be returned
- * when <code>HttpSession.getSessionContext()</code> is called.
- *
- * @author Craig R. McClanahan
- *
- * @deprecated As of Java Servlet API 2.1 with no replacement.  The
- *  interface will be removed in a future version of this API.
- */
-
-@Deprecated
-final class StandardSessionContext
-        implements jakarta.servlet.http.HttpSessionContext {
-
-    private static final List<String> emptyString = Collections.emptyList();
-
-    /**
-     * Return the session identifiers of all sessions defined
-     * within this context.
-     *
-     * @deprecated As of Java Servlet API 2.1 with no replacement.
-     *  This method must return an empty <code>Enumeration</code>
-     *  and will be removed in a future version of the API.
-     */
-    @Override
-    @Deprecated
-    public Enumeration<String> getIds() {
-        return Collections.enumeration(emptyString);
-    }
-
-
-    /**
-     * Return the <code>HttpSession</code> associated with the
-     * specified session identifier.
-     *
-     * @param id Session identifier for which to look up a session
-     *
-     * @deprecated As of Java Servlet API 2.1 with no replacement.
-     *  This method must return null and will be removed in a
-     *  future version of the API.
-     */
-    @Override
-    @Deprecated
-    public HttpSession getSession(String id) {
-        return null;
     }
 }

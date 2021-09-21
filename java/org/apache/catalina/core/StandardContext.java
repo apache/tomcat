@@ -6482,32 +6482,8 @@ public class StandardContext extends ContainerBase
         }
 
         @Override
-        @Deprecated
-        public Servlet getServlet(String name) throws ServletException {
-            return sc.getServlet(name);
-        }
-
-        @Override
-        @Deprecated
-        public Enumeration<Servlet> getServlets() {
-            return sc.getServlets();
-        }
-
-        @Override
-        @Deprecated
-        public Enumeration<String> getServletNames() {
-            return sc.getServletNames();
-        }
-
-        @Override
         public void log(String msg) {
             sc.log(msg);
-        }
-
-        @Override
-        @Deprecated
-        public void log(Exception exception, String msg) {
-            sc.log(exception, msg);
         }
 
         @Override

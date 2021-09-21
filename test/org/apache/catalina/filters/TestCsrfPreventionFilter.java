@@ -107,17 +107,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         }
 
         @Override
-        public String encodeRedirectUrl(String url) {
-            return url;
-        }
-
-        @Override
         public String encodeURL(String url) {
-            return url;
-        }
-
-        @Override
-        public String encodeUrl(String url) {
             return url;
         }
     }

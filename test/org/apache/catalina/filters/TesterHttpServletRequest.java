@@ -194,11 +194,6 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public String getRealPath(String path) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
     public int getRemotePort() {
         throw new RuntimeException("Not implemented");
     }
@@ -355,11 +350,6 @@ public class TesterHttpServletRequest implements HttpServletRequest {
 
     @Override
     public boolean isRequestedSessionIdFromURL() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean isRequestedSessionIdFromUrl() {
         throw new RuntimeException("Not implemented");
     }
 

@@ -42,7 +42,6 @@ import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.SingleThreadModel;
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.annotation.MultipartConfig;
 
@@ -71,7 +70,6 @@ import org.apache.tomcat.util.modeler.Util;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-@SuppressWarnings("deprecation") // SingleThreadModel
 public class StandardWrapper extends ContainerBase
     implements ServletConfig, Wrapper, NotificationEmitter {
 
@@ -1086,13 +1084,6 @@ public class StandardWrapper extends ContainerBase
             }
 
             classLoadTime=(int) (System.currentTimeMillis() -t1);
-
-            if (servlet instanceof SingleThreadModel) {
-                if (instancePool == null) {
-                    instancePool = new Stack<>();
-                }
-                singleThreadModel = true;
-            }
 
             initServlet(servlet);
 

@@ -41,7 +41,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Remy Maucherat
  */
-@SuppressWarnings("deprecation")
 public class ResponseFacade implements HttpServletResponse {
 
     // ----------------------------------------------------------- DoPrivileged
@@ -424,30 +423,6 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     @Override
-    public String encodeUrl(String url) {
-
-        if (response == null) {
-            throw new IllegalStateException(
-                            sm.getString("responseFacade.nullResponse"));
-        }
-
-        return response.encodeURL(url);
-    }
-
-
-    @Override
-    public String encodeRedirectUrl(String url) {
-
-        if (response == null) {
-            throw new IllegalStateException(
-                            sm.getString("responseFacade.nullResponse"));
-        }
-
-        return response.encodeRedirectURL(url);
-    }
-
-
-    @Override
     public void sendError(int sc, String msg)
         throws IOException {
 
@@ -586,17 +561,6 @@ public class ResponseFacade implements HttpServletResponse {
 
         response.setStatus(sc);
 
-    }
-
-
-    @Override
-    public void setStatus(int sc, String sm) {
-
-        if (isCommitted()) {
-            return;
-        }
-
-        response.setStatus(sc, sm);
     }
 
 

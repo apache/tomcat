@@ -53,7 +53,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-@SuppressWarnings("deprecation")
 public class RequestFacade implements HttpServletRequest {
 
 
@@ -616,18 +615,6 @@ public class RequestFacade implements HttpServletRequest {
     }
 
     @Override
-    public String getRealPath(String path) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
-        return request.getRealPath(path);
-    }
-
-
-    @Override
     public String getAuthType() {
 
         if (request == null) {
@@ -957,18 +944,6 @@ public class RequestFacade implements HttpServletRequest {
 
     @Override
     public boolean isRequestedSessionIdFromURL() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
-        return request.isRequestedSessionIdFromURL();
-    }
-
-
-    @Override
-    public boolean isRequestedSessionIdFromUrl() {
 
         if (request == null) {
             throw new IllegalStateException(

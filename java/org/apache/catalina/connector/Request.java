@@ -1233,35 +1233,6 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * @return the real path of the specified virtual path.
-     *
-     * @param path Path to be translated
-     *
-     * @deprecated As of version 2.1 of the Java Servlet API, use
-     *  <code>ServletContext.getRealPath()</code>.
-     */
-    @Override
-    @Deprecated
-    public String getRealPath(String path) {
-
-        Context context = getContext();
-        if (context == null) {
-            return null;
-        }
-        ServletContext servletContext = context.getServletContext();
-        if (servletContext == null) {
-            return null;
-        }
-
-        try {
-            return servletContext.getRealPath(path);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
-
-
-    /**
      * @return the remote IP address making this Request.
      */
     @Override
@@ -2494,20 +2465,6 @@ public class Request implements HttpServletRequest {
         }
 
         return requestedSessionURL;
-    }
-
-
-    /**
-     * @return <code>true</code> if the session identifier included in this
-     * request came from the request URI.
-     *
-     * @deprecated As of Version 2.1 of the Java Servlet API, use
-     *  <code>isRequestedSessionIdFromURL()</code> instead.
-     */
-    @Override
-    @Deprecated
-    public boolean isRequestedSessionIdFromUrl() {
-        return isRequestedSessionIdFromURL();
     }
 
 

@@ -34,7 +34,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.Filter;
@@ -502,49 +501,11 @@ public class JspCServletContext implements ServletContext {
 
 
     /**
-     * Return a null reference for the specified servlet name.
-     *
-     * @param name Name of the requested servlet
-     *
-     * @deprecated This method has been deprecated with no replacement
-     */
-    @Override
-    @Deprecated
-    public Servlet getServlet(String name) throws ServletException {
-        return null;
-    }
-
-
-    /**
      * Return the name of this servlet context.
      */
     @Override
     public String getServletContextName() {
         return getServerInfo();
-    }
-
-
-    /**
-     * Return an empty enumeration of servlet names.
-     *
-     * @deprecated This method has been deprecated with no replacement
-     */
-    @Override
-    @Deprecated
-    public Enumeration<String> getServletNames() {
-        return new Vector<String>().elements();
-    }
-
-
-    /**
-     * Return an empty enumeration of servlets.
-     *
-     * @deprecated This method has been deprecated with no replacement
-     */
-    @Override
-    @Deprecated
-    public Enumeration<Servlet> getServlets() {
-        return new Vector<Servlet>().elements();
     }
 
 
@@ -556,21 +517,6 @@ public class JspCServletContext implements ServletContext {
     @Override
     public void log(String message) {
         myLogWriter.println(message);
-    }
-
-
-    /**
-     * Log the specified message and exception.
-     *
-     * @param exception The exception to be logged
-     * @param message The message to be logged
-     *
-     * @deprecated Use log(String,Throwable) instead
-     */
-    @Override
-    @Deprecated
-    public void log(Exception exception, String message) {
-        log(message, exception);
     }
 
 

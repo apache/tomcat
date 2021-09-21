@@ -26,7 +26,6 @@ import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.SingleThreadModel;
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -66,8 +65,6 @@ import org.apache.tomcat.Jar;
  * @author Glenn Nielsen
  * @author Tim Fennell
  */
-
-@SuppressWarnings("deprecation") // Have to support SingleThreadModel
 public class JspServletWrapper {
 
     private static final Map<String,Long> ALWAYS_OUTDATED_DEPENDENCIES =
@@ -456,15 +453,7 @@ public class JspServletWrapper {
             /*
              * (4) Service request
              */
-            if (servlet instanceof SingleThreadModel) {
-               // sync on the wrapper so that the freshness
-               // of the page is determined right before servicing
-               synchronized (this) {
-                   servlet.service(request, response);
-                }
-            } else {
-                servlet.service(request, response);
-            }
+            servlet.service(request, response);
         } catch (UnavailableException ex) {
             String includeRequestUri = (String)
                 request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI);

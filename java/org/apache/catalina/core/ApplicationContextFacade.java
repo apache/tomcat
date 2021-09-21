@@ -238,82 +238,12 @@ public class ApplicationContextFacade implements ServletContext {
     }
 
 
-    /**
-     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
-     */
-    @Override
-    @Deprecated
-    public Servlet getServlet(String name)
-        throws ServletException {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try {
-                return (Servlet) invokeMethod(context, "getServlet",
-                                              new Object[]{name});
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                if (t instanceof ServletException) {
-                    throw (ServletException) t;
-                }
-                return null;
-            }
-        } else {
-            return context.getServlet(name);
-        }
-    }
-
-
-    /**
-     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
-     */
-    @Override
-    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
-    @Deprecated
-    public Enumeration<Servlet> getServlets() {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Enumeration<Servlet>) doPrivileged("getServlets", null);
-        } else {
-            return context.getServlets();
-        }
-    }
-
-
-    /**
-     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
-     */
-    @Override
-    @SuppressWarnings("unchecked") // doPrivileged() returns the correct type
-    @Deprecated
-    public Enumeration<String> getServletNames() {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Enumeration<String>) doPrivileged("getServletNames", null);
-        } else {
-            return context.getServletNames();
-        }
-   }
-
-
     @Override
     public void log(String msg) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("log", new Object[]{msg} );
         } else {
             context.log(msg);
-        }
-    }
-
-
-    /**
-     * @deprecated As of Java Servlet API 2.1, use
-     *  <code>log(String, Throwable)</code> instead
-     */
-    @Override
-    @Deprecated
-    public void log(Exception exception, String msg) {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            doPrivileged("log", new Class[]{Exception.class, String.class},
-                         new Object[]{exception,msg});
-        } else {
-            context.log(exception, msg);
         }
     }
 

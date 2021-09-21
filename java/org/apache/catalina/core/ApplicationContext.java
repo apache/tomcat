@@ -139,18 +139,6 @@ public class ApplicationContext implements ServletContext {
 
 
     /**
-     * Empty String collection to serve as the basis for empty enumerations.
-     */
-    private static final List<String> emptyString = Collections.emptyList();
-
-
-    /**
-     * Empty Servlet collection to serve as the basis for empty enumerations.
-     */
-    private static final List<Servlet> emptyServlet = Collections.emptyList();
-
-
-    /**
      * The facade around this object.
      */
     private final ServletContext facade = new ApplicationContextFacade(this);
@@ -598,42 +586,14 @@ public class ApplicationContext implements ServletContext {
 
 
     @Override
-    @Deprecated
-    public Servlet getServlet(String name) {
-        return null;
-    }
-
-
-    @Override
     public String getServletContextName() {
         return context.getDisplayName();
     }
 
 
     @Override
-    @Deprecated
-    public Enumeration<String> getServletNames() {
-        return Collections.enumeration(emptyString);
-    }
-
-
-    @Override
-    @Deprecated
-    public Enumeration<Servlet> getServlets() {
-        return Collections.enumeration(emptyServlet);
-    }
-
-
-    @Override
     public void log(String message) {
         context.getLogger().info(message);
-    }
-
-
-    @Override
-    @Deprecated
-    public void log(Exception exception, String message) {
-        context.getLogger().error(message, exception);
     }
 
 

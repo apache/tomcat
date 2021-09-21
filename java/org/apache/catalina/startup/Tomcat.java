@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Stack;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -1199,13 +1198,8 @@ public class Tomcat {
     public static class ExistingStandardWrapper extends StandardWrapper {
         private final Servlet existing;
 
-        @SuppressWarnings("deprecation")
         public ExistingStandardWrapper( Servlet existing ) {
             this.existing = existing;
-            if (existing instanceof jakarta.servlet.SingleThreadModel) {
-                singleThreadModel = true;
-                instancePool = new Stack<>();
-            }
             this.asyncSupported = hasAsync(existing);
         }
 

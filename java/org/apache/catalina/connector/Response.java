@@ -1144,23 +1144,6 @@ public class Response implements HttpServletResponse {
 
     /**
      * Encode the session identifier associated with this response
-     * into the specified redirect URL, if necessary.
-     *
-     * @param url URL to be encoded
-     * @return <code>true</code> if the URL was encoded
-     *
-     * @deprecated As of Version 2.1 of the Java Servlet API, use
-     *  <code>encodeRedirectURL()</code> instead.
-     */
-    @Override
-    @Deprecated
-    public String encodeRedirectUrl(String url) {
-        return encodeRedirectURL(url);
-    }
-
-
-    /**
-     * Encode the session identifier associated with this response
      * into the specified URL, if necessary.
      *
      * @param url URL to be encoded
@@ -1189,23 +1172,6 @@ public class Response implements HttpServletResponse {
             return url;
         }
 
-    }
-
-
-    /**
-     * Encode the session identifier associated with this response
-     * into the specified URL, if necessary.
-     *
-     * @param url URL to be encoded
-     * @return <code>true</code> if the URL was encoded
-     *
-     * @deprecated As of Version 2.1 of the Java Servlet API, use
-     *  <code>encodeURL()</code> instead.
-     */
-    @Override
-    @Deprecated
-    public String encodeUrl(String url) {
-        return encodeURL(url);
     }
 
 
@@ -1443,23 +1409,6 @@ public class Response implements HttpServletResponse {
      */
     @Override
     public void setStatus(int status) {
-        setStatus(status, null);
-    }
-
-
-    /**
-     * Set the HTTP status and message to be returned with this response.
-     *
-     * @param status The new HTTP status
-     * @param message The associated text message
-     *
-     * @deprecated As of Version 2.1 of the Java Servlet API, this method
-     *  has been deprecated due to the ambiguous meaning of the message
-     *  parameter.
-     */
-    @Override
-    @Deprecated
-    public void setStatus(int status, String message) {
 
         if (isCommitted()) {
             return;
@@ -1471,8 +1420,6 @@ public class Response implements HttpServletResponse {
         }
 
         getCoyoteResponse().setStatus(status);
-        getCoyoteResponse().setMessage(message);
-
     }
 
 
