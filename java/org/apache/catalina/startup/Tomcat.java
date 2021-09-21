@@ -1221,6 +1221,7 @@ public class Tomcat {
             return result;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public synchronized Servlet loadServlet() throws ServletException {
             if (singleThreadModel) {
