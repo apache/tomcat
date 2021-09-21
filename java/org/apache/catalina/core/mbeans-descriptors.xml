@@ -1595,7 +1595,7 @@
                writeable="false" />
 
     <attribute name="maxInstances"
-               description="Maximum number of STM instances."
+               description="Deprecated. Will be removed in Tomcat 10.1 onwards. Maximum number of STM instances."
                type="int" />
 
     <attribute name="minTime"
@@ -1627,7 +1627,7 @@
                writeable="false" />
 
     <attribute name="singleThreadModel"
-               description="Does this servlet implement the SingleThreadModel interface?"
+               description="Deprecated. Will be removed in Tomcat 10.1 onwards. Does this servlet implement the SingleThreadModel interface?"
                type="java.lang.Boolean"
                is="true"
                writeable="false" />

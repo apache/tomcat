@@ -182,7 +182,10 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * Does this servlet implement the SingleThreadModel interface?
+     *
+     * @deprecated This will be removed in Tomcat 10.1 onwards.
      */
+    @Deprecated
     protected volatile boolean singleThreadModel = false;
 
 
@@ -194,19 +197,28 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * Maximum number of STM instances.
+     *
+     * @deprecated This will be removed in Tomcat 10.1 onwards.
      */
+    @Deprecated
     protected int maxInstances = 20;
 
 
     /**
      * Number of instances currently loaded for a STM servlet.
+     *
+     * @deprecated This will be removed in Tomcat 10.1 onwards.
      */
+    @Deprecated
     protected int nInstances = 0;
 
 
     /**
      * Stack containing the STM instances.
+     *
+     * @deprecated This will be removed in Tomcat 10.1 onwards.
      */
+    @Deprecated
     protected Stack<Servlet> instancePool = null;
 
 
@@ -396,7 +408,10 @@ public class StandardWrapper extends ContainerBase
     /**
      * @return maximum number of instances that will be allocated when a single
      * thread model servlet is used.
+     *
+     * @deprecated This will be removed in Tomcat 10.1 onwards.
      */
+    @Deprecated
     public int getMaxInstances() {
         return this.maxInstances;
     }
@@ -407,7 +422,10 @@ public class StandardWrapper extends ContainerBase
      * thread model servlet is used.
      *
      * @param maxInstances New value of maxInstances
+     *
+     * @deprecated This will be removed in Tomcat 10.1 onwards.
      */
+    @Deprecated
     public void setMaxInstances(int maxInstances) {
 
         int oldMaxInstances = this.maxInstances;
@@ -516,7 +534,10 @@ public class StandardWrapper extends ContainerBase
      * @return {@code null} if the class has not been loaded, otherwise {@code
      *         true} if the servlet does implement {@code SingleThreadModel} and
      *         {@code false} if it does not.
+     *
+     * @deprecated This will be removed in Tomcat 10.1 onwards.
      */
+    @Deprecated
     public Boolean isSingleThreadModel() {
         // If the servlet has been loaded either singleThreadModel will be true
         // or instance will be non-null
