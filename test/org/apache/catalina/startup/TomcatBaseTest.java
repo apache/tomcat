@@ -452,7 +452,6 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        @SuppressWarnings("deprecation")
         @Override
         public void service(HttpServletRequest request,
                             HttpServletResponse response)
@@ -559,7 +558,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             out.println("SESSION-REQUESTED-ID-COOKIE: " +
                         request.isRequestedSessionIdFromCookie());
             out.println("SESSION-REQUESTED-ID-URL: " +
-                        request.isRequestedSessionIdFromUrl());
+                        request.isRequestedSessionIdFromURL());
             out.println("SESSION-REQUESTED-ID-VALID: " +
                         request.isRequestedSessionIdValid());
 
