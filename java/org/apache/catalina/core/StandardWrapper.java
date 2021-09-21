@@ -110,8 +110,7 @@ public class StandardWrapper extends ContainerBase
     protected final NotificationBroadcasterSupport broadcaster;
 
     /**
-     * The count of allocations that are currently active (even if they
-     * are for the same instance, as will be true on a non-STM servlet).
+     * The count of allocations that are currently active.
      */
     protected final AtomicInteger countAllocated = new AtomicInteger(0);
 
@@ -679,11 +678,8 @@ public class StandardWrapper extends ContainerBase
                 if (instance == null) {
                     try {
                         if (log.isDebugEnabled()) {
-                            log.debug("Allocating non-STM instance");
+                            log.debug("Allocating instance");
                         }
-
-                        // Note: We don't know if the Servlet implements
-                        // SingleThreadModel until we have loaded it.
                         instance = loadServlet();
                         newInstance = true;
                         // Increment here to prevent a race condition
@@ -703,7 +699,7 @@ public class StandardWrapper extends ContainerBase
         }
 
         if (log.isTraceEnabled()) {
-            log.trace("  Returning non-STM instance");
+            log.trace("  Returning instance");
         }
         // For new instances, count will have been incremented at the
         // time of creation
@@ -1123,7 +1119,6 @@ public class StandardWrapper extends ContainerBase
         unloading = true;
 
         // Loaf a while if the current instance is allocated
-        // (possibly more than once if non-STM)
         if (countAllocated.get() > 0) {
             int nRetries = 0;
             long delay = unloadDelay / 20;

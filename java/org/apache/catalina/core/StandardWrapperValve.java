@@ -75,7 +75,7 @@ final class StandardWrapperValve extends ValveBase {
 
     /**
      * Invoke the servlet we are managing, respecting the rules regarding
-     * servlet lifecycle and SingleThreadModel support.
+     * servlet lifecycle support.
      *
      * @param request Request to be processed
      * @param response Response to be produced

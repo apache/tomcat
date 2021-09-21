@@ -1574,11 +1574,6 @@
                type="int"
                writeable="false" />
 
-    <attribute name="countAllocated"
-               description="The count of allocations that are currently active (even if they  are for the same instance, as will be true on a non-STM servlet)."
-               type="int"
-               writeable="false" />
-
     <attribute name="errorCount"
                description="Error count"
                type="int"
@@ -1597,10 +1592,6 @@
                description="Maximum processing time of a request"
                type="long"
                writeable="false" />
-
-    <attribute name="maxInstances"
-               description="Maximum number of STM instances."
-               type="int" />
 
     <attribute name="minTime"
                description="Minimum processing time of a request"
