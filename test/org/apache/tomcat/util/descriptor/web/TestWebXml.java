@@ -46,7 +46,7 @@ public class TestWebXml {
         WebXml webxml = new WebXml();
 
         // Defaults
-        Assert.assertEquals(5, webxml.getMajorVersion());
+        Assert.assertEquals(6, webxml.getMajorVersion());
         Assert.assertEquals(0, webxml.getMinorVersion());
 
         // Both get changed
@@ -180,6 +180,11 @@ public class TestWebXml {
     @Test
     public void testValidateVersion50() throws IOException, SAXException {
         doTestValidateVersion("5.0");
+    }
+
+    @Test
+    public void testValidateVersion60() throws IOException, SAXException {
+        doTestValidateVersion("6.0");
     }
 
     private void doTestValidateVersion(String version) throws IOException, SAXException {
