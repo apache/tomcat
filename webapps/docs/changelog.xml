@@ -115,6 +115,10 @@
         Fix delete then create object manipulations with
         <code>DataSourceUserDatabase</code>. (remm)
       </fix>
+      <update>
+        Remove all deprecated code from the Servlet API to align Tomcat with
+        recent changes in the Jakarta Servlet specification project. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

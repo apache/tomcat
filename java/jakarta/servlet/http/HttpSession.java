@@ -135,16 +135,6 @@ public interface HttpSession {
     public int getMaxInactiveInterval();
 
     /**
-     * Do not use.
-     * @return A dummy implementation of HttpSessionContext
-     * @deprecated As of Version 2.1, this method is deprecated and has no
-     *             replacement. It will be removed in a future version of the
-     *             Java Servlet API.
-     */
-    @Deprecated
-    public HttpSessionContext getSessionContext();
-
-    /**
      * Returns the object bound with the specified name in this session, or
      * <code>null</code> if no object is bound under the name.
      *
@@ -157,18 +147,6 @@ public interface HttpSession {
     public Object getAttribute(String name);
 
     /**
-     * @param name
-     *            a string specifying the name of the object
-     * @return the object with the specified name
-     * @exception IllegalStateException
-     *                if this method is called on an invalidated session
-     * @deprecated As of Version 2.2, this method is replaced by
-     *             {@link #getAttribute}.
-     */
-    @Deprecated
-    public Object getValue(String name);
-
-    /**
      * Returns an <code>Enumeration</code> of <code>String</code> objects
      * containing the names of all the objects bound to this session.
      *
@@ -178,17 +156,6 @@ public interface HttpSession {
      *                if this method is called on an invalidated session
      */
     public Enumeration<String> getAttributeNames();
-
-    /**
-     * @return an array of <code>String</code> objects specifying the names of
-     *         all the objects bound to this session
-     * @exception IllegalStateException
-     *                if this method is called on an invalidated session
-     * @deprecated As of Version 2.2, this method is replaced by
-     *             {@link #getAttributeNames}
-     */
-    @Deprecated
-    public String[] getValueNames();
 
     /**
      * Binds an object to this session, using the name specified. If an object
@@ -217,19 +184,6 @@ public interface HttpSession {
     public void setAttribute(String name, Object value);
 
     /**
-     * @param name
-     *            the name to which the object is bound; cannot be null
-     * @param value
-     *            the object to be bound; cannot be null
-     * @exception IllegalStateException
-     *                if this method is called on an invalidated session
-     * @deprecated As of Version 2.2, this method is replaced by
-     *             {@link #setAttribute}
-     */
-    @Deprecated
-    public void putValue(String name, Object value);
-
-    /**
      * Removes the object bound with the specified name from this session. If
      * the session does not have an object bound with the specified name, this
      * method does nothing.
@@ -246,17 +200,6 @@ public interface HttpSession {
      *                if this method is called on an invalidated session
      */
     public void removeAttribute(String name);
-
-    /**
-     * @param name
-     *            the name of the object to remove from this session
-     * @exception IllegalStateException
-     *                if this method is called on an invalidated session
-     * @deprecated As of Version 2.2, this method is replaced by
-     *             {@link #removeAttribute}
-     */
-    @Deprecated
-    public void removeValue(String name);
 
     /**
      * Invalidates this session then unbinds any objects bound to it.

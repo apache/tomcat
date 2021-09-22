@@ -299,57 +299,6 @@ public interface ServletContext {
     public RequestDispatcher getNamedDispatcher(String name);
 
     /**
-     * Do not use. This method was originally defined to retrieve a servlet from
-     * a <code>ServletContext</code>. In this version, this method always
-     * returns <code>null</code> and remains only to preserve binary
-     * compatibility. This method will be permanently removed in a future
-     * version of the Java Servlet API.
-     * <p>
-     * In lieu of this method, servlets can share information using the
-     * <code>ServletContext</code> class and can perform shared business logic
-     * by invoking methods on common non-servlet classes.
-     *
-     * @param name Not used
-     *
-     * @return Always <code>null</code>
-     *
-     * @throws ServletException never
-     *
-     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
-     */
-    @Deprecated
-    public Servlet getServlet(String name) throws ServletException;
-
-    /**
-     * Do not use. This method was originally defined to return an
-     * <code>Enumeration</code> of all the servlets known to this servlet
-     * context. In this version, this method always returns an empty enumeration
-     * and remains only to preserve binary compatibility. This method will be
-     * permanently removed in a future version of the Java Servlet API.
-     *
-     * @return Always and empty Enumeration
-     *
-     * @deprecated As of Java Servlet API 2.0, with no replacement.
-     */
-    @Deprecated
-    public Enumeration<Servlet> getServlets();
-
-    /**
-     * Do not use. This method was originally defined to return an
-     * <code>Enumeration</code> of all the servlet names known to this context.
-     * In this version, this method always returns an empty
-     * <code>Enumeration</code> and remains only to preserve binary
-     * compatibility. This method will be permanently removed in a future
-     * version of the Java Servlet API.
-     *
-     * @return Always and empty Enumeration
-     *
-     * @deprecated As of Java Servlet API 2.1, with no replacement.
-     */
-    @Deprecated
-    public Enumeration<String> getServletNames();
-
-    /**
      * Writes the specified message to a servlet log file, usually an event log.
      * The name and type of the servlet log file is specific to the servlet
      * container.
@@ -359,20 +308,6 @@ public interface ServletContext {
      *            the log file
      */
     public void log(String msg);
-
-    /**
-     * Do not use.
-     * @param exception The exception to log
-     * @param msg       The message to log with the exception
-     * @deprecated As of Java Servlet API 2.1, use
-     *             {@link #log(String message, Throwable throwable)} instead.
-     *             <p>
-     *             This method was originally defined to write an exception's
-     *             stack trace and an explanatory error message to the servlet
-     *             log file.
-     */
-    @Deprecated
-    public void log(Exception exception, String msg);
 
     /**
      * Writes an explanatory message and a stack trace for a given

@@ -473,14 +473,6 @@ public interface HttpServletRequest extends ServletRequest {
     public boolean isRequestedSessionIdFromURL();
 
     /**
-     * @return {@link #isRequestedSessionIdFromURL()}
-     * @deprecated As of Version 2.1 of the Java Servlet API, use
-     *             {@link #isRequestedSessionIdFromURL} instead.
-     */
-    @Deprecated
-    public boolean isRequestedSessionIdFromUrl();
-
-    /**
      * Triggers the same authentication process as would be triggered if the
      * request is for a resource that is protected by a security constraint.
      *

@@ -404,15 +404,6 @@ public interface ServletRequest {
     public RequestDispatcher getRequestDispatcher(String path);
 
     /**
-     * @param path The virtual path to be converted to a real path
-     * @return {@link ServletContext#getRealPath(String)}
-     * @deprecated As of Version 2.1 of the Java Servlet API, use
-     *             {@link ServletContext#getRealPath} instead.
-     */
-    @Deprecated
-    public String getRealPath(String path);
-
-    /**
      * Returns the Internet Protocol (IP) source port of the client or last
      * proxy that sent the request.
      *
