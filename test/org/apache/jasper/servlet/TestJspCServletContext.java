@@ -134,6 +134,16 @@ public class TestJspCServletContext {
 
 
     @Test
+    public void testWebapp_6_0() throws Exception {
+        File appDir = new File("test/webapp-6.0");
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
+        Assert.assertEquals(6, context.getEffectiveMajorVersion());
+        Assert.assertEquals(0, context.getEffectiveMinorVersion());
+    }
+
+
+    @Test
     public void testWebresources() throws Exception {
         File appDir = new File("test/webresources/dir1");
         JspCServletContext context = new JspCServletContext(

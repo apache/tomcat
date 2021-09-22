@@ -158,4 +158,18 @@ public class TestSchemaValidation {
         Assert.assertEquals(0, handler.getWarnings().size());
     }
 
+
+    @Test
+    public void testWebapp_6_0() throws Exception {
+        XmlErrorHandler handler = new XmlErrorHandler();
+        Digester digester = DigesterFactory.newDigester(
+                true, true, new WebRuleSet(false), true);
+        digester.setErrorHandler(handler);
+        digester.push(new WebXml());
+        WebXml desc = (WebXml) digester.parse(
+                new File("test/webapp-6.0/WEB-INF/web.xml"));
+        Assert.assertEquals("6.0", desc.getVersion());
+        Assert.assertEquals(0, handler.getErrors().size());
+        Assert.assertEquals(0, handler.getWarnings().size());
+    }
 }

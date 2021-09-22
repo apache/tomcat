@@ -135,6 +135,16 @@ public class DigesterFactory {
         addSelf(systemIds, "jakartaee_web_services_2_0.xsd");
         addSelf(systemIds, "jakartaee_web_services_client_2_0.xsd");
 
+        // from JakartaEE 10
+        add(systemIds, XmlIdentifiers.WEB_60_XSD, locationFor("web-app_6_0.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_FRAGMENT_60_XSD, locationFor("web-fragment_6_0.xsd"));
+        add(systemIds, XmlIdentifiers.TLD_31_XSD, locationFor("web-jsptaglibrary_3_1.xsd"));
+        addSelf(systemIds, "web-common_6_0.xsd");
+        addSelf(systemIds, "jakartaee_10.xsd");
+        addSelf(systemIds, "jsp_3_1.xsd");
+        addSelf(systemIds, "jakartaee_web_services_2_0.xsd");
+        addSelf(systemIds, "jakartaee_web_services_client_2_0.xsd");
+
         SERVLET_API_PUBLIC_IDS = Collections.unmodifiableMap(publicIds);
         SERVLET_API_SYSTEM_IDS = Collections.unmodifiableMap(systemIds);
     }
