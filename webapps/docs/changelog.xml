@@ -119,6 +119,10 @@
         Remove all deprecated code from the Servlet API to align Tomcat with
         recent changes in the Jakarta Servlet specification project. (markt)
       </update>
+      <add>
+        Add the current available Jakarta EE 10 schemas from the Jakarta EE
+        schema project. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -175,6 +179,14 @@
         rather than the types being passed explicitly to
         <code>ExpressionFactory.createMethodExpression()</code>. (markt)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <update>
+        Update the web applications that are included with Apache Tomcat to use
+        the Jakarta EE 10 schema for web.xml. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
