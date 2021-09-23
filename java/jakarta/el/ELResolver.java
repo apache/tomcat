@@ -121,6 +121,8 @@ public abstract class ELResolver {
     /**
      * Obtain the feature descriptors for the resolvable properties of the given
      * object.
+     * <p>
+     * The default implementation returns {@code null}.
      *
      * @param context The context in which the examination takes place
      * @param base The object to examine
@@ -132,7 +134,9 @@ public abstract class ELResolver {
      *             Tomcat 11.
      */
     @Deprecated(forRemoval = true, since = "EL 5.0")
-    public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
+    public Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
+        return null;
+    }
 
     /**
      * Obtain the most common type that is acceptable for the given base object.
