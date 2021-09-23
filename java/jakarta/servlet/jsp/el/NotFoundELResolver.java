@@ -20,9 +20,11 @@ import java.beans.FeatureDescriptor;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
+import jakarta.el.PropertyNotFoundException;
 
 /**
  * The final resolver of the Jakarta Server Pages ELResolver chain. It always
@@ -32,16 +34,36 @@ import jakarta.el.ELResolver;
  */
 public class NotFoundELResolver extends ELResolver {
 
+    private static final String LSTRING_FILE = "jakarta.servlet.jsp.LocalStrings";
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
+
     /**
      * {@inheritDoc}
      * <p>
-     * Always resolves the property and always returns {@code null}.
+     * Resolves the property and always returns {@code null} unless the provided
+     * context contains a Boolean object with value {@code Boolean.TRUE} as the
+     * value associated with the key
+     * {@code jakarta.servlet.jsp.el.NotFoundELResolver.class} in which case an
+     * exception is thrown. This is to support implementation of the
+     * {@code errorOnELNotFound} page/tag directive.
      *
      * @return Always {@code null}
+     *
+     * @throws PropertyNotFoundException if the provided context contains a
+     *         Boolean object with value {@code Boolean.TRUE} as the value
+     *         associated with the key
+     *         {@code jakarta.servlet.jsp.el.NotFoundELResolver.class}
      */
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
+
+        Object obj = context.getContext(this.getClass());
+        if (obj instanceof Boolean && ((Boolean) obj).booleanValue()) {
+            throw new PropertyNotFoundException(
+                    lStrings.getString("el.unknown.identifier") + " [" + property.toString() + "]");
+        }
+
         context.setPropertyResolved(base, property);
         return null;
     }
