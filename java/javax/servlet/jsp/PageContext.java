@@ -201,7 +201,7 @@ public abstract class PageContext
      * the "out" name in page scope with this newly created object.
      *
      * <p>
-     * This method should not be used by page  or tag library authors.
+     * This method should not be used by page or tag library authors.
      *
      * @param servlet The Servlet that is associated with this PageContext
      * @param request The currently pending request for this Servlet
