@@ -132,6 +132,10 @@ public abstract class Compiler {
             pageInfo.setELIgnored(JspUtil.booleanValue(jspProperty
                     .isELIgnored()));
         }
+        if (jspProperty.getErrorOnELNotFound() != null) {
+            pageInfo.setErrorOnELNotFound(JspUtil.booleanValue(jspProperty
+                    .getErrorOnELNotFound()));
+        }
         if (jspProperty.isScriptingInvalid() != null) {
             pageInfo.setScriptingInvalid(JspUtil.booleanValue(jspProperty
                     .isScriptingInvalid()));

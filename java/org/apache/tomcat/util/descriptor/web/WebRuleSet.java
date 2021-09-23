@@ -283,6 +283,8 @@ public class WebRuleSet implements RuleSet {
                                "setDeferredSyntax", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/el-ignored",
                                "setElIgnored", 0);
+        digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/error-on-el-not-found",
+                               "setErrorOnELNotFound", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/include-coda",
                                "addIncludeCoda", 0);
         digester.addCallMethod(fullPrefix + "/jsp-config/jsp-property-group/include-prelude",

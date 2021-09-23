@@ -152,6 +152,14 @@
       <page-encoding>ISO-8859-1</page-encoding>
       <is-xml>true</is-xml>
     </jsp-property-group>
+    <jsp-property-group>
+      <url-pattern>/jsp/errorOnELNotFound/web-xml-true.jsp</url-pattern>
+      <error-on-el-not-found>true</error-on-el-not-found>
+    </jsp-property-group>
+    <jsp-property-group>
+      <url-pattern>/jsp/errorOnELNotFound/web-xml-false.jsp</url-pattern>
+      <error-on-el-not-found>false</error-on-el-not-found>
+    </jsp-property-group>
   </jsp-config>
 
   <servlet>

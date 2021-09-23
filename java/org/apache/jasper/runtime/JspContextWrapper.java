@@ -48,6 +48,7 @@ import jakarta.servlet.jsp.JspWriter;
 import jakarta.servlet.jsp.PageContext;
 import jakarta.servlet.jsp.el.ELException;
 import jakarta.servlet.jsp.el.ExpressionEvaluator;
+import jakarta.servlet.jsp.el.NotFoundELResolver;
 import jakarta.servlet.jsp.el.VariableResolver;
 import jakarta.servlet.jsp.tagext.BodyContent;
 import jakarta.servlet.jsp.tagext.JspTag;
@@ -562,6 +563,14 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         public Object getContext(Class<?> key) {
             if (key == JspContext.class) {
                 return pageContext;
+            }
+            if (key == NotFoundELResolver.class) {
+                if (jspTag instanceof JspSourceDirectives) {
+                    return Boolean.valueOf(((JspSourceDirectives) jspTag).getErrorOnELNotFound());
+                } else {
+                    // returning Boolean.FALSE would have the same effect
+                    return null;
+                }
             }
             return wrapped.getContext(key);
         }

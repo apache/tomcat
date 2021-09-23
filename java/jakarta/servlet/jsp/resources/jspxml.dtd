@@ -94,19 +94,20 @@
 
 <!ELEMENT jsp:directive.page EMPTY>
 <!ATTLIST jsp:directive.page
-    language        CDATA           "java"
-    extends         %ClassName;     #IMPLIED
-    contentType     %Content;       "text/html; charset=ISO-8859-1"
-    import          CDATA           #IMPLIED
-    session         %Bool;          "true"
-    buffer          CDATA           "8kb"
-    autoFlush       %Bool;          "true"
-    isThreadSafe    %Bool;          "true"
-    info            CDATA           #IMPLIED
-    errorPage       %URL;           #IMPLIED
-    isErrorPage     %Bool;          "false"
-    pageEncoding    CDATA           #IMPLIED
-    isELIgnored     %Bool;          #IMPLIED
+    language            CDATA           "java"
+    extends             %ClassName;     #IMPLIED
+    contentType         %Content;       "text/html; charset=ISO-8859-1"
+    import              CDATA           #IMPLIED
+    session             %Bool;          "true"
+    buffer              CDATA           "8kb"
+    autoFlush           %Bool;          "true"
+    isThreadSafe        %Bool;          "true"
+    info                CDATA           #IMPLIED
+    errorPage           %URL;           #IMPLIED
+    isErrorPage         %Bool;          "false"
+    pageEncoding        CDATA           #IMPLIED
+    isELIgnored         %Bool;          #IMPLIED
+    errorOnELNotFound   %Bool;          "false"
 >
 
 <!-- the jsp:directive.include only appears in JSP documents and does

@@ -18,6 +18,8 @@ package org.apache.jasper.compiler;
 
 import java.io.File;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -191,5 +193,148 @@ public class TestJspConfig extends TomcatBaseTest {
         String result = res.toString();
 
         Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+    }
+
+    @Test
+    public void testErrorOnELNotFound01() throws Exception {
+        // Defaults
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/errorOnELNotFound/default.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String result = res.toString();
+        Assert.assertTrue(result, result.indexOf("<p>00-OK</p>") > 0);
+    }
+
+    @Test
+    public void testErrorOnELNotFound02() throws Exception {
+        // Page directive true
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/errorOnELNotFound/page-directive-true.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // Look for the non-i18n part of the Exception message
+        String result = res.toString();
+        Assert.assertTrue(result, result.indexOf("[unknown]") > 0);
+    }
+
+    @Test
+    public void testErrorOnELNotFound03() throws Exception {
+        // Page directive false
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/errorOnELNotFound/page-directive-false.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String result = res.toString();
+        Assert.assertTrue(result, result.indexOf("<p>00-OK</p>") > 0);
+    }
+
+    @Test
+    public void testErrorOnELNotFound04() throws Exception {
+        // web.xml true
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/errorOnELNotFound/web-xml-true.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // Look for the non-i18n part of the Exception message
+        String result = res.toString();
+        Assert.assertTrue(result, result.indexOf("[unknown]") > 0);
+    }
+
+    @Test
+    public void testErrorOnELNotFound05() throws Exception {
+        // web.xml false
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/errorOnELNotFound/web-xml-false.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String result = res.toString();
+        Assert.assertTrue(result, result.indexOf("<p>00-OK</p>") > 0);
+    }
+
+    @Test
+    public void testErrorOnELNotFound06() throws Exception {
+        // tag file true
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/errorOnELNotFound/tag-file-true.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+
+        // Look for the non-i18n part of the Exception message
+        String result = res.toString();
+        Assert.assertTrue(result, result.indexOf("[unknown]") > 0);
+    }
+
+    @Test
+    public void testErrorOnELNotFound07() throws Exception {
+        // tag file false
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/errorOnELNotFound/tag-file-false.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String result = res.toString();
+        Assert.assertTrue(result, result.indexOf("<p>00-OK</p>") > 0);
     }
 }

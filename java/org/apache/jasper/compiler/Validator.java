@@ -82,6 +82,7 @@ class Validator {
             new JspUtil.ValidAttribute("contentType"),
             new JspUtil.ValidAttribute("pageEncoding"),
             new JspUtil.ValidAttribute("isELIgnored"),
+            new JspUtil.ValidAttribute("errorOnELNotFound"),
             new JspUtil.ValidAttribute("deferredSyntaxAllowedAsLiteral"),
             new JspUtil.ValidAttribute("trimDirectiveWhitespaces")
         };
@@ -173,6 +174,13 @@ class Validator {
                     } else if (!pageInfo.getIsELIgnored().equals(value)) {
                         err.jspError(n, "jsp.error.page.conflict.iselignored",
                                 pageInfo.getIsELIgnored(), value);
+                    }
+                } else if ("errorOnELNotFound".equals(attr)) {
+                    if (pageInfo.getErrorOnELNotFound() == null) {
+                        pageInfo.setErrorOnELNotFound(value, n, err, true);
+                    } else if (!pageInfo.getErrorOnELNotFound().equals(value)) {
+                        err.jspError(n, "jsp.error.page.conflict.errorOnELNotFound",
+                                pageInfo.getErrorOnELNotFound(), value);
                     }
                 } else if ("isErrorPage".equals(attr)) {
                     if (pageInfo.getIsErrorPage() == null) {
@@ -269,6 +277,13 @@ class Validator {
                     } else if (!pageInfo.getIsELIgnored().equals(value)) {
                         err.jspError(n, "jsp.error.tag.conflict.iselignored",
                                 pageInfo.getIsELIgnored(), value);
+                    }
+                } else if ("errorOnELNotFound".equals(attr)) {
+                    if (pageInfo.getErrorOnELNotFound() == null) {
+                        pageInfo.setErrorOnELNotFound(value, n, err, false);
+                    } else if (!pageInfo.getErrorOnELNotFound().equals(value)) {
+                        err.jspError(n, "jsp.error.tag.conflict.errorOnELNotFound",
+                                pageInfo.getErrorOnELNotFound(), value);
                     }
                 } else if ("pageEncoding".equals(attr)) {
                     if (pageEncodingSeen) {

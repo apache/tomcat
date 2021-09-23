@@ -700,6 +700,17 @@ class Generator {
         out.printil("}");
         out.println();
 
+        // Implement JspSourceDirectives
+        out.printil("public boolean getErrorOnELNotFound() {");
+        out.pushIndent();
+        if (pageInfo.isErrorOnELNotFound()) {
+            out.printil("return true;");
+        } else {
+            out.printil("return false;");
+        }
+        out.popIndent();
+        out.printil("}");
+        out.println();
 
         generateGetters();
         generateInit();
@@ -733,6 +744,8 @@ class Generator {
             out.println(",");
             out.printin("                 jakarta.servlet.SingleThreadModel");
         }
+        out.println(",");
+        out.printin("                 org.apache.jasper.runtime.JspSourceDirectives");
         out.println(" {");
         out.pushIndent();
 
@@ -3652,6 +3665,8 @@ class Generator {
             out.println(",");
             out.printin("               jakarta.servlet.jsp.tagext.DynamicAttributes");
         }
+        out.println(",");
+        out.printin("                 org.apache.jasper.runtime.JspSourceDirectives");
         out.println(" {");
         out.pushIndent();
 

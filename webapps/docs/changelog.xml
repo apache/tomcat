@@ -179,6 +179,11 @@
         rather than the types being passed explicitly to
         <code>ExpressionFactory.createMethodExpression()</code>. (markt)
       </fix>
+      <add>
+        Add support for a new page/tag directive <code>errorOnELNotFound</code>
+        that can be used to trigger an identifier if an EL expression in a
+        page/tag contains an identifier that cannot be resolved. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

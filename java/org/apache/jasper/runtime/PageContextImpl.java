@@ -43,6 +43,7 @@ import jakarta.servlet.jsp.JspException;
 import jakarta.servlet.jsp.JspFactory;
 import jakarta.servlet.jsp.JspWriter;
 import jakarta.servlet.jsp.PageContext;
+import jakarta.servlet.jsp.el.NotFoundELResolver;
 import jakarta.servlet.jsp.tagext.BodyContent;
 
 import org.apache.jasper.Constants;
@@ -719,6 +720,11 @@ public class PageContextImpl extends PageContext {
                     for (String classImport : classImports) {
                         ih.importClass(classImport);
                     }
+                }
+            }
+            if (servlet instanceof JspSourceDirectives) {
+                if (((JspSourceDirectives) servlet).getErrorOnELNotFound()) {
+                    elContext.putContext(NotFoundELResolver.class, Boolean.TRUE);
                 }
             }
         }

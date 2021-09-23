@@ -68,7 +68,8 @@ class TagFileProcessor {
                 new JspUtil.ValidAttribute("import"),
                 new JspUtil.ValidAttribute("deferredSyntaxAllowedAsLiteral"), // JSP 2.1
                 new JspUtil.ValidAttribute("trimDirectiveWhitespaces"), // JSP 2.1
-                new JspUtil.ValidAttribute("isELIgnored") };
+                new JspUtil.ValidAttribute("isELIgnored"),
+                new JspUtil.ValidAttribute("errorOnELNotFound") };
 
         private static final JspUtil.ValidAttribute[] attributeDirectiveAttrs = {
                 new JspUtil.ValidAttribute("name", true),

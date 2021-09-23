@@ -100,6 +100,10 @@ class PageInfo {
     // JSP 2.2
     private boolean errorOnUndeclaredNamespace = false;
 
+    // JSP 3.1
+    private String errorOnELNotFoundValue;
+    private boolean errorOnELNotFound = false;
+
     private final boolean isTagFile;
 
     PageInfo(BeanRepository beanRepository, JspCompilationContext ctxt) {
@@ -635,6 +639,30 @@ class PageInfo {
         isELIgnoredValue = value;
     }
 
+
+    /*
+     * errorOnELNotFound
+     */
+    public void setErrorOnELNotFound(String value, Node n, ErrorDispatcher err,
+                   boolean pagedir)
+        throws JasperException {
+
+        if ("true".equalsIgnoreCase(value)) {
+            errorOnELNotFound = true;
+        } else if ("false".equalsIgnoreCase(value)) {
+            errorOnELNotFound = false;
+        } else {
+            if (pagedir) {
+                err.jspError(n, "jsp.error.page.invalid.errorOnELNotFound");
+            } else {
+                err.jspError(n, "jsp.error.tag.invalid.errorOnELNotFound");
+            }
+        }
+
+        errorOnELNotFoundValue = value;
+    }
+
+
     /*
      * deferredSyntaxAllowedAsLiteral
      */
@@ -689,6 +717,18 @@ class PageInfo {
 
     public boolean isELIgnored() {
         return isELIgnored;
+    }
+
+    public void setErrorOnELNotFound(boolean s) {
+        errorOnELNotFound = s;
+    }
+
+    public String getErrorOnELNotFound() {
+        return errorOnELNotFoundValue;
+    }
+
+    public boolean isErrorOnELNotFound() {
+        return errorOnELNotFound;
     }
 
     public void putNonCustomTagPrefix(String prefix, Mark where) {
