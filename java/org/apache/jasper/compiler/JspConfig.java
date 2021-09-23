@@ -329,8 +329,7 @@ public class JspConfig {
         String isELIgnored = defaultIsELIgnored;
         String isScriptingInvalid = defaultIsScriptingInvalid;
         String pageEncoding = null;
-        String isDeferedSyntaxAllowedAsLiteral =
-            defaultDeferedSyntaxAllowedAsLiteral;
+        String isDeferedSyntaxAllowedAsLiteral = defaultDeferedSyntaxAllowedAsLiteral;
         String isTrimDirectiveWhitespaces = defaultTrimDirectiveWhitespaces;
         String defaultContentType = defaultDefaultContentType;
         String buffer = defaultBuffer;
