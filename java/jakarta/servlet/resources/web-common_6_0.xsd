@@ -955,19 +955,6 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="same-site"
-                   type="jakartaee:cookie-sameSiteType"
-                   minOccurs="0">
-        <xsd:annotation>
-          <xsd:documentation>
-
-            Specifies whether any session tracking cookies created
-            by this web application will be marked with a Same-Site
-            attribute
-
-          </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
       <xsd:element name="secure"
                    type="jakartaee:true-falseType"
                    minOccurs="0">
@@ -1077,30 +1064,6 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="jakartaee:nonEmptyStringType"/>
-    </xsd:simpleContent>
-  </xsd:complexType>
-
-
-<!-- **************************************************** -->
-
-  <xsd:complexType name="cookie-sameSiteType">
-    <xsd:annotation>
-      <xsd:documentation>
-
-        This type defines the values for the Same-Site cookie
-        attribute as defined by
-        https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis-03#section-4.1.2.7
-
-        Used in: cookie-config
-
-      </xsd:documentation>
-    </xsd:annotation>
-    <xsd:simpleContent>
-      <xsd:restriction base="jakartaee:string">
-        <xsd:enumeration value="None"/>
-        <xsd:enumeration value="Lax"/>
-        <xsd:enumeration value="Strict"/>
-      </xsd:restriction>
     </xsd:simpleContent>
   </xsd:complexType>
 
