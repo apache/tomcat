@@ -40,6 +40,14 @@ public interface JspPropertyGroupDescriptor {
     public String getElIgnored();
 
     /**
+     * Will the use of an unknown identifier in EL within a JSP page trigger an
+     * error for this group?
+     *
+     * @return {@code true} if an error will be triggered, otherwise {@code false}
+     */
+    public String getErrorOnELNotFound();
+
+    /**
      * Obtain the page encoding for this group.
      *
      * @return the page encoding for this group
