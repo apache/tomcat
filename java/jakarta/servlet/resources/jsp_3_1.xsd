@@ -152,6 +152,19 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+      <xsd:element name="error-on-el-not-found"
+                   type="jakartaee:true-falseType"
+                   minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+
+            Can be used to easily set the errorOnELNotFound
+            property of a group of JSP pages. By default, this
+            property is false.
+
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element name="page-encoding"
                    type="jakartaee:string"
                    minOccurs="0">
