@@ -53,7 +53,6 @@ public class TesterOpenSSL {
             // Note: Gump currently tests 10.x with OpenSSL 3.1.x
             VERSION = 30100;
         } else if (versionString.startsWith("OpenSSL 3.0.0")) {
-            // Note: Gump currently tests 10.x with OpenSSL 3.0.x
             VERSION = 30000;
         } else if (versionString.startsWith("OpenSSL 1.1.1")) {
             // LTS
