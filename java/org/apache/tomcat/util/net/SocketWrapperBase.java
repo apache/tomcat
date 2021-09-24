@@ -137,7 +137,7 @@ public abstract class SocketWrapperBase<E> {
             readPending = null;
             writePending = null;
         }
-        connectionId = Long.toString(connectionIdGenerator.getAndIncrement());
+        connectionId = Long.toHexString(connectionIdGenerator.getAndIncrement());
     }
 
     public E getSocket() {

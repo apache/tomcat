@@ -793,7 +793,7 @@ public final class Request {
         available = 0;
         sendfile = true;
 
-        requestId = Long.toString(requestIdGenerator.getAndIncrement());
+        requestId = Long.toHexString(requestIdGenerator.getAndIncrement());
 
         serverCookies.recycle();
         parameters.recycle();
