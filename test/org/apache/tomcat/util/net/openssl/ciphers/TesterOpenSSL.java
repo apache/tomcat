@@ -49,7 +49,10 @@ public class TesterOpenSSL {
         } catch (IOException e) {
             versionString = "";
         }
-        if (versionString.startsWith("OpenSSL 3.0.0")) {
+        if (versionString.startsWith("OpenSSL 3.1.0")) {
+            // Note: Gump currently tests 10.x with OpenSSL 3.1.x
+            VERSION = 30100;
+        } else if (versionString.startsWith("OpenSSL 3.0.0")) {
             // Note: Gump currently tests 10.x with OpenSSL 3.0.x
             VERSION = 30000;
         } else if (versionString.startsWith("OpenSSL 1.1.1")) {
@@ -337,7 +340,7 @@ public class TesterOpenSSL {
             // Explicit OpenSSL path may also need explicit lib path
             // (e.g. Gump needs this)
             openSSLLibPath = openSSLPath.substring(0, openSSLPath.lastIndexOf('/'));
-            openSSLLibPath = openSSLLibPath + "/../lib:" + openSSLLibPath + "/../lib64";
+            openSSLLibPath = openSSLLibPath + "/../:" + openSSLLibPath + "/../lib:" + openSSLLibPath + "/../lib64";
         }
         List<String> cmd = new ArrayList<>();
         cmd.add(openSSLPath);
