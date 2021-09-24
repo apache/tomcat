@@ -787,6 +787,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
 
+        @SuppressWarnings("deprecation")
         @Override
         public SocketState process(SocketWrapperBase<S> wrapper, SocketEvent status) {
             if (getLog().isDebugEnabled()) {
@@ -882,6 +883,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     }
                 }
 
+                // Can switch to non-deprecated version in Tomcat 10.1.x
                 processor.setSslSupport(
                         wrapper.getSslSupport(getProtocol().getClientCertProvider()));
 
