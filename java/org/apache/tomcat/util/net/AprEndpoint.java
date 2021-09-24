@@ -2578,6 +2578,12 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         @Override
+        public SSLSupport getSslSupport() {
+            throw new UnsupportedOperationException();
+        }
+
+
+        @Override
         public void doClientAuth(SSLSupport sslSupport) throws IOException {
             long socket = getSocket().longValue();
             // Configure connection to require a certificate. This requires a
