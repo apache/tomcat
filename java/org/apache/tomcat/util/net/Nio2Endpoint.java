@@ -1531,12 +1531,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         }
 
 
-        /**
-         * {@inheritDoc}
-         * @param clientCertProvider Ignored for this implementation
-         */
         @Override
-        public SSLSupport getSslSupport(String clientCertProvider) {
+        public SSLSupport getSslSupport() {
             if (getSocket() instanceof SecureNio2Channel) {
                 SecureNio2Channel ch = (SecureNio2Channel) getSocket();
                 return ch.getSSLSupport();
