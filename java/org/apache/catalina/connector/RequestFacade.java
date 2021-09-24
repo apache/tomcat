@@ -28,6 +28,7 @@ import java.util.Map;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -1119,5 +1120,23 @@ public class RequestFacade implements HttpServletRequest {
     @Override
     public Map<String, String> getTrailerFields() {
         return request.getTrailerFields();
+    }
+
+
+    @Override
+    public String getRequestId() {
+        return request.getRequestId();
+    }
+
+
+    @Override
+    public String getProtocolRequestId() {
+        return request.getProtocolRequestId();
+    }
+
+
+    @Override
+    public ServletConnection getServletConnection() {
+        return request.getServletConnection();
     }
 }

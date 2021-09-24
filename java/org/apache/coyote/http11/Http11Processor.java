@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.AbstractProcessor;
@@ -1115,6 +1116,12 @@ public class Http11Processor extends AbstractProcessor {
     @Override
     protected Log getLog() {
         return log;
+    }
+
+
+    @Override
+    protected ServletConnection getServletConnection() {
+        return socketWrapper.getServletConnection("http/1.1", "");
     }
 
 

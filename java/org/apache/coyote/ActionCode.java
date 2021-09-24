@@ -272,14 +272,15 @@ public enum ActionCode {
     IS_TRAILER_FIELDS_SUPPORTED,
 
     /**
-     * Obtain the connection identifier for the request. Used with multiplexing
-     * protocols such as HTTP/2.
+     * Obtain the request identifier for this request as defined by the protocol
+     * in use. Note that some protocols do not define such an identifier. E.g.
+     * this will be Stream ID for HTTP/2.
      */
-    CONNECTION_ID,
+    PROTOCOL_REQUEST_ID,
 
     /**
-     * Obtain the stream identifier for the request. Used with multiplexing
-     * protocols such as HTTP/2.
+     * Obtain the servlet connection instance for the network connection
+     * supporting the current request.
      */
-    STREAM_ID
+    SERVLET_CONNECTION
 }

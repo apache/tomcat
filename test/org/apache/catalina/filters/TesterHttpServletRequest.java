@@ -32,6 +32,7 @@ import java.util.Map;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -444,6 +445,21 @@ public class TesterHttpServletRequest implements HttpServletRequest {
 
     @Override
     public Map<String, String> getTrailerFields() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public String getRequestId() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
         throw new RuntimeException("Not implemented");
     }
 }

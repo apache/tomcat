@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import jakarta.servlet.ServletConnection;
+
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
@@ -366,14 +368,8 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected Object getConnectionID() {
-        return stream.getConnectionId();
-    }
-
-
-    @Override
-    protected Object getStreamID() {
-        return stream.getIdAsString().toString();
+    protected String getProtocolRequestId() {
+        return stream.getIdAsString();
     }
 
 
@@ -398,6 +394,12 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     protected final Log getLog() {
         return log;
+    }
+
+
+    @Override
+    protected ServletConnection getServletConnection() {
+        return handler.getServletConnection();
     }
 
 

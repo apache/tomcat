@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -630,17 +631,17 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
 
-        // Identifiers associated with multiplexing protocols like HTTP/2
-        case CONNECTION_ID: {
+        // Identifiers
+        case PROTOCOL_REQUEST_ID: {
             @SuppressWarnings("unchecked")
             AtomicReference<Object> result = (AtomicReference<Object>) param;
-            result.set(getConnectionID());
+            result.set(getProtocolRequestId());
             break;
         }
-        case STREAM_ID: {
+        case SERVLET_CONNECTION: {
             @SuppressWarnings("unchecked")
             AtomicReference<Object> result = (AtomicReference<Object>) param;
-            result.set(getStreamID());
+            result.set(getServletConnection());
             break;
         }
         }
@@ -987,27 +988,25 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Protocols that support multiplexing (e.g. HTTP/2) should override this
-     * method and return the appropriate ID.
+     * Protocols that provide per HTTP request IDs (e.g. Stream ID for HTTP/2)
+     * should override this method and return the appropriate ID.
      *
-     * @return The stream ID associated with this request or {@code null} if a
-     *         multiplexing protocol is not being used
-      */
-    protected Object getConnectionID() {
+     * @return The ID associated with this request or the empty string if no
+     *         such ID is defined
+     */
+    protected Object getProtocolRequestId() {
         return null;
     }
 
 
     /**
-     * Protocols that support multiplexing (e.g. HTTP/2) should override this
-     * method and return the appropriate ID.
+     * Protocols must override this method and return an appropriate
+     * ServletConnection instance
      *
-     * @return The stream ID associated with this request or {@code null} if a
-     *         multiplexing protocol is not being used
-     */
-    protected Object getStreamID() {
-        return null;
-    }
+     * @return the ServletConnection instance associated with the current
+     *         request.
+      */
+    protected abstract ServletConnection getServletConnection();
 
 
     /**

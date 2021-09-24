@@ -38,7 +38,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.naming.NamingException;
 import javax.security.auth.Subject;
@@ -48,6 +47,7 @@ import jakarta.servlet.DispatcherType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -1765,8 +1765,26 @@ public class Request implements HttpServletRequest {
         return this.internalDispatcherType;
     }
 
-    // ---------------------------------------------------- HttpRequest Methods
 
+    @Override
+    public String getRequestId() {
+        return coyoteRequest.getRequestId();
+    }
+
+
+    @Override
+    public String getProtocolRequestId() {
+        return coyoteRequest.getProtocolRequestId();
+    }
+
+
+    @Override
+    public ServletConnection getServletConnection() {
+        return coyoteRequest.getServletConnection();
+    }
+
+
+    // ---------------------------------------------------- HttpRequest Methods
 
     /**
      * Add a Cookie to the set of Cookies associated with this Request.
@@ -3496,32 +3514,6 @@ public class Request implements HttpServletRequest {
                         return Boolean.valueOf(
                                 request.getConnector().getProtocolHandler(
                                         ).isSendfileSupported() && request.getCoyoteRequest().getSendfile());
-                    }
-                    @Override
-                    public void set(Request request, String name, Object value) {
-                        // NO-OP
-                    }
-                });
-        specialAttributes.put(Globals.CONNECTION_ID,
-                new SpecialAttributeAdapter() {
-                    @Override
-                    public Object get(Request request, String name) {
-                        AtomicReference<Object> result = new AtomicReference<>();
-                        request.getCoyoteRequest().action(ActionCode.CONNECTION_ID, result);
-                        return result.get();
-                    }
-                    @Override
-                    public void set(Request request, String name, Object value) {
-                        // NO-OP
-                    }
-                });
-        specialAttributes.put(Globals.STREAM_ID,
-                new SpecialAttributeAdapter() {
-                    @Override
-                    public Object get(Request request, String name) {
-                        AtomicReference<Object> result = new AtomicReference<>();
-                        request.getCoyoteRequest().action(ActionCode.STREAM_ID, result);
-                        return result.get();
                     }
                     @Override
                     public void set(Request request, String name, Object value) {

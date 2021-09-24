@@ -54,6 +54,7 @@ public class ImportHandler {
         servletClassNames.add("RequestDispatcher");
         servletClassNames.add("Servlet");
         servletClassNames.add("ServletConfig");
+        servletClassNames.add("ServletConnection");
         servletClassNames.add("ServletContainerInitializer");
         servletClassNames.add("ServletContext");
         servletClassNames.add("ServletContextAttributeListener");

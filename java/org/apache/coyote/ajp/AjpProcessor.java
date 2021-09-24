@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.AbstractProcessor;
@@ -1286,6 +1287,12 @@ public class AjpProcessor extends AbstractProcessor {
     @Override
     protected Log getLog() {
         return log;
+    }
+
+
+    @Override
+    protected ServletConnection getServletConnection() {
+        return socketWrapper.getServletConnection("ajp", "");
     }
 
 

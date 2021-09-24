@@ -470,4 +470,40 @@ public class ServletRequestWrapper implements ServletRequest {
     public DispatcherType getDispatcherType() {
         return this.request.getDispatcherType();
     }
+
+    /**
+     * Gets the request ID for the wrapped request.
+     *
+     * @return the request ID for the wrapped request
+     *
+     * @since Servlet 6.0
+     */
+    @Override
+    public String getRequestId() {
+        return request.getRequestId();
+    }
+
+    /**
+     * Gets the protocol defined request ID, if any, for the wrapped request.
+     *
+     * @return the protocol defined request ID, if any, for the wrapped request
+     *
+     * @since Servlet 6.0
+     */
+    @Override
+    public String getProtocolRequestId() {
+        return request.getProtocolRequestId();
+    }
+
+    /**
+     * Gets the connection information for the wrapped request.
+     *
+     * @return the connection information for the wrapped request
+     *
+     * @since Servlet 6.0
+     */
+    @Override
+    public ServletConnection getServletConnection() {
+        return request.getServletConnection();
+    }
 }

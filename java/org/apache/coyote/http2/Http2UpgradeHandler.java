@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.http.WebConnection;
 
 import org.apache.coyote.Adapter;
@@ -77,7 +78,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     protected static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
     protected static final StringManager sm = StringManager.getManager(Http2UpgradeHandler.class);
 
-    private static final AtomicInteger connectionIdGenerator = new AtomicInteger(0);
     private static final Integer STREAM_ID_ZERO = Integer.valueOf(0);
 
     protected static final int FLAG_END_OF_STREAM = 1;
@@ -100,7 +100,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     protected final Http2Protocol protocol;
     private final Adapter adapter;
-    protected volatile SocketWrapperBase<?> socketWrapper;
+    protected final SocketWrapperBase<?> socketWrapper;
     private volatile SSLSupport sslSupport;
 
     private volatile Http2Parser parser;
@@ -147,11 +147,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private volatile int lastWindowUpdate;
 
 
-    Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
+    Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest, SocketWrapperBase<?> socketWrapper) {
         super (STREAM_ID_ZERO);
         this.protocol = protocol;
         this.adapter = adapter;
-        this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
+        this.socketWrapper = socketWrapper;
 
         // Defaults to -10 * the count factor.
         // i.e. when the connection opens, 10 'overhead' frames in a row will
@@ -163,6 +163,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         lastNonFinalDataPayload = protocol.getOverheadDataThreshold() * 2;
         lastWindowUpdate = protocol.getOverheadWindowUpdateThreshold() * 2;
+
+        connectionId = getServletConnection().getConnectionId();
 
         remoteSettings = new ConnectionSettingsRemote(connectionId);
         localSettings = new ConnectionSettingsLocal(connectionId);
@@ -302,7 +304,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     @Override
     public void setSocketWrapper(SocketWrapperBase<?> wrapper) {
-        this.socketWrapper = wrapper;
+        // NO-OP. It is passed via the constructor
     }
 
 
@@ -1857,6 +1859,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
+
+    public ServletConnection getServletConnection() {
+        if (socketWrapper.getSslSupport() == null) {
+            return socketWrapper.getServletConnection("h2c", "");
+        } else {
+            return socketWrapper.getServletConnection("h2", "");
+        }
+    }
 
     protected class PingManager {
 

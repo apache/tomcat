@@ -130,8 +130,8 @@ public class Http2Protocol implements UpgradeProtocol {
     public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper,
             Adapter adapter, Request coyoteRequest) {
         return socketWrapper.hasAsyncIO()
-                ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest)
-                : new Http2UpgradeHandler(this, adapter, coyoteRequest);
+                ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest, socketWrapper)
+                : new Http2UpgradeHandler(this, adapter, coyoteRequest, socketWrapper);
     }
 
 

@@ -123,6 +123,10 @@
         Add the current available Jakarta EE 10 schemas from the Jakarta EE
         schema project. (markt)
       </add>
+      <add>
+        Implement the new connection ID and request ID API for Servlet 6.0.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

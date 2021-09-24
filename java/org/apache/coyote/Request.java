@@ -23,8 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletConnection;
 
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -69,6 +72,18 @@ public final class Request {
     // Expected maximum typical number of cookies per request.
     private static final int INITIAL_COOKIE_SIZE = 4;
 
+    /*
+     * At 100,000 requests a second there are enough IDs here for ~3,000,000
+     * years before it overflows (and then we have another 3,000,000 years
+     * before it gets back to zero).
+     *
+     * Local testing shows that 5, 10, 50, 500 or 1000 threads can obtain
+     * 60,000,000+ IDs a second from a single AtomicLong. That is about about
+     * 17ns per request. It does not appear that the introduction of this
+     * counter will cause a bottleneck for request processing.
+     */
+    private static final AtomicLong requestIdGenerator = new AtomicLong(0);
+
     // ----------------------------------------------------------- Constructors
 
     public Request() {
@@ -93,6 +108,8 @@ public final class Request {
     private final MessageBytes queryMB = MessageBytes.newInstance();
     private final MessageBytes protoMB = MessageBytes.newInstance();
 
+    private String requestId = Long.toString(requestIdGenerator.getAndIncrement());
+
     // remote address/host
     private final MessageBytes remoteAddrMB = MessageBytes.newInstance();
     private final MessageBytes peerAddrMB = MessageBytes.newInstance();
@@ -102,7 +119,6 @@ public final class Request {
 
     private final MimeHeaders headers = new MimeHeaders();
     private final Map<String,String> trailerFields = new HashMap<>();
-
 
     /**
      * Path parameters
@@ -676,6 +692,25 @@ public final class Request {
 
     // -------------------- debug --------------------
 
+    public String getRequestId() {
+        return requestId;
+    }
+
+
+    public String getProtocolRequestId() {
+        AtomicReference<String> ref = new AtomicReference<>();
+        hook.action(ActionCode.PROTOCOL_REQUEST_ID, ref);
+        return ref.get();
+    }
+
+
+    public ServletConnection getServletConnection() {
+        AtomicReference<ServletConnection> ref = new AtomicReference<>();
+        hook.action(ActionCode.SERVLET_CONNECTION, ref);
+        return ref.get();
+    }
+
+
     @Override
     public String toString() {
         return "R( " + requestURI().toString() + ")";
@@ -757,6 +792,8 @@ public final class Request {
         remotePort = -1;
         available = 0;
         sendfile = true;
+
+        requestId = Long.toString(requestIdGenerator.getAndIncrement());
 
         serverCookies.recycle();
         parameters.recycle();

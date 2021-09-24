@@ -49,8 +49,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     private final AtomicReference<IOException> applicationIOE = new AtomicReference<>();
 
     public Http2AsyncUpgradeHandler(Http2Protocol protocol, Adapter adapter,
-            Request coyoteRequest) {
-        super(protocol, adapter, coyoteRequest);
+            Request coyoteRequest, SocketWrapperBase<?> socketWrapper) {
+        super(protocol, adapter, coyoteRequest, socketWrapper);
     }
 
     private final CompletionHandler<Long, Void> errorCompletion = new CompletionHandler<>() {
