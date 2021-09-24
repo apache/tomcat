@@ -791,21 +791,6 @@ public abstract class SocketWrapperBase<E> {
     /**
      * Obtain an SSLSupport instance for this socket.
      *
-     * @param clientCertProvider The name of the client certificate provider to
-     *                           use. Only used by APR/native.
-     *
-     * @return An SSLSupport instance for this socket.
-     *
-     * @deprecated Will be removed in Tomcat 10.1.x onwards
-     */
-    @Deprecated
-    public SSLSupport getSslSupport(String clientCertProvider) {
-        return getSslSupport();
-    }
-
-    /**
-     * Obtain an SSLSupport instance for this socket.
-     *
      * @return An SSLSupport instance for this socket.
      */
     public abstract SSLSupport getSslSupport();
