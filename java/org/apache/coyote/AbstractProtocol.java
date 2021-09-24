@@ -853,8 +853,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     }
                 }
 
-                processor.setSslSupport(
-                        wrapper.getSslSupport(getProtocol().getClientCertProvider()));
+                processor.setSslSupport(wrapper.getSslSupport());
 
                 // Associate the processor with the connection
                 wrapper.setCurrentProcessor(processor);
