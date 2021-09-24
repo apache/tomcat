@@ -788,7 +788,27 @@ public abstract class SocketWrapperBase<E> {
      */
     public abstract void doClientAuth(SSLSupport sslSupport) throws IOException;
 
-    public abstract SSLSupport getSslSupport(String clientCertProvider);
+    /**
+     * Obtain an SSLSupport instance for this socket.
+     *
+     * @param clientCertProvider The name of the client certificate provider to
+     *                           use. Only used by APR/native.
+     *
+     * @return An SSLSupport instance for this socket.
+     *
+     * @deprecated Will be removed in Tomcat 10.1.x onwards
+     */
+    @Deprecated
+    public SSLSupport getSslSupport(String clientCertProvider) {
+        return getSslSupport();
+    }
+
+    /**
+     * Obtain an SSLSupport instance for this socket.
+     *
+     * @return An SSLSupport instance for this socket.
+     */
+    public abstract SSLSupport getSslSupport();
 
 
     // ------------------------------------------------------- NIO 2 style APIs
