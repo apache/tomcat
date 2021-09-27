@@ -288,7 +288,7 @@ public class TestHttp2Limits extends Http2TestBase {
             // expression (since we don't know the connection ID). Generate the
             // string as a regular expression and then replace '[' and ']' with
             // the escaped values.
-            String limitMessage = sm.getString("http2Parser.headerLimitSize", "\\d++", "3");
+            String limitMessage = sm.getString("http2Parser.headerLimitSize", "\\p{XDigit}++", "3");
             limitMessage = limitMessage.replace("[", "\\[").replace("]", "\\]");
             // Connection reset. Connection ID will vary so use a pattern
             // On some platform / Connector combinations the TCP connection close
@@ -546,7 +546,7 @@ public class TestHttp2Limits extends Http2TestBase {
             // expression (since we don't know the connection ID). Generate the
             // string as a regular expression and then replace '[' and ']' with
             // the escaped values.
-            String limitMessage = sm.getString("http2Parser.headerLimitSize", "\\d++", "3");
+            String limitMessage = sm.getString("http2Parser.headerLimitSize", "\\p{XDigit}++", "3");
             limitMessage = limitMessage.replace("[", "\\[").replace("]", "\\]");
             MatcherAssert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
                     "0-Goaway-\\[3\\]-\\[11\\]-\\[" + limitMessage + "\\]"));
