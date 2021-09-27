@@ -100,6 +100,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
     @Override
     public void init(WebConnection connection) {
+        this.connection = connection;
         if (serverEndpointConfig == null) {
             throw new IllegalStateException(
                     sm.getString("wsHttpUpgradeHandler.noPreInit"));
@@ -212,7 +213,9 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
     @Override
     public void destroy() {
+        WebConnection connection = this.connection;
         if (connection != null) {
+            this.connection = null;
             try {
                 connection.close();
             } catch (Exception e) {
