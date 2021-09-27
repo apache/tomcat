@@ -78,6 +78,16 @@ public final class JarContents {
 
             bits1.set(pathHash1 % TABLE_SIZE);
             bits2.set(pathHash2 % TABLE_SIZE);
+
+            // While directory entry names always end in "/", application code
+            // may look them up without the trailing "/". Add this second form.
+            if (entry.isDirectory()) {
+                pathHash1 = hashcode(name, startPos, name.length() - 1, HASH_PRIME_1);
+                pathHash2 = hashcode(name, startPos, name.length() - 1, HASH_PRIME_2);
+
+                bits1.set(pathHash1 % TABLE_SIZE);
+                bits2.set(pathHash2 % TABLE_SIZE);
+            }
         }
     }
 
@@ -92,9 +102,12 @@ public final class JarContents {
      * @return hashcode of the range.
      */
     private int hashcode(String content, int startPos, int hashPrime) {
+        return hashcode(content, startPos, content.length(), hashPrime);
+    }
+
+    private int hashcode(String content, int startPos, int endPos, int hashPrime) {
         int h = hashPrime/2;
-        int contentLength = content.length();
-        for (int i = startPos; i < contentLength; i++) {
+        for (int i = startPos; i < endPos; i++) {
             h = hashPrime * h + content.charAt(i);
         }
 
