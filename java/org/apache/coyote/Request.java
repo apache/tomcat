@@ -108,7 +108,7 @@ public final class Request {
     private final MessageBytes queryMB = MessageBytes.newInstance();
     private final MessageBytes protoMB = MessageBytes.newInstance();
 
-    private String requestId = Long.toString(requestIdGenerator.getAndIncrement());
+    private volatile String requestId = Long.toString(requestIdGenerator.getAndIncrement());
 
     // remote address/host
     private final MessageBytes remoteAddrMB = MessageBytes.newInstance();
@@ -793,7 +793,13 @@ public final class Request {
         available = 0;
         sendfile = true;
 
-        requestId = Long.toHexString(requestIdGenerator.getAndIncrement());
+        // There may be multiple calls to recycle but only the first should
+        // trigger a change in the request ID until a new request has been
+        // started. Use startTimeNanos to detect when a request has started so a
+        // subsequent call to recycle() will trigger a change in the request ID.
+        if (startTimeNanos != -1) {
+            requestId = Long.toHexString(requestIdGenerator.getAndIncrement());
+        }
 
         serverCookies.recycle();
         parameters.recycle();
