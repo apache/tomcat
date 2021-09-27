@@ -523,6 +523,7 @@ public interface ServletRequest {
      * <dd>The stream identifier</dd>
      * <dt>AJP</dt>
      * <dd>None, so the empty string should be returned</dd>
+     * </dl>
      *
      * @return The request identifier if one is defined, otherwise an empty
      *         string
