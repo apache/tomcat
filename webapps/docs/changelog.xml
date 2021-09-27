@@ -138,6 +138,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Clarify the JASPIC configuration options in the documentation web
+        application. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.71 (schultz)" rtext="2021-09-13">
   <subsection name="Catalina">
