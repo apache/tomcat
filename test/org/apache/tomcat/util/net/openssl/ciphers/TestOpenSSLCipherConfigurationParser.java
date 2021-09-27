@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestOpenSSLCipherConfigurationParser {
@@ -200,13 +199,6 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testECDHE() throws Exception {
         testSpecification("ECDHE");
-    }
-
-
-    @Test
-    @Ignore("Contrary to the docs, OpenSSL does not recognise EECDHE")
-    public void testEECDHE() throws Exception {
-        testSpecification("EECDHE");
     }
 
 
