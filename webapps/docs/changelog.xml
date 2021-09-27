@@ -146,6 +146,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>65585</bug>: Update obsolete comments at the start of the
+        <code>build.properties.default</code> file. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.71 (schultz)" rtext="2021-09-13">
   <subsection name="Catalina">
