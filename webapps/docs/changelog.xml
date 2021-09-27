@@ -121,6 +121,10 @@
         Reclassify TLS ciphers that use AESCCM8 as medium security rather than
         high security to align with recent changes in OpenSSL. (markt)
       </update>
+      <fix>
+        Fix an issue that caused some Servlet non-blocking API reads of the HTTP
+        request body to incorrectly use blocking IO. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

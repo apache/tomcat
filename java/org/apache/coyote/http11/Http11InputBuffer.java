@@ -1191,10 +1191,14 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         public int doRead(ApplicationBufferHandler handler) throws IOException {
 
             if (byteBuffer.position() >= byteBuffer.limit()) {
-                // The application is reading the HTTP request body which is
-                // always a blocking operation.
-                if (!fill(true)) {
-                    return -1;
+                // The application is reading the HTTP request body
+                boolean block = (request.getReadListener() == null);
+                if (!fill(block)) {
+                    if (block) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
                 }
             }
 
