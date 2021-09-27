@@ -14,12 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # -----------------------------------------------------------------------------
-# build.properties.sample
+# build.properties.default
 #
-# This is an example "build.properties" file, used to customize building
-# Tomcat for your local environment.  It defines the location of all external
-# modules that Tomcat depends on.  Copy this file to "build.properties"
-# in the top-level source directory, and customize it as needed.
+# This file provides the defaults for build properties that are likely to:
+# - change over time such as those related to dependencies
+# - be ones that individual developers will wish to customise.
+#
+# To customise the build, create a build.properties file in the top-level
+# source directory (where this file is located) and use it to define new
+# values for the build properties you wish to change. In addition to
+# changing any of the properties defined in this file, you can change any
+# build property defined in build.xml. More information is available in
+# BUILDING.txt.
 # -----------------------------------------------------------------------------
 
 # ----- Version Control Flags -----
