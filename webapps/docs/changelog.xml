@@ -127,6 +127,12 @@
         Implement the new connection ID and request ID API for Servlet 6.0.
         (markt)
       </add>
+      <fix>
+        <bug>65586</bug>: Fix the bloom filter used to improve performance of
+        archive file look ups in the web resources implementation so it works
+        correctly for directory lookups whether or not the provided directory
+        name includes the trailing <code>/</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
