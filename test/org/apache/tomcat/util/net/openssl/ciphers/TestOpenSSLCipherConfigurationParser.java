@@ -27,23 +27,13 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testDEFAULT() throws Exception {
-        if (TesterOpenSSL.VERSION < 10100) {
-            // Account for classes of ciphers removed from DEFAULT in 1.1.0
-            testSpecification("DEFAULT:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES");
-        } else {
-            testSpecification("DEFAULT");
-        }
+        testSpecification("DEFAULT");
     }
 
 
     @Test
     public void testCOMPLEMENTOFDEFAULT() throws Exception {
-        if (TesterOpenSSL.VERSION < 10100) {
-            // Account for classes of ciphers removed from DEFAULT in 1.1.0
-            testSpecification("COMPLEMENTOFDEFAULT:RC4:DSS:SEED:IDEA:CAMELLIA:AESCCM:aNULL:3DES");
-        } else {
-            testSpecification("COMPLEMENTOFDEFAULT");
-        }
+        testSpecification("COMPLEMENTOFDEFAULT");
     }
 
 
@@ -137,10 +127,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testkDHE() throws Exception {
-        // This alias was introduced in 1.0.2
-        if (TesterOpenSSL.VERSION >= 10002) {
-            testSpecification("kDHE");
-        }
+        testSpecification("kDHE");
     }
 
 
@@ -152,10 +139,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testDHE() throws Exception {
-        // This alias was introduced in 1.0.2
-        if (TesterOpenSSL.VERSION >= 10002) {
-            testSpecification("DHE");
-        }
+        testSpecification("DHE");
     }
 
 
@@ -300,27 +284,19 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testTLSv1() throws Exception {
-        // In OpenSSL 1.1.0-dev, TLSv1 refers to those ciphers that require
-        // TLSv1 rather than being an alias for SSLv3
-        if (TesterOpenSSL.VERSION >= 10100) {
-            testSpecification("TLSv1");
-        }
+        testSpecification("TLSv1");
+    }
+
+
+    @Test
+    public void testSSLv3() throws Exception {
+        testSpecification("SSLv3");
     }
 
 
     @Test
     public void testSSLv2() throws Exception {
         testSpecification("SSLv2");
-    }
-
-
-    @Test
-    public void testSSLv3() throws Exception {
-        // In OpenSSL 1.1.0-dev, TLSv1 refers to those ciphers that require
-        // TLSv1 rather than being an alias for SSLv3
-        if (TesterOpenSSL.VERSION < 10100) {
-            testSpecification("SSLv3:TLSv1");
-        }
     }
 
 
