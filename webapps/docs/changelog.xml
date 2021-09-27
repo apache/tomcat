@@ -204,6 +204,10 @@
         Update the web applications that are included with Apache Tomcat to use
         the Jakarta EE 10 schema for web.xml. (markt)
       </update>
+      <fix>
+        Clarify the JASPIC configuration options in the documentation web
+        application. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
