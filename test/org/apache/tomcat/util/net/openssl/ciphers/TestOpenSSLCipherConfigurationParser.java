@@ -73,13 +73,23 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testHIGH() throws Exception {
-        testSpecification("HIGH");
+        if (TesterOpenSSL.VERSION < 30100) {
+            // OpenSSL 3.1.x moved the CCM8 ciphers from high to medium
+            testSpecification("HIGH:!AESCCM8");
+        } else {
+            testSpecification("HIGH");
+        }
     }
 
 
     @Test
     public void testMEDIUM() throws Exception {
-        testSpecification("MEDIUM");
+        if (TesterOpenSSL.VERSION < 30100) {
+            // OpenSSL 3.1.x moved the CCM8 ciphers from high to medium
+            testSpecification("MEDIUM:AESCCM8");
+        } else {
+            testSpecification("MEDIUM");
+        }
     }
 
 
@@ -555,7 +565,12 @@ public class TestOpenSSLCipherConfigurationParser {
         // Tomcat 8 default as of 2014-08-04
         // This gets an A- from https://www.ssllabs.com/ssltest with no FS for
         // a number of the reference browsers
-        testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+        if (TesterOpenSSL.VERSION < 30100) {
+            // OpenSSL 3.1.x moved the CCM8 ciphers from high to medium
+            testSpecification("HIGH:!AESCCM8:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+        } else {
+            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+        }
     }
 
 
