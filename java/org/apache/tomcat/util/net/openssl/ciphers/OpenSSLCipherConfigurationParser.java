@@ -182,10 +182,6 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String ECDHE = "ECDHE";
     /**
-     * Cipher suites using authenticated ephemeral ECDH key agreement
-     */
-    private static final String EECDHE = "EECDHE";
-    /**
      * Anonymous Elliptic Curve Diffie Hellman cipher suites.
      */
     private static final String AECDH = "AECDH";
@@ -470,7 +466,6 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(ECDHE, ecdhe);
 
         addListAlias(kEECDH, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH)));
-        aliases.put(EECDHE, aliases.get(kEECDH));
         Set<Cipher> eecdh = filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH));
         eecdh.removeAll(filterByAuthentication(allCiphers, Collections.singleton(Authentication.aNULL)));
         addListAlias(EECDH, eecdh);
