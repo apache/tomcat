@@ -168,6 +168,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        The internal upgrade handler should close the associated
+        <code>WebConnection</code> on destroy. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
