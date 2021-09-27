@@ -117,6 +117,10 @@
         <bug>65577</bug>: Fix a <code>AccessControlException</code> reporting
         when running an NIO2 connector with TLS enabled. (markt)
       </fix>
+      <update>
+        Reclassify TLS ciphers that use AESCCM8 as medium security rather than
+        high security to align with recent changes in OpenSSL. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
