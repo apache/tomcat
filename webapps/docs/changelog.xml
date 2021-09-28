@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.72 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>65553</bug>: Implement a work-around for a
+        <a href="https://bugs.openjdk.java.net/browse/JDK-8273874">JRE bug</a>
+        that can trigger a memory leak when using the JNDI realm. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
