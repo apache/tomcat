@@ -146,9 +146,9 @@
       </fix>
       <fix>
         Further improvements in the management of the connection flow control
-        window. This addresses various bugs that what cause streams to
-        incorrectly report that they had timed out waiting for an allocation
-        from the connection flow control window. (markt)
+        window. This addresses various bugs that caused streams to incorrectly
+        report that they had timed out waiting for an allocation from the
+        connection flow control window. (markt)
       </fix>
       <fix>
         <bug>65577</bug>: Fix a <code>AccessControlException</code> reporting
