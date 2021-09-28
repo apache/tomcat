@@ -128,6 +128,11 @@
         (markt)
       </add>
       <fix>
+        <bug>65553</bug>: Implement a work-around for a
+        <a href="https://bugs.openjdk.java.net/browse/JDK-8273874">JRE bug</a>
+        that can trigger a memory leak when using the JNDI realm. (markt)
+      </fix>
+      <fix>
         <bug>65586</bug>: Fix the bloom filter used to improve performance of
         archive file look ups in the web resources implementation so it works
         correctly for directory lookups whether or not the provided directory
