@@ -35,7 +35,7 @@ public class TestAbstractArchiveResourceSet {
 
         root.getContext().setUseBloomFilterForArchives(true);
 
-        File file = new File("webapps/examples/WEB-INF/lib/taglibs-standard-impl-1.2.5-migrated-0.0.1.jar");
+        File file = new File("webapps/examples/WEB-INF/lib/taglibs-standard-impl-1.2.5.jar");
 
         JarResourceSet jarResourceSet = new JarResourceSet(root, "/WEB-INF/classes", file.getAbsolutePath(), "/");
         jarResourceSet.getArchiveEntries(false);
