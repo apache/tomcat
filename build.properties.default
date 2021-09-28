@@ -38,8 +38,8 @@ version.suffix=-M6-dev
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds
 # Note: The value is in seconds (unlike milliseconds used by System.currentTimeMillis()).
-#2021-09-06T12:00:00Z
-#ant.tstamp.now=1630929600
+#2021-09-28T12:09:00Z
+#ant.tstamp.now=1632819600
 
 # ----- Source control flags -----
 git.branch=main
