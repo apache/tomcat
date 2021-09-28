@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +65,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSName;
 
@@ -1215,10 +1217,19 @@ public class JNDIRealm extends RealmBase {
     @Override
     public Principal authenticate(String username, String credentials) {
 
+        ClassLoader ocl = null;
         JNDIConnection connection = null;
         Principal principal = null;
 
         try {
+            // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
+            // This can move back to open() once it is known that Tomcat must be
+            // running on a JVM that includes a fix for
+            // https://bugs.openjdk.java.net/browse/JDK-8273874
+            if (!isUseContextClassLoader()) {
+                ocl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            }
 
             // Ensure that we have a directory context available
             connection = get();
@@ -1282,6 +1293,10 @@ public class JNDIRealm extends RealmBase {
                 containerLog.debug("Returning null principal.");
             }
             return null;
+        } finally {
+            if (!isUseContextClassLoader()) {
+                Thread.currentThread().setContextClassLoader(ocl);
+            }
         }
     }
 
@@ -1308,52 +1323,189 @@ public class JNDIRealm extends RealmBase {
             return null;
         }
 
-        if (userPatternArray != null) {
-            for (int curUserPattern = 0; curUserPattern < userPatternArray.length; curUserPattern++) {
-                // Retrieve user information
-                User user = getUser(connection, username, credentials, curUserPattern);
-                if (user != null) {
-                    try {
-                        // Check the user's credentials
-                        if (checkCredentials(connection.context, user, credentials)) {
-                            // Search for additional roles
-                            List<String> roles = getRoles(connection, user);
-                            if (containerLog.isDebugEnabled()) {
-                                containerLog.debug("Found roles: " + roles.toString());
+        ClassLoader ocl = null;
+        try {
+            // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
+            // This can move back to open() once it is known that Tomcat must be
+            // running on a JVM that includes a fix for
+            // https://bugs.openjdk.java.net/browse/JDK-8273874
+            if (!isUseContextClassLoader()) {
+                ocl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            }
+
+            if (userPatternArray != null) {
+                for (int curUserPattern = 0; curUserPattern < userPatternArray.length; curUserPattern++) {
+                    // Retrieve user information
+                    User user = getUser(connection, username, credentials, curUserPattern);
+                    if (user != null) {
+                        try {
+                            // Check the user's credentials
+                            if (checkCredentials(connection.context, user, credentials)) {
+                                // Search for additional roles
+                                List<String> roles = getRoles(connection, user);
+                                if (containerLog.isDebugEnabled()) {
+                                    containerLog.debug("Found roles: " + roles.toString());
+                                }
+                                return new GenericPrincipal(username, roles);
                             }
-                            return new GenericPrincipal(username, roles);
+                        } catch (InvalidNameException ine) {
+                            // Log the problem for posterity
+                            containerLog.warn(sm.getString("jndiRealm.exception"), ine);
+                            // ignore; this is probably due to a name not fitting
+                            // the search path format exactly, as in a fully-
+                            // qualified name being munged into a search path
+                            // that already contains cn= or vice-versa
                         }
-                    } catch (InvalidNameException ine) {
-                        // Log the problem for posterity
-                        containerLog.warn(sm.getString("jndiRealm.exception"), ine);
-                        // ignore; this is probably due to a name not fitting
-                        // the search path format exactly, as in a fully-
-                        // qualified name being munged into a search path
-                        // that already contains cn= or vice-versa
                     }
                 }
-            }
-            return null;
-        } else {
-            // Retrieve user information
-            User user = getUser(connection, username, credentials);
-            if (user == null) {
                 return null;
-            }
+            } else {
+                // Retrieve user information
+                User user = getUser(connection, username, credentials);
+                if (user == null) {
+                    return null;
+                }
 
-            // Check the user's credentials
-            if (!checkCredentials(connection.context, user, credentials)) {
-                return null;
-            }
+                // Check the user's credentials
+                if (!checkCredentials(connection.context, user, credentials)) {
+                    return null;
+                }
 
-            // Search for additional roles
-            List<String> roles = getRoles(connection, user);
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("Found roles: " + roles.toString());
-            }
+                // Search for additional roles
+                List<String> roles = getRoles(connection, user);
+                if (containerLog.isDebugEnabled()) {
+                    containerLog.debug("Found roles: " + roles.toString());
+                }
 
-            // Create and return a suitable Principal for this user
-            return new GenericPrincipal(username, roles);
+                // Create and return a suitable Principal for this user
+                return new GenericPrincipal(username, roles);
+            }
+        } finally {
+            if (!isUseContextClassLoader()) {
+                Thread.currentThread().setContextClassLoader(ocl);
+            }
+        }
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
+     * This method can be removed and the class loader switch moved back to
+     * open() once it is known that Tomcat must be running on a JVM that
+     * includes a fix for
+     * https://bugs.openjdk.java.net/browse/JDK-8273874
+     */
+    @Override
+    public Principal authenticate(String username) {
+        ClassLoader ocl = null;
+        try {
+            if (!isUseContextClassLoader()) {
+                ocl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            }
+            return super.authenticate(username);
+        } finally {
+            if (!isUseContextClassLoader()) {
+                Thread.currentThread().setContextClassLoader(ocl);
+            }
+        }
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
+     * This method can be removed and the class loader switch moved back to
+     * open() once it is known that Tomcat must be running on a JVM that
+     * includes a fix for
+     * https://bugs.openjdk.java.net/browse/JDK-8273874
+     */
+    @Override
+    public Principal authenticate(String username, String clientDigest, String nonce, String nc,
+            String cnonce, String qop, String realm, String md5a2) {
+        ClassLoader ocl = null;
+        try {
+            if (!isUseContextClassLoader()) {
+                ocl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            }
+            return super.authenticate(username, clientDigest, nonce, nc, cnonce, qop, realm, md5a2);
+        } finally {
+            if (!isUseContextClassLoader()) {
+                Thread.currentThread().setContextClassLoader(ocl);
+            }
+        }
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
+     * This method can be removed and the class loader switch moved back to
+     * open() once it is known that Tomcat must be running on a JVM that
+     * includes a fix for
+     * https://bugs.openjdk.java.net/browse/JDK-8273874
+     */
+    @Override
+    public Principal authenticate(X509Certificate[] certs) {
+        ClassLoader ocl = null;
+        try {
+            if (!isUseContextClassLoader()) {
+                ocl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            }
+            return super.authenticate(certs);
+        } finally {
+            if (!isUseContextClassLoader()) {
+                Thread.currentThread().setContextClassLoader(ocl);
+            }
+        }
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
+     * This method can be removed and the class loader switch moved back to
+     * open() once it is known that Tomcat must be running on a JVM that
+     * includes a fix for
+     * https://bugs.openjdk.java.net/browse/JDK-8273874
+     */
+    @Override
+    public Principal authenticate(GSSContext gssContext, boolean storeCred) {
+        ClassLoader ocl = null;
+        try {
+            if (!isUseContextClassLoader()) {
+                ocl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            }
+            return super.authenticate(gssContext, storeCred);
+        } finally {
+            if (!isUseContextClassLoader()) {
+                Thread.currentThread().setContextClassLoader(ocl);
+            }
+        }
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
+     * This method can be removed and the class loader switch moved back to
+     * open() once it is known that Tomcat must be running on a JVM that
+     * includes a fix for
+     * https://bugs.openjdk.java.net/browse/JDK-8273874
+     */
+    @Override
+    public Principal authenticate(GSSName gssName, GSSCredential gssCredential) {
+        ClassLoader ocl = null;
+        try {
+            if (!isUseContextClassLoader()) {
+                ocl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            }
+            return super.authenticate(gssName, gssCredential);
+        } finally {
+            if (!isUseContextClassLoader()) {
+                Thread.currentThread().setContextClassLoader(ocl);
+            }
         }
     }
 
@@ -2457,12 +2609,7 @@ public class JNDIRealm extends RealmBase {
      * @throws NamingException if a directory server error occurs
      */
     protected void open(JNDIConnection connection) throws NamingException {
-        ClassLoader ocl = null;
         try {
-            if (!isUseContextClassLoader()) {
-                ocl = Thread.currentThread().getContextClassLoader();
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-            }
             // Ensure that we have a directory context available
             connection.context = createDirContext(getDirectoryContextEnvironment());
         } catch (Exception e) {
@@ -2479,9 +2626,6 @@ public class JNDIRealm extends RealmBase {
             // reset it in case the connection times out.
             // the primary may come back.
             connectionAttempt = 0;
-            if (!isUseContextClassLoader()) {
-                Thread.currentThread().setContextClassLoader(ocl);
-            }
         }
     }
 
@@ -2667,8 +2811,17 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Check to see if the connection to the directory can be opened
+        ClassLoader ocl = null;
         JNDIConnection connection = null;
         try {
+            // https://bz.apache.org/bugzilla/show_bug.cgi?id=65553
+            // This can move back to open() once it is known that Tomcat must be
+            // running on a JVM that includes a fix for
+            // https://bugs.openjdk.java.net/browse/JDK-8273874
+            if (!isUseContextClassLoader()) {
+                ocl = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+            }
             connection = get();
         } catch (NamingException e) {
             // A failure here is not fatal as the directory may be unavailable
@@ -2678,6 +2831,9 @@ public class JNDIRealm extends RealmBase {
             containerLog.error(sm.getString("jndiRealm.open"), e);
         } finally {
             release(connection);
+            if (!isUseContextClassLoader()) {
+                Thread.currentThread().setContextClassLoader(ocl);
+            }
         }
 
         super.startInternal();
