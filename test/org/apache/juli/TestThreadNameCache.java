@@ -18,11 +18,12 @@ package org.apache.juli;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.CountDownLatch;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TestThreadNameCache {
-    private int threadId;
+    private Integer threadId;
 
     @Test
     public void testCache() throws Exception {
@@ -37,7 +38,7 @@ public class TestThreadNameCache {
             @Override
             public void run() {
                 setName(THREAD_NAME);
-                threadId= (int) getId();
+                threadId = Integer.valueOf((int) getId());
                 threadIdLatch.countDown();
                 try {
                     cacheLatch.await();
