@@ -16,6 +16,8 @@
  */
 package jakarta.el;
 
+import java.util.Arrays;
+
 public class MethodInfo {
 
     private final String name;
@@ -40,5 +42,47 @@ public class MethodInfo {
 
     public Class<?>[] getParamTypes() {
         return this.paramTypes;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + Arrays.hashCode(paramTypes);
+        result = prime * result + ((returnType == null) ? 0 : returnType.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MethodInfo other = (MethodInfo) obj;
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (!Arrays.equals(paramTypes, other.paramTypes)) {
+            return false;
+        }
+        if (returnType == null) {
+            if (other.returnType != null) {
+                return false;
+            }
+        } else if (!returnType.equals(other.returnType)) {
+            return false;
+        }
+        return true;
     }
 }
