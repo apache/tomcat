@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.55 (remm)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Regenerate the EL parser using JavaCC 7.0.10. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.54 (remm)" rtext="in progress">
   <subsection name="Catalina">
