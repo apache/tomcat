@@ -327,7 +327,7 @@ void NonLiteral() : {}
     | <LPAREN> Expression() <RPAREN>
     | LOOKAHEAD((<IDENTIFIER> <COLON>)? <IDENTIFIER> <LPAREN>) Function()
     | Identifier()
-    | LOOKAHEAD(3)SetData()
+    | LOOKAHEAD(5)SetData()
     | ListData()
     | MapData()
 }
