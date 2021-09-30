@@ -17,6 +17,7 @@
 package jakarta.el;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 
 /**
  * Provides information about the method to which a method expression resolves.
@@ -81,5 +82,53 @@ public class MethodReference {
      */
     public Object[] getEvaluatedParameters() {
         return evaluatedParameters;
+    }
+
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(annotations);
+        result = prime * result + ((base == null) ? 0 : base.hashCode());
+        result = prime * result + Arrays.deepHashCode(evaluatedParameters);
+        result = prime * result + ((methodInfo == null) ? 0 : methodInfo.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MethodReference other = (MethodReference) obj;
+        if (!Arrays.equals(annotations, other.annotations)) {
+            return false;
+        }
+        if (base == null) {
+            if (other.base != null) {
+                return false;
+            }
+        } else if (!base.equals(other.base)) {
+            return false;
+        }
+        if (!Arrays.deepEquals(evaluatedParameters, other.evaluatedParameters)) {
+            return false;
+        }
+        if (methodInfo == null) {
+            if (other.methodInfo != null) {
+                return false;
+            }
+        } else if (!methodInfo.equals(other.methodInfo)) {
+            return false;
+        }
+        return true;
     }
 }
