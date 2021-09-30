@@ -149,6 +149,9 @@
         rather than the types being passed explicitly to
         <code>ExpressionFactory.createMethodExpression()</code>. (markt)
       </fix>
+      <update>
+        Regenerate the EL parser using JavaCC 7.0.10. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
