@@ -51,6 +51,15 @@ public class ListELResolver extends ELResolver {
                 throw new PropertyNotFoundException(
                         new ArrayIndexOutOfBoundsException(idx).getMessage());
             }
+
+            /*
+             * Not perfect as a custom list implementation may be read-only but
+             * consistent with isReadOnly().
+             */
+            if (list.getClass() == UNMODIFIABLE || readOnly) {
+                return null;
+            }
+
             return Object.class;
         }
 

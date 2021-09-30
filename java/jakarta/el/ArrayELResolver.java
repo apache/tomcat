@@ -45,6 +45,13 @@ public class ArrayELResolver extends ELResolver {
             } catch (IllegalArgumentException e) {
                 // ignore
             }
+            /*
+             * The resolver may have been created in read-only mode but the
+             * array and its elements will always be read-write.
+             */
+            if (readOnly) {
+                return null;
+            }
             return base.getClass().getComponentType();
         }
 

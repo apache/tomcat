@@ -46,6 +46,12 @@ public class MapELResolver extends ELResolver {
 
         if (base instanceof Map<?,?>) {
             context.setPropertyResolved(base, property);
+
+            Map<?, ?> map = (Map<?, ?>) base;
+            if (readOnly || map.getClass() == UNMODIFIABLE) {
+                return null;
+            }
+
             return Object.class;
         }
 

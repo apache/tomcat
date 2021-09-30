@@ -69,7 +69,13 @@ public class BeanELResolver extends ELResolver {
         }
 
         context.setPropertyResolved(base, property);
-        return this.property(context, base, property).getPropertyType();
+        BeanProperty beanProperty = property(context, base, property);
+
+        if (readOnly || beanProperty.isReadOnly(base)) {
+            return null;
+        }
+
+        return beanProperty.getPropertyType();
     }
 
     @Override

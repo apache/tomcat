@@ -104,9 +104,16 @@ public class BeanNameELResolver extends ELResolver {
 
         try {
             if (beanNameResolver.isNameResolved(beanName)) {
-                Class<?> result = beanNameResolver.getBean(beanName).getClass();
                 context.setPropertyResolved(base, property);
-                return result;
+
+                /*
+                 * No resolver level isReadOnly property for this resolver
+                 */
+                if (beanNameResolver.isReadOnly((String) property)) {
+                    return null;
+                }
+
+                return beanNameResolver.getBean(beanName).getClass();
             }
         } catch (Throwable t) {
             Util.handleThrowable(t);

@@ -115,6 +115,13 @@
         that used variables rather than literals for both keys and values.
         (markt)
       </fix>
+      <update>
+        Ensure that the <code>getType()</code> method of any
+        <code>ELResolver</code> implementation returns <code>null</code> if
+        either the <code>ELResolver</code> or the resolved property is read-only
+        to align Tomcat with recent updates in the Jakarta EL specification
+        project. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
