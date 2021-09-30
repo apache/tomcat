@@ -110,8 +110,14 @@
       <update>
         Regenerate the EL parser using JavaCC 7.0.10. (markt)
       </update>
+      <fix>
+        Fix a bug that prevented the EL parser correctly parsing a literal Map
+        that used variables rather than literals for both keys and values.
+        (markt)
+      </fix>
     </changelog>
-  </subsection></section>
+  </subsection>
+</section>
 <section name="Tomcat 10.0.12 (markt)" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
