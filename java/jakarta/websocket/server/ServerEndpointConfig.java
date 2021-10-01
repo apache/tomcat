@@ -213,6 +213,15 @@ public interface ServerEndpointConfig extends EndpointConfig {
         }
 
 
+        /**
+         * Return the platform default configurator.
+         *
+         * @return the platform default configurator
+         */
+        public ServerEndpointConfig.Configurator getContainerDefaultConfigurator() {
+            return fetchContainerDefaultConfigurator();
+        }
+
         public String getNegotiatedSubprotocol(List<String> supported,
                 List<String> requested) {
             return fetchContainerDefaultConfigurator().getNegotiatedSubprotocol(supported, requested);

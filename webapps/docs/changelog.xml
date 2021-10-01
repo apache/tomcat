@@ -124,6 +124,16 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <update>
+        Add a new method<code>
+        ServerEndpointConfig.Configurator.getContainerDefaultConfigurator()
+        </code>to align with recent updates in the WebSocket specification
+        project. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M6 (markt)" rtext="release in progress">
   <subsection name="Catalina">
