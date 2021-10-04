@@ -97,7 +97,8 @@ public class TestBeanELResolver {
 
         Class<?> result = resolver.getType(context, new Bean(), PROPERTY01_NAME);
 
-        Assert.assertEquals(String.class, result);
+        // Property is read-only so should return null
+        Assert.assertNull(result);
         Assert.assertTrue(context.isPropertyResolved());
     }
 

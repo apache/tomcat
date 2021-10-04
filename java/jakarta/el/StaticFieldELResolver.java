@@ -149,15 +149,26 @@ public class StaticFieldELResolver extends ELResolver {
 
             Class<?> clazz = ((ELClass) base).getKlass();
             String name = (String) property;
+            Exception exception = null;
             try {
-                clazz.getField(name);
-                /*
-                 * This resolver is always read-only so fall-through to return
-                 * null.
-                 */
-            } catch (IllegalArgumentException | NoSuchFieldException | SecurityException e) {
-                String msg = Util.message(context, "staticFieldELResolver.notFound", name, clazz.getName());
-                throw new PropertyNotFoundException(msg, e);
+                Field field = clazz.getField(name);
+                int modifiers = field.getModifiers();
+                if (Modifier.isStatic(modifiers) &&
+                        Modifier.isPublic(modifiers) &&
+                        Util.canAccess(null, field)) {
+                    // Resolver is read-only so returns null for resolved fields
+                    return null;
+                }
+            } catch (IllegalArgumentException | NoSuchFieldException |
+                    SecurityException e) {
+                exception = e;
+            }
+            String msg = Util.message(context, "staticFieldELResolver.notFound",
+                    name, clazz.getName());
+            if (exception == null) {
+                throw new PropertyNotFoundException(msg);
+            } else {
+                throw new PropertyNotFoundException(msg, exception);
             }
         }
         return null;

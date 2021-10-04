@@ -104,6 +104,7 @@ public class BeanNameELResolver extends ELResolver {
 
         try {
             if (beanNameResolver.isNameResolved(beanName)) {
+                Class<?> result = beanNameResolver.getBean(beanName).getClass();
                 context.setPropertyResolved(base, property);
 
                 /*
@@ -113,7 +114,7 @@ public class BeanNameELResolver extends ELResolver {
                     return null;
                 }
 
-                return beanNameResolver.getBean(beanName).getClass();
+                return result;
             }
         } catch (Throwable t) {
             Util.handleThrowable(t);
