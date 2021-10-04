@@ -135,7 +135,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 10.1.0-M6 (markt)" rtext="release in progress">
+<section name="Tomcat 10.1.0-M6 (markt)" rtext="2021-09-28">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -273,7 +273,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 10.1.0-M5 (markt)" rtext="release in progress">
+<section name="Tomcat 10.1.0-M5 (markt)" rtext="2021-09-10">
   <subsection name="Catalina">
     <changelog>
       <fix>
