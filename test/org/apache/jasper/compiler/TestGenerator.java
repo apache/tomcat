@@ -720,6 +720,11 @@ public class TestGenerator extends TomcatBaseTest {
     }
 
     @Test
+    public void testSingleThreaded() throws Exception {
+        doTestJsp("single-threaded.jsp");
+    }
+
+    @Test
     public void testXpoweredBy() throws Exception {
         doTestJsp("x-powered-by.jsp");
     }
