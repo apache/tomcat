@@ -199,6 +199,90 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
+    protected static boolean checkConf(OpenSSLConf conf, long cctx) throws Exception {
+        boolean result = true;
+        OpenSSLConfCmd cmd;
+        String name;
+        String value;
+        int rc;
+        for (OpenSSLConfCmd command : conf.getCommands()) {
+            cmd = command;
+            name = cmd.getName();
+            value = cmd.getValue();
+            if (name == null) {
+                log.error(sm.getString("opensslconf.noCommandName", value));
+                result = false;
+                continue;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("opensslconf.checkCommand", name, value));
+            }
+            try {
+                rc = SSLConf.check(cctx, name, value);
+            } catch (Exception e) {
+                log.error(sm.getString("opensslconf.checkFailed"));
+                return false;
+            }
+            if (rc <= 0) {
+                log.error(sm.getString("opensslconf.failedCommand", name, value,
+                        Integer.toString(rc)));
+                result = false;
+            } else if (log.isDebugEnabled()) {
+                log.debug(sm.getString("opensslconf.resultCommand", name, value,
+                        Integer.toString(rc)));
+            }
+        }
+        if (!result) {
+            log.error(sm.getString("opensslconf.checkFailed"));
+        }
+        return result;
+    }
+
+    protected static boolean applyConf(OpenSSLConf conf, long cctx, long ctx) throws Exception {
+        boolean result = true;
+        SSLConf.assign(cctx, ctx);
+        OpenSSLConfCmd cmd;
+        String name;
+        String value;
+        int rc;
+        for (OpenSSLConfCmd command : conf.getCommands()) {
+            cmd = command;
+            name = cmd.getName();
+            value = cmd.getValue();
+            if (name == null) {
+                log.error(sm.getString("opensslconf.noCommandName", value));
+                result = false;
+                continue;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("opensslconf.applyCommand", name, value));
+            }
+            try {
+                rc = SSLConf.apply(cctx, name, value);
+            } catch (Exception e) {
+                log.error(sm.getString("opensslconf.applyFailed"));
+                return false;
+            }
+            if (rc <= 0) {
+                log.error(sm.getString("opensslconf.failedCommand", name, value,
+                        Integer.toString(rc)));
+                result = false;
+            } else if (log.isDebugEnabled()) {
+                log.debug(sm.getString("opensslconf.resultCommand", name, value,
+                        Integer.toString(rc)));
+            }
+        }
+        rc = SSLConf.finish(cctx);
+        if (rc <= 0) {
+            log.error(sm.getString("opensslconf.finishFailed", Integer.toString(rc)));
+            result = false;
+        }
+        if (!result) {
+            log.error(sm.getString("opensslconf.applyFailed"));
+        }
+        return result;
+    }
+
     /**
      * Setup the SSL_CTX.
      *
@@ -319,7 +403,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     log.debug(sm.getString("openssl.checkConf"));
                 }
                 try {
-                    if (!openSslConf.check(state.cctx)) {
+                    if (!checkConf(openSslConf, state.cctx)) {
                         log.error(sm.getString("openssl.errCheckConf"));
                         throw new Exception(sm.getString("openssl.errCheckConf"));
                     }
@@ -330,7 +414,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     log.debug(sm.getString("openssl.applyConf"));
                 }
                 try {
-                    if (!openSslConf.apply(state.cctx, state.ctx)) {
+                    if (!applyConf(openSslConf, state.cctx, state.ctx)) {
                         log.error(sm.getString("openssl.errApplyConf"));
                         throw new SSLException(sm.getString("openssl.errApplyConf"));
                     }
