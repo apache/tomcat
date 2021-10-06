@@ -56,6 +56,8 @@ import org.apache.jasper.TrimSpacesOption;
 import org.apache.jasper.compiler.Node.ChildInfoBase;
 import org.apache.jasper.compiler.Node.NamedAttribute;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.xml.sax.Attributes;
 
 /**
@@ -80,6 +82,8 @@ import org.xml.sax.Attributes;
  */
 
 class Generator {
+
+    private final Log log = LogFactory.getLog(Generator.class); // must not be static
 
     private static final Class<?>[] OBJECT_CLASS = { Object.class };
 
@@ -740,10 +744,6 @@ class Generator {
         out.printin("    implements org.apache.jasper.runtime.JspSourceDependent,");
         out.println();
         out.printin("                 org.apache.jasper.runtime.JspSourceImports");
-        if (!pageInfo.isThreadSafe()) {
-            out.println(",");
-            out.printin("                 jakarta.servlet.SingleThreadModel");
-        }
         out.println(",");
         out.printin("                 org.apache.jasper.runtime.JspSourceDirectives");
         out.println(" {");
@@ -762,7 +762,14 @@ class Generator {
         genPreambleMethods();
 
         // Now the service method
-        out.printin("public void ");
+        if (pageInfo.isThreadSafe()) {
+            out.printin("public void ");
+        } else {
+            // This is unlikely to perform well.
+            out.printin("public synchronized void ");
+            // As required by JSP 3.1, log a warning
+            log.warn(Localizer.getMessage("jsp.warning.isThreadSafe", ctxt.getJspFile()));
+        }
         out.print(serviceMethodName);
         out.println("(final jakarta.servlet.http.HttpServletRequest request, final jakarta.servlet.http.HttpServletResponse response)");
         out.pushIndent();

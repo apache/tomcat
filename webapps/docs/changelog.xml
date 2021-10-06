@@ -122,6 +122,13 @@
         to align Tomcat with recent updates in the Jakarta EL specification
         project. (markt)
       </update>
+      <fix>
+        Implement an alternative solution to support the JSP page directive
+        attribute <code>isThreadSafe</code> now that the
+        <code>SingleThreadModel</code> interface has been removed from the
+        Servlet API. The new approach synchronizes the <code>service()</code>
+        method.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
