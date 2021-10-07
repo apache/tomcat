@@ -313,12 +313,56 @@ public class WsServerContainer extends WsWebSocketContainer
      * @throws ServletException If a configuration error prevents the upgrade
      *         from taking place
      * @throws IOException If an I/O error occurs during the upgrade process
+     *
+     * @deprecated This method will be removed in Apache Tomcat 10.1 onwards. It
+     *             has been replaced by {@link #upgradeHttpToWebSocket(Object,
+     *             Object, ServerEndpointConfig, Map)}
      */
+    @Deprecated
     public void doUpgrade(HttpServletRequest request,
             HttpServletResponse response, ServerEndpointConfig sec,
             Map<String,String> pathParams)
             throws ServletException, IOException {
         UpgradeUtil.doUpgrade(this, request, response, sec, pathParams);
+    }
+
+
+    /**
+     * Upgrade the HTTP connection represented by the {@code HttpServletRequest} and {@code HttpServletResponse} to the
+     * WebSocket protocol and establish a WebSocket connection as per the provided {@link ServerEndpointConfig}.
+     * <p>
+     * This method is primarily intended to be used by frameworks that implement the front-controller pattern. It does
+     * not deploy the provided endpoint.
+     * <p>
+     * If the WebSocket implementation is not deployed as part of a Jakarta Servlet container, this method will throw an
+     * {@link UnsupportedOperationException}.
+     * <p>
+     * This method will be part of the Jakarta WebSocket API from version 2.1
+     *
+     * @param httpServletRequest    The {@code HttpServletRequest} to be processed as a WebSocket handshake as per
+     *                              section 4.0 of RFC 6455.
+     * @param httpServletResponse   The {@code HttpServletResponse} to be used when processing the
+     *                              {@code httpServletRequest} as a WebSocket handshake as per section 4.0 of RFC 6455.
+     * @param sec                   The server endpoint configuration to use to configure the WebSocket endpoint
+     * @param pathParameters        Provides a mapping of path parameter names and values, if any, to be used for the
+     *                              WebSocket connection established by the call to this method. If no such mapping is
+     *                              defined, an empty Map must be passed.
+     *
+     * @throws IllegalStateException if the provided request does not meet the requirements of the WebSocket handshake
+     * @throws UnsupportedOperationException if the WebSocket implementation is not deployed as part of a Jakarta
+     *                                       Servlet container
+     * @throws IOException if an I/O error occurs during the establishment of a WebSocket connection
+     * @throws DeploymentException if a configuration error prevents the establishment of a WebSocket connection
+     */
+    public void upgradeHttpToWebSocket(Object httpServletRequest, Object httpServletResponse,
+            ServerEndpointConfig sec, Map<String, String> pathParameters)
+            throws IOException, DeploymentException {
+        try {
+            UpgradeUtil.doUpgrade(this, (HttpServletRequest) httpServletRequest, (HttpServletResponse) httpServletResponse,
+                    sec, pathParameters);
+        } catch (ServletException e) {
+            throw new DeploymentException(e.getMessage(), e);
+        }
     }
 
 
