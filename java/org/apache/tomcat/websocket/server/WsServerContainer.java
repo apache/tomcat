@@ -313,12 +313,30 @@ public class WsServerContainer extends WsWebSocketContainer
      * @throws ServletException If a configuration error prevents the upgrade
      *         from taking place
      * @throws IOException If an I/O error occurs during the upgrade process
+     *
+     * @deprecated This method will be removed in Apache Tomcat 10.1 onwards. It
+     *             has been replaced by {@link #upgradeHttpToWebSocket(Object,
+     *             Object, ServerEndpointConfig, Map)}
      */
+    @Deprecated
     public void doUpgrade(HttpServletRequest request,
             HttpServletResponse response, ServerEndpointConfig sec,
             Map<String,String> pathParams)
             throws ServletException, IOException {
         UpgradeUtil.doUpgrade(this, request, response, sec, pathParams);
+    }
+
+
+    @Override
+    public void upgradeHttpToWebSocket(Object httpServletRequest, Object httpServletResponse,
+            ServerEndpointConfig sec, Map<String, String> pathParameters)
+            throws IOException, DeploymentException {
+        try {
+            UpgradeUtil.doUpgrade(this, (HttpServletRequest) httpServletRequest, (HttpServletResponse) httpServletResponse,
+                    sec, pathParameters);
+        } catch (ServletException e) {
+            throw new DeploymentException(e.getMessage(), e);
+        }
     }
 
 

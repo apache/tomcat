@@ -139,6 +139,11 @@
         </code>to align with recent updates in the WebSocket specification
         project. (markt)
       </update>
+      <update>
+        Add a new method <code>ServerContainer.upgradeHttpToWebSocket()</code>
+        to align with recent updates in the WebSocket specification project.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
