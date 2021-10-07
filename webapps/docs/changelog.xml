@@ -117,6 +117,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <update>
+        Add a new method <code>WsServerContainer.upgradeHttpToWebSocket()</code>
+        to align with the new method that will be available from WebSocket 2.1
+        onwards. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.54 (remm)" rtext="2021-09-28">
   <subsection name="Catalina">
