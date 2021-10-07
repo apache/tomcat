@@ -104,7 +104,18 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 8.5.72 (schultz)" rtext="in development">
+<section name="Tomcat 8.5.73 (schultz)">
+  <subsection name="WebSocket">
+    <changelog>
+      <update>
+        Add a new method <code>WsServerContainer.upgradeHttpToWebSocket()</code>
+        to align with the new method that will be available from WebSocket 2.1
+        onwards. (markt)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 8.5.72 (schultz)">
   <subsection name="Catalina">
     <changelog>
       <fix>
