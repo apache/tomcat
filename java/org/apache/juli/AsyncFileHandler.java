@@ -87,6 +87,8 @@ public class AsyncFileHandler extends FileHandler {
         if (closed) {
             return;
         }
+        // try to flush the queue
+        for (int i = 0; !queue.isEmpty() && i < 9; ++i) Thread.yield();
         closed = true;
         super.close();
     }
