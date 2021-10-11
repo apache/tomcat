@@ -1071,12 +1071,17 @@ public abstract class AbstractEndpoint<S,U> {
                     getLog().debug("Socket unlock completed for:" + unlockAddress);
                 }
             }
-            // Wait for upto 1000ms acceptor threads to unlock
-            long waitLeft = 1000;
-            while (waitLeft > 0 &&
-                    acceptor.getState() == AcceptorState.RUNNING) {
-                Thread.sleep(5);
-                waitLeft -= 5;
+            // Wait for up to 1000ms acceptor threads to unlock. Particularly
+            // for the unit tests, we want to exit this loop as quickly as
+            // possible. However, we also don't want to trigger excessive CPU
+            // usage if the unlock takes longer than expected. Therefore, we
+            // initially wait for the unlock in a tight loop but if that takes
+            // more than 1ms we start using short sleeps to reduce CPU usage.
+            long startTime = System.nanoTime();
+            while (startTime + 1_000_000_000 > System.nanoTime() && acceptor.getState() == AcceptorState.RUNNING) {
+                if (startTime + 1_000_000 < System.nanoTime()) {
+                    Thread.sleep(1);
+                }
             }
         } catch(Throwable t) {
             ExceptionUtils.handleThrowable(t);

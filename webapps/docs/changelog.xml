@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.55 (remm)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Improve performance of Connector shutdown - primarily to reduce the time
+        it takes to run the test suite. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <update>
