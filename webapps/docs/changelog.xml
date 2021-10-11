@@ -111,6 +111,10 @@
         Improve performance of Connector shutdown - primarily to reduce the time
         it takes to run the test suite. (markt)
       </scode>
+      <fix>
+        Refactor the APR/native connector shutdown to reduce the possibility of
+        a JVM crash during the connector shutdown. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
