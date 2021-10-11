@@ -34,6 +34,7 @@ import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
+import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -325,6 +326,10 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         case ":method": {
             if (coyoteRequest.method().isNull()) {
                 coyoteRequest.method().setString(value);
+                if ("HEAD".equals(value)) {
+                    addOutputFilter(new VoidOutputFilter());
+                    streamOutputBuffer.closed = true;
+                }
             } else {
                 throw new HpackException(sm.getString("stream.header.duplicate",
                         getConnectionId(), getIdAsString(), ":method" ));

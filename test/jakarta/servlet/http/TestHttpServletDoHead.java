@@ -19,6 +19,7 @@ package jakarta.servlet.http;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,14 +35,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.coyote.http2.Http2TestBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 
 @RunWith(Parameterized.class)
-public class TestHttpServletDoHead extends TomcatBaseTest {
+public class TestHttpServletDoHead extends Http2TestBase {
 
     // Tomcat has a minimum output buffer size of 8 * 1024.
     // (8 * 1024) /16 = 512
@@ -55,17 +58,19 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
             Integer.valueOf(511), Integer.valueOf(512), Integer.valueOf(513),
             Integer.valueOf(1023), Integer.valueOf(1024), Integer.valueOf(1025) };
 
-    @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4} {5}")
+    @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4} {5} {6}")
     public static Collection<Object[]> parameters() {
 
         List<Object[]> parameterSets = new ArrayList<>();
-        for (Integer buf : BUFFERS) {
-            for (Boolean w : booleans) {
-                for (Integer c1 : COUNTS) {
-                    for (ResetType rt : ResetType.values()) {
-                        for (Integer c2 : COUNTS) {
-                            for (Boolean f : booleans) {
-                                parameterSets.add(new Object[] { buf, w, c1, rt, c2, f });
+        for (Boolean l : booleans) {
+            for (Integer buf : BUFFERS) {
+                for (Boolean w : booleans) {
+                    for (Integer c1 : COUNTS) {
+                        for (ResetType rt : ResetType.values()) {
+                            for (Integer c2 : COUNTS) {
+                                for (Boolean f : booleans) {
+                                    parameterSets.add(new Object[] { l, buf, w, c1, rt, c2, f });
+                                }
                             }
                         }
                     }
@@ -76,30 +81,25 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
     }
 
     @Parameter(0)
-    public int bufferSize;
+    public boolean useLegacy;
     @Parameter(1)
-    public boolean useWriter;
+    public int bufferSize;
     @Parameter(2)
-    public int invalidWriteCount;
+    public boolean useWriter;
     @Parameter(3)
-    public ResetType resetType;
+    public int invalidWriteCount;
     @Parameter(4)
-    public int validWriteCount;
+    public ResetType resetType;
     @Parameter(5)
+    public int validWriteCount;
+    @Parameter(6)
     public boolean explicitFlush;
 
     @Test
     public void testDoHead() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
-
-        HeadTestServlet s = new HeadTestServlet(bufferSize, useWriter, invalidWriteCount, resetType, validWriteCount, explicitFlush);
-        Tomcat.addServlet(ctx, "HeadTestServlet", s);
-        ctx.addServletMappingDecoded("/test", "HeadTestServlet");
-
-        tomcat.start();
+        configureAndStartWebApplication();
 
         Map<String,List<String>> getHeaders = new CaseInsensitiveKeyMap<>();
         String path = "http://localhost:" + getPort() + "/test";
@@ -130,6 +130,73 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
         }
 
         tomcat.stop();
+    }
+
+
+    @Test
+    public void testDoHeadHttp2() throws Exception {
+        http2Connect();
+
+        // Get request
+        byte[] frameHeaderGet = new byte[9];
+        ByteBuffer headersPayloadGet = ByteBuffer.allocate(128);
+        buildGetRequest(frameHeaderGet, headersPayloadGet, null, 3, "/test");
+        writeFrame(frameHeaderGet, headersPayloadGet);
+
+        parser.readFrame(true);
+        String traceGet = output.getTrace();
+        while (!output.getTrace().endsWith("3-EndOfStream\n")) {
+            parser.readFrame(true);
+        }
+        output.clearTrace();
+
+        // Head request
+        byte[] frameHeaderHead = new byte[9];
+        ByteBuffer headersPayloadHead = ByteBuffer.allocate(128);
+        buildHeadRequest(frameHeaderHead, headersPayloadHead, 5, "/test");
+        writeFrame(frameHeaderHead, headersPayloadHead);
+
+        while (!output.getTrace().endsWith("5-EndOfStream\n")) {
+            parser.readFrame(true);
+        }
+        String traceHead = output.getTrace();
+
+        String[] getHeaders = traceGet.split("\n");
+        String[] headHeaders = traceHead.split("\n");
+
+        int i = 0;
+        for (; i < getHeaders.length; i++) {
+            // Headers should be the same, ignoring the first character which is the steam ID
+            Assert.assertEquals(getHeaders[i].charAt(0), '3');
+            Assert.assertEquals(headHeaders[i].charAt(0), '5');
+            Assert.assertEquals(getHeaders[i].substring(1), headHeaders[i].substring(1));
+        }
+
+        // Stream 5 should have one more trace entry
+        Assert.assertEquals("5-EndOfStream", headHeaders[i]);
+    }
+
+
+    @Override
+    @SuppressWarnings("deprecation")
+    protected void configureAndStartWebApplication() throws LifecycleException {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        StandardContext ctxt = (StandardContext) tomcat.addContext("", null);
+
+
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+
+        HeadTestServlet s = new HeadTestServlet(bufferSize, useWriter, invalidWriteCount, resetType, validWriteCount, explicitFlush);
+        Wrapper w = Tomcat.addServlet(ctxt, "HeadTestServlet", s);
+        if (useLegacy) {
+            w.addInitParameter(HttpServlet.LEGACY_DO_HEAD, "true");
+        }
+        ctxt.addServletMappingDecoded("/test", "HeadTestServlet");
+
+        tomcat.start();
     }
 
 

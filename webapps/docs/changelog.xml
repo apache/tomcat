@@ -105,6 +105,20 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M7 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Refactor <code>HttpServlet</code> so the default <code>doHead()</code>
+        implementation now calls <code>doGet()</code> and relies on the
+        container to ensure that the response body is not sent. The previous
+        behaviour (wrapping the response) may be enabled per Servlet by setting
+        the <code>jakarta.servlet.http.legacyDoHead</code> Servlet
+        initialisation parameter to <code>true</code>. This aligns Tomcat with
+        recent changes updates for Servlet 6.0 in the Jakarta Servlet
+        specification project. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <scode>

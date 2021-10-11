@@ -31,6 +31,7 @@ import jakarta.servlet.AsyncEvent;
 import jakarta.servlet.AsyncListener;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.GenericServlet;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.ServletRequest;
@@ -94,18 +95,34 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
     private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
+    /**
+     * @deprecated May be removed in a future release
+     *
+     * @since 6.0
+     */
+    @Deprecated
+    public static final String LEGACY_DO_HEAD = "jakarta.servlet.http.legacyDoHead";
+
     private final transient Object cachedAllowHeaderValueLock = new Object();
     /**
      * Cached value of the HTTP {@code Allow} header for this servlet.
      */
     private volatile String cachedAllowHeaderValue = null;
 
+    private volatile boolean cachedUseLegacyDoHead;
 
     /**
      * Does nothing, because this is an abstract class.
      */
     public HttpServlet() {
         // NOOP
+    }
+
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        cachedUseLegacyDoHead = Boolean.parseBoolean(config.getInitParameter(LEGACY_DO_HEAD));
     }
 
 
@@ -241,7 +258,7 @@ public abstract class HttpServlet extends GenericServlet {
     protected void doHead(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
-        if (DispatcherType.INCLUDE.equals(req.getDispatcherType())) {
+        if (DispatcherType.INCLUDE.equals(req.getDispatcherType()) || !cachedUseLegacyDoHead) {
             doGet(req, resp);
         } else {
             NoBodyResponse response = new NoBodyResponse(resp);
