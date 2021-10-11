@@ -551,11 +551,13 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
         if (running) {
             running = false;
+            // Stop new connections being accepted.
             acceptor.stop(10);
+
+            // Stop the Poller calling select
             poller.stop();
-            for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
-                socketWrapper.close();
-            }
+
+            // Wait for the acceptor to shutdown
             if (acceptor.getState() != AcceptorState.ENDED && !getBindOnInit()) {
                 log.warn(sm.getString("endpoint.warn.unlockAcceptorFailed", acceptor.getThreadName()));
                 // If the Acceptor is still running force
@@ -565,12 +567,40 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     serverSock = 0;
                 }
             }
-            // Close any sockets not in the poller performing blocking
-            // read/writes. Need to do this before destroying the poller since
-            // that will also destroy the root pool for these sockets.
-            for (Long s : connections.keySet()) {
-                Socket.shutdown(s.longValue(), Socket.APR_SHUTDOWN_READWRITE);
+
+            // Wait for Poller to stop
+            int waitMillis = 0;
+            try {
+                while (poller.pollerThread.isAlive() && waitMillis < 10000) {
+                    waitMillis++;
+                    Thread.sleep(1);
+                }
+            } catch (InterruptedException e) {
+                // Ignore
             }
+
+            // Close the SocketWrapper for each open connection - this should
+            // trigger a IOException when the app (or container) tries to write.
+            // Use the blocking status write lock as a proxy for a lock on
+            // writing to the socket. Don't want to close it while another
+            // thread is writing as that could trigger a JVM crash.
+            for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
+                WriteLock wl = ((AprSocketWrapper) socketWrapper).getBlockingStatusWriteLock();
+                wl.lock();
+                try {
+                    socketWrapper.close();
+                } finally {
+                    wl.unlock();
+                }
+            }
+
+            for (Long socket : connections.keySet()) {
+                // Close the APR Socket. Need to do this before destroying the
+                // poller since that will also destroy the root pool for these
+                // sockets.
+                Socket.shutdown(socket.longValue(), Socket.APR_SHUTDOWN_READWRITE);
+            }
+
             try {
                 poller.destroy();
             } catch (Exception e) {
