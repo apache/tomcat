@@ -461,18 +461,41 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public void run() {
 
             int errorDelay = 0;
+            long pauseStart = 0;
 
             // Loop until we receive a shutdown command
             while (running) {
 
-                // Loop if endpoint is paused
-                while (paused && running) {
-                    state = AcceptorState.PAUSED;
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
+                // Loop if endpoint is paused.
+                // There are two likely scenarios here.
+                // The first scenario is that Tomcat is shutting down. In this
+                // case - and particularly for the unit tests - we want to exit
+                // this loop as quickly as possible. The second scenario is a
+                // genuine pause of the connector. In this case we want to avoid
+                // excessive CPU usage.
+                // Therefore, we start with a tight loop but if there isn't a
+                // rapid transition to stop then sleeps are introduced.
+                // < 1ms       - tight loop
+                // 1ms to 10ms - 1ms sleep
+                // > 10ms      - 10ms sleep
+                 while (paused && running) {
+                     if (state != AcceptorState.PAUSED) {
+                         pauseStart = System.nanoTime();
+                         // Entered pause state
+                         state = AcceptorState.PAUSED;
+                     }
+                     if ((System.nanoTime() - pauseStart) > 1_000_000) {
+                         // Paused for more than 1ms
+                         try {
+                             if ((System.nanoTime() - pauseStart) > 10_000_000) {
+                                 Thread.sleep(10);
+                             } else {
+                                 Thread.sleep(1);
+                             }
+                         } catch (InterruptedException e) {
+                             // Ignore
+                         }
+                     }
                 }
 
                 if (!running) {

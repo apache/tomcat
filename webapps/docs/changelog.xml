@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.73 (schultz)">
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Improve performance of Connector shutdown - primarily to reduce the time
+        it takes to run the test suite. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <update>
