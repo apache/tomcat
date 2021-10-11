@@ -167,8 +167,8 @@ public class TestHttpServletDoHead extends Http2TestBase {
         int i = 0;
         for (; i < getHeaders.length; i++) {
             // Headers should be the same, ignoring the first character which is the steam ID
-            Assert.assertEquals(getHeaders[i].charAt(0), '3');
-            Assert.assertEquals(headHeaders[i].charAt(0), '5');
+            Assert.assertEquals(getHeaders[i], '3', getHeaders[i].charAt(0));
+            Assert.assertEquals(headHeaders[i], '5', headHeaders[i].charAt(0));
             Assert.assertEquals(getHeaders[i].substring(1), headHeaders[i].substring(1));
         }
 
