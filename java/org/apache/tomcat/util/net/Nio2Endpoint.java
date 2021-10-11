@@ -253,8 +253,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             try {
                 long timeout = getExecutorTerminationTimeoutMillis();
                 while (timeout > 0 && !allClosed) {
-                    timeout -= 100;
-                    Thread.sleep(100);
+                    timeout -= 1;
+                    Thread.sleep(1);
                 }
                 threadGroup.shutdownNow();
                 if (timeout > 0) {
