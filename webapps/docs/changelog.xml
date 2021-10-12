@@ -173,6 +173,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        <pr>454</pr>: Differentiate warning messages in
+        <code>KubernetesMembershipProvider</code> so that the missing attribute
+        is clear to the user. PR provided by Hal Deadman. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M6 (markt)" rtext="2021-10-01">
   <subsection name="Catalina">
