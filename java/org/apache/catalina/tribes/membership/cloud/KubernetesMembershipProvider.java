@@ -156,7 +156,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             List<Object> items = (List<Object>) itemsObject;
             for (Object podObject : items) {
                 if (!(podObject instanceof LinkedHashMap<?, ?>)) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "item"));
                     continue;
                 }
                 LinkedHashMap<String, Object> pod = (LinkedHashMap<String, Object>) podObject;
@@ -168,26 +168,26 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 // "metadata" contains "name", "uid" and "creationTimestamp"
                 Object metadataObject = pod.get("metadata");
                 if (!(metadataObject instanceof LinkedHashMap<?, ?>)) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "metadata"));
                     continue;
                 }
                 LinkedHashMap<String, Object> metadata = (LinkedHashMap<String, Object>) metadataObject;
                 Object nameObject = metadata.get("name");
                 if (nameObject == null) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "name"));
                     continue;
                 }
                 Object objectUid = metadata.get("uid");
                 Object creationTimestampObject = metadata.get("creationTimestamp");
                 if (creationTimestampObject == null) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "uid"));
                     continue;
                 }
                 String creationTimestamp = creationTimestampObject.toString();
                 // "status" contains "phase" (which must be "Running") and "podIP"
                 Object statusObject = pod.get("status");
                 if (!(statusObject instanceof LinkedHashMap<?, ?>)) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "status"));
                     continue;
                 }
                 LinkedHashMap<String, Object> status = (LinkedHashMap<String, Object>) statusObject;
@@ -196,7 +196,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 }
                 Object podIPObject = status.get("podIP");
                 if (podIPObject == null) {
-                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod"));
+                    log.warn(sm.getString("kubernetesMembershipProvider.invalidPod", "podIP"));
                     continue;
                 }
                 String podIP = podIPObject.toString();
