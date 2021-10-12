@@ -332,7 +332,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
         if (cookieSameSite == null) {
             // Use processor config
             SameSiteCookies sameSiteCookiesValue = getSameSiteCookies();
-            if (sameSiteCookiesValue.equals(SameSiteCookies.UNSET)) {
+            if (!sameSiteCookiesValue.equals(SameSiteCookies.UNSET)) {
                 buf.append("; SameSite=");
                 buf.append(sameSiteCookiesValue.getValue());
             }
