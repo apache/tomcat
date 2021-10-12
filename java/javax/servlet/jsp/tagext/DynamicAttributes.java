@@ -29,7 +29,7 @@ import javax.servlet.jsp.JspException;
  * value of the attribute.  It is the responsibility of the tag to
  * remember the names and values of the dynamic attributes.
  *
- * @since 2.0
+ * @since JSP 2.0
  */
 public interface DynamicAttributes {
 

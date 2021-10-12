@@ -41,7 +41,7 @@ import javax.servlet.jsp.PageContext;
 /**
  * Provides resolution in EL for the implicit variables of a JSP page.
  *
- * @since 2.1
+ * @since JSP 2.1
  */
 public class ImplicitObjectELResolver extends ELResolver {
 

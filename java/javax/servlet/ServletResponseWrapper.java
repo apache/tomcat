@@ -27,7 +27,7 @@ import java.util.ResourceBundle;
  * This class implements the Wrapper or Decorator pattern. Methods default to
  * calling through to the wrapped response object.
  *
- * @since v 2.3
+ * @since Servlet 2.3
  * @see javax.servlet.ServletResponse
  */
 public class ServletResponseWrapper implements ServletResponse {
@@ -80,7 +80,7 @@ public class ServletResponseWrapper implements ServletResponse {
      * The default behavior of this method is to call
      * setCharacterEncoding(String charset) on the wrapped response object.
      *
-     * @since 2.4
+     * @since Servlet 2.4
      */
     @Override
     public void setCharacterEncoding(String charset) {
@@ -147,7 +147,7 @@ public class ServletResponseWrapper implements ServletResponse {
      * The default behavior of this method is to return getContentType() on the
      * wrapped response object.
      *
-     * @since 2.4
+     * @since Servlet 2.4
      */
     @Override
     public String getContentType() {

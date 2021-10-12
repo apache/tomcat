@@ -107,7 +107,7 @@ public interface HttpSession {
      * Returns the ServletContext to which this session belongs.
      *
      * @return The ServletContext object for the web application
-     * @since 2.3
+     * @since Servlet 2.3
      */
     public ServletContext getServletContext();
 

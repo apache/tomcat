@@ -27,7 +27,7 @@ package javax.servlet.jsp.el;
  * A client invoking the evaluate() method should be ready for the case
  * where ELParseException exceptions are raised. </p>
  *
- * @since 2.0
+ * @since JSP 2.0
  * @deprecated As of JSP 2.1, replaced by javax.el.ValueExpression
  */
 @SuppressWarnings("dep-ann") // TCK signature test fails with annotation

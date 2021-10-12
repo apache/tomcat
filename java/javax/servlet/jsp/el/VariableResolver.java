@@ -29,7 +29,7 @@ package javax.servlet.jsp.el;
  * happen
  * </p>
  *
- * @since 2.0
+ * @since JSP 2.0
  * @deprecated As of JSP 2.1, replaced by javax.el.ELResolver
  */
 @SuppressWarnings("dep-ann")

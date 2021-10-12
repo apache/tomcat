@@ -21,7 +21,7 @@ package javax.servlet.jsp.tagext;
  * This class is instantiated from the Tag Library Descriptor file (TLD)
  * and is available only at translation time.
  *
- * @since 2.0
+ * @since JSP 2.0
  */
 public class FunctionInfo {
 

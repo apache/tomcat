@@ -25,7 +25,7 @@ import java.util.EventListener;
  * web application.
  *
  * @see HttpSessionEvent
- * @since v 2.3
+ * @since Servlet 2.3
  */
 public interface HttpSessionListener extends EventListener {
 

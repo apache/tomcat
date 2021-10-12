@@ -56,7 +56,7 @@ public class JspTagException extends JspException {
      *            the <code>Throwable</code> exception that interfered with the
      *            JSP Tag's normal operation, making this JSP Tag exception
      *            necessary
-     * @since 2.0
+     * @since JSP 2.0
      */
     public JspTagException(String message, Throwable rootCause) {
         super(message, rootCause);
@@ -77,7 +77,7 @@ public class JspTagException extends JspException {
      *            the <code>Throwable</code> exception that interfered with the
      *            JSP Tag's normal operation, making the JSP Tag exception
      *            necessary
-     * @since 2.0
+     * @since JSP 2.0
      */
     public JspTagException(Throwable rootCause) {
         super(rootCause);

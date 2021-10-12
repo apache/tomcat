@@ -31,9 +31,9 @@ import javax.servlet.jsp.JspContext;
 import javax.servlet.jsp.PageContext;
 
 /**
-*
-* @since 2.1
-*/
+ *
+ * @since JSP 2.1
+ */
 public class ScopedAttributeELResolver extends ELResolver {
 
     // Indicates if a performance short-cut is available

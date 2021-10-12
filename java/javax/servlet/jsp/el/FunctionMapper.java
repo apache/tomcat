@@ -22,7 +22,7 @@ package javax.servlet.jsp.el;
  * <p>Classes implementing this interface may, for instance, consult tag library
  * information to resolve the map. </p>
  *
- * @since 2.0
+ * @since JSP 2.0
  * @deprecated As of JSP 2.1, replaced by javax.el.FunctionMapper
  */
 @SuppressWarnings("dep-ann") // TCK signature test fails with annotation
