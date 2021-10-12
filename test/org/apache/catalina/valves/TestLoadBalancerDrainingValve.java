@@ -17,7 +17,10 @@ package org.apache.catalina.valves;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.SessionCookieConfig;
@@ -34,6 +37,7 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardPipeline;
+import org.apache.tomcat.util.descriptor.web.Constants;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -191,12 +195,8 @@ public class TestLoadBalancerDrainingValve {
     private static class CookieConfig implements SessionCookieConfig {
 
         private String name;
-        private String domain;
-        private String path;
-        private String comment;
-        private boolean httpOnly;
-        private boolean secure;
-        private int maxAge;
+
+        private final Map<String,String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         @Override
         public String getName() {
@@ -208,51 +208,75 @@ public class TestLoadBalancerDrainingValve {
         }
         @Override
         public String getDomain() {
-            return domain;
+            return attributes.get(Constants.COOKIE_DOMAIN_ATTR);
         }
         @Override
         public void setDomain(String domain) {
-            this.domain = domain;
+            attributes.put(Constants.COOKIE_DOMAIN_ATTR, domain);
         }
         @Override
         public String getPath() {
-            return path;
+            return attributes.get(Constants.COOKIE_PATH_ATTR);
         }
         @Override
         public void setPath(String path) {
-            this.path = path;
+            attributes.put(Constants.COOKIE_PATH_ATTR, path);
         }
         @Override
         public String getComment() {
-            return comment;
+            return attributes.get(Constants.COOKIE_COMMENT_ATTR);
         }
         @Override
         public void setComment(String comment) {
-            this.comment = comment;
+            attributes.put(Constants.COOKIE_COMMENT_ATTR, comment);
         }
         @Override
         public boolean isHttpOnly() {
-            return httpOnly;
+            String httpOnly = getAttribute(Constants.COOKIE_HTTP_ONLY_ATTR);
+            if (httpOnly == null) {
+                return false;
+            }
+            return Boolean.parseBoolean(httpOnly);
         }
         @Override
         public void setHttpOnly(boolean httpOnly) {
-            this.httpOnly = httpOnly;
+            setAttribute(Constants.COOKIE_HTTP_ONLY_ATTR, Boolean.toString(httpOnly));
         }
         @Override
         public boolean isSecure() {
-            return secure;
+            String secure = getAttribute(Constants.COOKIE_SECURE_ATTR);
+            if (secure == null) {
+                return false;
+            }
+            return Boolean.parseBoolean(secure);
         }
         @Override
         public void setSecure(boolean secure) {
-            this.secure = secure;
+            setAttribute(Constants.COOKIE_SECURE_ATTR, Boolean.toString(secure));
         }
         @Override
         public int getMaxAge() {
-            return maxAge;
+            String maxAge = getAttribute(Constants.COOKIE_MAX_AGE_ATTR);
+            if (maxAge == null) {
+                return -1;
+            }
+            return Integer.parseInt(maxAge);
         }
         @Override
         public void setMaxAge(int maxAge) {
-            this.maxAge = maxAge;
+            setAttribute(Constants.COOKIE_MAX_AGE_ATTR, Integer.toString(maxAge));
+        }
+        @Override
+        public void setAttribute(String name, String value) {
+            attributes.put(name, value);
+        }
+        @Override
+        public String getAttribute(String name) {
+            return attributes.get(name);
+        }
+        @Override
+        public Map<String, String> getAttributes() {
+            return Collections.unmodifiableMap(attributes);
         }
     }
 

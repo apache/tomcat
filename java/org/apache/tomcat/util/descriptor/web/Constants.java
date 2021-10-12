@@ -23,4 +23,12 @@ public class Constants {
 
     public static final String WEB_XML_LOCATION = "/WEB-INF/web.xml";
 
+    // -------------------------------------------------- Cookie attribute names
+    public static final String COOKIE_COMMENT_ATTR = "Comment";
+    public static final String COOKIE_DOMAIN_ATTR = "Domain";
+    public static final String COOKIE_MAX_AGE_ATTR = "Max-Age";
+    public static final String COOKIE_PATH_ATTR = "Path";
+    public static final String COOKIE_SECURE_ATTR = "Secure";
+    public static final String COOKIE_HTTP_ONLY_ATTR = "HttpOnly";
+    public static final String COOKIE_SAME_SITE_ATTR = "SameSite";
 }

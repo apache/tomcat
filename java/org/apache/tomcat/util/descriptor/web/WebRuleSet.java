@@ -443,6 +443,10 @@ public class WebRuleSet implements RuleSet {
                                "setCookieSecure", 0);
         digester.addCallMethod(fullPrefix + "/session-config/cookie-config/max-age",
                                "setCookieMaxAge", 0);
+        digester.addCallMethod(fullPrefix + "/session-config/cookie-config/attribute",
+                               "setCookieAttribute", 2);
+        digester.addCallParam(fullPrefix + "/session-config/cookie-config/attribute/attribute-name", 0);
+        digester.addCallParam(fullPrefix + "/session-config/cookie-config/attribute/attribute-value", 1);
         digester.addCallMethod(fullPrefix + "/session-config/tracking-mode",
                                "addSessionTrackingMode", 0);
 

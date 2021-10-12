@@ -537,6 +537,96 @@ public class TestWebXml {
                 Assert.assertEquals(StandardCharsets.ISO_8859_1, securityCollection.getCharset());
             }
         }
+    }
 
+
+    @Test
+    public void testMergeSessionCookieConfig01() {
+        WebXml main = new WebXml();
+        WebXml fragmentA = new WebXml();
+        WebXml fragmentB = new WebXml();
+
+        fragmentA.getSessionConfig().setCookieHttpOnly("true");
+        fragmentB.getSessionConfig().setCookieSecure("true");
+
+        Set<WebXml> fragments = new HashSet<>();
+        fragments.add(fragmentA);
+        fragments.add(fragmentB);
+
+        Assert.assertTrue(main.merge(fragments));
+        Assert.assertEquals(Boolean.TRUE, main.getSessionConfig().getCookieHttpOnly());
+        Assert.assertEquals(Boolean.TRUE, main.getSessionConfig().getCookieSecure());
+    }
+
+
+    @Test
+    public void testMergeSessionCookieConfig02() {
+        WebXml main = new WebXml();
+        WebXml fragmentA = new WebXml();
+        WebXml fragmentB = new WebXml();
+
+        fragmentA.getSessionConfig().setCookieHttpOnly("true");
+        fragmentB.getSessionConfig().setCookieHttpOnly("false");
+
+        Set<WebXml> fragments = new HashSet<>();
+        fragments.add(fragmentA);
+        fragments.add(fragmentB);
+
+        Assert.assertFalse(main.merge(fragments));
+    }
+
+
+    @Test
+    public void testMergeSessionCookieConfig03() {
+        WebXml main = new WebXml();
+        WebXml fragmentA = new WebXml();
+        WebXml fragmentB = new WebXml();
+
+        main.getSessionConfig().setCookieHttpOnly("false");
+        fragmentA.getSessionConfig().setCookieHttpOnly("true");
+        fragmentB.getSessionConfig().setCookieSecure("true");
+
+        Set<WebXml> fragments = new HashSet<>();
+        fragments.add(fragmentA);
+        fragments.add(fragmentB);
+
+        Assert.assertTrue(main.merge(fragments));
+        Assert.assertEquals(Boolean.FALSE, main.getSessionConfig().getCookieHttpOnly());
+        Assert.assertEquals(Boolean.TRUE, main.getSessionConfig().getCookieSecure());
+    }
+
+
+    @Test
+    public void testMergeSessionCookieConfig04() {
+        WebXml main = new WebXml();
+        WebXml fragmentA = new WebXml();
+        WebXml fragmentB = new WebXml();
+
+        fragmentA.getSessionConfig().setCookieAttribute("aaa", "bbb");
+        fragmentB.getSessionConfig().setCookieAttribute("AAA", "bbb");
+
+        Set<WebXml> fragments = new HashSet<>();
+        fragments.add(fragmentA);
+        fragments.add(fragmentB);
+
+        Assert.assertTrue(main.merge(fragments));
+        Assert.assertEquals("bbb", main.getSessionConfig().getCookieAttribute("aAa"));
+    }
+
+
+    @Test
+    public void testMergeSessionCookieConfig05() {
+        WebXml main = new WebXml();
+        WebXml fragmentA = new WebXml();
+        WebXml fragmentB = new WebXml();
+
+        fragmentA.getSessionConfig().setCookieAttribute("aaa", "bBb");
+        fragmentB.getSessionConfig().setCookieAttribute("AAA", "bbb");
+
+        Set<WebXml> fragments = new HashSet<>();
+        fragments.add(fragmentA);
+        fragments.add(fragmentB);
+
+        Assert.assertFalse(main.merge(fragments));
     }
 }

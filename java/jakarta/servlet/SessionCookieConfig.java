@@ -16,6 +16,8 @@
  */
 package jakarta.servlet;
 
+import java.util.Map;
+
 /**
  * Configures the session cookies used by the web application associated with
  * the ServletContext from which this SessionCookieConfig was obtained.
@@ -142,4 +144,48 @@ public interface SessionCookieConfig {
      * @return the maximum age in seconds
      */
     public int getMaxAge();
+
+    /**
+     * Sets the value for the given session cookie attribute. When a value is
+     * set via this method, the value returned by the attribute specific getter
+     * (if any) must be consistent with the value set via this method.
+     *
+     * @param name  Name of attribute to set
+     * @param value Value of attribute
+     *
+     * @throws IllegalStateException if the associated ServletContext has
+     *         already been initialised
+     *
+     * @throws IllegalArgumentException If the attribute name is null or
+     *         contains any characters not permitted for use in Cookie names.
+     *
+     * @throws NumberFormatException If the attribute is known to be numerical
+     *         but the provided value cannot be parsed to a number.
+     *
+     * @since Servlet 6.0
+     */
+    public void setAttribute(String name, String value);
+
+    /**
+     * Obtain the value for a sesison cookie given attribute. Values returned
+     * from this method must be consistent with the values set and returned by
+     * the attribute specific getters and setters in this class.
+     *
+     * @param name  Name of attribute to return
+     *
+     * @return Value of specified attribute
+     *
+     * @since Servlet 6.0
+     */
+    public String getAttribute(String name);
+
+    /**
+     * Obtain the Map of attributes and values (excluding version) for this
+     * session cookie.
+     *
+     * @return A read-only Map of attributes to values, excluding version.
+     *
+     * @since Servlet 6.0
+     */
+    public Map<String,String> getAttributes();
 }

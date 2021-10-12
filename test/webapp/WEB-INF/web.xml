@@ -327,4 +327,12 @@
     <mapped-name>Bug53465MappedName</mapped-name>
   </env-entry>
 
+  <session-config>
+    <cookie-config>
+      <attribute>
+        <attribute-name>aaa</attribute-name>
+        <attribute-value>bbb</attribute-value>
+      </attribute>
+    </cookie-config>
+  </session-config>
 </web-app>

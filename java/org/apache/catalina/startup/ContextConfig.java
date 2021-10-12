@@ -1567,20 +1567,11 @@ public class ContextConfig implements LifecycleListener {
                 context.setSessionTimeout(
                         sessionConfig.getSessionTimeout().intValue());
             }
-            SessionCookieConfig scc =
-                context.getServletContext().getSessionCookieConfig();
+            SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
             scc.setName(sessionConfig.getCookieName());
-            scc.setDomain(sessionConfig.getCookieDomain());
-            scc.setPath(sessionConfig.getCookiePath());
-            scc.setComment(sessionConfig.getCookieComment());
-            if (sessionConfig.getCookieHttpOnly() != null) {
-                scc.setHttpOnly(sessionConfig.getCookieHttpOnly().booleanValue());
-            }
-            if (sessionConfig.getCookieSecure() != null) {
-                scc.setSecure(sessionConfig.getCookieSecure().booleanValue());
-            }
-            if (sessionConfig.getCookieMaxAge() != null) {
-                scc.setMaxAge(sessionConfig.getCookieMaxAge().intValue());
+            Map<String,String> attributes = sessionConfig.getCookieAttributes();
+            for (Map.Entry<String,String> attribute : attributes.entrySet()) {
+                scc.setAttribute(attribute.getKey(), attribute.getValue());
             }
             if (sessionConfig.getSessionTrackingModes().size() > 0) {
                 context.getServletContext().setSessionTrackingModes(
