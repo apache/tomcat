@@ -48,7 +48,7 @@ public class TagInfo {
     /**
      * Static constant for getBodyContent() when it is scriptless.
      *
-     * @since 2.0
+     * @since JSP 2.0
      */
     public static final String BODY_CONTENT_SCRIPTLESS = "scriptless";
 
@@ -180,7 +180,7 @@ public class TagInfo {
      * @param tvi An array of a TagVariableInfo (or null)
      * @param dynamicAttributes True if supports dynamic attributes
      *
-     * @since 2.0
+     * @since JSP 2.0
      */
     public TagInfo(String tagName,
             String tagClassName,
@@ -275,7 +275,7 @@ public class TagInfo {
      * @param data The translation-time TagData instance.
      * @return A null object, or zero length array if no errors, an
      *     array of ValidationMessages otherwise.
-     * @since 2.0
+     * @since JSP 2.0
      */
     public ValidationMessage[] validate( TagData data ) {
         TagExtraInfo tei = getTagExtraInfo();
@@ -426,7 +426,7 @@ public class TagInfo {
      * Get dynamicAttributes associated with this TagInfo.
      *
      * @return True if tag handler supports dynamic attributes
-     * @since 2.0
+     * @since JSP 2.0
      */
     public boolean hasDynamicAttributes() {
         return dynamicAttributes;

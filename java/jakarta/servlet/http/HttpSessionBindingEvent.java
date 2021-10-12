@@ -114,7 +114,7 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
      *         value of the removed attribute. If the attribute was replaced,
      *         this is the old value of the attribute.
      *
-     * @since 2.3
+     * @since Servlet 2.3
      */
     public Object getValue() {
         return this.value;

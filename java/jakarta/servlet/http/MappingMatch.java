@@ -19,7 +19,7 @@ package jakarta.servlet.http;
 /**
  * Represents the ways that a request can be mapped to a servlet
  *
- * @since 4.0
+ * @since Servlet 4.0
  */
 public enum MappingMatch {
 
