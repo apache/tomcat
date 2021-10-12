@@ -30,7 +30,7 @@ import javax.servlet.jsp.PageContext;
  * setParent() instead. A classic Tag Handler can call getAdaptee() to retrieve
  * the encapsulated SimpleTag instance.
  *
- * @since 2.0
+ * @since JSP 2.0
  */
 public class TagAdapter implements Tag {
     /** The simple tag that's being adapted. */

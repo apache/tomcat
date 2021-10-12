@@ -20,7 +20,7 @@ package javax.servlet.http;
  * This is the class representing event notifications for changes to sessions
  * within a web application.
  *
- * @since v 2.3
+ * @since Servlet 2.3
  */
 public class HttpSessionEvent extends java.util.EventObject {
     private static final long serialVersionUID = 1L;

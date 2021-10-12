@@ -30,7 +30,7 @@ package javax.servlet.jsp;
  * @see javax.servlet.jsp.tagext.SimpleTag#doTag
  * @see javax.servlet.jsp.tagext.JspFragment#invoke
  * @see javax.servlet.jsp.tagext.Tag#doEndTag
- * @since 2.0
+ * @since JSP 2.0
  */
 public class SkipPageException extends JspException {
 

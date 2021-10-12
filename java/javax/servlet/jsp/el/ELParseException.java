@@ -20,7 +20,7 @@ package javax.servlet.jsp.el;
 /**
  * Represents a parsing error encountered while parsing an EL expression.
  *
- * @since 2.0
+ * @since JSP 2.0
  * @deprecated As of JSP 2.1, replaced by javax.el.ELException
  */
 @SuppressWarnings("dep-ann") // TCK signature test fails with annotation

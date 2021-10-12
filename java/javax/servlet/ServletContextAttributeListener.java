@@ -25,7 +25,7 @@ import java.util.EventListener;
  * deployment descriptor for the web application.
  *
  * @see ServletContextAttributeEvent
- * @since v 2.3
+ * @since Servlet 2.3
  */
 
 public interface ServletContextAttributeListener extends EventListener {

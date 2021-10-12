@@ -23,7 +23,7 @@ package javax.servlet.jsp;
  * isErrorPage attribute of the page directive to "true".
  *
  * @see PageContext#getErrorData
- * @since 2.0
+ * @since JSP 2.0
  */
 public final class ErrorData {
 

@@ -68,7 +68,7 @@ import javax.servlet.jsp.JspContext;
  * </ol>
  *
  * @see SimpleTagSupport
- * @since 2.0
+ * @since JSP 2.0
  */
 public interface SimpleTag extends JspTag {
 

@@ -80,7 +80,7 @@ public interface ServletResponse {
      *
      * @return a <code>String</code> specifying the content type, for example,
      *         <code>text/html; charset=UTF-8</code>, or null
-     * @since 2.4
+     * @since Servlet 2.4
      */
     public String getContentType();
 
@@ -158,7 +158,7 @@ public interface ServletResponse {
      *            Character Sets
      *            (http://www.iana.org/assignments/character-sets)
      * @see #setContentType #setLocale
-     * @since 2.4
+     * @since Servlet 2.4
      */
     public void setCharacterEncoding(String charset);
 
@@ -272,7 +272,7 @@ public interface ServletResponse {
      * @see #getBufferSize
      * @see #isCommitted
      * @see #reset
-     * @since 2.3
+     * @since Servlet 2.3
      */
     public void resetBuffer();
 

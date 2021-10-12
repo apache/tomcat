@@ -25,7 +25,7 @@ import javax.el.ExpressionFactory;
  * Stores <i>application</i>-scoped information for the JSP container.
  * </p>
  *
- * @since 2.1
+ * @since JSP 2.1
  */
 public interface JspApplicationContext {
 

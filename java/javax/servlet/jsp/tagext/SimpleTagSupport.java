@@ -30,7 +30,7 @@ import javax.servlet.jsp.JspException;
  * convenience methods including getter methods for the properties in
  * SimpleTag.
  *
- * @since 2.0
+ * @since JSP 2.0
  */
 public class SimpleTagSupport implements SimpleTag {
     /** Reference to the enclosing tag. */

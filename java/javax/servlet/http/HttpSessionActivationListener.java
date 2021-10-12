@@ -25,7 +25,7 @@ import java.util.EventListener;
  * to notify all attributes bound to sessions implementing
  * HttpSessionActivationListener.
  *
- * @since 2.3
+ * @since Servlet 2.3
  */
 public interface HttpSessionActivationListener extends EventListener {
 

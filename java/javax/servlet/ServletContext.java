@@ -751,7 +751,7 @@ public interface ServletContext {
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
      * @throws ServletException TODO
-     * @since Servlet 3.
+     * @since Servlet 3.0
      */
     public <T extends Filter> T createFilter(Class<T> c) throws ServletException;
 
