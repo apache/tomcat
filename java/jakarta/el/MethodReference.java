@@ -21,6 +21,8 @@ import java.util.Arrays;
 
 /**
  * Provides information about the method to which a method expression resolves.
+ *
+ * @since EL 5.0
  */
 public class MethodReference {
 

@@ -20,7 +20,7 @@ package jakarta.servlet.jsp.el;
  * Represents any of the exception conditions that arise during the operation
  * evaluation of the evaluator.
  *
- * @since 2.0
+ * @since JSP 2.0
  * @deprecated As of JSP 2.1, replaced by jakarta.el.ELException
  */
 @Deprecated

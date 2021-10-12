@@ -217,6 +217,8 @@ public interface ServerEndpointConfig extends EndpointConfig {
          * Return the platform default configurator.
          *
          * @return the platform default configurator
+         *
+         * @since WebSocket 2.1
          */
         public ServerEndpointConfig.Configurator getContainerDefaultConfigurator() {
             return fetchContainerDefaultConfigurator();

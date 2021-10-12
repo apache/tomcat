@@ -44,6 +44,8 @@ public interface JspPropertyGroupDescriptor {
      * error for this group?
      *
      * @return {@code true} if an error will be triggered, otherwise {@code false}
+     *
+     * @since Servlet 6.0
      */
     public String getErrorOnELNotFound();
 

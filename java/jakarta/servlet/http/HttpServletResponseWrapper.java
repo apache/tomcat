@@ -29,7 +29,7 @@ import jakarta.servlet.ServletResponseWrapper;
  * Servlet. This class implements the Wrapper or Decorator pattern. Methods
  * default to calling through to the wrapped response object.
  *
- * @since v 2.3
+ * @since Servlet 2.3
  * @see jakarta.servlet.http.HttpServletResponse
  */
 public class HttpServletResponseWrapper extends ServletResponseWrapper

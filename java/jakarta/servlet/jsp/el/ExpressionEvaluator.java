@@ -50,7 +50,7 @@ package jakarta.servlet.jsp.el;
  * <li><code>${my:reverse('hello')}</code></li>
  * </ul>
  *
- * @since 2.0
+ * @since JSP 2.0
  * @deprecated As of JSP 2.1, replaced by jakarta.el.ExpressionFactory
  */
 @Deprecated

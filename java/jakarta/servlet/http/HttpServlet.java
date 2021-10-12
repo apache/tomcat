@@ -98,7 +98,7 @@ public abstract class HttpServlet extends GenericServlet {
     /**
      * @deprecated May be removed in a future release
      *
-     * @since 6.0
+     * @since Servlet 6.0
      */
     @Deprecated
     public static final String LEGACY_DO_HEAD = "jakarta.servlet.http.legacyDoHead";

@@ -54,6 +54,8 @@ public interface ServerContainer extends WebSocketContainer {
      *                                       Servlet container
      * @throws IOException if an I/O error occurs during the establishment of a WebSocket connection
      * @throws DeploymentException if a configuration error prevents the establishment of a WebSocket connection
+     *
+     * @since WebSocket 2.0
      */
     public void upgradeHttpToWebSocket(Object httpServletRequest, Object httpServletResponse, ServerEndpointConfig sec,
             Map<String,String> pathParameters) throws IOException, DeploymentException;

@@ -50,7 +50,7 @@ import jakarta.servlet.jsp.JspException;
  * JspFragment. Upon construction, a discriminator can be passed to
  * select which fragment that instance will execute.
  *
- * @since 2.0
+ * @since JSP 2.0
  */
 public abstract class JspFragment {
 
