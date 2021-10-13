@@ -135,50 +135,60 @@ public class TestHttpServletDoHead extends Http2TestBase {
 
     @Test
     public void testDoHeadHttp2() throws Exception {
-        http2Connect();
+        StringBuilder debug = new StringBuilder();
+        try {
+            http2Connect();
 
-        // Get request
-        byte[] frameHeaderGet = new byte[9];
-        ByteBuffer headersPayloadGet = ByteBuffer.allocate(128);
-        buildGetRequest(frameHeaderGet, headersPayloadGet, null, 3, "/test");
-        writeFrame(frameHeaderGet, headersPayloadGet);
+            // Get request
+            byte[] frameHeaderGet = new byte[9];
+            ByteBuffer headersPayloadGet = ByteBuffer.allocate(128);
+            buildGetRequest(frameHeaderGet, headersPayloadGet, null, 3, "/test");
+            writeFrame(frameHeaderGet, headersPayloadGet);
 
-        // Want the headers frame for stream 3
-        parser.readFrame(true);
-        while (!output.getTrace().startsWith("3-HeadersStart\n")) {
-            output.clearTrace();
+            // Want the headers frame for stream 3
             parser.readFrame(true);
-        }
-        String traceGet = output.getTrace();
-        output.clearTrace();
-
-        // Head request
-        byte[] frameHeaderHead = new byte[9];
-        ByteBuffer headersPayloadHead = ByteBuffer.allocate(128);
-        buildHeadRequest(frameHeaderHead, headersPayloadHead, 5, "/test");
-        writeFrame(frameHeaderHead, headersPayloadHead);
-
-        // Want the headers frame for stream 5
-        parser.readFrame(true);
-        while (!output.getTrace().startsWith("5-HeadersStart\n")) {
+            while (!output.getTrace().startsWith("3-HeadersStart\n")) {
+                debug.append(output.getTrace());
+                output.clearTrace();
+                parser.readFrame(true);
+            }
+            String traceGet = output.getTrace();
+            debug.append(output.getTrace());
             output.clearTrace();
+
+            // Head request
+            byte[] frameHeaderHead = new byte[9];
+            ByteBuffer headersPayloadHead = ByteBuffer.allocate(128);
+            buildHeadRequest(frameHeaderHead, headersPayloadHead, 5, "/test");
+            writeFrame(frameHeaderHead, headersPayloadHead);
+
+            // Want the headers frame for stream 5
             parser.readFrame(true);
+            while (!output.getTrace().startsWith("5-HeadersStart\n")) {
+                debug.append(output.getTrace());
+                output.clearTrace();
+                parser.readFrame(true);
+            }
+            String traceHead = output.getTrace();
+            debug.append(output.getTrace());
+
+            String[] getHeaders = traceGet.split("\n");
+            String[] headHeaders = traceHead.split("\n");
+
+            int i = 0;
+            for (; i < getHeaders.length; i++) {
+                // Headers should be the same, ignoring the first character which is the steam ID
+                Assert.assertEquals(getHeaders[i] + "\n" + traceGet + traceHead, '3', getHeaders[i].charAt(0));
+                Assert.assertEquals(headHeaders[i] + "\n" + traceGet + traceHead, '5', headHeaders[i].charAt(0));
+                Assert.assertEquals(traceGet + traceHead, getHeaders[i].substring(1), headHeaders[i].substring(1));
+            }
+
+            // Stream 5 should have one more trace entry
+            Assert.assertEquals("5-EndOfStream", headHeaders[i]);
+        } catch (Exception t) {
+            System.out.println(debug.toString());
+            throw t;
         }
-        String traceHead = output.getTrace();
-
-        String[] getHeaders = traceGet.split("\n");
-        String[] headHeaders = traceHead.split("\n");
-
-        int i = 0;
-        for (; i < getHeaders.length; i++) {
-            // Headers should be the same, ignoring the first character which is the steam ID
-            Assert.assertEquals(getHeaders[i] + "\n" + traceGet + traceHead, '3', getHeaders[i].charAt(0));
-            Assert.assertEquals(headHeaders[i] + "\n" + traceGet + traceHead, '5', headHeaders[i].charAt(0));
-            Assert.assertEquals(traceGet + traceHead, getHeaders[i].substring(1), headHeaders[i].substring(1));
-        }
-
-        // Stream 5 should have one more trace entry
-        Assert.assertEquals("5-EndOfStream", headHeaders[i]);
     }
 
 
