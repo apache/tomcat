@@ -1149,6 +1149,7 @@ public class CoyoteAdapter implements Adapter {
         final byte[] b = uriBC.getBytes();
         final int start = uriBC.getStart();
         int end = uriBC.getEnd();
+        boolean appendedSlash = false;
 
         // An empty URL is not acceptable
         if (start == end) {
@@ -1197,6 +1198,7 @@ public class CoyoteAdapter implements Adapter {
                     && (b[end - 3] == (byte) '/'))) {
                 b[end] = (byte) '/';
                 end++;
+                appendedSlash = true;
             }
         }
 
@@ -1241,8 +1243,13 @@ public class CoyoteAdapter implements Adapter {
             index = index2;
         }
 
-        return true;
+        // If a slash was appended to help normalize "/." or "/.." then remove
+        // any trailing "/" from the result unless the result is "/".
+        if (appendedSlash && end > 1 && b[end - 1]== '/') {
+            uriBC.setEnd(end -1);
+        }
 
+        return true;
     }
 
 

@@ -328,10 +328,18 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         doTestNormalize("/foo/../bar", "/bar");
     }
 
+    @Test
+    public void testNormalize02() {
+        doTestNormalize("/foo/.", "/foo");
+    }
+
     private void doTestNormalize(String input, String expected) {
         MessageBytes mb = MessageBytes.newInstance();
         byte[] b = input.getBytes(StandardCharsets.UTF_8);
-        mb.setBytes(b, 0, b.length);
+        // Need to allow an extra byte in case '/' is appended during processing
+        byte[] b2 = new byte[b.length + 1];
+        System.arraycopy(b, 0, b2, 0, b.length);
+        mb.setBytes(b2, 0, b.length);
 
         boolean result = CoyoteAdapter.normalize(mb, false);
         mb.toString();

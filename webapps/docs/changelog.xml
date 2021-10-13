@@ -122,6 +122,10 @@
         aligns Apache Tomcat with recent changes in the Jakarta Servlet
         specification project. (markt)
       </add>
+      <fix>
+        Do not add a trailing <code>/</code> to a request URI during
+        canonicalization. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
