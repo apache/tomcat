@@ -126,6 +126,10 @@
         Do not add a trailing <code>/</code> to a request URI during
         canonicalization. (markt)
       </fix>
+      <fix>
+        Invalid byte sequences (typically in %nn form) in a request URi that are
+        not valid for the given URI encoding now trigger a 400 response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
