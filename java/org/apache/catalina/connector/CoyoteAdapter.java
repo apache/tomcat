@@ -911,7 +911,10 @@ public class CoyoteAdapter implements Adapter {
         req.decodedURI().toBytes();
 
         ByteChunk uriBC = req.decodedURI().getByteChunk();
-        int semicolon = uriBC.indexOf(';', 0);
+        // The first character must always be '/' so start search at position 1.
+        // If the first character is ';' the URI will be rejected at the
+        // normalization stage
+        int semicolon = uriBC.indexOf(';', 1);
         // Performance optimisation. Return as soon as it is known there are no
         // path parameters;
         if (semicolon == -1) {
