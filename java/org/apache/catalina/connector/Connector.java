@@ -296,6 +296,9 @@ public class Connector extends LifecycleMBeanBase  {
     protected boolean useBodyEncodingForURI = false;
 
 
+    private boolean rejectSuspiciousURIs;
+
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -911,6 +914,16 @@ public class Connector extends LifecycleMBeanBase  {
 
     public EncodedSolidusHandling getEncodedSolidusHandlingInternal() {
         return encodedSolidusHandling;
+    }
+
+
+    public boolean getRejectSuspiciousURIs() {
+        return rejectSuspiciousURIs;
+    }
+
+
+    public void setRejectSuspiciousURIs(boolean rejectSuspiciousURIs) {
+        this.rejectSuspiciousURIs = rejectSuspiciousURIs;
     }
 
 

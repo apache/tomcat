@@ -46,6 +46,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.ServerCookies;
@@ -631,6 +632,12 @@ public class CoyoteAdapter implements Adapter {
         MessageBytes decodedURI = req.decodedURI();
 
         if (undecodedURI.getType() == MessageBytes.T_BYTES) {
+            if (connector.getRejectSuspiciousURIs()) {
+                if (checkSuspiciousURIs(undecodedURI.getByteChunk())) {
+                    response.sendError(400, "Invalid URI");
+                }
+            }
+
             // Copy the raw URI to the decodedURI
             decodedURI.duplicate(undecodedURI);
 
@@ -661,6 +668,8 @@ public class CoyoteAdapter implements Adapter {
              *   non-normalized URI
              * - req.decodedURI() has been set to the decoded, normalized form
              *   of req.requestURI()
+             * - 'suspicious' URI filtering - if required - has already been
+             *   performed
              */
             decodedURI.toChars();
             // Remove all path parameters; any needed path parameter should be set
@@ -1267,5 +1276,87 @@ public class CoyoteAdapter implements Adapter {
      */
     protected static void copyBytes(byte[] b, int dest, int src, int len) {
         System.arraycopy(b, src, b, dest, len);
+    }
+
+
+    /*
+     * Examine URI segment by segment for 'suspicious' URIs.
+     */
+    private static boolean checkSuspiciousURIs(ByteChunk undecodedURI) {
+        byte[] bytes = undecodedURI.getBytes();
+        int start = undecodedURI.getStart();
+        int end = undecodedURI.getEnd();
+        int segmentStart = -1;
+        int segmentEnd = -1;
+
+        // Find first segment
+        segmentStart = undecodedURI.indexOf('/', 0);
+        if (segmentStart > -1) {
+            segmentEnd = undecodedURI.indexOf('/', segmentStart + 1);
+        }
+
+        while (segmentStart > -1) {
+            int pos = start + segmentStart + 1;
+
+            // Empty segment other than final segment with path parameters
+            if (segmentEnd > 0 && bytes[pos] == ';') {
+                return true;
+            }
+
+            // encoded dot-segments and/or dot-segments with path parameters
+            int dotCount = 0;
+            boolean encodedDot = false;
+            while (pos < end) {
+                if (bytes[pos] == '.') {
+                    dotCount++;
+                    pos++;
+                } else if (pos + 2 < end && bytes[pos] == '%' && bytes[pos + 1] == '2' && (bytes[pos+2] == 'e' || bytes[pos+2] == 'E')) {
+                    encodedDot = true;
+                    dotCount++;
+                    pos += 3;
+                } else if (bytes[pos] == ';') {
+                    if (dotCount > 0) {
+                        return true;
+                    }
+                    break;
+                } else if (bytes[pos] == '/') {
+                    break;
+                } else {
+                    dotCount = 0;
+                    break;
+                }
+            }
+            if (dotCount > 0 && encodedDot) {
+                return true;
+            }
+
+            // %nn encoded controls or '/'
+            pos = start + segmentStart + 1;
+            while (pos < end) {
+                if (pos + 2 < end && bytes[pos] == '%') {
+                    byte b1 = bytes[pos + 1];
+                    byte b2 = bytes[pos + 2];
+                    pos += 3;
+                    int decoded = (HexUtils.getDec(b1) << 4) + HexUtils.getDec(b2);
+                    if (decoded < 20 || decoded == 0x7F || decoded == 0x2F) {
+                        return true;
+                    }
+                } else {
+                    pos++;
+                }
+            }
+
+            // Move to next segment
+            if (segmentEnd == -1) {
+                segmentStart = -1;
+            } else {
+                segmentStart = segmentEnd;
+                if (segmentStart > -1) {
+                    segmentEnd = undecodedURI.indexOf('/', segmentStart + 1);
+                }
+            }
+        }
+
+        return false;
     }
 }

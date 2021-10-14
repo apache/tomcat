@@ -261,6 +261,12 @@
       number specified here.</p>
     </attribute>
 
+    <attribute name="rejectSuspiciousURIs" required="false">
+      <p>Should this <strong>Connector</strong> reject a requests if the URI
+      matches one of the suspicious URIs patterns identified by the Servlet 6.0
+      specification? The default value is <code>false</code>.</p>
+    </attribute>
+
     <attribute name="scheme" required="false">
       <p>Set this attribute to the name of the protocol you wish to have
       returned by calls to <code>request.getScheme()</code>.  For

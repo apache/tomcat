@@ -131,8 +131,13 @@
         not valid for the given URI encoding now trigger a 400 response. (markt)
       </fix>
       <fix>
-        Ensure that a requets URI must start with a <code>/</code>. (markt)
+        Ensure that a request URI starts with a <code>/</code>. (markt)
       </fix>
+      <add>
+        Add a new Connector option, <code>rejectSuspiciousURIs</code> that will
+        causes 'suspicious' (see the Servlet 6.0 specification) URIs to be
+        rejected with a 400 response. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
