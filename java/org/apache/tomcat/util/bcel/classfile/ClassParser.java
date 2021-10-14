@@ -106,8 +106,8 @@ public final class ClassParser {
     /**
      * Reads information about the attributes of the class.
      * @param fieldOrMethod false if processing a class
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException if an I/O occurs reading the the .class file
+     * @throws  ClassFormatException If the .class file is not valid
      */
     private void readAttributes(boolean fieldOrMethod) throws IOException, ClassFormatException {
         final int attributes_count = dataInputStream.readUnsignedShort();
@@ -147,8 +147,8 @@ public final class ClassParser {
 
     /**
      * Reads information about the class and its super class.
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException if an I/O occurs reading the the .class file
+     * @throws  ClassFormatException If the .class file is not valid
      */
     private void readClassInfo() throws IOException, ClassFormatException {
         accessFlags = dataInputStream.readUnsignedShort();
@@ -178,8 +178,8 @@ public final class ClassParser {
 
     /**
      * Reads constant pool entries.
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException if an I/O occurs reading the the .class file
+     * @throws  ClassFormatException If the .class file is not valid
      */
     private void readConstantPool() throws IOException, ClassFormatException {
         constantPool = new ConstantPool(dataInputStream);
@@ -188,8 +188,8 @@ public final class ClassParser {
 
     /**
      * Reads information about the fields of the class, i.e., its variables.
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException if an I/O occurs reading the the .class file
+     * @throws  ClassFormatException If the .class file is not valid
      */
     private void readFields() throws IOException, ClassFormatException {
         final int fields_count = dataInputStream.readUnsignedShort();
@@ -208,8 +208,8 @@ public final class ClassParser {
     /**
      * Checks whether the header of the file is ok.
      * Of course, this has to be the first action on successive file reads.
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException if an I/O occurs reading the the .class file
+     * @throws  ClassFormatException If the .class file is not valid
      */
     private void readID() throws IOException, ClassFormatException {
         if (dataInputStream.readInt() != MAGIC) {
@@ -220,8 +220,8 @@ public final class ClassParser {
 
     /**
      * Reads information about the interfaces implemented by this class.
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException if an I/O occurs reading the the .class file
+     * @throws  ClassFormatException If the .class file is not valid
      */
     private void readInterfaces() throws IOException, ClassFormatException {
         final int interfaces_count = dataInputStream.readUnsignedShort();
@@ -239,8 +239,8 @@ public final class ClassParser {
 
     /**
      * Reads information about the methods of the class.
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException if an I/O occurs reading the the .class file
+     * @throws  ClassFormatException If the .class file is not valid
      */
     private void readMethods() throws IOException, ClassFormatException {
         final int methods_count = dataInputStream.readUnsignedShort();
@@ -257,8 +257,8 @@ public final class ClassParser {
 
     /**
      * Reads major and minor version of compiler which created the file.
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException if an I/O occurs reading the the .class file
+     * @throws  ClassFormatException If the .class file is not valid
      */
     private void readVersion() throws IOException, ClassFormatException {
         // file.readUnsignedShort(); // Unused minor
