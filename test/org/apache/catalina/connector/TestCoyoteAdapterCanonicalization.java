@@ -99,7 +99,7 @@ public class TestCoyoteAdapterCanonicalization extends TomcatBaseTest {
         parameterSets.add(new Object[] { "/;/foo;/;/bar/;/;", "/foo/bar/", Boolean.TRUE, Boolean.FALSE });
         parameterSets.add(new Object[] { "/foo//../bar", "/bar", Boolean.FALSE, Boolean.FALSE });
         parameterSets.add(new Object[] { "/foo/;/../bar", "/bar", Boolean.TRUE, Boolean.FALSE });
-        parameterSets.add(new Object[] { "/foo%E2%82%ACbar", "/foo€bar", Boolean.FALSE, Boolean.FALSE });
+        parameterSets.add(new Object[] { "/foo%E2%82%ACbar", "/foo\u20acbar", Boolean.FALSE, Boolean.FALSE });
         parameterSets.add(new Object[] { "/foo%20bar", "/foo bar", Boolean.FALSE, Boolean.FALSE });
         parameterSets.add(new Object[] { "/foo%E2%82", "/foo%E2%82", Boolean.TRUE, Boolean.TRUE });
         parameterSets.add(new Object[] { "/foo%E2%82bar", "/foo%E2%82bar", Boolean.TRUE, Boolean.TRUE });
@@ -197,7 +197,7 @@ public class TestCoyoteAdapterCanonicalization extends TomcatBaseTest {
             Assert.assertTrue(line + CRLF + body, line.startsWith("HTTP/1.1 " + HttpServletResponse.SC_BAD_REQUEST));
         } else {
             Assert.assertTrue(line + CRLF + body, line.startsWith("HTTP/1.1 " + HttpServletResponse.SC_OK));
-            Assert.assertTrue(line + CRLF + body, body.equals(canonicalizedURI));
+            Assert.assertEquals(line + CRLF + body, canonicalizedURI, body);
         }
     }
 
