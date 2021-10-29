@@ -147,6 +147,10 @@
         Add Javadoc comment which listeners must be nested whithin
         <code>Server</code> elements only. (michaelo)
       </docs>
+      <docs>
+        Document conditions under which the <code>AprLifecycleListener</code>
+        can be used to avoid JVM crashes. (michaelo)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="Coyote">
