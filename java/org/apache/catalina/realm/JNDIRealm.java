@@ -1287,7 +1287,7 @@ public class JNDIRealm extends RealmBase {
             // Return the authenticated Principal (if any)
             return principal;
 
-        } catch (NamingException e) {
+        } catch (Exception e) {
 
             // Log the problem for posterity
             containerLog.error(sm.getString("jndiRealm.exception"), e);
@@ -2402,9 +2402,12 @@ public class JNDIRealm extends RealmBase {
                 // ... and have a password
                 return user.getPassword();
             }
-        } catch (NamingException e) {
+        } catch (Exception e) {
             // Log the problem for posterity
             containerLog.error(sm.getString("jndiRealm.exception"), e);
+            // close the connection so we know it will be reopened.
+            close(connection);
+            closePooledConnections();
             return null;
         }
     }
@@ -2475,7 +2478,7 @@ public class JNDIRealm extends RealmBase {
             // Return the authenticated Principal (if any)
             return principal;
 
-        } catch (NamingException e) {
+        } catch (Exception e) {
             // Log the problem for posterity
             containerLog.error(sm.getString("jndiRealm.exception"), e);
 
@@ -2582,9 +2585,11 @@ public class JNDIRealm extends RealmBase {
      */
     protected void release(JNDIConnection connection) {
         if (connectionPool != null) {
-            if (!connectionPool.push(connection)) {
-                // Any connection that doesn't end back to the pool must be closed
-                close(connection);
+            if (connection != null) {
+                if (!connectionPool.push(connection)) {
+                    // Any connection that doesn't end back to the pool must be closed
+                    close(connection);
+                }
             }
         } else {
             singleConnectionLock.unlock();

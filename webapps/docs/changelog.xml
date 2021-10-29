@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.73 (schultz)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Improve robustness of JNDIRealm for exceptions occurring when getting
+        the connection. Also add missing close when running into issues
+        getting the passord of a user. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <scode>
