@@ -41,6 +41,12 @@ import org.apache.tomcat.util.res.StringManager;
  * and destroy APR.
  * <p>
  * This listener must only be nested within {@link Server} elements.
+ * <p>
+ * <strong>Note</strong>: If you are running Tomcat in an embedded fashion and
+ * have more than one Server instance per JVM, this listener <em>must not</em>
+ * be added to the {@code Server} instances, but handled outside by the calling
+ * code which is bootstrapping the embedded Tomcat instances. Not doing so will
+ * lead to JVM crashes.
  *
  * @since 4.1
  */
