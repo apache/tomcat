@@ -138,6 +138,11 @@
         causes 'suspicious' (see the Servlet 6.0 specification) URIs to be
         rejected with a 400 response. (markt)
       </add>
+      <fix>
+        Improve robustness of JNDIRealm for exceptions occurring when getting
+        the connection. Also add missing close when running into issues
+        getting the passord of a user. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
