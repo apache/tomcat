@@ -115,6 +115,10 @@
         <bug>65684</bug>: Fix a potential <code>NullPointerException</code> when
         using JULI. (markt)
       </fix>
+      <docs>
+        Document conditions under which the <code>AprLifecycleListener</code>
+        can be used to avoid JVM crashes. (michaelo)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="Coyote">
