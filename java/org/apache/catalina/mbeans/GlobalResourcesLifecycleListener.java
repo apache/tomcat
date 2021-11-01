@@ -31,6 +31,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Role;
+import org.apache.catalina.Server;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.juli.logging.Log;
@@ -42,6 +43,8 @@ import org.apache.tomcat.util.modeler.Registry;
  * Implementation of <code>LifecycleListener</code> that instantiates the
  * set of MBeans associated with global JNDI resources that are subject to
  * management.
+ * <p>
+ * This listener must only be nested within {@link Server} elements.
  *
  * @author Craig R. McClanahan
  * @since 4.1
