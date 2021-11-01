@@ -143,6 +143,10 @@
         the connection. Also add missing close when running into issues
         getting the passord of a user. (remm)
       </fix>
+      <docs>
+        Add Javadoc comment which listeners must be nested whithin
+        <code>Server</code> elements only. (michaelo)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="Coyote">

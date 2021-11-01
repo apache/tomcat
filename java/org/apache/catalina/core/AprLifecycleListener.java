@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Server;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Library;
@@ -38,6 +39,8 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Implementation of <code>LifecycleListener</code> that will init and
  * and destroy APR.
+ * <p>
+ * This listener must only be nested within {@link Server} elements.
  *
  * @since 4.1
  */
