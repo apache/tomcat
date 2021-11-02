@@ -32,8 +32,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.startup.SafeForkJoinWorkerThreadFactory;
 import org.apache.catalina.Server;
+import org.apache.catalina.startup.SafeForkJoinWorkerThreadFactory;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -56,6 +56,8 @@ import org.w3c.dom.ls.DOMImplementationLS;
  * Locked files usually occur when a resource inside a JAR is accessed without
  * first disabling Jar URL connection caching. The workaround is to disable this
  * caching by default.
+ * <p>
+ * This listener must only be nested within {@link Server} elements.
  */
 public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
