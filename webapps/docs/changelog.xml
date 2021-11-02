@@ -373,8 +373,12 @@
         and DataSource testing. (remm)
       </update>
       <add>
-        Update the internal fork of Apache Commons FileUpload to 33d2d79
-        (2021-09-01, 2.0-SNAPSHOT). Refactoring and code clean-up. (markt)
+        <bug>65661</bug>: Update the internal fork of Apache Commons FileUpload
+        to 33d2d79 (2021-09-01, 2.0-SNAPSHOT). Refactoring and code clean-up. As
+        a result of Commons File Upload now using
+        <code>java.nio.file.Files</code>, applications using multi-part uploads
+        need to ensure that the JVM is configured with sufficient direct memory
+        to store all in progress multi-part uploads. (markt)
       </add>
       <add>
         Update the internal fork of Apache Commons Pool to 2.11.1 (2021-08-17).
