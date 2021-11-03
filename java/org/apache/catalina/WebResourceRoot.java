@@ -85,7 +85,7 @@ import java.util.Set;
 public interface WebResourceRoot extends Lifecycle {
     /**
      * Obtain the object that represents the resource at the given path. Note
-     * that the resource at that path may not exist. If the path does not
+     * that the resource at that path may not exist. If the resource does not
      * exist, the WebResource returned will be associated with the main
      * WebResourceSet.
      *
@@ -98,7 +98,7 @@ public interface WebResourceRoot extends Lifecycle {
 
     /**
      * Obtain the objects that represent the resource at the given path. Note
-     * that the resource at that path may not exist. If the path does not
+     * that the resource at that path may not exist. If the resource does not
      * exist, the WebResource returned will be associated with the main
      * WebResourceSet. This will include all matches even if the resource would
      * not normally be accessible (e.g. because it was overridden by another
