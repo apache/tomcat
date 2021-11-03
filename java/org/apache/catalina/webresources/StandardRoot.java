@@ -676,14 +676,14 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
-        cacheJmxName = register(cache, getObjectNameKeyProperties() + ",name=Cache");
-
-        registerURLStreamHandlerFactory();
-
         if (context == null) {
             throw new IllegalStateException(
                     sm.getString("standardRoot.noContext"));
         }
+
+        cacheJmxName = register(cache, getObjectNameKeyProperties() + ",name=Cache");
+
+        registerURLStreamHandlerFactory();
 
         for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
