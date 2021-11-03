@@ -45,4 +45,5 @@ bin/setenv.*
 java/org/apache/catalina/startup/catalina.properties
 modules/jdbc-pool/bin
 modules/jdbc-pool/includes
+modules/openssl-panama-foreign/target
 webapps/docs/jdbc-pool.xml
