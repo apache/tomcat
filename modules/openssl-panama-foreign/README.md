@@ -14,6 +14,10 @@ it does. This is the only way to obtain the jextract tool, that is more or less
 required for large libraries. The Panama API from this branch is also
 different from the API present in Java 17.
 
+Clang is a dependency for jextract, and ideally Clang from LLVM 12 should be
+used. It may need explicit declaration to the configure script, using something
+like `--with-libclang=/usr/lib64/llvm12 --with-libclang-version=12`.
+
 ```
 bash configure
 make images
