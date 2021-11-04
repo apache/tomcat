@@ -498,6 +498,17 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return cachingAllowed;
     }
 
+
+    @Override
+    public CacheStrategy getCacheStrategy() {
+        return cache.getCacheStrategy();
+    }
+
+    @Override
+    public void setCacheStrategy(CacheStrategy strategy) {
+        cache.setCacheStrategy(strategy);
+    }
+
     @Override
     public long getCacheTtl() {
         return cache.getTtl();
