@@ -16,13 +16,13 @@
  */
 package org.apache.tomcat.util.http;
 
-import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.res.StringManager;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Enumeration;
+
+import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class is used to contain standard internet message headers,
