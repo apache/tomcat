@@ -168,6 +168,14 @@ public class ContextRuleSet implements RuleSet {
                             "setResources",
                             "org.apache.catalina.WebResourceRoot");
 
+        digester.addObjectCreate(prefix + "Context/Resources/CacheStrategy",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(prefix + "Context/Resources/CacheStrategy");
+        digester.addSetNext(prefix + "Context/Resources/CacheStrategy",
+                            "setCacheStrategy",
+                            "org.apache.catalina.WebResourceRoot$CacheStrategy");
+
         digester.addObjectCreate(prefix + "Context/Resources/PreResources",
                                  null, // MUST be specified in the element
                                  "className");
