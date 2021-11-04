@@ -116,6 +116,11 @@
         Add Javadoc comment which listeners must be nested whithin
         <code>Server</code> elements only. (michaelo)
       </docs>
+      <add>
+        Add support for custom caching strategies for web application resources.
+        This initial implementation allows control over whether or not a
+        resource is cached. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
