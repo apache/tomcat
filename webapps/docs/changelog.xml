@@ -128,6 +128,10 @@
         Refactor the APR/native connector shutdown to reduce the possibility of
         a JVM crash during the connector shutdown. (markt)
       </fix>
+      <add>
+        <pr>457</pr>: Add a <code>toString()</code> method to
+        <code>MimeHeader</code> to aid debugging. (dblevins)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
