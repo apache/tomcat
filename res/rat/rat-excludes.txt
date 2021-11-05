@@ -27,10 +27,9 @@
 
   - *.manifest, MANIFEST.MF JAR manifest files cannot contain license
 
-  - package-list and script.js files in API documentation (javadoc) are
-    generated
+  - Files in API documentation (javadoc) that are generated
 
-  - other test files, such as trivial textual files containing only "OK' string,
+  - test files, such as trivial textual files containing only "OK' string,
     files in unusual encodings or compressed files are also excluded.
 
   - JSON files (RFC7159) are data and cannot contain comments
@@ -55,8 +54,6 @@
 
   - Temporary cache files used by Checkstle
 
-  - Configuration files for third party Continuous Integration systems like Travis CI
-
 
 output/build/logs/*
 output/test-tmp/**
@@ -70,7 +67,12 @@ output/deployer/deployer-howto.html
 **/MANIFEST.MF
 **/*.manifest
 
-output/dist/webapps/docs/*/package-list
+output/dist/webapps/docs/*/element-list
+output/dist/webapps/docs/*/jquery/*
+output/dist/webapps/docs/*/member-search-index.js
+output/dist/webapps/docs/*/package-search-index.js
+output/dist/webapps/docs/*/search.js
+output/dist/webapps/docs/*/type-search-index.js
 output/dist/webapps/docs/*/script.js
 
 output/dist/src/test/webapp/404.html
