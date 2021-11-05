@@ -41,6 +41,16 @@ public class Asn1Parser {
     }
 
 
+    public boolean eof() {
+        return pos == source.length;
+    }
+
+
+    public int peekTag() {
+        return source[pos] & 0xFF;
+    }
+
+
     public void parseTag(int tag) {
         int value = next();
         if (value != tag) {
