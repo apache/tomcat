@@ -54,6 +54,8 @@
 
   - Temporary cache files used by Checkstle
 
+  - Temporary files used by buildbot
+
 
 output/build/logs/*
 output/test-tmp/**
@@ -232,3 +234,4 @@ output/dist/temp/safeToDelete.tmp
 
 output/res/checkstyle/*
 
+tomcat-10.1.x/**
