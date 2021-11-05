@@ -116,7 +116,11 @@ public interface ServletContext {
     public int getMinorVersion();
 
     /**
-     * @return TODO
+     * Obtain the major version of the servlet specification for which this web
+     * application is implemented.
+     *
+     * @return The major version declared in web.xml
+     *
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -125,7 +129,7 @@ public interface ServletContext {
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
      *
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public int getEffectiveMajorVersion();
 
