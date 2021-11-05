@@ -872,11 +872,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 || certificateVerifyMode == SSL_VERIFY_NONE()) {
             return 1;
         }
-        /*SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) -> ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) \
-        || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN) \
-        || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY) \
-        || (errnum == X509_V_ERR_CERT_UNTRUSTED) \
-        || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE))*/
+        /*SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) -> ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT)
+                || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN)
+                || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY)
+                || (errnum == X509_V_ERR_CERT_UNTRUSTED)
+                || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE))*/
         boolean verifyErrorIsOptional = (errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT())
                 || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN())
                 || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY())
@@ -1173,7 +1173,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                     cert = PEM_read_bio_X509_AUX(bio, MemoryAddress.NULL, openSSLCallbackPassword, MemoryAddress.NULL);
                     if (MemoryAddress.NULL.equals(cert) &&
-                            // FIXME: Unfortunately jextract doesn't convert this ERR_GET_REASON(ERR_peek_last_error())
+                            // Missing ERR_GET_REASON(ERR_peek_last_error())
+                            /*int ERR_GET_REASON(unsigned long errcode) {
+                             *    if (ERR_SYSTEM_ERROR(errcode))
+                             *        return errcode & ERR_SYSTEM_MASK;
+                             *    return errcode & ERR_REASON_MASK;
+                             *}
+                             *# define ERR_SYSTEM_ERROR(errcode)      (((errcode) & ERR_SYSTEM_FLAG) != 0)
+                             *# define ERR_SYSTEM_FLAG                ((unsigned int)INT_MAX + 1)
+                             *# define ERR_SYSTEM_MASK                ((unsigned int)INT_MAX)
+                             *# define ERR_REASON_MASK                0X7FFFFF
+                             */
                             ((ERR_peek_last_error() & 0X7FFFFF) == PEM_R_NO_START_LINE())) {
                         ERR_clear_error();
                         BIO_ctrl(bio, BIO_CTRL_RESET(), 0, MemoryAddress.NULL);

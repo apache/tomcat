@@ -1302,10 +1302,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (certificateVerifyMode == -1 /*SSL_CVERIFY_UNSET*/ || certificateVerifyMode == SSL_VERIFY_NONE()) {
             return 1;
         }
-        /*SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) -> ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) \
-                || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN) \
-                || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY) \
-                || (errnum == X509_V_ERR_CERT_UNTRUSTED) \
+        /*SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) -> ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT)
+                || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN)
+                || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY)
+                || (errnum == X509_V_ERR_CERT_UNTRUSTED)
                 || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE))*/
         boolean verifyErrorIsOptional = (errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT())
                 || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN())
@@ -1358,9 +1358,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
         }
 
-        if (ok == 0) {
-            // FIXME: debug logging
-        }
         if (errdepth > certificateVerificationDepth) {
             // Certificate Verification: Certificate Chain too long
             ok = 0;
@@ -1485,7 +1482,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             MemoryAddress buf = bufPointer.get(ValueLayout.ADDRESS, 0);
             // HTTP request with the following header
-            // POST urlPath HTTP/1.0
+            // POST urlPath HTTP/1.1
             // Host: urlHost:urlPort
             // Content-Type: application/ocsp-request
             // Content-Length: ocspRequestData.length
