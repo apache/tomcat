@@ -25,6 +25,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -1403,14 +1404,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                             if (!urls.isEmpty()) {
                                 // Use OpenSSL to build OCSP request
                                 for (String urlString : urls) {
-                                    if (logger.isDebugEnabled()) {
-                                        logger.debug("Processing OCSP URL: " + urlString);
-                                    }
                                     try {
                                         URL url = new URL(urlString);
                                         ocspResponse = processOCSPRequest(url, issuer, x509, x509ctx, scope);
+                                        if (logger.isDebugEnabled()) {
+                                            logger.debug("OCSP response for URL: " + urlString + " was " + ocspResponse);
+                                        }
                                     } catch (MalformedURLException e) {
-                                        logger.warn(sm.getString("engine.invalidOCSPURL"));
+                                        logger.warn(sm.getString("engine.invalidOCSPURL", urlString));
                                     }
                                     if (ocspResponse != V_OCSP_CERTSTATUS_UNKNOWN()) {
                                         break;
@@ -1460,7 +1461,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         MemoryAddress ocspResponse = MemoryAddress.NULL;
         MemoryAddress id = MemoryAddress.NULL;
         MemoryAddress ocspOneReq = MemoryAddress.NULL;
-        HttpsURLConnection connection = null;
+        HttpURLConnection connection = null;
         MemoryAddress basicResponse = MemoryAddress.NULL;
         MemoryAddress certId = MemoryAddress.NULL;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -1489,7 +1490,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // Content-Type: application/ocsp-request
             // Content-Length: ocspRequestData.length
             byte[] ocspRequestData = MemorySegment.ofAddressNative(buf, requestLength, scope).toArray(ValueLayout.JAVA_BYTE);
-            connection = (HttpsURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoInput(true);
             connection.setDoOutput(true);
@@ -1498,7 +1499,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             connection.connect();
             connection.getOutputStream().write(ocspRequestData);
             int responseCode = connection.getResponseCode();
-            if (responseCode != HttpsURLConnection.HTTP_OK) {
+            if (responseCode != HttpURLConnection.HTTP_OK) {
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             InputStream is = connection.getInputStream();
@@ -1524,7 +1525,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                             MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.warn(sm.getString("engine.ocspRequestError", url.toString()), e);
         } finally {
             if (MemoryAddress.NULL.equals(ocspResponse)) {
