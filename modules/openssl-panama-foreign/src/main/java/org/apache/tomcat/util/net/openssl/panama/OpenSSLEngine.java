@@ -16,16 +16,23 @@
  */
 package org.apache.tomcat.util.net.openssl.panama;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
@@ -56,6 +64,7 @@ import static org.apache.tomcat.util.openssl.openssl_h.*;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
@@ -204,6 +213,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private boolean sendHandshakeError = false;
 
     private final boolean clientMode;
+    private final boolean noOcspCheck;
     private final String fallbackApplicationProtocol;
     private final OpenSSLSessionContext sessionContext;
     private final boolean alpn;
@@ -239,7 +249,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     OpenSSLEngine(Cleaner cleaner, MemoryAddress sslCtx, String fallbackApplicationProtocol,
             boolean clientMode, OpenSSLSessionContext sessionContext, boolean alpn,
             boolean initialized, int certificateVerificationDepth,
-            boolean certificateVerificationOptionalNoCA) {
+            boolean certificateVerificationOptionalNoCA, boolean noOcspCheck) {
         if (sslCtx == null) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
@@ -272,6 +282,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         this.alpn = alpn;
         this.initialized = initialized;
         this.certificateVerificationOptionalNoCA = certificateVerificationOptionalNoCA;
+        this.noOcspCheck = noOcspCheck;
     }
 
     @Override
@@ -1280,13 +1291,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    public synchronized int openSSLCallbackVerify(int preverify_ok, MemoryAddress /*X509_STORE_CTX*/ x509_ctx) {
+    public synchronized int openSSLCallbackVerify(int preverify_ok, MemoryAddress /*X509_STORE_CTX*/ x509ctx) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Verification in engine with mode [" + certificateVerifyMode + "]");
+            logger.debug("Verification in engine with mode [" + certificateVerifyMode + "] for " + state.ssl);
         }
         int ok = preverify_ok;
-        int errnum = X509_STORE_CTX_get_error(x509_ctx);
-        int errdepth = X509_STORE_CTX_get_error_depth(x509_ctx);
+        int errnum = X509_STORE_CTX_get_error(x509ctx);
+        int errdepth = X509_STORE_CTX_get_error_depth(x509ctx);
         phaState = PHAState.COMPLETE;
         if (certificateVerifyMode == -1 /*SSL_CVERIFY_UNSET*/ || certificateVerifyMode == SSL_VERIFY_NONE()) {
             return 1;
@@ -1296,12 +1307,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY) \
                 || (errnum == X509_V_ERR_CERT_UNTRUSTED) \
                 || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE))*/
-        if ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT())
+        boolean verifyErrorIsOptional = (errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT())
                 || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN())
                 || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY())
                 || (errnum == X509_V_ERR_CERT_UNTRUSTED())
-                || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE()) &&
-                (certificateVerifyMode == OPTIONAL_NO_CA)) {
+                || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE());
+        if (verifyErrorIsOptional && (certificateVerifyMode == OPTIONAL_NO_CA)) {
             ok = 1;
             SSL_set_verify_result(state.ssl, X509_V_OK());
         }
@@ -1318,10 +1329,35 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
          * the "real" error, as returned by OpenSSL.
          */
         if (ok == 0 && errnum == X509_V_ERR_CRL_HAS_EXPIRED()) {
-            X509_STORE_CTX_set_error(x509_ctx, -1);
+            X509_STORE_CTX_set_error(x509ctx, -1);
         }
-        // FIXME: Implement OCSP again
-        // FIXME: GLORIOUS PURPOSE !!!!!
+
+        // OCSP
+        if (!noOcspCheck && (ok > 0)) {
+            /* If there was an optional verification error, it's not
+             * possible to perform OCSP validation since the issuer may be
+             * missing/untrusted.  Fail in that case.
+             */
+            if (verifyErrorIsOptional) {
+                if (certificateVerifyMode != OPTIONAL_NO_CA) {
+                    X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
+                    errnum = X509_V_ERR_APPLICATION_VERIFICATION();
+                    ok = 0;
+                }
+            } else {
+                int ocspResponse = processOCSP(x509ctx);
+                if (ocspResponse == V_OCSP_CERTSTATUS_REVOKED()) {
+                    ok = 0;
+                    errnum = X509_STORE_CTX_get_error(x509ctx);
+                } else if (ocspResponse == V_OCSP_CERTSTATUS_UNKNOWN()) {
+                    errnum = X509_STORE_CTX_get_error(x509ctx);
+                    if (errnum <= 0) {
+                        ok = 0;
+                    }
+                }
+            }
+        }
+
         if (ok == 0) {
             // FIXME: debug logging
         }
@@ -1330,6 +1366,181 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             ok = 0;
         }
         return ok;
+    }
+
+    static int processOCSP(MemoryAddress /*X509_STORE_CTX*/ x509ctx) {
+        int ocspResponse = V_OCSP_CERTSTATUS_UNKNOWN();
+        // ocspResponse = ssl_verify_OCSP(x509_ctx);
+        MemoryAddress x509 = X509_STORE_CTX_get_current_cert(x509ctx);
+        if (!MemoryAddress.NULL.equals(x509)) {
+            // No need to check cert->valid, because ssl_verify_OCSP() only
+            // is called if OpenSSL already successfully verified the certificate
+            // (parameter "ok" in SSL_callback_SSL_verify() must be true).
+            if (X509_check_issued(x509, x509) == X509_V_OK()) {
+                // don't do OCSP checking for valid self-issued certs
+                X509_STORE_CTX_set_error(x509ctx, X509_V_OK());
+            } else {
+                // If we can't get the issuer, we cannot perform OCSP verification
+                MemoryAddress issuer = X509_STORE_CTX_get0_current_issuer(x509ctx);
+                if (!MemoryAddress.NULL.equals(issuer)) {
+                    // sslutils.c ssl_ocsp_request(x509, issuer, x509ctx);
+                    int nid = X509_get_ext_by_NID(x509, NID_info_access(), -1);
+                    if (nid >= 0) {
+                        try (var scope = ResourceScope.newConfinedScope()) {
+                            MemoryAddress ext = X509_get_ext(x509, nid);
+                            MemoryAddress os = X509_EXTENSION_get_data(ext);
+                            int length = ASN1_STRING_length(os);
+                            MemoryAddress data = ASN1_STRING_get0_data(os);
+                            // ocsp_urls = decode_OCSP_url(os);
+                            byte[] asn1String = MemorySegment.ofAddressNative(data, length, scope).toArray(ValueLayout.JAVA_BYTE);
+                            Asn1Parser parser = new Asn1Parser(asn1String);
+                            // Parse the byte sequence
+                            ArrayList<String> urls = new ArrayList<>();
+                            try {
+                                parseOCSPURLs(parser, urls);
+                            } catch (Exception e) {
+                                logger.error(sm.getString("engine.ocspParseError"), e);
+                            }
+                            if (!urls.isEmpty()) {
+                                // Use OpenSSL to build OCSP request
+                                for (String urlString : urls) {
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug("Processing OCSP URL: " + urlString);
+                                    }
+                                    try {
+                                        URL url = new URL(urlString);
+                                        ocspResponse = processOCSPRequest(url, issuer, x509, x509ctx, scope);
+                                    } catch (MalformedURLException e) {
+                                        logger.warn(sm.getString("engine.invalidOCSPURL"));
+                                    }
+                                    if (ocspResponse != V_OCSP_CERTSTATUS_UNKNOWN()) {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return ocspResponse;
+    }
+
+    private static final int ASN1_SEQUENCE = 0x30;
+    private static final int ASN1_OID      = 0x06;
+    private static final int ASN1_STRING   = 0x86;
+    private static final byte[] OCSP_OID = {0x2b, 0x06, 0x01, 0x05, 0x05, 0x07, 0x30, 0x01};
+
+    private static void parseOCSPURLs(Asn1Parser parser, ArrayList<String> urls) {
+        while (!parser.eof()) {
+            int tag = parser.peekTag();
+            if (tag == ASN1_SEQUENCE) {
+                parser.parseTag(ASN1_SEQUENCE);
+                parser.parseFullLength();
+            } else if (tag == ASN1_OID) {
+                parser.parseTag(ASN1_OID);
+                int oidLen = parser.parseLength();
+                byte[] oid = new byte[oidLen];
+                parser.parseBytes(oid);
+                if (Arrays.compareUnsigned(oid, 0, OCSP_OID.length, OCSP_OID, 0, OCSP_OID.length) == 0) {
+                    parser.parseTag(ASN1_STRING);
+                    int urlLen = parser.parseLength();
+                    byte[] url = new byte[urlLen];
+                    parser.parseBytes(url);
+                    urls.add(new String(url));
+                }
+            } else {
+                return;
+            }
+        }
+    }
+
+    private static int processOCSPRequest(URL url, MemoryAddress issuer, MemoryAddress x509,
+            MemoryAddress /*X509_STORE_CTX*/ x509ctx, ResourceScope scope) {
+        MemoryAddress ocspRequest = MemoryAddress.NULL;
+        MemoryAddress ocspResponse = MemoryAddress.NULL;
+        MemoryAddress id = MemoryAddress.NULL;
+        MemoryAddress ocspOneReq = MemoryAddress.NULL;
+        HttpsURLConnection connection = null;
+        MemoryAddress basicResponse = MemoryAddress.NULL;
+        MemoryAddress certId = MemoryAddress.NULL;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            var allocator = SegmentAllocator.nativeAllocator(scope);
+            ocspRequest = OCSP_REQUEST_new();
+            if (MemoryAddress.NULL.equals(ocspRequest)) {
+                return V_OCSP_CERTSTATUS_UNKNOWN();
+            }
+            id = OCSP_cert_to_id(MemoryAddress.NULL, x509, issuer);
+            if (MemoryAddress.NULL.equals(id)) {
+                return V_OCSP_CERTSTATUS_UNKNOWN();
+            }
+            ocspOneReq = OCSP_request_add0_id(ocspRequest, id);
+            if (MemoryAddress.NULL.equals(ocspOneReq)) {
+                return V_OCSP_CERTSTATUS_UNKNOWN();
+            }
+            MemorySegment bufPointer = allocator.allocate(ValueLayout.ADDRESS, MemoryAddress.NULL);
+            int requestLength = i2d_OCSP_REQUEST(ocspRequest, bufPointer);
+            if (requestLength <= 0) {
+                return V_OCSP_CERTSTATUS_UNKNOWN();
+            }
+            MemoryAddress buf = bufPointer.get(ValueLayout.ADDRESS, 0);
+            // HTTP request with the following header
+            // POST urlPath HTTP/1.0
+            // Host: urlHost:urlPort
+            // Content-Type: application/ocsp-request
+            // Content-Length: ocspRequestData.length
+            byte[] ocspRequestData = MemorySegment.ofAddressNative(buf, requestLength, scope).toArray(ValueLayout.JAVA_BYTE);
+            connection = (HttpsURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setFixedLengthStreamingMode(requestLength);
+            connection.setRequestProperty("Content-Type", "application/ocsp-request");
+            connection.connect();
+            connection.getOutputStream().write(ocspRequestData);
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpsURLConnection.HTTP_OK) {
+                return V_OCSP_CERTSTATUS_UNKNOWN();
+            }
+            InputStream is = connection.getInputStream();
+            int read = 0;
+            byte[] responseBuf = new byte[1024];
+            while ((read = is.read(responseBuf)) > 0) {
+                baos.write(responseBuf, 0, read);
+            }
+            byte[] responseData = baos.toByteArray();
+            var nativeResponseData = allocator.allocateArray(ValueLayout.JAVA_BYTE, responseData);
+            var nativeResponseDataPointer = allocator.allocate(ValueLayout.ADDRESS, nativeResponseData);
+            ocspResponse = d2i_OCSP_RESPONSE(MemoryAddress.NULL, nativeResponseDataPointer, responseData.length);
+            if (!MemoryAddress.NULL.equals(ocspResponse)) {
+                if (OCSP_response_status(ocspResponse) == OCSP_RESPONSE_STATUS_SUCCESSFUL()) {
+                    basicResponse = OCSP_response_get1_basic(ocspResponse);
+                    certId = OCSP_cert_to_id(MemoryAddress.NULL, x509, issuer);
+                    if (MemoryAddress.NULL.equals(certId)) {
+                        return V_OCSP_CERTSTATUS_UNKNOWN();
+                    }
+                    // Find by serial number and get the matching response
+                    MemoryAddress singleResponse = OCSP_resp_get0(basicResponse, OCSP_resp_find(basicResponse, certId, -1));
+                    return OCSP_single_get0_status(singleResponse, MemoryAddress.NULL,
+                            MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
+                }
+            }
+        } catch (IOException e) {
+            logger.warn(sm.getString("engine.ocspRequestError", url.toString()), e);
+        } finally {
+            if (MemoryAddress.NULL.equals(ocspResponse)) {
+                // Failed to get a valid response
+                X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
+            }
+            OCSP_CERTID_free(certId);
+            OCSP_BASICRESP_free(basicResponse);
+            OCSP_RESPONSE_free(ocspResponse);
+            OCSP_REQUEST_free(ocspRequest);
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return V_OCSP_CERTSTATUS_UNKNOWN();
     }
 
     @Override

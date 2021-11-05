@@ -26,9 +26,52 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.ValueLayout.*;
 class constants$27 {
 
-    static final MemorySegment SSL_TXT_RSA$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("RSA");
-    static final MemorySegment SSL_TXT_ECDH$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("ECDH");
-    static final MemorySegment SSL_TXT_ECDSA$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("ECDSA");
+    static final FunctionDescriptor OCSP_single_get0_status$FUNC = FunctionDescriptor.of(JAVA_INT,
+        ADDRESS,
+        ADDRESS,
+        ADDRESS,
+        ADDRESS,
+        ADDRESS
+    );
+    static final MethodHandle OCSP_single_get0_status$MH = RuntimeHelper.downcallHandle(
+        "OCSP_single_get0_status",
+        constants$27.OCSP_single_get0_status$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_BASICRESP_free$FUNC = FunctionDescriptor.ofVoid(
+        ADDRESS
+    );
+    static final MethodHandle OCSP_BASICRESP_free$MH = RuntimeHelper.downcallHandle(
+        "OCSP_BASICRESP_free",
+        constants$27.OCSP_BASICRESP_free$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_RESPONSE_free$FUNC = FunctionDescriptor.ofVoid(
+        ADDRESS
+    );
+    static final MethodHandle OCSP_RESPONSE_free$MH = RuntimeHelper.downcallHandle(
+        "OCSP_RESPONSE_free",
+        constants$27.OCSP_RESPONSE_free$FUNC, false
+    );
+    static final FunctionDescriptor d2i_OCSP_RESPONSE$FUNC = FunctionDescriptor.of(ADDRESS,
+        ADDRESS,
+        ADDRESS,
+        JAVA_LONG
+    );
+    static final MethodHandle d2i_OCSP_RESPONSE$MH = RuntimeHelper.downcallHandle(
+        "d2i_OCSP_RESPONSE",
+        constants$27.d2i_OCSP_RESPONSE$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_CERTID_free$FUNC = FunctionDescriptor.ofVoid(
+        ADDRESS
+    );
+    static final MethodHandle OCSP_CERTID_free$MH = RuntimeHelper.downcallHandle(
+        "OCSP_CERTID_free",
+        constants$27.OCSP_CERTID_free$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_REQUEST_new$FUNC = FunctionDescriptor.of(ADDRESS);
+    static final MethodHandle OCSP_REQUEST_new$MH = RuntimeHelper.downcallHandle(
+        "OCSP_REQUEST_new",
+        constants$27.OCSP_REQUEST_new$FUNC, false
+    );
 }
 
 

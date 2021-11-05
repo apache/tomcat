@@ -242,6 +242,18 @@ public class openssl_h  {
     public static int SSL_CTRL_SET_MAX_PROTO_VERSION() {
         return (int)124L;
     }
+    public static int OCSP_RESPONSE_STATUS_SUCCESSFUL() {
+        return (int)0L;
+    }
+    public static int V_OCSP_CERTSTATUS_GOOD() {
+        return (int)0L;
+    }
+    public static int V_OCSP_CERTSTATUS_REVOKED() {
+        return (int)1L;
+    }
+    public static int V_OCSP_CERTSTATUS_UNKNOWN() {
+        return (int)2L;
+    }
     public static MethodHandle OPENSSL_sk_num$MH() {
         return RuntimeHelper.requireNonNull(constants$0.OPENSSL_sk_num$MH,"OPENSSL_sk_num");
     }
@@ -1892,20 +1904,174 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
+    public static MethodHandle OCSP_cert_to_id$MH() {
+        return RuntimeHelper.requireNonNull(constants$26.OCSP_cert_to_id$MH,"OCSP_cert_to_id");
+    }
+    public static MemoryAddress OCSP_cert_to_id ( Addressable dgst,  Addressable subject,  Addressable issuer) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$26.OCSP_cert_to_id$MH, "OCSP_cert_to_id");
+        try {
+            return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(dgst, subject, issuer);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_request_add0_id$MH() {
+        return RuntimeHelper.requireNonNull(constants$26.OCSP_request_add0_id$MH,"OCSP_request_add0_id");
+    }
+    public static MemoryAddress OCSP_request_add0_id ( Addressable req,  Addressable cid) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$26.OCSP_request_add0_id$MH, "OCSP_request_add0_id");
+        try {
+            return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(req, cid);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_response_status$MH() {
+        return RuntimeHelper.requireNonNull(constants$26.OCSP_response_status$MH,"OCSP_response_status");
+    }
+    public static int OCSP_response_status ( Addressable resp) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$26.OCSP_response_status$MH, "OCSP_response_status");
+        try {
+            return (int)mh$.invokeExact(resp);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_response_get1_basic$MH() {
+        return RuntimeHelper.requireNonNull(constants$26.OCSP_response_get1_basic$MH,"OCSP_response_get1_basic");
+    }
+    public static MemoryAddress OCSP_response_get1_basic ( Addressable resp) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$26.OCSP_response_get1_basic$MH, "OCSP_response_get1_basic");
+        try {
+            return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(resp);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_resp_get0$MH() {
+        return RuntimeHelper.requireNonNull(constants$26.OCSP_resp_get0$MH,"OCSP_resp_get0");
+    }
+    public static MemoryAddress OCSP_resp_get0 ( Addressable bs,  int idx) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$26.OCSP_resp_get0$MH, "OCSP_resp_get0");
+        try {
+            return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(bs, idx);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_resp_find$MH() {
+        return RuntimeHelper.requireNonNull(constants$26.OCSP_resp_find$MH,"OCSP_resp_find");
+    }
+    public static int OCSP_resp_find ( Addressable bs,  Addressable id,  int last) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$26.OCSP_resp_find$MH, "OCSP_resp_find");
+        try {
+            return (int)mh$.invokeExact(bs, id, last);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_single_get0_status$MH() {
+        return RuntimeHelper.requireNonNull(constants$27.OCSP_single_get0_status$MH,"OCSP_single_get0_status");
+    }
+    public static int OCSP_single_get0_status ( Addressable single,  Addressable reason,  Addressable revtime,  Addressable thisupd,  Addressable nextupd) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$27.OCSP_single_get0_status$MH, "OCSP_single_get0_status");
+        try {
+            return (int)mh$.invokeExact(single, reason, revtime, thisupd, nextupd);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_BASICRESP_free$MH() {
+        return RuntimeHelper.requireNonNull(constants$27.OCSP_BASICRESP_free$MH,"OCSP_BASICRESP_free");
+    }
+    public static void OCSP_BASICRESP_free ( Addressable a) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$27.OCSP_BASICRESP_free$MH, "OCSP_BASICRESP_free");
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_RESPONSE_free$MH() {
+        return RuntimeHelper.requireNonNull(constants$27.OCSP_RESPONSE_free$MH,"OCSP_RESPONSE_free");
+    }
+    public static void OCSP_RESPONSE_free ( Addressable a) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$27.OCSP_RESPONSE_free$MH, "OCSP_RESPONSE_free");
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle d2i_OCSP_RESPONSE$MH() {
+        return RuntimeHelper.requireNonNull(constants$27.d2i_OCSP_RESPONSE$MH,"d2i_OCSP_RESPONSE");
+    }
+    public static MemoryAddress d2i_OCSP_RESPONSE ( Addressable a,  Addressable in,  long len) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$27.d2i_OCSP_RESPONSE$MH, "d2i_OCSP_RESPONSE");
+        try {
+            return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(a, in, len);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_CERTID_free$MH() {
+        return RuntimeHelper.requireNonNull(constants$27.OCSP_CERTID_free$MH,"OCSP_CERTID_free");
+    }
+    public static void OCSP_CERTID_free ( Addressable a) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$27.OCSP_CERTID_free$MH, "OCSP_CERTID_free");
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_REQUEST_new$MH() {
+        return RuntimeHelper.requireNonNull(constants$27.OCSP_REQUEST_new$MH,"OCSP_REQUEST_new");
+    }
+    public static MemoryAddress OCSP_REQUEST_new () {
+        var mh$ = RuntimeHelper.requireNonNull(constants$27.OCSP_REQUEST_new$MH, "OCSP_REQUEST_new");
+        try {
+            return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact();
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OCSP_REQUEST_free$MH() {
+        return RuntimeHelper.requireNonNull(constants$28.OCSP_REQUEST_free$MH,"OCSP_REQUEST_free");
+    }
+    public static void OCSP_REQUEST_free ( Addressable a) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$28.OCSP_REQUEST_free$MH, "OCSP_REQUEST_free");
+        try {
+            mh$.invokeExact(a);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle i2d_OCSP_REQUEST$MH() {
+        return RuntimeHelper.requireNonNull(constants$28.i2d_OCSP_REQUEST$MH,"i2d_OCSP_REQUEST");
+    }
+    public static int i2d_OCSP_REQUEST ( Addressable a,  Addressable out) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$28.i2d_OCSP_REQUEST$MH, "i2d_OCSP_REQUEST");
+        try {
+            return (int)mh$.invokeExact(a, out);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
     public static long OPENSSL_VERSION_NUMBER() {
         return 269488335L;
     }
     public static MemorySegment OPENSSL_VERSION_TEXT() {
-        return constants$26.OPENSSL_VERSION_TEXT$SEGMENT;
+        return constants$28.OPENSSL_VERSION_TEXT$SEGMENT;
     }
     public static MemorySegment SHLIB_VERSION_HISTORY() {
-        return constants$26.SHLIB_VERSION_HISTORY$SEGMENT;
+        return constants$28.SHLIB_VERSION_HISTORY$SEGMENT;
     }
     public static MemorySegment SHLIB_VERSION_NUMBER() {
-        return constants$26.SHLIB_VERSION_NUMBER$SEGMENT;
+        return constants$28.SHLIB_VERSION_NUMBER$SEGMENT;
     }
     public static MemorySegment OPENSSL_FILE() {
-        return constants$26.OPENSSL_FILE$SEGMENT;
+        return constants$28.OPENSSL_FILE$SEGMENT;
     }
     public static int OPENSSL_LINE() {
         return (int)32L;
@@ -1926,19 +2092,19 @@ public class openssl_h  {
         return (int)116L;
     }
     public static MemorySegment SSL_TXT_DSS() {
-        return constants$26.SSL_TXT_DSS$SEGMENT;
+        return constants$29.SSL_TXT_DSS$SEGMENT;
     }
     public static MemorySegment SSL_TXT_DH() {
-        return constants$26.SSL_TXT_DH$SEGMENT;
+        return constants$29.SSL_TXT_DH$SEGMENT;
     }
     public static MemorySegment SSL_TXT_RSA() {
-        return constants$27.SSL_TXT_RSA$SEGMENT;
+        return constants$29.SSL_TXT_RSA$SEGMENT;
     }
     public static MemorySegment SSL_TXT_ECDH() {
-        return constants$27.SSL_TXT_ECDH$SEGMENT;
+        return constants$29.SSL_TXT_ECDH$SEGMENT;
     }
     public static MemorySegment SSL_TXT_ECDSA() {
-        return constants$27.SSL_TXT_ECDSA$SEGMENT;
+        return constants$29.SSL_TXT_ECDSA$SEGMENT;
     }
     public static int SSL_OP_NO_TICKET() {
         return (int)16384L;

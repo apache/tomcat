@@ -26,12 +26,54 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.ValueLayout.*;
 class constants$26 {
 
-    static final MemorySegment OPENSSL_VERSION_TEXT$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("OpenSSL 1.1.1l  FIPS 24 Aug 2021");
-    static final MemorySegment SHLIB_VERSION_HISTORY$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("");
-    static final MemorySegment SHLIB_VERSION_NUMBER$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("1.1");
-    static final MemorySegment OPENSSL_FILE$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("/tmp/jextract$13411719127200839343.h");
-    static final MemorySegment SSL_TXT_DSS$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("DSS");
-    static final MemorySegment SSL_TXT_DH$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("DH");
+    static final FunctionDescriptor OCSP_cert_to_id$FUNC = FunctionDescriptor.of(ADDRESS,
+        ADDRESS,
+        ADDRESS,
+        ADDRESS
+    );
+    static final MethodHandle OCSP_cert_to_id$MH = RuntimeHelper.downcallHandle(
+        "OCSP_cert_to_id",
+        constants$26.OCSP_cert_to_id$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_request_add0_id$FUNC = FunctionDescriptor.of(ADDRESS,
+        ADDRESS,
+        ADDRESS
+    );
+    static final MethodHandle OCSP_request_add0_id$MH = RuntimeHelper.downcallHandle(
+        "OCSP_request_add0_id",
+        constants$26.OCSP_request_add0_id$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_response_status$FUNC = FunctionDescriptor.of(JAVA_INT,
+        ADDRESS
+    );
+    static final MethodHandle OCSP_response_status$MH = RuntimeHelper.downcallHandle(
+        "OCSP_response_status",
+        constants$26.OCSP_response_status$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_response_get1_basic$FUNC = FunctionDescriptor.of(ADDRESS,
+        ADDRESS
+    );
+    static final MethodHandle OCSP_response_get1_basic$MH = RuntimeHelper.downcallHandle(
+        "OCSP_response_get1_basic",
+        constants$26.OCSP_response_get1_basic$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_resp_get0$FUNC = FunctionDescriptor.of(ADDRESS,
+        ADDRESS,
+        JAVA_INT
+    );
+    static final MethodHandle OCSP_resp_get0$MH = RuntimeHelper.downcallHandle(
+        "OCSP_resp_get0",
+        constants$26.OCSP_resp_get0$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_resp_find$FUNC = FunctionDescriptor.of(JAVA_INT,
+        ADDRESS,
+        ADDRESS,
+        JAVA_INT
+    );
+    static final MethodHandle OCSP_resp_find$MH = RuntimeHelper.downcallHandle(
+        "OCSP_resp_find",
+        constants$26.OCSP_resp_find$FUNC, false
+    );
 }
 
 
