@@ -68,7 +68,7 @@ output/deployer/deployer-howto.html
 **/*.manifest
 
 output/dist/webapps/docs/*/element-list
-output/dist/webapps/docs/*/jquery/*
+output/dist/webapps/docs/*/jquery/**
 output/dist/webapps/docs/*/member-search-index.js
 output/dist/webapps/docs/*/package-search-index.js
 output/dist/webapps/docs/*/search.js
