@@ -187,5 +187,5 @@ output/dist/temp/safeToDelete.tmp
 
 output/res/checkstyle/*
 
-tomcat-9.0.x/**
+tomcat-8.5.x/**
 
