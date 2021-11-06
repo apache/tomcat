@@ -52,7 +52,7 @@
 
   - Markdown files for display in their GitHub UI
 
-  - Temporary cache files used by Checkstle
+  - Temporary cache files used by Checkstyle
 
   - Temporary files used by buildbot
 
