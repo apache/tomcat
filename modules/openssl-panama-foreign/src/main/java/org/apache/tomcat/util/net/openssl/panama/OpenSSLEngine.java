@@ -17,9 +17,7 @@
 package org.apache.tomcat.util.net.openssl.panama;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -42,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
