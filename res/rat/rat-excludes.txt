@@ -30,7 +30,7 @@
   - package-list and script.js files in API documentation (javadoc) are
     generated
 
-  - other test files, such as trivial textual files containing only "OK' string,
+  - test files, such as trivial textual files containing only "OK' string,
     files in unusual encodings or compressed files are also excluded.
 
   - JSON files (RFC7159) are data and cannot contain comments
@@ -53,9 +53,9 @@
 
   - Markdown files for display in their GitHub UI
 
-  - Temporary cache files used by Checkstle
+  - Temporary cache files used by Checkstyle
 
-  - Configuration files for third party Continuous Integration systems like Travis CI
+  - Temporary files used by buildbot
 
 
 output/build/logs/*
@@ -211,4 +211,6 @@ output/dist/temp/safeToDelete.tmp
 **/*.md
 
 output/res/checkstyle/*
+
+tomcat-10.0.x/**
 
