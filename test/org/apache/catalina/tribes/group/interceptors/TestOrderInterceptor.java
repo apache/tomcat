@@ -35,6 +35,7 @@ import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.InterceptorPayload;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 
 public class TestOrderInterceptor {
 
@@ -55,7 +56,7 @@ public class TestOrderInterceptor {
         threads = new Thread[channelCount];
         for ( int i=0; i<channelCount; i++ ) {
             channels[i] = new GroupChannel();
-
+            ((ReceiverBase) channels[i].getChannelReceiver()).setHost("localhost");
             orderitcs[i] = new OrderInterceptor();
             mangleitcs[i] = new MangleOrderInterceptor();
             orderitcs[i].setExpire(Long.MAX_VALUE);

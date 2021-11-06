@@ -31,6 +31,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 
 public class TestTcpFailureDetector {
     private TcpFailureDetector tcpFailureDetector1 = null;
@@ -44,6 +45,8 @@ public class TestTcpFailureDetector {
     public void setUp() throws Exception {
         channel1 = new GroupChannel();
         channel2 = new GroupChannel();
+        ((ReceiverBase) channel1.getChannelReceiver()).setHost("localhost");
+        ((ReceiverBase) channel2.getChannelReceiver()).setHost("localhost");
         channel1.getMembershipService().setPayload("Channel-1".getBytes("ASCII"));
         channel2.getMembershipService().setPayload("Channel-2".getBytes("ASCII"));
         mbrlist1 = new TestMbrListener("Channel-1");
