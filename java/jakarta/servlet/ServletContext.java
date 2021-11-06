@@ -688,8 +688,12 @@ public interface ServletContext {
     public ServletRegistration getServletRegistration(String servletName);
 
     /**
-     * TODO SERVLET3 - Add comments
-     * @return TODO
+     * Obtain a Map of servlet names to servlet registrations for all servlets
+     * registered with this context.
+     *
+     * @return A Map of servlet names to servlet registrations for all servlets
+     *         registered with this context
+     *
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -697,6 +701,7 @@ public interface ServletContext {
      *    {@link jakarta.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
+     *
      * @since Servlet 3.0
      */
     public Map<String, ? extends ServletRegistration> getServletRegistrations();
