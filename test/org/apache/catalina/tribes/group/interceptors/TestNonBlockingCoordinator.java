@@ -28,6 +28,7 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.GroupChannel;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -51,6 +52,7 @@ public class TestNonBlockingCoordinator {
             Thread[] threads = new Thread[CHANNEL_COUNT];
             for ( int i=0; i<CHANNEL_COUNT; i++ ) {
                 channels[i] = new GroupChannel();
+                ((ReceiverBase) channels[i].getChannelReceiver()).setHost("localhost");
                 coordinators[i] = new NonBlockingCoordinator();
                 channels[i].addInterceptor(coordinators[i]);
                 TcpFailureDetector tcpFailureDetector = new TcpFailureDetector();

@@ -34,6 +34,7 @@ public class TestGroupChannelStartStop {
     @Before
     public void setUp() throws Exception {
         channel = new GroupChannel();
+        ((ReceiverBase) channel.getChannelReceiver()).setHost("localhost");
     }
 
     @After
