@@ -826,37 +826,38 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     //        const unsigned char *in, unsigned int inlen, void *arg)
     public int openSSLCallbackAlpnSelectProto(MemoryAddress ssl, MemoryAddress out, MemoryAddress outlen,
             MemoryAddress in, int inlen, MemoryAddress arg) {
-        // No scope, so byte by byte read, the ALPN data is small
-        byte[] advertisedBytes = in.asSegment(inlen, state.scope).toByteArray();
-        ArrayList<byte[]> negotiableProtocolsBytes = new ArrayList<>(negotiableProtocols.size() + 1);
-        for (String negotiableProtocol : negotiableProtocols) {
-            negotiableProtocolsBytes.add(negotiableProtocol.getBytes());
-        }
-        negotiableProtocolsBytes.add(HTTP_11_PROTOCOL);
-        for (byte[] negotiableProtocolBytes : negotiableProtocolsBytes) {
-            for (int i = 0; i <= advertisedBytes.length - negotiableProtocolBytes.length; i++) {
-                if (advertisedBytes[i] == negotiableProtocolBytes[0]) {
-                    for (int j = 0; j < negotiableProtocolBytes.length; j++) {
-                        if (advertisedBytes[i + j] == negotiableProtocolBytes[j]) {
-                            if (j == negotiableProtocolBytes.length - 1) {
-                                MemorySegment outSegment = out.asSegment(CLinker.C_POINTER.byteSize(), state.scope);
-                                MemorySegment outlenSegment = outlen.asSegment(CLinker.C_CHAR.byteSize(), state.scope);
-                                // Match
-                                MemoryAccess.setAddress(outSegment, in.addOffset(i));
-                                MemoryAccess.setByte(outlenSegment, (byte) negotiableProtocolBytes.length);
-                                return SSL_TLSEXT_ERR_OK();
+        try (ResourceScope scope = ResourceScope.newConfinedScope()) {
+            byte[] advertisedBytes = in.asSegment(inlen, scope).toByteArray();
+            ArrayList<byte[]> negotiableProtocolsBytes = new ArrayList<>(negotiableProtocols.size() + 1);
+            for (String negotiableProtocol : negotiableProtocols) {
+                negotiableProtocolsBytes.add(negotiableProtocol.getBytes());
+            }
+            negotiableProtocolsBytes.add(HTTP_11_PROTOCOL);
+            for (byte[] negotiableProtocolBytes : negotiableProtocolsBytes) {
+                for (int i = 0; i <= advertisedBytes.length - negotiableProtocolBytes.length; i++) {
+                    if (advertisedBytes[i] == negotiableProtocolBytes[0]) {
+                        for (int j = 0; j < negotiableProtocolBytes.length; j++) {
+                            if (advertisedBytes[i + j] == negotiableProtocolBytes[j]) {
+                                if (j == negotiableProtocolBytes.length - 1) {
+                                    MemorySegment outSegment = out.asSegment(CLinker.C_POINTER.byteSize(), scope);
+                                    MemorySegment outlenSegment = outlen.asSegment(CLinker.C_CHAR.byteSize(), scope);
+                                    // Match
+                                    MemoryAccess.setAddress(outSegment, in.addOffset(i));
+                                    MemoryAccess.setByte(outlenSegment, (byte) negotiableProtocolBytes.length);
+                                    return SSL_TLSEXT_ERR_OK();
+                                }
+                            } else {
+                                break;
                             }
-                        } else {
-                            break;
                         }
                     }
                 }
             }
+            return SSL_TLSEXT_ERR_NOACK();
         }
-        return SSL_TLSEXT_ERR_NOACK();
     }
 
-    public int openSSLCallbackVerify(int preverify_ok, MemoryAddress /*X509_STORE_CTX*/ x509ctx) {
+    public synchronized int openSSLCallbackVerify(int preverify_ok, MemoryAddress /*X509_STORE_CTX*/ x509ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Verification with mode [" + certificateVerifyMode + "]");
         }
