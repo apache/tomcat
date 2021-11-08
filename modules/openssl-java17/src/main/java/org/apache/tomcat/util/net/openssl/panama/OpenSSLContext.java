@@ -826,6 +826,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     //        const unsigned char *in, unsigned int inlen, void *arg)
     public int openSSLCallbackAlpnSelectProto(MemoryAddress ssl, MemoryAddress out, MemoryAddress outlen,
             MemoryAddress in, int inlen, MemoryAddress arg) {
+        // It would be better to read byte by byte as the ALPN data is very small
+        // However, the Java 17 API forces use of a scope later on, so create one for everything
         try (ResourceScope scope = ResourceScope.newConfinedScope()) {
             byte[] advertisedBytes = in.asSegment(inlen, scope).toByteArray();
             ArrayList<byte[]> negotiableProtocolsBytes = new ArrayList<>(negotiableProtocols.size() + 1);
