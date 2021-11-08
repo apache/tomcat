@@ -121,6 +121,10 @@
         This initial implementation allows control over whether or not a
         resource is cached. (markt)
       </add>
+      <update>
+        Log warning if a listener is not nested inside a Server element
+        although it must have been. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
