@@ -190,6 +190,10 @@
         Servlet API. The new approach synchronizes the <code>service()</code>
         method.
       </fix>
+      <add>
+        Add OpenSSL support through the Panama API incubating in Java 17, with
+        support for OpenSSL 1.1+. This no longer requires tomcat-native. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

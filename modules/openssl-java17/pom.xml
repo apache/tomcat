@@ -28,7 +28,6 @@
     <artifactId>tomcat-openssl</artifactId>
     <name>Apache Tomcat OpenSSL support for Panama</name>
     <description>OpenSSL support using the Panama API</description>
-    <!-- This is the Apache OpenWebBeans version -->
     <version>0.1</version>
     <packaging>jar</packaging>
 
