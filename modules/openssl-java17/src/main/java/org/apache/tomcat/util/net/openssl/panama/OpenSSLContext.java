@@ -126,7 +126,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     CLinker.C_POINTER, CLinker.C_POINTER, CLinker.C_POINTER,
                     CLinker.C_INT, CLinker.C_POINTER);
     private static final FunctionDescriptor openSSLCallbackTmpDHFunctionDescriptor =
-            FunctionDescriptor.of(CLinker.C_LONG, CLinker.C_POINTER,
+            FunctionDescriptor.of(CLinker.C_POINTER, CLinker.C_POINTER,
                     CLinker.C_INT, CLinker.C_INT);
 
     static {
@@ -142,7 +142,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class,
                             MemoryAddress.class, MemoryAddress.class, int.class, MemoryAddress.class));
             openSSLCallbackTmpDHHandle = lookup.findVirtual(OpenSSLContext.class, "openSSLCallbackTmpDH",
-                    MethodType.methodType(long.class, MemoryAddress.class, int.class, int.class));
+                    MethodType.methodType(MemoryAddress.class, MemoryAddress.class, int.class, int.class));
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -795,7 +795,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     // DH *(*tmp_dh_callback)(SSL *ssl, int is_export, int keylength)
-    public long openSSLCallbackTmpDH(MemoryAddress ssl, int isExport, int keylength) {
+    public MemoryAddress openSSLCallbackTmpDH(MemoryAddress ssl, int isExport, int keylength) {
         var pkey = SSL_get_privatekey(ssl);
         int type = (MemoryAddress.NULL.equals(pkey)) ? EVP_PKEY_NONE() : EVP_PKEY_base_id(pkey);
         /*
@@ -816,10 +816,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
         for (int i = 0; i < dhParameters.length; i++) {
             if (keylen >= dhParameters[i].min) {
-                return dhParameters[i].dh.toRawLongValue();
+                return dhParameters[i].dh;
             }
         }
-        return MemoryAddress.NULL.toRawLongValue();
+        return MemoryAddress.NULL;
     }
 
     // int SSL_callback_alpn_select_proto(SSL* ssl, const unsigned char **out, unsigned char *outlen,
