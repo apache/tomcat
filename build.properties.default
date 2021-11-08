@@ -62,12 +62,11 @@ test.verbose=true
 
 # Number of parallel threads to use for testing. The recommended value is one
 # thread per core.
-# Note: Cobertura code coverage currently requires this to be set to 1. Setting
-#       a value above one will disable code coverage if enabled.
 test.threads=1
 
-# Note the Cobertura code coverage tool is GPLv2 licensed
-test.cobertura=false
+# Note the JaCoCo code coverage tool is EPLv2 licensed
+# Enabling code coverage extends the time taken to run the tests by ~50%
+test.coverage=false
 
 # Note the FindBugs is LGPL licensed
 execute.findbugs=false
@@ -275,14 +274,14 @@ checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 
-# ----- Cobertura code coverage tool -----
-cobertura.version=2.1.1
-cobertura.checksum.enabled=true
-cobertura.checksum.algorithm=MD5|SHA-1
-cobertura.checksum.value=4f46638aa8e4d89565c038092398ea06|99cb44d36555feedcedc46263c23c2f5394ef342
-cobertura.home=${base.path}/cobertura-${cobertura.version}
-cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
-cobertura.loc=${base-sf.loc}/cobertura/cobertura-${cobertura.version}-bin.tar.gz
+# ----- JaCoCo code coverage tool -----
+jacoco.version=0.8.7
+jacoco.checksum.enabled=true
+jacoco.checksum.algorithm=MD5|SHA-1
+jacoco.checksum.value=174fde230d1090a5622119d5096bce07|983a52a030f4123b671840a27426ed73479f45cc
+jacoco.home=${base.path}/jacoco-${jacoco.version}
+jacoco.jar=${jacoco.home}/lib/jacocoant.jar
+jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
 
 # ----- SpotBugs (originally FindBugs) -----
 findbugs.version=4.2.3
