@@ -79,6 +79,10 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.START_EVENT.equals(event.getType())) {
+            if (!(event.getLifecycle() instanceof Server)) {
+                log.warn("This listener must only be nested within Server elements, but is in [" +
+                        event.getLifecycle().getClass().getSimpleName() + "].");
+            }
             component = event.getLifecycle();
             createMBeans();
         } else if (Lifecycle.STOP_EVENT.equals(event.getType())) {

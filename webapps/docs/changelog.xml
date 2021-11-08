@@ -116,6 +116,10 @@
         Add Javadoc comment which listeners must be nested whithin
         <code>Server</code> elements only. (michaelo)
       </docs>
+      <update>
+        Log warning if a listener is not nested inside a Server element
+        although it must have been. (michaelo)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
