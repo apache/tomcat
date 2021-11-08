@@ -74,6 +74,10 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.START_EVENT.equals(event.getType())) {
+            if (!(event.getLifecycle() instanceof Server)) {
+                log.warn(sm.getString("listener.notServer",
+                        event.getLifecycle().getClass().getSimpleName()));
+            }
             component = event.getLifecycle();
             createMBeans();
         } else if (Lifecycle.STOP_EVENT.equals(event.getType())) {

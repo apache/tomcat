@@ -65,6 +65,10 @@ public class SecurityListener implements LifecycleListener {
     public void lifecycleEvent(LifecycleEvent event) {
         // This is the earliest event in Lifecycle
         if (event.getType().equals(Lifecycle.BEFORE_INIT_EVENT)) {
+            if (!(event.getLifecycle() instanceof Server)) {
+                log.warn(sm.getString("listener.notServer",
+                        event.getLifecycle().getClass().getSimpleName()));
+            }
             doChecks();
         }
     }
