@@ -132,6 +132,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Switch from Cobertura to JaCoCo for code coverage as Cobertura does not
+        support code coverage for code compiled for Java 11 onwards. It also
+        removes the need to use a single thread to run the tests. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.73 (schultz)" rtext="2021-11-17">
   <subsection name="Catalina">
