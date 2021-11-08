@@ -107,6 +107,10 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     public void lifecycleEvent(LifecycleEvent event) {
         // Initialise these classes when Tomcat starts
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
+            if (!(event.getLifecycle() instanceof Server)) {
+                log.warn(sm.getString("listener.notServer",
+                        event.getLifecycle().getClass().getSimpleName()));
+            }
 
             /*
              * First call to this loads all drivers visible to the current class
