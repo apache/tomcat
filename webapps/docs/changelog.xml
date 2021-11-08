@@ -191,8 +191,10 @@
         method.
       </fix>
       <add>
-        Add OpenSSL support through the Panama API incubating in Java 17, with
-        support for OpenSSL 1.1+. This no longer requires tomcat-native. (remm)
+        Add experimental OpenSSL support through the Panama API incubating in
+        Java 17, with support for OpenSSL 1.1+. This no longer requires
+        tomcat-native or APR. Please refer to the <code>openssl-java17</code>
+        module for more details. (remm)
       </add>
     </changelog>
   </subsection>
