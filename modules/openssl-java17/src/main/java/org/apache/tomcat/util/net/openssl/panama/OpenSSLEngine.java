@@ -401,8 +401,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 MemorySegment bufSegment = allocator.allocateArray(CLinker.C_CHAR, len);
                 final int sslRead = SSL_read(ssl, bufSegment, len);
                 if (sslRead > 0) {
-                    byte[] buf = bufSegment.toByteArray();
-                    dst.put(buf, 0, sslRead);
+                    MemorySegment.ofByteBuffer(dst).copyFrom(bufSegment.asSlice(0, sslRead));
+                    dst.position(dst.position() + sslRead);
                     return sslRead;
                 } else {
                     checkLastError();
@@ -419,8 +419,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      */
     private int readEncryptedData(final MemoryAddress networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
         clearLastError();
+        final int pos = dst.position();
         if (dst.isDirect()) {
-            final int pos = dst.position();
             final int bioRead = BIO_read(networkBIO, MemorySegment.ofByteBuffer(dst), pending);
             if (bioRead > 0) {
                 dst.position(pos + bioRead);
@@ -436,7 +436,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 if (bioRead > 0) {
                     buf.limit(bioRead);
                     int oldLimit = dst.limit();
-                    dst.limit(dst.position() + bioRead);
+                    dst.limit(pos + bioRead);
                     dst.put(buf);
                     dst.limit(oldLimit);
                     return bioRead;
