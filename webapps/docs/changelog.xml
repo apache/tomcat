@@ -147,6 +147,10 @@
         tomcat-native or APR. Please refer to the <code>openssl-java17</code>
         module from the <code>main</code> branch for more details. (remm)
       </add>
+      <fix>
+        Fix APR connector stop so it correctly waits for the sendfile thread, if
+        any, to exit. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
