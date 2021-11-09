@@ -607,6 +607,24 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             if (getUseSendfile()) {
                 try {
                     sendfile.stop();
+
+                    // Wait for the sendfile thread to exit, otherwise parallel
+                    // destruction of sockets which are still in the poller can cause
+                    // problems.
+                    waitMillis = 0;
+                    try {
+                        while (sendfile.sendfileThread.isAlive() && waitMillis < 10000) {
+                            waitMillis++;
+                            Thread.sleep(1);
+                        }
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+
+                    if (sendfile.sendfileThread.isAlive()) {
+                        log.warn(sm.getString("endpoint.sendfileThreadStop"));
+                    }
+
                     sendfile.destroy();
                 } catch (Exception e) {
                     // Ignore
@@ -1723,22 +1741,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             sendfileRunning = false;
             // In case the sendfile thread is in the idle wait
             this.notify();
-
-            // Wait for the sendfile thread to exit, otherwise parallel
-            // destruction of sockets which are still in the poller can cause
-            // problems.
-            int loops = 50;
-            while (loops > 0 && sendfileThread.isAlive()) {
-                try {
-                    this.wait(pollTime / 1000);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                loops--;
-            }
-            if (sendfileThread.isAlive()) {
-                log.warn(sm.getString("endpoint.sendfileThreadStop"));
-            }
         }
 
         /**
