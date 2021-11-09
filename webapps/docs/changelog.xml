@@ -137,6 +137,12 @@
         <pr>457</pr>: Add a <code>toString()</code> method to
         <code>MimeHeader</code> to aid debugging. (dblevins)
       </add>
+      <add>
+        Add experimental OpenSSL support through the Panama API incubating in
+        Java 17, with support for OpenSSL 1.1+. This no longer requires
+        tomcat-native or APR. Please refer to the <code>openssl-java17</code>
+        module from the <code>main</code> branch for more details. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
