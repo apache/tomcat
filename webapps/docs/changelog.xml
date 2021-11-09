@@ -132,6 +132,11 @@
         <pr>457</pr>: Add a <code>toString()</code> method to
         <code>MimeHeader</code> to aid debugging. (dblevins)
       </add>
+      <fix>
+        Do not ignore the error condition if the APR connector is not able to
+        open a sever socket as continuing in this case will trigger a JVM crash.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

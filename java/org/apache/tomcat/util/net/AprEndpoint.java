@@ -676,10 +676,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         } catch (Error e) {
             if (Status.APR_STATUS_IS_EINVAL(e.getError())) {
                 log.info(sm.getString("endpoint.poll.limitedpollsize", "" + size));
-                return 0;
+                throw new RuntimeException(e);
             } else {
                 log.error(sm.getString("endpoint.poll.initfail"), e);
-                return -1;
+                throw new RuntimeException(e);
             }
         }
     }
