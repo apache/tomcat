@@ -173,6 +173,8 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         Assert.assertTrue(connector.setProperty("address", InetAddress.getByName("localhost").getHostAddress()));
         // Use random free port
         connector.setPort(0);
+        // By default, a connector failure means a failed test
+        connector.setThrowOnFailure(true);
         // Mainly set to reduce timeouts during async tests
         Assert.assertTrue(connector.setProperty("connectionTimeout", "3000"));
         tomcat.getService().addConnector(connector);
