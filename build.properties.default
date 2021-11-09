@@ -331,7 +331,7 @@ migration-lib.loc=${base-maven.loc}/org/apache/tomcat/jakartaee-migration/${migr
 jsign.version=4.0
 
 # checksums for JSign 4.0
-jsign.checksum.enable=true
+jsign.checksum.enabled=true
 jsign.checksum.algorithm=MD5|SHA-1
 jsign.checksum.value=50982facf864df4f08a051b43f7d2e42|3d203fbffdc45e837f98b7c9c5d311b615661a75
 
