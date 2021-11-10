@@ -110,7 +110,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             try {
                 SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
                 SSL_CTX_set_cipher_list(sslCtx, CLinker.toCString("ALL", scope));
-                var ssl = SSL_new(sslCtx);
+                var ssl = SSL_new(sslCtx).asSegment(CLinker.C_POINTER.byteSize(), scope);
                 SSL_set_accept_state(ssl);
                 try {
                     for (String c : getCiphers(ssl)) {
@@ -142,7 +142,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         IMPLEMENTED_PROTOCOLS_SET = Collections.unmodifiableSet(protocols);
     }
 
-    private static String[] getCiphers(MemoryAddress ssl) {
+    private static String[] getCiphers(MemorySegment ssl) {
         MemoryAddress sk = SSL_get_ciphers(ssl);
         int len = OPENSSL_sk_num(sk);
         if (len <= 0) {
@@ -251,7 +251,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         ResourceScope scope = ResourceScope.newSharedScope();
         var allocator = SegmentAllocator.ofScope(scope);
         session = new OpenSSLSession();
-        var ssl = SSL_new(sslCtx);
+        var ssl = SSL_new(sslCtx).asSegment(CLinker.C_POINTER.byteSize(), scope);
         this.certificateVerificationDepth = certificateVerificationDepth;
         // Set ssl_info_callback
         MemoryAddress openSSLCallbackInfo = CLinker.getInstance().upcallStub(openSSLCallbackInfoHandle.bindTo(this),
@@ -267,7 +267,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         var networkBIOPointer = allocator.allocate(CLinker.C_POINTER);
         BIO_new_bio_pair(internalBIOPointer, 0, networkBIOPointer, 0);
         var internalBIO = MemoryAccess.getAddress(internalBIOPointer);
-        var networkBIO = MemoryAccess.getAddress(networkBIOPointer);
+        var networkBIO = MemoryAccess.getAddress(networkBIOPointer).asSegment(CLinker.C_POINTER.byteSize(), scope);
         SSL_set_bio(ssl, internalBIO, internalBIO);
         state = new OpenSSLState(scope, ssl, networkBIO);
         cleanable = cleaner.register(this, state);
@@ -303,7 +303,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Calling this function with src.remaining == 0 is undefined.
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int writePlaintextData(final MemoryAddress ssl, final ByteBuffer src) throws SSLException {
+    private int writePlaintextData(final MemorySegment ssl, final ByteBuffer src) throws SSLException {
         clearLastError();
         final int pos = src.position();
         final int limit = src.limit();
@@ -341,7 +341,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Write encrypted data to the OpenSSL network BIO.
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int writeEncryptedData(final MemoryAddress networkBIO, final ByteBuffer src) throws SSLException {
+    private int writeEncryptedData(final MemorySegment networkBIO, final ByteBuffer src) throws SSLException {
         clearLastError();
         final int pos = src.position();
         final int len = src.remaining();
@@ -380,7 +380,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Read plain text data from the OpenSSL internal BIO
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int readPlaintextData(final MemoryAddress ssl, final ByteBuffer dst) throws SSLException {
+    private int readPlaintextData(final MemorySegment ssl, final ByteBuffer dst) throws SSLException {
         clearLastError();
         final int pos = dst.position();
 
@@ -417,7 +417,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Read encrypted data from the OpenSSL network BIO
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int readEncryptedData(final MemoryAddress networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
+    private int readEncryptedData(final MemorySegment networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
         clearLastError();
         final int pos = dst.position();
         if (dst.isDirect()) {
@@ -1852,10 +1852,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static class OpenSSLState implements Runnable {
 
         private final ResourceScope scope;
-        private final MemoryAddress ssl;
-        private final MemoryAddress networkBIO;
+        private final MemorySegment ssl;
+        private final MemorySegment networkBIO;
 
-        private OpenSSLState(ResourceScope scope, MemoryAddress ssl, MemoryAddress networkBIO) {
+        private OpenSSLState(ResourceScope scope, MemorySegment ssl, MemorySegment networkBIO) {
             this.scope = scope;
             this.ssl = ssl;
             this.networkBIO = networkBIO;
