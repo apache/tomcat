@@ -858,6 +858,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         // Accept the next incoming connection from the server
                         // socket
                         socket = Socket.accept(serverSock);
+                        if (socket == 0) {
+                            throw new IOException(sm.getString("endpoint.err.accept", getName()));
+                        }
                         if (log.isDebugEnabled()) {
                             long sa = Address.get(Socket.APR_REMOTE, socket);
                             Sockaddr addr = Address.getInfo(sa);

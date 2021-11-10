@@ -141,6 +141,10 @@
         Improve error handling if APR/Native fails to attach TLS capabilities to
         a TLS enabled client connection. (markt)
       </fix>
+      <fix>
+        Improve error handling if APR/Native fails to accept an incoming
+        connection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
