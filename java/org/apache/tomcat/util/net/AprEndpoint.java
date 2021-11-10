@@ -803,6 +803,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     @Override
     protected Long serverSocketAccept() throws Exception {
         long socket = Socket.accept(serverSock);
+        if (socket == 0) {
+            throw new IOException(sm.getString("endpoint.err.accept", getName()));
+        }
         if (log.isDebugEnabled()) {
             long sa = Address.get(Socket.APR_REMOTE, socket);
             Sockaddr addr = Address.getInfo(sa);
