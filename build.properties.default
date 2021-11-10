@@ -33,13 +33,13 @@ version.major=9
 version.minor=0
 version.build=55
 version.patch=0
-version.suffix=-dev
+version.suffix=
 
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds
 # Note: The value is in seconds (unlike milliseconds used by System.currentTimeMillis()).
-#2021-09-28T12:09:00Z
-#ant.tstamp.now=1632819600
+#2021-11-10T08:13:36Z
+#ant.tstamp.now=1636532016
 
 # ----- Source control flags -----
 git.branch=9.0.x
