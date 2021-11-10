@@ -134,7 +134,7 @@
       </add>
       <fix>
         Do not ignore the error condition if the APR connector is not able to
-        open a sever socket as continuing in this case will trigger a JVM crash.
+        open a server socket as continuing in this case will trigger a JVM crash.
         (markt)
       </fix>
     </changelog>
