@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.14 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Improve error handling if APR/Native fails to attach TLS capabilities to
+        a TLS enabled client connection. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.13 (markt)" rtext="release in progress">
   <subsection name="Catalina">
