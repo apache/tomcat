@@ -705,7 +705,11 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             // 2: SSL handshake
             step = 2;
             if (sslContext != 0) {
-                SSLSocket.attach(sslContext, socket);
+                int rv = SSLSocket.attach(sslContext, socket);
+                if (rv != Status.APR_SUCCESS) {
+                    log.warn(sm.getString("endpoint.err.attach", Integer.valueOf(rv)));
+                    return false;
+                }
                 if (SSLSocket.handshake(socket) != 0) {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("endpoint.err.handshake") + ": " + SSL.getLastError());
