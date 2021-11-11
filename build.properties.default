@@ -31,15 +31,16 @@
 # ----- Version Control Flags -----
 version.major=8
 version.minor=5
-version.build=72
+version.build=73
 version.patch=0
-version.suffix=-dev
+version.suffix=
 
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds
 # Note: The value is in seconds (unlike milliseconds used by System.currentTimeMillis()).
-#2021-06-08T12:00:00Z
-#ant.tstamp.now=1623153600
+# 2021-11-11 13:14:36 UTC
+ant.tstamp.now=1636636476
+
 
 # ----- Source control flags -----
 git.branch=8.5.x
