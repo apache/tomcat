@@ -768,10 +768,15 @@ public interface ServletContext {
             Class<? extends Filter> filterClass);
 
     /**
-     * TODO SERVLET3 - Add comments
-     * @param <T> TODO
-     * @param c   TODO
-     * @return TODO
+     * Create a Filter instance using the given class. The instance is just
+     * created. No initialisation occurs.
+     *
+     * @param <T> The type for the given class
+     * @param c   The the class for which an instance should be created
+     *
+     * @return The created Filter instance.
+     *
+     * @throws ServletException If the Filter instance cannot be created
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -779,7 +784,7 @@ public interface ServletContext {
      *    {@link jakarta.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @throws ServletException TODO
+     *
      * @since Servlet 3.0
      */
     public <T extends Filter> T createFilter(Class<T> c) throws ServletException;
