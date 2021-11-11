@@ -2343,7 +2343,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 if (sslOutputBuffer != null) {
                     ByteBufferUtils.cleanDirectBuffer(sslOutputBuffer);
                 }
-                ((AprEndpoint) getEndpoint()).getPoller().close(getSocket().longValue());
+                Poller poller = ((AprEndpoint) getEndpoint()).getPoller();
+                if (poller != null) {
+                    poller.close(getSocket().longValue());
+                }
             }
         }
 
