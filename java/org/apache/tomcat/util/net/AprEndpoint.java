@@ -714,11 +714,22 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     log.warn(sm.getString("endpoint.err.attach", Integer.valueOf(rv)));
                     return false;
                 }
-                if (SSLSocket.handshake(socket) != 0) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("endpoint.err.handshake") + ": " + SSL.getLastError());
+
+                // Need to make sure the socket doesn't get closed while the
+                // handshake is in progress as that could trigger a JVM crash.
+                // Like stopInternal(), use the blocking status write lock as a
+                // proxy for a lock on writing to the socket.
+                WriteLock wl = ((AprSocketWrapper) socketWrapper).getBlockingStatusWriteLock();
+                wl.lock();
+                try {
+                    if (SSLSocket.handshake(socket) != 0) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("endpoint.err.handshake") + ": " + SSL.getLastError());
+                        }
+                        return false;
                     }
-                    return false;
+                } finally {
+                    wl.unlock();
                 }
 
                 if (negotiableProtocols.size() > 0) {
