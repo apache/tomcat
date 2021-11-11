@@ -202,9 +202,9 @@ public final class TesterSupport {
         try {
             SSLContext sc;
             if (TesterSupport.TLSV13_AVAILABLE) {
-                 sc = SSLContext.getInstance("TLSv1.3");
+                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
             } else {
-                sc = SSLContext.getInstance(Constants.SSL_PROTO_TLS);
+                sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
             }
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
