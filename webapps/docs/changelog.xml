@@ -170,6 +170,11 @@
         open a server socket as continuing in this case will trigger a JVM crash.
         (markt)
       </fix>
+      <fix>
+        Fix a potential JVM crash when using the APR/Native connector with TLS.
+        A crash could occur if the connector was stopped whilst a connection was
+        performing a TLS handshake. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
