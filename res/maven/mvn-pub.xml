@@ -515,6 +515,7 @@
 
   <target name="init-gpg-1">
     <available file="${gpg.exec}" property="gpg.exec.available"/>
+    <fail unless="gpg.exec.available">GPG is required, but was not found at ${gpg.exec}</fail>
   </target>
 
   <target name="init-gpg-2" if="${gpg.exec.available}">
