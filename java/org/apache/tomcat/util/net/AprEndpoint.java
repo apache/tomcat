@@ -77,8 +77,6 @@ import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
  * <li>Worker threads pool</li>
  * </ul>
  *
- * TODO: Consider using the virtual machine's thread pool.
- *
  * @author Mladen Turk
  * @author Remy Maucherat
  *
@@ -1538,7 +1536,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                                 // codes plus the flags it was waiting for or it may just
                                 // return an error code. We could handle the error here but
                                 // if we do, there will be no exception associated with the
-                                // error in application code. By signaling read/write is
+                                // error in application code. By signalling read/write is
                                 // possible, a read/write will be attempted, fail and that
                                 // will trigger an exception the application will see.
                                 // Check the return flags first, followed by what the socket
@@ -2084,7 +2082,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 }
             }
         }
-
     }
 
 
@@ -2844,7 +2841,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     }
                 }
             }
-
         }
 
     }
