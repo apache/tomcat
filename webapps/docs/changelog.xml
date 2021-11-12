@@ -113,6 +113,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Use an implicit scope to tie the cleanup of OpenSSL memory to the Java
+        GC. (remm)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M7 (markt)" rtext="release in progress">
   <subsection name="Catalina">

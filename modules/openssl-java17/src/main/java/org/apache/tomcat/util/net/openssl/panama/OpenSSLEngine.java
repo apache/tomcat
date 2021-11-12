@@ -22,7 +22,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.ref.Cleaner;
-import java.lang.ref.Cleaner.Cleanable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,6 +38,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -94,9 +94,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     static {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
-            openSSLCallbackInfoHandle = lookup.findVirtual(OpenSSLEngine.class, "openSSLCallbackInfo",
+            openSSLCallbackInfoHandle = lookup.findStatic(OpenSSLEngine.class, "openSSLCallbackInfo",
                     MethodType.methodType(void.class, MemoryAddress.class, int.class, int.class));
-            openSSLCallbackVerifyHandle = lookup.findVirtual(OpenSSLEngine.class, "openSSLCallbackVerify",
+            openSSLCallbackVerifyHandle = lookup.findStatic(OpenSSLEngine.class, "openSSLCallbackVerify",
                     MethodType.methodType(int.class, int.class, MemoryAddress.class));
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -110,7 +110,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             try {
                 SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
                 SSL_CTX_set_cipher_list(sslCtx, CLinker.toCString("ALL", scope));
-                var ssl = SSL_new(sslCtx).asSegment(CLinker.C_POINTER.byteSize(), scope);
+                var ssl = SSL_new(sslCtx);
                 SSL_set_accept_state(ssl);
                 try {
                     for (String c : getCiphers(ssl)) {
@@ -142,7 +142,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         IMPLEMENTED_PROTOCOLS_SET = Collections.unmodifiableSet(protocols);
     }
 
-    private static String[] getCiphers(MemorySegment ssl) {
+    private static String[] getCiphers(MemoryAddress ssl) {
         MemoryAddress sk = SSL_get_ciphers(ssl);
         int len = OPENSSL_sk_num(sk);
         if (len <= 0) {
@@ -177,16 +177,16 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static final String INVALID_CIPHER = "SSL_NULL_WITH_NULL_NULL";
 
+    private static final ConcurrentHashMap<Long, OpenSSLState> states = new ConcurrentHashMap<>();
+
     private final OpenSSLState state;
-    private final Cleanable cleanable;
+    private final ResourceScope scope;
 
     private enum Accepted { NOT, IMPLICIT, EXPLICIT }
     private Accepted accepted = Accepted.NOT;
     private enum PHAState { NONE, START, COMPLETE }
-    private PHAState phaState = PHAState.NONE;
     private boolean handshakeFinished;
     private int currentHandshake;
-    private int handshakeCount = 0;
     private boolean receivedShutdown;
     private volatile boolean destroyed;
 
@@ -208,15 +208,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private boolean sendHandshakeError = false;
 
     private final boolean clientMode;
-    private final boolean noOcspCheck;
     private final String fallbackApplicationProtocol;
     private final OpenSSLSessionContext sessionContext;
     private final boolean alpn;
     private final boolean initialized;
     private final boolean certificateVerificationOptionalNoCA;
-    private final int certificateVerificationDepth;
-
-    private int certificateVerifyMode = 0;
 
     private String selectedProtocol = null;
 
@@ -248,13 +244,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (sslCtx == null) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
-        ResourceScope scope = ResourceScope.newSharedScope();
+        scope = ResourceScope.newImplicitScope();
         var allocator = SegmentAllocator.ofScope(scope);
         session = new OpenSSLSession();
-        var ssl = SSL_new(sslCtx).asSegment(CLinker.C_POINTER.byteSize(), scope);
-        this.certificateVerificationDepth = certificateVerificationDepth;
+        var ssl = SSL_new(sslCtx);
         // Set ssl_info_callback
-        MemoryAddress openSSLCallbackInfo = CLinker.getInstance().upcallStub(openSSLCallbackInfoHandle.bindTo(this),
+        MemoryAddress openSSLCallbackInfo = CLinker.getInstance().upcallStub(openSSLCallbackInfoHandle,
                 openSSLCallbackInfoFunctionDescriptor, scope);
         SSL_set_info_callback(ssl, openSSLCallbackInfo);
         if (clientMode) {
@@ -267,17 +262,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         var networkBIOPointer = allocator.allocate(CLinker.C_POINTER);
         BIO_new_bio_pair(internalBIOPointer, 0, networkBIOPointer, 0);
         var internalBIO = MemoryAccess.getAddress(internalBIOPointer);
-        var networkBIO = MemoryAccess.getAddress(networkBIOPointer).asSegment(CLinker.C_POINTER.byteSize(), scope);
+        var networkBIO = MemoryAccess.getAddress(networkBIOPointer);
         SSL_set_bio(ssl, internalBIO, internalBIO);
-        state = new OpenSSLState(scope, ssl, networkBIO);
-        cleanable = cleaner.register(this, state);
+        state = new OpenSSLState(scope, ssl, networkBIO, certificateVerificationDepth, noOcspCheck);
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
         this.alpn = alpn;
         this.initialized = initialized;
         this.certificateVerificationOptionalNoCA = certificateVerificationOptionalNoCA;
-        this.noOcspCheck = noOcspCheck;
     }
 
     @Override
@@ -291,7 +284,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public synchronized void shutdown() {
         if (!destroyed) {
             destroyed = true;
-            cleanable.clean();
+            states.remove(Long.valueOf(state.ssl.address().toRawLongValue()));
             // internal errors can cause shutdown without marking the engine closed
             isInboundDone = isOutboundDone = engineClosed = true;
         }
@@ -303,7 +296,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Calling this function with src.remaining == 0 is undefined.
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int writePlaintextData(final MemorySegment ssl, final ByteBuffer src) throws SSLException {
+    private int writePlaintextData(final MemoryAddress ssl, final ByteBuffer src) throws SSLException {
         clearLastError();
         final int pos = src.position();
         final int limit = src.limit();
@@ -341,7 +334,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Write encrypted data to the OpenSSL network BIO.
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int writeEncryptedData(final MemorySegment networkBIO, final ByteBuffer src) throws SSLException {
+    private int writeEncryptedData(final MemoryAddress networkBIO, final ByteBuffer src) throws SSLException {
         clearLastError();
         final int pos = src.position();
         final int len = src.remaining();
@@ -380,7 +373,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Read plain text data from the OpenSSL internal BIO
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int readPlaintextData(final MemorySegment ssl, final ByteBuffer dst) throws SSLException {
+    private int readPlaintextData(final MemoryAddress ssl, final ByteBuffer dst) throws SSLException {
         clearLastError();
         final int pos = dst.position();
 
@@ -417,7 +410,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Read encrypted data from the OpenSSL network BIO
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int readEncryptedData(final MemorySegment networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
+    private int readEncryptedData(final MemoryAddress networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
         clearLastError();
         final int pos = dst.position();
         if (dst.isDirect()) {
@@ -835,7 +828,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         final String cipherSuiteSpec = buf.toString();
         try {
-            SSL_set_cipher_list(state.ssl, CLinker.toCString(cipherSuiteSpec, state.scope));
+            SSL_set_cipher_list(state.ssl, CLinker.toCString(cipherSuiteSpec, scope));
         } catch (Exception e) {
             throw new IllegalStateException(sm.getString("engine.failedCipherSuite", cipherSuiteSpec), e);
         }
@@ -971,7 +964,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private byte[] getPeerCertificate() {
-        var allocator = SegmentAllocator.ofScope(state.scope);
+        var allocator = SegmentAllocator.ofScope(scope);
         MemoryAddress/*(X509*)*/ x509 = SSL_get_peer_certificate(state.ssl);
         MemorySegment bufPointer = allocator.allocate(CLinker.C_POINTER, MemoryAddress.NULL);
         int length = i2d_X509(x509, bufPointer);
@@ -979,7 +972,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return null;
         }
         MemoryAddress buf = MemoryAccess.getAddress(bufPointer);
-        byte[] certificate = buf.asSegment(length, state.scope).toByteArray();
+        byte[] certificate = buf.asSegment(length, scope).toByteArray();
         X509_free(x509);
         CRYPTO_free(buf, OPENSSL_FILE(), OPENSSL_LINE()); // OPENSSL_free macro
         return certificate;
@@ -992,7 +985,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return null;
         }
         byte[][] certificateChain = new byte[len][];
-        var allocator = SegmentAllocator.ofScope(state.scope);
+        var allocator = SegmentAllocator.ofScope(scope);
         for (int i = 0; i < len; i++) {
             MemoryAddress/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
             MemorySegment bufPointer = allocator.allocate(CLinker.C_POINTER, MemoryAddress.NULL);
@@ -1002,7 +995,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 continue;
             }
             MemoryAddress buf = MemoryAccess.getAddress(bufPointer);
-            byte[] certificate = buf.asSegment(length, state.scope).toByteArray();
+            byte[] certificate = buf.asSegment(length, scope).toByteArray();
             certificateChain[i] = certificate;
             CRYPTO_free(buf, OPENSSL_FILE(), OPENSSL_LINE()); // OPENSSL_free macro
         }
@@ -1010,7 +1003,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private String getProtocolNegotiated() {
-        var allocator = SegmentAllocator.ofScope(state.scope);
+        var allocator = SegmentAllocator.ofScope(scope);
         MemorySegment lenAddress = allocator.allocate(CLinker.C_INT, 0);
         MemorySegment protocolPointer = allocator.allocate(CLinker.C_POINTER, MemoryAddress.NULL);
         SSL_get0_alpn_selected(state.ssl, protocolPointer, lenAddress);
@@ -1025,7 +1018,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return null;
         }
         MemoryAddress protocolAddress = MemoryAccess.getAddress(protocolPointer);
-        byte[] name = protocolAddress.asSegment(length, state.scope).toByteArray();
+        byte[] name = protocolAddress.asSegment(length, scope).toByteArray();
         if (logger.isDebugEnabled()) {
             logger.debug("Protocol negotiated [" + new String(name) + "]");
         }
@@ -1038,7 +1031,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void handshake() throws SSLException {
-        currentHandshake = handshakeCount;
+        currentHandshake = state.handshakeCount;
         clearLastError();
         int code = SSL_do_handshake(state.ssl);
         if (code <= 0) {
@@ -1061,7 +1054,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         clearLastError();
         int code;
         if (CLinker.toJavaString(SSL_get_version(state.ssl)).equals(Constants.SSL_PROTO_TLSv1_3)) {
-            phaState = PHAState.START;
+            state.phaState = PHAState.START;
             code = SSL_verify_client_post_handshake(state.ssl);
         } else {
             code = SSL_renegotiate(state.ssl);
@@ -1072,7 +1065,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         handshakeFinished = false;
         peerCerts = null;
         x509PeerCerts = null;
-        currentHandshake = handshakeCount;
+        currentHandshake = state.handshakeCount;
         int code2 = SSL_do_handshake(state.ssl);
         if (code2 <= 0) {
             checkLastError();
@@ -1112,7 +1105,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         String sslError = null;
         long error = ERR_get_error();
         if (error != SSL_ERROR_NONE()) {
-            var allocator = SegmentAllocator.ofScope(state.scope);
+            var allocator = SegmentAllocator.ofScope(scope);
             do {
                 // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
                 var buf = allocator.allocateArray(CLinker.C_CHAR, new byte[128]);
@@ -1185,8 +1178,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
             // No pending data to be sent to the peer
             // Check to see if we have finished handshaking
-            if (handshakeCount != currentHandshake && SSL_renegotiate_pending(state.ssl) == 0 &&
-                    (phaState != PHAState.START)) {
+            if (state.handshakeCount != currentHandshake && SSL_renegotiate_pending(state.ssl) == 0 &&
+                    (state.phaState != PHAState.START)) {
                 if (alpn) {
                     selectedProtocol = getProtocolNegotiated();
                 }
@@ -1258,7 +1251,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (clientAuth == mode) {
                 return;
             }
-            certificateVerifyMode = switch (mode) {
+            state.certificateVerifyMode = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
                 case OPTIONAL -> certificateVerificationOptionalNoCA ? OPTIONAL_NO_CA : SSL_VERIFY_PEER();
@@ -1266,8 +1259,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // SSL.setVerify(state.ssl, value, certificateVerificationDepth);
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             MemoryAddress openSSLCallbackVerify =
-                    CLinker.getInstance().upcallStub(openSSLCallbackVerifyHandle.bindTo(this),
-                    openSSLCallbackVerifyFunctionDescriptor, state.scope);
+                    CLinker.getInstance().upcallStub(openSSLCallbackVerifyHandle,
+                    openSSLCallbackVerifyFunctionDescriptor, scope);
             int value = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_PEER() | SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
@@ -1278,21 +1271,32 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    public synchronized void openSSLCallbackInfo(MemoryAddress ssl, int where, int ret) {
+    public static void openSSLCallbackInfo(MemoryAddress ssl, int where, int ret) {
+        OpenSSLState state = states.get(Long.valueOf(ssl.toRawLongValue()));
+        if (state == null) {
+            logger.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.toRawLongValue())));
+            return;
+        }
         if (0 != (where & SSL_CB_HANDSHAKE_DONE())) {
-            handshakeCount++;
+            state.handshakeCount++;
         }
     }
 
-    public synchronized int openSSLCallbackVerify(int preverify_ok, MemoryAddress /*X509_STORE_CTX*/ x509ctx) {
+    public static int openSSLCallbackVerify(int preverify_ok, MemoryAddress /*X509_STORE_CTX*/ x509ctx) {
+        MemoryAddress ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
+        OpenSSLState state = states.get(Long.valueOf(ssl.toRawLongValue()));
+        if (state == null) {
+            logger.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.toRawLongValue())));
+            return 0;
+        }
         if (logger.isDebugEnabled()) {
-            logger.debug("Verification in engine with mode [" + certificateVerifyMode + "] for " + state.ssl);
+            logger.debug("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
         }
         int ok = preverify_ok;
         int errnum = X509_STORE_CTX_get_error(x509ctx);
         int errdepth = X509_STORE_CTX_get_error_depth(x509ctx);
-        phaState = PHAState.COMPLETE;
-        if (certificateVerifyMode == -1 /*SSL_CVERIFY_UNSET*/ || certificateVerifyMode == SSL_VERIFY_NONE()) {
+        state.phaState = PHAState.COMPLETE;
+        if (state.certificateVerifyMode == -1 /*SSL_CVERIFY_UNSET*/ || state.certificateVerifyMode == SSL_VERIFY_NONE()) {
             return 1;
         }
         /*SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) -> ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT)
@@ -1305,7 +1309,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY())
                 || (errnum == X509_V_ERR_CERT_UNTRUSTED())
                 || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE());
-        if (verifyErrorIsOptional && (certificateVerifyMode == OPTIONAL_NO_CA)) {
+        if (verifyErrorIsOptional && (state.certificateVerifyMode == OPTIONAL_NO_CA)) {
             ok = 1;
             SSL_set_verify_result(state.ssl, X509_V_OK());
         }
@@ -1326,13 +1330,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // OCSP
-        if (!noOcspCheck && (ok > 0)) {
+        if (!state.noOcspCheck && (ok > 0)) {
             /* If there was an optional verification error, it's not
              * possible to perform OCSP validation since the issuer may be
              * missing/untrusted.  Fail in that case.
              */
             if (verifyErrorIsOptional) {
-                if (certificateVerifyMode != OPTIONAL_NO_CA) {
+                if (state.certificateVerifyMode != OPTIONAL_NO_CA) {
                     X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_APPLICATION_VERIFICATION());
                     errnum = X509_V_ERR_APPLICATION_VERIFICATION();
                     ok = 0;
@@ -1351,7 +1355,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
         }
 
-        if (errdepth > certificateVerificationDepth) {
+        if (errdepth > state.certificateVerificationDepth) {
             // Certificate Verification: Certificate Chain too long
             ok = 0;
         }
@@ -1560,12 +1564,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             byte[] id = null;
             synchronized (OpenSSLEngine.this) {
                 if (!destroyed) {
-                    var allocator = SegmentAllocator.ofScope(state.scope);
+                    var allocator = SegmentAllocator.ofScope(scope);
                     MemorySegment lenPointer = allocator.allocate(CLinker.C_POINTER);
                     var session = SSL_get_session(state.ssl);
                     MemoryAddress sessionId = SSL_SESSION_get_id(session, lenPointer);
                     int length = MemoryAccess.getInt(lenPointer);
-                    id = (length == 0) ? new byte[0] : sessionId.asSegment(length, state.scope).toByteArray();
+                    id = (length == 0) ? new byte[0] : sessionId.asSegment(length, scope).toByteArray();
                 }
             }
 
@@ -1851,24 +1855,30 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static class OpenSSLState implements Runnable {
 
-        private final ResourceScope scope;
-        private final MemorySegment ssl;
-        private final MemorySegment networkBIO;
+        // FIXME: MemorySegment is supposed to be used but creates GC roots to the implicit scope
+        private final MemoryAddress ssl;
+        private final MemoryAddress networkBIO;
+        private final int certificateVerificationDepth;
+        private final boolean noOcspCheck;
 
-        private OpenSSLState(ResourceScope scope, MemorySegment ssl, MemorySegment networkBIO) {
-            this.scope = scope;
+        private PHAState phaState = PHAState.NONE;
+        private int certificateVerifyMode = 0;
+        private int handshakeCount = 0;
+
+        private OpenSSLState(ResourceScope scope, MemoryAddress ssl, MemoryAddress networkBIO,
+                int certificateVerificationDepth, boolean noOcspCheck) {
+            states.put(Long.valueOf(ssl.address().toRawLongValue()), this);
+            scope.addCloseAction(this);
             this.ssl = ssl;
             this.networkBIO = networkBIO;
+            this.certificateVerificationDepth = certificateVerificationDepth;
+            this.noOcspCheck = noOcspCheck;
         }
 
         @Override
         public void run() {
-            try {
-                BIO_free(networkBIO);
-                SSL_free(ssl);
-            } finally {
-                scope.close();
-            }
+            BIO_free(networkBIO);
+            SSL_free(ssl);
         }
     }
 }
