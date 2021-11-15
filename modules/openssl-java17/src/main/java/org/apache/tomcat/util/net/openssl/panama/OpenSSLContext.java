@@ -141,7 +141,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             openSSLCallbackAlpnSelectProtoHandle = lookup.findVirtual(OpenSSLContext.class, "openSSLCallbackAlpnSelectProto",
                     MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class,
                             MemoryAddress.class, MemoryAddress.class, int.class, MemoryAddress.class));
-            openSSLCallbackTmpDHHandle = lookup.findVirtual(OpenSSLContext.class, "openSSLCallbackTmpDH",
+            openSSLCallbackTmpDHHandle = lookup.findStatic(OpenSSLContext.class, "openSSLCallbackTmpDH",
                     MethodType.methodType(MemoryAddress.class, MemoryAddress.class, int.class, int.class));
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -212,7 +212,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
-    private final List<String> negotiableProtocols;
+    private final boolean alpn;
+    private final List<byte[]> negotiableProtocols;
 
     private int certificateVerifyMode = -1;
 
@@ -381,7 +382,16 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     openSSLCallbackPasswordFunctionDescriptor, scope);
             SSL_CTX_set_default_passwd_cb(ctx, openSSLCallbackPassword);
 
-            this.negotiableProtocols = negotiableProtocols;
+            alpn = (negotiableProtocols != null && negotiableProtocols.size() > 0);
+            if (alpn) {
+                this.negotiableProtocols = new ArrayList<>(negotiableProtocols.size() + 1);
+                for (String negotiableProtocol : negotiableProtocols) {
+                    this.negotiableProtocols.add(negotiableProtocol.getBytes(StandardCharsets.ISO_8859_1));
+                }
+                this.negotiableProtocols.add(HTTP_11_PROTOCOL);
+            } else {
+                this.negotiableProtocols = null;
+            }
 
             success = true;
         } catch(Exception e) {
@@ -715,7 +725,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         CLinker.getInstance().upcallStub(openSSLCallbackAlpnSelectProtoHandle.bindTo(this),
                         openSSLCallbackAlpnSelectProtoFunctionDescriptor, state.scope);
                 SSL_CTX_set_alpn_select_cb(state.ctx, openSSLCallbackAlpnSelectProto, MemoryAddress.NULL);
-
                 // Skip NPN (annoying and likely not useful anymore)
                 //SSLContext.setNpnProtos(state.ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
             }
@@ -795,7 +804,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     // DH *(*tmp_dh_callback)(SSL *ssl, int is_export, int keylength)
-    public MemoryAddress openSSLCallbackTmpDH(MemoryAddress ssl, int isExport, int keylength) {
+    public static MemoryAddress openSSLCallbackTmpDH(MemoryAddress ssl, int isExport, int keylength) {
         var pkey = SSL_get_privatekey(ssl);
         int type = (MemoryAddress.NULL.equals(pkey)) ? EVP_PKEY_NONE() : EVP_PKEY_base_id(pkey);
         /*
@@ -830,12 +839,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         // However, the Java 17 API forces use of a scope later on, so create one for everything
         try (ResourceScope scope = ResourceScope.newConfinedScope()) {
             byte[] advertisedBytes = in.asSegment(inlen, scope).toByteArray();
-            ArrayList<byte[]> negotiableProtocolsBytes = new ArrayList<>(negotiableProtocols.size() + 1);
-            for (String negotiableProtocol : negotiableProtocols) {
-                negotiableProtocolsBytes.add(negotiableProtocol.getBytes());
-            }
-            negotiableProtocolsBytes.add(HTTP_11_PROTOCOL);
-            for (byte[] negotiableProtocolBytes : negotiableProtocolsBytes) {
+            for (byte[] negotiableProtocolBytes : negotiableProtocols) {
                 for (int i = 0; i <= advertisedBytes.length - negotiableProtocolBytes.length; i++) {
                     if (advertisedBytes[i] == negotiableProtocolBytes[0]) {
                         for (int j = 0; j < negotiableProtocolBytes.length; j++) {
@@ -1231,8 +1235,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     EC_GROUP_free(ecparams);
                 }
                 // Set callback for DH parameters
-                MemoryAddress openSSLCallbackTmpDH =
-                        CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle.bindTo(this),
+                MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
                         openSSLCallbackTmpDHFunctionDescriptor, state.scope);
                 SSL_CTX_set_tmp_dh_callback(state.ctx, openSSLCallbackTmpDH);
                 callbackPassword = null;
@@ -1321,8 +1324,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     return;
                 }
                 // Set callback for DH parameters
-                MemoryAddress openSSLCallbackTmpDH =
-                        CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle.bindTo(this),
+                MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
                         openSSLCallbackTmpDHFunctionDescriptor, state.scope);
                 SSL_CTX_set_tmp_dh_callback(state.ctx, openSSLCallbackTmpDH);
                 for (int i = 1; i < chain.length; i++) {
@@ -1423,7 +1425,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public synchronized SSLEngine createSSLEngine() {
         return new OpenSSLEngine(cleaner, state.ctx, defaultProtocol, false, sessionContext,
-                (negotiableProtocols != null && negotiableProtocols.size() > 0), initialized,
+                alpn, initialized,
                 sslHostConfig.getCertificateVerificationDepth(),
                 sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA,
                 noOcspCheck);
