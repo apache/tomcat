@@ -32,7 +32,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <tomcat.version>10.0.12</tomcat.version>
+        <tomcat.version>10.0.13</tomcat.version>
     </properties>
 
     <dependencies>
