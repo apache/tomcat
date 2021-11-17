@@ -116,6 +116,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     protected long sslContext = 0;
 
 
+    private int previousAcceptedPort = -1;
+    private String previousAcceptedAddress = null;
+
     // ------------------------------------------------------------ Constructor
 
     public AprEndpoint() {
@@ -794,7 +797,18 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("endpoint.debug.socket", socket));
             }
+
+            // Do the duplicate accept check here rather than in serverSocketaccept()
+            // so we can cache the results in the SocketWrapper
             AprSocketWrapper wrapper = new AprSocketWrapper(socket, this);
+            if (wrapper.getRemotePort() == previousAcceptedPort) {
+                if (wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
+                    throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                }
+            }
+            previousAcceptedPort = wrapper.getRemotePort();
+            previousAcceptedAddress = wrapper.getRemoteAddr();
+
             connections.put(socket, wrapper);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
             wrapper.setReadTimeout(getConnectionTimeout());
@@ -815,6 +829,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
     @Override
     protected Long serverSocketAccept() throws Exception {
+        // See setSocketOptions(Long) for duplicate accept check
         long socket = Socket.accept(serverSock);
         if (socket == 0) {
             throw new IOException(sm.getString("endpoint.err.accept", getName()));
