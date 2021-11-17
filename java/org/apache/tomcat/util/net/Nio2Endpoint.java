@@ -84,8 +84,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
      */
     private SynchronizedStack<Nio2Channel> nioChannels;
 
-    // ------------------------------------------------------------- Properties
+    private SocketAddress previousAcceptedSocketRemoteAddress = null;
 
+
+    // ------------------------------------------------------------- Properties
 
     /**
      * Is deferAccept supported?
@@ -98,7 +100,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Number of keep-alive sockets.
@@ -367,7 +368,15 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
     @Override
     protected AsynchronousSocketChannel serverSocketAccept() throws Exception {
-        return serverSock.accept().get();
+        AsynchronousSocketChannel result = serverSock.accept().get();
+
+        SocketAddress currentRemoteAddress = result.getRemoteAddress();
+        if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress)) {
+            throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+        }
+        previousAcceptedSocketRemoteAddress = currentRemoteAddress;
+
+        return result;
     }
 
 
