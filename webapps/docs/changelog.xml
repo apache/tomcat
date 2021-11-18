@@ -116,8 +116,8 @@
   <subsection name="Coyote">
     <changelog>
       <add>
-        Use an implicit scope to tie the cleanup of OpenSSL memory to the Java
-        GC. (remm)
+        Use implicit scopes in the OpenSSL Panama module to tie the cleanup of
+        OpenSSL memory to the Java GC. (remm)
       </add>
       <add>
         Provide protection against a known <a
