@@ -331,13 +331,13 @@
      with the following attributes:</p>
 
   <attributes>
-  
+
     <attribute name="className" required="true">
       <p>Java class name of the implementation to use. This class must implement
       the <code>org.apache.catalina.WebResourceRoot$CacheStrategy</code>
       interface.</p>
     </attribute>
-  
+
   </attributes>
 
 </section>
