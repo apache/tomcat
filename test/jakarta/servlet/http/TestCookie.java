@@ -134,6 +134,29 @@ public class TestCookie {
         Cookie cookie = new Cookie("$Foo", null);
     }
 
+    @Test
+    public void testClone() {
+        Cookie a = new Cookie("a","a");
+        a.setComment("comment");
+        a.setDomain("domain");
+        a.setHttpOnly(true);
+        a.setMaxAge(123);
+        a.setPath("/path");
+        a.setSecure(true);
+
+        Cookie b = (Cookie) a.clone();
+
+        Assert.assertEquals("a", b.getName());
+        Assert.assertEquals("a", b.getValue());
+        Assert.assertEquals("comment", b.getComment());
+        Assert.assertEquals("domain", b.getDomain());
+        Assert.assertTrue(b.isHttpOnly());
+        Assert.assertEquals(123, b.getMaxAge());
+        Assert.assertEquals("/path", b.getPath());
+        Assert.assertTrue(b.getSecure());
+    }
+
+
     public static void checkCharInName(CookieNameValidator validator, BitSet allowed) {
         for (char ch = 0; ch < allowed.size(); ch++) {
             boolean expected = allowed.get(ch);
