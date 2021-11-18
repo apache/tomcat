@@ -342,7 +342,7 @@ public class Cookie implements Cloneable, Serializable {
      * using any protocol.
      *
      * @return <code>true</code> if the browser uses a secure protocol;
-     *         otherwise, <code>true</code>
+     *         otherwise, <code>false</code>
      * @see #setSecure
      */
     public boolean getSecure() {
