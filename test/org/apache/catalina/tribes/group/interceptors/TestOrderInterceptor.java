@@ -81,10 +81,20 @@ public class TestOrderInterceptor {
         for ( int i=0; i<channelCount; i++ ) {
           threads[i].start();
         }
-        for ( int i=0; i<channelCount; i++ ) {
-          threads[i].join();
+
+        int totalSleep = 0;
+
+        for (int i = 0; i < channelCount; i++) {
+            Member[] m = channels[i].getMembers();
+            while (m == null || m.length < channelCount - 1) {
+                totalSleep += 50;
+                if (totalSleep > 60000) {
+                    Assert.fail("Cluster took more than 60s to start");
+                }
+                Thread.sleep(50);
+                m = channels[i].getMembers();
+            }
         }
-        Thread.sleep(1500);
     }
 
     @Test
