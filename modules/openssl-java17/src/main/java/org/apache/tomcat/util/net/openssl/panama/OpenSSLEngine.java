@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.ref.Cleaner;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -178,9 +177,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static final String INVALID_CIPHER = "SSL_NULL_WITH_NULL_NULL";
 
-    private static final ConcurrentHashMap<Long, OpenSSLState> states = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, EngineState> states = new ConcurrentHashMap<>();
+    private static EngineState getState(MemoryAddress ssl) {
+        return states.get(Long.valueOf(ssl.toRawLongValue()));
+    }
 
-    private final OpenSSLState state;
+    private final EngineState state;
     private final ResourceScope scope;
 
     private enum Accepted { NOT, IMPLICIT, EXPLICIT }
@@ -222,8 +224,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     /**
      * Creates a new instance
      *
-     * @param cleaner   Used to clean up references to instances before they are
-     *                  garbage collected
      * @param sslCtx an OpenSSL {@code SSL_CTX} object
      * @param fallbackApplicationProtocol the fallback application protocol
      * @param clientMode {@code true} if this is used for clients, {@code false}
@@ -238,7 +238,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * @param certificateVerificationOptionalNoCA Skip CA verification in
      *   optional mode
      */
-    OpenSSLEngine(Cleaner cleaner, MemoryAddress sslCtx, String fallbackApplicationProtocol,
+    OpenSSLEngine(MemoryAddress sslCtx, String fallbackApplicationProtocol,
             boolean clientMode, OpenSSLSessionContext sessionContext, boolean alpn,
             boolean initialized, int certificateVerificationDepth,
             boolean certificateVerificationOptionalNoCA, boolean noOcspCheck) {
@@ -265,7 +265,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         var internalBIO = MemoryAccess.getAddress(internalBIOPointer);
         var networkBIO = MemoryAccess.getAddress(networkBIOPointer);
         SSL_set_bio(ssl, internalBIO, internalBIO);
-        state = new OpenSSLState(scope, ssl, networkBIO, certificateVerificationDepth, noOcspCheck);
+        state = new EngineState(ssl, networkBIO, certificateVerificationDepth, noOcspCheck);
+        states.put(Long.valueOf(ssl.address().toRawLongValue()), state);
+        scope.addCloseAction(state);
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
@@ -975,7 +977,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         MemoryAddress buf = MemoryAccess.getAddress(bufPointer);
         byte[] certificate = buf.asSegment(length, scope).toByteArray();
         X509_free(x509);
-        CRYPTO_free(buf, OPENSSL_FILE(), OPENSSL_LINE()); // OPENSSL_free macro
+        CRYPTO_free(buf, MemoryAddress.NULL, 0); // OPENSSL_free macro
         return certificate;
     }
 
@@ -998,7 +1000,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             MemoryAddress buf = MemoryAccess.getAddress(bufPointer);
             byte[] certificate = buf.asSegment(length, scope).toByteArray();
             certificateChain[i] = certificate;
-            CRYPTO_free(buf, OPENSSL_FILE(), OPENSSL_LINE()); // OPENSSL_free macro
+            CRYPTO_free(buf, MemoryAddress.NULL, 0); // OPENSSL_free macro
         }
         return certificateChain;
     }
@@ -1273,7 +1275,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     public static void openSSLCallbackInfo(MemoryAddress ssl, int where, int ret) {
-        OpenSSLState state = states.get(Long.valueOf(ssl.toRawLongValue()));
+        EngineState state = getState(ssl);
         if (state == null) {
             logger.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.toRawLongValue())));
             return;
@@ -1285,7 +1287,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     public static int openSSLCallbackVerify(int preverify_ok, MemoryAddress /*X509_STORE_CTX*/ x509ctx) {
         MemoryAddress ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
-        OpenSSLState state = states.get(Long.valueOf(ssl.toRawLongValue()));
+        EngineState state = getState(ssl);
         if (state == null) {
             logger.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.toRawLongValue())));
             return 0;
@@ -1854,7 +1856,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     }
 
-    private static class OpenSSLState implements Runnable {
+    private static class EngineState implements Runnable {
 
         // FIXME: MemorySegment is supposed to be used but creates GC roots to the implicit scope
         private final MemoryAddress ssl;
@@ -1866,10 +1868,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         private int certificateVerifyMode = 0;
         private int handshakeCount = 0;
 
-        private OpenSSLState(ResourceScope scope, MemoryAddress ssl, MemoryAddress networkBIO,
+        private EngineState(MemoryAddress ssl, MemoryAddress networkBIO,
                 int certificateVerificationDepth, boolean noOcspCheck) {
-            states.put(Long.valueOf(ssl.address().toRawLongValue()), this);
-            scope.addCloseAction(this);
             this.ssl = ssl;
             this.networkBIO = networkBIO;
             this.certificateVerificationDepth = certificateVerificationDepth;

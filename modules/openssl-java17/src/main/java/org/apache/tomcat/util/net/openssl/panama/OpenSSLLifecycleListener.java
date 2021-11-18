@@ -265,6 +265,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
             }
         }
 
+        // FIXME: OPENSSL_VERSION_TEXT is actually hardcoded by jextract so this is not useful
         log.info(sm.getString("listener.initializedOpenSSL", new String(OPENSSL_VERSION_TEXT().toByteArray())));
         OpenSSLStatus.setAvailable(true);
     }
