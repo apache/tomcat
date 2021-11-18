@@ -74,7 +74,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolInfo {
 
-    private static final Log logger = LogFactory.getLog(OpenSSLEngine.class);
+    private static final Log log = LogFactory.getLog(OpenSSLEngine.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLEngine.class);
 
     private static final Certificate[] EMPTY_CERTIFICATES = new Certificate[0];
@@ -127,7 +127,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 SSL_CTX_free(sslCtx);
             }
         } catch (Exception e) {
-            logger.warn(sm.getString("engine.ciphersFailure"), e);
+            log.warn(sm.getString("engine.ciphersFailure"), e);
         }
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
 
@@ -814,7 +814,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             String converted = OpenSSLCipherConfigurationParser.jsseToOpenSSL(cipherSuite);
             if (!AVAILABLE_CIPHER_SUITES.contains(cipherSuite)) {
-                logger.debug(sm.getString("engine.unsupportedCipher", cipherSuite, converted));
+                log.debug(sm.getString("engine.unsupportedCipher", cipherSuite, converted));
             }
             if (converted != null) {
                 cipherSuite = converted;
@@ -1022,8 +1022,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
         MemoryAddress protocolAddress = MemoryAccess.getAddress(protocolPointer);
         byte[] name = protocolAddress.asSegment(length, scope).toByteArray();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Protocol negotiated [" + new String(name) + "]");
+        if (log.isDebugEnabled()) {
+            log.debug("Protocol negotiated [" + new String(name) + "]");
         }
         return new String(name);
     }
@@ -1051,8 +1051,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private synchronized void renegotiate() throws SSLException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Start renegotiate");
+        if (log.isDebugEnabled()) {
+            log.debug("Start renegotiate");
         }
         clearLastError();
         int code;
@@ -1117,8 +1117,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 if (sslError == null) {
                     sslError = err;
                 }
-                if (logger.isDebugEnabled()) {
-                    logger.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
                 }
             } while ((error = ERR_get_error()) != SSL_ERROR_NONE());
         }
@@ -1277,7 +1277,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public static void openSSLCallbackInfo(MemoryAddress ssl, int where, int ret) {
         EngineState state = getState(ssl);
         if (state == null) {
-            logger.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.toRawLongValue())));
+            log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.toRawLongValue())));
             return;
         }
         if (0 != (where & SSL_CB_HANDSHAKE_DONE())) {
@@ -1289,11 +1289,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         MemoryAddress ssl = X509_STORE_CTX_get_ex_data(x509ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
         EngineState state = getState(ssl);
         if (state == null) {
-            logger.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.toRawLongValue())));
+            log.warn(sm.getString("engine.noSSL", Long.valueOf(ssl.toRawLongValue())));
             return 0;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
+        if (log.isDebugEnabled()) {
+            log.debug("Verification in engine with mode [" + state.certificateVerifyMode + "] for " + state.ssl);
         }
         int ok = preverify_ok;
         int errnum = X509_STORE_CTX_get_error(x509ctx);
@@ -1396,7 +1396,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                             try {
                                 parseOCSPURLs(parser, urls);
                             } catch (Exception e) {
-                                logger.error(sm.getString("engine.ocspParseError"), e);
+                                log.error(sm.getString("engine.ocspParseError"), e);
                             }
                             if (!urls.isEmpty()) {
                                 // Use OpenSSL to build OCSP request
@@ -1404,11 +1404,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                     try {
                                         URL url = new URL(urlString);
                                         ocspResponse = processOCSPRequest(url, issuer, x509, x509ctx, scope);
-                                        if (logger.isDebugEnabled()) {
-                                            logger.debug("OCSP response for URL: " + urlString + " was " + ocspResponse);
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("OCSP response for URL: " + urlString + " was " + ocspResponse);
                                         }
                                     } catch (MalformedURLException e) {
-                                        logger.warn(sm.getString("engine.invalidOCSPURL", urlString));
+                                        log.warn(sm.getString("engine.invalidOCSPURL", urlString));
                                     }
                                     if (ocspResponse != V_OCSP_CERTSTATUS_UNKNOWN()) {
                                         break;
@@ -1523,7 +1523,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 }
             }
         } catch (Exception e) {
-            logger.warn(sm.getString("engine.ocspRequestError", url.toString()), e);
+            log.warn(sm.getString("engine.ocspRequestError", url.toString()), e);
         } finally {
             if (MemoryAddress.NULL.equals(ocspResponse)) {
                 // Failed to get a valid response
@@ -1858,7 +1858,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static class EngineState implements Runnable {
 
-        // FIXME: MemorySegment is supposed to be used but creates GC roots to the implicit scope
         private final MemoryAddress ssl;
         private final MemoryAddress networkBIO;
         private final int certificateVerificationDepth;
