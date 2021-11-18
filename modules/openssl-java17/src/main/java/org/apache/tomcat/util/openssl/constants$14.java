@@ -26,6 +26,25 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$14 {
 
+    static final FunctionDescriptor SSL_set_verify$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER,
+        C_INT,
+        C_POINTER
+    );
+    static final MethodHandle SSL_set_verify$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_set_verify",
+        "(Ljdk/incubator/foreign/MemoryAddress;ILjdk/incubator/foreign/MemoryAddress;)V",
+        constants$14.SSL_set_verify$FUNC, false
+    );
+    static final FunctionDescriptor SSL_CTX_use_certificate_chain_file$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CTX_use_certificate_chain_file$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_use_certificate_chain_file",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$14.SSL_CTX_use_certificate_chain_file$FUNC, false
+    );
     static final FunctionDescriptor SSL_load_client_CA_file$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
     );
@@ -59,22 +78,6 @@ class constants$14 {
         openssl_h.LIBRARIES, "SSL_SESSION_get_id",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$14.SSL_SESSION_get_id$FUNC, false
-    );
-    static final FunctionDescriptor SSL_get_peer_certificate$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_get_peer_certificate$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_get_peer_certificate",
-        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$14.SSL_get_peer_certificate$FUNC, false
-    );
-    static final FunctionDescriptor SSL_get_peer_cert_chain$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_get_peer_cert_chain$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_get_peer_cert_chain",
-        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$14.SSL_get_peer_cert_chain$FUNC, false
     );
 }
 

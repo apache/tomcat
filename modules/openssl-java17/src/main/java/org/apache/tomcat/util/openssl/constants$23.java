@@ -26,6 +26,25 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$23 {
 
+    static final FunctionDescriptor SSL_CONF_cmd$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CONF_cmd$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CONF_cmd",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$23.SSL_CONF_cmd$FUNC, false
+    );
+    static final FunctionDescriptor SSL_CONF_cmd_value_type$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CONF_cmd_value_type$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CONF_cmd_value_type",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$23.SSL_CONF_cmd_value_type$FUNC, false
+    );
     static final FunctionDescriptor OPENSSL_init_ssl$FUNC = FunctionDescriptor.of(C_INT,
         C_LONG,
         C_POINTER
@@ -52,25 +71,6 @@ class constants$23 {
         openssl_h.LIBRARIES, "ERR_clear_error",
         "()V",
         constants$23.ERR_clear_error$FUNC, false
-    );
-    static final FunctionDescriptor ERR_error_string$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_LONG,
-        C_POINTER
-    );
-    static final MethodHandle ERR_error_string$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "ERR_error_string",
-        "(JLjdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$23.ERR_error_string$FUNC, false
-    );
-    static final FunctionDescriptor PKCS12_verify_mac$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER,
-        C_INT
-    );
-    static final MethodHandle PKCS12_verify_mac$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "PKCS12_verify_mac",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
-        constants$23.PKCS12_verify_mac$FUNC, false
     );
 }
 

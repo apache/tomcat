@@ -26,6 +26,21 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$22 {
 
+    static final FunctionDescriptor SSL_CTX_set_tmp_dh_callback$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CTX_set_tmp_dh_callback$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_set_tmp_dh_callback",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
+        constants$22.SSL_CTX_set_tmp_dh_callback$FUNC, false
+    );
+    static final FunctionDescriptor SSL_CONF_CTX_new$FUNC = FunctionDescriptor.of(C_POINTER);
+    static final MethodHandle SSL_CONF_CTX_new$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CONF_CTX_new",
+        "()Ljdk/incubator/foreign/MemoryAddress;",
+        constants$22.SSL_CONF_CTX_new$FUNC, false
+    );
     static final FunctionDescriptor SSL_CONF_CTX_finish$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER
     );
@@ -59,25 +74,6 @@ class constants$22 {
         openssl_h.LIBRARIES, "SSL_CONF_CTX_set_ssl_ctx",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
         constants$22.SSL_CONF_CTX_set_ssl_ctx$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CONF_cmd$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_CONF_cmd$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CONF_cmd",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$22.SSL_CONF_cmd$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CONF_cmd_value_type$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_CONF_cmd_value_type$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CONF_cmd_value_type",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$22.SSL_CONF_cmd_value_type$FUNC, false
     );
 }
 

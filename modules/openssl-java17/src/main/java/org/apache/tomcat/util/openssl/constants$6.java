@@ -26,6 +26,20 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$6 {
 
+    static final FunctionDescriptor DH_new$FUNC = FunctionDescriptor.of(C_POINTER);
+    static final MethodHandle DH_new$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "DH_new",
+        "()Ljdk/incubator/foreign/MemoryAddress;",
+        constants$6.DH_new$FUNC, false
+    );
+    static final FunctionDescriptor DH_free$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER
+    );
+    static final MethodHandle DH_free$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "DH_free",
+        "(Ljdk/incubator/foreign/MemoryAddress;)V",
+        constants$6.DH_free$FUNC, false
+    );
     static final FunctionDescriptor DH_set0_pqg$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER,
         C_POINTER,
@@ -62,18 +76,6 @@ class constants$6 {
         openssl_h.LIBRARIES, "X509_STORE_add_lookup",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$6.X509_STORE_add_lookup$FUNC, false
-    );
-    static final FunctionDescriptor X509_LOOKUP_hash_dir$FUNC = FunctionDescriptor.of(C_POINTER);
-    static final MethodHandle X509_LOOKUP_hash_dir$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "X509_LOOKUP_hash_dir",
-        "()Ljdk/incubator/foreign/MemoryAddress;",
-        constants$6.X509_LOOKUP_hash_dir$FUNC, false
-    );
-    static final FunctionDescriptor X509_LOOKUP_file$FUNC = FunctionDescriptor.of(C_POINTER);
-    static final MethodHandle X509_LOOKUP_file$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "X509_LOOKUP_file",
-        "()Ljdk/incubator/foreign/MemoryAddress;",
-        constants$6.X509_LOOKUP_file$FUNC, false
     );
 }
 

@@ -26,6 +26,22 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$5 {
 
+    static final FunctionDescriptor EVP_PKEY_base_id$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER
+    );
+    static final MethodHandle EVP_PKEY_base_id$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "EVP_PKEY_base_id",
+        "(Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$5.EVP_PKEY_base_id$FUNC, false
+    );
+    static final FunctionDescriptor EVP_PKEY_bits$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER
+    );
+    static final MethodHandle EVP_PKEY_bits$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "EVP_PKEY_bits",
+        "(Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$5.EVP_PKEY_bits$FUNC, false
+    );
     static final FunctionDescriptor EC_GROUP_free$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER
     );
@@ -57,20 +73,6 @@ class constants$5 {
         openssl_h.LIBRARIES, "EC_KEY_free",
         "(Ljdk/incubator/foreign/MemoryAddress;)V",
         constants$5.EC_KEY_free$FUNC, false
-    );
-    static final FunctionDescriptor DH_new$FUNC = FunctionDescriptor.of(C_POINTER);
-    static final MethodHandle DH_new$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "DH_new",
-        "()Ljdk/incubator/foreign/MemoryAddress;",
-        constants$5.DH_new$FUNC, false
-    );
-    static final FunctionDescriptor DH_free$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER
-    );
-    static final MethodHandle DH_free$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "DH_free",
-        "(Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$5.DH_free$FUNC, false
     );
 }
 

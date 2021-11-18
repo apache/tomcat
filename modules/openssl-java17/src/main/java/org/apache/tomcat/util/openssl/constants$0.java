@@ -43,6 +43,20 @@ class constants$0 {
         "(Ljdk/incubator/foreign/MemoryAddress;I)Ljdk/incubator/foreign/MemoryAddress;",
         constants$0.OPENSSL_sk_value$FUNC, false
     );
+    static final FunctionDescriptor OpenSSL_version_num$FUNC = FunctionDescriptor.of(C_LONG);
+    static final MethodHandle OpenSSL_version_num$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "OpenSSL_version_num",
+        "()J",
+        constants$0.OpenSSL_version_num$FUNC, false
+    );
+    static final FunctionDescriptor OpenSSL_version$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_INT
+    );
+    static final MethodHandle OpenSSL_version$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "OpenSSL_version",
+        "(I)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$0.OpenSSL_version$FUNC, false
+    );
     static final FunctionDescriptor CRYPTO_free$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER,
         C_POINTER,
@@ -58,22 +72,6 @@ class constants$0 {
         openssl_h.LIBRARIES, "FIPS_mode",
         "()I",
         constants$0.FIPS_mode$FUNC, false
-    );
-    static final FunctionDescriptor FIPS_mode_set$FUNC = FunctionDescriptor.of(C_INT,
-        C_INT
-    );
-    static final MethodHandle FIPS_mode_set$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "FIPS_mode_set",
-        "(I)I",
-        constants$0.FIPS_mode_set$FUNC, false
-    );
-    static final FunctionDescriptor BIO_ctrl_pending$FUNC = FunctionDescriptor.of(C_LONG,
-        C_POINTER
-    );
-    static final MethodHandle BIO_ctrl_pending$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "BIO_ctrl_pending",
-        "(Ljdk/incubator/foreign/MemoryAddress;)J",
-        constants$0.BIO_ctrl_pending$FUNC, false
     );
 }
 

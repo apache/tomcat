@@ -26,6 +26,22 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$13 {
 
+    static final FunctionDescriptor SSL_CIPHER_get_name$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CIPHER_get_name$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CIPHER_get_name",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$13.SSL_CIPHER_get_name$FUNC, false
+    );
+    static final FunctionDescriptor SSL_CIPHER_get_kx_nid$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CIPHER_get_kx_nid$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CIPHER_get_kx_nid",
+        "(Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$13.SSL_CIPHER_get_kx_nid$FUNC, false
+    );
     static final FunctionDescriptor SSL_CIPHER_get_auth_nid$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER
     );
@@ -60,25 +76,6 @@ class constants$13 {
         openssl_h.LIBRARIES, "SSL_set_cipher_list",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$13.SSL_set_cipher_list$FUNC, false
-    );
-    static final FunctionDescriptor SSL_set_verify$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER,
-        C_INT,
-        C_POINTER
-    );
-    static final MethodHandle SSL_set_verify$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_set_verify",
-        "(Ljdk/incubator/foreign/MemoryAddress;ILjdk/incubator/foreign/MemoryAddress;)V",
-        constants$13.SSL_set_verify$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CTX_use_certificate_chain_file$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_CTX_use_certificate_chain_file$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CTX_use_certificate_chain_file",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$13.SSL_CTX_use_certificate_chain_file$FUNC, false
     );
 }
 

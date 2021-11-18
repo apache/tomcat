@@ -26,6 +26,22 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$20 {
 
+    static final FunctionDescriptor SSL_get_privatekey$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_get_privatekey$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_get_privatekey",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$20.SSL_get_privatekey$FUNC, false
+    );
+    static final FunctionDescriptor SSL_get_shutdown$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER
+    );
+    static final MethodHandle SSL_get_shutdown$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_get_shutdown",
+        "(Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$20.SSL_get_shutdown$FUNC, false
+    );
     static final FunctionDescriptor SSL_CTX_set_default_verify_paths$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER
     );
@@ -56,19 +72,6 @@ class constants$20 {
         C_POINTER,
         C_INT,
         C_INT
-    );
-    static final MethodHandle SSL_set_info_callback$cb$MH = RuntimeHelper.downcallHandle(
-        "(Ljdk/incubator/foreign/MemoryAddress;II)V",
-        constants$20.SSL_set_info_callback$cb$FUNC, false
-    );
-    static final FunctionDescriptor SSL_set_info_callback$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_set_info_callback$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_set_info_callback",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$20.SSL_set_info_callback$FUNC, false
     );
 }
 

@@ -26,6 +26,25 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$24 {
 
+    static final FunctionDescriptor ERR_error_string$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_LONG,
+        C_POINTER
+    );
+    static final MethodHandle ERR_error_string$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "ERR_error_string",
+        "(JLjdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$24.ERR_error_string$FUNC, false
+    );
+    static final FunctionDescriptor PKCS12_verify_mac$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER,
+        C_INT
+    );
+    static final MethodHandle PKCS12_verify_mac$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "PKCS12_verify_mac",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
+        constants$24.PKCS12_verify_mac$FUNC, false
+    );
     static final FunctionDescriptor PKCS12_free$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER
     );
@@ -63,24 +82,6 @@ class constants$24 {
         openssl_h.LIBRARIES, "RAND_seed",
         "(Ljdk/incubator/foreign/MemoryAddress;I)V",
         constants$24.RAND_seed$FUNC, false
-    );
-    static final FunctionDescriptor RAND_load_file$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_LONG
-    );
-    static final MethodHandle RAND_load_file$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "RAND_load_file",
-        "(Ljdk/incubator/foreign/MemoryAddress;J)I",
-        constants$24.RAND_load_file$FUNC, false
-    );
-    static final FunctionDescriptor X509_check_issued$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle X509_check_issued$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "X509_check_issued",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$24.X509_check_issued$FUNC, false
     );
 }
 

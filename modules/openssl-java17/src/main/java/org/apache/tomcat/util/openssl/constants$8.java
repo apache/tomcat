@@ -26,6 +26,22 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$8 {
 
+    static final FunctionDescriptor X509_STORE_CTX_get_error_depth$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER
+    );
+    static final MethodHandle X509_STORE_CTX_get_error_depth$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "X509_STORE_CTX_get_error_depth",
+        "(Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$8.X509_STORE_CTX_get_error_depth$FUNC, false
+    );
+    static final FunctionDescriptor X509_STORE_CTX_get_current_cert$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle X509_STORE_CTX_get_current_cert$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "X509_STORE_CTX_get_current_cert",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$8.X509_STORE_CTX_get_current_cert$FUNC, false
+    );
     static final FunctionDescriptor X509_STORE_CTX_get0_current_issuer$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
     );
@@ -60,25 +76,6 @@ class constants$8 {
         openssl_h.LIBRARIES, "d2i_X509",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;J)Ljdk/incubator/foreign/MemoryAddress;",
         constants$8.d2i_X509$FUNC, false
-    );
-    static final FunctionDescriptor i2d_X509$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle i2d_X509$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "i2d_X509",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$8.i2d_X509$FUNC, false
-    );
-    static final FunctionDescriptor X509_get_ext_by_NID$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_INT,
-        C_INT
-    );
-    static final MethodHandle X509_get_ext_by_NID$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "X509_get_ext_by_NID",
-        "(Ljdk/incubator/foreign/MemoryAddress;II)I",
-        constants$8.X509_get_ext_by_NID$FUNC, false
     );
 }
 

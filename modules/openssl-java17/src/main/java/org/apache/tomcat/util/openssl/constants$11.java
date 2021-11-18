@@ -26,6 +26,25 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$11 {
 
+    static final FunctionDescriptor SSL_set_options$FUNC = FunctionDescriptor.of(C_LONG,
+        C_POINTER,
+        C_LONG
+    );
+    static final MethodHandle SSL_set_options$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_set_options",
+        "(Ljdk/incubator/foreign/MemoryAddress;J)J",
+        constants$11.SSL_set_options$FUNC, false
+    );
+    static final FunctionDescriptor SSL_get0_next_proto_negotiated$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_get0_next_proto_negotiated$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_get0_next_proto_negotiated",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
+        constants$11.SSL_get0_next_proto_negotiated$FUNC, false
+    );
     static final FunctionDescriptor SSL_CTX_set_alpn_select_cb$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER,
         C_POINTER,
@@ -62,22 +81,6 @@ class constants$11 {
         openssl_h.LIBRARIES, "SSL_CTX_set_cipher_list",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$11.SSL_CTX_set_cipher_list$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CTX_new$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_CTX_new$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CTX_new",
-        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$11.SSL_CTX_new$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CTX_free$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER
-    );
-    static final MethodHandle SSL_CTX_free$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CTX_free",
-        "(Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$11.SSL_CTX_free$FUNC, false
     );
 }
 

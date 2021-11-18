@@ -947,12 +947,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     //private static final int SSL_aGOST01 = 200;
     //private static final int SSL_aSRP = 400;
 
-    private static final String SSL_TXT_RSA = CLinker.toJavaString(SSL_TXT_RSA());
-    private static final String SSL_TXT_DH = CLinker.toJavaString(SSL_TXT_DH());
-    private static final String SSL_TXT_DSS = CLinker.toJavaString(SSL_TXT_DSS());
+    private static final String SSL_TXT_RSA = "RSA";
+    private static final String SSL_TXT_DH = "DH";
+    private static final String SSL_TXT_DSS = "DSS";
     private static final String SSL_TXT_KRB5 = "KRB5";
-    private static final String SSL_TXT_ECDH = CLinker.toJavaString(SSL_TXT_ECDH());
-    private static final String SSL_TXT_ECDSA = CLinker.toJavaString(SSL_TXT_ECDSA());
+    private static final String SSL_TXT_ECDH = "ECDH";
+    private static final String SSL_TXT_ECDSA = "ECDSA";
 
     private static String getCipherAuthenticationMethod(int auth, int kx) {
         switch (kx) {

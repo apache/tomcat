@@ -26,6 +26,22 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$18 {
 
+    static final FunctionDescriptor SSL_get_ciphers$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_get_ciphers$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_get_ciphers",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$18.SSL_get_ciphers$FUNC, false
+    );
+    static final FunctionDescriptor SSL_CTX_get_ciphers$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CTX_get_ciphers$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_get_ciphers",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$18.SSL_CTX_get_ciphers$FUNC, false
+    );
     static final FunctionDescriptor SSL_do_handshake$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER
     );
@@ -57,23 +73,6 @@ class constants$18 {
         openssl_h.LIBRARIES, "SSL_shutdown",
         "(Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$18.SSL_shutdown$FUNC, false
-    );
-    static final FunctionDescriptor SSL_verify_client_post_handshake$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER
-    );
-    static final MethodHandle SSL_verify_client_post_handshake$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_verify_client_post_handshake",
-        "(Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$18.SSL_verify_client_post_handshake$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CTX_set_client_CA_list$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_CTX_set_client_CA_list$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CTX_set_client_CA_list",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$18.SSL_CTX_set_client_CA_list$FUNC, false
     );
 }
 

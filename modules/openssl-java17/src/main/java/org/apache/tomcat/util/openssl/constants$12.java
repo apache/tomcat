@@ -26,6 +26,22 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$12 {
 
+    static final FunctionDescriptor SSL_CTX_new$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CTX_new$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_new",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$12.SSL_CTX_new$FUNC, false
+    );
+    static final FunctionDescriptor SSL_CTX_free$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER
+    );
+    static final MethodHandle SSL_CTX_free$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_free",
+        "(Ljdk/incubator/foreign/MemoryAddress;)V",
+        constants$12.SSL_CTX_free$FUNC, false
+    );
     static final FunctionDescriptor SSL_CTX_set_timeout$FUNC = FunctionDescriptor.of(C_LONG,
         C_POINTER,
         C_LONG
@@ -58,22 +74,6 @@ class constants$12 {
         openssl_h.LIBRARIES, "SSL_get_current_cipher",
         "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$12.SSL_get_current_cipher$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CIPHER_get_name$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_CIPHER_get_name$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CIPHER_get_name",
-        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$12.SSL_CIPHER_get_name$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CIPHER_get_kx_nid$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER
-    );
-    static final MethodHandle SSL_CIPHER_get_kx_nid$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CIPHER_get_kx_nid",
-        "(Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$12.SSL_CIPHER_get_kx_nid$FUNC, false
     );
 }
 

@@ -272,6 +272,28 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
+    public static MethodHandle OpenSSL_version_num$MH() {
+        return RuntimeHelper.requireNonNull(constants$0.OpenSSL_version_num$MH,"OpenSSL_version_num");
+    }
+    public static long OpenSSL_version_num () {
+        var mh$ = RuntimeHelper.requireNonNull(constants$0.OpenSSL_version_num$MH, "OpenSSL_version_num");
+        try {
+            return (long)mh$.invokeExact();
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+    public static MethodHandle OpenSSL_version$MH() {
+        return RuntimeHelper.requireNonNull(constants$0.OpenSSL_version$MH,"OpenSSL_version");
+    }
+    public static MemoryAddress OpenSSL_version ( int type) {
+        var mh$ = RuntimeHelper.requireNonNull(constants$0.OpenSSL_version$MH, "OpenSSL_version");
+        try {
+            return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(type);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
     public static MethodHandle CRYPTO_free$MH() {
         return RuntimeHelper.requireNonNull(constants$0.CRYPTO_free$MH,"CRYPTO_free");
     }
@@ -295,10 +317,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle FIPS_mode_set$MH() {
-        return RuntimeHelper.requireNonNull(constants$0.FIPS_mode_set$MH,"FIPS_mode_set");
+        return RuntimeHelper.requireNonNull(constants$1.FIPS_mode_set$MH,"FIPS_mode_set");
     }
     public static int FIPS_mode_set ( int r) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$0.FIPS_mode_set$MH, "FIPS_mode_set");
+        var mh$ = RuntimeHelper.requireNonNull(constants$1.FIPS_mode_set$MH, "FIPS_mode_set");
         try {
             return (int)mh$.invokeExact(r);
         } catch (Throwable ex$) {
@@ -306,10 +328,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_ctrl_pending$MH() {
-        return RuntimeHelper.requireNonNull(constants$0.BIO_ctrl_pending$MH,"BIO_ctrl_pending");
+        return RuntimeHelper.requireNonNull(constants$1.BIO_ctrl_pending$MH,"BIO_ctrl_pending");
     }
     public static long BIO_ctrl_pending ( Addressable b) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$0.BIO_ctrl_pending$MH, "BIO_ctrl_pending");
+        var mh$ = RuntimeHelper.requireNonNull(constants$1.BIO_ctrl_pending$MH, "BIO_ctrl_pending");
         try {
             return (long)mh$.invokeExact(b.address());
         } catch (Throwable ex$) {
@@ -361,10 +383,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_read$MH() {
-        return RuntimeHelper.requireNonNull(constants$1.BIO_read$MH,"BIO_read");
+        return RuntimeHelper.requireNonNull(constants$2.BIO_read$MH,"BIO_read");
     }
     public static int BIO_read ( Addressable b,  Addressable data,  int dlen) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$1.BIO_read$MH, "BIO_read");
+        var mh$ = RuntimeHelper.requireNonNull(constants$2.BIO_read$MH, "BIO_read");
         try {
             return (int)mh$.invokeExact(b.address(), data.address(), dlen);
         } catch (Throwable ex$) {
@@ -372,10 +394,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BIO_write$MH() {
-        return RuntimeHelper.requireNonNull(constants$1.BIO_write$MH,"BIO_write");
+        return RuntimeHelper.requireNonNull(constants$2.BIO_write$MH,"BIO_write");
     }
     public static int BIO_write ( Addressable b,  Addressable data,  int dlen) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$1.BIO_write$MH, "BIO_write");
+        var mh$ = RuntimeHelper.requireNonNull(constants$2.BIO_write$MH, "BIO_write");
         try {
             return (int)mh$.invokeExact(b.address(), data.address(), dlen);
         } catch (Throwable ex$) {
@@ -427,10 +449,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$2.BN_new$MH,"BN_new");
+        return RuntimeHelper.requireNonNull(constants$3.BN_new$MH,"BN_new");
     }
     public static MemoryAddress BN_new () {
-        var mh$ = RuntimeHelper.requireNonNull(constants$2.BN_new$MH, "BN_new");
+        var mh$ = RuntimeHelper.requireNonNull(constants$3.BN_new$MH, "BN_new");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact();
         } catch (Throwable ex$) {
@@ -438,10 +460,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_set_word$MH() {
-        return RuntimeHelper.requireNonNull(constants$2.BN_set_word$MH,"BN_set_word");
+        return RuntimeHelper.requireNonNull(constants$3.BN_set_word$MH,"BN_set_word");
     }
     public static int BN_set_word ( Addressable a,  long w) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$2.BN_set_word$MH, "BN_set_word");
+        var mh$ = RuntimeHelper.requireNonNull(constants$3.BN_set_word$MH, "BN_set_word");
         try {
             return (int)mh$.invokeExact(a.address(), w);
         } catch (Throwable ex$) {
@@ -493,10 +515,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc3526_prime_3072$MH() {
-        return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_3072$MH,"BN_get_rfc3526_prime_3072");
+        return RuntimeHelper.requireNonNull(constants$4.BN_get_rfc3526_prime_3072$MH,"BN_get_rfc3526_prime_3072");
     }
     public static MemoryAddress BN_get_rfc3526_prime_3072 ( Addressable bn) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_3072$MH, "BN_get_rfc3526_prime_3072");
+        var mh$ = RuntimeHelper.requireNonNull(constants$4.BN_get_rfc3526_prime_3072$MH, "BN_get_rfc3526_prime_3072");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(bn.address());
         } catch (Throwable ex$) {
@@ -504,10 +526,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle BN_get_rfc3526_prime_4096$MH() {
-        return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_4096$MH,"BN_get_rfc3526_prime_4096");
+        return RuntimeHelper.requireNonNull(constants$4.BN_get_rfc3526_prime_4096$MH,"BN_get_rfc3526_prime_4096");
     }
     public static MemoryAddress BN_get_rfc3526_prime_4096 ( Addressable bn) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_4096$MH, "BN_get_rfc3526_prime_4096");
+        var mh$ = RuntimeHelper.requireNonNull(constants$4.BN_get_rfc3526_prime_4096$MH, "BN_get_rfc3526_prime_4096");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(bn.address());
         } catch (Throwable ex$) {
@@ -559,10 +581,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle EVP_PKEY_base_id$MH() {
-        return RuntimeHelper.requireNonNull(constants$4.EVP_PKEY_base_id$MH,"EVP_PKEY_base_id");
+        return RuntimeHelper.requireNonNull(constants$5.EVP_PKEY_base_id$MH,"EVP_PKEY_base_id");
     }
     public static int EVP_PKEY_base_id ( Addressable pkey) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$4.EVP_PKEY_base_id$MH, "EVP_PKEY_base_id");
+        var mh$ = RuntimeHelper.requireNonNull(constants$5.EVP_PKEY_base_id$MH, "EVP_PKEY_base_id");
         try {
             return (int)mh$.invokeExact(pkey.address());
         } catch (Throwable ex$) {
@@ -570,10 +592,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle EVP_PKEY_bits$MH() {
-        return RuntimeHelper.requireNonNull(constants$4.EVP_PKEY_bits$MH,"EVP_PKEY_bits");
+        return RuntimeHelper.requireNonNull(constants$5.EVP_PKEY_bits$MH,"EVP_PKEY_bits");
     }
     public static int EVP_PKEY_bits ( Addressable pkey) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$4.EVP_PKEY_bits$MH, "EVP_PKEY_bits");
+        var mh$ = RuntimeHelper.requireNonNull(constants$5.EVP_PKEY_bits$MH, "EVP_PKEY_bits");
         try {
             return (int)mh$.invokeExact(pkey.address());
         } catch (Throwable ex$) {
@@ -625,10 +647,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle DH_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$5.DH_new$MH,"DH_new");
+        return RuntimeHelper.requireNonNull(constants$6.DH_new$MH,"DH_new");
     }
     public static MemoryAddress DH_new () {
-        var mh$ = RuntimeHelper.requireNonNull(constants$5.DH_new$MH, "DH_new");
+        var mh$ = RuntimeHelper.requireNonNull(constants$6.DH_new$MH, "DH_new");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact();
         } catch (Throwable ex$) {
@@ -636,10 +658,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle DH_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$5.DH_free$MH,"DH_free");
+        return RuntimeHelper.requireNonNull(constants$6.DH_free$MH,"DH_free");
     }
     public static void DH_free ( Addressable dh) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$5.DH_free$MH, "DH_free");
+        var mh$ = RuntimeHelper.requireNonNull(constants$6.DH_free$MH, "DH_free");
         try {
             mh$.invokeExact(dh.address());
         } catch (Throwable ex$) {
@@ -691,10 +713,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_LOOKUP_hash_dir$MH() {
-        return RuntimeHelper.requireNonNull(constants$6.X509_LOOKUP_hash_dir$MH,"X509_LOOKUP_hash_dir");
+        return RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_hash_dir$MH,"X509_LOOKUP_hash_dir");
     }
     public static MemoryAddress X509_LOOKUP_hash_dir () {
-        var mh$ = RuntimeHelper.requireNonNull(constants$6.X509_LOOKUP_hash_dir$MH, "X509_LOOKUP_hash_dir");
+        var mh$ = RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_hash_dir$MH, "X509_LOOKUP_hash_dir");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact();
         } catch (Throwable ex$) {
@@ -702,10 +724,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_LOOKUP_file$MH() {
-        return RuntimeHelper.requireNonNull(constants$6.X509_LOOKUP_file$MH,"X509_LOOKUP_file");
+        return RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_file$MH,"X509_LOOKUP_file");
     }
     public static MemoryAddress X509_LOOKUP_file () {
-        var mh$ = RuntimeHelper.requireNonNull(constants$6.X509_LOOKUP_file$MH, "X509_LOOKUP_file");
+        var mh$ = RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_file$MH, "X509_LOOKUP_file");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact();
         } catch (Throwable ex$) {
@@ -757,10 +779,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_CTX_get_error_depth$MH() {
-        return RuntimeHelper.requireNonNull(constants$7.X509_STORE_CTX_get_error_depth$MH,"X509_STORE_CTX_get_error_depth");
+        return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get_error_depth$MH,"X509_STORE_CTX_get_error_depth");
     }
     public static int X509_STORE_CTX_get_error_depth ( Addressable ctx) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$7.X509_STORE_CTX_get_error_depth$MH, "X509_STORE_CTX_get_error_depth");
+        var mh$ = RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get_error_depth$MH, "X509_STORE_CTX_get_error_depth");
         try {
             return (int)mh$.invokeExact(ctx.address());
         } catch (Throwable ex$) {
@@ -768,10 +790,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_STORE_CTX_get_current_cert$MH() {
-        return RuntimeHelper.requireNonNull(constants$7.X509_STORE_CTX_get_current_cert$MH,"X509_STORE_CTX_get_current_cert");
+        return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get_current_cert$MH,"X509_STORE_CTX_get_current_cert");
     }
     public static MemoryAddress X509_STORE_CTX_get_current_cert ( Addressable ctx) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$7.X509_STORE_CTX_get_current_cert$MH, "X509_STORE_CTX_get_current_cert");
+        var mh$ = RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get_current_cert$MH, "X509_STORE_CTX_get_current_cert");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(ctx.address());
         } catch (Throwable ex$) {
@@ -823,10 +845,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle i2d_X509$MH() {
-        return RuntimeHelper.requireNonNull(constants$8.i2d_X509$MH,"i2d_X509");
+        return RuntimeHelper.requireNonNull(constants$9.i2d_X509$MH,"i2d_X509");
     }
     public static int i2d_X509 ( Addressable a,  Addressable out) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$8.i2d_X509$MH, "i2d_X509");
+        var mh$ = RuntimeHelper.requireNonNull(constants$9.i2d_X509$MH, "i2d_X509");
         try {
             return (int)mh$.invokeExact(a.address(), out.address());
         } catch (Throwable ex$) {
@@ -834,10 +856,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_get_ext_by_NID$MH() {
-        return RuntimeHelper.requireNonNull(constants$8.X509_get_ext_by_NID$MH,"X509_get_ext_by_NID");
+        return RuntimeHelper.requireNonNull(constants$9.X509_get_ext_by_NID$MH,"X509_get_ext_by_NID");
     }
     public static int X509_get_ext_by_NID ( Addressable x,  int nid,  int lastpos) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$8.X509_get_ext_by_NID$MH, "X509_get_ext_by_NID");
+        var mh$ = RuntimeHelper.requireNonNull(constants$9.X509_get_ext_by_NID$MH, "X509_get_ext_by_NID");
         try {
             return (int)mh$.invokeExact(x.address(), nid, lastpos);
         } catch (Throwable ex$) {
@@ -889,10 +911,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle PEM_read_bio_DHparams$MH() {
-        return RuntimeHelper.requireNonNull(constants$9.PEM_read_bio_DHparams$MH,"PEM_read_bio_DHparams");
+        return RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_DHparams$MH,"PEM_read_bio_DHparams");
     }
     public static MemoryAddress PEM_read_bio_DHparams ( Addressable bp,  Addressable x,  Addressable cb,  Addressable u) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$9.PEM_read_bio_DHparams$MH, "PEM_read_bio_DHparams");
+        var mh$ = RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_DHparams$MH, "PEM_read_bio_DHparams");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(bp.address(), x.address(), cb.address(), u.address());
         } catch (Throwable ex$) {
@@ -900,10 +922,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle PEM_read_bio_PrivateKey$MH() {
-        return RuntimeHelper.requireNonNull(constants$9.PEM_read_bio_PrivateKey$MH,"PEM_read_bio_PrivateKey");
+        return RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_PrivateKey$MH,"PEM_read_bio_PrivateKey");
     }
     public static MemoryAddress PEM_read_bio_PrivateKey ( Addressable bp,  Addressable x,  Addressable cb,  Addressable u) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$9.PEM_read_bio_PrivateKey$MH, "PEM_read_bio_PrivateKey");
+        var mh$ = RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_PrivateKey$MH, "PEM_read_bio_PrivateKey");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(bp.address(), x.address(), cb.address(), u.address());
         } catch (Throwable ex$) {
@@ -955,10 +977,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_options$MH() {
-        return RuntimeHelper.requireNonNull(constants$10.SSL_set_options$MH,"SSL_set_options");
+        return RuntimeHelper.requireNonNull(constants$11.SSL_set_options$MH,"SSL_set_options");
     }
     public static long SSL_set_options ( Addressable s,  long op) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$10.SSL_set_options$MH, "SSL_set_options");
+        var mh$ = RuntimeHelper.requireNonNull(constants$11.SSL_set_options$MH, "SSL_set_options");
         try {
             return (long)mh$.invokeExact(s.address(), op);
         } catch (Throwable ex$) {
@@ -966,10 +988,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get0_next_proto_negotiated$MH() {
-        return RuntimeHelper.requireNonNull(constants$10.SSL_get0_next_proto_negotiated$MH,"SSL_get0_next_proto_negotiated");
+        return RuntimeHelper.requireNonNull(constants$11.SSL_get0_next_proto_negotiated$MH,"SSL_get0_next_proto_negotiated");
     }
     public static void SSL_get0_next_proto_negotiated ( Addressable s,  Addressable data,  Addressable len) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$10.SSL_get0_next_proto_negotiated$MH, "SSL_get0_next_proto_negotiated");
+        var mh$ = RuntimeHelper.requireNonNull(constants$11.SSL_get0_next_proto_negotiated$MH, "SSL_get0_next_proto_negotiated");
         try {
             mh$.invokeExact(s.address(), data.address(), len.address());
         } catch (Throwable ex$) {
@@ -1021,10 +1043,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$11.SSL_CTX_new$MH,"SSL_CTX_new");
+        return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_new$MH,"SSL_CTX_new");
     }
     public static MemoryAddress SSL_CTX_new ( Addressable meth) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$11.SSL_CTX_new$MH, "SSL_CTX_new");
+        var mh$ = RuntimeHelper.requireNonNull(constants$12.SSL_CTX_new$MH, "SSL_CTX_new");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(meth.address());
         } catch (Throwable ex$) {
@@ -1032,10 +1054,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$11.SSL_CTX_free$MH,"SSL_CTX_free");
+        return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_free$MH,"SSL_CTX_free");
     }
     public static void SSL_CTX_free ( Addressable x0) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$11.SSL_CTX_free$MH, "SSL_CTX_free");
+        var mh$ = RuntimeHelper.requireNonNull(constants$12.SSL_CTX_free$MH, "SSL_CTX_free");
         try {
             mh$.invokeExact(x0.address());
         } catch (Throwable ex$) {
@@ -1087,10 +1109,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CIPHER_get_name$MH() {
-        return RuntimeHelper.requireNonNull(constants$12.SSL_CIPHER_get_name$MH,"SSL_CIPHER_get_name");
+        return RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_name$MH,"SSL_CIPHER_get_name");
     }
     public static MemoryAddress SSL_CIPHER_get_name ( Addressable c) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$12.SSL_CIPHER_get_name$MH, "SSL_CIPHER_get_name");
+        var mh$ = RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_name$MH, "SSL_CIPHER_get_name");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(c.address());
         } catch (Throwable ex$) {
@@ -1098,10 +1120,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CIPHER_get_kx_nid$MH() {
-        return RuntimeHelper.requireNonNull(constants$12.SSL_CIPHER_get_kx_nid$MH,"SSL_CIPHER_get_kx_nid");
+        return RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_kx_nid$MH,"SSL_CIPHER_get_kx_nid");
     }
     public static int SSL_CIPHER_get_kx_nid ( Addressable c) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$12.SSL_CIPHER_get_kx_nid$MH, "SSL_CIPHER_get_kx_nid");
+        var mh$ = RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_kx_nid$MH, "SSL_CIPHER_get_kx_nid");
         try {
             return (int)mh$.invokeExact(c.address());
         } catch (Throwable ex$) {
@@ -1153,10 +1175,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_verify$MH() {
-        return RuntimeHelper.requireNonNull(constants$13.SSL_set_verify$MH,"SSL_set_verify");
+        return RuntimeHelper.requireNonNull(constants$14.SSL_set_verify$MH,"SSL_set_verify");
     }
     public static void SSL_set_verify ( Addressable s,  int mode,  Addressable callback) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$13.SSL_set_verify$MH, "SSL_set_verify");
+        var mh$ = RuntimeHelper.requireNonNull(constants$14.SSL_set_verify$MH, "SSL_set_verify");
         try {
             mh$.invokeExact(s.address(), mode, callback.address());
         } catch (Throwable ex$) {
@@ -1164,10 +1186,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_use_certificate_chain_file$MH() {
-        return RuntimeHelper.requireNonNull(constants$13.SSL_CTX_use_certificate_chain_file$MH,"SSL_CTX_use_certificate_chain_file");
+        return RuntimeHelper.requireNonNull(constants$14.SSL_CTX_use_certificate_chain_file$MH,"SSL_CTX_use_certificate_chain_file");
     }
     public static int SSL_CTX_use_certificate_chain_file ( Addressable ctx,  Addressable file) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$13.SSL_CTX_use_certificate_chain_file$MH, "SSL_CTX_use_certificate_chain_file");
+        var mh$ = RuntimeHelper.requireNonNull(constants$14.SSL_CTX_use_certificate_chain_file$MH, "SSL_CTX_use_certificate_chain_file");
         try {
             return (int)mh$.invokeExact(ctx.address(), file.address());
         } catch (Throwable ex$) {
@@ -1219,10 +1241,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_peer_certificate$MH() {
-        return RuntimeHelper.requireNonNull(constants$14.SSL_get_peer_certificate$MH,"SSL_get_peer_certificate");
+        return RuntimeHelper.requireNonNull(constants$15.SSL_get_peer_certificate$MH,"SSL_get_peer_certificate");
     }
     public static MemoryAddress SSL_get_peer_certificate ( Addressable s) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$14.SSL_get_peer_certificate$MH, "SSL_get_peer_certificate");
+        var mh$ = RuntimeHelper.requireNonNull(constants$15.SSL_get_peer_certificate$MH, "SSL_get_peer_certificate");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(s.address());
         } catch (Throwable ex$) {
@@ -1230,10 +1252,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_peer_cert_chain$MH() {
-        return RuntimeHelper.requireNonNull(constants$14.SSL_get_peer_cert_chain$MH,"SSL_get_peer_cert_chain");
+        return RuntimeHelper.requireNonNull(constants$15.SSL_get_peer_cert_chain$MH,"SSL_get_peer_cert_chain");
     }
     public static MemoryAddress SSL_get_peer_cert_chain ( Addressable s) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$14.SSL_get_peer_cert_chain$MH, "SSL_get_peer_cert_chain");
+        var mh$ = RuntimeHelper.requireNonNull(constants$15.SSL_get_peer_cert_chain$MH, "SSL_get_peer_cert_chain");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(s.address());
         } catch (Throwable ex$) {
@@ -1263,10 +1285,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_use_PrivateKey$MH() {
-        return RuntimeHelper.requireNonNull(constants$15.SSL_CTX_use_PrivateKey$MH,"SSL_CTX_use_PrivateKey");
+        return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_use_PrivateKey$MH,"SSL_CTX_use_PrivateKey");
     }
     public static int SSL_CTX_use_PrivateKey ( Addressable ctx,  Addressable pkey) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$15.SSL_CTX_use_PrivateKey$MH, "SSL_CTX_use_PrivateKey");
+        var mh$ = RuntimeHelper.requireNonNull(constants$16.SSL_CTX_use_PrivateKey$MH, "SSL_CTX_use_PrivateKey");
         try {
             return (int)mh$.invokeExact(ctx.address(), pkey.address());
         } catch (Throwable ex$) {
@@ -1274,10 +1296,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_use_certificate$MH() {
-        return RuntimeHelper.requireNonNull(constants$15.SSL_CTX_use_certificate$MH,"SSL_CTX_use_certificate");
+        return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_use_certificate$MH,"SSL_CTX_use_certificate");
     }
     public static int SSL_CTX_use_certificate ( Addressable ctx,  Addressable x) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$15.SSL_CTX_use_certificate$MH, "SSL_CTX_use_certificate");
+        var mh$ = RuntimeHelper.requireNonNull(constants$16.SSL_CTX_use_certificate$MH, "SSL_CTX_use_certificate");
         try {
             return (int)mh$.invokeExact(ctx.address(), x.address());
         } catch (Throwable ex$) {
@@ -1329,10 +1351,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$16.SSL_free$MH,"SSL_free");
+        return RuntimeHelper.requireNonNull(constants$17.SSL_free$MH,"SSL_free");
     }
     public static void SSL_free ( Addressable ssl) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$16.SSL_free$MH, "SSL_free");
+        var mh$ = RuntimeHelper.requireNonNull(constants$17.SSL_free$MH, "SSL_free");
         try {
             mh$.invokeExact(ssl.address());
         } catch (Throwable ex$) {
@@ -1340,10 +1362,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_read$MH() {
-        return RuntimeHelper.requireNonNull(constants$16.SSL_read$MH,"SSL_read");
+        return RuntimeHelper.requireNonNull(constants$17.SSL_read$MH,"SSL_read");
     }
     public static int SSL_read ( Addressable ssl,  Addressable buf,  int num) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$16.SSL_read$MH, "SSL_read");
+        var mh$ = RuntimeHelper.requireNonNull(constants$17.SSL_read$MH, "SSL_read");
         try {
             return (int)mh$.invokeExact(ssl.address(), buf.address(), num);
         } catch (Throwable ex$) {
@@ -1395,10 +1417,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_ciphers$MH() {
-        return RuntimeHelper.requireNonNull(constants$17.SSL_get_ciphers$MH,"SSL_get_ciphers");
+        return RuntimeHelper.requireNonNull(constants$18.SSL_get_ciphers$MH,"SSL_get_ciphers");
     }
     public static MemoryAddress SSL_get_ciphers ( Addressable s) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$17.SSL_get_ciphers$MH, "SSL_get_ciphers");
+        var mh$ = RuntimeHelper.requireNonNull(constants$18.SSL_get_ciphers$MH, "SSL_get_ciphers");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(s.address());
         } catch (Throwable ex$) {
@@ -1406,10 +1428,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_get_ciphers$MH() {
-        return RuntimeHelper.requireNonNull(constants$17.SSL_CTX_get_ciphers$MH,"SSL_CTX_get_ciphers");
+        return RuntimeHelper.requireNonNull(constants$18.SSL_CTX_get_ciphers$MH,"SSL_CTX_get_ciphers");
     }
     public static MemoryAddress SSL_CTX_get_ciphers ( Addressable ctx) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$17.SSL_CTX_get_ciphers$MH, "SSL_CTX_get_ciphers");
+        var mh$ = RuntimeHelper.requireNonNull(constants$18.SSL_CTX_get_ciphers$MH, "SSL_CTX_get_ciphers");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(ctx.address());
         } catch (Throwable ex$) {
@@ -1461,10 +1483,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_verify_client_post_handshake$MH() {
-        return RuntimeHelper.requireNonNull(constants$18.SSL_verify_client_post_handshake$MH,"SSL_verify_client_post_handshake");
+        return RuntimeHelper.requireNonNull(constants$19.SSL_verify_client_post_handshake$MH,"SSL_verify_client_post_handshake");
     }
     public static int SSL_verify_client_post_handshake ( Addressable s) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$18.SSL_verify_client_post_handshake$MH, "SSL_verify_client_post_handshake");
+        var mh$ = RuntimeHelper.requireNonNull(constants$19.SSL_verify_client_post_handshake$MH, "SSL_verify_client_post_handshake");
         try {
             return (int)mh$.invokeExact(s.address());
         } catch (Throwable ex$) {
@@ -1472,10 +1494,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_client_CA_list$MH() {
-        return RuntimeHelper.requireNonNull(constants$18.SSL_CTX_set_client_CA_list$MH,"SSL_CTX_set_client_CA_list");
+        return RuntimeHelper.requireNonNull(constants$19.SSL_CTX_set_client_CA_list$MH,"SSL_CTX_set_client_CA_list");
     }
     public static void SSL_CTX_set_client_CA_list ( Addressable ctx,  Addressable name_list) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$18.SSL_CTX_set_client_CA_list$MH, "SSL_CTX_set_client_CA_list");
+        var mh$ = RuntimeHelper.requireNonNull(constants$19.SSL_CTX_set_client_CA_list$MH, "SSL_CTX_set_client_CA_list");
         try {
             mh$.invokeExact(ctx.address(), name_list.address());
         } catch (Throwable ex$) {
@@ -1527,10 +1549,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_privatekey$MH() {
-        return RuntimeHelper.requireNonNull(constants$19.SSL_get_privatekey$MH,"SSL_get_privatekey");
+        return RuntimeHelper.requireNonNull(constants$20.SSL_get_privatekey$MH,"SSL_get_privatekey");
     }
     public static MemoryAddress SSL_get_privatekey ( Addressable ssl) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$19.SSL_get_privatekey$MH, "SSL_get_privatekey");
+        var mh$ = RuntimeHelper.requireNonNull(constants$20.SSL_get_privatekey$MH, "SSL_get_privatekey");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(ssl.address());
         } catch (Throwable ex$) {
@@ -1538,10 +1560,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_get_shutdown$MH() {
-        return RuntimeHelper.requireNonNull(constants$19.SSL_get_shutdown$MH,"SSL_get_shutdown");
+        return RuntimeHelper.requireNonNull(constants$20.SSL_get_shutdown$MH,"SSL_get_shutdown");
     }
     public static int SSL_get_shutdown ( Addressable ssl) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$19.SSL_get_shutdown$MH, "SSL_get_shutdown");
+        var mh$ = RuntimeHelper.requireNonNull(constants$20.SSL_get_shutdown$MH, "SSL_get_shutdown");
         try {
             return (int)mh$.invokeExact(ssl.address());
         } catch (Throwable ex$) {
@@ -1582,10 +1604,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_set_info_callback$MH() {
-        return RuntimeHelper.requireNonNull(constants$20.SSL_set_info_callback$MH,"SSL_set_info_callback");
+        return RuntimeHelper.requireNonNull(constants$21.SSL_set_info_callback$MH,"SSL_set_info_callback");
     }
     public static void SSL_set_info_callback ( Addressable ssl,  Addressable cb) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$20.SSL_set_info_callback$MH, "SSL_set_info_callback");
+        var mh$ = RuntimeHelper.requireNonNull(constants$21.SSL_set_info_callback$MH, "SSL_set_info_callback");
         try {
             mh$.invokeExact(ssl.address(), cb.address());
         } catch (Throwable ex$) {
@@ -1615,10 +1637,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CTX_set_tmp_dh_callback$MH() {
-        return RuntimeHelper.requireNonNull(constants$21.SSL_CTX_set_tmp_dh_callback$MH,"SSL_CTX_set_tmp_dh_callback");
+        return RuntimeHelper.requireNonNull(constants$22.SSL_CTX_set_tmp_dh_callback$MH,"SSL_CTX_set_tmp_dh_callback");
     }
     public static void SSL_CTX_set_tmp_dh_callback ( Addressable ctx,  Addressable dh) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$21.SSL_CTX_set_tmp_dh_callback$MH, "SSL_CTX_set_tmp_dh_callback");
+        var mh$ = RuntimeHelper.requireNonNull(constants$22.SSL_CTX_set_tmp_dh_callback$MH, "SSL_CTX_set_tmp_dh_callback");
         try {
             mh$.invokeExact(ctx.address(), dh.address());
         } catch (Throwable ex$) {
@@ -1626,10 +1648,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_CTX_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$21.SSL_CONF_CTX_new$MH,"SSL_CONF_CTX_new");
+        return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_new$MH,"SSL_CONF_CTX_new");
     }
     public static MemoryAddress SSL_CONF_CTX_new () {
-        var mh$ = RuntimeHelper.requireNonNull(constants$21.SSL_CONF_CTX_new$MH, "SSL_CONF_CTX_new");
+        var mh$ = RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_new$MH, "SSL_CONF_CTX_new");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact();
         } catch (Throwable ex$) {
@@ -1681,10 +1703,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_cmd$MH() {
-        return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_cmd$MH,"SSL_CONF_cmd");
+        return RuntimeHelper.requireNonNull(constants$23.SSL_CONF_cmd$MH,"SSL_CONF_cmd");
     }
     public static int SSL_CONF_cmd ( Addressable cctx,  Addressable cmd,  Addressable value) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$22.SSL_CONF_cmd$MH, "SSL_CONF_cmd");
+        var mh$ = RuntimeHelper.requireNonNull(constants$23.SSL_CONF_cmd$MH, "SSL_CONF_cmd");
         try {
             return (int)mh$.invokeExact(cctx.address(), cmd.address(), value.address());
         } catch (Throwable ex$) {
@@ -1692,10 +1714,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle SSL_CONF_cmd_value_type$MH() {
-        return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_cmd_value_type$MH,"SSL_CONF_cmd_value_type");
+        return RuntimeHelper.requireNonNull(constants$23.SSL_CONF_cmd_value_type$MH,"SSL_CONF_cmd_value_type");
     }
     public static int SSL_CONF_cmd_value_type ( Addressable cctx,  Addressable cmd) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$22.SSL_CONF_cmd_value_type$MH, "SSL_CONF_cmd_value_type");
+        var mh$ = RuntimeHelper.requireNonNull(constants$23.SSL_CONF_cmd_value_type$MH, "SSL_CONF_cmd_value_type");
         try {
             return (int)mh$.invokeExact(cctx.address(), cmd.address());
         } catch (Throwable ex$) {
@@ -1747,10 +1769,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ERR_error_string$MH() {
-        return RuntimeHelper.requireNonNull(constants$23.ERR_error_string$MH,"ERR_error_string");
+        return RuntimeHelper.requireNonNull(constants$24.ERR_error_string$MH,"ERR_error_string");
     }
     public static MemoryAddress ERR_error_string ( long e,  Addressable buf) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$23.ERR_error_string$MH, "ERR_error_string");
+        var mh$ = RuntimeHelper.requireNonNull(constants$24.ERR_error_string$MH, "ERR_error_string");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(e, buf.address());
         } catch (Throwable ex$) {
@@ -1758,10 +1780,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle PKCS12_verify_mac$MH() {
-        return RuntimeHelper.requireNonNull(constants$23.PKCS12_verify_mac$MH,"PKCS12_verify_mac");
+        return RuntimeHelper.requireNonNull(constants$24.PKCS12_verify_mac$MH,"PKCS12_verify_mac");
     }
     public static int PKCS12_verify_mac ( Addressable p12,  Addressable pass,  int passlen) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$23.PKCS12_verify_mac$MH, "PKCS12_verify_mac");
+        var mh$ = RuntimeHelper.requireNonNull(constants$24.PKCS12_verify_mac$MH, "PKCS12_verify_mac");
         try {
             return (int)mh$.invokeExact(p12.address(), pass.address(), passlen);
         } catch (Throwable ex$) {
@@ -1813,10 +1835,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle RAND_load_file$MH() {
-        return RuntimeHelper.requireNonNull(constants$24.RAND_load_file$MH,"RAND_load_file");
+        return RuntimeHelper.requireNonNull(constants$25.RAND_load_file$MH,"RAND_load_file");
     }
     public static int RAND_load_file ( Addressable file,  long max_bytes) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$24.RAND_load_file$MH, "RAND_load_file");
+        var mh$ = RuntimeHelper.requireNonNull(constants$25.RAND_load_file$MH, "RAND_load_file");
         try {
             return (int)mh$.invokeExact(file.address(), max_bytes);
         } catch (Throwable ex$) {
@@ -1824,10 +1846,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle X509_check_issued$MH() {
-        return RuntimeHelper.requireNonNull(constants$24.X509_check_issued$MH,"X509_check_issued");
+        return RuntimeHelper.requireNonNull(constants$25.X509_check_issued$MH,"X509_check_issued");
     }
     public static int X509_check_issued ( Addressable issuer,  Addressable subject) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$24.X509_check_issued$MH, "X509_check_issued");
+        var mh$ = RuntimeHelper.requireNonNull(constants$25.X509_check_issued$MH, "X509_check_issued");
         try {
             return (int)mh$.invokeExact(issuer.address(), subject.address());
         } catch (Throwable ex$) {
@@ -1879,10 +1901,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ENGINE_load_private_key$MH() {
-        return RuntimeHelper.requireNonNull(constants$25.ENGINE_load_private_key$MH,"ENGINE_load_private_key");
+        return RuntimeHelper.requireNonNull(constants$26.ENGINE_load_private_key$MH,"ENGINE_load_private_key");
     }
     public static MemoryAddress ENGINE_load_private_key ( Addressable e,  Addressable key_id,  Addressable ui_method,  Addressable callback_data) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$25.ENGINE_load_private_key$MH, "ENGINE_load_private_key");
+        var mh$ = RuntimeHelper.requireNonNull(constants$26.ENGINE_load_private_key$MH, "ENGINE_load_private_key");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(e.address(), key_id.address(), ui_method.address(), callback_data.address());
         } catch (Throwable ex$) {
@@ -1890,10 +1912,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle ENGINE_set_default$MH() {
-        return RuntimeHelper.requireNonNull(constants$25.ENGINE_set_default$MH,"ENGINE_set_default");
+        return RuntimeHelper.requireNonNull(constants$26.ENGINE_set_default$MH,"ENGINE_set_default");
     }
     public static int ENGINE_set_default ( Addressable e,  int flags) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$25.ENGINE_set_default$MH, "ENGINE_set_default");
+        var mh$ = RuntimeHelper.requireNonNull(constants$26.ENGINE_set_default$MH, "ENGINE_set_default");
         try {
             return (int)mh$.invokeExact(e.address(), flags);
         } catch (Throwable ex$) {
@@ -1945,10 +1967,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_resp_get0$MH() {
-        return RuntimeHelper.requireNonNull(constants$26.OCSP_resp_get0$MH,"OCSP_resp_get0");
+        return RuntimeHelper.requireNonNull(constants$27.OCSP_resp_get0$MH,"OCSP_resp_get0");
     }
     public static MemoryAddress OCSP_resp_get0 ( Addressable bs,  int idx) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$26.OCSP_resp_get0$MH, "OCSP_resp_get0");
+        var mh$ = RuntimeHelper.requireNonNull(constants$27.OCSP_resp_get0$MH, "OCSP_resp_get0");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact(bs.address(), idx);
         } catch (Throwable ex$) {
@@ -1956,10 +1978,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_resp_find$MH() {
-        return RuntimeHelper.requireNonNull(constants$26.OCSP_resp_find$MH,"OCSP_resp_find");
+        return RuntimeHelper.requireNonNull(constants$27.OCSP_resp_find$MH,"OCSP_resp_find");
     }
     public static int OCSP_resp_find ( Addressable bs,  Addressable id,  int last) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$26.OCSP_resp_find$MH, "OCSP_resp_find");
+        var mh$ = RuntimeHelper.requireNonNull(constants$27.OCSP_resp_find$MH, "OCSP_resp_find");
         try {
             return (int)mh$.invokeExact(bs.address(), id.address(), last);
         } catch (Throwable ex$) {
@@ -2011,10 +2033,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_CERTID_free$MH() {
-        return RuntimeHelper.requireNonNull(constants$27.OCSP_CERTID_free$MH,"OCSP_CERTID_free");
+        return RuntimeHelper.requireNonNull(constants$28.OCSP_CERTID_free$MH,"OCSP_CERTID_free");
     }
     public static void OCSP_CERTID_free ( Addressable a) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$27.OCSP_CERTID_free$MH, "OCSP_CERTID_free");
+        var mh$ = RuntimeHelper.requireNonNull(constants$28.OCSP_CERTID_free$MH, "OCSP_CERTID_free");
         try {
             mh$.invokeExact(a.address());
         } catch (Throwable ex$) {
@@ -2022,10 +2044,10 @@ public class openssl_h  {
         }
     }
     public static MethodHandle OCSP_REQUEST_new$MH() {
-        return RuntimeHelper.requireNonNull(constants$27.OCSP_REQUEST_new$MH,"OCSP_REQUEST_new");
+        return RuntimeHelper.requireNonNull(constants$28.OCSP_REQUEST_new$MH,"OCSP_REQUEST_new");
     }
     public static MemoryAddress OCSP_REQUEST_new () {
-        var mh$ = RuntimeHelper.requireNonNull(constants$27.OCSP_REQUEST_new$MH, "OCSP_REQUEST_new");
+        var mh$ = RuntimeHelper.requireNonNull(constants$28.OCSP_REQUEST_new$MH, "OCSP_REQUEST_new");
         try {
             return (jdk.incubator.foreign.MemoryAddress)mh$.invokeExact();
         } catch (Throwable ex$) {
@@ -2054,18 +2076,6 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
-    public static long OPENSSL_VERSION_NUMBER() {
-        return 269488335L;
-    }
-    public static MemorySegment OPENSSL_VERSION_TEXT() {
-        return constants$28.OPENSSL_VERSION_TEXT$SEGMENT;
-    }
-    public static MemorySegment SHLIB_VERSION_HISTORY() {
-        return constants$28.SHLIB_VERSION_HISTORY$SEGMENT;
-    }
-    public static MemorySegment SHLIB_VERSION_NUMBER() {
-        return constants$28.SHLIB_VERSION_NUMBER$SEGMENT;
-    }
     public static MemorySegment OPENSSL_FILE() {
         return constants$28.OPENSSL_FILE$SEGMENT;
     }
@@ -2086,21 +2096,6 @@ public class openssl_h  {
     }
     public static int EVP_PKEY_DSA() {
         return (int)116L;
-    }
-    public static MemorySegment SSL_TXT_DSS() {
-        return constants$29.SSL_TXT_DSS$SEGMENT;
-    }
-    public static MemorySegment SSL_TXT_DH() {
-        return constants$29.SSL_TXT_DH$SEGMENT;
-    }
-    public static MemorySegment SSL_TXT_RSA() {
-        return constants$29.SSL_TXT_RSA$SEGMENT;
-    }
-    public static MemorySegment SSL_TXT_ECDH() {
-        return constants$29.SSL_TXT_ECDH$SEGMENT;
-    }
-    public static MemorySegment SSL_TXT_ECDSA() {
-        return constants$29.SSL_TXT_ECDSA$SEGMENT;
     }
     public static int SSL_OP_NO_TICKET() {
         return (int)16384L;

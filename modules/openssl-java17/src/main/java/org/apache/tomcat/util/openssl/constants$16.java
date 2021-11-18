@@ -26,6 +26,24 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$16 {
 
+    static final FunctionDescriptor SSL_CTX_use_PrivateKey$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CTX_use_PrivateKey$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_use_PrivateKey",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$16.SSL_CTX_use_PrivateKey$FUNC, false
+    );
+    static final FunctionDescriptor SSL_CTX_use_certificate$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CTX_use_certificate$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_use_certificate",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$16.SSL_CTX_use_certificate$FUNC, false
+    );
     static final FunctionDescriptor SSL_CTX_set_default_passwd_cb$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER,
         C_POINTER
@@ -60,24 +78,6 @@ class constants$16 {
         openssl_h.LIBRARIES, "SSL_new",
         "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$16.SSL_new$FUNC, false
-    );
-    static final FunctionDescriptor SSL_free$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER
-    );
-    static final MethodHandle SSL_free$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_free",
-        "(Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$16.SSL_free$FUNC, false
-    );
-    static final FunctionDescriptor SSL_read$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER,
-        C_INT
-    );
-    static final MethodHandle SSL_read$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_read",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
-        constants$16.SSL_read$FUNC, false
     );
 }
 

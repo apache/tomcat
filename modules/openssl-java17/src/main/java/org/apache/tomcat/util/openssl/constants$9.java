@@ -26,6 +26,25 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$9 {
 
+    static final FunctionDescriptor i2d_X509$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle i2d_X509$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "i2d_X509",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$9.i2d_X509$FUNC, false
+    );
+    static final FunctionDescriptor X509_get_ext_by_NID$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_INT,
+        C_INT
+    );
+    static final MethodHandle X509_get_ext_by_NID$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "X509_get_ext_by_NID",
+        "(Ljdk/incubator/foreign/MemoryAddress;II)I",
+        constants$9.X509_get_ext_by_NID$FUNC, false
+    );
     static final FunctionDescriptor X509_get_ext$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER,
         C_INT
@@ -64,28 +83,6 @@ class constants$9 {
         openssl_h.LIBRARIES, "PEM_read_bio_ECPKParameters",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$9.PEM_read_bio_ECPKParameters$FUNC, false
-    );
-    static final FunctionDescriptor PEM_read_bio_DHparams$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER,
-        C_POINTER,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle PEM_read_bio_DHparams$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "PEM_read_bio_DHparams",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$9.PEM_read_bio_DHparams$FUNC, false
-    );
-    static final FunctionDescriptor PEM_read_bio_PrivateKey$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER,
-        C_POINTER,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle PEM_read_bio_PrivateKey$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "PEM_read_bio_PrivateKey",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$9.PEM_read_bio_PrivateKey$FUNC, false
     );
 }
 

@@ -26,6 +26,26 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$26 {
 
+    static final FunctionDescriptor ENGINE_load_private_key$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER,
+        C_POINTER,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle ENGINE_load_private_key$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "ENGINE_load_private_key",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$26.ENGINE_load_private_key$FUNC, false
+    );
+    static final FunctionDescriptor ENGINE_set_default$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_INT
+    );
+    static final MethodHandle ENGINE_set_default$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "ENGINE_set_default",
+        "(Ljdk/incubator/foreign/MemoryAddress;I)I",
+        constants$26.ENGINE_set_default$FUNC, false
+    );
     static final FunctionDescriptor OCSP_cert_to_id$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER,
         C_POINTER,
@@ -60,25 +80,6 @@ class constants$26 {
         openssl_h.LIBRARIES, "OCSP_response_get1_basic",
         "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$26.OCSP_response_get1_basic$FUNC, false
-    );
-    static final FunctionDescriptor OCSP_resp_get0$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER,
-        C_INT
-    );
-    static final MethodHandle OCSP_resp_get0$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "OCSP_resp_get0",
-        "(Ljdk/incubator/foreign/MemoryAddress;I)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$26.OCSP_resp_get0$FUNC, false
-    );
-    static final FunctionDescriptor OCSP_resp_find$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER,
-        C_INT
-    );
-    static final MethodHandle OCSP_resp_find$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "OCSP_resp_find",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
-        constants$26.OCSP_resp_find$FUNC, false
     );
 }
 

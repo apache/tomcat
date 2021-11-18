@@ -26,6 +26,24 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$25 {
 
+    static final FunctionDescriptor RAND_load_file$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_LONG
+    );
+    static final MethodHandle RAND_load_file$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "RAND_load_file",
+        "(Ljdk/incubator/foreign/MemoryAddress;J)I",
+        constants$25.RAND_load_file$FUNC, false
+    );
+    static final FunctionDescriptor X509_check_issued$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle X509_check_issued$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "X509_check_issued",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$25.X509_check_issued$FUNC, false
+    );
     static final FunctionDescriptor ENGINE_by_id$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
     );
@@ -58,26 +76,6 @@ class constants$25 {
         openssl_h.LIBRARIES, "ENGINE_free",
         "(Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$25.ENGINE_free$FUNC, false
-    );
-    static final FunctionDescriptor ENGINE_load_private_key$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER,
-        C_POINTER,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle ENGINE_load_private_key$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "ENGINE_load_private_key",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$25.ENGINE_load_private_key$FUNC, false
-    );
-    static final FunctionDescriptor ENGINE_set_default$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_INT
-    );
-    static final MethodHandle ENGINE_set_default$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "ENGINE_set_default",
-        "(Ljdk/incubator/foreign/MemoryAddress;I)I",
-        constants$25.ENGINE_set_default$FUNC, false
     );
 }
 

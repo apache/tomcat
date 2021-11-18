@@ -26,6 +26,25 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$27 {
 
+    static final FunctionDescriptor OCSP_resp_get0$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER,
+        C_INT
+    );
+    static final MethodHandle OCSP_resp_get0$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "OCSP_resp_get0",
+        "(Ljdk/incubator/foreign/MemoryAddress;I)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$27.OCSP_resp_get0$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_resp_find$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER,
+        C_INT
+    );
+    static final MethodHandle OCSP_resp_find$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "OCSP_resp_find",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
+        constants$27.OCSP_resp_find$FUNC, false
+    );
     static final FunctionDescriptor OCSP_single_get0_status$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER,
         C_POINTER,
@@ -63,20 +82,6 @@ class constants$27 {
         openssl_h.LIBRARIES, "d2i_OCSP_RESPONSE",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;J)Ljdk/incubator/foreign/MemoryAddress;",
         constants$27.d2i_OCSP_RESPONSE$FUNC, false
-    );
-    static final FunctionDescriptor OCSP_CERTID_free$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER
-    );
-    static final MethodHandle OCSP_CERTID_free$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "OCSP_CERTID_free",
-        "(Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$27.OCSP_CERTID_free$FUNC, false
-    );
-    static final FunctionDescriptor OCSP_REQUEST_new$FUNC = FunctionDescriptor.of(C_POINTER);
-    static final MethodHandle OCSP_REQUEST_new$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "OCSP_REQUEST_new",
-        "()Ljdk/incubator/foreign/MemoryAddress;",
-        constants$27.OCSP_REQUEST_new$FUNC, false
     );
 }
 

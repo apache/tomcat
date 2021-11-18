@@ -26,6 +26,23 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$19 {
 
+    static final FunctionDescriptor SSL_verify_client_post_handshake$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER
+    );
+    static final MethodHandle SSL_verify_client_post_handshake$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_verify_client_post_handshake",
+        "(Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$19.SSL_verify_client_post_handshake$FUNC, false
+    );
+    static final FunctionDescriptor SSL_CTX_set_client_CA_list$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CTX_set_client_CA_list$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_set_client_CA_list",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
+        constants$19.SSL_CTX_set_client_CA_list$FUNC, false
+    );
     static final FunctionDescriptor SSL_CTX_get_client_CA_list$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
     );
@@ -58,22 +75,6 @@ class constants$19 {
         openssl_h.LIBRARIES, "SSL_set_accept_state",
         "(Ljdk/incubator/foreign/MemoryAddress;)V",
         constants$19.SSL_set_accept_state$FUNC, false
-    );
-    static final FunctionDescriptor SSL_get_privatekey$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_get_privatekey$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_get_privatekey",
-        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$19.SSL_get_privatekey$FUNC, false
-    );
-    static final FunctionDescriptor SSL_get_shutdown$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER
-    );
-    static final MethodHandle SSL_get_shutdown$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_get_shutdown",
-        "(Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$19.SSL_get_shutdown$FUNC, false
     );
 }
 

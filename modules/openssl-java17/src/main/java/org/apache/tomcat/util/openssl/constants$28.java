@@ -26,6 +26,20 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$28 {
 
+    static final FunctionDescriptor OCSP_CERTID_free$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER
+    );
+    static final MethodHandle OCSP_CERTID_free$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "OCSP_CERTID_free",
+        "(Ljdk/incubator/foreign/MemoryAddress;)V",
+        constants$28.OCSP_CERTID_free$FUNC, false
+    );
+    static final FunctionDescriptor OCSP_REQUEST_new$FUNC = FunctionDescriptor.of(C_POINTER);
+    static final MethodHandle OCSP_REQUEST_new$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "OCSP_REQUEST_new",
+        "()Ljdk/incubator/foreign/MemoryAddress;",
+        constants$28.OCSP_REQUEST_new$FUNC, false
+    );
     static final FunctionDescriptor OCSP_REQUEST_free$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER
     );
@@ -43,10 +57,7 @@ class constants$28 {
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$28.i2d_OCSP_REQUEST$FUNC, false
     );
-    static final MemorySegment OPENSSL_VERSION_TEXT$SEGMENT = CLinker.toCString("OpenSSL 1.1.1l  FIPS 24 Aug 2021", ResourceScope.newImplicitScope());
-    static final MemorySegment SHLIB_VERSION_HISTORY$SEGMENT = CLinker.toCString("", ResourceScope.newImplicitScope());
-    static final MemorySegment SHLIB_VERSION_NUMBER$SEGMENT = CLinker.toCString("1.1", ResourceScope.newImplicitScope());
-    static final MemorySegment OPENSSL_FILE$SEGMENT = CLinker.toCString("/tmp/jextract$6761937692400069639.h", ResourceScope.newImplicitScope());
+    static final MemorySegment OPENSSL_FILE$SEGMENT = CLinker.toCString("/tmp/jextract$18067138764655173084.h", ResourceScope.newImplicitScope());
 }
 
 
