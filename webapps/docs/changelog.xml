@@ -111,6 +111,14 @@
         Log warning if a listener is not nested inside a Server element
         although it must have been. (michaelo)
       </update>
+      <fix>
+        Where the getter can be called safely, remove the checks for
+        <code>ServletContext</code> getters called from a
+        <code>contextInitialized()</code> method of a
+        <code>ServletContextListener</code> that was not defined in a
+        <code>web.xml</code> file, a <code>web-fragment.xml</code> file nor
+        annotated with <code>WebListener</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
