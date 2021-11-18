@@ -326,7 +326,7 @@
   <h3>Cache Strategy</h3>
 
   <p>Additional control over the caching of static resources can be obtained by
-     configuring a custom cache strategy. To configure a custom cache straegy,
+     configuring a custom cache strategy. To configure a custom cache strategy,
      nest a &lt;CacheStrategy&gt; element inside the &lt;Resources&gt; element
      with the following attributes:</p>
 
