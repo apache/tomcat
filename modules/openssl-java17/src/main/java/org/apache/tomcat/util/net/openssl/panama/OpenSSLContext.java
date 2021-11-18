@@ -147,66 +147,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    /*
-    { BN_get_rfc3526_prime_8192, NULL, 6145 },
-    { BN_get_rfc3526_prime_6144, NULL, 4097 },
-    { BN_get_rfc3526_prime_4096, NULL, 3073 },
-    { BN_get_rfc3526_prime_3072, NULL, 2049 },
-    { BN_get_rfc3526_prime_2048, NULL, 1025 },
-    { BN_get_rfc2409_prime_1024, NULL, 0 }
-     */
-    private static final class DHParam {
-        private final MemoryAddress dh;
-        private final int min;
-        private DHParam(MemoryAddress dh, int min) {
-            this.dh = dh;
-            this.min = min;
-        }
-    }
-    private static final DHParam[] dhParameters = new DHParam[6];
-
-    static {
-
-        OpenSSLLifecycleListener.initLibrary();
-
-        var dh = DH_new();
-        var p = BN_get_rfc3526_prime_8192(MemoryAddress.NULL);
-        var g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
-        dhParameters[0] = new DHParam(dh, 6145);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_6144(MemoryAddress.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
-        dhParameters[1] = new DHParam(dh, 4097);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_4096(MemoryAddress.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
-        dhParameters[2] = new DHParam(dh, 3073);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_3072(MemoryAddress.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
-        dhParameters[3] = new DHParam(dh, 2049);
-        dh = DH_new();
-        p = BN_get_rfc3526_prime_2048(MemoryAddress.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
-        dhParameters[4] = new DHParam(dh, 1025);
-        dh = DH_new();
-        p = BN_get_rfc2409_prime_1024(MemoryAddress.NULL);
-        g = BN_new();
-        BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
-        dhParameters[5] = new DHParam(dh, 0);
-    }
-
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private final boolean alpn;
@@ -821,9 +761,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         if ((type == EVP_PKEY_RSA()) || (type == EVP_PKEY_DSA())) {
             keylen = EVP_PKEY_bits(pkey);
         }
-        for (int i = 0; i < dhParameters.length; i++) {
-            if (keylen >= dhParameters[i].min) {
-                return dhParameters[i].dh;
+        for (int i = 0; i < OpenSSLLifecycleListener.dhParameters.length; i++) {
+            if (keylen >= OpenSSLLifecycleListener.dhParameters[i].min) {
+                return OpenSSLLifecycleListener.dhParameters[i].dh;
             }
         }
         return MemoryAddress.NULL;

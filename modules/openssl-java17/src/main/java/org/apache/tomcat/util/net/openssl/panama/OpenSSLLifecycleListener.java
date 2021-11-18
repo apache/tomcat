@@ -29,6 +29,7 @@ import java.security.SecureRandom;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Server;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -39,7 +40,8 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Implementation of <code>LifecycleListener</code> that will do the global
  * initialization of OpenSSL according to specified configuration parameters.
- * Using the listener is completely optional, but is needed for configuration.
+ * Using the listener is completely optional, but is needed for configuration
+ * and full cleanup of a few native memory allocations.
  */
 public class OpenSSLLifecycleListener implements LifecycleListener {
 
@@ -89,7 +91,12 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
 
+        boolean initError = false;
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
+            if (!(event.getLifecycle() instanceof Server)) {
+                log.warn(sm.getString("listener.notServer",
+                        event.getLifecycle().getClass().getSimpleName()));
+            }
             synchronized (lock) {
                 try {
                     init();
@@ -97,6 +104,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                     t = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("listener.sslInit"), t);
+                    initError = true;
                 }
                 // Failure to initialize FIPS mode is fatal
                 if (!(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode)) && !isFIPSModeActive()) {
@@ -104,18 +112,15 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                     Error e = new Error(errorMessage);
                     // Log here, because thrown error might be not logged
                     log.fatal(errorMessage, e);
-                    throw e;
+                    initError = true;
                 }
             }
-        } else if (Lifecycle.AFTER_DESTROY_EVENT.equals(event.getType())) {
+        }
+        if (initError || Lifecycle.AFTER_DESTROY_EVENT.equals(event.getType())) {
+            // Note: Without the listener, destroy will never be called (which is not a significant problem)
             synchronized (lock) {
-                if (!OpenSSLStatus.isAvailable()) {
-                    return;
-                }
                 try {
-                    OpenSSLStatus.setAvailable(false);
-                    OpenSSLStatus.setInitialized(false);
-                    fipsModeActive = false;
+                    destroy();
                 } catch (Throwable t) {
                     t = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(t);
@@ -138,6 +143,75 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
         }
     }
 
+    /*
+    { BN_get_rfc3526_prime_8192, NULL, 6145 },
+    { BN_get_rfc3526_prime_6144, NULL, 4097 },
+    { BN_get_rfc3526_prime_4096, NULL, 3073 },
+    { BN_get_rfc3526_prime_3072, NULL, 2049 },
+    { BN_get_rfc3526_prime_2048, NULL, 1025 },
+    { BN_get_rfc2409_prime_1024, NULL, 0 }
+     */
+    static final class DHParam {
+        final MemoryAddress dh;
+        final int min;
+        private DHParam(MemoryAddress dh, int min) {
+            this.dh = dh;
+            this.min = min;
+        }
+    }
+    static final DHParam[] dhParameters = new DHParam[6];
+
+    private static void initDHParameters() {
+        var dh = DH_new();
+        var p = BN_get_rfc3526_prime_8192(MemoryAddress.NULL);
+        var g = BN_new();
+        BN_set_word(g, 2);
+        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        dhParameters[0] = new DHParam(dh, 6145);
+        dh = DH_new();
+        p = BN_get_rfc3526_prime_6144(MemoryAddress.NULL);
+        g = BN_new();
+        BN_set_word(g, 2);
+        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        dhParameters[1] = new DHParam(dh, 4097);
+        dh = DH_new();
+        p = BN_get_rfc3526_prime_4096(MemoryAddress.NULL);
+        g = BN_new();
+        BN_set_word(g, 2);
+        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        dhParameters[2] = new DHParam(dh, 3073);
+        dh = DH_new();
+        p = BN_get_rfc3526_prime_3072(MemoryAddress.NULL);
+        g = BN_new();
+        BN_set_word(g, 2);
+        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        dhParameters[3] = new DHParam(dh, 2049);
+        dh = DH_new();
+        p = BN_get_rfc3526_prime_2048(MemoryAddress.NULL);
+        g = BN_new();
+        BN_set_word(g, 2);
+        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        dhParameters[4] = new DHParam(dh, 1025);
+        dh = DH_new();
+        p = BN_get_rfc2409_prime_1024(MemoryAddress.NULL);
+        g = BN_new();
+        BN_set_word(g, 2);
+        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        dhParameters[5] = new DHParam(dh, 0);
+    }
+
+    private static void freeDHParameters() {
+        for (int i = 0; i < dhParameters.length; i++) {
+            if (dhParameters[i] != null) {
+                MemoryAddress dh = dhParameters[i].dh;
+                if (dh != null && !MemoryAddress.NULL.equals(dh)) {
+                    DH_free(dh);
+                    dhParameters[i] = null;
+                }
+            }
+        }
+    }
+
     static void init() throws Exception {
 
         if (OpenSSLStatus.isInitialized()) {
@@ -151,8 +225,6 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
         var scope = ResourceScope.globalScope();
         var allocator = SegmentAllocator.ofScope(scope);
-
-        // FIXME: implement ssl_init_cleanup to use if there's an error or when the library is unloaded, possibly only ENGINE_free
 
         // Main library init
         initLibrary();
@@ -203,9 +275,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
             RAND_seed(allocator.allocateArray(CLinker.C_CHAR, randomBytes), 128);
         }
 
-        // init_dh_params is done in OpenSSLContext static init
-        
-        // FIXME: Keylog ?
+        initDHParameters();
 
         if (!(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
 
@@ -267,6 +337,24 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
         log.info(sm.getString("listener.initializedOpenSSL", CLinker.toJavaString(OpenSSL_version(0))));
         OpenSSLStatus.setAvailable(true);
+    }
+
+    static void destroy() {
+        if (!OpenSSLStatus.isAvailable()) {
+            return;
+        }
+        OpenSSLStatus.setAvailable(false);
+
+        try {
+            freeDHParameters();
+            if (!MemoryAddress.NULL.equals(enginePointer)) {
+                ENGINE_free(enginePointer);
+            }
+            FIPS_mode_set(0);
+        } finally {
+            OpenSSLStatus.setInitialized(false);
+            fipsModeActive = false;
+        }
     }
 
     public String getSSLEngine() {
