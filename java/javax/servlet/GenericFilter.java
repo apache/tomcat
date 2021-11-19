@@ -25,6 +25,8 @@ import java.util.Enumeration;
  *
  * @see javax.servlet.Filter
  * @see javax.servlet.FilterConfig
+ *
+ * @since Servlet 4.0
  */
 public abstract class GenericFilter implements Filter, FilterConfig, Serializable {
 
