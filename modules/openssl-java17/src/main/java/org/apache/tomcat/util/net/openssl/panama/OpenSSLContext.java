@@ -1359,11 +1359,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static class ContextState implements Runnable {
 
-        // SSL context
         private final MemoryAddress sslCtx;
-        // OpenSSLConfCmd context
         private final MemoryAddress confCtx;
         private final List<byte[]> negotiableProtocols;
+
         private X509TrustManager x509TrustManager = null;
 
         private ContextState(MemoryAddress sslCtx, MemoryAddress confCtx, List<byte[]> negotiableProtocols) {
