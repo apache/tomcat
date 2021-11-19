@@ -272,6 +272,7 @@ public interface ServletResponse {
      * @see #getBufferSize
      * @see #isCommitted
      * @see #reset
+     *
      * @since Servlet 2.3
      */
     public void resetBuffer();

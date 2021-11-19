@@ -523,6 +523,7 @@ public interface ServletContext {
      * method with an attribute name to get the value of an attribute.
      *
      * @return an <code>Enumeration</code> of attribute names
+     *
      * @see #getAttribute
      */
     public Enumeration<String> getAttributeNames();

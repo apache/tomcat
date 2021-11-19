@@ -29,8 +29,9 @@ import java.util.ResourceBundle;
  * class implements the Wrapper or Decorator pattern. Methods default to calling
  * through to the wrapped request object.
  *
- * @since Servlet 2.3
  * @see javax.servlet.ServletRequest
+ *
+ * @since Servlet 2.3
  */
 public class ServletRequestWrapper implements ServletRequest {
     private static final String LSTRING_FILE = "javax.servlet.LocalStrings";
@@ -63,6 +64,7 @@ public class ServletRequestWrapper implements ServletRequest {
 
     /**
      * Sets the request object being wrapped.
+     *
      * @param request The new wrapped request.
      *
      * @throws IllegalArgumentException if the request is null.

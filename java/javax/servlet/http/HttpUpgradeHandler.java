@@ -30,8 +30,6 @@ public interface HttpUpgradeHandler {
      * the container to the {@link HttpUpgradeHandler}.
      *
      * @param connection    The connection that has been upgraded
-     *
-     * @since Servlet 3.1
      */
     void init(WebConnection connection);
 

@@ -344,7 +344,7 @@ public interface HttpServletResponse extends ServletResponse {
     public Collection<String> getHeaderNames();
 
     /*
-     * Server status codes; see RFC 2068.
+     * Server status codes; see RFC 7231.
      */
 
     /**

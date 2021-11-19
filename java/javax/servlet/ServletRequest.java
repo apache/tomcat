@@ -411,6 +411,7 @@ public interface ServletRequest {
      * proxy that sent the request.
      *
      * @return an integer specifying the port number
+     *
      * @since Servlet 2.4
      */
     public int getRemotePort();
@@ -440,6 +441,7 @@ public interface ServletRequest {
      * the request was received.
      *
      * @return an integer specifying the port number
+     *
      * @since Servlet 2.4
      */
     public int getLocalPort();
