@@ -220,12 +220,13 @@ public interface HttpServletRequest extends ServletRequest {
      * This method returns <code>null</code> if there was no extra path
      * information.
      * <p>
-     * Same as the value of the CGI variable PATH_INFO.
+     * The URL will be canonicalized as per section 3.5 of the specification
+     * before the path information, if any, is extracted.
      *
-     * @return a <code>String</code>, decoded by the web container, specifying
-     *         extra path information that comes after the servlet path but
-     *         before the query string in the request URL; or <code>null</code>
-     *         if the URL does not have any extra path information
+     * @return a <code>String</code>, canonicalized by the web container,
+     *         specifying extra path information that comes after the servlet
+     *         path but before the query string in the request URL; or
+     *         {@code null} if the URL does not have any extra path information
      */
     public String getPathInfo();
 
@@ -388,13 +389,16 @@ public interface HttpServletRequest extends ServletRequest {
      * path to the servlet, but does not include any extra path information or a
      * query string. Same as the value of the CGI variable SCRIPT_NAME.
      * <p>
+     * The URL will be canonicalized as per section 3.5 of the specification
+     * before the path information, if any, is extracted.
+     * <p>
      * This method will return an empty string ("") if the servlet used to
      * process this request was matched using the "/*" pattern.
      *
-     * @return a <code>String</code> containing the name or path of the servlet
-     *         being called, as specified in the request URL, decoded, or an
-     *         empty string if the servlet used to process the request is
-     *         matched using the "/*" pattern.
+     * @return a <code>String</code>, canonicalized by the web container,
+     *         containing the name or path of the servlet being called, as
+     *         specified in the request URL, or an empty string if the servlet
+     *         used to process the request is matched using the "/*" pattern.
      */
     public String getServletPath();
 
