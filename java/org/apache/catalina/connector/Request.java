@@ -2657,11 +2657,13 @@ public class Request implements HttpServletRequest {
                 int left = -1;
                 try {
                     left = gssCredential.getRemainingLifetime();
-                } catch (GSSException e) {
+                } catch (GSSException | IllegalStateException e) {
                     log.warn(sm.getString("coyoteRequest.gssLifetimeFail",
                             userPrincipal.getName()), e);
                 }
-                if (left == 0) {
+                // zero is expired.
+                // Should never be less than zero but handle those values too
+                if (left <= 0) {
                     // GSS credential has expired. Need to re-authenticate.
                     try {
                         logout();
