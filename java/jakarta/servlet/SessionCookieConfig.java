@@ -79,20 +79,26 @@ public interface SessionCookieConfig {
     public String getPath();
 
     /**
-     * Sets the comment for the session cookie
+     * If called, this method has no effect.
      *
-     * @param comment The session cookie comment
+     * @param comment Ignore
      *
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
+     *
+     * @deprecated This is no longer required with RFC 6265
      */
+    @Deprecated(since = "Servlet 6.0", forRemoval = true)
     public void setComment(String comment);
 
     /**
-     * Obtain the comment to use for session cookies.
+     * With the adoption of support for RFC 6265, this method should no longer be used.
      *
-     * @return the comment to use for session cookies.
+     * @return always {@code null}
+     *
+     * @deprecated This is no longer required with RFC 6265
      */
+    @Deprecated(since = "Servlet 6.0", forRemoval = true)
     public String getComment();
 
     /**

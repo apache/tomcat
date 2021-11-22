@@ -36,7 +36,7 @@ public class TestApplicationSessionCookieConfig {
     public void testSetCommentInitPhase() {
         context.setState(LifecycleState.STARTING_PREP);
         applicationSessionCookieConfig.setComment("test");
-        Assert.assertTrue(applicationSessionCookieConfig.getComment().equals("test"));
+        Assert.assertNull(applicationSessionCookieConfig.getComment());
     }
 
     @Test(expected = IllegalStateException.class)

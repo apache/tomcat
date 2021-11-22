@@ -51,7 +51,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
     @Override
     public String getComment() {
-        return getAttribute(Constants.COOKIE_COMMENT_ATTR);
+        return null;
     }
 
     @Override
@@ -103,7 +103,6 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
                     "applicationSessionCookieConfig.ise", "comment",
                     context.getPath()));
         }
-        setAttribute(Constants.COOKIE_COMMENT_ATTR, comment);
     }
 
     @Override
@@ -208,7 +207,6 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
         // Just apply the defaults.
         cookie.setMaxAge(scc.getMaxAge());
-        cookie.setComment(scc.getComment());
 
         if (context.getSessionCookieDomain() == null) {
             // Avoid possible NPE

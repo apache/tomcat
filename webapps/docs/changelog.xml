@@ -123,6 +123,10 @@
         Make SPNEGO authentication more robust for the case where the provided
         credential has expired. (markt)
       </fix>
+      <fix>
+        Limit cookie support to RFC 6265 to align with recent updates to the
+        Servlet specification. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

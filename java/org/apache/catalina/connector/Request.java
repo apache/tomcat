@@ -3126,17 +3126,8 @@ public class Request implements HttpServletRequest {
             try {
                 // We must unescape the '\\' escape character
                 Cookie cookie = new Cookie(scookie.getName().toString(),null);
-                int version = scookie.getVersion();
-                cookie.setVersion(version);
                 scookie.getValue().getByteChunk().setCharset(cookieProcessor.getCharset());
                 cookie.setValue(unescape(scookie.getValue().toString()));
-                cookie.setPath(unescape(scookie.getPath().toString()));
-                String domain = scookie.getDomain().toString();
-                if (domain!=null) {
-                    cookie.setDomain(unescape(domain));//avoid NPE
-                }
-                String comment = scookie.getComment().toString();
-                cookie.setComment(version==1?unescape(comment):null);
                 cookies[idx++] = cookie;
             } catch(IllegalArgumentException e) {
                 // Ignore bad cookie

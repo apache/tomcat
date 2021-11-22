@@ -224,11 +224,11 @@ public class TestLoadBalancerDrainingValve {
         }
         @Override
         public String getComment() {
-            return attributes.get(Constants.COOKIE_COMMENT_ATTR);
+            return null;
         }
         @Override
         public void setComment(String comment) {
-            attributes.put(Constants.COOKIE_COMMENT_ATTR, comment);
+            // NO-OP
         }
         @Override
         public boolean isHttpOnly() {

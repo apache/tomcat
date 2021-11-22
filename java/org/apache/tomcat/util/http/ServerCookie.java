@@ -34,23 +34,9 @@ public class ServerCookie implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // Version 0 (Netscape) attributes
+    // RFC 6265
     private final MessageBytes name=MessageBytes.newInstance();
     private final MessageBytes value=MessageBytes.newInstance();
-    // Expires - Not stored explicitly. Generated from Max-Age (see V1)
-    private final MessageBytes path=MessageBytes.newInstance();
-    private final MessageBytes domain=MessageBytes.newInstance();
-
-    // Version 1 (RFC2109) attributes
-    private final MessageBytes comment=MessageBytes.newInstance();
-    private int version = 0;
-
-    // Note: Servlet Spec =< 3.0 only refers to Netscape and RFC2109, not RFC2965
-
-    // Version 2 (RFC2965) attributes that would need to be added to support v2 cookies
-    // CommentURL
-    // Discard - implied by maxAge <0
-    // Port
 
     public ServerCookie() {
         // NOOP
@@ -59,22 +45,6 @@ public class ServerCookie implements Serializable {
     public void recycle() {
         name.recycle();
         value.recycle();
-        comment.recycle();
-        path.recycle();
-        domain.recycle();
-        version=0;
-    }
-
-    public MessageBytes getComment() {
-        return comment;
-    }
-
-    public MessageBytes getDomain() {
-        return domain;
-    }
-
-    public MessageBytes getPath() {
-        return path;
     }
 
     public MessageBytes getName() {
@@ -85,21 +55,12 @@ public class ServerCookie implements Serializable {
         return value;
     }
 
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int v) {
-        version = v;
-    }
-
 
     // -------------------- utils --------------------
 
     @Override
     public String toString() {
-        return "Cookie " + getName() + "=" + getValue() + " ; "
-            + getVersion() + " " + getPath() + " " + getDomain();
+        return "Cookie " + getName() + "=" + getValue();
     }
 }
 
