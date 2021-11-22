@@ -107,6 +107,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     protected long sslContext = 0;
 
 
+    private int previousAcceptedPort = -1;
+    private String previousAcceptedAddress = null;
+
+
     private final Map<Long,AprSocketWrapper> connections = new ConcurrentHashMap<>();
 
 
@@ -752,7 +756,18 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     log.debug(sm.getString("endpoint.debug.socket",
                             Long.valueOf(socket)));
                 }
+
+                // Do the duplicate accept check here rather than in Acceptor.run()
+                // so we can cache the results in the SocketWrapper
                 AprSocketWrapper wrapper = new AprSocketWrapper(Long.valueOf(socket), this);
+                if (wrapper.getRemotePort() == previousAcceptedPort) {
+                    if (wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
+                        throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                    }
+                }
+                previousAcceptedPort = wrapper.getRemotePort();
+                previousAcceptedAddress = wrapper.getRemoteAddr();
+
                 wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
                 wrapper.setReadTimeout(getConnectionTimeout());
                 wrapper.setWriteTimeout(getConnectionTimeout());
@@ -905,6 +920,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     try {
                         // Accept the next incoming connection from the server
                         // socket
+                        // See processSocketWithOptions(long) for duplicate
+                        // accept check
                         socket = Socket.accept(serverSock);
                         if (socket == 0) {
                             throw new IOException(sm.getString("endpoint.err.accept", getName()));

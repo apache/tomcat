@@ -83,6 +83,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
      */
     private SynchronizedStack<Nio2Channel> nioChannels;
 
+    private SocketAddress previousAcceptedSocketRemoteAddress = null;
+
 
     public Nio2Endpoint() {
         // Override the defaults for NIO2
@@ -408,6 +410,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         // Accept the next incoming connection from the server
                         // socket
                         socket = serverSock.accept().get();
+
+                        SocketAddress currentRemoteAddress = socket.getRemoteAddress();
+                        if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress)) {
+                            throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                        }
+                        previousAcceptedSocketRemoteAddress = currentRemoteAddress;
+
                     } catch (Exception e) {
                         // We didn't get a socket
                         countDownConnection();

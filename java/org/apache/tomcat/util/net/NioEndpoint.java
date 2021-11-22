@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
@@ -101,6 +102,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
      */
     private SynchronizedStack<NioChannel> nioChannels;
+
+    private SocketAddress previousAcceptedSocketRemoteAddress = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -507,6 +510,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         // Accept the next incoming connection from the server
                         // socket
                         socket = serverSock.accept();
+
+                        SocketAddress currentRemoteAddress = socket.getRemoteAddress();
+                        if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress)) {
+                            throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                        }
+                        previousAcceptedSocketRemoteAddress = currentRemoteAddress;
                     } catch (IOException ioe) {
                         // We didn't get a socket
                         countDownConnection();
