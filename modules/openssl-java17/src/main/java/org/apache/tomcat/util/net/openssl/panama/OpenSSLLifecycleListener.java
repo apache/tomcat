@@ -340,7 +340,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     }
 
     static void destroy() {
-        if (!OpenSSLStatus.isAvailable()) {
+        if (!OpenSSLStatus.isInitialized()) {
             return;
         }
         OpenSSLStatus.setAvailable(false);
