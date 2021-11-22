@@ -147,12 +147,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
         serverSock.bind(addr, getAcceptCount());
 
-        // Initialize thread count defaults for acceptor, poller
-        if (acceptorThreadCount != 1) {
-            // NIO2 does not allow any form of IO concurrency
-            acceptorThreadCount = 1;
-        }
-
         // Initialize SSL if needed
         initialiseSsl();
     }

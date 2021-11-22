@@ -337,9 +337,27 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         return endpoint.getConnectionCount();
     }
 
+    /**
+     * Unused.
+     *
+     * @param threadCount   Ignored
+     *
+     * @deprecated  This attribute is hard-coded to {@code 1} and is no longer
+     *              configurable.
+     */
+    @Deprecated
     public void setAcceptorThreadCount(int threadCount) {
         endpoint.setAcceptorThreadCount(threadCount);
     }
+    /**
+     * Unused.
+     *
+     * @return  Always returns {@code 1}
+     *
+     * @deprecated  This attribute is hard-coded to {@code 1} and is no longer
+     *              configurable.
+     */
+    @Deprecated
     public int getAcceptorThreadCount() {
       return endpoint.getAcceptorThreadCount();
     }

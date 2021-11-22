@@ -191,7 +191,8 @@ public abstract class AbstractEndpoint<S> {
     }
 
     /**
-     * Threads used to accept new connections and pass them to worker threads.
+     * Thread used to accept new connections and pass them to worker threads.
+     * This is hard-coded to use a single acceptor.
      */
     protected Acceptor[] acceptors;
 
@@ -445,14 +446,39 @@ public abstract class AbstractEndpoint<S> {
 
 
     /**
-     * Acceptor thread count.
+     * Unused.
+     *
+     * @deprecated  This attribute is hard-coded to {@code 1} and is no longer
+     *              configurable.
      */
+    @Deprecated
     protected int acceptorThreadCount = 1;
 
+    /**
+     * Unused.
+     *
+     * @param acceptorThreadCount   Ignored
+     *
+     * @deprecated  This attribute is hard-coded to {@code 1} and is no longer
+     *              configurable.
+     */
+    @Deprecated
     public void setAcceptorThreadCount(int acceptorThreadCount) {
-        this.acceptorThreadCount = acceptorThreadCount;
+        // NO-OP;
     }
-    public int getAcceptorThreadCount() { return acceptorThreadCount; }
+
+    /**
+     * Unused.
+     *
+     * @return  Always returns {@code 1}
+     *
+     * @deprecated  This attribute is hard-coded to {@code 1} and is no longer
+     *              configurable.
+     */
+    @Deprecated
+    public int getAcceptorThreadCount() {
+        return 1;
+    }
 
 
     /**
@@ -1014,6 +1040,8 @@ public abstract class AbstractEndpoint<S> {
                 }
             }
             // Wait for upto 1000ms acceptor threads to unlock
+            // Should only be one thread but retain this code in case the
+            // acceptor start has been customised.
             long waitLeft = 1000;
             for (Acceptor acceptor : acceptors) {
                 while (waitLeft > 0 &&
@@ -1238,18 +1266,15 @@ public abstract class AbstractEndpoint<S> {
     }
 
     protected final void startAcceptorThreads() {
-        int count = getAcceptorThreadCount();
-        acceptors = new Acceptor[count];
+        acceptors = new Acceptor[1];
 
-        for (int i = 0; i < count; i++) {
-            acceptors[i] = createAcceptor();
-            String threadName = getName() + "-Acceptor-" + i;
-            acceptors[i].setThreadName(threadName);
-            Thread t = new Thread(acceptors[i], threadName);
-            t.setPriority(getAcceptorThreadPriority());
-            t.setDaemon(getDaemon());
-            t.start();
-        }
+        acceptors[0] = createAcceptor();
+        String threadName = getName() + "-Acceptor-0";
+        acceptors[0].setThreadName(threadName);
+        Thread t = new Thread(acceptors[0], threadName);
+        t.setPriority(getAcceptorThreadPriority());
+        t.setDaemon(getDaemon());
+        t.start();
     }
 
 

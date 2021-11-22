@@ -349,12 +349,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             setUseSendfileInternal(false);
         }
 
-        // Initialize thread count default for acceptor
-        if (acceptorThreadCount == 0) {
-            // FIXME: Doesn't seem to work that well with multiple accept threads
-            acceptorThreadCount = 1;
-        }
-
         // Delay accepting of new connections until data is available
         // Only Linux kernels 2.4 + have that implemented
         // on other platforms this call is noop and will return APR_ENOTIMPL.
@@ -496,7 +490,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // Stop the Poller calling select
             poller.stop();
 
-            // Wait for the acceptor(s) to shutdown
+            // Wait for the acceptor to shutdown.
+            // Should only be one thread but retain this code in case the
+            // acceptor start has been customised.
             for (AbstractEndpoint.Acceptor acceptor : acceptors) {
                 long waitLeft = 10000;
                 while (waitLeft > 0 &&

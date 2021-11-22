@@ -231,11 +231,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         }
         serverSock.configureBlocking(true); //mimic APR behavior
 
-        // Initialize thread count defaults for acceptor, poller
-        if (acceptorThreadCount == 0) {
-            // FIXME: Doesn't seem to work that well with multiple accept threads
-            acceptorThreadCount = 1;
-        }
         if (pollerThreadCount <= 0) {
             //minimum one poller thread
             pollerThreadCount = 1;

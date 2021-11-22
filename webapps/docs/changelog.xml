@@ -156,6 +156,9 @@
         Improve error handling if APR/Native fails to accept an incoming
         connection. (markt)
       </fix>
+      <add>
+        Hard code all connectors to use a single acceptor thread. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

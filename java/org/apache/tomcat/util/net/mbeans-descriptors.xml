@@ -30,7 +30,8 @@
                  type="int"/>
 
     <attribute   name="acceptorThreadCount"
-                 type="int"/>
+                 type="int"
+                 description="Deprecated - do not use"/>
 
     <attribute   name="acceptorThreadPriority"
                  type="int"/>
@@ -253,7 +254,8 @@
                  type="int"/>
 
     <attribute   name="acceptorThreadCount"
-                 type="int"/>
+                 type="int"
+                 description="Deprecated - do not use"/>
 
     <attribute   name="acceptorThreadPriority"
                  type="int"/>
@@ -464,7 +466,8 @@
                  type="int"/>
 
     <attribute   name="acceptorThreadCount"
-                 type="int"/>
+                 type="int"
+                 description="Deprecated - do not use"/>
 
     <attribute   name="acceptorThreadPriority"
                  type="int"/>
