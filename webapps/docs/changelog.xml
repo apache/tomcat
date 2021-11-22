@@ -133,6 +133,10 @@
         bug</a> that causes the acceptor to report an incoming connection more
         than once. (markt)
       </add>
+      <fix>
+        Avoid unnecessary duplicate read registrations for blocking I/O with the
+        NIO connector. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
