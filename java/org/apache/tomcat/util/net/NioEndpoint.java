@@ -1302,8 +1302,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     if (n == -1) {
                         throw new EOFException();
                     } else if (n == 0) {
-                        readBlocking = true;
-                        registerReadInterest();
+                        if (!readBlocking) {
+                            readBlocking = true;
+                            registerReadInterest();
+                        }
                         synchronized (readLock) {
                             if (readBlocking) {
                                 try {
@@ -1316,7 +1318,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 } catch (InterruptedException e) {
                                     // Continue
                                 }
-                                readBlocking = false;
                             }
                         }
                     }
