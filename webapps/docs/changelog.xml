@@ -119,6 +119,10 @@
         <code>web.xml</code> file, a <code>web-fragment.xml</code> file nor
         annotated with <code>WebListener</code>. (markt)
       </fix>
+      <fix>
+        Make SPNEGO authentication more robust for the case where the provided
+        credential has expired. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
