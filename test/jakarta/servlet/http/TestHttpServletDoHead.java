@@ -193,7 +193,7 @@ public class TestHttpServletDoHead extends Http2TestBase {
 
 
     @Override
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings("removal")
     protected void configureAndStartWebApplication() throws LifecycleException {
         Tomcat tomcat = getTomcatInstance();
 
