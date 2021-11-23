@@ -57,6 +57,8 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
                 "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
@@ -187,7 +189,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
 
         TesterSupport.initSsl(tomcat);
 
-        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
 
         if (needApr) {
             AprLifecycleListener listener = new AprLifecycleListener();

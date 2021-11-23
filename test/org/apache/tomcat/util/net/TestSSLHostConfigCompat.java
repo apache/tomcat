@@ -55,6 +55,8 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
                     "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation", storeType});
             parameterSets.add(new Object[] {
                     "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
+            parameterSets.add(new Object[] {
+                    "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation", storeType});
         }
 
         return parameterSets;
@@ -313,7 +315,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         sslHostConfig.setProtocols("TLSv1.2");
         connector.addSslHostConfig(sslHostConfig);
 
-        Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
 
         if (needApr) {
             AprLifecycleListener listener = new AprLifecycleListener();

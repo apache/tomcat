@@ -54,6 +54,8 @@ public class TestCustomSslTrustManager extends TomcatBaseTest {
                 "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
@@ -97,7 +99,7 @@ public class TestCustomSslTrustManager extends TomcatBaseTest {
         TesterSupport.configureClientCertContext(tomcat);
 
         Connector connector = tomcat.getConnector();
-        Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
 
         if (needApr) {
             AprLifecycleListener listener = new AprLifecycleListener();

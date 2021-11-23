@@ -49,6 +49,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Assume;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.SSLAuthenticator;
@@ -228,6 +229,15 @@ public final class TesterSupport {
         }
 
         return true;
+    }
+
+    public static void configureSSLImplementation(Tomcat tomcat, String sslImplementationName) {
+        try {
+            Class.forName(sslImplementationName);
+        } catch (Exception e) {
+            Assume.assumeNoException(e);
+        }
+        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
     }
 
     public static void configureClientCertContext(Tomcat tomcat) {
