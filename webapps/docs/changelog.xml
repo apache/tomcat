@@ -147,6 +147,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        Update the WebSocket API packaging to remove the copy of the client API
+        from the server API and replace it with a dependency on the client API.
+        This aligns Tomcat with changes in the WebSocket 2.1 specification.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M7 (markt)" rtext="2021-11-15">
   <subsection name="Catalina">

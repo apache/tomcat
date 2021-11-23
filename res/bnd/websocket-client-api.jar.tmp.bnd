@@ -15,42 +15,32 @@
 
 -include: build-defaults.bnd, spec-defaults.bnd
 
-Bundle-Name: tomcat-websocket-api
-Bundle-SymbolicName: org.apache.tomcat-websocket-api
+Bundle-Name: tomcat-websocket-client-api
+Bundle-SymbolicName: org.apache.tomcat-websocket-client-api
 Export-Package: \
-    jakarta.websocket.server.*;version=${websocket.spec.version}
-
-Provide-Capability: \
-    osgi.contract;\
-        osgi.contract=JavaWebSockets;\
-        version:Version=${websocket.spec.version};\
-        uses:='${packages;NAMED;jakarta.websocket.*}'
+    jakarta.websocket;version=${websocket.spec.version}
 
 Require-Capability: \
     osgi.extender;\
         filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
     osgi.serviceloader;\
-        filter:="(osgi.serviceloader=jakarta.websocket.server.ServerEndpointConfig$Configurator)";\
-        osgi.serviceloader="jakarta.websocket.server.ServerEndpointConfig$Configurator",\
+        filter:="(osgi.serviceloader=jakarta.websocket.ContainerProvider)";\
+        osgi.serviceloader="jakarta.websocket.ContainerProvider",\
     osgi.ee;\
         filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 
--namesection: jakarta/websocket*/;\
-    Specification-Title=Jakarta WebSocket;\
+-namesection: jakarta/websocket/client*/;\
+    Specification-Title=Jakarta WebSocket Client;\
     Specification-Version=${websocket.spec.version};\
     Specification-Vendor=Eclipse Foundation;\
-    Implementation-Title=jakarta.websocket.server;\
+    Implementation-Title=jakarta.websocket;\
     Implementation-Version=${websocket.spec.version}.${websocket.revision};\
     Implementation-Vendor=Apache Software Foundation
 
 -jpms-module-info: \
-    jakarta.websocket;\
+    jakarta.websocket.client;\
         access=32;\
-        modules=jakarta.websocket.client;\
         version=${websocket.spec.version}
 -jpms-module-info-options: \
-    jakarta.websocket;\
-        substitute=websocket-api,\
-    jakarta.websocket.client;\
-        transitive=true;\
-        static=false
+    jakarta.websocke.clientt;\
+        substitute=websocket-client-api

@@ -85,8 +85,9 @@ for use by web applications (by placing them in "lib"):
 * tomcat-jdbc.jar (Tomcat's database connection pooling solution)
 * tomcat-jni.jar (Interface to the native component of the APR/native connector)
 * tomcat-util.jar (Various utilities)
-* tomcat-websocket.jar (WebSocket 2.0 implementation)
-* websocket-api.jar (WebSocket 2.0 API)
+* tomcat-websocket.jar (WebSocket 2.1 implementation)
+* websocket-api.jar (WebSocket 2.1 API)
+* websocket-client-api.jar (WebSocket 2.1 Client API)
 
 You can make additional APIs available to all of your web applications by
 putting unpacked classes into a "classes" directory (not created by default),

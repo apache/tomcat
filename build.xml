@@ -117,6 +117,7 @@
   <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
   <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
   <property name="websocket-api.jar" value="${tomcat.build}/lib/websocket-api.jar"/>
+  <property name="websocket-client-api.jar" value="${tomcat.build}/lib/websocket-client-api.jar"/>
   <property name="jaspic-api.jar" value="${tomcat.build}/lib/jaspic-api.jar"/>
   <property name="tomcat-websocket.jar" value="${tomcat.build}/lib/tomcat-websocket.jar"/>
   <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
@@ -144,6 +145,7 @@
   <property name="jsp-api-src.jar" value="${tomcat.src.jars}/jsp-api-src.jar"/>
   <property name="el-api-src.jar" value="${tomcat.src.jars}/el-api-src.jar"/>
   <property name="websocket-api-src.jar" value="${tomcat.src.jars}/websocket-api-src.jar"/>
+  <property name="websocket-client-api-src.jar" value="${tomcat.src.jars}/websocket-client-api-src.jar"/>
   <property name="jaspic-api-src.jar" value="${tomcat.src.jars}/jaspic-api-src.jar"/>
   <property name="tomcat-websocket-src.jar" value="${tomcat.src.jars}/tomcat-websocket-src.jar"/>
   <property name="catalina-src.jar" value="${tomcat.src.jars}/catalina-src.jar"/>
@@ -349,7 +351,11 @@
   </patternset>
 
   <patternset id="files.websocket-api">
-    <include name="jakarta/websocket/**" />
+    <include name="jakarta/websocket/server/*" />
+  </patternset>
+
+  <patternset id="files.websocket-client-api">
+    <include name="jakarta/websocket/*" />
   </patternset>
 
   <patternset id="files.jaspic-api">
@@ -754,6 +760,7 @@
 
   <patternset id="files.tomcat-embed-websocket" >
     <patternset refid="files.websocket-api" />
+    <patternset refid="files.websocket-client-api" />
     <patternset refid="files.tomcat-websocket" />
   </patternset>
 
@@ -1041,6 +1048,13 @@
       filesDir="${tomcat.classes}"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest"
+      addOSGi="true" />
+
+    <!-- WebSocket Client API JAR File -->
+    <jarIt jarfile="${websocket-client-api.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.websocket-client-api"
+      manifest="${tomcat.manifests}/websocket-client-api.jar.manifest"
       addOSGi="true" />
 
     <!-- JASPIC API JAR File -->
@@ -2311,6 +2325,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="jaspic-api.jar"/>
         <include name="servlet-api.jar"/>
         <include name="websocket-api.jar"/>
+        <include name="websocket-client-api.jar"/>
         <include name="tomcat-websocket.jar"/>
         <include name="tomcat-coyote.jar"/>
         <include name="tomcat-util.jar"/>
@@ -2918,6 +2933,12 @@ skip.installer property in build.properties" />
       filesDir="java"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
+
+    <!-- WebSocket Client API JAR File -->
+    <jarIt jarfile="${websocket-client-api-src.jar}"
+      filesDir="java"
+      filesId="files.websocket-client-api"
+      manifest="${tomcat.manifests}/websocket-client-api.jar.manifest" />
 
     <!-- JASPIC API JAR File -->
     <jarIt jarfile="${jaspic-api-src.jar}"

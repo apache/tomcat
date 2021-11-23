@@ -21,9 +21,9 @@
   http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.tomcat</groupId>
-  <artifactId>tomcat-websocket-api</artifactId>
+  <artifactId>tomcat-websocket-client-api</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>WebSocket API</description>
+  <description>WebSocket Client API</description>
   <url>https://tomcat.apache.org/</url>
   <licenses>
     <license>
@@ -32,12 +32,4 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-websocket-client-api</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
 </project>
