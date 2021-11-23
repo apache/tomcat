@@ -53,7 +53,7 @@ public class TestJspServlet  extends TomcatBaseTest {
         // PUT requests are normally blocked for JSPs
         ErrorPage ep = new ErrorPage();
         ep.setErrorCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        ep.setLocation("/WEB-INF/jsp/error.jsp");
+        ep.setLocation("/jsp/error.jsp");
         context.addErrorPage(ep);
 
         tomcat.start();
