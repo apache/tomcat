@@ -30,6 +30,8 @@ import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.ref.Cleaner;
+import java.lang.ref.Cleaner.Cleanable;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
@@ -147,6 +149,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
+    private static final Cleaner cleaner = Cleaner.create();
+
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private final boolean alpn;
@@ -167,7 +171,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     private final ContextState state;
-    private final ResourceScope scope;
+    private final Cleanable cleanable;
 
     private static String[] getCiphers(MemoryAddress sslCtx) {
         MemoryAddress sk = SSL_CTX_get_ciphers(sslCtx);
@@ -198,7 +202,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
-        scope = ResourceScope.newImplicitScope();
+        ResourceScope scope = ResourceScope.newSharedScope();
 
         MemoryAddress sslCtx = MemoryAddress.NULL;
         MemoryAddress confCtx = MemoryAddress.NULL;
@@ -335,7 +339,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         } catch(Exception e) {
             throw new SSLException(sm.getString("openssl.errorSSLCtxInit"), e);
         } finally {
-            state = new ContextState(sslCtx, confCtx, negotiableProtocolsBytes);
+            state = new ContextState(scope, sslCtx, confCtx, negotiableProtocolsBytes);
             /*
              * When an SSLHostConfig is replaced at runtime, it is not possible to
              * call destroy() on the associated OpenSSLContext since it is likely
@@ -344,11 +348,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
              * OpenSSLSessionContext) to ensure that the OpenSSLContext remains
              * ineligible for GC while those connections are alive. Once those
              * connections complete, the OpenSSLContext will become eligible for GC
-             * and the implicit scope will ensure that the associated native
-             * resources are cleaned up.
+             * and this method will ensure that the associated native resources are
+             * cleaned up.
              */
             states.put(Long.valueOf(sslCtx.address().toRawLongValue()), state);
-            scope.addCloseAction(state);
+            cleanable = cleaner.register(this, state);
 
             if (!success) {
                 destroy();
@@ -370,6 +374,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public synchronized void destroy() {
         states.remove(Long.valueOf(state.sslCtx.address().toRawLongValue()));
+        cleanable.clean();
     }
 
 
@@ -556,7 +561,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             // List the ciphers that the client is permitted to negotiate
-            if (SSL_CTX_set_cipher_list(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), scope)) <= 0) {
+            if (SSL_CTX_set_cipher_list(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), state.scope)) <= 0) {
                 log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
             }
 
@@ -592,66 +597,64 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             MemoryAddress openSSLCallbackVerify =
                     CLinker.getInstance().upcallStub(openSSLCallbackVerifyHandle,
-                    openSSLCallbackVerifyFunctionDescriptor, scope);
+                    openSSLCallbackVerifyFunctionDescriptor, state.scope);
             // Leave this just in case but in Tomcat this is always set again by the engine
             SSL_CTX_set_verify(state.sslCtx, value, openSSLCallbackVerify);
 
             // Trust and certificate verification
-            try (var scope = ResourceScope.newConfinedScope()) {
-                var allocator = SegmentAllocator.ofScope(scope);
-                if (tms != null) {
-                    // Client certificate verification based on custom trust managers
-                    state.x509TrustManager = chooseTrustManager(tms);
-                    MemoryAddress openSSLCallbackCertVerify =
-                            CLinker.getInstance().upcallStub(openSSLCallbackCertVerifyHandle,
-                            openSSLCallbackCertVerifyFunctionDescriptor, this.scope);
-                    SSL_CTX_set_cert_verify_callback(state.sslCtx, openSSLCallbackCertVerify, state.sslCtx);
+            var allocator = SegmentAllocator.ofScope(state.scope);
+            if (tms != null) {
+                // Client certificate verification based on custom trust managers
+                state.x509TrustManager = chooseTrustManager(tms);
+                MemoryAddress openSSLCallbackCertVerify =
+                        CLinker.getInstance().upcallStub(openSSLCallbackCertVerifyHandle,
+                                openSSLCallbackCertVerifyFunctionDescriptor, state.scope);
+                SSL_CTX_set_cert_verify_callback(state.sslCtx, openSSLCallbackCertVerify, state.sslCtx);
 
-                    // Pass along the DER encoded certificates of the accepted client
-                    // certificate issuers, so that their subjects can be presented
-                    // by the server during the handshake to allow the client choosing
-                    // an acceptable certificate
-                    for (X509Certificate caCert : state.x509TrustManager.getAcceptedIssuers()) {
-                        //SSLContext.addClientCACertificateRaw(state.ctx, caCert.getEncoded());
-                        var rawCACertificate = allocator.allocateArray(CLinker.C_CHAR, caCert.getEncoded());
-                        var rawCACertificatePointer = allocator.allocate(CLinker.C_POINTER, rawCACertificate);
-                        var x509CACert = d2i_X509(MemoryAddress.NULL, rawCACertificatePointer, rawCACertificate.byteSize());
-                        if (MemoryAddress.NULL.equals(x509CACert)) {
-                            logLastError(allocator, "openssl.errorLoadingCertificate");
-                        } else if (SSL_CTX_add_client_CA(state.sslCtx, x509CACert) <= 0) {
-                            logLastError(allocator, "openssl.errorAddingCertificate");
-                        } else if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
+                // Pass along the DER encoded certificates of the accepted client
+                // certificate issuers, so that their subjects can be presented
+                // by the server during the handshake to allow the client choosing
+                // an acceptable certificate
+                for (X509Certificate caCert : state.x509TrustManager.getAcceptedIssuers()) {
+                    //SSLContext.addClientCACertificateRaw(state.ctx, caCert.getEncoded());
+                    var rawCACertificate = allocator.allocateArray(CLinker.C_CHAR, caCert.getEncoded());
+                    var rawCACertificatePointer = allocator.allocate(CLinker.C_POINTER, rawCACertificate);
+                    var x509CACert = d2i_X509(MemoryAddress.NULL, rawCACertificatePointer, rawCACertificate.byteSize());
+                    if (MemoryAddress.NULL.equals(x509CACert)) {
+                        logLastError(allocator, "openssl.errorLoadingCertificate");
+                    } else if (SSL_CTX_add_client_CA(state.sslCtx, x509CACert) <= 0) {
+                        logLastError(allocator, "openssl.errorAddingCertificate");
+                    } else if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
+                    }
+                }
+            } else if (sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) {
+                // Client certificate verification based on trusted CA files and dirs
+                //SSLContext.setCACertificate(state.ctx,
+                //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
+                //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
+                MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null
+                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()), state.scope) : null;
+                MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
+                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()), state.scope) : null;
+                if (SSL_CTX_load_verify_locations(state.sslCtx,
+                        caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative,
+                                caCertificatePathNative == null ? MemoryAddress.NULL : caCertificatePathNative) <= 0) {
+                    logLastError(allocator, "openssl.errorConfiguringLocations");
+                } else {
+                    var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
+                    if (MemoryAddress.NULL.equals(caCerts)) {
+                        caCerts = SSL_load_client_CA_file(caCertificateFileNative);
+                        if (!MemoryAddress.NULL.equals(caCerts)) {
+                            SSL_CTX_set_client_CA_list(state.sslCtx, caCerts);
+                        }
+                    } else {
+                        if (SSL_add_file_cert_subjects_to_stack(caCerts, caCertificateFileNative) <= 0) {
+                            caCerts = MemoryAddress.NULL;
                         }
                     }
-                } else if (sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) {
-                    // Client certificate verification based on trusted CA files and dirs
-                    //SSLContext.setCACertificate(state.ctx,
-                    //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
-                    //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
-                    MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null
-                            ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()), scope) : null;
-                    MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
-                            ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()), scope) : null;
-                    if (SSL_CTX_load_verify_locations(state.sslCtx,
-                            caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative,
-                            caCertificatePathNative == null ? MemoryAddress.NULL : caCertificatePathNative) <= 0) {
-                        logLastError(allocator, "openssl.errorConfiguringLocations");
-                    } else {
-                        var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
-                        if (MemoryAddress.NULL.equals(caCerts)) {
-                            caCerts = SSL_load_client_CA_file(caCertificateFileNative);
-                            if (!MemoryAddress.NULL.equals(caCerts)) {
-                                SSL_CTX_set_client_CA_list(state.sslCtx, caCerts);
-                            }
-                        } else {
-                            if (SSL_add_file_cert_subjects_to_stack(caCerts, caCertificateFileNative) <= 0) {
-                                caCerts = MemoryAddress.NULL;
-                            }
-                        }
-                        if (MemoryAddress.NULL.equals(caCerts)) {
-                            log.warn(sm.getString("openssl.noCACerts"));
-                        }
+                    if (MemoryAddress.NULL.equals(caCerts)) {
+                        log.warn(sm.getString("openssl.noCACerts"));
                     }
                 }
             }
@@ -661,7 +664,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //        MemoryAddress in, int inlen, MemoryAddress arg
                 MemoryAddress openSSLCallbackAlpnSelectProto =
                         CLinker.getInstance().upcallStub(openSSLCallbackAlpnSelectProtoHandle,
-                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, scope);
+                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, state.scope);
                 SSL_CTX_set_alpn_select_cb(state.sslCtx, openSSLCallbackAlpnSelectProto, state.sslCtx);
                 // Skip NPN (annoying and likely not useful anymore)
                 //SSLContext.setNpnProtos(state.ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
@@ -1125,7 +1128,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 // Set callback for DH parameters
                 MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
-                        openSSLCallbackTmpDHFunctionDescriptor, scope);
+                        openSSLCallbackTmpDHFunctionDescriptor, state.scope);
                 SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
                 // Set certificate chain file
                 if (certificate.getCertificateChainFile() != null) {
@@ -1213,7 +1216,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 // Set callback for DH parameters
                 MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
-                        openSSLCallbackTmpDHFunctionDescriptor, scope);
+                        openSSLCallbackTmpDHFunctionDescriptor, state.scope);
                 SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
                 for (int i = 1; i < chain.length; i++) {
                     //SSLContext.addChainCertificateRaw(state.ctx, chain[i].getEncoded());
@@ -1359,13 +1362,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static class ContextState implements Runnable {
 
+        final ResourceScope scope;
         private final MemoryAddress sslCtx;
         private final MemoryAddress confCtx;
         private final List<byte[]> negotiableProtocols;
 
         private X509TrustManager x509TrustManager = null;
 
-        private ContextState(MemoryAddress sslCtx, MemoryAddress confCtx, List<byte[]> negotiableProtocols) {
+        private ContextState(ResourceScope scope, MemoryAddress sslCtx, MemoryAddress confCtx, List<byte[]> negotiableProtocols) {
+            this.scope = scope;
             this.sslCtx = sslCtx;
             this.confCtx = confCtx;
             this.negotiableProtocols = negotiableProtocols;
@@ -1373,9 +1378,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         @Override
         public void run() {
-            SSL_CTX_free(sslCtx);
-            if (!MemoryAddress.NULL.equals(confCtx)) {
-                SSL_CONF_CTX_free(confCtx);
+            try {
+                SSL_CTX_free(sslCtx);
+                if (!MemoryAddress.NULL.equals(confCtx)) {
+                    SSL_CONF_CTX_free(confCtx);
+                }
+            } finally {
+                scope.close();
             }
         }
     }
