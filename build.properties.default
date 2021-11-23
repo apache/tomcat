@@ -84,7 +84,7 @@ gpg.exec=/path/to/gpg
 # Code signing of Windows installer
 # See https://infra.apache.org/digicert-use.html for setup instructions
 do.codesigning=false
-codesigning.alias=Tomcat-PMC-cert-2021-04
+codesigning.alias=Tomcat-PMC-cert-2021-11
 codesigning.digest=SHA-512
 codesigning.storetype=DIGICERTONE
 # Set codesigning.storepass in build.properties with the following syntax
