@@ -266,7 +266,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         var networkBIO = MemoryAccess.getAddress(networkBIOPointer);
         SSL_set_bio(ssl, internalBIO, internalBIO);
         state = new EngineState(ssl, networkBIO, certificateVerificationDepth, noOcspCheck);
-        states.put(Long.valueOf(ssl.address().toRawLongValue()), state);
         scope.addCloseAction(state);
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
@@ -287,7 +286,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public synchronized void shutdown() {
         if (!destroyed) {
             destroyed = true;
-            states.remove(Long.valueOf(state.ssl.address().toRawLongValue()));
             // internal errors can cause shutdown without marking the engine closed
             isInboundDone = isOutboundDone = engineClosed = true;
         }
@@ -1869,6 +1867,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         private EngineState(MemoryAddress ssl, MemoryAddress networkBIO,
                 int certificateVerificationDepth, boolean noOcspCheck) {
+            states.put(Long.valueOf(ssl.toRawLongValue()), this);
             this.ssl = ssl;
             this.networkBIO = networkBIO;
             this.certificateVerificationDepth = certificateVerificationDepth;
@@ -1877,6 +1876,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         @Override
         public void run() {
+            states.remove(Long.valueOf(ssl.toRawLongValue()));
             BIO_free(networkBIO);
             SSL_free(ssl);
         }

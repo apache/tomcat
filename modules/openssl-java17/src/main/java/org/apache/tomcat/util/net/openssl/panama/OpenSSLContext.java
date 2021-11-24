@@ -30,8 +30,6 @@ import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.ref.Cleaner;
-import java.lang.ref.Cleaner.Cleanable;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
@@ -149,8 +147,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    private static final Cleaner cleaner = Cleaner.create();
-
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private final boolean alpn;
@@ -171,7 +167,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     private final ContextState state;
-    private final Cleanable cleanable;
+    private final ResourceScope scope;
 
     private static String[] getCiphers(MemoryAddress sslCtx) {
         MemoryAddress sk = SSL_CTX_get_ciphers(sslCtx);
@@ -202,7 +198,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
-        ResourceScope scope = ResourceScope.newSharedScope();
+        scope = ResourceScope.newImplicitScope();
 
         MemoryAddress sslCtx = MemoryAddress.NULL;
         MemoryAddress confCtx = MemoryAddress.NULL;
@@ -339,7 +335,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         } catch(Exception e) {
             throw new SSLException(sm.getString("openssl.errorSSLCtxInit"), e);
         } finally {
-            state = new ContextState(scope, sslCtx, confCtx, negotiableProtocolsBytes);
+            state = new ContextState(sslCtx, confCtx, negotiableProtocolsBytes);
             /*
              * When an SSLHostConfig is replaced at runtime, it is not possible to
              * call destroy() on the associated OpenSSLContext since it is likely
@@ -348,11 +344,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
              * OpenSSLSessionContext) to ensure that the OpenSSLContext remains
              * ineligible for GC while those connections are alive. Once those
              * connections complete, the OpenSSLContext will become eligible for GC
-             * and this method will ensure that the associated native resources are
-             * cleaned up.
+             * and the implicit scope will ensure that the associated native
+             * resources are cleaned up.
              */
-            states.put(Long.valueOf(sslCtx.address().toRawLongValue()), state);
-            cleanable = cleaner.register(this, state);
+            scope.addCloseAction(state);
 
             if (!success) {
                 destroy();
@@ -372,9 +367,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     @Override
-    public synchronized void destroy() {
-        states.remove(Long.valueOf(state.sslCtx.address().toRawLongValue()));
-        cleanable.clean();
+    public void destroy() {
     }
 
 
@@ -561,7 +554,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             // List the ciphers that the client is permitted to negotiate
-            if (SSL_CTX_set_cipher_list(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), state.scope)) <= 0) {
+            if (SSL_CTX_set_cipher_list(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), scope)) <= 0) {
                 log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
             }
 
@@ -597,18 +590,18 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             MemoryAddress openSSLCallbackVerify =
                     CLinker.getInstance().upcallStub(openSSLCallbackVerifyHandle,
-                    openSSLCallbackVerifyFunctionDescriptor, state.scope);
+                    openSSLCallbackVerifyFunctionDescriptor, scope);
             // Leave this just in case but in Tomcat this is always set again by the engine
             SSL_CTX_set_verify(state.sslCtx, value, openSSLCallbackVerify);
 
             // Trust and certificate verification
-            var allocator = SegmentAllocator.ofScope(state.scope);
+            var allocator = SegmentAllocator.ofScope(scope);
             if (tms != null) {
                 // Client certificate verification based on custom trust managers
                 state.x509TrustManager = chooseTrustManager(tms);
                 MemoryAddress openSSLCallbackCertVerify =
                         CLinker.getInstance().upcallStub(openSSLCallbackCertVerifyHandle,
-                                openSSLCallbackCertVerifyFunctionDescriptor, state.scope);
+                                openSSLCallbackCertVerifyFunctionDescriptor, scope);
                 SSL_CTX_set_cert_verify_callback(state.sslCtx, openSSLCallbackCertVerify, state.sslCtx);
 
                 // Pass along the DER encoded certificates of the accepted client
@@ -634,9 +627,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
                 //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
                 MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null
-                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()), state.scope) : null;
+                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()), scope) : null;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
-                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()), state.scope) : null;
+                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()), scope) : null;
                 if (SSL_CTX_load_verify_locations(state.sslCtx,
                         caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative,
                                 caCertificatePathNative == null ? MemoryAddress.NULL : caCertificatePathNative) <= 0) {
@@ -664,7 +657,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //        MemoryAddress in, int inlen, MemoryAddress arg
                 MemoryAddress openSSLCallbackAlpnSelectProto =
                         CLinker.getInstance().upcallStub(openSSLCallbackAlpnSelectProtoHandle,
-                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, state.scope);
+                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, scope);
                 SSL_CTX_set_alpn_select_cb(state.sslCtx, openSSLCallbackAlpnSelectProto, state.sslCtx);
                 // Skip NPN (annoying and likely not useful anymore)
                 //SSLContext.setNpnProtos(state.ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
@@ -963,275 +956,273 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     private void addCertificate(SSLHostConfigCertificate certificate) throws Exception {
-        try (var scope = ResourceScope.newConfinedScope()) {
-            var allocator = SegmentAllocator.ofScope(scope);
-            int index = getCertificateIndex(certificate);
-            // Load Server key and certificate
-            if (certificate.getCertificateFile() != null) {
-                // Set certificate
-                //SSLContext.setCertificate(state.ctx,
-                //        SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
-                //        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
-                //        certificate.getCertificateKeyPassword(), getCertificateIndex(certificate));
-                var certificateFileNative = CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()), scope);
-                var certificateKeyFileNative = (certificate.getCertificateKeyFile() == null) ? certificateFileNative
-                        : CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()), scope);
-                MemoryAddress bio;
-                MemoryAddress cert = MemoryAddress.NULL;
-                MemoryAddress key = MemoryAddress.NULL;
-                if (certificate.getCertificateFile().endsWith(".pkcs12")) {
-                    // Load pkcs12
-                    bio = BIO_new(BIO_s_file());
-                    //#  define BIO_read_filename(b,name)
-                    //        (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_READ,(char *)(name))
-                    if (BIO_ctrl(bio, BIO_C_SET_FILENAME(), BIO_CLOSE() | BIO_FP_READ(), certificateFileNative) <= 0) {
-                        BIO_free(bio);
-                        log.error(sm.getString("openssl.errorLoadingCertificate", "[0]:" + certificate.getCertificateFile()));
-                        return;
-                    }
-                    MemoryAddress p12 = d2i_PKCS12_bio(bio, MemoryAddress.NULL);
+        var allocator = SegmentAllocator.ofScope(scope);
+        int index = getCertificateIndex(certificate);
+        // Load Server key and certificate
+        if (certificate.getCertificateFile() != null) {
+            // Set certificate
+            //SSLContext.setCertificate(state.ctx,
+            //        SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
+            //        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
+            //        certificate.getCertificateKeyPassword(), getCertificateIndex(certificate));
+            var certificateFileNative = CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()), scope);
+            var certificateKeyFileNative = (certificate.getCertificateKeyFile() == null) ? certificateFileNative
+                    : CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()), scope);
+            MemoryAddress bio;
+            MemoryAddress cert = MemoryAddress.NULL;
+            MemoryAddress key = MemoryAddress.NULL;
+            if (certificate.getCertificateFile().endsWith(".pkcs12")) {
+                // Load pkcs12
+                bio = BIO_new(BIO_s_file());
+                //#  define BIO_read_filename(b,name)
+                //        (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_READ,(char *)(name))
+                if (BIO_ctrl(bio, BIO_C_SET_FILENAME(), BIO_CLOSE() | BIO_FP_READ(), certificateFileNative) <= 0) {
                     BIO_free(bio);
-                    if (MemoryAddress.NULL.equals(p12)) {
-                        log.error(sm.getString("openssl.errorLoadingCertificate", "[1]:" + certificate.getCertificateFile()));
-                        return;
-                    }
-                    MemoryAddress passwordAddress = MemoryAddress.NULL;
-                    int passwordLength = 0;
-                    String callbackPassword = certificate.getCertificateKeyPassword();
-                    if (callbackPassword != null && callbackPassword.length() > 0) {
-                        MemorySegment password = CLinker.toCString(callbackPassword, scope);
-                        passwordAddress = password.address();
-                        passwordLength = (int) (password.byteSize() - 1);
-                    }
-                    if (PKCS12_verify_mac(p12, passwordAddress, passwordLength) <= 0) {
-                        // Bad password
-                        log.error(sm.getString("openssl.errorLoadingCertificate", "[2]:" + certificate.getCertificateFile()));
-                        PKCS12_free(p12);
-                        return;
-                    }
-                    MemorySegment certPointer = allocator.allocate(CLinker.C_POINTER);
-                    MemorySegment keyPointer = allocator.allocate(CLinker.C_POINTER);
-                    if (PKCS12_parse(p12, passwordAddress, keyPointer, certPointer, MemoryAddress.NULL) <= 0) {
-                        log.error(sm.getString("openssl.errorLoadingCertificate", "[3]:" + certificate.getCertificateFile()));
-                        PKCS12_free(p12);
-                        return;
-                    }
+                    log.error(sm.getString("openssl.errorLoadingCertificate", "[0]:" + certificate.getCertificateFile()));
+                    return;
+                }
+                MemoryAddress p12 = d2i_PKCS12_bio(bio, MemoryAddress.NULL);
+                BIO_free(bio);
+                if (MemoryAddress.NULL.equals(p12)) {
+                    log.error(sm.getString("openssl.errorLoadingCertificate", "[1]:" + certificate.getCertificateFile()));
+                    return;
+                }
+                MemoryAddress passwordAddress = MemoryAddress.NULL;
+                int passwordLength = 0;
+                String callbackPassword = certificate.getCertificateKeyPassword();
+                if (callbackPassword != null && callbackPassword.length() > 0) {
+                    MemorySegment password = CLinker.toCString(callbackPassword, scope);
+                    passwordAddress = password.address();
+                    passwordLength = (int) (password.byteSize() - 1);
+                }
+                if (PKCS12_verify_mac(p12, passwordAddress, passwordLength) <= 0) {
+                    // Bad password
+                    log.error(sm.getString("openssl.errorLoadingCertificate", "[2]:" + certificate.getCertificateFile()));
                     PKCS12_free(p12);
-                    cert = MemoryAccess.getAddress(certPointer);
-                    key = MemoryAccess.getAddress(keyPointer);
-                } else {
-                    // Load key
-                    bio = BIO_new(BIO_s_file());
-                    //#  define BIO_read_filename(b,name)
-                    //        (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_READ,(char *)(name))
-                    if (BIO_ctrl(bio, BIO_C_SET_FILENAME(), BIO_CLOSE() | BIO_FP_READ(), certificateKeyFileNative) <= 0) {
-                        BIO_free(bio);
-                        log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateKeyFile()));
-                        return;
-                    }
-                    key = MemoryAddress.NULL;
-                    for (int i = 0; i < 3; i++) {
-                        try {
-                            callbackPasswordTheadLocal.set(certificate.getCertificateKeyPassword());
-                            key = PEM_read_bio_PrivateKey(bio, MemoryAddress.NULL, openSSLCallbackPassword, MemoryAddress.NULL);
-                        } finally {
-                            callbackPasswordTheadLocal.set(null);
-                        }
-                        if (!MemoryAddress.NULL.equals(key)) {
-                            break;
-                        }
-                        BIO_ctrl(bio, BIO_CTRL_RESET(), 0, MemoryAddress.NULL);
-                    }
+                    return;
+                }
+                MemorySegment certPointer = allocator.allocate(CLinker.C_POINTER);
+                MemorySegment keyPointer = allocator.allocate(CLinker.C_POINTER);
+                if (PKCS12_parse(p12, passwordAddress, keyPointer, certPointer, MemoryAddress.NULL) <= 0) {
+                    log.error(sm.getString("openssl.errorLoadingCertificate", "[3]:" + certificate.getCertificateFile()));
+                    PKCS12_free(p12);
+                    return;
+                }
+                PKCS12_free(p12);
+                cert = MemoryAccess.getAddress(certPointer);
+                key = MemoryAccess.getAddress(keyPointer);
+            } else {
+                // Load key
+                bio = BIO_new(BIO_s_file());
+                //#  define BIO_read_filename(b,name)
+                //        (int)BIO_ctrl(b,BIO_C_SET_FILENAME, BIO_CLOSE|BIO_FP_READ,(char *)(name))
+                if (BIO_ctrl(bio, BIO_C_SET_FILENAME(), BIO_CLOSE() | BIO_FP_READ(), certificateKeyFileNative) <= 0) {
                     BIO_free(bio);
-                    if (MemoryAddress.NULL.equals(key)) {
-                        if (!MemoryAddress.NULL.equals(OpenSSLLifecycleListener.enginePointer)) {
-                            key = ENGINE_load_private_key(OpenSSLLifecycleListener.enginePointer, certificateKeyFileNative,
-                                    MemoryAddress.NULL, MemoryAddress.NULL);
-                        }
-                    }
-                    if (MemoryAddress.NULL.equals(key)) {
-                        log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateKeyFile()));
-                        return;
-                    }
-                    // Load certificate
-                    bio = BIO_new(BIO_s_file());
-                    if (BIO_ctrl(bio, BIO_C_SET_FILENAME(), BIO_CLOSE() | BIO_FP_READ(), certificateFileNative) <= 0) {
-                        BIO_free(bio);
-                        log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateFile()));
-                        return;
-                    }
+                    log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateKeyFile()));
+                    return;
+                }
+                key = MemoryAddress.NULL;
+                for (int i = 0; i < 3; i++) {
                     try {
                         callbackPasswordTheadLocal.set(certificate.getCertificateKeyPassword());
-                        cert = PEM_read_bio_X509_AUX(bio, MemoryAddress.NULL, openSSLCallbackPassword, MemoryAddress.NULL);
+                        key = PEM_read_bio_PrivateKey(bio, MemoryAddress.NULL, openSSLCallbackPassword, MemoryAddress.NULL);
                     } finally {
                         callbackPasswordTheadLocal.set(null);
                     }
-                    if (MemoryAddress.NULL.equals(cert) &&
-                            // Missing ERR_GET_REASON(ERR_peek_last_error())
-                            /*int ERR_GET_REASON(unsigned long errcode) {
-                             *    if (ERR_SYSTEM_ERROR(errcode))
-                             *        return errcode & ERR_SYSTEM_MASK;
-                             *    return errcode & ERR_REASON_MASK;
-                             *}
-                             *# define ERR_SYSTEM_ERROR(errcode)      (((errcode) & ERR_SYSTEM_FLAG) != 0)
-                             *# define ERR_SYSTEM_FLAG                ((unsigned int)INT_MAX + 1)
-                             *# define ERR_SYSTEM_MASK                ((unsigned int)INT_MAX)
-                             *# define ERR_REASON_MASK                0X7FFFFF
-                             */
-                            ((ERR_peek_last_error() & 0X7FFFFF) == PEM_R_NO_START_LINE())) {
-                        ERR_clear_error();
-                        BIO_ctrl(bio, BIO_CTRL_RESET(), 0, MemoryAddress.NULL);
-                        cert = d2i_X509_bio(bio, MemoryAddress.NULL);
+                    if (!MemoryAddress.NULL.equals(key)) {
+                        break;
                     }
+                    BIO_ctrl(bio, BIO_CTRL_RESET(), 0, MemoryAddress.NULL);
+                }
+                BIO_free(bio);
+                if (MemoryAddress.NULL.equals(key)) {
+                    if (!MemoryAddress.NULL.equals(OpenSSLLifecycleListener.enginePointer)) {
+                        key = ENGINE_load_private_key(OpenSSLLifecycleListener.enginePointer, certificateKeyFileNative,
+                                MemoryAddress.NULL, MemoryAddress.NULL);
+                    }
+                }
+                if (MemoryAddress.NULL.equals(key)) {
+                    log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateKeyFile()));
+                    return;
+                }
+                // Load certificate
+                bio = BIO_new(BIO_s_file());
+                if (BIO_ctrl(bio, BIO_C_SET_FILENAME(), BIO_CLOSE() | BIO_FP_READ(), certificateFileNative) <= 0) {
                     BIO_free(bio);
-                    if (MemoryAddress.NULL.equals(cert)) {
-                        log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateFile()));
-                        return;
-                    }
-                }
-                if (SSL_CTX_use_certificate(state.sslCtx, cert) <= 0) {
-                    logLastError(allocator, "openssl.errorLoadingCertificate");
+                    log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateFile()));
                     return;
                 }
-                if (SSL_CTX_use_PrivateKey(state.sslCtx, key) <= 0) {
-                    logLastError(allocator, "openssl.errorLoadingPrivateKey");
+                try {
+                    callbackPasswordTheadLocal.set(certificate.getCertificateKeyPassword());
+                    cert = PEM_read_bio_X509_AUX(bio, MemoryAddress.NULL, openSSLCallbackPassword, MemoryAddress.NULL);
+                } finally {
+                    callbackPasswordTheadLocal.set(null);
+                }
+                if (MemoryAddress.NULL.equals(cert) &&
+                        // Missing ERR_GET_REASON(ERR_peek_last_error())
+                        /*int ERR_GET_REASON(unsigned long errcode) {
+                         *    if (ERR_SYSTEM_ERROR(errcode))
+                         *        return errcode & ERR_SYSTEM_MASK;
+                         *    return errcode & ERR_REASON_MASK;
+                         *}
+                         *# define ERR_SYSTEM_ERROR(errcode)      (((errcode) & ERR_SYSTEM_FLAG) != 0)
+                         *# define ERR_SYSTEM_FLAG                ((unsigned int)INT_MAX + 1)
+                         *# define ERR_SYSTEM_MASK                ((unsigned int)INT_MAX)
+                         *# define ERR_REASON_MASK                0X7FFFFF
+                         */
+                        ((ERR_peek_last_error() & 0X7FFFFF) == PEM_R_NO_START_LINE())) {
+                    ERR_clear_error();
+                    BIO_ctrl(bio, BIO_CTRL_RESET(), 0, MemoryAddress.NULL);
+                    cert = d2i_X509_bio(bio, MemoryAddress.NULL);
+                }
+                BIO_free(bio);
+                if (MemoryAddress.NULL.equals(cert)) {
+                    log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateFile()));
                     return;
                 }
-                if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
-                    logLastError(allocator, "openssl.errorPrivateKeyCheck");
-                    return;
-                }
-                // Try to read DH parameters from the (first) SSLCertificateFile
-                if (index == SSL_AIDX_RSA) {
-                    bio = BIO_new_file(certificateFileNative, CLinker.toCString("r", scope));
-                    var dh = PEM_read_bio_DHparams(bio, MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
-                    BIO_free(bio);
-                    // #  define SSL_CTX_set_tmp_dh(sslCtx,dh) \
-                    //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
-                    if (!MemoryAddress.NULL.equals(dh)) {
-                        SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_DH(), 0, dh);
-                        DH_free(dh);
-                    }
-                }
-                // Similarly, try to read the ECDH curve name from SSLCertificateFile...
+            }
+            if (SSL_CTX_use_certificate(state.sslCtx, cert) <= 0) {
+                logLastError(allocator, "openssl.errorLoadingCertificate");
+                return;
+            }
+            if (SSL_CTX_use_PrivateKey(state.sslCtx, key) <= 0) {
+                logLastError(allocator, "openssl.errorLoadingPrivateKey");
+                return;
+            }
+            if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
+                logLastError(allocator, "openssl.errorPrivateKeyCheck");
+                return;
+            }
+            // Try to read DH parameters from the (first) SSLCertificateFile
+            if (index == SSL_AIDX_RSA) {
                 bio = BIO_new_file(certificateFileNative, CLinker.toCString("r", scope));
-                var ecparams = PEM_read_bio_ECPKParameters(bio, MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
+                var dh = PEM_read_bio_DHparams(bio, MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
                 BIO_free(bio);
-                if (!MemoryAddress.NULL.equals(ecparams)) {
-                    int nid = EC_GROUP_get_curve_name(ecparams);
-                    var eckey = EC_KEY_new_by_curve_name(nid);
-                    // #  define SSL_CTX_set_tmp_ecdh(sslCtx,ecdh) \
-                    //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_ECDH,0,(char *)(ecdh))
-                    SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_ECDH(), 0, eckey);
-                    EC_KEY_free(eckey);
-                    EC_GROUP_free(ecparams);
+                // #  define SSL_CTX_set_tmp_dh(sslCtx,dh) \
+                //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_DH,0,(char *)(dh))
+                if (!MemoryAddress.NULL.equals(dh)) {
+                    SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_DH(), 0, dh);
+                    DH_free(dh);
                 }
-                // Set callback for DH parameters
-                MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
-                        openSSLCallbackTmpDHFunctionDescriptor, state.scope);
-                SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
-                // Set certificate chain file
-                if (certificate.getCertificateChainFile() != null) {
-                    var certificateChainFileNative =
-                            CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), scope);
-                    // SSLContext.setCertificateChainFile(state.ctx,
-                    //        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
-                    if (SSL_CTX_use_certificate_chain_file(state.sslCtx, certificateChainFileNative) <= 0) {
-                        log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateChainFile()));
-                    }
+            }
+            // Similarly, try to read the ECDH curve name from SSLCertificateFile...
+            bio = BIO_new_file(certificateFileNative, CLinker.toCString("r", scope));
+            var ecparams = PEM_read_bio_ECPKParameters(bio, MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
+            BIO_free(bio);
+            if (!MemoryAddress.NULL.equals(ecparams)) {
+                int nid = EC_GROUP_get_curve_name(ecparams);
+                var eckey = EC_KEY_new_by_curve_name(nid);
+                // #  define SSL_CTX_set_tmp_ecdh(sslCtx,ecdh) \
+                //           SSL_CTX_ctrl(sslCtx,SSL_CTRL_SET_TMP_ECDH,0,(char *)(ecdh))
+                SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_TMP_ECDH(), 0, eckey);
+                EC_KEY_free(eckey);
+                EC_GROUP_free(ecparams);
+            }
+            // Set callback for DH parameters
+            MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
+                    openSSLCallbackTmpDHFunctionDescriptor, scope);
+            SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
+            // Set certificate chain file
+            if (certificate.getCertificateChainFile() != null) {
+                var certificateChainFileNative =
+                        CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), scope);
+                // SSLContext.setCertificateChainFile(state.ctx,
+                //        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
+                if (SSL_CTX_use_certificate_chain_file(state.sslCtx, certificateChainFileNative) <= 0) {
+                    log.error(sm.getString("openssl.errorLoadingCertificate", certificate.getCertificateChainFile()));
                 }
-                // Set revocation
-                //SSLContext.setCARevocation(state.ctx,
-                //        SSLHostConfig.adjustRelativePath(
-                //                sslHostConfig.getCertificateRevocationListFile()),
-                //        SSLHostConfig.adjustRelativePath(
-                //                sslHostConfig.getCertificateRevocationListPath()));
-                MemoryAddress certificateStore = SSL_CTX_get_cert_store(state.sslCtx);
-                if (sslHostConfig.getCertificateRevocationListFile() != null) {
-                    MemoryAddress x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_file());
-                    var certificateRevocationListFileNative =
-                            CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()), scope);
-                    //X509_LOOKUP_ctrl(lookup,X509_L_FILE_LOAD,file,type,NULL)
-                    if (X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), certificateRevocationListFileNative,
-                            X509_FILETYPE_PEM(), MemoryAddress.NULL) <= 0) {
-                        log.error(sm.getString("openssl.errorLoadingCertificateRevocationList", sslHostConfig.getCertificateRevocationListFile()));
-                    }
+            }
+            // Set revocation
+            //SSLContext.setCARevocation(state.ctx,
+            //        SSLHostConfig.adjustRelativePath(
+            //                sslHostConfig.getCertificateRevocationListFile()),
+            //        SSLHostConfig.adjustRelativePath(
+            //                sslHostConfig.getCertificateRevocationListPath()));
+            MemoryAddress certificateStore = SSL_CTX_get_cert_store(state.sslCtx);
+            if (sslHostConfig.getCertificateRevocationListFile() != null) {
+                MemoryAddress x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_file());
+                var certificateRevocationListFileNative =
+                        CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()), scope);
+                //X509_LOOKUP_ctrl(lookup,X509_L_FILE_LOAD,file,type,NULL)
+                if (X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), certificateRevocationListFileNative,
+                        X509_FILETYPE_PEM(), MemoryAddress.NULL) <= 0) {
+                    log.error(sm.getString("openssl.errorLoadingCertificateRevocationList", sslHostConfig.getCertificateRevocationListFile()));
                 }
-                if (sslHostConfig.getCertificateRevocationListPath() != null) {
-                    MemoryAddress x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_hash_dir());
-                    var certificateRevocationListPathNative =
-                            CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()), scope);
-                    //X509_LOOKUP_ctrl(lookup,X509_L_ADD_DIR,path,type,NULL)
-                    if (X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), certificateRevocationListPathNative,
-                            X509_FILETYPE_PEM(), MemoryAddress.NULL) <= 0) {
-                        log.error(sm.getString("openssl.errorLoadingCertificateRevocationList", sslHostConfig.getCertificateRevocationListPath()));
-                    }
+            }
+            if (sslHostConfig.getCertificateRevocationListPath() != null) {
+                MemoryAddress x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_hash_dir());
+                var certificateRevocationListPathNative =
+                        CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()), scope);
+                //X509_LOOKUP_ctrl(lookup,X509_L_ADD_DIR,path,type,NULL)
+                if (X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), certificateRevocationListPathNative,
+                        X509_FILETYPE_PEM(), MemoryAddress.NULL) <= 0) {
+                    log.error(sm.getString("openssl.errorLoadingCertificateRevocationList", sslHostConfig.getCertificateRevocationListPath()));
                 }
-                X509_STORE_set_flags(certificateStore, X509_V_FLAG_CRL_CHECK() | X509_V_FLAG_CRL_CHECK_ALL());
-            } else {
-                String alias = certificate.getCertificateKeyAlias();
-                X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
-                if (alias == null) {
-                    alias = "tomcat";
-                }
-                X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
-                if (chain == null) {
-                    alias = findAlias(x509KeyManager, certificate);
-                    chain = x509KeyManager.getCertificateChain(alias);
-                }
-                PrivateKey key = x509KeyManager.getPrivateKey(alias);
-                StringBuilder sb = new StringBuilder(BEGIN_KEY);
-                sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
-                sb.append(END_KEY);
-                //SSLContext.setCertificateRaw(state.ctx, chain[0].getEncoded(),
-                //        sb.toString().getBytes(StandardCharsets.US_ASCII),
-                //        getCertificateIndex(certificate));
-                var rawCertificate = allocator.allocateArray(CLinker.C_CHAR, chain[0].getEncoded());
-                var rawCertificatePointer = allocator.allocate(CLinker.C_POINTER, rawCertificate);
-                var rawKey = allocator.allocateArray(CLinker.C_CHAR, sb.toString().getBytes(StandardCharsets.US_ASCII));
-                var x509cert = d2i_X509(MemoryAddress.NULL, rawCertificatePointer, rawCertificate.byteSize());
-                if (MemoryAddress.NULL.equals(x509cert)) {
+            }
+            X509_STORE_set_flags(certificateStore, X509_V_FLAG_CRL_CHECK() | X509_V_FLAG_CRL_CHECK_ALL());
+        } else {
+            String alias = certificate.getCertificateKeyAlias();
+            X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
+            if (alias == null) {
+                alias = "tomcat";
+            }
+            X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
+            if (chain == null) {
+                alias = findAlias(x509KeyManager, certificate);
+                chain = x509KeyManager.getCertificateChain(alias);
+            }
+            PrivateKey key = x509KeyManager.getPrivateKey(alias);
+            StringBuilder sb = new StringBuilder(BEGIN_KEY);
+            sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
+            sb.append(END_KEY);
+            //SSLContext.setCertificateRaw(state.ctx, chain[0].getEncoded(),
+            //        sb.toString().getBytes(StandardCharsets.US_ASCII),
+            //        getCertificateIndex(certificate));
+            var rawCertificate = allocator.allocateArray(CLinker.C_CHAR, chain[0].getEncoded());
+            var rawCertificatePointer = allocator.allocate(CLinker.C_POINTER, rawCertificate);
+            var rawKey = allocator.allocateArray(CLinker.C_CHAR, sb.toString().getBytes(StandardCharsets.US_ASCII));
+            var x509cert = d2i_X509(MemoryAddress.NULL, rawCertificatePointer, rawCertificate.byteSize());
+            if (MemoryAddress.NULL.equals(x509cert)) {
+                logLastError(allocator, "openssl.errorLoadingCertificate");
+                return;
+            }
+            var bio = BIO_new(BIO_s_mem());
+            BIO_write(bio, rawKey.address(), (int) rawKey.byteSize());
+            MemoryAddress privateKeyAddress = PEM_read_bio_PrivateKey(bio, MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
+            BIO_free(bio);
+            if (MemoryAddress.NULL.equals(privateKeyAddress)) {
+                logLastError(allocator, "openssl.errorLoadingPrivateKey");
+                return;
+            }
+            if (SSL_CTX_use_certificate(state.sslCtx, x509cert) <= 0) {
+                logLastError(allocator, "openssl.errorLoadingCertificate");
+                return;
+            }
+            if (SSL_CTX_use_PrivateKey(state.sslCtx, privateKeyAddress) <= 0) {
+                logLastError(allocator, "openssl.errorLoadingPrivateKey");
+                return;
+            }
+            if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
+                logLastError(allocator, "openssl.errorPrivateKeyCheck");
+                return;
+            }
+            // Set callback for DH parameters
+            MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
+                    openSSLCallbackTmpDHFunctionDescriptor, scope);
+            SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
+            for (int i = 1; i < chain.length; i++) {
+                //SSLContext.addChainCertificateRaw(state.ctx, chain[i].getEncoded());
+                var rawCertificateChain = allocator.allocateArray(CLinker.C_CHAR, chain[i].getEncoded());
+                var rawCertificateChainPointer = allocator.allocate(CLinker.C_POINTER, rawCertificateChain);
+                var x509certChain = d2i_X509(MemoryAddress.NULL, rawCertificateChainPointer, rawCertificateChain.byteSize());
+                if (MemoryAddress.NULL.equals(x509certChain)) {
                     logLastError(allocator, "openssl.errorLoadingCertificate");
                     return;
                 }
-                var bio = BIO_new(BIO_s_mem());
-                BIO_write(bio, rawKey.address(), (int) rawKey.byteSize());
-                MemoryAddress privateKeyAddress = PEM_read_bio_PrivateKey(bio, MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
-                BIO_free(bio);
-                if (MemoryAddress.NULL.equals(privateKeyAddress)) {
-                    logLastError(allocator, "openssl.errorLoadingPrivateKey");
+                // # define SSL_CTX_add0_chain_cert(sslCtx,x509) SSL_CTX_ctrl(sslCtx,SSL_CTRL_CHAIN_CERT,0,(char *)(x509))
+                if (SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_CHAIN_CERT(), 0, x509certChain) <= 0) {
+                    logLastError(allocator, "openssl.errorAddingCertificate");
                     return;
-                }
-                if (SSL_CTX_use_certificate(state.sslCtx, x509cert) <= 0) {
-                    logLastError(allocator, "openssl.errorLoadingCertificate");
-                    return;
-                }
-                if (SSL_CTX_use_PrivateKey(state.sslCtx, privateKeyAddress) <= 0) {
-                    logLastError(allocator, "openssl.errorLoadingPrivateKey");
-                    return;
-                }
-                if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
-                    logLastError(allocator, "openssl.errorPrivateKeyCheck");
-                    return;
-                }
-                // Set callback for DH parameters
-                MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
-                        openSSLCallbackTmpDHFunctionDescriptor, state.scope);
-                SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
-                for (int i = 1; i < chain.length; i++) {
-                    //SSLContext.addChainCertificateRaw(state.ctx, chain[i].getEncoded());
-                    var rawCertificateChain = allocator.allocateArray(CLinker.C_CHAR, chain[i].getEncoded());
-                    var rawCertificateChainPointer = allocator.allocate(CLinker.C_POINTER, rawCertificateChain);
-                    var x509certChain = d2i_X509(MemoryAddress.NULL, rawCertificateChainPointer, rawCertificateChain.byteSize());
-                    if (MemoryAddress.NULL.equals(x509certChain)) {
-                        logLastError(allocator, "openssl.errorLoadingCertificate");
-                        return;
-                    }
-                    // # define SSL_CTX_add0_chain_cert(sslCtx,x509) SSL_CTX_ctrl(sslCtx,SSL_CTRL_CHAIN_CERT,0,(char *)(x509))
-                    if (SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_CHAIN_CERT(), 0, x509certChain) <= 0) {
-                        logLastError(allocator, "openssl.errorAddingCertificate");
-                        return;
-                    }
                 }
             }
         }
@@ -1362,15 +1353,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static class ContextState implements Runnable {
 
-        final ResourceScope scope;
         private final MemoryAddress sslCtx;
         private final MemoryAddress confCtx;
         private final List<byte[]> negotiableProtocols;
 
         private X509TrustManager x509TrustManager = null;
 
-        private ContextState(ResourceScope scope, MemoryAddress sslCtx, MemoryAddress confCtx, List<byte[]> negotiableProtocols) {
-            this.scope = scope;
+        private ContextState(MemoryAddress sslCtx, MemoryAddress confCtx, List<byte[]> negotiableProtocols) {
+            states.put(Long.valueOf(sslCtx.toRawLongValue()), this);
             this.sslCtx = sslCtx;
             this.confCtx = confCtx;
             this.negotiableProtocols = negotiableProtocols;
@@ -1378,13 +1368,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         @Override
         public void run() {
-            try {
-                SSL_CTX_free(sslCtx);
-                if (!MemoryAddress.NULL.equals(confCtx)) {
-                    SSL_CONF_CTX_free(confCtx);
-                }
-            } finally {
-                scope.close();
+            states.remove(Long.valueOf(sslCtx.toRawLongValue()));
+            SSL_CTX_free(sslCtx);
+            if (!MemoryAddress.NULL.equals(confCtx)) {
+                SSL_CONF_CTX_free(confCtx);
             }
         }
     }
