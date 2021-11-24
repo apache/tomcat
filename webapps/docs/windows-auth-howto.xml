@@ -188,7 +188,7 @@ com.sun.security.jgss.krb5.accept {
   <li>Ubuntu Server 12.04.3 LTS 64-bit</li>
   <li>Tomcat 8.0.x (r1546570)</li>
   </ul>
-  <p>It should work with any Tomcat 8 release although it is recommended that
+  <p>It should work with any Tomcat release although it is recommended that
   the latest stable release is used.</p>
   <p>The configuration is the same as for Windows but with the following
   changes:</p>
