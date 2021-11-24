@@ -730,7 +730,8 @@ public final class Mapper {
 
     /**
      * Map the specified URI.
-     * @throws IOException
+     * @throws IOException If an error occurs while manipulating the URI during
+     *         the mapping
      */
     @SuppressWarnings("deprecation") // contextPath
     private final void internalMap(CharChunk host, CharChunk uri,

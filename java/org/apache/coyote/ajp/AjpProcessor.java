@@ -1323,7 +1323,7 @@ public class AjpProcessor extends AbstractProcessor {
      *              called, should this call block until data becomes available?
      * @return  <code>true</code> if the requested number of bytes were read
      *          else <code>false</code>
-     * @throws IOException
+     * @throws IOException If an I/O error occurs during the read
      */
     private boolean read(byte[] buf, int pos, int n, boolean block) throws IOException {
         int read = socketWrapper.read(block, buf, pos, n);

@@ -89,12 +89,6 @@ public class AttributeParser {
     private final StringBuilder result;
 
 
-    /**
-     * For test purposes.
-     * @param input
-     * @param quote
-     * @param strict
-     */
     private AttributeParser(String input, char quote,
             boolean isELIgnored, boolean isDeferredSyntaxAllowedAsLiteral,
             boolean strict, boolean quoteAttributeEL) {

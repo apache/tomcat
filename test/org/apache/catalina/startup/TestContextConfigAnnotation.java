@@ -355,12 +355,8 @@ public class TestContextConfigAnnotation {
         public void removePropertyChangeListener(PropertyChangeListener l) {}
     }
 
-    /**
+    /*
      * Find compiled test class
-     *
-     * @param className
-     * @return File Resource
-     * @throws URISyntaxException
      */
     private File paramClassResource(String className) throws URISyntaxException {
         URL url = getClass().getClassLoader().getResource(className + ".class");

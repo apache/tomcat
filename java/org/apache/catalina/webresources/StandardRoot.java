@@ -236,7 +236,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
      * that the path is a String that starts with '/' and checks that the path
      * can be normalized without stepping outside of the root.
      *
-     * @param path
+     * @param path The path to validate
      * @return  the normalized path
      */
     private String validate(String path) {

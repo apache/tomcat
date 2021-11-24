@@ -37,7 +37,8 @@ public final class ConstantFloat extends Constant {
      * Initialize instance from file data.
      *
      * @param file Input stream
-     * @throws IOException
+     * @throws IOException If an I/O occurs reading from the provided
+     *         InoutStream
      */
     ConstantFloat(final DataInput file) throws IOException {
         super(Const.CONSTANT_Float);
