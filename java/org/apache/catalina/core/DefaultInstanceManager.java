@@ -225,13 +225,11 @@ public class DefaultInstanceManager implements InstanceManager {
         AnnotationCacheEntry[] annotations = annotationCache.get(clazz);
         for (AnnotationCacheEntry entry : annotations) {
             if (entry.getType() == AnnotationCacheEntryType.POST_CONSTRUCT) {
+                // This will always return a new Method instance
+                // Making this instance accessible does not affect other instances
                 Method postConstruct = getMethod(clazz, entry);
-                synchronized (postConstruct) {
-                    boolean accessibility = postConstruct.isAccessible();
-                    postConstruct.setAccessible(true);
-                    postConstruct.invoke(instance);
-                    postConstruct.setAccessible(accessibility);
-                }
+                postConstruct.setAccessible(true);
+                postConstruct.invoke(instance);
             }
         }
     }
@@ -263,13 +261,11 @@ public class DefaultInstanceManager implements InstanceManager {
         }
         for (AnnotationCacheEntry entry : annotations) {
             if (entry.getType() == AnnotationCacheEntryType.PRE_DESTROY) {
+                // This will always return a new Method instance
+                // Making this instance accessible does not affect other instances
                 Method preDestroy = getMethod(clazz, entry);
-                synchronized (preDestroy) {
-                    boolean accessibility = preDestroy.isAccessible();
-                    preDestroy.setAccessible(true);
-                    preDestroy.invoke(instance);
-                    preDestroy.setAccessible(accessibility);
-                }
+                preDestroy.setAccessible(true);
+                preDestroy.invoke(instance);
             }
         }
     }
@@ -572,7 +568,6 @@ public class DefaultInstanceManager implements InstanceManager {
             throws NamingException, IllegalAccessException {
 
         Object lookedupResource;
-        boolean accessibility;
 
         String normalizedName = normalize(name);
 
@@ -583,12 +578,10 @@ public class DefaultInstanceManager implements InstanceManager {
                 context.lookup(clazz.getName() + "/" + field.getName());
         }
 
-        synchronized (field) {
-            accessibility = field.isAccessible();
-            field.setAccessible(true);
-            field.set(instance, lookedupResource);
-            field.setAccessible(accessibility);
-        }
+        // This will always be a new Field instance
+        // Making this instance accessible does not affect other instances
+        field.setAccessible(true);
+        field.set(instance, lookedupResource);
     }
 
     /**
@@ -614,7 +607,6 @@ public class DefaultInstanceManager implements InstanceManager {
         }
 
         Object lookedupResource;
-        boolean accessibility;
 
         String normalizedName = normalize(name);
 
@@ -625,12 +617,10 @@ public class DefaultInstanceManager implements InstanceManager {
                     clazz.getName() + "/" + Introspection.getPropertyName(method));
         }
 
-        synchronized (method) {
-            accessibility = method.isAccessible();
-            method.setAccessible(true);
-            method.invoke(instance, lookedupResource);
-            method.setAccessible(accessibility);
-        }
+        // This will always be a new Method instance
+        // Making this instance accessible does not affect other instances
+        method.setAccessible(true);
+        method.invoke(instance, lookedupResource);
     }
 
     private static void loadProperties(Set<String> classNames, String resourceName,
