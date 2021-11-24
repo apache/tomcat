@@ -1146,7 +1146,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //                sslHostConfig.getCertificateRevocationListFile()),
                 //        SSLHostConfig.adjustRelativePath(
                 //                sslHostConfig.getCertificateRevocationListPath()));
-                MemoryAddress certificateStore = (state.sslCtx);
+                MemoryAddress certificateStore = SSL_CTX_get_cert_store(state.sslCtx);
                 if (sslHostConfig.getCertificateRevocationListFile() != null) {
                     MemoryAddress x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_file());
                     var certificateRevocationListFileNative =
