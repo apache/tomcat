@@ -43,10 +43,10 @@ The documentation available as of the date of this release is
 included in the docs webapp which ships with tomcat. You can access that webapp
 by starting tomcat and visiting <http://localhost:8080/docs/> in your browser.
 The most up-to-date documentation for each version can be found at:
-- [Tomcat 10](https://tomcat.apache.org/tomcat-10.0-doc/)
+- [Tomcat 10.1](https://tomcat.apache.org/tomcat-10.1-doc/)
+- [Tomcat 10.0](https://tomcat.apache.org/tomcat-10.0-doc/)
 - [Tomcat 9](https://tomcat.apache.org/tomcat-9.0-doc/)
 - [Tomcat 8](https://tomcat.apache.org/tomcat-8.5-doc/)
-- [Tomcat 7](https://tomcat.apache.org/tomcat-7.0-doc/)
 
 ### Installation
 
