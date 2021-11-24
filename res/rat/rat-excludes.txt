@@ -27,8 +27,7 @@
 
   - *.manifest, MANIFEST.MF JAR manifest files cannot contain license
 
-  - package-list and script.js files in API documentation (javadoc) are
-    generated
+  - Files in API documentation (javadoc) that are generated
 
   - test files, such as trivial textual files containing only "OK' string,
     files in unusual encodings or compressed files are also excluded.

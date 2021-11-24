@@ -229,7 +229,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     }
 
 
-
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         // Initialise these classes when Tomcat starts
@@ -256,8 +255,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-            try
-            {
+            try {
                 // Use the system classloader as the victim for all this
                 // ClassLoader pinning we're about to do.
                 Thread.currentThread().setContextClassLoader(

@@ -102,7 +102,6 @@ public final class Request {
 
     private final MimeHeaders headers = new MimeHeaders();
 
-
     /**
      * Path parameters
      */

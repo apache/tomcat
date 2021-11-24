@@ -100,5 +100,4 @@ public class SessionConfig {
         sessionTrackingModes.add(
                 SessionTrackingMode.valueOf(sessionTrackingMode));
     }
-
 }
