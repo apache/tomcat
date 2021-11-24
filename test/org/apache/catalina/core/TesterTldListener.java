@@ -38,7 +38,7 @@ public class TesterTldListener implements ServletContextListener {
 
         // Try and use one of the Servlet 3.0 methods that should be blocked
         try {
-            sc.getEffectiveMajorVersion();
+            sc.getServletRegistrations();
             log.append("FAIL-01");
         } catch (UnsupportedOperationException uoe) {
             log.append("PASS-01");
@@ -53,7 +53,7 @@ public class TesterTldListener implements ServletContextListener {
         if (servletContext == sce.getServletContext()) {
             log.append("PASS-02");
         } else {
-            //log.append("FAIL-03");
+            log.append("FAIL-03");
         }
     }
 }
