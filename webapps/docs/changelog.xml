@@ -111,6 +111,10 @@
         Make SPNEGO authentication more robust for the case where the provided
         credential has expired. (markt)
       </fix>
+      <fix>
+        <bug>65684</bug>: Fix a potential <code>NullPointerException</code> when
+        using JULI. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
