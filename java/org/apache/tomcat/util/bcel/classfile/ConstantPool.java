@@ -40,8 +40,8 @@ public class ConstantPool {
      * Reads constants from given input stream.
      *
      * @param input Input stream
-     * @throws IOException
-     * @throws ClassFormatException
+     * @throws  IOException if an I/O occurs reading the the InputStream
+     * @throws  ClassFormatException If the .class file is not valid
      */
     ConstantPool(final DataInput input) throws IOException, ClassFormatException {
         final int constant_pool_count = input.readUnsignedShort();
