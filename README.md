@@ -47,7 +47,6 @@ The most up-to-date documentation for each version can be found at:
 - [Tomcat 10.0](https://tomcat.apache.org/tomcat-10.0-doc/)
 - [Tomcat 9](https://tomcat.apache.org/tomcat-9.0-doc/)
 - [Tomcat 8](https://tomcat.apache.org/tomcat-8.5-doc/)
-- [Tomcat 7](https://tomcat.apache.org/tomcat-7.0-doc/)
 
 ### Installation
 
