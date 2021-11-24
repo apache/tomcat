@@ -58,7 +58,6 @@ public final class JarContents {
         bits1 = new BitSet(TABLE_SIZE);
         bits2 = new BitSet(TABLE_SIZE);
 
-        // Enumerations. When will they update this API?!
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
             String name = entry.getName();
@@ -140,7 +139,7 @@ public final class JarContents {
             startPos++;
         }
 
-        // calculate the hash lazyly and return a boolean value for this path
+        // calculate the hash lazily and return a boolean value for this path
         return (bits1.get(hashcode(path, startPos, HASH_PRIME_1) % TABLE_SIZE) &&
                 bits2.get(hashcode(path, startPos, HASH_PRIME_2) % TABLE_SIZE));
     }

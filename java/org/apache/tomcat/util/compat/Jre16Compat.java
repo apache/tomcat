@@ -65,6 +65,7 @@ class Jre16Compat extends Jre9Compat {
         return unixDomainSocketAddressClazz != null;
     }
 
+
     @Override
     public SocketAddress getUnixDomainSocketAddress(String path) {
         try {
@@ -74,6 +75,7 @@ class Jre16Compat extends Jre9Compat {
             throw new UnsupportedOperationException(e);
         }
     }
+
 
     @Override
     public ServerSocketChannel openUnixDomainServerSocketChannel() {
@@ -85,6 +87,7 @@ class Jre16Compat extends Jre9Compat {
         }
     }
 
+
     @Override
     public SocketChannel openUnixDomainSocketChannel() {
         try {
@@ -94,5 +97,4 @@ class Jre16Compat extends Jre9Compat {
             throw new UnsupportedOperationException(e);
         }
     }
-
 }

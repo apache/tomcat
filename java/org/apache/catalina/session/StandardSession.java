@@ -1123,7 +1123,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     // ----------------------------------------------HttpSession Public Methods
 
-
     /**
      * Return the object bound with the specified name in this session, or
      * <code>null</code> if no object is bound with that name.
