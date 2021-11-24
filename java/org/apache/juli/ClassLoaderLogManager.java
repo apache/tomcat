@@ -292,24 +292,25 @@ public class ClassLoaderLogManager extends LogManager {
 
 
     private synchronized String findProperty(String name) {
-        ClassLoader classLoader = Thread.currentThread()
-                .getContextClassLoader();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         ClassLoaderLogInfo info = getClassLoaderInfo(classLoader);
         String result = info.props.getProperty(name);
         // If the property was not found, and the current classloader had no
         // configuration (property list is empty), look for the parent classloader
         // properties.
         if ((result == null) && (info.props.isEmpty())) {
-            ClassLoader current = classLoader.getParent();
-            while (current != null) {
-                info = classLoaderLoggers.get(current);
-                if (info != null) {
-                    result = info.props.getProperty(name);
-                    if ((result != null) || (!info.props.isEmpty())) {
-                        break;
+            if (classLoader != null) {
+                ClassLoader current = classLoader.getParent();
+                while (current != null) {
+                    info = classLoaderLoggers.get(current);
+                    if (info != null) {
+                        result = info.props.getProperty(name);
+                        if ((result != null) || (!info.props.isEmpty())) {
+                            break;
+                        }
                     }
+                    current = current.getParent();
                 }
-                current = current.getParent();
             }
             if (result == null) {
                 result = super.getProperty(name);
