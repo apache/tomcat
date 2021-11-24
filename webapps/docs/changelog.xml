@@ -127,6 +127,10 @@
         Limit cookie support to RFC 6265 to align with recent updates to the
         Servlet specification. (markt)
       </fix>
+      <fix>
+        <bug>65684</bug>: Fix a potential <code>NullPointerException</code> when
+        using JULI. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
