@@ -74,7 +74,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         // Need to allow time (but not too long in case the test fails) for
         // ServletRequestListener to complete
-        int i = 20;
+        int i = 40;
         while (i > 0) {
             if (trace.toString().endsWith("Destroy")) {
                 break;
@@ -125,7 +125,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
 
         // Need to allow time (but not too long in case the test fails) for
         // ServletRequestListener to complete
-        int i = 20;
+        int i = 40;
         while (i > 0) {
             if (trace.toString().endsWith("Destroy")) {
                 break;
