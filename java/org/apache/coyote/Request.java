@@ -102,7 +102,6 @@ public final class Request {
     private final MimeHeaders headers = new MimeHeaders();
     private final Map<String,String> trailerFields = new HashMap<>();
 
-
     /**
      * Path parameters
      */

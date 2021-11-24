@@ -1828,7 +1828,6 @@ public class Request implements HttpServletRequest {
 
     // ---------------------------------------------------- HttpRequest Methods
 
-
     /**
      * Add a Cookie to the set of Cookies associated with this Request.
      *

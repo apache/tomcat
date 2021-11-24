@@ -196,6 +196,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
+
     protected static boolean checkConf(OpenSSLConf conf, long cctx) throws Exception {
         boolean result = true;
         OpenSSLConfCmd cmd;

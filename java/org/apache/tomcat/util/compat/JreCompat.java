@@ -321,6 +321,7 @@ public class JreCompat {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
     }
 
+
     /**
      * Create socket channel using the Unix domain socket ProtocolFamily.
      * @return the socket channel
@@ -328,5 +329,4 @@ public class JreCompat {
     public SocketChannel openUnixDomainSocketChannel() {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
     }
-
 }
