@@ -259,7 +259,7 @@ public class HpackDecoder {
      * Handle an indexed header representation
      *
      * @param index The index
-     * @throws HpackException
+     * @throws HpackException If an error occurs processing the given index
      */
     private void handleIndex(int index) throws HpackException {
         if (index <= Hpack.STATIC_TABLE_LENGTH) {

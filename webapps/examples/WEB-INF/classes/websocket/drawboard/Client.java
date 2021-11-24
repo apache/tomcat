@@ -165,7 +165,8 @@ public class Client {
 
     /**
      * Internally sends the messages asynchronously.
-     * @param msg
+     *
+     * @param msg Message to send
      */
     private void internalSendMessageAsync(AbstractWebsocketMessage msg) {
         try {

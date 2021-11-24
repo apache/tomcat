@@ -38,7 +38,7 @@ public class TokenList {
      * @param collection The Collection (usually a list or a set) to which the
      *                       parsed tokens should be added
      *
-     * @return {@code} true if the header values were parsed cleanly and at
+     * @return {@code true} if the header values were parsed cleanly and at
      *         least one token was found, otherwise {@code false} (e.g. if a
      *         non-token value was encountered)
      *
@@ -66,7 +66,7 @@ public class TokenList {
      * @param collection The Collection (usually a list or a set) to which the
      *                       parsed tokens should be added
      *
-     * @return {@code} true if the header values were parsed cleanly and at
+     * @return {@code true} if the header values were parsed cleanly and at
      *         least one token was found, otherwise {@code false} (e.g. if a
      *         non-token value was encountered)
      *

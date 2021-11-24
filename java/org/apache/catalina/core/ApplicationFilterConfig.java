@@ -85,9 +85,10 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      * @exception InstantiationException if an exception occurs while
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
-     * @throws NamingException
-     * @throws SecurityException
-     * @throws IllegalArgumentException
+     * @throws NamingException If a JNDI lookup fails
+     * @throws SecurityException If a security manager prevents the creation
+     * @throws IllegalArgumentException If the provided configuration is not
+     *         valid
      */
     ApplicationFilterConfig(Context context, FilterDef filterDef)
             throws ClassCastException, ReflectiveOperationException, ServletException,
@@ -232,10 +233,11 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      * @exception InstantiationException if an exception occurs while
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
-     * @throws NamingException
-     * @throws ReflectiveOperationException
-     * @throws SecurityException
-     * @throws IllegalArgumentException
+     * @throws NamingException If a JNDI lookup fails
+     * @throws ReflectiveOperationException If the creation of the filter fails
+     * @throws SecurityException If a security manager prevents the creation
+     * @throws IllegalArgumentException If the provided configuration is not
+     *         valid
      */
     Filter getFilter() throws ClassCastException, ReflectiveOperationException, ServletException,
             NamingException, IllegalArgumentException, SecurityException {

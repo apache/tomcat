@@ -319,9 +319,9 @@ public class BasicDataSourceFactory implements ObjectFactory {
     /**
      * Parse properties from the string. Format of the string must be [propertyName=property;]*
      *
-     * @param propText
+     * @param propText The string containing the properties
      * @return Properties
-     * @throws IOException
+     * @throws IOException If the properties string is not correctly formatted
      */
     private static Properties getProperties(final String propText) throws IOException {
         final Properties p = new Properties();

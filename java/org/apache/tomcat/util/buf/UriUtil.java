@@ -201,8 +201,8 @@ public final class UriUtil {
      *
      * @param path The path to test
      *
-     * @return {@code} if the supplied path starts with once of the recognised
-     *         sequences.
+     * @return {@code true} if the supplied path starts with once of the
+     *         recognised sequences.
      */
     public static boolean isAbsoluteURI(String path) {
         // Special case as only a single /

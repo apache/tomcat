@@ -706,7 +706,7 @@ public class CorsFilter extends GenericFilter {
      * @param preflightMaxAge
      *            The amount of seconds the user agent is allowed to cache the
      *            result of the pre-flight request.
-     * @throws ServletException
+     * @throws ServletException If the configuration is invalid
      */
     private void parseAndStore(final String allowedOrigins,
             final String allowedHttpMethods, final String allowedHttpHeaders,

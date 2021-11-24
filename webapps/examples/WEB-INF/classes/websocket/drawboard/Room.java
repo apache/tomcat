@@ -215,7 +215,7 @@ public final class Room {
 
     /**
      * @see Player#removeFromRoom()
-     * @param p
+     * @param p player to remove
      */
     private void internalRemovePlayer(Player p) {
         boolean removed = players.remove(p);
@@ -239,9 +239,9 @@ public final class Room {
 
     /**
      * @see Player#handleDrawMessage(DrawMessage, long)
-     * @param p
-     * @param msg
-     * @param msgId
+     * @param p player
+     * @param msg message containing details of new shapes to draw
+     * @param msgId message ID
      */
     private void internalHandleDrawMessage(Player p, DrawMessage msg,
             long msgId) {
@@ -261,8 +261,8 @@ public final class Room {
      * {@link #broadcastDrawMessage(DrawMessage)}
      * as this method will buffer them and prefix them with the correct
      * last received Message ID.
-     * @param type
-     * @param content
+     * @param type message type
+     * @param content message content
      */
     private void broadcastRoomMessage(MessageType type, String content) {
         for (Player p : players) {
@@ -276,7 +276,7 @@ public final class Room {
      * and the {@link #drawmessageBroadcastTimer} will broadcast them
      * at a regular interval, prefixing them with the player's current
      * {@link Player#lastReceivedMessageId}.
-     * @param msg
+     * @param msg message to broadcast
      */
     private void broadcastDrawMessage(DrawMessage msg) {
         if (!BUFFER_DRAW_MESSAGES) {
@@ -482,8 +482,8 @@ public final class Room {
 
         /**
          * Sends the given room message.
-         * @param type
-         * @param content
+         * @param type message type
+         * @param content message content
          */
         private void sendRoomMessage(MessageType type, String content) {
             Objects.requireNonNull(content);

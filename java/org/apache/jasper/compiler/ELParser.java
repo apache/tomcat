@@ -236,7 +236,8 @@ public class ELParser {
      * for $ and # is optional.
      *
      * @param input Non-EL input to be escaped
-     * @param isDeferredSyntaxAllowedAsLiteral
+     * @param isDeferredSyntaxAllowedAsLiteral Flag that indicates if deferred
+     *          syntax (#{) is allowed as a literal.\
      *
      * @return The escaped version of the input
      */

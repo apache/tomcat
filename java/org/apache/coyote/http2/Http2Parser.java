@@ -352,7 +352,7 @@ class Http2Parser {
      * @param streamId The pushed stream
      * @param buffer   The payload, if available
      *
-     * @throws Http2Exception
+     * @throws Http2Exception Always
      */
     protected void readPushPromiseFrame(int streamId, ByteBuffer buffer) throws Http2Exception {
         throw new ConnectionException(sm.getString("http2Parser.processFramePushPromise",

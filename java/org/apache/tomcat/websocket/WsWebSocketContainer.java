@@ -781,10 +781,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     /**
      * Process response, blocking until HTTP response has been fully received.
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws DeploymentException
-     * @throws TimeoutException
+     * @throws ExecutionException if there is an exception reading the response
+     * @throws InterruptedException if the thread is interrupted while reading
+     *         the response
+     * @throws DeploymentException if the response status line is not correctly
+     *         formatted
+     * @throws TimeoutException if the response was not read within the expected
+     *         timeout
      */
     private HttpResponse processResponse(ByteBuffer response,
             AsyncChannelWrapper channel, long timeout) throws InterruptedException,
