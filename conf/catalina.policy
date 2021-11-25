@@ -89,7 +89,6 @@ grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
 
         permission java.util.PropertyPermission "java.util.logging.config.class", "read";
         permission java.util.PropertyPermission "java.util.logging.config.file", "read";
-        permission java.util.PropertyPermission "org.apache.juli.AsyncLoggerPollInterval", "read";
         permission java.util.PropertyPermission "org.apache.juli.AsyncMaxRecordCount", "read";
         permission java.util.PropertyPermission "org.apache.juli.AsyncOverflowDropType", "read";
         permission java.util.PropertyPermission "org.apache.juli.ClassLoaderLogManager.debug", "read";
