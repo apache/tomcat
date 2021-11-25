@@ -58,8 +58,9 @@ public class TestJspServlet  extends TomcatBaseTest {
 
         tomcat.start();
 
+        // When using JaCoCo, the CI system seems to need a longer timeout
         int rc = methodUrl("http://localhost:" + getPort() + "/test/bug56568",
-                new ByteChunk(), 10000, null, null, "PUT");
+                new ByteChunk(), 30000, null, null, "PUT");
 
         // Make sure we get the original 500 response and not a 405 response
         // which would indicate that error.jsp is complaining about being called
