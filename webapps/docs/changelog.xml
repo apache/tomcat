@@ -130,6 +130,10 @@
         bug</a> that causes the acceptor to report an incoming connection more
         than once. (markt)
       </add>
+      <fix>
+        <bug>65677</bug>: Improve exception handling for errors during HTTP/1.1
+        reads with NIO2. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
