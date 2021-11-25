@@ -68,6 +68,7 @@ public class AsyncFileHandler extends FileHandler {
         logger.start();
     }
 
+    private final Object closeLock = new Object();
     protected volatile boolean closed = false;
 
     public AsyncFileHandler() {
@@ -88,7 +89,12 @@ public class AsyncFileHandler extends FileHandler {
         if (closed) {
             return;
         }
-        closed = true;
+        synchronized (closeLock) {
+            if (closed) {
+                return;
+            }
+            closed = true;
+        }
         super.close();
     }
 
@@ -97,7 +103,12 @@ public class AsyncFileHandler extends FileHandler {
         if (!closed) {
             return;
         }
-        closed = false;
+        synchronized (closeLock) {
+            if (!closed) {
+                return;
+            }
+            closed = false;
+        }
         super.open();
     }
 
