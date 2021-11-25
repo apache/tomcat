@@ -86,7 +86,7 @@
         <item name="Servlet 6.0 Javadocs"  href="servletapi/index.html"/>
         <item name="JSP 3.1 Javadocs"      href="jspapi/index.html"/>
         <item name="EL 5.0 Javadocs"       href="elapi/index.html"/>
-        <item name="WebSocket 2.0 Javadocs"
+        <item name="WebSocket 2.1 Javadocs"
               href="websocketapi/index.html"/>
         <item name="JASPIC 2.0 Javadocs"   href="jaspicapi/index.html"/>
         <item name="Annotations 2.0 Javadocs"

@@ -176,16 +176,16 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     <a href="https://jakarta.ee/specifications/pages/3.1/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>EL 4.0
-    <a href="https://jakarta.ee/specifications/expression-language/4.0/">
+<li>EL 5.0
+    <a href="https://jakarta.ee/specifications/expression-language/5.0/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/expression-language/4.0/apidocs">
+    <a href="https://jakarta.ee/specifications/expression-language/5.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>WebSocket 2.0
-    <a href="https://jakarta.ee/specifications/websocket/2.0/">
+<li>WebSocket 2.1
+    <a href="https://jakarta.ee/specifications/websocket/2.1/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/websocket/2.0/apidocs">
+    <a href="https://jakarta.ee/specifications/websocket/2.1/apidocs">
     <strong>Javadoc</strong></a>
     </li>
 <li>Authentication 2.0
