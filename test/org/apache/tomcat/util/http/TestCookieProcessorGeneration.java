@@ -24,7 +24,7 @@ import org.junit.Test;
 public class TestCookieProcessorGeneration {
 
     @Test
-    public void SimpleCookie() {
+    public void simpleCookie() {
         doTest(new Cookie("foo", "bar"), "foo=bar");
     }
 
