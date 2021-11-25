@@ -1972,8 +1972,6 @@
           <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
           <sysproperty key="tomcat.test.sslImplementation" value="${test.sslImplementation}" />
           <sysproperty key="tomcat.test.http2.loopCount" value="${test.http2.loopCount}" />
-          <!-- File for Cobertura to write coverage results to -->
-          <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
 
           <formatter type="${junit.formatter.type}"
                      usefile="${junit.formatter.usefile}"
@@ -1982,10 +1980,10 @@
           <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
           <test todir="${test.reports}" name="${test.entry}"
                 if="test.entry" unless="test.entry.methods"
-             />
+                />
           <test todir="${test.reports}" name="${test.entry}" methods="${test.entry.methods}"
                 if="test.entry.methods"
-             />
+                />
           <batchtest todir="${test.reports}" unless="test.entry">
             <!-- Include all by default -->
             <fileset dir="test" includes="${test.name}" excludes="${test.exclude}">
