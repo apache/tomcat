@@ -149,6 +149,10 @@
         Avoid unnecessary duplicate read registrations for blocking I/O with the
         NIO connector. (markt)
       </fix>
+      <fix>
+        <bug>65677</bug>: Improve exception handling for errors during HTTP/1.1
+        reads with NIO2. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
