@@ -18,6 +18,7 @@ package org.apache.juli;
 
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.LogRecord;
 /**
  * A {@link FileHandler} implementation that uses a queue of log entries.
@@ -94,6 +95,7 @@ public class AsyncFileHandler extends FileHandler {
             }
             closed = true;
         }
+        LoggerThread.deregisterHandler();
         super.close();
     }
 
@@ -108,6 +110,7 @@ public class AsyncFileHandler extends FileHandler {
             }
             closed = false;
         }
+        LoggerThread.registerHandler();
         super.open();
     }
 
@@ -157,6 +160,43 @@ public class AsyncFileHandler extends FileHandler {
     }
 
     protected static class LoggerThread extends Thread {
+
+        /*
+         * Implementation note: Use of this count could be extended to
+         * start/stop the LoggerThread but that would require careful locking as
+         * the current size of the queue also needs to be taken into account and
+         * there are lost of edge cases when rapidly starting and stopping
+         * handlers.
+         */
+        private static final AtomicInteger handlerCount = new AtomicInteger();
+
+        public static void registerHandler() {
+            handlerCount.incrementAndGet();
+        }
+
+        public static void deregisterHandler() {
+            int newCount = handlerCount.decrementAndGet();
+            if (newCount == 0) {
+                try {
+                    Thread dummyHook = new Thread();
+                    Runtime.getRuntime().addShutdownHook(dummyHook);
+                    Runtime.getRuntime().removeShutdownHook(dummyHook);
+                } catch (IllegalStateException ise) {
+                    // JVM is shutting down.
+                    // Allow up to 10s for for the queue to be emptied
+                    int sleepCount = 0;
+                    while (!AsyncFileHandler.queue.isEmpty() && sleepCount < 10000) {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
+                        sleepCount++;
+                    }
+                }
+            }
+        }
+
         public LoggerThread() {
             this.setDaemon(true);
             this.setName("AsyncFileHandlerWriter-" + System.identityHashCode(this));
