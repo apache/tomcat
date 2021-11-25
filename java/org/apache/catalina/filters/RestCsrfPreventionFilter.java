@@ -144,16 +144,24 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         @Override
         public boolean apply(HttpServletRequest request, HttpServletResponse response)
                 throws IOException {
-            if (isValidStateChangingRequest(
-                    extractNonceFromRequest(request),
-                    nonceFromSession.getNonce(request.getSession(false), Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))) {
+
+            String nonceRequest = extractNonceFromRequest(request);
+            HttpSession session = request.getSession(false);
+            String nonceSession = nonceFromSession.getNonce(session, Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
+
+            if (isValidStateChangingRequest(nonceRequest, nonceSession)) {
                 return true;
             }
 
             nonceToResponse.setNonce(response, Constants.CSRF_REST_NONCE_HEADER_NAME,
                     Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
-            response.sendError(getDenyStatus(),
-                    sm.getString("restCsrfPreventionFilter.invalidNonce"));
+            response.sendError(getDenyStatus(), sm.getString("restCsrfPreventionFilter.invalidNonce"));
+
+            if (getLogger().isDebugEnabled()) {
+                getLogger().debug(sm.getString("restCsrfPreventionFilter.invalidNonce.debug", request.getMethod(),
+                        request.getRequestURI(), Boolean.valueOf(request.getRequestedSessionId() != null),
+                        session, Boolean.valueOf(nonceRequest != null), Boolean.valueOf(nonceSession != null)));
+            }
             return false;
         }
 
@@ -174,12 +182,15 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         }
 
         private String extractNonceFromRequestParams(HttpServletRequest request) {
-            String[] params = nonceFromRequestParams.getNonce(request,
-                    Constants.CSRF_REST_NONCE_HEADER_NAME);
+            String[] params = nonceFromRequestParams.getNonce(request, Constants.CSRF_REST_NONCE_HEADER_NAME);
             if (Objects.nonNull(params) && params.length > 0) {
                 String nonce = params[0];
                 for (String param : params) {
                     if (!Objects.equals(param, nonce)) {
+                        if (getLogger().isDebugEnabled()) {
+                            getLogger().debug(sm.getString("restCsrfPreventionFilter.multipleNonce.debug",
+                                    request.getMethod(), request.getRequestURI()));
+                        }
                         return null;
                     }
                 }
@@ -205,6 +216,10 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
                 }
                 nonceToResponse.setNonce(response, Constants.CSRF_REST_NONCE_HEADER_NAME,
                         nonceFromSessionStr);
+                if (getLogger().isDebugEnabled()) {
+                    getLogger().debug(sm.getString("restCsrfPreventionFilter.fetch.debug",
+                            request.getMethod(), request.getRequestURI()));
+                }
             }
             return true;
         }
