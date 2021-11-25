@@ -119,6 +119,10 @@
         Document conditions under which the <code>AprLifecycleListener</code>
         can be used to avoid JVM crashes. (michaelo)
       </docs>
+      <fix>
+        Refactor the <code>AsyncFileHandler</code> to reduce the possibility of
+        log messages being lost on shutdown. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
