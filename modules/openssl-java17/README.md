@@ -2,13 +2,13 @@
 
 ## This module is experimental
 
-It uses an incubating Java API, and is not supported at this time.
+It uses the incubating JEP 412 Java API, and is not supported at this time.
+More details on this API are available at `https://openjdk.java.net/jeps/412`.
 
 ## Building
 
-The module can be built using Java 17, this will be the only Java version that
-is supported as the foreign API is incbating and will continue to evolve.
-It then requires OpenSSL 1.1 or newer at runtime.
+The module can be built using Java 17. This will be the only Java version that
+is supported as the foreign API is incubating and will continue to evolve.
 ```
 mvn package
 ```
@@ -16,7 +16,10 @@ Note: The build path for the JDK will be different on other platforms.
 
 ## Running in Tomcat
 
-Copy `tomcat-openssl-X.X.jar` to Tomcat lib folder.
+Copy `tomcat-openssl-1.0.jar` to the Apache Tomcat `lib` folder.
+
+The module requires OpenSSL 1.1 or a newer API compatible version or
+alternative, available from the system library path.
 
 Remove `AprLifecycleListener` from `server.xml`.
 
@@ -92,15 +95,15 @@ extract it to a path.
 
 Find include paths using `gcc -xc -E -v -`, on Fedora it is
 `/usr/lib/gcc/x86_64-redhat-linux/11/include`. Edit `openssl-tomcat.conf`
-accordingly.
+accordingly to set the appropriate path.
 
 ```
 export JAVA_HOME=<pathto_jdk17_with_jextract>
 $JAVA_HOME/bin/jextract @openssl-tomcat.conf openssl.h
 ```
 
-The code included was generated for OpenSSL 1.1.1. As long as things remain API
-compatible, this will still work.
+The code included was generated using OpenSSL 1.1.1. As long as things remain
+API compatible, the generated code will still work.
 
 The `openssl-tomcat.conf` will generate a trimmed down OpenSSL API. When
 developing new features, the full API can be generated instead using:
@@ -109,8 +112,8 @@ $JAVA_HOME/bin/jextract --source -t org.apache.tomcat.util.openssl -lssl -I /usr
 ```
 
 The `openssl.conf` file lists all the API calls and constants that can be
-generated using jextract, as a reference to what is available. Macros are not
-supported and have to be reproduced in code.
+generated using jextract, as a reference to what is available. Some macros are
+not supported and have to be reproduced in code.
 
 Before committing updated generated files, they need to have the license header
 added. The `addlicense.sh` script can do that and process all Java source files
