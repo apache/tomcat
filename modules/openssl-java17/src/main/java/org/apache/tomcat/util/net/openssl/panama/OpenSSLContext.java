@@ -167,7 +167,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     private final ContextState state;
-    private final ResourceScope scope;
+    private final ResourceScope contextScope;
 
     private static String[] getCiphers(MemoryAddress sslCtx) {
         MemoryAddress sk = SSL_CTX_get_ciphers(sslCtx);
@@ -198,7 +198,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
-        scope = ResourceScope.newImplicitScope();
+        contextScope = ResourceScope.newImplicitScope();
 
         MemoryAddress sslCtx = MemoryAddress.NULL;
         MemoryAddress confCtx = MemoryAddress.NULL;
@@ -208,7 +208,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Create OpenSSLConfCmd context if used
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             if (openSslConf != null) {
-                var allocator = SegmentAllocator.ofScope(scope);
+                var allocator = SegmentAllocator.ofScope(contextScope);
                 try {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("openssl.makeConf"));
@@ -319,7 +319,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Set int pem_password_cb(char *buf, int size, int rwflag, void *u) callback
             openSSLCallbackPassword =
                     CLinker.getInstance().upcallStub(openSSLCallbackPasswordHandle,
-                    openSSLCallbackPasswordFunctionDescriptor, scope);
+                    openSSLCallbackPasswordFunctionDescriptor, contextScope);
             SSL_CTX_set_default_passwd_cb(sslCtx, openSSLCallbackPassword);
 
             alpn = (negotiableProtocols != null && negotiableProtocols.size() > 0);
@@ -347,7 +347,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
              * and the implicit scope will ensure that the associated native
              * resources are cleaned up.
              */
-            scope.addCloseAction(state);
+            contextScope.addCloseAction(state);
 
             if (!success) {
                 destroy();
@@ -554,7 +554,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             // List the ciphers that the client is permitted to negotiate
-            if (SSL_CTX_set_cipher_list(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), scope)) <= 0) {
+            if (SSL_CTX_set_cipher_list(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), contextScope)) <= 0) {
                 log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
             }
 
@@ -590,18 +590,18 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             MemoryAddress openSSLCallbackVerify =
                     CLinker.getInstance().upcallStub(openSSLCallbackVerifyHandle,
-                    openSSLCallbackVerifyFunctionDescriptor, scope);
+                    openSSLCallbackVerifyFunctionDescriptor, contextScope);
             // Leave this just in case but in Tomcat this is always set again by the engine
             SSL_CTX_set_verify(state.sslCtx, value, openSSLCallbackVerify);
 
             // Trust and certificate verification
-            var allocator = SegmentAllocator.ofScope(scope);
+            var allocator = SegmentAllocator.ofScope(contextScope);
             if (tms != null) {
                 // Client certificate verification based on custom trust managers
                 state.x509TrustManager = chooseTrustManager(tms);
                 MemoryAddress openSSLCallbackCertVerify =
                         CLinker.getInstance().upcallStub(openSSLCallbackCertVerifyHandle,
-                                openSSLCallbackCertVerifyFunctionDescriptor, scope);
+                                openSSLCallbackCertVerifyFunctionDescriptor, contextScope);
                 SSL_CTX_set_cert_verify_callback(state.sslCtx, openSSLCallbackCertVerify, state.sslCtx);
 
                 // Pass along the DER encoded certificates of the accepted client
@@ -627,9 +627,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
                 //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
                 MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null
-                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()), scope) : null;
+                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()), contextScope) : null;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
-                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()), scope) : null;
+                        ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()), contextScope) : null;
                 if (SSL_CTX_load_verify_locations(state.sslCtx,
                         caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative,
                                 caCertificatePathNative == null ? MemoryAddress.NULL : caCertificatePathNative) <= 0) {
@@ -657,7 +657,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //        MemoryAddress in, int inlen, MemoryAddress arg
                 MemoryAddress openSSLCallbackAlpnSelectProto =
                         CLinker.getInstance().upcallStub(openSSLCallbackAlpnSelectProtoHandle,
-                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, scope);
+                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, contextScope);
                 SSL_CTX_set_alpn_select_cb(state.sslCtx, openSSLCallbackAlpnSelectProto, state.sslCtx);
                 // Skip NPN (annoying and likely not useful anymore)
                 //SSLContext.setNpnProtos(state.ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
@@ -956,7 +956,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     private void addCertificate(SSLHostConfigCertificate certificate) throws Exception {
-        var allocator = SegmentAllocator.ofScope(scope);
+        var allocator = SegmentAllocator.ofScope(contextScope);
         int index = getCertificateIndex(certificate);
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {
@@ -965,9 +965,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             //        SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
             //        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
             //        certificate.getCertificateKeyPassword(), getCertificateIndex(certificate));
-            var certificateFileNative = CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()), scope);
+            var certificateFileNative = CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()), contextScope);
             var certificateKeyFileNative = (certificate.getCertificateKeyFile() == null) ? certificateFileNative
-                    : CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()), scope);
+                    : CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()), contextScope);
             MemoryAddress bio;
             MemoryAddress cert = MemoryAddress.NULL;
             MemoryAddress key = MemoryAddress.NULL;
@@ -991,7 +991,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 int passwordLength = 0;
                 String callbackPassword = certificate.getCertificateKeyPassword();
                 if (callbackPassword != null && callbackPassword.length() > 0) {
-                    MemorySegment password = CLinker.toCString(callbackPassword, scope);
+                    MemorySegment password = CLinker.toCString(callbackPassword, contextScope);
                     passwordAddress = password.address();
                     passwordLength = (int) (password.byteSize() - 1);
                 }
@@ -1095,7 +1095,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             // Try to read DH parameters from the (first) SSLCertificateFile
             if (index == SSL_AIDX_RSA) {
-                bio = BIO_new_file(certificateFileNative, CLinker.toCString("r", scope));
+                bio = BIO_new_file(certificateFileNative, CLinker.toCString("r", contextScope));
                 var dh = PEM_read_bio_DHparams(bio, MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
                 BIO_free(bio);
                 // #  define SSL_CTX_set_tmp_dh(sslCtx,dh) \
@@ -1106,7 +1106,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
             // Similarly, try to read the ECDH curve name from SSLCertificateFile...
-            bio = BIO_new_file(certificateFileNative, CLinker.toCString("r", scope));
+            bio = BIO_new_file(certificateFileNative, CLinker.toCString("r", contextScope));
             var ecparams = PEM_read_bio_ECPKParameters(bio, MemoryAddress.NULL, MemoryAddress.NULL, MemoryAddress.NULL);
             BIO_free(bio);
             if (!MemoryAddress.NULL.equals(ecparams)) {
@@ -1120,12 +1120,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             // Set callback for DH parameters
             MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
-                    openSSLCallbackTmpDHFunctionDescriptor, scope);
+                    openSSLCallbackTmpDHFunctionDescriptor, contextScope);
             SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
             // Set certificate chain file
             if (certificate.getCertificateChainFile() != null) {
                 var certificateChainFileNative =
-                        CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), scope);
+                        CLinker.toCString(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), contextScope);
                 // SSLContext.setCertificateChainFile(state.ctx,
                 //        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
                 if (SSL_CTX_use_certificate_chain_file(state.sslCtx, certificateChainFileNative) <= 0) {
@@ -1142,7 +1142,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (sslHostConfig.getCertificateRevocationListFile() != null) {
                 MemoryAddress x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_file());
                 var certificateRevocationListFileNative =
-                        CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()), scope);
+                        CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()), contextScope);
                 //X509_LOOKUP_ctrl(lookup,X509_L_FILE_LOAD,file,type,NULL)
                 if (X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), certificateRevocationListFileNative,
                         X509_FILETYPE_PEM(), MemoryAddress.NULL) <= 0) {
@@ -1152,7 +1152,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (sslHostConfig.getCertificateRevocationListPath() != null) {
                 MemoryAddress x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_hash_dir());
                 var certificateRevocationListPathNative =
-                        CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()), scope);
+                        CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()), contextScope);
                 //X509_LOOKUP_ctrl(lookup,X509_L_ADD_DIR,path,type,NULL)
                 if (X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), certificateRevocationListPathNative,
                         X509_FILETYPE_PEM(), MemoryAddress.NULL) <= 0) {
@@ -1208,7 +1208,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             // Set callback for DH parameters
             MemoryAddress openSSLCallbackTmpDH = CLinker.getInstance().upcallStub(openSSLCallbackTmpDHHandle,
-                    openSSLCallbackTmpDHFunctionDescriptor, scope);
+                    openSSLCallbackTmpDHFunctionDescriptor, contextScope);
             SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
             for (int i = 1; i < chain.length; i++) {
                 //SSLContext.addChainCertificateRaw(state.ctx, chain[i].getEncoded());

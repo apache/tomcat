@@ -183,7 +183,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private final EngineState state;
-    private final ResourceScope scope;
+    private final ResourceScope engineScope;
 
     private enum Accepted { NOT, IMPLICIT, EXPLICIT }
     private Accepted accepted = Accepted.NOT;
@@ -245,13 +245,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (sslCtx == null) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
-        scope = ResourceScope.newImplicitScope();
-        var allocator = SegmentAllocator.ofScope(scope);
+        engineScope = ResourceScope.newImplicitScope();
+        var allocator = SegmentAllocator.ofScope(engineScope);
         session = new OpenSSLSession();
         var ssl = SSL_new(sslCtx);
         // Set ssl_info_callback
         MemoryAddress openSSLCallbackInfo = CLinker.getInstance().upcallStub(openSSLCallbackInfoHandle,
-                openSSLCallbackInfoFunctionDescriptor, scope);
+                openSSLCallbackInfoFunctionDescriptor, engineScope);
         SSL_set_info_callback(ssl, openSSLCallbackInfo);
         if (clientMode) {
             SSL_set_connect_state(ssl);
@@ -266,7 +266,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         var networkBIO = MemoryAccess.getAddress(networkBIOPointer);
         SSL_set_bio(ssl, internalBIO, internalBIO);
         state = new EngineState(ssl, networkBIO, certificateVerificationDepth, noOcspCheck);
-        scope.addCloseAction(state);
+        engineScope.addCloseAction(state);
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
@@ -829,7 +829,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         final String cipherSuiteSpec = buf.toString();
         try {
-            SSL_set_cipher_list(state.ssl, CLinker.toCString(cipherSuiteSpec, scope));
+            SSL_set_cipher_list(state.ssl, CLinker.toCString(cipherSuiteSpec, engineScope));
         } catch (Exception e) {
             throw new IllegalStateException(sm.getString("engine.failedCipherSuite", cipherSuiteSpec), e);
         }
@@ -965,7 +965,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private byte[] getPeerCertificate() {
-        var allocator = SegmentAllocator.ofScope(scope);
+        var allocator = SegmentAllocator.ofScope(engineScope);
         MemoryAddress/*(X509*)*/ x509 = SSL_get_peer_certificate(state.ssl);
         MemorySegment bufPointer = allocator.allocate(CLinker.C_POINTER, MemoryAddress.NULL);
         int length = i2d_X509(x509, bufPointer);
@@ -973,7 +973,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return null;
         }
         MemoryAddress buf = MemoryAccess.getAddress(bufPointer);
-        byte[] certificate = buf.asSegment(length, scope).toByteArray();
+        byte[] certificate = buf.asSegment(length, engineScope).toByteArray();
         X509_free(x509);
         CRYPTO_free(buf, MemoryAddress.NULL, 0); // OPENSSL_free macro
         return certificate;
@@ -986,7 +986,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return null;
         }
         byte[][] certificateChain = new byte[len][];
-        var allocator = SegmentAllocator.ofScope(scope);
+        var allocator = SegmentAllocator.ofScope(engineScope);
         for (int i = 0; i < len; i++) {
             MemoryAddress/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
             MemorySegment bufPointer = allocator.allocate(CLinker.C_POINTER, MemoryAddress.NULL);
@@ -996,7 +996,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 continue;
             }
             MemoryAddress buf = MemoryAccess.getAddress(bufPointer);
-            byte[] certificate = buf.asSegment(length, scope).toByteArray();
+            byte[] certificate = buf.asSegment(length, engineScope).toByteArray();
             certificateChain[i] = certificate;
             CRYPTO_free(buf, MemoryAddress.NULL, 0); // OPENSSL_free macro
         }
@@ -1004,7 +1004,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private String getProtocolNegotiated() {
-        var allocator = SegmentAllocator.ofScope(scope);
+        var allocator = SegmentAllocator.ofScope(engineScope);
         MemorySegment lenAddress = allocator.allocate(CLinker.C_INT, 0);
         MemorySegment protocolPointer = allocator.allocate(CLinker.C_POINTER, MemoryAddress.NULL);
         SSL_get0_alpn_selected(state.ssl, protocolPointer, lenAddress);
@@ -1019,7 +1019,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return null;
         }
         MemoryAddress protocolAddress = MemoryAccess.getAddress(protocolPointer);
-        byte[] name = protocolAddress.asSegment(length, scope).toByteArray();
+        byte[] name = protocolAddress.asSegment(length, engineScope).toByteArray();
         if (log.isDebugEnabled()) {
             log.debug("Protocol negotiated [" + new String(name) + "]");
         }
@@ -1106,7 +1106,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         String sslError = null;
         long error = ERR_get_error();
         if (error != SSL_ERROR_NONE()) {
-            var allocator = SegmentAllocator.ofScope(scope);
+            var allocator = SegmentAllocator.ofScope(engineScope);
             do {
                 // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
                 var buf = allocator.allocateArray(CLinker.C_CHAR, new byte[128]);
@@ -1261,7 +1261,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             MemoryAddress openSSLCallbackVerify =
                     CLinker.getInstance().upcallStub(openSSLCallbackVerifyHandle,
-                    openSSLCallbackVerifyFunctionDescriptor, scope);
+                    openSSLCallbackVerifyFunctionDescriptor, engineScope);
             int value = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_PEER() | SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
@@ -1565,12 +1565,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             byte[] id = null;
             synchronized (OpenSSLEngine.this) {
                 if (!destroyed) {
-                    var allocator = SegmentAllocator.ofScope(scope);
+                    var allocator = SegmentAllocator.ofScope(engineScope);
                     MemorySegment lenPointer = allocator.allocate(CLinker.C_POINTER);
                     var session = SSL_get_session(state.ssl);
                     MemoryAddress sessionId = SSL_SESSION_get_id(session, lenPointer);
                     int length = MemoryAccess.getInt(lenPointer);
-                    id = (length == 0) ? new byte[0] : sessionId.asSegment(length, scope).toByteArray();
+                    id = (length == 0) ? new byte[0] : sessionId.asSegment(length, engineScope).toByteArray();
                 }
             }
 
