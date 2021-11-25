@@ -794,7 +794,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         }
 
         int nRead = -1;
-        byteBuffer.mark();
+        int mark = byteBuffer.position();
         try {
             if (byteBuffer.position() < byteBuffer.limit()) {
                 byteBuffer.position(byteBuffer.limit());
@@ -810,7 +810,20 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             // Ensure that the buffer limit and position are returned to a
             // consistent "ready for read" state if an error occurs during in
             // the above code block.
-            byteBuffer.limit(byteBuffer.position()).reset();
+            // Some error conditions can result in the position being reset to
+            // zero which also invalidates the mark.
+            // https://bz.apache.org/bugzilla/show_bug.cgi?id=65677
+            if (byteBuffer.position() >= mark) {
+                // // Position and mark are consistent. Assume a read (possibly
+                // of zero bytes) has occurred.
+                byteBuffer.limit(byteBuffer.position());
+                byteBuffer.position(mark);
+            } else {
+                // Position and mark are inconsistent. Set position and limit to
+                // zero so effectively no data is reported as read.
+                byteBuffer.position(0);
+                byteBuffer.limit(0);
+            }
         }
 
         if (log.isDebugEnabled()) {
