@@ -16,7 +16,10 @@
   limitations under the License.
 -->
 <project name="Tomcat 10.1" default="deploy" basedir="."
-  xmlns:if="ant:if" xmlns:unless="ant:unless">
+  xmlns:if="ant:if"
+  xmlns:unless="ant:unless"
+  xmlns:jacoco="antlib:org.jacoco.ant"
+  >
 
   <!-- ===================== Initialize Property Values ==================== -->
 
@@ -58,12 +61,12 @@
   <property name="jsp.revision"            value="-SNAPSHOT" />
   <property name="el.spec.version"         value="5.0" />
   <property name="el.revision"             value="-SNAPSHOT" />
-  <property name="websocket.spec.version"  value="2.0" />
-  <property name="websocket.revision"      value="0" />
-  <property name="jaspic.spec.version"     value="2.0" />
-  <property name="jaspic.revision"         value="0" />
-  <property name="annotation.spec.version" value="2.0" />
-  <property name="annotation.revision"     value="0" />
+  <property name="websocket.spec.version"  value="2.1" />
+  <property name="websocket.revision"      value="-SNAPSHOT" />
+  <property name="jaspic.spec.version"     value="3.0" />
+  <property name="jaspic.revision"         value="-SNAPSHOT" />
+  <property name="annotation.spec.version" value="2.1" />
+  <property name="annotation.revision"     value="-SNAPSHOT" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -114,6 +117,7 @@
   <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
   <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
   <property name="websocket-api.jar" value="${tomcat.build}/lib/websocket-api.jar"/>
+  <property name="websocket-client-api.jar" value="${tomcat.build}/lib/websocket-client-api.jar"/>
   <property name="jaspic-api.jar" value="${tomcat.build}/lib/jaspic-api.jar"/>
   <property name="tomcat-websocket.jar" value="${tomcat.build}/lib/tomcat-websocket.jar"/>
   <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
@@ -141,6 +145,7 @@
   <property name="jsp-api-src.jar" value="${tomcat.src.jars}/jsp-api-src.jar"/>
   <property name="el-api-src.jar" value="${tomcat.src.jars}/el-api-src.jar"/>
   <property name="websocket-api-src.jar" value="${tomcat.src.jars}/websocket-api-src.jar"/>
+  <property name="websocket-client-api-src.jar" value="${tomcat.src.jars}/websocket-client-api-src.jar"/>
   <property name="jaspic-api-src.jar" value="${tomcat.src.jars}/jaspic-api-src.jar"/>
   <property name="tomcat-websocket-src.jar" value="${tomcat.src.jars}/tomcat-websocket-src.jar"/>
   <property name="catalina-src.jar" value="${tomcat.src.jars}/catalina-src.jar"/>
@@ -181,11 +186,9 @@
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
   <property name="test.relaxTiming" value="false"/>
 
-  <!-- Cobertura code coverage settings -->
-  <property name="cobertura.out" value="${tomcat.output}/coverage"/>
-  <property name="cobertura.datafile" value="${cobertura.out}/cobertura.ser"/>
-  <property name="tomcat.classes.cobertura" value="${tomcat.classes}-cobertura"/>
-  <property name="cobertura.report.format" value="html"/>
+  <!-- Code coverage settings -->
+  <property name="coverage.out" value="${tomcat.output}/coverage"/>
+  <property name="coverage.datafile" value="${coverage.out}/jacoco.exec"/>
 
   <!-- FindBugs settings -->
   <property name="findbugs.out" value="${tomcat.output}/findbugs"/>
@@ -348,7 +351,11 @@
   </patternset>
 
   <patternset id="files.websocket-api">
-    <include name="jakarta/websocket/**" />
+    <include name="jakarta/websocket/server/*" />
+  </patternset>
+
+  <patternset id="files.websocket-client-api">
+    <include name="jakarta/websocket/*" />
   </patternset>
 
   <patternset id="files.jaspic-api">
@@ -753,6 +760,7 @@
 
   <patternset id="files.tomcat-embed-websocket" >
     <patternset refid="files.websocket-api" />
+    <patternset refid="files.websocket-client-api" />
     <patternset refid="files.tomcat-websocket" />
   </patternset>
 
@@ -1040,6 +1048,13 @@
       filesDir="${tomcat.classes}"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest"
+      addOSGi="true" />
+
+    <!-- WebSocket Client API JAR File -->
+    <jarIt jarfile="${websocket-client-api.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.websocket-client-api"
+      manifest="${tomcat.manifests}/websocket-client-api.jar.manifest"
       addOSGi="true" />
 
     <!-- JASPIC API JAR File -->
@@ -1837,10 +1852,7 @@
   <property name="junit.formatter.extension" value=".txt" />
 
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-nio,test-nio2,cobertura-report,test-status" />
-
-  <target name="test-only" description="Runs the JUnit test cases without additional processing"
-          depends="test-only-nio,test-only-nio2,test-status" />
+          depends="setup-jacoco,test-nio,test-nio2,coverage-report,test-status" />
 
   <target name="test-status"
           description="Analyses logs directory and reports on skipped tests, test failures and test errors">
@@ -1878,25 +1890,13 @@
   </target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
-          depends="test-compile,deploy,cobertura-instrument,test-openssl-exists" if="${execute.test.nio}">
-    <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
-              extension=".NIO" />
-  </target>
-
-  <target name="test-only-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
-          depends="cobertura-disabled,test-openssl-exists" if="${execute.test.nio}">
+          depends="test-compile,deploy,test-openssl-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
 
   <target name="test-nio2" description="Runs the JUnit test cases for NIO2. Does not stop on errors."
-          depends="test-compile,deploy,cobertura-instrument,test-openssl-exists" if="${execute.test.nio2}">
-    <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-              extension=".NIO2" />
-  </target>
-
-  <target name="test-only-nio2" description="Runs the JUnit test cases for NIO2. Does not stop on errors."
-          depends="cobertura-disabled,test-openssl-exists" if="${execute.test.nio2}">
+          depends="test-compile,deploy,test-openssl-exists" if="${execute.test.nio2}">
     <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
               extension=".NIO2" />
   </target>
@@ -1932,162 +1932,104 @@
 
     <sequential>
       <mkdir dir="${test.reports}" />
-      <junit printsummary="yes" fork="yes" dir="." showoutput="${test.verbose}"
-        errorproperty="test.result.error"
-        failureproperty="test.result.failure"
-        haltonfailure="${test.haltonfailure}"
-        threads="${test.threads}">
+      <jacoco:coverage
+          enabled="${test.coverage}"
+          destfile="${coverage.datafile}"
+          >
+        <junit printsummary="yes" fork="yes" dir="." showoutput="${test.verbose}"
+          errorproperty="test.result.error"
+          failureproperty="test.result.failure"
+          haltonfailure="${test.haltonfailure}"
+          threads="${test.threads}">
 
-        <jvmarg value="${test.jvmarg.egd}"/>
-        <jvmarg value="-Dfile.encoding=UTF-8"/>
-        <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
-        <jvmarg value="${test.formatter}"/>
-        <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
-        <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
-        <jvmarg value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
-        <jvmarg value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
-        <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
-        <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
+          <jvmarg value="${test.jvmarg.egd}"/>
+          <jvmarg value="-Dfile.encoding=UTF-8"/>
+          <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
+          <jvmarg value="${test.formatter}"/>
+          <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
+          <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+          <jvmarg value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
+          <jvmarg value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
+          <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+          <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
 
-        <classpath refid="tomcat.test.run.classpath" />
+          <classpath refid="tomcat.test.classpath" />
 
-        <sysproperty key="tomcat.test.temp" value="${test.temp}" />
-        <sysproperty key="tomcat.test.basedir" value="${test.basedir}" />
-        <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
-        <sysproperty key="tomcat.test.protocol" value="@{protocol}" />
-        <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
-        <sysproperty key="tomcat.test.reports" value="${test.reports}" />
-        <sysproperty key="tomcat.test.openssl.path" value="${test.openssl.path}" />
-        <sysproperty key="tomcat.test.openssl.unimplemented" value="${test.openssl.unimplemented}" />
-        <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
-        <sysproperty key="tomcat.test.sslImplementation" value="${test.sslImplementation}" />
-        <sysproperty key="tomcat.test.http2.loopCount" value="${test.http2.loopCount}" />
-        <!-- File for Cobertura to write coverage results to -->
-        <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
+          <sysproperty key="tomcat.test.temp" value="${test.temp}" />
+          <sysproperty key="tomcat.test.basedir" value="${test.basedir}" />
+          <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
+          <sysproperty key="tomcat.test.protocol" value="@{protocol}" />
+          <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
+          <sysproperty key="tomcat.test.reports" value="${test.reports}" />
+          <sysproperty key="tomcat.test.openssl.path" value="${test.openssl.path}" />
+          <sysproperty key="tomcat.test.openssl.unimplemented" value="${test.openssl.unimplemented}" />
+          <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
+          <sysproperty key="tomcat.test.sslImplementation" value="${test.sslImplementation}" />
+          <sysproperty key="tomcat.test.http2.loopCount" value="${test.http2.loopCount}" />
 
-        <formatter type="${junit.formatter.type}"
-                   usefile="${junit.formatter.usefile}"
-                   extension="@{extension}${junit.formatter.extension}" />
+          <formatter type="${junit.formatter.type}"
+                     usefile="${junit.formatter.usefile}"
+                     extension="@{extension}${junit.formatter.extension}" />
 
-        <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
-        <test todir="${test.reports}" name="${test.entry}"
-              if="test.entry" unless="test.entry.methods"
-           />
-        <test todir="${test.reports}" name="${test.entry}" methods="${test.entry.methods}"
-              if="test.entry.methods"
-           />
-        <batchtest todir="${test.reports}" unless="test.entry">
-          <!-- Include all by default -->
-          <fileset dir="test" includes="${test.name}" excludes="${test.exclude}">
-            <!-- Exclude helper classes -->
-            <exclude name="**/Tester*.java" />
-            <!-- Exclude the tests known to fail -->
-            <exclude name="org/apache/catalina/tribes/test/**" />
-            <!-- Exclude the OpenSSL tests unless OpenSSL is available -->
-            <exclude name="org/apache/tomcat/util/net/openssl/ciphers/**" unless="${test.openssl.exists}" />
-            <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
-            <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
-            <!-- Exclude tests that Gump can't compile -->
-            <exclude name="org/apache/tomcat/buildutil/**" />
-            <!--
-              Avoid running tests which require the SecurityManager with other
-              tests. See below for more details.
-            -->
-            <exclude name="**/*SecurityManager.java" />
-          </fileset>
-        </batchtest>
-        <!--
-           Run tests which require the SecurityManager in their own forked
-           batch to ensure that global/system security settings don't pollute
-           other tests. See SecurityManagerBaseTest.java for more details.
-        -->
-        <batchtest todir="${test.reports}" unless="test.entry" fork="true">
-          <fileset dir="test" includes="**/SecurityManager.java" excludes="${test.exclude}" />
-        </batchtest>
-      </junit>
+          <!-- If test.entry is defined, run a single test, otherwise run all valid tests -->
+          <test todir="${test.reports}" name="${test.entry}"
+                if="test.entry" unless="test.entry.methods"
+                />
+          <test todir="${test.reports}" name="${test.entry}" methods="${test.entry.methods}"
+                if="test.entry.methods"
+                />
+          <batchtest todir="${test.reports}" unless="test.entry">
+            <!-- Include all by default -->
+            <fileset dir="test" includes="${test.name}" excludes="${test.exclude}">
+              <!-- Exclude helper classes -->
+              <exclude name="**/Tester*.java" />
+              <!-- Exclude the tests known to fail -->
+              <exclude name="org/apache/catalina/tribes/test/**" />
+              <!-- Exclude the OpenSSL tests unless OpenSSL is available -->
+              <exclude name="org/apache/tomcat/util/net/openssl/ciphers/**" unless="${test.openssl.exists}" />
+              <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
+              <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
+              <!-- Exclude tests that Gump can't compile -->
+              <exclude name="org/apache/tomcat/buildutil/**" />
+              <!--
+                Avoid running tests which require the SecurityManager with other
+                tests. See below for more details.
+              -->
+              <exclude name="**/*SecurityManager.java" />
+            </fileset>
+          </batchtest>
+          <!--
+             Run tests which require the SecurityManager in their own forked
+             batch to ensure that global/system security settings don't pollute
+             other tests. See SecurityManagerBaseTest.java for more details.
+          -->
+          <batchtest todir="${test.reports}" unless="test.entry" fork="true">
+            <fileset dir="test" includes="**/SecurityManager.java" excludes="${test.exclude}" />
+          </batchtest>
+        </junit>
+      </jacoco:coverage>
     </sequential>
   </macrodef>
 
-  <target name="cobertura-init">
-    <condition property="cobertura.enabled" value="true">
-      <and>
-        <istrue value="${test.cobertura}"/>
-        <equals arg1="1" arg2="${test.threads}"/>
-      </and>
-    </condition>
-    <condition property="cobertura.disabled" value="true">
-      <and>
-        <istrue value="${test.cobertura}"/>
-        <not>
-          <equals arg1="1" arg2="${test.threads}"/>
-        </not>
-      </and>
-    </condition>
-  </target>
-
-  <target name="cobertura-disabled" unless="${cobertura.enabled}"
-          depends="cobertura-init">
-    <!-- Define classpath used to run tests when Cobertura is turned off. -->
-    <path id="tomcat.test.run.classpath">
-      <path refid="tomcat.test.classpath" />
-    </path>
-  </target>
-
-  <target name="cobertura-disabled-log" if="${cobertura.disabled}"
-          depends="cobertura-init">
-    <echo message="Code coverage disabled because test.threads is greater than 1"/>
-  </target>
-
-  <target name="cobertura-instrument"
-          depends="compile,download-cobertura,cobertura-disabled,cobertura-disabled-log"
-          if="${cobertura.enabled}"
-          description="Adds Cobertura instrumentation to the compiled bytecode">
-
-    <path id="cobertura.classpath">
-      <fileset dir="${cobertura.home}">
-        <include name="cobertura-${cobertura.version}.jar" />
-        <include name="lib/**/*.jar" />
-        <exclude name="lib/**/jetty*.jar" />
-        <exclude name="lib/**/servlet-api*.jar" />
-      </fileset>
-      <pathelement path="res/cobertura"/>
-    </path>
-
-    <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
-
-    <cobertura-instrument datafile="${cobertura.datafile}"
-                          todir="${tomcat.classes.cobertura}">
-      <fileset dir="${tomcat.classes}">
-        <include name="**/*.class"/>
-        <exclude name="**/ClassLoaderLogManager.class"/>
-        <exclude name="**/ClassLoaderLogManager*.class"/>
-        <exclude name="**/FileHandler.class"/>
-        <exclude name="**/AsyncFileHandler.class"/>
-        <exclude name="**/AsyncFileHandler*.class"/>
-        <exclude name="**/OneLineFormatter.class"/>
-        <exclude name="**/OneLineFormatter*.class"/>
-        <exclude name="**/DateFormatCache.class"/>
-        <exclude name="**/DateFormatCache*.class"/>
-      </fileset>
-      <auxClasspath path="${jdt.jar}" />
-    </cobertura-instrument>
-
-    <!-- Define classpath used to run tests -->
-    <!-- The Cobertura instrumented classes must appear first on the classpath -->
-    <path id="tomcat.test.run.classpath">
-      <path location="${tomcat.classes.cobertura}" />
-      <path refid="tomcat.test.classpath" />
-      <path refid="cobertura.classpath"/>
-    </path>
-  </target>
-
-  <target name="cobertura-report" if="${cobertura.enabled}"
+  <target name="coverage-report" if="${test.coverage}"
           depends="test-nio,test-nio2"
-          description="Creates report from gathered Cobertura results">
+          description="Creates report from gathered Code coverage results">
 
-    <cobertura-report srcdir="${basedir}/java" destdir="${cobertura.out}"
-                      datafile="${cobertura.datafile}"
-                      format="${cobertura.report.format}"/>
+    <jacoco:report>
+      <executiondata>
+        <file file="${coverage.datafile}"/>
+      </executiondata>
+      <structure name="Tomcat 10.1.x Code Coverage">
+        <classfiles>
+          <fileset dir="${tomcat.classes}"/>
+        </classfiles>
+        <sourcefiles encoding="UTF-8">
+          <fileset dir="java"/>
+        </sourcefiles>
+      </structure>
+      <html destdir="${coverage.out}"/>
+    </jacoco:report>
+
   </target>
 
   <target name="findbugs"
@@ -2383,6 +2325,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="jaspic-api.jar"/>
         <include name="servlet-api.jar"/>
         <include name="websocket-api.jar"/>
+        <include name="websocket-client-api.jar"/>
         <include name="tomcat-websocket.jar"/>
         <include name="tomcat-coyote.jar"/>
         <include name="tomcat-util.jar"/>
@@ -2991,6 +2934,12 @@ skip.installer property in build.properties" />
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
 
+    <!-- WebSocket Client API JAR File -->
+    <jarIt jarfile="${websocket-client-api-src.jar}"
+      filesDir="java"
+      filesId="files.websocket-client-api"
+      manifest="${tomcat.manifests}/websocket-client-api.jar.manifest" />
+
     <!-- JASPIC API JAR File -->
     <jarIt jarfile="${jaspic-api-src.jar}"
       filesDir="java"
@@ -3262,19 +3211,33 @@ skip.installer property in build.properties" />
 
   </target>
 
-  <target name="download-cobertura"
-          if="${test.cobertura}"
-          description="Download the Cobertura code coverage tool" >
+  <target name="download-jacoco"
+          description="Download the Jacoco code coverage tool" >
 
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${cobertura.loc}"/>
-      <param name="destfile" value="${cobertura.jar}"/>
-      <param name="checksum.enabled" value="${cobertura.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${cobertura.checksum.algorithm}"/>
-      <param name="checksum.value" value="${cobertura.checksum.value}"/>
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${jacoco.loc}"/>
+      <param name="destfile" value="${jacoco.jar}"/>
+      <param name="destdir" value="${jacoco.home}"/>
+      <param name="checksum.enabled" value="${jacoco.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${jacoco.checksum.algorithm}"/>
+      <param name="checksum.value" value="${jacoco.checksum.value}"/>
     </antcall>
 
   </target>
+
+  <target name="setup-jacoco" depends="download-jacoco">
+    <!-- Add JaCoCo tasks to project -->
+    <path id="jacoco.classpath">
+      <fileset file="${jacoco.jar}" />
+    </path>
+
+    <taskdef uri="antlib:org.jacoco.ant"
+             resource="org/jacoco/ant/antlib.xml"
+             classpathref="jacoco.classpath"
+             />
+
+  </target>
+
 
   <target name="download-findbugs"
           if="${execute.findbugs}"

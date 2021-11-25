@@ -108,6 +108,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     private SynchronizedStack<NioChannel> nioChannels;
 
+    private SocketAddress previousAcceptedSocketRemoteAddress = null;
+
 
     // ------------------------------------------------------------- Properties
 
@@ -510,7 +512,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
     @Override
     protected SocketChannel serverSocketAccept() throws Exception {
-        return serverSock.accept();
+        SocketChannel result = serverSock.accept();
+        SocketAddress currentRemoteAddress = result.getRemoteAddress();
+        if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress)) {
+            throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+        }
+        previousAcceptedSocketRemoteAddress = currentRemoteAddress;
+
+        return result;
     }
 
 
@@ -1243,8 +1252,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     if (n == -1) {
                         throw new EOFException();
                     } else if (n == 0) {
-                        readBlocking = true;
-                        registerReadInterest();
+                        if (!readBlocking) {
+                            readBlocking = true;
+                            registerReadInterest();
+                        }
                         synchronized (readLock) {
                             if (readBlocking) {
                                 try {
@@ -1257,7 +1268,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 } catch (InterruptedException e) {
                                     // Continue
                                 }
-                                readBlocking = false;
                             }
                         }
                     }

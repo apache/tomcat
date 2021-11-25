@@ -49,6 +49,7 @@ public class TestCookie {
         TOKEN.andNot(SEPARATORS); // or separators
     }
 
+    @SuppressWarnings("removal")
     @Test
     public void testDefaults() {
         Cookie cookie = new Cookie("foo", null);
@@ -58,6 +59,7 @@ public class TestCookie {
         Assert.assertEquals(-1, cookie.getMaxAge());
     }
 
+    @SuppressWarnings("removal")
     @Test
     public void testInitialValue() {
         Cookie cookie = new Cookie("foo", "bar");
@@ -68,7 +70,6 @@ public class TestCookie {
 
     @Test
     public void defaultImpliesNetscape() {
-        // $Foo is allowed by Netscape but not by RFC2109
         Cookie cookie = new Cookie("$Foo", null);
         Assert.assertEquals("$Foo", cookie.getName());
     }
@@ -128,13 +129,6 @@ public class TestCookie {
     }
 
     @Test
-    public void strictNamingImpliesRFC2109() {
-        // Needs to be something RFC6265 allows, but strict naming does not.
-        @SuppressWarnings("unused")
-        Cookie cookie = new Cookie("$Foo", null);
-    }
-
-    @Test
     public void testGetAttributes01() {
         Cookie cookie = new Cookie("name", "value");
         Assert.assertEquals(0, cookie.getAttributes().size());
@@ -179,6 +173,27 @@ public class TestCookie {
         Cookie cookie = new Cookie("name", "value");
         cookie.setAttribute("Max-Age", "bbb");
     }
+
+    @Test
+    public void testClone() {
+        Cookie a = new Cookie("a","a");
+        a.setDomain("domain");
+        a.setHttpOnly(true);
+        a.setMaxAge(123);
+        a.setPath("/path");
+        a.setSecure(true);
+
+        Cookie b = (Cookie) a.clone();
+
+        Assert.assertEquals("a", b.getName());
+        Assert.assertEquals("a", b.getValue());
+        Assert.assertEquals("domain", b.getDomain());
+        Assert.assertTrue(b.isHttpOnly());
+        Assert.assertEquals(123, b.getMaxAge());
+        Assert.assertEquals("/path", b.getPath());
+        Assert.assertTrue(b.getSecure());
+    }
+
 
     public static void checkCharInName(CookieNameValidator validator, BitSet allowed) {
         for (char ch = 0; ch < allowed.size(); ch++) {

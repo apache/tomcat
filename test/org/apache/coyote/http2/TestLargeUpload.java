@@ -42,6 +42,7 @@ import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.tomcat.util.net.TesterSupport;
 
 @RunWith(Parameterized.class)
 public class TestLargeUpload extends Http2TestBase {
@@ -53,6 +54,8 @@ public class TestLargeUpload extends Http2TestBase {
                 "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
@@ -154,7 +157,7 @@ public class TestLargeUpload extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
 
         if (needApr) {
             AprLifecycleListener listener = new AprLifecycleListener();

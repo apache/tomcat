@@ -498,6 +498,17 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return cachingAllowed;
     }
 
+
+    @Override
+    public CacheStrategy getCacheStrategy() {
+        return cache.getCacheStrategy();
+    }
+
+    @Override
+    public void setCacheStrategy(CacheStrategy strategy) {
+        cache.setCacheStrategy(strategy);
+    }
+
     @Override
     public long getCacheTtl() {
         return cache.getTtl();
@@ -677,14 +688,14 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
-        cacheJmxName = register(cache, getObjectNameKeyProperties() + ",name=Cache");
-
-        registerURLStreamHandlerFactory();
-
         if (context == null) {
             throw new IllegalStateException(
                     sm.getString("standardRoot.noContext"));
         }
+
+        cacheJmxName = register(cache, getObjectNameKeyProperties() + ",name=Cache");
+
+        registerURLStreamHandlerFactory();
 
         for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {

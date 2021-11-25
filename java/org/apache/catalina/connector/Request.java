@@ -2599,12 +2599,24 @@ public class Request implements HttpServletRequest {
             if (gssCredential != null) {
                 int left = -1;
                 try {
+                    // Concurrent calls to this method from an expired session
+                    // can trigger an ISE. If one thread calls logout() below
+                    // before another thread calls getRemainingLifetime() then
+                    // then since logout() eventually calls
+                    // GSSCredential.dispose(), the subsequent call to
+                    // GSSCredential.getRemainingLifetime() will throw an ISE.
+                    // Avoiding the ISE would require locking in this method to
+                    // protect against concurrent access to the GSSCredential.
+                    // That would have a small performance impact. The ISE is
+                    // rare so it is caught and handled rather than avoided.
                     left = gssCredential.getRemainingLifetime();
-                } catch (GSSException e) {
+                } catch (GSSException | IllegalStateException e) {
                     log.warn(sm.getString("coyoteRequest.gssLifetimeFail",
                             userPrincipal.getName()), e);
                 }
-                if (left == 0) {
+                // zero is expired. Exception above will mean left == -1
+                // Treat both as expired.
+                if (left <= 0) {
                     // GSS credential has expired. Need to re-authenticate.
                     try {
                         logout();
@@ -3124,17 +3136,8 @@ public class Request implements HttpServletRequest {
             try {
                 // We must unescape the '\\' escape character
                 Cookie cookie = new Cookie(scookie.getName().toString(),null);
-                int version = scookie.getVersion();
-                cookie.setVersion(version);
                 scookie.getValue().getByteChunk().setCharset(cookieProcessor.getCharset());
                 cookie.setValue(unescape(scookie.getValue().toString()));
-                cookie.setPath(unescape(scookie.getPath().toString()));
-                String domain = scookie.getDomain().toString();
-                if (domain!=null) {
-                    cookie.setDomain(unescape(domain));//avoid NPE
-                }
-                String comment = scookie.getComment().toString();
-                cookie.setComment(version==1?unescape(comment):null);
                 cookies[idx++] = cookie;
             } catch(IllegalArgumentException e) {
                 // Ignore bad cookie

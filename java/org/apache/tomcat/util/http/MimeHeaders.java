@@ -539,4 +539,9 @@ class MimeHeaderField {
     public MessageBytes getValue() {
         return valueB;
     }
+
+    @Override
+    public String toString() {
+        return nameB + ": " + valueB;
+    }
 }

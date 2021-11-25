@@ -100,7 +100,7 @@ public abstract class HttpServlet extends GenericServlet {
      *
      * @since Servlet 6.0
      */
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "Servlet 6.0")
     public static final String LEGACY_DO_HEAD = "jakarta.servlet.http.legacyDoHead";
 
     private final transient Object cachedAllowHeaderValueLock = new Object();

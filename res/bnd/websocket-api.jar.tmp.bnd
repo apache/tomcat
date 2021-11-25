@@ -18,7 +18,7 @@
 Bundle-Name: tomcat-websocket-api
 Bundle-SymbolicName: org.apache.tomcat-websocket-api
 Export-Package: \
-    jakarta.websocket.*;version=${websocket.spec.version}
+    jakarta.websocket.server.*;version=${websocket.spec.version}
 
 Provide-Capability: \
     osgi.contract;\
@@ -30,9 +30,6 @@ Require-Capability: \
     osgi.extender;\
         filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
     osgi.serviceloader;\
-        filter:="(osgi.serviceloader=jakarta.websocket.ContainerProvider)";\
-        osgi.serviceloader="jakarta.websocket.ContainerProvider",\
-    osgi.serviceloader;\
         filter:="(osgi.serviceloader=jakarta.websocket.server.ServerEndpointConfig$Configurator)";\
         osgi.serviceloader="jakarta.websocket.server.ServerEndpointConfig$Configurator",\
     osgi.ee;\
@@ -42,14 +39,18 @@ Require-Capability: \
     Specification-Title=Jakarta WebSocket;\
     Specification-Version=${websocket.spec.version};\
     Specification-Vendor=Eclipse Foundation;\
-    Implementation-Title=jakarta.websocket;\
+    Implementation-Title=jakarta.websocket.server;\
     Implementation-Version=${websocket.spec.version}.${websocket.revision};\
     Implementation-Vendor=Apache Software Foundation
 
 -jpms-module-info: \
     jakarta.websocket;\
         access=32;\
+        modules=jakarta.websocket.client;\
         version=${websocket.spec.version}
 -jpms-module-info-options: \
     jakarta.websocket;\
-        substitute=websocket-api
+        substitute=websocket-api,\
+    jakarta.websocket.client;\
+        transitive=true;\
+        static=false

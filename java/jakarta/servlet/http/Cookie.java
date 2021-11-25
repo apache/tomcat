@@ -17,8 +17,6 @@
 package jakarta.servlet.http;
 
 import java.io.Serializable;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.BitSet;
 import java.util.Collections;
@@ -53,60 +51,14 @@ import java.util.TreeMap;
  * cache pages that use cookies created with this class. This class does not
  * support the cache control defined with HTTP 1.1.
  * <p>
- * This class supports both the RFC 2109 and the RFC 6265 specifications.
- * By default, cookies are created using RFC 6265.
+ * This class supports both the RFC 6265 specification.
  */
 public class Cookie implements Cloneable, Serializable {
 
     private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
     private static final ResourceBundle LSTRINGS = ResourceBundle.getBundle(LSTRING_FILE);
 
-    private static final CookieNameValidator validation;
-
-    static {
-        boolean strictServletCompliance;
-        boolean strictNaming;
-        boolean allowSlash;
-        String propStrictNaming;
-        String propFwdSlashIsSeparator;
-
-        if (System.getSecurityManager() == null) {
-            strictServletCompliance = Boolean.getBoolean(
-                    "org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
-            propStrictNaming = System.getProperty(
-                    "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING");
-            propFwdSlashIsSeparator = System.getProperty(
-                    "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
-        } else {
-            strictServletCompliance = AccessController.doPrivileged(
-                    (PrivilegedAction<Boolean>) () -> Boolean.valueOf(System.getProperty(
-                            "org.apache.catalina.STRICT_SERVLET_COMPLIANCE"))).booleanValue();
-            propStrictNaming = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(
-                            "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING"));
-            propFwdSlashIsSeparator = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(
-                            "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR"));
-        }
-
-        if (propStrictNaming == null) {
-            strictNaming = strictServletCompliance;
-        } else {
-            strictNaming = Boolean.parseBoolean(propStrictNaming);
-        }
-
-        if (propFwdSlashIsSeparator == null) {
-            allowSlash = !strictServletCompliance;
-        } else {
-            allowSlash = !Boolean.parseBoolean(propFwdSlashIsSeparator);
-        }
-
-        if (strictNaming) {
-            validation = new RFC2109Validator(allowSlash);
-        } else {
-            validation = new RFC6265Validator();
-        }
-    }
+    private static final CookieNameValidator validation = new RFC6265Validator();
 
     private static final long serialVersionUID = 2L;
 
@@ -121,16 +73,10 @@ public class Cookie implements Cloneable, Serializable {
     private String value;
 
     /**
-     * Cookie version value. {@code ;Version=1 ...} means RFC 2109 style.
-     */
-    private int version = 0;
-
-    /**
      * Attributes encoded in the header's cookie fields.
      */
     private volatile Map<String,String> attributes;
 
-    private static final String COMMENT = "Comment";
     private static final String DOMAIN = "Domain";
     private static final String MAX_AGE = "Max-Age";
     private static final String PATH = "Path";
@@ -140,29 +86,19 @@ public class Cookie implements Cloneable, Serializable {
     /**
      * Constructs a cookie with a specified name and value.
      * <p>
-     * The name must conform to RFC 2109. That means it can contain only ASCII
-     * alphanumeric characters and cannot contain commas, semicolons, or white
-     * space or begin with a $ character. The cookie's name cannot be changed
-     * after creation.
+     * The cookie's name cannot be changed after creation.
      * <p>
      * The value can be anything the server chooses to send. Its value is
      * probably of interest only to the server. The cookie's value can be
      * changed after creation with the <code>setValue</code> method.
-     * <p>
-     * By default, cookies are created according to the Netscape cookie
-     * specification. The version can be changed with the
-     * <code>setVersion</code> method.
      *
      * @param name
      *            a <code>String</code> specifying the name of the cookie
      * @param value
      *            a <code>String</code> specifying the value of the cookie
      * @throws IllegalArgumentException
-     *             if the cookie name contains illegal characters (for example,
-     *             a comma, space, or semicolon) or it is one of the tokens
-     *             reserved for use by the cookie protocol
+     *             if the cookie name contains illegal characters
      * @see #setValue
-     * @see #setVersion
      */
     public Cookie(String name, String value) {
         validation.validate(name);
@@ -172,45 +108,43 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Specifies a comment that describes a cookie's purpose. The comment is
-     * useful if the browser presents the cookie to the user. Comments are not
-     * supported by Netscape Version 0 cookies.
+     * If called, this method has no effect.
      *
-     * @param purpose
-     *            a <code>String</code> specifying the comment to display to the
-     *            user
+     * @param purpose   ignored
+     *
      * @see #getComment
+     *
+     * @deprecated This is no longer required with RFC 6265
      */
+    @Deprecated(since = "Servlet 6.0", forRemoval = true)
     public void setComment(String purpose) {
-        setAttributeInternal(COMMENT, purpose);
+        // NO-OP
     }
 
 
     /**
-     * Returns the comment describing the purpose of this cookie, or
-     * <code>null</code> if the cookie has no comment.
+     * With the adoption of support for RFC 6265, this method should no longer be used.
      *
-     * @return a <code>String</code> containing the comment, or
-     *         <code>null</code> if none
+     * @return always {@code null}
+     *
      * @see #setComment
+     *
+     * @deprecated This is no longer required with RFC 6265
      */
+    @Deprecated(since = "Servlet 6.0", forRemoval = true)
     public String getComment() {
-        return getAttribute(COMMENT);
+        return null;
     }
 
 
     /**
      * Specifies the domain within which this cookie should be presented.
      * <p>
-     * The form of the domain name is specified by RFC 2109. A domain name
-     * begins with a dot (<code>.foo.com</code>) and means that the cookie is
-     * visible to servers in a specified Domain Name System (DNS) zone (for
-     * example, <code>www.foo.com</code>, but not <code>a.b.foo.com</code>). By
-     * default, cookies are only returned to the server that sent them.
+     * By default, cookies are only returned to the server that sent them.
      *
      * @param pattern
      *            a <code>String</code> containing the domain name within which
-     *            this cookie is visible; form is according to RFC 2109
+     *            this cookie is visible
      * @see #getDomain
      */
     public void setDomain(String pattern) {
@@ -224,8 +158,7 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Returns the domain name set for this cookie. The form of the domain name
-     * is set by RFC 2109.
+     * Returns the domain name set for this cookie.
      *
      * @return a <code>String</code> containing the domain name
      * @see #setDomain
@@ -285,9 +218,6 @@ public class Cookie implements Cloneable, Serializable {
      * include the servlet that set the cookie, for example, <i>/catalog</i>,
      * which makes the cookie visible to all directories on the server under
      * <i>/catalog</i>.
-     * <p>
-     * Consult RFC 2109 (available on the Internet) for more information on
-     * setting path names for cookies.
      *
      * @param uri
      *            a <code>String</code> specifying a path
@@ -334,7 +264,7 @@ public class Cookie implements Cloneable, Serializable {
      * using any protocol.
      *
      * @return <code>true</code> if the browser uses a secure protocol;
-     *         otherwise, <code>true</code>
+     *         otherwise, <code>false</code>
      * @see #setSecure
      */
     public boolean getSecure() {
@@ -385,35 +315,32 @@ public class Cookie implements Cloneable, Serializable {
 
 
     /**
-     * Returns the version of the protocol this cookie complies with. Version 1
-     * complies with RFC 2109, and version 0 complies with the original cookie
-     * specification drafted by Netscape. Cookies provided by a browser use and
-     * identify the browser's cookie version.
+     * With the adoption of support for RFC 6265, this method should no longer be used.
      *
-     * @return 0 if the cookie complies with the original Netscape specification;
-     *         1 if the cookie complies with RFC 2109
+     * @return Always zero
+     *
      * @see #setVersion
+     *
+     * @deprecated This is no longer required with RFC 6265
      */
+    @Deprecated(since = "Servlet 6.0", forRemoval = true)
     public int getVersion() {
-        return version;
+        return 0;
     }
 
 
     /**
-     * Sets the version of the cookie protocol this cookie complies with.
-     * Version 0 complies with the original Netscape cookie specification.
-     * Version 1 complies with RFC 2109.
-     * <p>
-     * Since RFC 2109 is still somewhat new, consider version 1 as experimental;
-     * do not use it yet on production sites.
+     * If called, this method has no effect.
      *
-     * @param v
-     *            0 if the cookie should comply with the original Netscape
-     *            specification; 1 if the cookie should comply with RFC 2109
+     * @param v Ignored
+     *
      * @see #getVersion
+     *
+     * @deprecated This is no longer required with RFC 6265
      */
+    @Deprecated(since = "Servlet 6.0", forRemoval = true)
     public void setVersion(int v) {
-        version = v;
+        // NO-OP
     }
 
 
@@ -553,7 +480,6 @@ public class Cookie implements Cloneable, Serializable {
         result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((value == null) ? 0 : value.hashCode());
-        result = prime * result + version;
         return result;
     }
 
@@ -589,9 +515,6 @@ public class Cookie implements Cloneable, Serializable {
                 return false;
             }
         } else if (!value.equals(other.value)) {
-            return false;
-        }
-        if (version != other.version) {
             return false;
         }
         return true;
@@ -642,23 +565,5 @@ class RFC6265Validator extends CookieNameValidator {
 
     RFC6265Validator() {
         super(RFC2616_SEPARATORS);
-    }
-}
-
-class RFC2109Validator extends RFC6265Validator {
-    RFC2109Validator(boolean allowSlash) {
-        // special treatment to allow for FWD_SLASH_IS_SEPARATOR property
-        if (allowSlash) {
-            allowed.set('/');
-        }
-    }
-
-    @Override
-    void validate(String name) {
-        super.validate(name);
-        if (name.charAt(0) == '$') {
-            String errMsg = lStrings.getString("err.cookie_name_is_token");
-            throw new IllegalArgumentException(MessageFormat.format(errMsg, name));
-        }
     }
 }

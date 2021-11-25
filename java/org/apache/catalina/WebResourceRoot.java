@@ -85,7 +85,7 @@ import java.util.Set;
 public interface WebResourceRoot extends Lifecycle {
     /**
      * Obtain the object that represents the resource at the given path. Note
-     * that the resource at that path may not exist. If the path does not
+     * that the resource at that path may not exist. If the resource does not
      * exist, the WebResource returned will be associated with the main
      * WebResourceSet.
      *
@@ -98,7 +98,7 @@ public interface WebResourceRoot extends Lifecycle {
 
     /**
      * Obtain the objects that represent the resource at the given path. Note
-     * that the resource at that path may not exist. If the path does not
+     * that the resource at that path may not exist. If the resource does not
      * exist, the WebResource returned will be associated with the main
      * WebResourceSet. This will include all matches even if the resource would
      * not normally be accessible (e.g. because it was overridden by another
@@ -431,10 +431,54 @@ public interface WebResourceRoot extends Lifecycle {
      */
     void gc();
 
+    /**
+     * Obtain the current caching strategy.
+     * <p>
+     * The default implementation returns {@code null}. Sub-classes wishing to
+     * utilise a {@link CacheStrategy} should provide an appropriate
+     * implementation.
+     *
+     * @return the current caching strategy or {@code null} if no strategy has
+     *         been configured
+     */
+    default CacheStrategy getCacheStrategy() {
+        return null;
+    }
+
+    /**
+     * Set the current caching strategy.
+     * <p>
+     * The default implementation is a NO-OP. Sub-classes wishing to utilise a
+     * {@link CacheStrategy} should provide an appropriate implementation.
+     *
+     * @param strategy The new strategy to use or {@code null} for no strategy
+     */
+    default void setCacheStrategy(CacheStrategy strategy) {
+        // NO-OP
+    }
+
     enum ResourceSetType {
         PRE,
         RESOURCE_JAR,
         POST,
         CLASSES_JAR
+    }
+
+    /**
+     * Provides a mechanism to modify the caching behaviour.
+     */
+    interface CacheStrategy {
+
+        /**
+         * Should the result of looking up the resource at the given path be
+         * excluded from caching?
+         *
+         * @param path  The path to check against the strategy to see if the
+         *              result should be cached
+         *
+         * @return {@code true} if the result should not be cached, otherwise
+         *         {@code false}
+         */
+        boolean noCache(String path);
     }
 }

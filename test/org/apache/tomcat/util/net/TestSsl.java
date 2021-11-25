@@ -75,6 +75,8 @@ public class TestSsl extends TomcatBaseTest {
                 "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
@@ -101,7 +103,7 @@ public class TestSsl extends TomcatBaseTest {
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
-        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
 
         if (needApr) {
             AprLifecycleListener listener = new AprLifecycleListener();
@@ -135,7 +137,7 @@ public class TestSsl extends TomcatBaseTest {
         Connector connector = tomcat.getConnector();
         // Increase timeout as default (3s) can be too low for some CI systems
         Assert.assertTrue(connector.setProperty("connectionTimeout", "20000"));
-        Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
 
         if (needApr) {
             AprLifecycleListener listener = new AprLifecycleListener();
@@ -226,7 +228,7 @@ public class TestSsl extends TomcatBaseTest {
         TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
                 TesterSupport.JKS_PASS, TesterSupport.JKS_KEY_PASS);
 
-        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
 
         if (needApr) {
             AprLifecycleListener listener = new AprLifecycleListener();
@@ -250,7 +252,7 @@ public class TestSsl extends TomcatBaseTest {
 
         TesterSupport.initSsl(tomcat);
 
-        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
 
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isClientRenegotiationSupported(getTomcatInstance()));

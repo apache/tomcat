@@ -90,7 +90,7 @@ import org.apache.tomcat.util.security.PermissionCheck;
  * behavior may be completely different.
  * <p>
  * <strong>IMPLEMENTATION NOTE</strong> - By default, this class loader follows
- * the delegation model required by the specification. The system class
+ * the delegation model required by the specification. The bootstrap class
  * loader will be queried first, then the local repositories, and only then
  * delegation to the parent class loader will occur. This allows the web
  * application to override any shared class except the classes from J2SE.
@@ -1315,7 +1315,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 return clazz;
             }
 
-            // (0.2) Try loading the class with the system class loader, to prevent
+            // (0.2) Try loading the class with the bootstrap class loader, to prevent
             //       the webapp from overriding Java SE classes. This implements
             //       SRV.10.7.2
             String resourceName = binaryNameToPath(name, false);

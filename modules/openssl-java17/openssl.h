@@ -1,12 +1,11 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
+/* Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jakarta.servlet.http;
 
-import org.junit.Test;
+#include <openssl/opensslv.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/pkcs12.h>
+#include <openssl/crypto.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+#include <openssl/x509v3.h>
+#include <openssl/dh.h>
+#include <openssl/bn.h>
+#include <openssl/engine.h>
+#include <openssl/ocsp.h>
 
-/**
- * Basic tests for Cookie in default configuration.
- */
-public class TestCookieRFC2109Validator {
-
-    private RFC2109Validator validator = new RFC2109Validator(false);
-
-    @Test
-    public void actualCharactersAllowedInName() {
-        TestCookie.checkCharInName(validator, TestCookie.TOKEN);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void leadingDollar() {
-        validator.validate("$Version");
-    }
-}

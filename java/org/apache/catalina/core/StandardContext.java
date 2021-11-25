@@ -697,7 +697,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Enables the RMI Target memory leak detection to be controlled. This is
-     * necessary since the detection can only work  if some of the modularity
+     * necessary since the detection can only work if some of the modularity
      * checks are disabled.
      */
     private boolean clearReferencesRmiTargets = true;
@@ -6441,14 +6441,12 @@ public class StandardContext extends ContainerBase
 
         @Override
         public int getEffectiveMajorVersion() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
+            return sc.getEffectiveMajorVersion();
         }
 
         @Override
         public int getEffectiveMinorVersion() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
+            return sc.getEffectiveMinorVersion();
         }
 
         @Override
@@ -6641,14 +6639,12 @@ public class StandardContext extends ContainerBase
 
         @Override
         public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
+            return sc.getDefaultSessionTrackingModes();
         }
 
         @Override
         public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
+            return sc.getEffectiveSessionTrackingModes();
         }
 
         @Override
@@ -6678,14 +6674,12 @@ public class StandardContext extends ContainerBase
 
         @Override
         public JspConfigDescriptor getJspConfigDescriptor() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
+            return sc.getJspConfigDescriptor();
         }
 
         @Override
         public ClassLoader getClassLoader() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
+            return sc.getClassLoader();
         }
 
         @Override
@@ -6701,8 +6695,7 @@ public class StandardContext extends ContainerBase
 
         @Override
         public int getSessionTimeout() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
+            return sc.getSessionTimeout();
         }
 
         @Override
@@ -6713,8 +6706,7 @@ public class StandardContext extends ContainerBase
 
         @Override
         public String getRequestCharacterEncoding() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
+            return sc.getRequestCharacterEncoding();
         }
 
         @Override
@@ -6725,8 +6717,7 @@ public class StandardContext extends ContainerBase
 
         @Override
         public String getResponseCharacterEncoding() {
-            throw new UnsupportedOperationException(
-                    sm.getString("noPluggabilityServletContext.notAllowed"));
+            return sc.getResponseCharacterEncoding();
         }
 
         @Override

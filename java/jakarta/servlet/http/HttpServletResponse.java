@@ -341,7 +341,7 @@ public interface HttpServletResponse extends ServletResponse {
     }
 
     /*
-     * Server status codes; see RFC 2068.
+     * Server status codes; see RFC 7231.
      */
 
     /**

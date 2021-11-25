@@ -38,7 +38,7 @@
 </section>
 
 <section name="Application development">
-<p>Tomcat implements the Jakarta WebSocket 2.0 API defined by the <a
+<p>Tomcat implements the Jakarta WebSocket 2.1 API defined by the <a
    href="https://projects.eclipse.org/projects/ee4j.websocket">Jakarta
    WebSocket</a> project.</p>
 

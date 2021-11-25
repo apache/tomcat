@@ -927,9 +927,6 @@ public class Response implements HttpServletResponse {
 
         String header = generateCookieString(cookie);
         //if we reached here, no exception, cookie is valid
-        // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
-        // RFC2965 is not supported by browsers and the Servlet spec
-        // asks for 2109.
         addHeader("Set-Cookie", header, getContext().getCookieProcessor().getCharset());
     }
 

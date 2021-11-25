@@ -104,7 +104,73 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.0-M7 (markt)" rtext="in development">
+<section name="Tomcat 10.1.0-M8 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Log warning if a listener is not nested inside a Server element
+        although it must have been. (michaelo)
+      </update>
+      <fix>
+        Where the getter can be called safely, remove the checks for
+        <code>ServletContext</code> getters called from a
+        <code>contextInitialized()</code> method of a
+        <code>ServletContextListener</code> that was not defined in a
+        <code>web.xml</code> file, a <code>web-fragment.xml</code> file nor
+        annotated with <code>WebListener</code>. (markt)
+      </fix>
+      <fix>
+        Make SPNEGO authentication more robust for the case where the provided
+        credential has expired. (markt)
+      </fix>
+      <fix>
+        Limit cookie support to RFC 6265 to align with recent updates to the
+        Servlet specification. (markt)
+      </fix>
+      <fix>
+        <bug>65684</bug>: Fix a potential <code>NullPointerException</code> when
+        using JULI. (markt)
+      </fix>
+      <docs>
+        Document conditions under which the <code>AprLifecycleListener</code>
+        can be used to avoid JVM crashes. (michaelo)
+      </docs>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Use implicit scopes in the OpenSSL Panama module to tie the cleanup of
+        OpenSSL memory to the Java GC. (remm)
+      </add>
+      <add>
+        Provide protection against a known <a
+        href="https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1924298">OS
+        bug</a> that causes the acceptor to report an incoming connection more
+        than once. (markt)
+      </add>
+      <fix>
+        Avoid unnecessary duplicate read registrations for blocking I/O with the
+        NIO connector. (markt)
+      </fix>
+      <fix>
+        <bug>65677</bug>: Improve exception handling for errors during HTTP/1.1
+        reads with NIO2. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        Update the WebSocket API packaging to remove the copy of the client API
+        from the server API and replace it with a dependency on the client API.
+        This aligns Tomcat with changes in the WebSocket 2.1 specification.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 10.1.0-M7 (markt)" rtext="2021-11-15">
   <subsection name="Catalina">
     <changelog>
       <scode>
@@ -147,10 +213,11 @@
         Add Javadoc comment which listeners must be nested whithin
         <code>Server</code> elements only. (michaelo)
       </docs>
-      <docs>
-        Document conditions under which the <code>AprLifecycleListener</code>
-        can be used to avoid JVM crashes. (michaelo)
-      </docs>
+      <add>
+        Add support for custom caching strategies for web application resources.
+        This initial implementation allows control over whether or not a
+        resource is cached. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -159,6 +226,16 @@
         Improve performance of Connector shutdown - primarily to reduce the time
         it takes to run the test suite. (markt)
       </scode>
+      <add>
+        <pr>457</pr>: Add a <code>toString()</code> method to
+        <code>MimeHeader</code> to aid debugging. (dblevins)
+      </add>
+      <add>
+        Add experimental OpenSSL support through the Panama API incubating in
+        Java 17, with support for OpenSSL 1.1+. This no longer requires
+        tomcat-native or APR. Please refer to the <code>openssl-java17</code>
+        module for more details. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -208,6 +285,15 @@
         <pr>454</pr>: Differentiate warning messages in
         <code>KubernetesMembershipProvider</code> so that the missing attribute
         is clear to the user. PR provided by Hal Deadman. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Switch from Cobertura to JaCoCo for code coverage as Cobertura does not
+        support code coverage for code compiled for Java 11 onwards. It also
+        removes the need to use a single thread to run the tests. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -484,8 +570,12 @@
         1.16-SNAPSHOT). Minor refactoring. (markt)
       </add>
       <add>
-        Update the internal fork of Apache Commons FileUpload to 33d2d79
-        (2021-09-01, 2.0-SNAPSHOT). Refactoring and code clean-up. (markt)
+        <bug>65661</bug>: Update the internal fork of Apache Commons FileUpload
+        to 33d2d79 (2021-09-01, 2.0-SNAPSHOT). Refactoring and code clean-up. As
+        a result of Commons File Upload now using
+        <code>java.nio.file.Files</code>, applications using multi-part uploads
+        need to ensure that the JVM is configured with sufficient direct memory
+        to store all in progress multi-part uploads. (markt)
       </add>
       <add>
         Update the internal fork of Apache Commons Pool to 2.11.1 (2021-08-17).

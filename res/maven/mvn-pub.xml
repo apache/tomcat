@@ -331,6 +331,10 @@
                    jarFileName="websocket-api.jar"
                 srcJarFileName="websocket-api-src.jar"/>
 
+     <doMavenInstall artifactId="tomcat-websocket-client-api"
+                   jarFileName="websocket-client-api.jar"
+                srcJarFileName="websocket-client-api-src.jar"/>
+
      <doMavenInstall artifactId="tomcat-jaspic-api"
                    jarFileName="jaspic-api.jar"
                 srcJarFileName="jaspic-api-src.jar"/>
@@ -434,6 +438,10 @@
                   jarFileName="websocket-api.jar"
                srcJarFileName="websocket-api-src.jar"/>
 
+    <doMavenDeploy artifactId="tomcat-websocket-client-api"
+                  jarFileName="websocket-client-api.jar"
+               srcJarFileName="websocket-client-api-src.jar"/>
+
     <doMavenDeploy artifactId="tomcat-jaspic-api"
                   jarFileName="jaspic-api.jar"
                srcJarFileName="jaspic-api-src.jar"/>
@@ -502,6 +510,7 @@
   </target>
 
   <target name="deploy-release">
+    <fail unless="gpg.exec.available">GPG is required, but was not found at ${gpg.exec}</fail>
     <antcall target="generic-deploy">
       <param name="maven.repo.repositoryId"
              value="${maven.asf.release.repo.repositoryId}"/>

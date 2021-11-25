@@ -35,6 +35,7 @@ import org.apache.catalina.tribes.TesterUtil;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.InterceptorPayload;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 
 public class TestOrderInterceptor {
 
@@ -55,7 +56,7 @@ public class TestOrderInterceptor {
         threads = new Thread[channelCount];
         for ( int i=0; i<channelCount; i++ ) {
             channels[i] = new GroupChannel();
-
+            ((ReceiverBase) channels[i].getChannelReceiver()).setHost("localhost");
             orderitcs[i] = new OrderInterceptor();
             mangleitcs[i] = new MangleOrderInterceptor();
             orderitcs[i].setExpire(Long.MAX_VALUE);
@@ -80,10 +81,20 @@ public class TestOrderInterceptor {
         for ( int i=0; i<channelCount; i++ ) {
           threads[i].start();
         }
-        for ( int i=0; i<channelCount; i++ ) {
-          threads[i].join();
+
+        int totalSleep = 0;
+
+        for (int i = 0; i < channelCount; i++) {
+            Member[] m = channels[i].getMembers();
+            while (m == null || m.length < channelCount - 1) {
+                totalSleep += 50;
+                if (totalSleep > 60000) {
+                    Assert.fail("Cluster took more than 60s to start");
+                }
+                Thread.sleep(50);
+                m = channels[i].getMembers();
+            }
         }
-        Thread.sleep(1500);
     }
 
     @Test

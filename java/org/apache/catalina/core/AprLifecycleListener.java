@@ -127,6 +127,10 @@ public class AprLifecycleListener implements LifecycleListener {
 
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
             synchronized (lock) {
+                if (!(event.getLifecycle() instanceof Server)) {
+                    log.warn(sm.getString("listener.notServer",
+                            event.getLifecycle().getClass().getSimpleName()));
+                }
                 init();
                 for (String msg : initInfoLogMessages) {
                     log.info(msg);
