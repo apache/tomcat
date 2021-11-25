@@ -43,7 +43,7 @@ import org.apache.tomcat.util.res.StringManager;
  * This listener must only be nested within {@link Server} elements.
  * <p>
  * <strong>Note</strong>: If you are running Tomcat in an embedded fashion and
- * have more than one Tomcat instance per JVM, this listener <em>must not</em>
+ * have more than one Server instance per JVM, this listener <em>must not</em>
  * be added to the {@code Server} instances, but handled outside by the calling
  * code which is bootstrapping the embedded Tomcat instances. Not doing so will
  * lead to JVM crashes.
