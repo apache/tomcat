@@ -33,8 +33,6 @@ import java.util.logging.LogRecord;
  *    Default value: <code>1</code></li>
  *   <li><code>org.apache.juli.AsyncMaxRecordCount</code>
  *    Default value: <code>10000</code></li>
- *   <li><code>org.apache.juli.AsyncLoggerPollInterval</code>
- *    Default value: <code>1000</code></li>
  * </ul>
  *
  * <p>See the System Properties page in the configuration reference of Tomcat.</p>
@@ -48,7 +46,6 @@ public class AsyncFileHandler extends FileHandler {
 
     public static final int DEFAULT_OVERFLOW_DROP_TYPE = 1;
     public static final int DEFAULT_MAX_RECORDS        = 10000;
-    public static final int DEFAULT_LOGGER_SLEEP_TIME  = 1000;
 
     public static final int OVERFLOW_DROP_TYPE = Integer.parseInt(
             System.getProperty("org.apache.juli.AsyncOverflowDropType",
@@ -56,9 +53,6 @@ public class AsyncFileHandler extends FileHandler {
     public static final int MAX_RECORDS = Integer.parseInt(
             System.getProperty("org.apache.juli.AsyncMaxRecordCount",
                                Integer.toString(DEFAULT_MAX_RECORDS)));
-    public static final int LOGGER_SLEEP_TIME = Integer.parseInt(
-            System.getProperty("org.apache.juli.AsyncLoggerPollInterval",
-                               Integer.toString(DEFAULT_LOGGER_SLEEP_TIME)));
 
     protected static final LinkedBlockingDeque<LogEntry> queue =
             new LinkedBlockingDeque<>(MAX_RECORDS);
@@ -206,10 +200,8 @@ public class AsyncFileHandler extends FileHandler {
         public void run() {
             while (true) {
                 try {
-                    LogEntry entry = queue.poll(LOGGER_SLEEP_TIME, TimeUnit.MILLISECONDS);
-                    if (entry != null) {
-                        entry.flush();
-                    }
+                    LogEntry entry = queue.take();
+                    entry.flush();
                 } catch (InterruptedException x) {
                     // Ignore the attempt to interrupt the thread.
                 } catch (Exception x) {

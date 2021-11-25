@@ -139,6 +139,11 @@
         Refactor the <code>AsyncFileHandler</code> to reduce the possibility of
         log messages being lost on shutdown. (markt)
       </fix>
+      <update>
+        Refactor the <code>AsyncFileHandler</code> to remove the need for the
+        <code>org.apache.juli.AsyncLoggerPollInterval</code>. If set, this
+        property now has no effect. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
