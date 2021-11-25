@@ -144,6 +144,10 @@
         <code>org.apache.juli.AsyncLoggerPollInterval</code>. If set, this
         property now has no effect. (markt)
       </update>
+      <add>
+        Add debug logging to the <code>RestCsrfPreventionFilter</code>. Based on
+        pull request <pr>452</pr> by Polina Georgieva. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
