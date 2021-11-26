@@ -333,7 +333,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         State state = new State(request, response, false);
 
         if (WRAP_SAME_OBJECT) {
-            // Check SRV.8.2 / SRV.14.2.5.1 compliance
+            // Check SRV.9.2 / RequestDispacther Javadoc
             checkSameObjects(request, response);
         }
 
