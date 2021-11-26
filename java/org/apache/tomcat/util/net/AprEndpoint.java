@@ -494,6 +494,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // Stop the Poller calling select
             poller.stop();
 
+            if (getUseSendfile()) {
+                sendfile.stop();
+            }
+
             // Wait for the acceptor to shutdown.
             // Should only be one thread but retain this code in case the
             // acceptor start has been customised.
@@ -534,8 +538,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
             if (getUseSendfile()) {
                 try {
-                    sendfile.stop();
-
                     // Wait for the sendfile thread to exit, otherwise parallel
                     // destruction of sockets which are still in the poller can cause
                     // problems.
@@ -552,12 +554,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     if (sendfile.sendfileThread.isAlive()) {
                         log.warn(sm.getString("endpoint.sendfileThreadStop"));
                     }
-
-                    sendfile.destroy();
                 } catch (Exception e) {
                     // Ignore
                 }
-                sendfile = null;
             }
 
             // Close the SocketWrapper for each open connection - this should
@@ -582,6 +581,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 // poller since that will also destroy the root pool for these
                 // sockets.
                 Socket.shutdown(socket.longValue(), Socket.APR_SHUTDOWN_READWRITE);
+            }
+
+            if (getUseSendfile()) {
+                try {
+                    sendfile.destroy();
+                } catch (Exception e) {
+                    // Ignore
+                }
+                sendfile = null;
             }
 
             try {
@@ -1875,6 +1883,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
          *              otherwise
          */
         public SendfileState add(SendfileData data) {
+
+            SocketWrapperBase<Long> socketWrapper = connections.get(Long.valueOf(data.socket));
+
+            // Use the blocking status write lock as a proxy for a lock on
+            // writing to the socket. Don't want it to close in another thread
+            // while this thread is writing as that could trigger a JVM crash.
+            WriteLock wl = ((AprSocketWrapper) socketWrapper).getBlockingStatusWriteLock();
+            wl.lock();
+
             // Initialize fd from data given
             try {
                 data.fdpool = Socket.pool(data.socket);
@@ -1911,6 +1928,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             } catch (Exception e) {
                 log.warn(sm.getString("endpoint.sendfile.error"), e);
                 return SendfileState.ERROR;
+            } finally {
+                wl.unlock();
             }
             // Add socket to the list. Newly added sockets will wait
             // at most for pollTime before being polled
