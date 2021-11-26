@@ -2,28 +2,32 @@
 
 ## This module is experimental
 
-It uses the incubating JEP 412 Java API, and is not supported at this time.
-More details on this API are available at `https://openjdk.java.net/jeps/412`.
+It uses the incubating JEP 412 API. More details on this API are available
+at `https://openjdk.java.net/jeps/412`.
 
 ## Building
 
 The module can be built using Java 17. This will be the only Java version that
-is supported as the foreign API is incubating and will continue to evolve.
-```
-mvn package
-```
-Note: The build path for the JDK will be different on other platforms.
+is supported as the JEP 412 API is incubating and will continue to evolve.
 
-## Running in Tomcat
+## Running
+
+The module uses the OpenSSL 1.1 API. It requires an API compatible version of
+OpenSSL or a compatible alternative library, that can be loaded from the JVM
+library path.
 
 Copy `tomcat-openssl-1.0.jar` to the Apache Tomcat `lib` folder.
 
-The module requires OpenSSL 1.1 or a newer API compatible version or
-alternative, available from the system library path.
+Remove `AprLifecycleListener` from `server.xml`. The
+`org.apache.tomcat.util.net.openssl.panama.OpenSSLLifecycleListener` can be
+used as a replacement with the same configuration options (such as FIPS)
+and shutdown cleanup, but is not required.
 
-Remove `AprLifecycleListener` from `server.xml`.
+Define a `Connector` using the value
+`org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation` for the
+`sslImplementationName` attribute.
 
-Use a connector like:
+Example connector:
 ```
     <Connector port="8443" protocol="HTTP/1.1"
                SSLEnabled="true" scheme="https" secure="true"
@@ -38,7 +42,9 @@ Use a connector like:
         <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
     </Connector>
 ```
-Run Tomcat using:
+
+Run Tomcat using the additional Java options that allow access to the API and
+native code:
 ```
 export JAVA_OPTS="--enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.foreign"
 ```
@@ -85,7 +91,7 @@ index dc1260b..dd9fba9 100644
            <classpath refid="tomcat.test.classpath" />
 ```
 
-## Generating OpenSSL API code using jextract (optional)
+## Generating the OpenSSL API code using jextract (optional)
 
 This step is only useful to be able to use additional native APIs from OpenSSL
 or stdlib.
