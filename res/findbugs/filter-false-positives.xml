@@ -708,6 +708,20 @@
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
+    <!-- Expected. Statement is being generated from configuration. -->
+    <Class name="org.apache.catalina.users.DataSourceUserDatabase"/>
+    <Or>
+      <Method name="findGroupInternal"/>
+      <Method name="findRoleInternal"/>
+      <Method name="findUserInternal"/>
+      <Method name="getGroups"/>
+      <Method name="getRoles"/>
+      <Method name="getUsers"/>
+      <Method name="saveInternal"/>
+    </Or>
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.util.LifecycleBase" />
     <Method name="getState"/>
     <Bug code="UG" />
@@ -997,6 +1011,12 @@
     <Bug code="ES"/>
   </Match>
   <Match>
+    <!--  Dummy thread -->
+    <Class name="org.apache.juli.AsyncFileHandler$LoggerThread"/>
+    <Method name="deregisterHandler"/>
+    <Bug pattern="DM_USELESS_THREAD"/>
+  </Match>
+  <Match>
     <!-- Stream is closed in o.a.juli.ClassLoaderLogManager.readConfiguration
          (InputStream, ClassLoader) -->
     <Class name="org.apache.juli.ClassLoaderLogManager"/>
@@ -1100,6 +1120,15 @@
     </Or>
     <Method name="validateObject" />
     <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
+  </Match>
+  <Match>
+    <!-- Commons DBCP 2 code Tomcat does not control -->
+    <Class name="org.apache.tomcat.dbcp.dbcp2.datasources.UserPassKey" />
+    <Or>
+      <Field name="name" />
+      <Field name="password" />
+    </Or>
+    <Bug pattern="SE_BAD_FIELD" />
   </Match>
   <Match>
     <!-- Pooled objects can't be null so this is OK -->
@@ -1283,6 +1312,15 @@
       <Method name="hashCode" />
     </Or>
     <Bug pattern="DMI_BLOCKING_METHODS_ON_URL" />
+  </Match>
+  <Match>
+    <!--  Returning of null is deliberate -->
+    <Class name="org.apache.tomcat.util.descriptor.web.SessionConfig"/>
+    <Or>
+      <Method name="getCookieHttpOnly"/>
+      <Method name="getCookieSecure"/>
+    </Or>
+    <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
   </Match>
   <Match>
     <!-- NPE is desired as it indicates an error condition -->
@@ -1477,6 +1515,12 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Field is updated inside a lock. -->
+    <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
+    <Method name="runWorker" />
+    <Bug pattern="VO_VOLATILE_INCREMENT " />
+  </Match>
+  <Match>
     <!-- Monitor is used for a single condition. No need for loop. -->
     <Class name="org.apache.tomcat.util.threads.InlineExecutorService" />
     <Method name="awaitTermination" />
@@ -1493,6 +1537,12 @@
     <Class name="org.apache.tomcat.websocket.Util"/>
     <Method name="generateMask"/>
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- Access is single-threaded (but may switch between threads). -->
+    <Class name="org.apache.tomcat.websocket.WsFrameBase$UnmaskTransformation" />
+    <Method name="getMoreData" />
+    <Bug pattern="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
     <!-- Object creation will trigger input processing. -->
@@ -1930,6 +1980,15 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Non-constant is just a split constant -->
+    <Class name="org.apache.catalina.users.DataSourceUserDatabaseTests"/>
+    <Or>
+      <Method name="testBasicUserRoleDatabase"/>
+      <Method name="testUserDatabase"/>
+    </Or>
+    <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
+  </Match>
+  <Match>
     <!-- Concrete Map type not affected -->
     <Class name="org.apache.catalina.util.TestParameterMap" />
     <Method name="testEntrySetImmutabilityAfterLocked" />
@@ -2130,6 +2189,12 @@
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
   </Match>
   <Match>
+    <!-- Use of static is unavoidable -->
+    <Class name="org.apache.tomcat.jdbc.test.TestStatementCache$TestStatementCacheInterceptor" />
+    <Method name="&lt;init&gt;" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+  </Match>
+  <Match>
     <!-- Tests throw exceptions so connections are never created -->
     <Class name="org.apache.tomcat.jdbc.test.TestValidationQueryTimeout" />
     <Or>
@@ -2146,6 +2211,12 @@
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
   </Match>
   <Match>
+    <!-- Use of static is unavoidable -->
+    <Class name="org.apache.tomcat.jdbc.test.TestValidationQueryTimeout$MockStatement" />
+    <Method name="setQueryTimeout" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.jdbc.test.TwoDataSources" />
     <Method name="testTwoDataSources" />
     <Or>
@@ -2154,6 +2225,11 @@
       <!-- The connection should be close by the pool -->
       <Bug pattern="ODR_OPEN_DATABASE_RESOURCE" />
     </Or>
+  </Match>
+  <Match>
+    <!--  Deprecated native code -->
+    <Class name="org.apache.tomcat.jni.FileInfo"/>
+    <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD"/>
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.http.TestCookieParsing$EchoCookieHeader"/>
