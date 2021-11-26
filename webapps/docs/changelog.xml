@@ -158,6 +158,10 @@
         <bug>65677</bug>: Improve exception handling for errors during HTTP/1.1
         reads with NIO2. (markt)
       </fix>
+      <fix>
+        Refactor APR/native connector shutdown to remove a potential source of
+        JVM crashes on shutdown when sendfile is used. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
