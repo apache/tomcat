@@ -65,8 +65,8 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
             if (event.getSource() instanceof Server) {
                 createMBean((Server) event.getSource());
             } else {
-                log.warn("This listener must only be nested within Server elements, but is in [" +
-                        event.getLifecycle().getClass().getSimpleName() + "].");
+                log.warn(sm.getString("storeConfigListener.notServer",
+                        event.getLifecycle().getClass().getSimpleName()));
             }
         } else if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
             if (oname != null) {
