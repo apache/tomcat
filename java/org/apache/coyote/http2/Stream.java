@@ -614,8 +614,14 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     log.debug(sm.getString("stream.reset.send", getConnectionId(), getIdAsString(),
                             se.getError()));
                 }
-                state.sendReset();
-                handler.sendStreamReset(se);
+                // Sync ensures that if the call to sendReset() triggers resets
+                // in other threads, that the RST frame associated with this
+                // thread is sent before the RST frames associated with those
+                // threads.
+                synchronized (state) {
+                    state.sendReset();
+                    handler.sendStreamReset(se);
+                }
                 cancelAllocationRequests();
                 if (inputBuffer != null) {
                     inputBuffer.swallowUnread();
