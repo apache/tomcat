@@ -60,15 +60,6 @@ public class StatusManagerServlet
 
 
     /**
-     * Vector of protocol handlers object names.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.1.x
-     */
-    @Deprecated
-    protected final Vector<ObjectName> protocolHandlers = new Vector<>();
-
-
-    /**
      * Vector of thread pools object names.
      */
     protected final Vector<ObjectName> threadPools = new Vector<>();
@@ -107,21 +98,11 @@ public class StatusManagerServlet
 
         try {
 
-            // Query protocol handlers
-            String onStr = "*:type=ProtocolHandler,*";
+            // Query Thread Pools
+            String onStr = "*:type=ThreadPool,*";
             ObjectName objectName = new ObjectName(onStr);
             Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
             Iterator<ObjectInstance> iterator = set.iterator();
-            while (iterator.hasNext()) {
-                ObjectInstance oi = iterator.next();
-                protocolHandlers.addElement(oi.getObjectName());
-            }
-
-            // Query Thread Pools
-            onStr = "*:type=ThreadPool,*";
-            objectName = new ObjectName(onStr);
-            set = mBeanServer.queryMBeans(objectName, null);
-            iterator = set.iterator();
             while (iterator.hasNext()) {
                 ObjectInstance oi = iterator.next();
                 threadPools.addElement(oi.getObjectName());
@@ -363,9 +344,7 @@ public class StatusManagerServlet
                 (MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
                 String type = objectName.getKeyProperty("type");
                 if (type != null) {
-                    if (type.equals("ProtocolHandler")) {
-                        protocolHandlers.addElement(objectName);
-                    } else if (type.equals("ThreadPool")) {
+                    if (type.equals("ThreadPool")) {
                         threadPools.addElement(objectName);
                     } else if (type.equals("GlobalRequestProcessor")) {
                         globalRequestProcessors.addElement(objectName);
@@ -377,9 +356,7 @@ public class StatusManagerServlet
                        (MBeanServerNotification.UNREGISTRATION_NOTIFICATION)) {
                 String type = objectName.getKeyProperty("type");
                 if (type != null) {
-                    if (type.equals("ProtocolHandler")) {
-                        protocolHandlers.removeElement(objectName);
-                    } else if (type.equals("ThreadPool")) {
+                    if (type.equals("ThreadPool")) {
                         threadPools.removeElement(objectName);
                     } else if (type.equals("GlobalRequestProcessor")) {
                         globalRequestProcessors.removeElement(objectName);
