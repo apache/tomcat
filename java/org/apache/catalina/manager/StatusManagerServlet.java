@@ -61,7 +61,10 @@ public class StatusManagerServlet
 
     /**
      * Vector of protocol handlers object names.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1.x
      */
+    @Deprecated
     protected final Vector<ObjectName> protocolHandlers = new Vector<>();
 
 
