@@ -162,6 +162,11 @@
         Refactor APR/native connector shutdown to remove a potential source of
         JVM crashes on shutdown when sendfile is used. (markt)
       </fix>
+      <fix>
+        When an error occurs that triggers a stream reset, ensure that the first
+        <code>RST</code> frame sent to the client is the one associated with the
+        error that triggered the reset. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -3300,3 +3305,4 @@
 </section>
 </body>
 </document>
+
