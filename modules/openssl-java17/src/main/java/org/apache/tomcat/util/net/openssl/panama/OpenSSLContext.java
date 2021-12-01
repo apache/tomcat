@@ -650,6 +650,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         log.warn(sm.getString("openssl.noCACerts"));
                     }
                 }
+            } else {
+                // No CA certificates configured. Reject all client certificates.
+                MemoryAddress openSSLCallbackCertVerify =
+                        CLinker.getInstance().upcallStub(openSSLCallbackCertVerifyHandle,
+                                openSSLCallbackCertVerifyFunctionDescriptor, contextScope);
+                SSL_CTX_set_cert_verify_callback(state.sslCtx, openSSLCallbackCertVerify, MemoryAddress.NULL);
             }
 
             if (state.negotiableProtocols != null && state.negotiableProtocols.size() > 0) {
@@ -813,7 +819,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
         ContextState state = getState(param);
         if (state == null) {
-            log.warn(sm.getString("context.noSSL", Long.valueOf(param.toRawLongValue())));
             return 0;
         }
         MemoryAddress ssl = X509_STORE_CTX_get_ex_data(x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
