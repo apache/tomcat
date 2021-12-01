@@ -381,10 +381,20 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                 }
             } else {
-                // Client certificate verification based on trusted CA files and dirs
-                SSLContext.setCACertificate(state.ctx,
-                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
-                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
+                if (sslHostConfig.getCaCertificateFile() == null && sslHostConfig.getCaCertificatePath() == null) {
+                    // No CA certificates configured. Reject all client certificates.
+                    SSLContext.setCertVerifyCallback(state.ctx, new CertificateVerifier() {
+                        @Override
+                        public boolean verify(long ssl, byte[][] chain, String auth) {
+                            return false;
+                        }
+                    });
+                } else {
+                    // Client certificate verification based on trusted CA files and dirs
+                    SSLContext.setCACertificate(state.ctx,
+                            SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
+                            SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
+                }
             }
 
             if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
