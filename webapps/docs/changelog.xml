@@ -167,6 +167,11 @@
         <code>RST</code> frame sent to the client is the one associated with the
         error that triggered the reset. (markt)
       </fix>
+      <fix>
+        <bug>65714</bug>: Fix exceptions when the security manager is enabled
+        and the first request received after starting is an HTTP request to a
+        TLS enabled NIO2 connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -12104,4 +12109,5 @@
 </section>
 </body>
 </document>
+
 
