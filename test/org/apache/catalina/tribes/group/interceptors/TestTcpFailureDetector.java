@@ -105,8 +105,20 @@ public class TestTcpFailureDetector {
         channel2.start(Channel.MBR_RX_SEQ);
         channel2.stop(Channel.SND_RX_SEQ);
         channel2.start(Channel.MBR_TX_SEQ);
-        //Thread.sleep(1000);
-        Assert.assertEquals("Expecting member count to not be equal",mbrlist1.members.size()+1,mbrlist2.members.size());
+        // Intermittent CI failure
+        // Allow up to 5 seconds for membership to reach expected state
+        int count = 0;
+        while (mbrlist1.members.size()+1 != mbrlist2.members.size() && count < 100) {
+            Thread.sleep(50);
+            count++;
+        }
+        // Ensure membership remains in expected state for the same period plus
+        // 1 second
+        count += 20;
+        while (count > 0) {
+            Assert.assertEquals("Expecting member count to not be equal",mbrlist1.members.size()+1,mbrlist2.members.size());
+            count--;
+        }
         channel1.stop(Channel.DEFAULT);
         channel2.stop(Channel.DEFAULT);
     }
