@@ -101,12 +101,17 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (result.intValue() < 0) {
                 failed(new EOFException(), attachment);
             } else {
-                endpoint.processSocket(attachment, SocketEvent.OPEN_READ, false);
+                // When running under a security manager always dispatch so the
+                // processing occurs on a thread with the correct security
+                // context.
+                endpoint.processSocket(attachment, SocketEvent.OPEN_READ, Constants.IS_SECURITY_ENABLED);
             }
         }
         @Override
         public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
-            endpoint.processSocket(attachment, SocketEvent.ERROR, false);
+            // When running under a security manager always dispatch so the
+            // processing occurs on a thread with the correct security context.
+            endpoint.processSocket(attachment, SocketEvent.ERROR, Constants.IS_SECURITY_ENABLED);
         }
     }
 
@@ -118,12 +123,17 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (result.intValue() < 0) {
                 failed(new EOFException(), attachment);
             } else {
-                endpoint.processSocket(attachment, SocketEvent.OPEN_WRITE, false);
+                // When running under a security manager always dispatch so the
+                // processing occurs on a thread with the correct security
+                // context.
+                endpoint.processSocket(attachment, SocketEvent.OPEN_WRITE, Constants.IS_SECURITY_ENABLED);
             }
         }
         @Override
         public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
-            endpoint.processSocket(attachment, SocketEvent.ERROR, false);
+            // When running under a security manager always dispatch so the
+            // processing occurs on a thread with the correct security context.
+            endpoint.processSocket(attachment, SocketEvent.ERROR, Constants.IS_SECURITY_ENABLED);
         }
     }
 
