@@ -16,7 +16,7 @@ The module uses the OpenSSL 1.1 API. It requires an API compatible version of
 OpenSSL or a compatible alternative library, that can be loaded from the JVM
 library path.
 
-Copy `tomcat-openssl-1.0.jar` to the Apache Tomcat `lib` folder.
+Copy `openssl-java17-1.0.jar` to the Apache Tomcat `lib` folder.
 
 Remove `AprLifecycleListener` from `server.xml`. The
 `org.apache.tomcat.util.net.openssl.panama.OpenSSLLifecycleListener` can be
@@ -68,7 +68,7 @@ index dc1260b..dd9fba9 100644
      <pathelement location="${derby.jar}"/>
      <pathelement location="${derby-shared.jar}"/>
      <pathelement location="${derby-tools.jar}"/>
-+    <pathelement location="output/build/lib/tomcat-openssl-0.1.jar"/>
++    <pathelement location="output/build/lib/openssl-java17-0.1.jar"/>
      <path refid="compile.classpath" />
      <path refid="tomcat.classpath" />
    </path>
