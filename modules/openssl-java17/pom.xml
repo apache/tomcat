@@ -35,6 +35,13 @@
         <project.build.outputTimestamp>2021-12-02T12:00:00Z</project.build.outputTimestamp>
     </properties>
 
+    <scm>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/tomcat.git</connection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/tomcat.git</developerConnection>
+        <url>https://gitbox.apache.org/repos/asf?p=tomcat.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
 	<mailingLists>
 		<mailingList>
 			<name>Development List</name>
