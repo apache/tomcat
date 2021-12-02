@@ -817,8 +817,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         if (log.isDebugEnabled()) {
             log.debug("Certificate verification");
         }
+        if (MemoryAddress.NULL.equals(param)) {
+            return 0;
+        }
         ContextState state = getState(param);
         if (state == null) {
+            log.warn(sm.getString("context.noSSL", Long.valueOf(param.toRawLongValue())));
             return 0;
         }
         MemoryAddress ssl = X509_STORE_CTX_get_ex_data(x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
