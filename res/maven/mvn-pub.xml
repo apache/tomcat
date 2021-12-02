@@ -501,7 +501,7 @@
     </antcall>
   </target>
 
-  <target name="deploy-release">
+  <target name="deploy-release" depends="init-gpg-1,init-gpg-2">
     <fail unless="gpg.exec.available">GPG is required, but was not found at ${gpg.exec}</fail>
     <antcall target="generic-deploy">
       <param name="maven.repo.repositoryId"
