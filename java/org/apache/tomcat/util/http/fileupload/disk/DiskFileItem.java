@@ -192,7 +192,9 @@ public class DiskFileItem
     public InputStream getInputStream()
         throws IOException {
         if (!isInMemory()) {
-            return Files.newInputStream(dfos.getFile().toPath());
+            // Uses old code to avoid JVM bug
+            // https://bz.apache.org/bugzilla/show_bug.cgi?id=65710
+            return new FileInputStream(dfos.getFile());
         }
 
         if (cachedContent == null) {
