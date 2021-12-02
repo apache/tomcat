@@ -132,6 +132,12 @@
         Add debug logging to the <code>RestCsrfPreventionFilter</code>. Based on
         pull request <pr>452</pr> by Polina Georgieva. (markt)
       </add>
+      <add>
+        <bug>65710</bug>: Implement a workaround for a JVM bug that can trigger
+        a file descriptor leak when using multi-part upload and the application
+        does not explicitly close an input stream for an uploaded file that was
+        cached on disk. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
