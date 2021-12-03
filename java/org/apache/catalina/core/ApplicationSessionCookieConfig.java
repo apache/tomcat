@@ -168,6 +168,11 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
 
     @Override
     public void setAttribute(String name, String value) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
+            throw new IllegalStateException(sm.getString(
+                    "applicationSessionCookieConfig.ise", name,
+                    context.getPath()));
+        }
         attributes.put(name, value);
     }
 

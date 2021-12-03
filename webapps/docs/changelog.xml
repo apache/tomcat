@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M9 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Add missing check in <code>SessionCookieConfig.setSttribute()</code> to
+        ensure that the method fails if called after the web application has
+        started. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M8 (markt)" rtext="release in progress">
   <subsection name="Catalina">
