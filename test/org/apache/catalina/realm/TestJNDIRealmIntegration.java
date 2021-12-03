@@ -61,33 +61,38 @@ public class TestJNDIRealmIntegration {
         for (String userRoleAttribute : new String[] { "cn", null }) {
             for (String roleSearch : new String[] { ROLE_SEARCH_A, ROLE_SEARCH_B, ROLE_SEARCH_C }) {
                 if (userRoleAttribute != null) {
-                    addUsers(USER_PATTERN, null, null, roleSearch, ROLE_BASE, userRoleAttribute, parameterSets);
-                    addUsers(null, USER_SEARCH, USER_BASE, roleSearch, ROLE_BASE, userRoleAttribute, parameterSets);
+                    addUsers(USER_PATTERN, null, null, roleSearch, ROLE_BASE, userRoleAttribute, parameterSets, 1);
+                    addUsers(USER_PATTERN, null, null, roleSearch, ROLE_BASE, userRoleAttribute, parameterSets, 4);
+                    addUsers(null, USER_SEARCH, USER_BASE, roleSearch, ROLE_BASE, userRoleAttribute, parameterSets, 1);
+                    addUsers(null, USER_SEARCH, USER_BASE, roleSearch, ROLE_BASE, userRoleAttribute, parameterSets, 4);
                 }
             }
             parameterSets.add(new Object[] { "cn={0},ou=s\\;ub,ou=people,dc=example,dc=com", null, null, ROLE_SEARCH_A,
                     "{3},ou=people,dc=example,dc=com", "testsub", "test", new String[] { "TestGroup4" },
-                    userRoleAttribute });
+                    userRoleAttribute, Integer.valueOf(1) });
+            parameterSets.add(new Object[] { "cn={0},ou=s\\;ub,ou=people,dc=example,dc=com", null, null, ROLE_SEARCH_A,
+                    "{3},ou=people,dc=example,dc=com", "testsub", "test", new String[] { "TestGroup4" },
+                    userRoleAttribute, Integer.valueOf(4) });
         }
         return parameterSets;
     }
 
 
     private static void addUsers(String userPattern, String userSearch, String userBase, String roleSearch,
-            String roleBase, String userRoleAttribute, List<Object[]> parameterSets) {
+            String roleBase, String userRoleAttribute, List<Object[]> parameterSets, int poolSize) {
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "test", "test", new String[] {"TestGroup"}, userRoleAttribute });
+                "test", "test", new String[] {"TestGroup"}, userRoleAttribute, Integer.valueOf(poolSize) });
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "t;", "test", new String[] {"TestGroup"}, userRoleAttribute });
+                "t;", "test", new String[] {"TestGroup"}, userRoleAttribute, Integer.valueOf(poolSize) });
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "t*", "test", new String[] {"TestGroup"}, userRoleAttribute });
+                "t*", "test", new String[] {"TestGroup"}, userRoleAttribute, Integer.valueOf(poolSize) });
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "t=", "test", new String[] {"Test<Group*2", "Test>Group*3"}, userRoleAttribute });
+                "t=", "test", new String[] {"Test<Group*2", "Test>Group*3"}, userRoleAttribute, Integer.valueOf(poolSize) });
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "norole", "test", new String[0], userRoleAttribute });
+                "norole", "test", new String[0], userRoleAttribute, Integer.valueOf(poolSize) });
         // Bug 65373
         parameterSets.add(new Object[] { userPattern, userSearch, userBase, roleSearch, roleBase,
-                "<>+=\"#;,rrr", "<>+=\"#;,rrr", new String[0], userRoleAttribute });
+                "<>+=\"#;,rrr", "<>+=\"#;,rrr", new String[0], userRoleAttribute, Integer.valueOf(poolSize) });
     }
 
 
@@ -109,6 +114,8 @@ public class TestJNDIRealmIntegration {
     public String[] groups;
     @Parameter(8)
     public String realmConfigUserRoleAttribute;
+    @Parameter(9)
+    public int poolSize;
 
     @Test
     public void testAuthenication() throws Exception {
@@ -124,20 +131,24 @@ public class TestJNDIRealmIntegration {
         realm.setRoleBase(realmConfigRoleBase);
         realm.setRoleSearch(realmConfigRoleSearch);
         realm.setRoleNested(true);
+        realm.setConnectionPoolSize(poolSize);
 
-        GenericPrincipal p = (GenericPrincipal) realm.authenticate(username, credentials);
+        // If using pooling, simply try more to see what happens
+        for (int i = 0; i < poolSize; i++) {
+            GenericPrincipal p = (GenericPrincipal) realm.authenticate(username, credentials);
 
-        Assert.assertNotNull(p);
-        Assert.assertEquals(username, p.name);
+            Assert.assertNotNull(p);
+            Assert.assertEquals(username, p.name);
 
-        Set<String> actualGroups = new HashSet<>(Arrays.asList(p.getRoles()));
-        Set<String> expectedGroups  = new HashSet<>(Arrays.asList(groups));
+            Set<String> actualGroups = new HashSet<>(Arrays.asList(p.getRoles()));
+            Set<String> expectedGroups  = new HashSet<>(Arrays.asList(groups));
 
-        Assert.assertEquals(expectedGroups.size(), actualGroups.size());
-        Set<String> tmp = new HashSet<>();
-        tmp.addAll(expectedGroups);
-        tmp.removeAll(actualGroups);
-        Assert.assertEquals(0, tmp.size());
+            Assert.assertEquals(expectedGroups.size(), actualGroups.size());
+            Set<String> tmp = new HashSet<>();
+            tmp.addAll(expectedGroups);
+            tmp.removeAll(actualGroups);
+            Assert.assertEquals(0, tmp.size());
+        }
     }
 
 
