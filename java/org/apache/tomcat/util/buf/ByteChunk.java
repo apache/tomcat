@@ -465,7 +465,7 @@ public final class ByteChunk extends AbstractChunk {
     public void flushBuffer() throws IOException {
         // assert out!=null
         if (out == null) {
-            throw new IOException(sm.getString(
+            throw new BufferOverflowException(sm.getString(
                     "chunk.overflow", Integer.valueOf(getLimit()), Integer.valueOf(buff.length)));
         }
         out.realWriteBytes(buff, start, end - start);
@@ -829,5 +829,15 @@ public final class ByteChunk extends AbstractChunk {
             result[i] = (byte) value.charAt(i);
         }
         return result;
+    }
+
+
+    public static class BufferOverflowException extends IOException {
+
+        private static final long serialVersionUID = 1L;
+
+        public BufferOverflowException(String message) {
+            super(message);
+        }
     }
 }
