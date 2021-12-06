@@ -50,8 +50,8 @@
                  type="boolean"
             writeable="false"/>
 
-    <attribute   name="writeable"
-          description="Check if user database is writeable"
+    <attribute   name="writable"
+          description="Check if user database is writable"
                    is="true"
            writeable="false"/>
 
