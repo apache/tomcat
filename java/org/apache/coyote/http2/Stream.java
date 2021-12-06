@@ -120,7 +120,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     coyoteResponse.setError();
                 }
             }
-            // TODO Assuming the body has been read at this point is not valid
+            // Request body, if any, has been read and buffered
             state.receivedEndOfStream();
         }
         this.coyoteRequest.setSendfile(handler.hasAsyncIO() && handler.getProtocol().getUseSendfile());

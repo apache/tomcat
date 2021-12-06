@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
@@ -1352,6 +1353,32 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             resp.setCharacterEncoding("UTF-8");
 
             resp.getWriter().print(params.size());
+        }
+    }
+
+
+    static class ReadRequestBodyServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // Request bodies are unusal with GET but not illegal
+
+            long total = 0;
+            long read = 0;
+            byte[] buffer = new byte[1024];
+            try (InputStream is = req.getInputStream()) {
+                while ((read = is.read(buffer)) > 0) {
+                    total += read;
+                }
+            }
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            PrintWriter pw = resp.getWriter();
+            pw.print("Total bytes read from request body [" + total + "]");
         }
     }
 

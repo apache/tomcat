@@ -188,18 +188,20 @@
     </attribute>
 
     <attribute name="maxSavePostSize" required="false">
-      <p>The maximum size in bytes of the POST which will be saved/buffered by
-      the container during FORM or CLIENT-CERT authentication. For both types
-      of authentication, the POST will be saved/buffered before the user is
-      authenticated. For CLIENT-CERT authentication, the POST is buffered for
-      the duration of the SSL handshake and the buffer emptied when the request
-      is processed. For FORM authentication the POST is saved whilst the user
-      is re-directed to the login form and is retained until the user
-      successfully authenticates or the session associated with the
-      authentication request expires. The limit can be disabled by setting this
+      <p>The maximum size in bytes of the request body which will be
+      saved/buffered by the container during FORM or CLIENT-CERT authentication
+      or during HTTP/1.1 upgarde. For both types of authentication, the request
+      body will be saved/buffered before the user is authenticated. For
+      CLIENT-CERT authentication, the request body is buffered for the duration
+      of the SSL handshake and the buffer emptied when the request is processed.
+      For FORM authentication the POST is saved whilst the user is re-directed
+      to the login form and is retained until the user successfully
+      authenticates or the session associated with the authentication request
+      expires. For HTTP/1.1 upgrade, the request body is buffered for the
+      duration of the upgrade process. The limit can be disabled by setting this
       attribute to -1. Setting the attribute to zero will disable the saving of
-      POST data during authentication. If not specified, this attribute is set
-      to 4096 (4 kilobytes).</p>
+      the requets body data during authentication and HTTP/1.1 upgrade. If not
+      specified, this attribute is set to 4096 (4 kilobytes).</p>
     </attribute>
 
     <attribute name="parseBodyMethods" required="false">
