@@ -38,7 +38,7 @@ public abstract class AbstractTestResourceSet {
     protected WebResourceRoot resourceRoot;
 
     protected abstract WebResourceRoot getWebResourceRoot();
-    protected abstract boolean isWriteable();
+    protected abstract boolean isWritable();
 
     public String getMount() {
         return "";
@@ -399,7 +399,7 @@ public abstract class AbstractTestResourceSet {
     @Test
     public final void testMkdirNew() {
         String newDirName = getNewDirName();
-        if (isWriteable()) {
+        if (isWritable()) {
             Assert.assertTrue(resourceRoot.mkdir(getMount() + "/" + newDirName));
 
             File file = new File(getBaseDir(), newDirName);
@@ -472,7 +472,7 @@ public abstract class AbstractTestResourceSet {
     public final void testWrite() {
         String newFileName = getNewFileName();
         InputStream is = new ByteArrayInputStream("test".getBytes());
-        if (isWriteable()) {
+        if (isWritable()) {
             Assert.assertTrue(resourceRoot.write(
                     getMount() + "/" + newFileName, is, false));
             File file = new File(getBaseDir(), newFileName);

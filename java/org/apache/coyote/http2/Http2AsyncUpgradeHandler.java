@@ -205,7 +205,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     Integer.toString(len), Boolean.valueOf(finished)));
         }
         // Need to check this now since sending end of stream will change this.
-        boolean writeable = stream.canWrite();
+        boolean writable = stream.canWrite();
         byte[] header = new byte[9];
         ByteUtil.setThreeBytes(header, 0, len);
         header[3] = FrameType.DATA.getIdByte();
@@ -216,7 +216,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
             }
         }
-        if (writeable) {
+        if (writable) {
             ByteUtil.set31Bits(header, 5, stream.getIdAsInt());
             int orgLimit = data.limit();
             data.limit(data.position() + len);
@@ -328,7 +328,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             boolean finished = (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
             // Need to check this now since sending end of stream will change this.
-            boolean writeable = sendfile.stream.canWrite();
+            boolean writable = sendfile.stream.canWrite();
             byte[] header = new byte[9];
             ByteUtil.setThreeBytes(header, 0, frameSize);
             header[3] = FrameType.DATA.getIdByte();
@@ -339,7 +339,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
                 }
             }
-            if (writeable) {
+            if (writable) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
                             Integer.toString(frameSize), Boolean.valueOf(finished)));
@@ -408,7 +408,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 boolean finished = (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
                 // Need to check this now since sending end of stream will change this.
-                boolean writeable = sendfile.stream.canWrite();
+                boolean writable = sendfile.stream.canWrite();
                 byte[] header = new byte[9];
                 ByteUtil.setThreeBytes(header, 0, frameSize);
                 header[3] = FrameType.DATA.getIdByte();
@@ -419,7 +419,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
                     }
                 }
-                if (writeable) {
+                if (writable) {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("upgradeHandler.writeBody", connectionId, sendfile.stream.getIdAsString(),
                                 Integer.toString(frameSize), Boolean.valueOf(finished)));

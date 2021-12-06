@@ -760,7 +760,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         reduceOverheadCount(FrameType.DATA);
 
         // Need to check this now since sending end of stream will change this.
-        boolean writeable = stream.canWrite();
+        boolean writable = stream.canWrite();
         byte[] header = new byte[9];
         ByteUtil.setThreeBytes(header, 0, len);
         header[3] = FrameType.DATA.getIdByte();
@@ -771,7 +771,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 setConnectionTimeoutForStreamCount(activeRemoteStreamCount.decrementAndGet());
             }
         }
-        if (writeable) {
+        if (writable) {
             ByteUtil.set31Bits(header, 5, stream.getIdAsInt());
             synchronized (socketWrapper) {
                 try {
