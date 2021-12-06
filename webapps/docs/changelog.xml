@@ -114,6 +114,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>65726</bug>: Implement support for HTTP/1.1 upgrade when the
+        request includes a body. The maximum permitted size of the body is
+        controlled by <code>maxSavePostSize</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
