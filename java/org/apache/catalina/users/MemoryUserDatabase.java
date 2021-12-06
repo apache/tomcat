@@ -527,8 +527,23 @@ public class MemoryUserDatabase implements UserDatabase {
      * location.
      *
      * @return <code>true</code> if the database is writable
+     *
+     * @deprecated Use {@link #isWritable()}. This method will be removed in
+     *             Tomcat 10.1.x onwards.
      */
+    @Deprecated
     public boolean isWriteable() {
+        return isWritable();
+    }
+
+
+    /**
+     * Check for permissions to save this user database to persistent storage
+     * location.
+     *
+     * @return <code>true</code> if the database is writable
+     */
+    public boolean isWritable() {
 
         File file = new File(pathname);
         if (!file.isAbsolute()) {
@@ -553,7 +568,7 @@ public class MemoryUserDatabase implements UserDatabase {
             return;
         }
 
-        if (!isWriteable()) {
+        if (!isWritable()) {
             log.warn(sm.getString("memoryUserDatabase.notPersistable"));
             return;
         }
