@@ -373,10 +373,14 @@ public abstract class BaseNCodec {
      *
      * @param pArray
      *            A String containing Base-N character data
-     * @return a byte array containing binary data
+     * @return a byte array containing binary data, or
+     *         {@literal null} if the passed pArray is null
      */
     public byte[] decode(final String pArray) {
-        return decode(StringUtils.getBytesUtf8(pArray));
+        if (pArray != null) {
+            return decode(pArray.getBytes(StandardCharsets.UTF_8));
+        }
+        return pArray;
     }
 
     /**
