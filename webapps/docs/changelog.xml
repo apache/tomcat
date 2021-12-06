@@ -178,6 +178,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>65724</bug>: Fix missing messages for some
+        <code>PropertyNotWtriableException</code>s caused by a typo in the name
+        used for a resource string. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
