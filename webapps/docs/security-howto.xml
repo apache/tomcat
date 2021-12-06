@@ -282,10 +282,10 @@
       default to reduce exposure to a DOS attack.</p>
 
       <p>The <strong>maxSavePostSize</strong> attribute controls the saving of
-      POST requests during FORM and CLIENT-CERT authentication. The parameters
-      are cached for the duration of the authentication (which may be many
-      minutes) so this is limited to 4KB by default to reduce exposure to a DOS
-      attack.</p>
+      the request body during FORM and CLIENT-CERT authentication and HTTP/1.1
+      upgrade. For FORM authentication, the request body is cached for the
+      duration of the authentication (which may be many minutes) so this is
+      limited to 4KB by default to reduce exposure to a DOS attack.</p>
 
       <p>The <strong>maxParameterCount</strong> attribute controls the
       maximum number of parameter and value pairs (GET plus POST) that can
