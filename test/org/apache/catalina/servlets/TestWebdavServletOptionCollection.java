@@ -26,12 +26,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+/*
+ * Split into multiple tests as a single test takes so long it impacts the time
+ * of an entire test run.
+ */
 @RunWith(Parameterized.class)
-public class TestWebdavServletOptions extends ServletOptionsBaseTest {
+public class TestWebdavServletOptionCollection extends ServletOptionsBaseTest {
 
     @Parameters
     public static Collection<Object[]> inputs() {
-        String[] urls = new String[] { COLLECTION_NAME, FILE_NAME, UNKNOWN_NAME };
         String[] methods = new String[] { "GET", "POST", "HEAD", "TRACE", "PUT", "DELETE",
                 "MKCOL", "LOCK", "UNLOCK", "COPY", "MOVE", "PROPFIND", "PROPPATCH" };
 
@@ -40,11 +43,9 @@ public class TestWebdavServletOptions extends ServletOptionsBaseTest {
         for (Boolean listingsValue : booleans) {
             for (Boolean readOnlyValue : booleans) {
                 for (Boolean traceValue : booleans) {
-                    for (String url : urls) {
-                        for (String method : methods) {
-                            result.add(new Object[] {
-                                    listingsValue, readOnlyValue, traceValue, url, method } );
-                        }
+                    for (String method : methods) {
+                        result.add(new Object[] {
+                                listingsValue, readOnlyValue, traceValue, COLLECTION_NAME, method } );
                     }
                 }
             }

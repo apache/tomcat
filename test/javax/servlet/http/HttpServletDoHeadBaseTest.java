@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +28,6 @@ import javax.servlet.ServletException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.core.StandardContext;
@@ -40,8 +36,11 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 
-@RunWith(Parameterized.class)
-public class TestHttpServletDoHead extends TomcatBaseTest {
+/*
+ * Split into multiple tests as a single test takes so long it impacts the time
+ * of an entire test run.
+ */
+public class HttpServletDoHeadBaseTest extends TomcatBaseTest {
 
     // Tomcat has a minimum output buffer size of 8 * 1024.
     // (8 * 1024) /16 = 512
@@ -49,31 +48,11 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
     private static final String VALID = "** valid data **";
     private static final String INVALID = "* invalid data *";
 
-    private static final Integer BUFFERS[] = new Integer[] { Integer.valueOf (16), Integer.valueOf(8 * 1024), Integer.valueOf(16 * 1024) };
+    protected static final Integer BUFFERS[] = new Integer[] { Integer.valueOf (16), Integer.valueOf(8 * 1024), Integer.valueOf(16 * 1024) };
 
-    private static final Integer COUNTS[] = new Integer[] { Integer.valueOf(0), Integer.valueOf(1),
+    protected static final Integer COUNTS[] = new Integer[] { Integer.valueOf(0), Integer.valueOf(1),
             Integer.valueOf(511), Integer.valueOf(512), Integer.valueOf(513),
             Integer.valueOf(1023), Integer.valueOf(1024), Integer.valueOf(1025) };
-
-    @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4} {5}")
-    public static Collection<Object[]> parameters() {
-
-        List<Object[]> parameterSets = new ArrayList<>();
-        for (Integer buf : BUFFERS) {
-            for (Boolean w : booleans) {
-                for (Integer c1 : COUNTS) {
-                    for (ResetType rt : ResetType.values()) {
-                        for (Integer c2 : COUNTS) {
-                            for (Boolean f : booleans) {
-                                parameterSets.add(new Object[] { buf, w, c1, rt, c2, f });
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return parameterSets;
-    }
 
     @Parameter(0)
     public int bufferSize;
@@ -214,7 +193,7 @@ public class TestHttpServletDoHead extends TomcatBaseTest {
     }
 
 
-    private static enum ResetType {
+    static enum ResetType {
         NONE,
         BUFFER,
         FULL
