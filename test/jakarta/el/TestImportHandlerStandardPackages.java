@@ -98,7 +98,7 @@ public class TestImportHandlerStandardPackages {
                         // Skip non-class resources
                         continue;
                     }
-                    if (file.startsWith("Test")) {
+                    if (file.startsWith("Test") || file.endsWith("BaseTest.class")) {
                         // Skip test resources
                         continue;
                     }
