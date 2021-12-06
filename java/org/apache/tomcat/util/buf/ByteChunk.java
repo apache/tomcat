@@ -24,6 +24,8 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /*
  * In a server it is very important to be able to operate on
  * the original byte[] without converting everything to chars.
@@ -117,6 +119,8 @@ public final class ByteChunk extends AbstractChunk {
     }
 
     // --------------------
+
+    private static final StringManager sm = StringManager.getManager(ByteChunk.class);
 
     /**
      * Default encoding used to convert to strings. It should be UTF8, as most
@@ -466,7 +470,8 @@ public final class ByteChunk extends AbstractChunk {
     public void flushBuffer() throws IOException {
         // assert out!=null
         if (out == null) {
-            throw new IOException("Buffer overflow, no sink " + getLimit() + " " + buff.length);
+            throw new BufferOverflowException(sm.getString("byteChunk.noSink",
+                    Integer.valueOf(getLimit()), Integer.valueOf(buff.length)));
         }
         out.realWriteBytes(buff, start, end - start);
         end = start;
@@ -829,5 +834,15 @@ public final class ByteChunk extends AbstractChunk {
             result[i] = (byte) value.charAt(i);
         }
         return result;
+    }
+
+
+    public static class BufferOverflowException extends IOException {
+
+        private static final long serialVersionUID = 1L;
+
+        public BufferOverflowException(String message) {
+            super(message);
+        }
     }
 }
