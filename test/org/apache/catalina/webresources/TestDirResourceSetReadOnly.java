@@ -34,7 +34,7 @@ public class TestDirResourceSetReadOnly extends AbstractTestResourceSet {
     }
 
     @Override
-    protected boolean isWriteable() {
+    protected boolean isWritable() {
         return false;
     }
 

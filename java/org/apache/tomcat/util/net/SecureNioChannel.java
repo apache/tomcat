@@ -393,7 +393,7 @@ public class SecureNioChannel extends NioChannel  {
         }
         handshakeComplete = false;
         boolean isReadable = false;
-        boolean isWriteable = false;
+        boolean isWritable = false;
         boolean handshaking = true;
         Selector selector = null;
         SelectionKey key = null;
@@ -401,7 +401,7 @@ public class SecureNioChannel extends NioChannel  {
             sslEngine.beginHandshake();
             handshakeStatus = sslEngine.getHandshakeStatus();
             while (handshaking) {
-                int hsStatus = this.handshake(isReadable, isWriteable);
+                int hsStatus = this.handshake(isReadable, isWritable);
                 switch (hsStatus) {
                     case -1 : throw new EOFException(sm.getString("channel.nio.ssl.eofDuringHandshake"));
                     case  0 : handshaking = false; break;
@@ -418,7 +418,7 @@ public class SecureNioChannel extends NioChannel  {
                             throw new SocketTimeoutException(sm.getString("channel.nio.ssl.timeoutDuringHandshake"));
                         }
                         isReadable = key.isReadable();
-                        isWriteable = key.isWritable();
+                        isWritable = key.isWritable();
                     }
                 }
             }

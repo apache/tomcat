@@ -476,7 +476,7 @@ public class MyBean2 {
     </p>
 
     <p>The <code>readonly</code> attribute is optional and defaults to
-    <code>true</code> if not supplied. If the XML is writeable then it will be
+    <code>true</code> if not supplied. If the XML is writable then it will be
     written to when Tomcat starts. <strong>WARNING:</strong> When the file is
     written it will inherit the default file permissions for the user Tomcat
     is running as. Ensure that these are appropriate to maintain the security

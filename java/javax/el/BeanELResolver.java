@@ -111,7 +111,7 @@ public class BeanELResolver extends ELResolver {
 
         if (this.readOnly) {
             throw new PropertyNotWritableException(Util.message(context,
-                    "resolverNotWriteable", base.getClass().getName()));
+                    "resolverNotWritable", base.getClass().getName()));
         }
 
         Method m = this.property(context, base, property).write(context, base);

@@ -75,7 +75,7 @@ public class StaticFieldELResolver extends ELResolver {
             String name = (String) property;
 
             throw new PropertyNotWritableException(Util.message(context,
-                    "staticFieldELResolver.notWriteable", name,
+                    "staticFieldELResolver.notWritable", name,
                     clazz.getName()));
         }
     }
