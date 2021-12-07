@@ -138,11 +138,6 @@
         does not explicitly close an input stream for an uploaded file that was
         cached on disk. (markt)
       </add>
-      <fix>
-        <bug>65726</bug>: Implement support for HTTP/1.1 upgrade when the
-        request includes a body. The maximum permitted size of the body is
-        controlled by <code>maxSavePostSize</code>. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -181,6 +176,11 @@
         on MacOS as it does on Linux and Windows when no trusted certificate
         authorities are configured and reject all client certificates. (markt)
       </add>
+      <fix>
+        <bug>65726</bug>: Implement support for HTTP/1.1 upgrade when the
+        request includes a body. The maximum permitted size of the body is
+        controlled by <code>maxSavePostSize</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
