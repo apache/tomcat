@@ -91,6 +91,9 @@ public class NioBlockingSelector {
             reference = new KeyReference();
         }
         NioSocketWrapper att = (NioSocketWrapper) key.attachment();
+        if (att == null) {
+            throw new IOException();
+        }
         if (att.previousIOException != null) {
             /*
              * Socket has previously seen an IOException on write.
