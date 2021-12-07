@@ -470,8 +470,8 @@ public final class ByteChunk extends AbstractChunk {
     public void flushBuffer() throws IOException {
         // assert out!=null
         if (out == null) {
-            throw new BufferOverflowException(sm.getString("byteChunk.noSink",
-                    Integer.valueOf(getLimit()), Integer.valueOf(buff.length)));
+            throw new BufferOverflowException(sm.getString(
+                    "chunk.overflow", Integer.valueOf(getLimit()), Integer.valueOf(buff.length)));
         }
         out.realWriteBytes(buff, start, end - start);
         end = start;
