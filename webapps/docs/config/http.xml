@@ -187,7 +187,7 @@
     <attribute name="maxSavePostSize" required="false">
       <p>The maximum size in bytes of the request body which will be
       saved/buffered by the container during FORM or CLIENT-CERT authentication
-      or during HTTP/1.1 upgarde. For both types of authentication, the request
+      or during HTTP/1.1 upgrade. For both types of authentication, the request
       body will be saved/buffered before the user is authenticated. For
       CLIENT-CERT authentication, the request body is buffered for the duration
       of the SSL handshake and the buffer emptied when the request is processed.
