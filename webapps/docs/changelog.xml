@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.15 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>65726</bug>: Implement support for HTTP/1.1 upgrade when the
+        request includes a body. The maximum permitted size of the body is
+        controlled by <code>maxSavePostSize</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
@@ -149,11 +158,6 @@
         does not explicitly close an input stream for an uploaded file that was
         cached on disk. (markt)
       </add>
-      <fix>
-        <bug>65726</bug>: Implement support for HTTP/1.1 upgrade when the
-        request includes a body. The maximum permitted size of the body is
-        controlled by <code>maxSavePostSize</code>. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
