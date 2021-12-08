@@ -259,12 +259,6 @@
 
   <properties>
 
-    <property name="org.apache.tomcat. websocket.ALLOW_UNSUPPORTED_EXTENSIONS">
-      <p>If <code>true</code>, allow unknown extensions to be declared by
-      the user.</p>
-      <p>The default value is <code>false</code>.</p>
-    </property>
-
     <property name="org.apache.tomcat. websocket.DEFAULT_BUFFER_SIZE">
       <p>The default size for buffers used in the Websockets container.</p>
       <p>The default value is <code>8192</code> which corresponds to 8KB.</p>

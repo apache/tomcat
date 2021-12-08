@@ -132,6 +132,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Remove the <code>ALLOW_UNSUPPORTED_EXTENSIONS</code> system property. As
+        per RFC 6455, all extensions are optional. If an endpoint declares an
+        extension that isn't supported there is no need to trigger an error. The
+        extension can just be excluded from the result of the negotiation.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M8 (markt)" rtext="2021-12-08">
   <subsection name="Catalina">

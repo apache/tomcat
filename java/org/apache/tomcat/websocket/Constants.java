@@ -136,8 +136,6 @@ public class Constants {
      */
     static final boolean DISABLE_BUILTIN_EXTENSIONS =
             Boolean.getBoolean("org.apache.tomcat.websocket.DISABLE_BUILTIN_EXTENSIONS");
-    static final boolean ALLOW_UNSUPPORTED_EXTENSIONS =
-            Boolean.getBoolean("org.apache.tomcat.websocket.ALLOW_UNSUPPORTED_EXTENSIONS");
 
     public static final boolean STRICT_SPEC_COMPLIANCE =
             Boolean.getBoolean("org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
