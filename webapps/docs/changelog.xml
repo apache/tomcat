@@ -141,6 +141,11 @@
         extension can just be excluded from the result of the negotiation.
         (markt)
       </fix>
+      <fix>
+        Remove the <code>DISABLE_BUILTIN_EXTENSIONS</code>. It was added to
+        enable Tomcat to pass the WebSocket TCK but after updates to the TCK, it
+        is no longer required. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

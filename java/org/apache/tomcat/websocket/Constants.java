@@ -128,28 +128,15 @@ public class Constants {
     public static final String WS_AUTHENTICATION_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME";
     public static final String WS_AUTHENTICATION_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD";
 
-    /* Configuration for extensions
-     * Note: These options are primarily present to enable this implementation
-     *       to pass compliance tests. They are expected to be removed once
-     *       the WebSocket API includes a mechanism for adding custom extensions
-     *       and disabling built-in extensions.
-     */
-    static final boolean DISABLE_BUILTIN_EXTENSIONS =
-            Boolean.getBoolean("org.apache.tomcat.websocket.DISABLE_BUILTIN_EXTENSIONS");
-
     public static final boolean STRICT_SPEC_COMPLIANCE =
             Boolean.getBoolean("org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
 
     public static final List<Extension> INSTALLED_EXTENSIONS;
 
     static {
-        if (DISABLE_BUILTIN_EXTENSIONS) {
-            INSTALLED_EXTENSIONS = Collections.unmodifiableList(new ArrayList<>());
-        } else {
-            List<Extension> installed = new ArrayList<>(1);
-            installed.add(new WsExtension("permessage-deflate"));
-            INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
-        }
+        List<Extension> installed = new ArrayList<>(1);
+        installed.add(new WsExtension("permessage-deflate"));
+        INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
     }
 
     private Constants() {

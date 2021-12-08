@@ -277,12 +277,6 @@
          seconds.</p>
     </property>
 
-    <property name="org.apache.tomcat. websocket.DISABLE_BUILTIN_EXTENSIONS">
-      <p>If <code>true</code>, disable all built-in extensions provided by the
-         server, such as message compression.</p>
-      <p>The default value is <code>false</code>.</p>
-    </property>
-
   </properties>
 
 </section>
