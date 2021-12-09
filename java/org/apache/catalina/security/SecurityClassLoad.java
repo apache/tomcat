@@ -189,6 +189,9 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.net.AprEndpoint$AprSocketWrapper$AprOperationState");
         loader.loadClass(basePackage + "util.net.NioEndpoint$NioSocketWrapper$NioOperationState");
         loader.loadClass(basePackage + "util.net.Nio2Endpoint$Nio2SocketWrapper$Nio2OperationState");
+        loader.loadClass(basePackage + "util.net.SecureNio2Channel");
+        loader.loadClass(basePackage + "util.net.SocketBufferHandler");
+        loader.loadClass(basePackage + "util.net.SocketBufferHandler$1");
         loader.loadClass(basePackage + "util.net.SocketWrapperBase$BlockingMode");
         loader.loadClass(basePackage + "util.net.SocketWrapperBase$CompletionCheck");
         loader.loadClass(basePackage + "util.net.SocketWrapperBase$CompletionHandlerCall");
