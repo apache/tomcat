@@ -15,6 +15,8 @@
 # limitations under the License.
 
 FROM openjdk:8-jre
+# FROM openjdk:11-jre
+# FROM openjdk:17-jdk
 VOLUME /tmp
 
 USER root
@@ -37,6 +39,8 @@ ENV JAVA_OPTS="-Dcatalina.base=. -Djava.security.egd=file:/dev/urandom"
 
 # Add JULI logging configuration
 ENV JAVA_OPTS="${JAVA_OPTS} -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=conf/logging.properties"
+# OpenSSL integration for Java 17
+#ENV JAVA_OPTS="${JAVA_OPTS} --enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.foreign"
 
 RUN sh -c 'touch app.jar'
 
