@@ -121,6 +121,10 @@
         request includes a body. The maximum permitted size of the body is
         controlled by <code>maxSavePostSize</code>. (markt)
       </fix>
+      <fix>
+        <bug>65714</bug>: The previous fix was incomplete. Fix additional issues
+        when first using an NIO2 TLS enabled connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
