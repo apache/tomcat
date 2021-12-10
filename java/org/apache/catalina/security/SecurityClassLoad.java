@@ -200,5 +200,6 @@ public final class SecurityClassLoad {
         // security
         loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");
         loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");
+        loader.loadClass(basePackage + "util.security.PrivilegedSetAccessControlContext");
     }
 }
