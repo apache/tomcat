@@ -71,10 +71,6 @@
   that it will be removed in a future Java version. Users currently using a
   SecurityManager are recommended to start planning for its removal.</p>
 
-  <p>There is a known issue (<bug>bug 65714</bug>) using NIO2 with TLS under a
-  SecurityManager. The recommendation for users affected by this issue is to
-  either move away from using a SecurityManager or switch from NIO2 to NIO.</p>
-
 </section>
 
 
