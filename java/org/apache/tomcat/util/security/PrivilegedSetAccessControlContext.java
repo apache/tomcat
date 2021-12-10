@@ -38,7 +38,7 @@ public class PrivilegedSetAccessControlContext implements PrivilegedAction<Void>
         Field f = null;
         try {
             f = Thread.class.getDeclaredField("inheritedAccessControlContext");
-            f.trySetAccessible();
+            f.setAccessible(true);
         } catch (NoSuchFieldException | SecurityException e) {
             log.warn(sm.getString("privilegedSetAccessControlContext.lookupFailed"), e);
         }
