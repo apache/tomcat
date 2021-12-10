@@ -112,6 +112,10 @@
         request includes a body. The maximum permitted size of the body is
         controlled by <code>maxSavePostSize</code>. (markt)
       </fix>
+      <fix>
+        Restore pre-starting of <code>minSpareThreads</code> lost in the fix for
+        <bug>65454</bug>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
