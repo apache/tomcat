@@ -125,6 +125,10 @@
         Restore pre-starting of <code>minSpareThreads</code> lost in the fix for
         <bug>65454</bug>. (markt)
       </fix>
+      <fix>
+        Revert the previous fix for <bug>65714</bug> and implement a more
+        comprehensive fix. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
