@@ -1366,6 +1366,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         this.keepAliveTime = unit.toNanos(keepAliveTime);
         this.threadFactory = threadFactory;
         this.handler = handler;
+
+        prestartAllCoreThreads();
     }
 
 
