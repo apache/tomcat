@@ -131,6 +131,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        Add support for POJO WebSocket endpoints to the programmatic upgrade
+        that allows applications to opt to upgrade an HTTP connection to
+        WebSocket. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.56 (remm)" rtext="2021-12-02">
   <subsection name="Catalina">
