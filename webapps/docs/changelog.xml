@@ -196,6 +196,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        Add support for POJO WebSocket endpoints to the programmatic upgrade
+        that allows applications to opt to upgrade an HTTP connection to
+        WebSocket. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
