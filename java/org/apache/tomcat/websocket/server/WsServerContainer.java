@@ -386,6 +386,17 @@ public class WsServerContainer extends WsWebSocketContainer
      * Overridden to make it visible to other classes in this package.
      */
     @Override
+    protected InstanceManager getInstanceManager(ClassLoader classLoader) {
+        return super.getInstanceManager(classLoader);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * Overridden to make it visible to other classes in this package.
+     */
+    @Override
     protected void registerSession(Object key, WsSession wsSession) {
         super.registerSession(key, wsSession);
         if (wsSession.isOpen() &&

@@ -154,6 +154,11 @@
         enable Tomcat to pass the WebSocket TCK but after updates to the TCK, it
         is no longer required. (markt)
       </fix>
+      <add>
+        Add support for POJO WebSocket endpoints to the programmatic upgrade
+        that allows applications to opt to upgrade an HTTP connection to
+        WebSocket. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
