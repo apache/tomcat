@@ -135,7 +135,7 @@
     <changelog>
       <fix>
         <bug>65724</bug>: Fix missing messages for some
-        <code>PropertyNotWtriableException</code>s caused by a typo in the name
+        <code>PropertyNotWritableException</code>s caused by a typo in the name
         used for a resource string. (markt)
       </fix>
     </changelog>
