@@ -215,7 +215,7 @@ public class UpgradeUtil {
                 }
             } catch (DeploymentException e) {
                 throw new ServletException(
-                        sm.getString("upgradeUtil.pojoMpaFail", sec.getEndpointClass().getName()),  e);
+                        sm.getString("upgradeUtil.pojoMapFail", sec.getEndpointClass().getName()),  e);
             }
         }
 
