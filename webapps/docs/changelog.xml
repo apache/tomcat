@@ -129,6 +129,10 @@
         Revert the previous fix for <bug>65714</bug> and implement a more
         comprehensive fix. (markt)
       </fix>
+      <fix>
+        Allow freeing up context on JVM shutdown in the OpenSSL Panama module
+        by properly using a shared scope. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
