@@ -116,7 +116,7 @@
 <p>When using the WebSocket client to connect to secure server endpoints, the
    client SSL configuration should be configured via
    <code>jakarta.websocket.ClientEndpointConfig.getSSLContext()</code>. Tomcat
-   10.1.x still supports the pre-WebSocket 2.1 configuration method where TLS 
+   10.1.x still supports the pre-WebSocket 2.1 configuration method where TLS
    configuration was via the <code>userProperties</code> of the provided
    <code>jakarta.websocket.ClientEndpointConfig</code>. However, this approach
    is deprecated and will be removed in Tomcat 11. The following user properties
