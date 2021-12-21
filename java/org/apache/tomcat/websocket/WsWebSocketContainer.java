@@ -900,6 +900,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
+    @SuppressWarnings("removal")
     private SSLEngine createSSLEngine(ClientEndpointConfig clientEndpointConfig, String host, int port)
             throws DeploymentException {
 
