@@ -72,5 +72,6 @@
   </subpackage>
   <subpackage name="websocket">
     <allow pkg="jakarta.websocket"/>
+    <allow pkg="javax.net.ssl"/>
   </subpackage>
 </import-control>

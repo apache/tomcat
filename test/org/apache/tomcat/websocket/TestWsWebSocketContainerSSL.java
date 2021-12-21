@@ -16,13 +16,20 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URI;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.ContainerProvider;
@@ -42,6 +49,7 @@ import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.net.TesterSupport;
+import org.apache.tomcat.util.security.KeyStoreUtil;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
@@ -74,7 +82,7 @@ public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
     private static final String MESSAGE_STRING_1 = "qwerty";
 
     @Test
-    public void testConnectToServerEndpointSSL() throws Exception {
+    public void testConnectToServerEndpointSslLegacy() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
@@ -92,6 +100,54 @@ public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
         clientEndpointConfig.getUserProperties().put(
                 org.apache.tomcat.websocket.Constants.SSL_TRUSTSTORE_PROPERTY,
                 TesterSupport.CA_JKS);
+        Session wsSession = wsContainer.connectToServer(
+                TesterProgrammaticEndpoint.class,
+                clientEndpointConfig,
+                new URI("wss://localhost:" + getPort() +
+                        TesterEchoServer.Config.PATH_ASYNC));
+        CountDownLatch latch = new CountDownLatch(1);
+        BasicText handler = new BasicText(latch);
+        wsSession.addMessageHandler(handler);
+        wsSession.getBasicRemote().sendText(MESSAGE_STRING_1);
+
+        boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
+
+        Assert.assertTrue(latchResult);
+
+        Queue<String> messages = handler.getMessages();
+        Assert.assertEquals(1, messages.size());
+        Assert.assertEquals(MESSAGE_STRING_1, messages.peek());
+    }
+
+
+    @Test
+    public void testConnectToServerEndpointSSL() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+
+        // Build the SSLContext
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        File trustStoreFile = new File(TesterSupport.CA_JKS);
+        KeyStore ks = KeyStore.getInstance("JKS");
+        try (InputStream is = new FileInputStream(trustStoreFile)) {
+            KeyStoreUtil.load(ks, is, Constants.SSL_TRUSTSTORE_PWD_DEFAULT.toCharArray());
+        }
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(ks);
+        sslContext.init(null,  tmf.getTrustManagers(), null);
+
+        ClientEndpointConfig clientEndpointConfig =
+                ClientEndpointConfig.Builder.create().sslContext(sslContext).build();
+
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,

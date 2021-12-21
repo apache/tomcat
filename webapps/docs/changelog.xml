@@ -163,6 +163,10 @@
         that allows applications to opt to upgrade an HTTP connection to
         WebSocket. (markt)
       </add>
+      <add>
+        Add support for the WebSocket 2.1 client-side API for configuring TLS
+        connection for wss client connections. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
