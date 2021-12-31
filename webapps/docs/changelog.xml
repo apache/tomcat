@@ -212,9 +212,21 @@
         support code coverage for code compiled for Java 11 onwards. It also
         removes the need to use a single thread to run the tests. (markt)
       </fix>
+      <add>
+        Improvements to Chinese translations contributed by zhnnn. (markt)
+      </add>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations contributed by Shirayuking, yoshy
+        and tak7iji. (markt)
+      </add>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
     </changelog>
-  </subsection>
-</section>
+  </subsection></section>
 <section name="Tomcat 8.5.73 (schultz)" rtext="2021-11-17">
   <subsection name="Catalina">
     <changelog>
