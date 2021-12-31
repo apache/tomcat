@@ -177,6 +177,9 @@
       <update>
         Update the CXF module to Apache CXF 3.5.0. (remm)
       </update>
+      <add>
+        Improvements to Chinese translations contributed by zhnnn. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
