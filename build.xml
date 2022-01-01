@@ -188,10 +188,10 @@
   <property name="coverage.out" value="${tomcat.output}/coverage"/>
   <property name="coverage.datafile" value="${coverage.out}/jacoco.exec"/>
 
-  <!-- FindBugs settings -->
-  <property name="findbugs.out" value="${tomcat.output}/findbugs"/>
-  <property name="findbugs.report.format" value="html"/>
-  <property name="findbugs.report.level" value="low"/>
+  <!-- SpotBugs settings -->
+  <property name="spotbugs.out" value="${tomcat.output}/spotbugs"/>
+  <property name="spotbugs.report.format" value="html"/>
+  <property name="spotbugs.report.level" value="low"/>
 
   <!-- Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721 -->
   <available file="/dev/urandom" property="test.jvmarg.egd" value="-Djava.security.egd=file:/dev/./urandom"/>
@@ -2038,23 +2038,23 @@
 
   </target>
 
-  <target name="findbugs"
-          if="${execute.findbugs}"
-          depends="compile,download-findbugs">
+  <target name="spotbugs"
+          if="${execute.spotbugs}"
+          depends="compile,download-spotbugs">
 
-    <path id="findbugs.classpath">
-      <fileset file="${findbugs.jar}" />
+    <path id="spotbugs.classpath">
+      <fileset file="${spotbugs.jar}" />
     </path>
 
-    <taskdef classpathref="findbugs.classpath" name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+    <taskdef classpathref="spotbugs.classpath" name="spotbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
 
-    <mkdir dir="${findbugs.out}" />
+    <mkdir dir="${spotbugs.out}" />
 
-    <findbugs home="${findbugs.home}"
-              output="${findbugs.report.format}"
-              outputFile="${findbugs.out}/findbugs-report.${findbugs.report.format}"
-              reportLevel="${findbugs.report.level}"
-              excludeFilter="res/findbugs/filter-false-positives.xml" >
+    <spotbugs home="${spotbugs.home}"
+              output="${spotbugs.report.format}"
+              outputFile="${spotbugs.out}/spotbugs-report.${spotbugs.report.format}"
+              reportLevel="${spotbugs.report.level}"
+              excludeFilter="res/spotbugs/filter-false-positives.xml" >
       <sourcePath path="${basedir}/java" />
       <class location="${tomcat.classes}" />
       <class location="${test.classes}" />
@@ -2062,7 +2062,7 @@
         <fileset file="${jdt.jar}" />
         <fileset file="${ant.core.lib}" />
       </auxClasspath>
-    </findbugs>
+    </spotbugs>
   </target>
 
   <target name="dist-prepare" depends="download-dist">
@@ -3219,16 +3219,16 @@ skip.installer property in build.properties" />
   </target>
 
 
-  <target name="download-findbugs"
-          if="${execute.findbugs}"
-          description="Download FindBugs" >
+  <target name="download-spotbugs"
+          if="${execute.spotbugs}"
+          description="Download SpotBugs" >
 
     <antcall target="downloadgz">
-      <param name="sourcefile" value="${findbugs.loc}"/>
-      <param name="destfile" value="${findbugs.jar}"/>
-      <param name="checksum.enabled" value="${findbugs.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${findbugs.checksum.algorithm}"/>
-      <param name="checksum.value" value="${findbugs.checksum.value}"/>
+      <param name="sourcefile" value="${spotbugs.loc}"/>
+      <param name="destfile" value="${spotbugs.jar}"/>
+      <param name="checksum.enabled" value="${spotbugs.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${spotbugs.checksum.algorithm}"/>
+      <param name="checksum.value" value="${spotbugs.checksum.value}"/>
     </antcall>
 
   </target>
