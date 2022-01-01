@@ -34,7 +34,6 @@
     {"name":"org.apache.catalina.tribes.membership.cloud.LocalStrings"},
     {"name":"org.apache.catalina.tribes.tipis.LocalStrings"},
     {"name":"org.apache.catalina.tribes.transport.LocalStrings"},
-    {"name":"org.apache.catalina.tribes.transport.bio.LocalStrings"},
     {"name":"org.apache.catalina.tribes.transport.nio.LocalStrings"},
     {"name":"org.apache.catalina.tribes.util.LocalStrings"},
     {"name":"org.apache.catalina.users.LocalStrings"},
@@ -68,7 +67,7 @@
     {"name":"org.apache.tomcat.util.net.LocalStrings"},
     {"name":"org.apache.tomcat.util.scan.LocalStrings"},
     {"name":"org.apache.tomcat.util.security.LocalStrings"},
-    {"name":"org.apache.tomcat.util.threads.res.LocalStrings"},
+    {"name":"org.apache.tomcat.util.threads.LocalStrings"},
     {"name":"org.apache.tomcat.websocket.LocalStrings"},
     {"name":"org.apache.tomcat.websocket.pojo.LocalStrings"},
     {"name":"org.apache.tomcat.websocket.server.LocalStrings"}
