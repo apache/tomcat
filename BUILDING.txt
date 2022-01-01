@@ -519,26 +519,26 @@ target. The command is:
     ant -Dexecute.validate=true validate
 
 
-(8.2) FindBugs
+(8.2) SpotBugs
 
-NOTE: FindBugs is licensed under LGPL. Using Findbugs during Tomcat build is
+NOTE: SpotBugs is licensed under LGPL. Using SpotBugs during Tomcat build is
       optional and is off by default.
 
       See https://spotbugs.github.io/ for more information.
 
-To enable FindBugs, add the following property to build.properties file:
+To enable SpotBugs, add the following property to build.properties file:
 
-    execute.findbugs=true
+    execute.spotbugs=true
 
-To compile Tomcat classes and generate a FindBugs report, call the
-"findbugs" target. For example:
+To compile Tomcat classes and generate a SpotBugs report, call the
+"spotbugs" target. For example:
 
     cd ${tomcat.source}
-    ant -Dexecute.findbugs=true findbugs
+    ant -Dexecute.spotbugs=true spotbugs
 
 The report file by default is written to
 
-    output/findbugs
+    output/spotbugs
 
 
 (8.3) End-of-line conventions check
