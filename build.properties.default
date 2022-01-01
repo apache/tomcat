@@ -66,8 +66,8 @@ test.threads=1
 # Enabling code coverage extends the time taken to run the tests by ~50%
 test.coverage=false
 
-# Note the FindBugs is LGPL licensed
-execute.findbugs=false
+# Note the SpotBugs is LGPL licensed
+execute.spotbugs=false
 
 # Some platforms (e.g. OSX El Capitan) require IPv4 to be the default for the
 # multicast tests to work
@@ -282,13 +282,13 @@ jacoco.jar=${jacoco.home}/lib/jacocoant.jar
 jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
 
 # ----- SpotBugs (originally FindBugs) -----
-findbugs.version=4.2.3
-findbugs.checksum.enabled=true
-findbugs.checksum.algorithm=MD5|SHA-1
-findbugs.checksum.value=6eb4a01355a5770f02e136c80182baa6|37daf40c76f11f7ae31894ab8d8fefd7fcb9d07b
-findbugs.home=${base.path}/spotbugs-${findbugs.version}
-findbugs.jar=${findbugs.home}/lib/spotbugs-ant.jar
-findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/spotbugs-${findbugs.version}.tgz
+spotbugs.version=4.2.3
+spotbugs.checksum.enabled=true
+spotbugs.checksum.algorithm=MD5|SHA-1
+spotbugs.checksum.value=6eb4a01355a5770f02e136c80182baa6|37daf40c76f11f7ae31894ab8d8fefd7fcb9d07b
+spotbugs.home=${base.path}/spotbugs-${spotbugs.version}
+spotbugs.jar=${spotbugs.home}/lib/spotbugs-ant.jar
+spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/spotbugs-${spotbugs.version}.tgz
 
 # ----- bnd, version 5.3.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
