@@ -161,6 +161,9 @@
       <add>
         Improvements to Korean translations. (woonsan)
       </add>
+      <update>
+        Update SpotBugs to 4.5.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
