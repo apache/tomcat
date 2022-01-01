@@ -393,13 +393,9 @@ public class CallMethodRule extends Rule {
                     code.append(", ");
                 }
                 if (bodyText != null) {
-                    StringBuilder bodyTextParam = new StringBuilder();
-                    for (String bodyPart : bodyText.split("\n")) {
-                        bodyTextParam.append(bodyPart.trim()).append(' ');
-                    }
-                    code.append("\"").append(bodyTextParam.toString().trim().replace("\"", "\\\"")).append("\"");
+                    code.append("\"").append(IntrospectionUtils.escape(bodyText)).append("\"");
                 } else if (paramValues[i] instanceof String) {
-                    code.append("\"").append(paramValues[i].toString()).append("\"");
+                    code.append("\"").append(IntrospectionUtils.escape(paramValues[i].toString())).append("\"");
                 } else {
                     code.append(digester.toVariableName(paramValues[i]));
                 }
