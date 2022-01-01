@@ -67,8 +67,8 @@ test.threads=1
 # Enabling code coverage extends the time taken to run the tests by ~50%
 test.coverage=false
 
-# Note the FindBugs is LGPL licensed
-execute.findbugs=false
+# Note the SpotBugs is LGPL licensed
+execute.spotbugs=false
 
 # Some platforms (e.g. OSX El Capitan) require IPv4 to be the default for the
 # multicast tests to work
@@ -297,13 +297,13 @@ jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco
 
 # ----- SpotBugs (originally FindBugs) -----
 # 3.1.12 is the last version that runs on Java 7
-findbugs.version=3.1.12
-findbugs.checksum.enabled=true
-findbugs.checksum.algorithm=MD5|SHA-1
-findbugs.checksum.value=8c54502a8e1b78ea6b173a186ce6f379|95114d9aaeeba7bd4ea5a3d6a2167cd6c87bb943
-findbugs.home=${base.path}/spotbugs-${findbugs.version}
-findbugs.jar=${findbugs.home}/lib/spotbugs-ant.jar
-findbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${findbugs.version}/spotbugs-${findbugs.version}.tgz
+spotbugs.version=3.1.12
+spotbugs.checksum.enabled=true
+spotbugs.checksum.algorithm=MD5|SHA-1
+spotbugs.checksum.value=8c54502a8e1b78ea6b173a186ce6f379|95114d9aaeeba7bd4ea5a3d6a2167cd6c87bb943
+spotbugs.home=${base.path}/spotbugs-${spotbugs.version}
+spotbugs.jar=${spotbugs.home}/lib/spotbugs-ant.jar
+spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/spotbugs-${spotbugs.version}.tgz
 
 # ----- JSign, version 4.0 -----
 # JSign 3.0 onwards requires Java 8 by default
