@@ -185,6 +185,9 @@
       <update>
         Update the NSIS installer to 3.08. (markt)
       </update>
+      <update>
+        Update UnboundID to 6.0.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
