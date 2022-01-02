@@ -224,6 +224,9 @@
       <update>
         Update CheckStyle to 9.2.1. (markt)
       </update>
+      <update>
+        Update BND to 6.1.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
