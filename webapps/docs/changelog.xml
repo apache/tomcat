@@ -235,6 +235,9 @@
       <update>
         Update the NSIS installer to 3.08. (markt)
       </update>
+      <update>
+        Update UnboundID to 6.0.3. (markt)
+      </update>
     </changelog>
   </subsection></section>
 <section name="Tomcat 8.5.73 (schultz)" rtext="2021-11-17">
