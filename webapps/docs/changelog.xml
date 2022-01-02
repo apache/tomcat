@@ -194,6 +194,9 @@
       <update>
         Update BND to 6.1.0. (markt)
       </update>
+      <update>
+        Update OSGI annotations to 1.1.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
