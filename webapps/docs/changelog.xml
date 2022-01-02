@@ -200,6 +200,9 @@
       <update>
         Update SpotBugs to 4.5.2. (markt)
       </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.22. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
