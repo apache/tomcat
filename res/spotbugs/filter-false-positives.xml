@@ -1248,6 +1248,12 @@
     <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE" />
   </Match>
   <Match>
+    <!-- NPE is triggered by concurrent close. Catching NPE is reasonable. -->
+    <Class name="org.apache.tomcat.jdbc.pool.DisposableConnectionFacade" />
+    <Method name="invoke" />
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+  </Match>
+  <Match>
     <!-- Lock is released -->
     <Class name="org.apache.tomcat.jdbc.pool.FairBlockingQueue" />
     <Method name="poll" />
@@ -1813,12 +1819,36 @@
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet$1"/>
+    <Method name="run"/>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
     <Or>
       <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet"/>
       <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet"/>
     </Or>
     <Field name="result"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet$1$1"/>
+    <Method name="run"/>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION"/>
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
@@ -2400,25 +2430,16 @@
     </Or>
   </Match>
   <Match>
-    <!-- Array contents is not mutated -->
-    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
-    <Field name="data"/>
-    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
-  </Match>
-  <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Or>
       <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
       <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClientSSL"/>
     </Or>
-    <Method name="testConnectToServerEndpoint"/>
+    <Or>
+      <Method name="testConnectToServerEndpoint"/>
+      <Method name="testConnectToServerEndpointLegacy"/>
+    </Or>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
-  </Match>
-  <Match>
-    <!-- Statics are used deliberately as they are simpler -->
-    <Class name="org.apache.tomcat.websocket.server.TestClose" />
-    <Method name="setUp" />
-    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
     <!-- Statics are used deliberately as they are simpler -->
@@ -2428,12 +2449,24 @@
   </Match>
   <Match>
     <!-- Statics are used deliberately as they are simpler -->
-    <Class name="org.apache.tomcat.websocket.TestWsWebSocketContainer$ConstantTxEndpoint" />
+    <Class name="org.apache.tomcat.websocket.TestWsWebSocketContainerTimeoutServer$ConstantTxEndpoint" />
     <Or>
       <Field name="exception" />
       <Field name="running" />
       <Field name="timeout" />
     </Or>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Array contents is not mutated -->
+    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
+    <Field name="data"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestClose" />
+    <Method name="setUp" />
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
