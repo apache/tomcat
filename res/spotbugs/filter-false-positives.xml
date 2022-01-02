@@ -371,6 +371,14 @@
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
   </Match>
   <Match>
+    <!-- Not catching NPE would require generating an NPE and then wrapping
+         it because there is no MBeanException(String) constructor. It is
+         cleaner to catch the NPE. -->
+    <Class name="org.apache.catalina.mbeans.ContainerMBean" />
+    <Method name="removeValve" />
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+  </Match>
+  <Match>
     <!-- Object is used via side-effect of creation. -->
     <Class name="org.apache.catalina.mbeans.JmxRemoteLifecycleListener" />
     <Method name="createServer" />
@@ -409,6 +417,15 @@
     <Class name="org.apache.catalina.realm.DigestCredentialHandlerBase"/>
     <Method name="mutate"/>
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- Safer to catch NPE as the root cause of NPEs is not clear -->
+    <Class name="org.apache.catalina.realm.JNDIRealm" />
+    <Or>
+      <Method name="authenticate" />
+      <Method name="getPassword" />
+    </Or>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
   </Match>
   <Match>
     <!-- roles will be initialized in addAttributeValues -->
@@ -1060,6 +1077,12 @@
     <Bug code="ES"/>
   </Match>
   <Match>
+    <!--  Dummy thread -->
+    <Class name="org.apache.juli.AsyncFileHandler$LoggerThread"/>
+    <Method name="deregisterHandler"/>
+    <Bug pattern="DM_USELESS_THREAD"/>
+  </Match>
+  <Match>
     <!-- Stream is closed in o.a.juli.ClassLoaderLogManager.readConfiguration
          (InputStream, ClassLoader) -->
     <Class name="org.apache.juli.ClassLoaderLogManager"/>
@@ -1204,6 +1227,12 @@
       <Class name="org.apache.tomcat.jdbc.pool.XADataSource" />
     </Or>
     <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE" />
+  </Match>
+  <Match>
+    <!-- NPE is triggered by concurrent close. Catching NPE is reasonable. -->
+    <Class name="org.apache.tomcat.jdbc.pool.DisposableConnectionFacade" />
+    <Method name="invoke" />
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
   </Match>
   <Match>
     <!-- Lock is released -->
@@ -1441,7 +1470,7 @@
     <Or>
       <Method name="add"/>
       <Method name="close"/>
-      <Method name="destroy"/>
+      <Method name="stop"/>
     </Or>
     <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
@@ -1469,7 +1498,7 @@
     <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
     <Or>
       <Method name="add"/>
-      <Method name="destroy"/>
+      <Method name="stop"/>
     </Or>
     <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
@@ -1541,6 +1570,18 @@
     <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL " />
   </Match>
   <Match>
+    <!-- NPE should never happen but it is caught as a precaution -->
+    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$SocketProcessor" />
+    <Method name="doRun" />
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+  </Match>
+  <Match>
+    <!-- NPE should never happen but it is caught as a precaution -->
+    <Class name="org.apache.tomcat.util.net.NioBlockingSelector$BlockPoller" />
+    <Method name="run" />
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.net.SecureNioChannel"/>
     <Method name="rehandshake"/>
     <Bug code="DE" />
@@ -1598,10 +1639,27 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Field is updated inside a lock. -->
+    <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
+    <Method name="runWorker" />
+    <Bug pattern="VO_VOLATILE_INCREMENT " />
+  </Match>
+  <Match>
     <!-- Random will be SecureRandom and will be used multiple times. -->
     <Class name="org.apache.tomcat.websocket.DigestAuthenticator"/>
     <Method name="getAuthorization"/>
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- A concurrently closed connection can trigger NPEs. It is not possible
+         to test for this before use. -->
+    <Class name="org.apache.tomcat.websocket.PerMessageDeflate" />
+    <Or>
+      <Method name="getMoreData" />
+      <Method name="sendMessagePart" />
+      <Method name="startNewMessage" />
+    </Or>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
   </Match>
   <Match>
     <!-- Random will be SecureRandom and will be used multiple times. -->
@@ -1772,12 +1830,36 @@
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet$1"/>
+    <Method name="run"/>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
     <Or>
       <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet"/>
       <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet"/>
     </Or>
     <Field name="result"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet$1$1"/>
+    <Method name="run"/>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION"/>
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
@@ -2343,7 +2425,7 @@
   </Match>
   <Match>
     <!-- Statics are used deliberately as they are simpler -->
-    <Class name="org.apache.tomcat.websocket.TestWsWebSocketContainer$ConstantTxEndpoint" />
+    <Class name="org.apache.tomcat.websocket.TestWsWebSocketContainerTimeoutServer$ConstantTxEndpoint" />
     <Or>
       <Field name="exception" />
       <Field name="running" />
