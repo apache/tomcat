@@ -377,6 +377,14 @@
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
   </Match>
   <Match>
+    <!-- Not catching NPE would require generating an NPE and then wrapping
+         it because there is no MBeanException(String) constructor. It is
+         cleaner to catch the NPE. -->
+    <Class name="org.apache.catalina.mbeans.ContainerMBean" />
+    <Method name="removeValve" />
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+  </Match>
+  <Match>
     <!-- SQL construction is safe since it is from trusted config -->
     <Class name="org.apache.catalina.realm.DataSourceRealm" />
     <Or>
@@ -392,6 +400,15 @@
     <Class name="org.apache.catalina.realm.DigestCredentialHandlerBase"/>
     <Method name="mutate"/>
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- Safer to catch NPE as the root cause of NPEs is not clear -->
+    <Class name="org.apache.catalina.realm.JNDIRealm" />
+    <Or>
+      <Method name="authenticate" />
+      <Method name="getPassword" />
+    </Or>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
   </Match>
   <Match>
     <!-- roles will be initialized in addAttributeValues -->
@@ -723,6 +740,30 @@
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
   </Match>
   <Match>
+    <!-- Expected. Statement is being generated from configuration. -->
+    <Class name="org.apache.catalina.users.DataSourceUserDatabase"/>
+    <Or>
+      <Method name="findGroupInternal"/>
+      <Method name="findRoleInternal"/>
+      <Method name="findUserInternal"/>
+      <Method name="getGroups"/>
+      <Method name="getRoles"/>
+      <Method name="getUsers"/>
+      <Method name="saveInternal"/>
+    </Or>
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"/>
+  </Match>
+  <Match>
+    <!-- All modifications wrapped with appropriate locks -->
+    <Class name="org.apache.catalina.users.DataSourceUserDatabase"/>
+    <Or>
+      <Method name="modifiedGroup"/>
+      <Method name="modifiedRole"/>
+      <Method name="modifiedUser"/>
+    </Or>
+    <Bug pattern="AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.util.LifecycleBase" />
     <Method name="getState"/>
     <Bug code="UG" />
@@ -1040,6 +1081,12 @@
     <Bug code="ES"/>
   </Match>
   <Match>
+    <!--  Dummy thread -->
+    <Class name="org.apache.juli.AsyncFileHandler$LoggerThread"/>
+    <Method name="deregisterHandler"/>
+    <Bug pattern="DM_USELESS_THREAD"/>
+  </Match>
+  <Match>
     <!-- Stream is closed in o.a.juli.ClassLoaderLogManager.readConfiguration
          (InputStream, ClassLoader) -->
     <Class name="org.apache.juli.ClassLoaderLogManager"/>
@@ -1145,6 +1192,15 @@
     <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
   </Match>
   <Match>
+    <!-- Commons DBCP 2 code Tomcat does not control -->
+    <Class name="org.apache.tomcat.dbcp.dbcp2.datasources.UserPassKey" />
+    <Or>
+      <Field name="name" />
+      <Field name="password" />
+    </Or>
+    <Bug pattern="SE_BAD_FIELD" />
+  </Match>
+  <Match>
     <!-- Pooled objects can't be null so this is OK -->
     <Class name="org.apache.tomcat.dbcp.pool2.impl.BaseGenericObjectPool$IdentityWrapper" />
     <Method name="equals" />
@@ -1189,6 +1245,12 @@
       <Class name="org.apache.tomcat.jdbc.pool.XADataSource" />
     </Or>
     <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE" />
+  </Match>
+  <Match>
+    <!-- NPE is triggered by concurrent close. Catching NPE is reasonable. -->
+    <Class name="org.apache.tomcat.jdbc.pool.DisposableConnectionFacade" />
+    <Method name="invoke" />
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
   </Match>
   <Match>
     <!-- Lock is released -->
@@ -1539,6 +1601,12 @@
     <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL " />
   </Match>
   <Match>
+    <!-- NPE should never happen but it is caught as a precaution -->
+    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$SocketProcessor" />
+    <Method name="doRun" />
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.net.SecureNioChannel"/>
     <Method name="rehandshake"/>
     <Bug code="DE" />
@@ -1596,6 +1664,12 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Field is updated inside a lock. -->
+    <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
+    <Method name="runWorker" />
+    <Bug pattern="VO_VOLATILE_INCREMENT " />
+  </Match>
+  <Match>
     <!-- Monitor is used for a single condition. No need for loop. -->
     <Class name="org.apache.tomcat.util.threads.InlineExecutorService" />
     <Method name="awaitTermination" />
@@ -1606,6 +1680,17 @@
     <Class name="org.apache.tomcat.websocket.DigestAuthenticator"/>
     <Method name="getAuthorization"/>
     <Bug pattern="DMI_RANDOM_USED_ONLY_ONCE"/>
+  </Match>
+  <Match>
+    <!-- A concurrently closed connection can trigger NPEs. It is not possible
+         to test for this before use. -->
+    <Class name="org.apache.tomcat.websocket.PerMessageDeflate" />
+    <Or>
+      <Method name="getMoreData" />
+      <Method name="sendMessagePart" />
+      <Method name="startNewMessage" />
+    </Or>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
   </Match>
   <Match>
     <!-- Random will be SecureRandom and will be used multiple times. -->
@@ -1788,12 +1873,36 @@
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet$1"/>
+    <Method name="run"/>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
     <Or>
       <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet"/>
       <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet"/>
     </Or>
     <Field name="result"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet"/>
+    <Method name="doGet"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet$1$1"/>
+    <Method name="run"/>
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION"/>
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
@@ -2047,6 +2156,15 @@
     <Class name="org.apache.catalina.tribes.test.transport.SocketValidateReceive$1" />
     <Method name="run" />
     <Bug code="DE" />
+  </Match>
+  <Match>
+    <!-- Non-constant is just a split constant -->
+    <Class name="org.apache.catalina.users.DataSourceUserDatabaseTests"/>
+    <Or>
+      <Method name="testBasicUserRoleDatabase"/>
+      <Method name="testUserDatabase"/>
+    </Or>
+    <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
   </Match>
   <Match>
     <!-- Concrete Map type not affected -->
@@ -2377,7 +2495,7 @@
   </Match>
   <Match>
     <!-- Statics are used deliberately as they are simpler -->
-    <Class name="org.apache.tomcat.websocket.TestWsWebSocketContainer$ConstantTxEndpoint" />
+    <Class name="org.apache.tomcat.websocket.TestWsWebSocketContainerTimeoutServer$ConstantTxEndpoint" />
     <Or>
       <Field name="exception" />
       <Field name="running" />
