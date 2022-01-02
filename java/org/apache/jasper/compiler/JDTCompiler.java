@@ -320,11 +320,11 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_Source, "18");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
-                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_8);
+                settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_11);
             }
         } else {
-            // Default to 1.8
-            settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_8);
+            // Default to 11
+            settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_11);
         }
 
         // Target JVM
@@ -387,12 +387,12 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_Compliance, "18");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));
-                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_8);
+                settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_11);
             }
         } else {
-            // Default to 1.8
-            settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_8);
-            settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_1_8);
+            // Default to 11
+            settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_11);
+            settings.put(CompilerOptions.OPTION_Compliance, CompilerOptions.VERSION_11);
         }
 
         final IProblemFactory problemFactory = new DefaultProblemFactory(Locale.getDefault());
