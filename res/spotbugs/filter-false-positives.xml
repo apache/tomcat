@@ -837,6 +837,12 @@
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
+    <!-- Switch fall-though is deliberate -->
+    <Class name="org.apache.coyote.AbstractProcessor"/>
+    <Method name="parseHost"/>
+    <Bug pattern="SF_SWITCH_FALLTHROUGH" />
+  </Match>
+  <Match>
     <!-- Use of synchronisation is required to make a sequence of calls in   -->
     <!-- one method appear to be atomic.                                     -->
     <Class name="org.apache.coyote.AbstractProcessorLight"/>
@@ -1672,6 +1678,18 @@
     <Class name="org.apache.tomcat.websocket.WsWebSocketContainer" />
     <Method name="connectToServer" />
     <Bug code="DLS" />
+  </Match>
+  <Match>
+    <!-- Exception is caught so any issue is handled -->
+    <Class name="org.apache.tomcat.websocket.WsRemoteEndpointImplBase" />
+    <Method name="sendObjectByCompletion" />
+    <Bug pattern="REC_CATCH_EXCEPTION" />
+  </Match>
+  <Match>
+    <!-- Exception is caught so any issue is handled -->
+    <Class name="org.apache.tomcat.websocket.WsWebSocketContainer" />
+    <Method name="createSSLEngine" />
+    <Bug pattern="REC_CATCH_EXCEPTION" />
   </Match>
   <Match>
     <!-- Random will be used multiple times. -->
