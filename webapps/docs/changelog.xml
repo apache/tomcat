@@ -156,7 +156,7 @@
       <update>
         To align with the JSP 3.1 specification that requires Java 11 as a
         minimum, make the default JSP source version and target version Java 11.
-        (markt) 
+        (markt)
       </update>
     </changelog>
   </subsection>
