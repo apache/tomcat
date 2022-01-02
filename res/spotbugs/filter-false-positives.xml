@@ -546,6 +546,12 @@
     <Bug pattern="DM_EXIT" />
   </Match>
   <Match>
+    <!-- Genric error handling -->
+    <Class name="org.apache.catalina.startup.Catalina" />
+    <Method name="parseServerXml" />
+    <Bug pattern="REC_CATCH_EXCEPTION" />
+  </Match>
+  <Match>
     <!-- Catalina isn't used when embedding -->
     <Class name="org.apache.catalina.startup.Catalina" />
     <Method name="stopServer" />
@@ -840,6 +846,12 @@
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
+    <!-- Switch fall-though is deliberate -->
+    <Class name="org.apache.coyote.AbstractProcessor"/>
+    <Method name="parseHost"/>
+    <Bug pattern="SF_SWITCH_FALLTHROUGH" />
+  </Match>
+  <Match>
     <!-- Use of synchronisation is required to make a sequence of calls in   -->
     <!-- one method appear to be atomic.                                     -->
     <Class name="org.apache.coyote.AbstractProcessorLight"/>
@@ -1116,7 +1128,12 @@
     <!-- Simpler to catch Exception than to create dummy implementations of the
          necessary exception hierarchy -->
     <Class name="org.apache.naming.factory.SendMailFactory" />
-    <Method name="lambda$0" />
+    <Or>
+      <!-- Latest Eclipse plug-in and latest stand-alone JAR report different
+           method names. -->
+      <Method name="lambda$0" />
+      <Method name="lambda$getObjectInstance$0" />
+    </Or>
     <Bug pattern="DE_MIGHT_IGNORE" />
   </Match>
   <Match>
@@ -1300,7 +1317,10 @@
   <Match>
     <!-- Fields are used by native code. Tomcat doesn't use them but they are
          part of the public API. -->
-    <Class name="org.apache.tomcat.jni.Sockaddr" />
+    <Or>
+      <Class name="org.apache.tomcat.jni.FileInfo" />
+      <Class name="org.apache.tomcat.jni.Sockaddr" />
+    </Or>
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
   </Match>
   <Match>
@@ -1703,6 +1723,18 @@
     <Class name="org.apache.tomcat.websocket.WsWebSocketContainer" />
     <Method name="connectToServer" />
     <Bug code="DLS" />
+  </Match>
+  <Match>
+    <!-- Exception is caught so any issue is handled -->
+    <Class name="org.apache.tomcat.websocket.WsRemoteEndpointImplBase" />
+    <Method name="sendObjectByCompletion" />
+    <Bug pattern="REC_CATCH_EXCEPTION" />
+  </Match>
+  <Match>
+    <!-- Exception is caught so any issue is handled -->
+    <Class name="org.apache.tomcat.websocket.WsWebSocketContainer" />
+    <Method name="createSSLEngine" />
+    <Bug pattern="REC_CATCH_EXCEPTION" />
   </Match>
   <Match>
     <!-- Random will be used multiple times. -->
