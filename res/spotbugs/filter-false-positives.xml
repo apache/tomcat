@@ -754,6 +754,16 @@
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"/>
   </Match>
   <Match>
+    <!-- All modifications wrapped with appropriate locks -->
+    <Class name="org.apache.catalina.users.DataSourceUserDatabase"/>
+    <Or>
+      <Method name="modifiedGroup"/>
+      <Method name="modifiedRole"/>
+      <Method name="modifiedUser"/>
+    </Or>
+    <Bug pattern="AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.util.LifecycleBase" />
     <Method name="getState"/>
     <Bug code="UG" />

@@ -112,6 +112,10 @@
         ensure that the method fails if called after the web application has
         started. (markt)
       </fix>
+      <fix>
+        Add additional locking to <code>DataSourceUserDatabase</code> to provide
+        improved protection for concurrent modifications. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

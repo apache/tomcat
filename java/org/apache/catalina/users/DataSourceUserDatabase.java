@@ -220,14 +220,26 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
      */
     protected boolean readonly = true;
 
-
+    // The write lock on the database is assumed to include the write locks
+    // for groups, users and roles.
     private final ReentrantReadWriteLock dbLock = new ReentrantReadWriteLock();
-    private final Lock readLock = dbLock.readLock();
-    private final Lock writeLock = dbLock.writeLock();
+    private final Lock dbReadLock = dbLock.readLock();
+    private final Lock dbWriteLock = dbLock.writeLock();
+
+    private final ReentrantReadWriteLock groupsLock = new ReentrantReadWriteLock();
+    private final Lock groupsReadLock = groupsLock.readLock();
+    private final Lock groupsWriteLock = groupsLock.writeLock();
+
+    private final ReentrantReadWriteLock usersLock = new ReentrantReadWriteLock();
+    private final Lock usersReadLock = usersLock.readLock();
+    private final Lock usersWriteLock = usersLock.writeLock();
+
+    private final ReentrantReadWriteLock rolesLock = new ReentrantReadWriteLock();
+    private final Lock rolesReadLock = rolesLock.readLock();
+    private final Lock rolesWriteLock = rolesLock.writeLock();
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * @return the name of the JNDI JDBC DataSource.
@@ -445,109 +457,124 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
     @Override
     public Iterator<Group> getGroups() {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            HashMap<String, Group> groups = new HashMap<>();
-            groups.putAll(createdGroups);
-            groups.putAll(modifiedGroups);
+            groupsReadLock.lock();
+            try {
+                HashMap<String, Group> groups = new HashMap<>();
+                groups.putAll(createdGroups);
+                groups.putAll(modifiedGroups);
 
-            Connection dbConnection = openConnection();
-            if (dbConnection != null && preparedAllGroups != null) {
-                try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllGroups)) {
-                    try (ResultSet rs = stmt.executeQuery()) {
-                        while (rs.next()) {
-                            String groupName = rs.getString(1);
-                            if (groupName != null) {
-                                if (!groups.containsKey(groupName) && !removedGroups.containsKey(groupName)) {
-                                    Group group = findGroupInternal(dbConnection, groupName);
-                                    if (group != null) {
-                                        groups.put(groupName, group);
+                Connection dbConnection = openConnection();
+                if (dbConnection != null && preparedAllGroups != null) {
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllGroups)) {
+                        try (ResultSet rs = stmt.executeQuery()) {
+                            while (rs.next()) {
+                                String groupName = rs.getString(1);
+                                if (groupName != null) {
+                                    if (!groups.containsKey(groupName) && !removedGroups.containsKey(groupName)) {
+                                        Group group = findGroupInternal(dbConnection, groupName);
+                                        if (group != null) {
+                                            groups.put(groupName, group);
+                                        }
                                     }
                                 }
                             }
                         }
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    } finally {
+                        closeConnection(dbConnection);
                     }
-                } catch (SQLException e) {
-                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                } finally {
-                    closeConnection(dbConnection);
                 }
+                return groups.values().iterator();
+            } finally {
+                groupsReadLock.unlock();
             }
-            return groups.values().iterator();
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
     @Override
     public Iterator<Role> getRoles() {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            HashMap<String, Role> roles = new HashMap<>();
-            roles.putAll(createdRoles);
-            roles.putAll(modifiedRoles);
+            rolesReadLock.lock();
+            try {
+                HashMap<String, Role> roles = new HashMap<>();
+                roles.putAll(createdRoles);
+                roles.putAll(modifiedRoles);
 
-            Connection dbConnection = openConnection();
-            if (dbConnection != null && preparedAllRoles != null) {
-                try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllRoles)) {
-                    try (ResultSet rs = stmt.executeQuery()) {
-                        while (rs.next()) {
-                            String roleName = rs.getString(1);
-                            if (roleName != null) {
-                                if (!roles.containsKey(roleName) && !removedRoles.containsKey(roleName)) {
-                                    Role role = findRoleInternal(dbConnection, roleName);
-                                    if (role != null) {
-                                        roles.put(roleName, role);
+                Connection dbConnection = openConnection();
+                if (dbConnection != null && preparedAllRoles != null) {
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllRoles)) {
+                        try (ResultSet rs = stmt.executeQuery()) {
+                            while (rs.next()) {
+                                String roleName = rs.getString(1);
+                                if (roleName != null) {
+                                    if (!roles.containsKey(roleName) && !removedRoles.containsKey(roleName)) {
+                                        Role role = findRoleInternal(dbConnection, roleName);
+                                        if (role != null) {
+                                            roles.put(roleName, role);
+                                        }
                                     }
                                 }
                             }
                         }
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    } finally {
+                        closeConnection(dbConnection);
                     }
-                } catch (SQLException e) {
-                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                } finally {
-                    closeConnection(dbConnection);
                 }
+                return roles.values().iterator();
+            } finally {
+                rolesReadLock.unlock();
             }
-            return roles.values().iterator();
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
     @Override
     public Iterator<User> getUsers() {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            HashMap<String, User> users = new HashMap<>();
-            users.putAll(createdUsers);
-            users.putAll(modifiedUsers);
+            usersReadLock.lock();
+            try {
+                HashMap<String, User> users = new HashMap<>();
+                users.putAll(createdUsers);
+                users.putAll(modifiedUsers);
 
-            Connection dbConnection = openConnection();
-            if (dbConnection != null) {
-                try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllUsers)) {
-                    try (ResultSet rs = stmt.executeQuery()) {
-                        while (rs.next()) {
-                            String userName = rs.getString(1);
-                            if (userName != null) {
-                                if (!users.containsKey(userName) && !removedUsers.containsKey(userName)) {
-                                    User user = findUserInternal(dbConnection, userName);
-                                    if (user != null) {
-                                        users.put(userName, user);
+                Connection dbConnection = openConnection();
+                if (dbConnection != null) {
+                    try (PreparedStatement stmt = dbConnection.prepareStatement(preparedAllUsers)) {
+                        try (ResultSet rs = stmt.executeQuery()) {
+                            while (rs.next()) {
+                                String userName = rs.getString(1);
+                                if (userName != null) {
+                                    if (!users.containsKey(userName) && !removedUsers.containsKey(userName)) {
+                                        User user = findUserInternal(dbConnection, userName);
+                                        if (user != null) {
+                                            users.put(userName, user);
+                                        }
                                     }
                                 }
                             }
                         }
+                    } catch (SQLException e) {
+                        log.error(sm.getString("dataSourceUserDatabase.exception"), e);
+                    } finally {
+                        closeConnection(dbConnection);
                     }
-                } catch (SQLException e) {
-                    log.error(sm.getString("dataSourceUserDatabase.exception"), e);
-                } finally {
-                    closeConnection(dbConnection);
                 }
+                return users.values().iterator();
+            } finally {
+                usersReadLock.unlock();
             }
-            return users.values().iterator();
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
@@ -557,76 +584,96 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
     @Override
     public Group createGroup(String groupname, String description) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            Group group = new GenericGroup<>(this, groupname, description, null);
-            createdGroups.put(groupname, group);
-            modifiedGroups.remove(groupname);
-            return group;
+            groupsWriteLock.lock();
+            try {
+                Group group = new GenericGroup<>(this, groupname, description, null);
+                createdGroups.put(groupname, group);
+                modifiedGroups.remove(groupname);
+                return group;
+            } finally {
+                groupsWriteLock.unlock();
+            }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
     @Override
     public Role createRole(String rolename, String description) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            Role role = new GenericRole<>(this, rolename, description);
-            createdRoles.put(rolename, role);
-            modifiedRoles.remove(rolename);
-            return role;
+            rolesWriteLock.lock();
+            try {
+                Role role = new GenericRole<>(this, rolename, description);
+                createdRoles.put(rolename, role);
+                modifiedRoles.remove(rolename);
+                return role;
+            } finally {
+                rolesWriteLock.unlock();
+            }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
     @Override
     public User createUser(String username, String password, String fullName) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            User user = new GenericUser<>(this, username, password, fullName, null, null);
-            createdUsers.put(username, user);
-            modifiedUsers.remove(username);
-            return user;
+            usersWriteLock.lock();
+            try {
+                User user = new GenericUser<>(this, username, password, fullName, null, null);
+                createdUsers.put(username, user);
+                modifiedUsers.remove(username);
+                return user;
+            } finally {
+                usersWriteLock.unlock();
+            }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
     @Override
     public Group findGroup(String groupname) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            // Check local changes first
-            Group group = createdGroups.get(groupname);
-            if (group != null) {
-                return group;
-            }
-            group = modifiedGroups.get(groupname);
-            if (group != null) {
-                return group;
-            }
-            group = removedGroups.get(groupname);
-            if (group != null) {
-                return null;
-            }
-
-            if (isGroupStoreDefined()) {
-                Connection dbConnection = openConnection();
-                if (dbConnection == null) {
+            groupsReadLock.lock();
+            try {
+                // Check local changes first
+                Group group = createdGroups.get(groupname);
+                if (group != null) {
+                    return group;
+                }
+                group = modifiedGroups.get(groupname);
+                if (group != null) {
+                    return group;
+                }
+                group = removedGroups.get(groupname);
+                if (group != null) {
                     return null;
                 }
-                try {
-                    return findGroupInternal(dbConnection, groupname);
-                } finally {
-                    closeConnection(dbConnection);
+
+                if (isGroupStoreDefined()) {
+                    Connection dbConnection = openConnection();
+                    if (dbConnection == null) {
+                        return null;
+                    }
+                    try {
+                        return findGroupInternal(dbConnection, groupname);
+                    } finally {
+                        closeConnection(dbConnection);
+                    }
+                } else {
+                    return null;
                 }
-            } else {
-                return null;
+            } finally {
+                groupsReadLock.unlock();
             }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
@@ -670,37 +717,42 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
     @Override
     public Role findRole(String rolename) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            // Check local changes first
-            Role role = createdRoles.get(rolename);
-            if (role != null) {
-                return role;
-            }
-            role = modifiedRoles.get(rolename);
-            if (role != null) {
-                return role;
-            }
-            role = removedRoles.get(rolename);
-            if (role != null) {
-                return null;
-            }
-
-            if (userRoleTable != null && roleNameCol != null) {
-                Connection dbConnection = openConnection();
-                if (dbConnection == null) {
+            rolesReadLock.lock();
+            try {
+                // Check local changes first
+                Role role = createdRoles.get(rolename);
+                if (role != null) {
+                    return role;
+                }
+                role = modifiedRoles.get(rolename);
+                if (role != null) {
+                    return role;
+                }
+                role = removedRoles.get(rolename);
+                if (role != null) {
                     return null;
                 }
-                try {
-                    return findRoleInternal(dbConnection, rolename);
-                } finally {
-                    closeConnection(dbConnection);
+
+                if (userRoleTable != null && roleNameCol != null) {
+                    Connection dbConnection = openConnection();
+                    if (dbConnection == null) {
+                        return null;
+                    }
+                    try {
+                        return findRoleInternal(dbConnection, rolename);
+                    } finally {
+                        closeConnection(dbConnection);
+                    }
+                } else {
+                    return null;
                 }
-            } else {
-                return null;
+            } finally {
+                rolesReadLock.unlock();
             }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
@@ -724,33 +776,38 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
     @Override
     public User findUser(String username) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            // Check local changes first
-            User user = createdUsers.get(username);
-            if (user != null) {
-                return user;
-            }
-            user = modifiedUsers.get(username);
-            if (user != null) {
-                return user;
-            }
-            user = removedUsers.get(username);
-            if (user != null) {
-                return null;
-            }
-
-            Connection dbConnection = openConnection();
-            if (dbConnection == null) {
-                return null;
-            }
+            usersReadLock.lock();
             try {
-                return findUserInternal(dbConnection, username);
+                // Check local changes first
+                User user = createdUsers.get(username);
+                if (user != null) {
+                    return user;
+                }
+                user = modifiedUsers.get(username);
+                if (user != null) {
+                    return user;
+                }
+                user = removedUsers.get(username);
+                if (user != null) {
+                    return null;
+                }
+
+                Connection dbConnection = openConnection();
+                if (dbConnection == null) {
+                    return null;
+                }
+                try {
+                    return findUserInternal(dbConnection, username);
+                } finally {
+                    closeConnection(dbConnection);
+                }
             } finally {
-                closeConnection(dbConnection);
+                usersReadLock.unlock();
             }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
@@ -822,40 +879,55 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
     @Override
     public void modifiedGroup(Group group) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            String name = group.getName();
-            if (!createdGroups.containsKey(name) && !removedGroups.containsKey(name)) {
-                modifiedGroups.put(name, group);
+            groupsWriteLock.lock();
+            try {
+                String name = group.getName();
+                if (!createdGroups.containsKey(name) && !removedGroups.containsKey(name)) {
+                    modifiedGroups.put(name, group);
+                }
+            } finally {
+                groupsWriteLock.unlock();
             }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
     @Override
     public void modifiedRole(Role role) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            String name = role.getName();
-            if (!createdRoles.containsKey(name) && !removedRoles.containsKey(name)) {
-                modifiedRoles.put(name, role);
+            rolesWriteLock.lock();
+            try {
+                String name = role.getName();
+                if (!createdRoles.containsKey(name) && !removedRoles.containsKey(name)) {
+                    modifiedRoles.put(name, role);
+                }
+            } finally {
+                rolesWriteLock.unlock();
             }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
     @Override
     public void modifiedUser(User user) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            String name = user.getName();
-            if (!createdUsers.containsKey(name) && !removedUsers.containsKey(name)) {
-                modifiedUsers.put(name, user);
+            usersWriteLock.lock();
+            try {
+                String name = user.getName();
+                if (!createdUsers.containsKey(name) && !removedUsers.containsKey(name)) {
+                    modifiedUsers.put(name, user);
+                }
+            } finally {
+                usersWriteLock.unlock();
             }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
@@ -870,7 +942,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                     + "], Groups [" + Boolean.toString(isRoleStoreDefined()) + "]");
         }
 
-        writeLock.lock();
+        dbWriteLock.lock();
         try {
 
             StringBuilder temp = new StringBuilder("SELECT ");
@@ -970,47 +1042,62 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             }
 
         } finally {
-            writeLock.unlock();
+            dbWriteLock.unlock();
         }
 
     }
 
     @Override
     public void removeGroup(Group group) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            String name = group.getName();
-            createdGroups.remove(name);
-            modifiedGroups.remove(name);
-            removedGroups.put(name, group);
+            groupsWriteLock.lock();
+            try {
+                String name = group.getName();
+                createdGroups.remove(name);
+                modifiedGroups.remove(name);
+                removedGroups.put(name, group);
+            } finally {
+                groupsWriteLock.unlock();
+            }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
     @Override
     public void removeRole(Role role) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            String name = role.getName();
-            createdRoles.remove(name);
-            modifiedRoles.remove(name);
-            removedRoles.put(name, role);
+            rolesWriteLock.lock();
+            try {
+                String name = role.getName();
+                createdRoles.remove(name);
+                modifiedRoles.remove(name);
+                removedRoles.put(name, role);
+            } finally {
+                rolesWriteLock.unlock();
+            }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
     @Override
     public void removeUser(User user) {
-        readLock.lock();
+        dbReadLock.lock();
         try {
-            String name = user.getName();
-            createdUsers.remove(name);
-            modifiedUsers.remove(name);
-            removedUsers.put(name, user);
+            usersWriteLock.lock();
+            try {
+                String name = user.getName();
+                createdUsers.remove(name);
+                modifiedUsers.remove(name);
+                removedUsers.put(name, user);
+            } finally {
+                usersWriteLock.unlock();
+            }
         } finally {
-            readLock.unlock();
+            dbReadLock.unlock();
         }
     }
 
@@ -1025,7 +1112,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
             return;
         }
 
-        writeLock.lock();
+        dbWriteLock.lock();
         try {
             try {
                 saveInternal(dbConnection);
@@ -1033,7 +1120,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
                 closeConnection(dbConnection);
             }
         } finally {
-            writeLock.unlock();
+            dbWriteLock.unlock();
         }
     }
 
