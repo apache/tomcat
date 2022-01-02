@@ -215,6 +215,9 @@
       <update>
         Update to the Eclipse JDT compiler 4.22. (markt)
       </update>
+      <update>
+        Update the NSIS installer to 3.08. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
