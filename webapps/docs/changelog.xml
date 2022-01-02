@@ -194,6 +194,13 @@
         <code>PropertyNotWritableException</code>s caused by a typo in the name
         used for a resource string. (markt)
       </fix>
+      <add>
+        Add support for specifying Java 18 (with the value <code>18</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will used.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
