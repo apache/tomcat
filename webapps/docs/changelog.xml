@@ -128,6 +128,10 @@
         Revert the previous fix for <bug>65714</bug> and implement a more
         comprehensive fix. (markt)
       </fix>
+      <fix>
+        <bug>65757</bug>: Missing initial IO listener notification on Servlet
+       container dispatch to another container thread. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
