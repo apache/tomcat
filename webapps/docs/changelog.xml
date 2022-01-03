@@ -137,6 +137,10 @@
         Allow freeing up context on JVM shutdown in the OpenSSL Panama module
         by properly using a shared scope. (remm)
       </fix>
+      <fix>
+        <bug>65757</bug>: Missing initial IO listener notification on Servlet
+       container dispatch to another container thread. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
