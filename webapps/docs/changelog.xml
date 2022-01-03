@@ -185,6 +185,10 @@
         Restore pre-starting of <code>minSpareThreads</code> lost in the fix for
         <bug>65454</bug>. (markt)
       </fix>
+      <fix>
+        <bug>65757</bug>: Missing initial IO listener notification on Servlet
+       container dispatch to another container thread. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
