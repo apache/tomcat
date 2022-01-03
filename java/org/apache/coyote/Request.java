@@ -154,6 +154,7 @@ public final class Request {
     private long bytesRead=0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
     private long startTime = -1;
+    private long threadId = 0;
     private int available = 0;
 
     private final RequestInfo reqProcessorMX=new RequestInfo(this);
@@ -220,7 +221,7 @@ public final class Request {
                 fireListener = true;
             }
             action(ActionCode.DISPATCH_READ, null);
-            if (!ContainerThreadMarker.isContainerThread()) {
+            if (!isRequestThread()) {
                 // Not on a container thread so need to execute the dispatch
                 action(ActionCode.DISPATCH_EXECUTE, null);
             }
@@ -687,6 +688,18 @@ public final class Request {
         this.startTime = startTime;
     }
 
+    public long getThreadId() {
+        return threadId;
+    }
+
+    public void setRequestThread() {
+        threadId = Thread.currentThread().getId();
+    }
+
+    public boolean isRequestThread() {
+        return Thread.currentThread().getId() == threadId;
+    }
+
     // -------------------- Per-Request "notes" --------------------
 
 
@@ -770,6 +783,7 @@ public final class Request {
         allDataReadEventSent.set(false);
 
         startTime = -1;
+        threadId = 0;
     }
 
     // -------------------- Info  --------------------

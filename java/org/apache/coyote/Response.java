@@ -727,7 +727,7 @@ public final class Response {
                 fireListener = true;
             }
             action(ActionCode.DISPATCH_WRITE, null);
-            if (!ContainerThreadMarker.isContainerThread()) {
+            if (!req.isRequestThread()) {
                 // Not on a container thread so need to execute the dispatch
                 action(ActionCode.DISPATCH_EXECUTE, null);
             }

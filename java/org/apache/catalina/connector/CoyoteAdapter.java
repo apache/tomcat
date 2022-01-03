@@ -133,6 +133,7 @@ public class CoyoteAdapter implements Adapter {
         AsyncContextImpl asyncConImpl = request.getAsyncContextInternal();
 
         req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
+        req.setRequestThread();
 
         try {
             if (!request.isAsync()) {
@@ -344,6 +345,7 @@ public class CoyoteAdapter implements Adapter {
         boolean postParseSuccess = false;
 
         req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
+        req.setRequestThread();
 
         try {
             // Parse and set Catalina and configuration specific
