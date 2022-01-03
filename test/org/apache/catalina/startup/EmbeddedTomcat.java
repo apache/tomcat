@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.modeler.Registry;
 import org.junit.Ignore;
 
 import org.apache.catalina.Context;
@@ -57,6 +58,7 @@ public class EmbeddedTomcat {
     }
 
     public static void main(String... args) throws Exception {
+        Registry.disableRegistry();
         Tomcat tomcat = new Tomcat();
         resetLogging();
         tomcat.setPort(8080);
