@@ -49,7 +49,7 @@ native-image \
 -H:EnableURLProtocols=http \
 --report-unsupported-elements-at-runtime \
 --initialize-at-run-time=org.apache,jakarta.servlet \
--H:+TraceClassInitialization \
+-H:TraceClassInitialization=org.* \
 -H:+PrintClassInitialization \
 -H:+PrintAnalysisCallTree \
 -H:Name=tc-graal-image \
