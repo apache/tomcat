@@ -52,7 +52,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -929,7 +928,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
 
-    @Ignore
     @Test
     public void testDelayedNBWrite() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -979,7 +977,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             try {
                 ByteChunk result = new ByteChunk();
                 int rc = getUrl(url, result, null);
-                Assert.assertTrue(rc == HttpServletResponse.SC_OK);
+                Assert.assertEquals(HttpServletResponse.SC_OK, rc);
                 Assert.assertTrue(result.toString().contains("OK"));
             } catch (Throwable e) {
                 e.printStackTrace();
