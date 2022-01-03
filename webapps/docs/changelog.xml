@@ -141,6 +141,11 @@
         <bug>65757</bug>: Missing initial IO listener notification on Servlet
        container dispatch to another container thread. (remm)
       </fix>
+      <fix>
+        Improve the fix for RST frame ordering added in 10.1.0-M8 to avoid a
+        potential deadlock on some systems in non-default configurations.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -353,7 +353,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                             // continue reading frames
                             Stream stream = getStream(se.getStreamId(), false);
                             if (stream == null) {
-                                sendStreamReset(se);
+                                sendStreamReset(null, se);
                             } else {
                                 stream.close(se);
                             }
@@ -536,7 +536,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    void sendStreamReset(StreamException se) throws IOException {
+    void sendStreamReset(StreamStateMachine state, StreamException se) throws IOException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
@@ -555,7 +555,17 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Payload
         ByteUtil.setFourBytes(rstFrame, 9, se.getError().getCode());
 
+        // Need to update state atomically with the sending of the RST
+        // frame else other threads currently working with this stream
+        // may see the state change and send a RST frame before the RST
+        // frame triggered by this thread. If that happens the client
+        // may see out of order RST frames which may hard to follow if
+        // the client is unaware the RST frames may be received out of
+        // order.
         synchronized (socketWrapper) {
+            if (state != null) {
+                state.sendReset();
+            }
             socketWrapper.write(true, rstFrame, 0, rstFrame.length);
             socketWrapper.flush(true);
         }
