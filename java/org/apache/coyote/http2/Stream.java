@@ -1308,16 +1308,23 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 closed = true;
             }
             if (inBuffer != null) {
+                int unreadByteCount = 0;
                 synchronized (inBuffer) {
-                    int unreadByteCount = inBuffer.position();
+                    unreadByteCount = inBuffer.position();
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("stream.inputBuffer.swallowUnread", Integer.valueOf(unreadByteCount)));
                     }
                     if (unreadByteCount > 0) {
                         inBuffer.position(0);
                         inBuffer.limit(inBuffer.limit() - unreadByteCount);
-                        handler.onSwallowedDataFramePayload(getIdAsInt(), unreadByteCount);
                     }
+                }
+                // Do this outside of the sync because:
+                // - it doesn't need to be inside the sync
+                // - if inside the sync it can trigger a deadlock
+                //   https://markmail.org/message/vbglzkvj6wxlhh3p
+                if (unreadByteCount > 0) {
+                    handler.onSwallowedDataFramePayload(getIdAsInt(), unreadByteCount);
                 }
             }
         }

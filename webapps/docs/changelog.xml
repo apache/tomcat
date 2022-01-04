@@ -189,6 +189,10 @@
         <bug>65757</bug>: Missing initial IO listener notification on Servlet
        container dispatch to another container thread. (remm)
       </fix>
+      <fix>
+        Avoid a potential deadlock during the concurrent processing of incoming
+        HTTP/2 frames for a stream and that stream being reset. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
