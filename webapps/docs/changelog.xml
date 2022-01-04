@@ -285,6 +285,10 @@
         on MacOS as it does on Linux and Windows when no trusted certificate
         authorities are configured and reject all client certificates. (markt)
       </add>
+      <fix>
+        Avoid a potential deadlock during the concurrent processing of incoming
+        HTTP/2 frames for a stream and that stream being reset. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
