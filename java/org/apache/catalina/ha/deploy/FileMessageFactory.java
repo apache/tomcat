@@ -353,7 +353,7 @@ public class FileMessageFactory {
      *            String[], args[0] - read from filename, args[1] write to
      *            filename
      * @throws Exception An error occurred
-     * @deprecated
+     * @deprecated This method will be removed in Tomcat 10.0.x
      */
     @Deprecated
     public static void main(String[] args) throws Exception {
