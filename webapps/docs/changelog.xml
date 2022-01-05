@@ -138,6 +138,10 @@
         does not explicitly close an input stream for an uploaded file that was
         cached on disk. (markt)
       </add>
+      <fix>
+        Add recycling check in the input and output stream isReady to try to
+        give a more informative ISE when the facade has been recycled. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

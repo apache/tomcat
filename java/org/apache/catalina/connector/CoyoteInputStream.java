@@ -241,6 +241,9 @@ public class CoyoteInputStream extends ServletInputStream {
 
     @Override
     public boolean isReady() {
+        if (ib == null) {
+            throw new IllegalStateException(sm.getString("coyoteInputStream.null"));
+        }
         return ib.isReady();
     }
 
