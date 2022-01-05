@@ -116,6 +116,10 @@
         Add additional locking to <code>DataSourceUserDatabase</code> to provide
         improved protection for concurrent modifications. (markt)
       </fix>
+      <fix>
+        Add recycling check in the input and output stream isReady to try to
+        give a more informative ISE when the facade has been recycled. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

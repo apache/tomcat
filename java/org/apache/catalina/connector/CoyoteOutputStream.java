@@ -159,6 +159,9 @@ public class CoyoteOutputStream extends ServletOutputStream {
 
     @Override
     public boolean isReady() {
+        if (ob == null) {
+            throw new IllegalStateException(sm.getString("coyoteOutputStream.null"));
+        }
         return ob.isReady();
     }
 
