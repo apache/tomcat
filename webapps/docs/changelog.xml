@@ -166,6 +166,10 @@
         that allows applications to opt to upgrade an HTTP connection to
         WebSocket. (markt)
       </add>
+      <fix>
+        <bug>65763</bug>: Improve handling of WebSocket connection close if a
+        message write times out before the message is fully written. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -19,7 +19,6 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.channels.WritePendingException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Collections;
@@ -814,7 +813,7 @@ public class WsSession implements Session {
         msg.flip();
         try {
             wsRemoteEndpoint.sendMessageBlock(Constants.OPCODE_CLOSE, msg, true);
-        } catch (IOException | WritePendingException e) {
+        } catch (IOException | IllegalStateException e) {
             // Failed to send close message. Close the socket and let the caller
             // deal with the Exception
             if (log.isDebugEnabled()) {
