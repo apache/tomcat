@@ -197,6 +197,10 @@
         Avoid a potential deadlock during the concurrent processing of incoming
         HTTP/2 frames for a stream and that stream being reset. (markt)
       </fix>
+      <add>
+        <bug>65767</bug>:  Add support for certificates that use keys encrypted
+        using PBES2. Based on a pull request provided by xiezhaokun. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
