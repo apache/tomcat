@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -59,6 +60,8 @@ public class PEMFile {
 
     private static final byte[] OID_EC_PUBLIC_KEY =
             new byte[] { 0x06, 0x07, 0x2A, (byte) 0x86, 0x48, (byte) 0xCE, 0x3D, 0x02, 0x01 };
+
+    private static final String OID_PKCS5_PBES2 = "1.2.840.113549.1.5.13";
 
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
         StringBuilder result = new StringBuilder();
@@ -181,10 +184,11 @@ public class PEMFile {
                 }
             } else {
                 EncryptedPrivateKeyInfo privateKeyInfo = new EncryptedPrivateKeyInfo(decode());
-                SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(privateKeyInfo.getAlgName());
+                String pbeAlgorithm = getPBEAlgorithm(privateKeyInfo);
+                SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(pbeAlgorithm);
                 SecretKey secretKey = secretKeyFactory.generateSecret(new PBEKeySpec(password.toCharArray()));
 
-                Cipher cipher = Cipher.getInstance(privateKeyInfo.getAlgName());
+                Cipher cipher = Cipher.getInstance(pbeAlgorithm);
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, privateKeyInfo.getAlgParameters());
 
                 keySpec = privateKeyInfo.getKeySpec(cipher);
@@ -208,6 +212,25 @@ public class PEMFile {
             }
 
             throw exception;
+        }
+
+
+        private String getPBEAlgorithm(EncryptedPrivateKeyInfo privateKeyInfo) {
+            AlgorithmParameters parameters = privateKeyInfo.getAlgParameters();
+            if (parameters != null && OID_PKCS5_PBES2.equals(privateKeyInfo.getAlgName())) {
+                /*
+                 * This should be "PBEWith<prf>And<encryption>".
+                 * Relying on the toString() implementation is potentially
+                 * fragile but acceptable in this case since the JRE depends on
+                 * the toString() implementation as well.
+                 * In the future, if necessary, we can parse the value of
+                 * paremeters.getEncoded() but the associated complexity and
+                 * unlikeliness of the JRE implementation changing means that
+                 * Tomcat will use to toString() approach for now.
+                 */
+                return parameters.toString();
+            }
+            return privateKeyInfo.getAlgName();
         }
 
 
