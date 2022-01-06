@@ -196,6 +196,10 @@
         Add support for the WebSocket 2.1 client-side API for configuring TLS
         connection for wss client connections. (markt)
       </add>
+      <fix>
+        <bug>65763</bug>: Improve handling of WebSocket connection close if a
+        message write times out before the message is fully written. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
