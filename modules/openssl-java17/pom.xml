@@ -25,7 +25,7 @@
     </parent>
 
     <groupId>org.apache.tomcat</groupId>
-    <artifactId>openssl-java17</artifactId>
+    <artifactId>tomcat-coyote-openssl-java17</artifactId>
     <name>Apache Tomcat OpenSSL support for Java 17</name>
     <description>OpenSSL support using the Panama JEP 412 API included in Java 17</description>
     <version>0.1-SNAPSHOT</version>
