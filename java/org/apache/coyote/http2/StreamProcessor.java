@@ -17,7 +17,10 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Iterator;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
@@ -34,6 +37,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketEvent;
@@ -373,7 +377,13 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     public final SocketState service(SocketWrapperBase<?> socket) throws IOException {
         try {
-            adapter.service(request, response);
+            if (validateRequest()) {
+                adapter.service(request, response);
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                adapter.log(request, response, 0);
+                setErrorState(ErrorState.CLOSE_CLEAN, null);
+            }
         } catch (Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("streamProcessor.service.error"), e);
@@ -393,6 +403,65 @@ class StreamProcessor extends AbstractProcessor {
             request.updateCounters();
             return SocketState.CLOSED;
         }
+    }
+
+
+    /*
+     * In HTTP/1.1 some aspects of the request are validated as the request is
+     * parsed and the request rejected immediately with a 400 response. These
+     * checks are performed in Http11InputBuffer. Because, in Tomcat's HTTP/2
+     * implementation, incoming frames are processed on one thread while the
+     * corresponding request/response is processed on a separate thread,
+     * rejecting invalid requests is more involved.
+     *
+     * One approach would be to validate the request during parsing, note any
+     * validation errors and then generate a 400 response once processing moves
+     * to the separate request/response thread. This would require refactoring
+     * to track the validation errors.
+     *
+     * A second approach, and the one currently adopted, is to perform the
+     * validation shortly after processing of the received request passes to the
+     * separate thread and to generate a 400 response if validation fails.
+     *
+     * The checks performed below are based on the checks in Http11InputBuffer.
+     */
+    private boolean validateRequest() {
+        // Method name must be a token
+        String method = request.method().toString();
+        if (!HttpParser.isToken(method)) {
+            return false;
+        }
+
+        // Invalid character in request target
+        // (other checks such as valid %nn happen later)
+        ByteChunk bc = request.requestURI().getByteChunk();
+        for (int i = bc.getStart(); i < bc.getEnd(); i++) {
+            if (HttpParser.isNotRequestTarget(bc.getBuffer()[i])) {
+                return false;
+            }
+        }
+
+        // Ensure the query string doesn't contain invalid characters.
+        // (other checks such as valid %nn happen later)
+        String qs = request.queryString().toString();
+        if (qs != null) {
+            for (char c : qs.toCharArray()) {
+                if (!HttpParser.isQuery(c)) {
+                    return false;
+                }
+            }
+        }
+
+        // HTTP header names must be tokens.
+        MimeHeaders headers = request.getMimeHeaders();
+        Enumeration<String> names = headers.names();
+        while (names.hasMoreElements()) {
+            if (!HttpParser.isToken(names.nextElement())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 

@@ -204,6 +204,10 @@
       <scode>
         Refactor testing whether a String is a valid HTTP token. (markt)
       </scode>
+      <fix>
+        <bug>65785</bug>: Perform additional validation of HTTP headers when
+        using HTTP/2. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
