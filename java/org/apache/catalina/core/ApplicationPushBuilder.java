@@ -199,11 +199,8 @@ public class ApplicationPushBuilder implements PushBuilder {
                     sm.getString("applicationPushBuilder.methodInvalid", upperMethod));
         }
         // Check a token was supplied
-        for (char c : upperMethod.toCharArray()) {
-            if (!HttpParser.isToken(c)) {
-                throw new IllegalArgumentException(
-                        sm.getString("applicationPushBuilder.methodNotToken", upperMethod));
-            }
+        if (!HttpParser.isToken(upperMethod)) {
+            throw new IllegalArgumentException(sm.getString("applicationPushBuilder.methodNotToken", upperMethod));
         }
         this.method = method;
         return this;

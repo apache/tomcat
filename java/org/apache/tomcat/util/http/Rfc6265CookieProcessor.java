@@ -272,15 +272,11 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
 
     private void validateAttribute(String name, String value) {
-        char[] chars = name.toCharArray();
-        for (char ch : chars) {
-            if (!HttpParser.isToken(ch)) {
-                throw new IllegalArgumentException(sm.getString(
-                        "rfc6265CookieProcessor.invalidAttributeName", name));
-            }
+        if (!HttpParser.isToken(name)) {
+            throw new IllegalArgumentException(sm.getString("rfc6265CookieProcessor.invalidAttributeName", name));
         }
 
-        chars = value.toCharArray();
+        char[] chars = value.toCharArray();
         for (char ch : chars) {
             if (ch < 0x20 || ch > 0x7E || ch == ';') {
                 throw new IllegalArgumentException(sm.getString(
