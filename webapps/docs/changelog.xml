@@ -145,6 +145,9 @@
         <bug>65767</bug>:  Add support for certificates that use keys encrypted
         using PBES2. Based on a pull request provided by xiezhaokun. (markt)
       </add>
+      <scode>
+        Refactor testing whether a String is a valid HTTP token. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

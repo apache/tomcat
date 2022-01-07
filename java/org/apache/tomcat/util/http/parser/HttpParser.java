@@ -237,6 +237,23 @@ public class HttpParser {
     }
 
 
+    public static boolean isToken(String s) {
+        // token = 1 * tchar (RFC 7230)
+        if (s == null) {
+            return false;
+        }
+        if (s.isEmpty()) {
+            return false;
+        }
+        for (char c : s.toCharArray()) {
+            if (!isToken(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     public static boolean isHex(int c) {
         // Fast for correct values, slower for some incorrect ones
         try {
