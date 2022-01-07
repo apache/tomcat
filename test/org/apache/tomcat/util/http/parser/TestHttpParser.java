@@ -25,4 +25,38 @@ public class TestHttpParser {
     public void testTokenDel() {
         Assert.assertFalse("DEL is not a token", HttpParser.isToken(127));
     }
+    @Test
+    public void testTokenStringNull() {
+        Assert.assertFalse(HttpParser.isToken(null));
+    }
+
+
+    @Test
+    public void testTokenStringEmpty() {
+        Assert.assertFalse(HttpParser.isToken(""));
+    }
+
+
+    @Test
+    public void testTokenStringLws01() {
+        Assert.assertFalse(HttpParser.isToken(" "));
+    }
+
+
+    @Test
+    public void testTokenStringLws02() {
+        Assert.assertFalse(HttpParser.isToken(" aaa"));
+    }
+
+
+    @Test
+    public void testTokenStringLws03() {
+        Assert.assertFalse(HttpParser.isToken("\taaa"));
+    }
+
+
+    @Test
+    public void testTokenStringValid() {
+        Assert.assertTrue(HttpParser.isToken("token"));
+    }
 }
