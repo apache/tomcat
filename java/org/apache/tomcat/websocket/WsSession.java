@@ -691,6 +691,8 @@ public class WsSession implements Session {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("wsSession.doClose", id));
             }
+
+            // This will trigger a flush of any batched messages.
             try {
                 wsRemoteEndpoint.setBatchingAllowed(false);
             } catch (IOException e) {
@@ -698,13 +700,20 @@ public class WsSession implements Session {
                 fireEndpointOnError(e);
             }
 
-            state = State.OUTPUT_CLOSED;
+            /*
+             * If the flush above fails the error handling could call this
+             * method recursively. Without this check, the close message and
+             * notifications could be sent multiple times.
+             */
+            if (state != State.OUTPUT_CLOSED) {
+                state = State.OUTPUT_CLOSED;
 
-            sendCloseMessage(closeReasonMessage);
-            if (closeSocket) {
-                wsRemoteEndpoint.close();
+                sendCloseMessage(closeReasonMessage);
+                if (closeSocket) {
+                    wsRemoteEndpoint.close();
+                }
+                fireEndpointOnClose(closeReasonLocal);
             }
-            fireEndpointOnClose(closeReasonLocal);
         }
 
         IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
