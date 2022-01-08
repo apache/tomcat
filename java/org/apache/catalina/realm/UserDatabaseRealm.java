@@ -296,10 +296,12 @@ public class UserDatabaseRealm extends RealmBase {
         if (user == null) {
             return null;
         } else {
+            UserDatabasePrincipal principal =
+                    new UserDatabasePrincipal(user, database, getUserAttributesList(user));
             if (useStaticPrincipal) {
-                return new GenericPrincipal(username, Arrays.asList(getRoles(user)));
+                return principal.getStaticPrincipal();
             } else {
-                return new UserDatabasePrincipal(user, database);
+                return principal;
             }
         }
     }
@@ -418,10 +420,10 @@ public class UserDatabaseRealm extends RealmBase {
         private final transient UserDatabase database;
         private final List<String> userAttributesList;
 
-        public UserDatabasePrincipal(User user, UserDatabase database) {
+        public UserDatabasePrincipal(User user, UserDatabase database, List<String> userAttributesList) {
             super(user.getName());
             this.database = database;
-            this.userAttributesList = getUserAttributesList(user);
+            this.userAttributesList = userAttributesList;
         }
 
         @Override
@@ -488,9 +490,12 @@ public class UserDatabaseRealm extends RealmBase {
                 // Return only requested attributes
                 return null;
             }
-            UserDatabase database = getUserDatabase();
-            if (user == null || database == null) {
+            if (database == null) {
                 return super.getAttribute(name);
+            }
+            User user = database.findUser(name);
+            if (user == null) {
+                return null;
             }
             StringBuilder sb;
             boolean first = true;
@@ -554,6 +559,13 @@ public class UserDatabaseRealm extends RealmBase {
          */
         private Object writeReplace() throws ObjectStreamException {
             // Replace with a static principal disconnected from the database
+            return getStaticPrincipal();
+        }
+
+        /**
+         * Return a static Principal instance disconnected from the user database.
+         */
+        private Principal getStaticPrincipal() {
             return new GenericPrincipal(getName(), Arrays.asList(getRoles()),
                     null, null, null, getUserAttributesMap());
         }
