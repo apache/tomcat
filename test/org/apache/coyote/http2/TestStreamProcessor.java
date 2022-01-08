@@ -347,6 +347,51 @@ public class TestStreamProcessor extends Http2TestBase {
     }
 
 
+    @Test
+    public void testValidateRequestQueryStringRelaxed() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context ctxt = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+
+        tomcat.getConnector().setProperty("relaxedQueryChars", "[]");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/index.html?foo=[]"));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+
+        buildGetRequest(frameHeader, headersPayload, null, headers, 3);
+
+        writeFrame(frameHeader, headersPayload);
+
+        parser.readFrame(true);
+
+        StringBuilder expected = new StringBuilder();
+        expected.append("3-HeadersStart\n");
+        expected.append("3-Header-[:status]-[200]\n");
+
+        // The status code is the most important thing to test
+        Assert.assertTrue(output.getTrace().startsWith(expected.toString()));
+    }
+
+
     private static final class AsyncComplete extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
