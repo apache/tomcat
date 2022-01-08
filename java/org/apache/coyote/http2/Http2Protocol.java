@@ -21,7 +21,6 @@ import java.util.Enumeration;
 
 import javax.management.ObjectName;
 
-import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.Processor;
@@ -342,7 +341,7 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
-    public AbstractProtocol<?> getHttp11Protocol() {
+    public AbstractHttp11Protocol<?> getHttp11Protocol() {
         return this.http11Protocol;
     }
 

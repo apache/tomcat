@@ -466,6 +466,9 @@ class StreamProcessor extends AbstractProcessor {
      * The checks performed below are based on the checks in Http11InputBuffer.
      */
     private boolean validateRequest() {
+        HttpParser httpParser = new HttpParser(handler.getProtocol().getHttp11Protocol().getRelaxedPathChars(),
+                handler.getProtocol().getHttp11Protocol().getRelaxedQueryChars());
+
         // Method name must be a token
         String method = request.method().toString();
         if (!HttpParser.isToken(method)) {
@@ -476,7 +479,7 @@ class StreamProcessor extends AbstractProcessor {
         // (other checks such as valid %nn happen later)
         ByteChunk bc = request.requestURI().getByteChunk();
         for (int i = bc.getStart(); i < bc.getEnd(); i++) {
-            if (HttpParser.isNotRequestTarget(bc.getBuffer()[i])) {
+            if (httpParser.isNotRequestTargetRelaxed(bc.getBuffer()[i])) {
                 return false;
             }
         }
@@ -486,7 +489,7 @@ class StreamProcessor extends AbstractProcessor {
         String qs = request.queryString().toString();
         if (qs != null) {
             for (char c : qs.toCharArray()) {
-                if (!HttpParser.isQuery(c)) {
+                if (!httpParser.isQueryRelaxed(c)) {
                     return false;
                 }
             }
