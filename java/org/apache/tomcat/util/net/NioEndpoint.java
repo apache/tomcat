@@ -319,7 +319,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 eventCache = null;
             }
             if (nioChannels != null) {
-                nioChannels.clear();
+                NioChannel socket;
+                while ((socket = nioChannels.pop()) != null) {
+                    socket.free();
+                }
                 nioChannels = null;
             }
             if (processorCache != null) {
