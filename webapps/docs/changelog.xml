@@ -223,6 +223,10 @@
         Explicitly release ByteBuffer instances associated with pooled channels
         when stopping the NioEndpoint and Nio2Endpoint. (markt)
       </fix>
+      <fix>
+        Narrow the scope of the logging of invalid cookie headers to just the
+        invalid cookie rather than the whole cookie header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

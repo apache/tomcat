@@ -200,6 +200,7 @@ public class Cookie {
         while (moreToProcess) {
             skipLWS(bb);
 
+            int start = bb.position();
             ByteBuffer name = readToken(bb);
             ByteBuffer value = null;
 
@@ -210,9 +211,9 @@ public class Cookie {
                 skipLWS(bb);
                 value = readCookieValueRfc6265(bb);
                 if (value == null) {
-                    logInvalidHeader(bb);
                     // Invalid cookie value. Skip to the next semi-colon
                     skipUntilSemiColon(bb);
+                    logInvalidHeader(start, bb);
                     continue;
                 }
                 skipLWS(bb);
@@ -222,9 +223,9 @@ public class Cookie {
             if (skipResult == SkipResult.FOUND) {
                 // NO-OP
             } else if (skipResult == SkipResult.NOT_FOUND) {
-                logInvalidHeader(bb);
                 // Invalid cookie. Ignore it and skip to the next semi-colon
                 skipUntilSemiColon(bb);
+                logInvalidHeader(start, bb);
                 continue;
             } else {
                 // SkipResult.EOF
@@ -253,6 +254,7 @@ public class Cookie {
             skipLWS(bb);
 
             boolean parseAttributes = true;
+            int start = bb.position();
 
             ByteBuffer name = readToken(bb);
             ByteBuffer value = null;
@@ -266,7 +268,7 @@ public class Cookie {
                 skipLWS(bb);
                 value = readCookieValueRfc2109(bb, false);
                 if (value == null) {
-                    skipInvalidCookie(bb);
+                    skipInvalidCookie(start, bb);
                     continue;
                 }
                 skipLWS(bb);
@@ -282,7 +284,7 @@ public class Cookie {
                 parseAttributes = false;
                 moreToProcess = false;
             } else if (skipResult == SkipResult.NOT_FOUND) {
-                skipInvalidCookie(bb);
+                skipInvalidCookie(start, bb);
                 continue;
             }
 
@@ -293,13 +295,13 @@ public class Cookie {
                     skipLWS(bb);
                     skipResult = skipByte(bb, EQUALS_BYTE);
                     if (skipResult != SkipResult.FOUND) {
-                        skipInvalidCookie(bb);
+                        skipInvalidCookie(start, bb);
                         continue;
                     }
                     skipLWS(bb);
                     path = readCookieValueRfc2109(bb, true);
                     if (path == null) {
-                        skipInvalidCookie(bb);
+                        skipInvalidCookie(start, bb);
                         continue;
                     }
                     skipLWS(bb);
@@ -314,7 +316,7 @@ public class Cookie {
                         parseAttributes = false;
                         moreToProcess = false;
                     } else if (skipResult == SkipResult.NOT_FOUND) {
-                        skipInvalidCookie(bb);
+                        skipInvalidCookie(start, bb);
                         continue;
                     }
                 }
@@ -327,13 +329,13 @@ public class Cookie {
                     skipLWS(bb);
                     skipResult = skipByte(bb, EQUALS_BYTE);
                     if (skipResult != SkipResult.FOUND) {
-                        skipInvalidCookie(bb);
+                        skipInvalidCookie(start, bb);
                         continue;
                     }
                     skipLWS(bb);
                     domain = readCookieValueRfc2109(bb, false);
                     if (domain == null) {
-                        skipInvalidCookie(bb);
+                        skipInvalidCookie(start, bb);
                         continue;
                     }
                     skipLWS(bb);
@@ -348,7 +350,7 @@ public class Cookie {
                         parseAttributes = false;
                         moreToProcess = false;
                     } else if (skipResult == SkipResult.NOT_FOUND) {
-                        skipInvalidCookie(bb);
+                        skipInvalidCookie(start, bb);
                         continue;
                     }
                 }
@@ -370,10 +372,10 @@ public class Cookie {
     }
 
 
-    private static void skipInvalidCookie(ByteBuffer bb) {
-        logInvalidHeader(bb);
+    private static void skipInvalidCookie(int start, ByteBuffer bb) {
         // Invalid cookie value. Skip to the next semi-colon
         skipUntilSemiColonOrComma(bb);
+        logInvalidHeader(start, bb);
     }
 
 
@@ -584,11 +586,10 @@ public class Cookie {
     }
 
 
-    private static void logInvalidHeader(ByteBuffer bb) {
+    private static void logInvalidHeader(int start, ByteBuffer bb) {
         UserDataHelper.Mode logMode = invalidCookieLog.getNextMode();
         if (logMode != null) {
-            String headerValue = new String(bb.array(), bb.position(), bb.limit() - bb.position(),
-                        StandardCharsets.UTF_8);
+            String headerValue = new String(bb.array(), start, bb.position() - start, StandardCharsets.UTF_8);
             String message = sm.getString("cookie.invalidCookieValue", headerValue);
             switch (logMode) {
                 case INFO_THEN_DEBUG:
