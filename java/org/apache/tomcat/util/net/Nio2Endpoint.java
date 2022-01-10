@@ -210,7 +210,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     }
                 }
             });
-            nioChannels.clear();
+            Nio2Channel socket;
+            while ((socket = nioChannels.pop()) != null) {
+                socket.free();
+            }
             processorCache.clear();
         }
     }
