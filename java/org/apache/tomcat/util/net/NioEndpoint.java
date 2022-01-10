@@ -691,7 +691,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         }
                     }
                 }
-                if (running && !paused && eventCache != null) {
+                if (running && eventCache != null) {
                     pe.reset();
                     eventCache.push(pe);
                 }
@@ -1218,7 +1218,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 if (getSocket().isOpen()) {
                     getSocket().close(true);
                 }
-                if (getEndpoint().running && !getEndpoint().paused) {
+                if (getEndpoint().running) {
                     if (nioChannels == null || !nioChannels.push(getSocket())) {
                         getSocket().free();
                     }
@@ -1726,7 +1726,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 socketWrapper = null;
                 event = null;
                 //return to cache
-                if (running && !paused && processorCache != null) {
+                if (running && processorCache != null) {
                     processorCache.push(this);
                 }
             }

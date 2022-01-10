@@ -1899,14 +1899,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             // Loop until we receive a shutdown command
             while (sendfileRunning) {
 
-                // Loop if endpoint is paused
-                while (sendfileRunning && paused) {
-                    try {
-                        Thread.sleep(pollTime / 1000);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
-                }
                 // Loop if poller is empty
                 while (sendfileRunning && sendfileCount < 1 && addS.size() < 1) {
                     // Reset maintain time.
@@ -2146,7 +2138,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 socketWrapper = null;
                 event = null;
                 //return to cache
-                if (running && !paused && processorCache != null) {
+                if (running && processorCache != null) {
                     processorCache.push(this);
                 }
             }

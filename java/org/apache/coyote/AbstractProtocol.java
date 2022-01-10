@@ -591,9 +591,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         endpoint.start();
         monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(
                 () -> {
-                    if (!isPaused()) {
-                        startAsyncTimeout();
-                    }
+                    startAsyncTimeout();
                 }, 0, 60, TimeUnit.SECONDS);
     }
 
@@ -636,7 +634,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             getLog().info(sm.getString("abstractProtocolHandler.pause", getName()));
         }
 
-        stopAsyncTimeout();
         endpoint.pause();
     }
 
@@ -653,7 +650,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
         endpoint.resume();
-        startAsyncTimeout();
     }
 
 
