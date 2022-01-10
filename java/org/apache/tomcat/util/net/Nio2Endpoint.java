@@ -1643,7 +1643,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     if (state == SocketState.CLOSED) {
                         // Close socket and pool
                         socketWrapper.close();
-                        if (running && !paused) {
+                        if (running) {
                             if (!nioChannels.push(socketWrapper.getSocket())) {
                                 socketWrapper.getSocket().free();
                             }
@@ -1654,7 +1654,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 } else if (handshake == -1 ) {
                     getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
                     socketWrapper.close();
-                    if (running && !paused) {
+                    if (running) {
                         if (!nioChannels.push(socketWrapper.getSocket())) {
                             socketWrapper.getSocket().free();
                         }
@@ -1681,7 +1681,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 socketWrapper = null;
                 event = null;
                 //return to cache
-                if (running && !paused) {
+                if (running) {
                     processorCache.push(this);
                 }
             }

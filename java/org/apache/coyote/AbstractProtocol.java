@@ -1214,15 +1214,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 for (Processor processor : waitingProcessors) {
                    processor.timeoutAsync(now);
                 }
-
-                // Loop if endpoint is paused
-                while (endpoint.isPaused() && asyncTimeoutRunning) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
-                }
             }
         }
 

@@ -589,7 +589,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 if (log.isDebugEnabled()) {
                     log.debug("Socket: [" + socket + "] closed");
                 }
-                if (running && !paused) {
+                if (running) {
                     if (!nioChannels.push(socket)) {
                         socket.free();
                     }
@@ -753,7 +753,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 try {
                     pe.run();
                     pe.reset();
-                    if (running && !paused) {
+                    if (running) {
                         eventCache.push(pe);
                     }
                 } catch ( Throwable x ) {
@@ -1698,7 +1698,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 socketWrapper = null;
                 event = null;
                 //return to cache
-                if (running && !paused) {
+                if (running) {
                     processorCache.push(this);
                 }
             }
