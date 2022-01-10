@@ -167,6 +167,11 @@
         <bug>65785</bug>: Perform additional validation of HTTP headers when
         using HTTP/2. (markt)
       </fix>
+      <fix>
+        When a Connector or Endpoint is paused, ensure that only new connections
+        and new requests on existing connections are stopped while allowing in
+        progress requests to run to completion. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
