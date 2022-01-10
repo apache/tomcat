@@ -26,7 +26,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
-import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.Request;
@@ -73,7 +72,6 @@ class StreamProcessor extends AbstractProcessor {
             synchronized (this) {
                 // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
                 // socket <-> processor mapping
-                ContainerThreadMarker.set();
                 SocketState state = SocketState.CLOSED;
                 try {
                     state = process(socketWrapper, event);
@@ -125,7 +123,6 @@ class StreamProcessor extends AbstractProcessor {
                     if (state == SocketState.CLOSED) {
                         recycle();
                     }
-                    ContainerThreadMarker.clear();
                 }
             }
         } finally {

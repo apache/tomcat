@@ -137,6 +137,12 @@
        container dispatch to another container thread. (remm)
       </fix>
       <fix>
+        Expand the fix for <bug>65757</bug> so that rather than just checking if
+        processing is happening on a container thread, the check is now if
+        processing is happening on the container thread currently allocated to
+        this request/response. (markt)
+      </fix>
+      <fix>
         Improve the fix for RST frame ordering added in 10.0.14 to avoid a
         potential deadlock on some systems in non-default configurations.
         (markt)

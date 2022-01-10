@@ -21,7 +21,7 @@ import java.io.IOException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
 
-import org.apache.coyote.ContainerThreadMarker;
+import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -119,7 +119,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         synchronized (registeredLock) {
             registered = true;
             // Container is responsible for first call to onDataAvailable().
-            if (ContainerThreadMarker.isContainerThread()) {
+            Request request = processor.getRequest();
+            if (request != null && request.isRequestThread()) {
                 processor.addDispatch(DispatchType.NON_BLOCKING_WRITE);
             } else {
                 socketWrapper.registerWriteInterest();

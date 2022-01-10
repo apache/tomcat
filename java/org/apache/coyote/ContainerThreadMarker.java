@@ -21,7 +21,10 @@ package org.apache.coyote;
  * data from an incoming connection. Application created threads are not
  * container threads and neither are threads taken from the container thread
  * pool to execute AsyncContext.start(Runnable).
+ *
+ * @deprecated Unused. Will be removed in Tomcat 10.1.x
  */
+@Deprecated
 public class ContainerThreadMarker {
 
     public static boolean isContainerThread() {
