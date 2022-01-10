@@ -163,6 +163,10 @@
         and new requests on existing connections are stopped while allowing in
         progress requests to run to completion. (markt)
       </fix>
+      <fix>
+        Explicitly release ByteBuffer instances associated with pooled channels
+        when stopping the NioEndpoint and Nio2Endpoint. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
