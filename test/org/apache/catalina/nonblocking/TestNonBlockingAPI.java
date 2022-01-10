@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
@@ -55,16 +56,17 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.startup.BytesStreamer;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
+import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.net.ContainerThreadMarker;
 
 public class TestNonBlockingAPI extends TomcatBaseTest {
 
@@ -75,6 +77,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     private static final byte[] DATA = new byte[WRITE_SIZE];
     private static final int WRITE_PAUSE_MS = 500;
 
+    private static final Field CTX_REQUEST_FIELD;
 
     static {
         // Use this sequence for padding to make it easier to spot errors
@@ -91,6 +94,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             System.arraycopy(
                     hex.getBytes(), 0, DATA, i * blockSize + padSize, hexSize);
         }
+
+        Field f = null;
+        try {
+            f = AsyncContextImpl.class.getDeclaredField("request");
+            f.setAccessible(true);
+        } catch (NoSuchFieldException | SecurityException e) {
+            Assert.fail();
+        }
+        CTX_REQUEST_FIELD = f;
     }
 
 
@@ -720,7 +732,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public void onDataAvailable() throws IOException {
-            if (ContainerThreadMarker.isContainerThread()) {
+            Request coyoteRequest;
+            try {
+                coyoteRequest = ((org.apache.catalina.connector.Request) CTX_REQUEST_FIELD.get(ctx)).getCoyoteRequest();
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+
+            if (coyoteRequest.isRequestThread()) {
                 containerThreadCount.incrementAndGet();
             } else {
                 nonContainerThreadCount.incrementAndGet();

@@ -828,8 +828,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 return SocketState.CLOSED;
             }
 
-            ContainerThreadMarker.set();
-
             try {
                 if (processor == null) {
                     String negotiatedProtocol = wrapper.getNegotiatedProtocol();
@@ -1049,8 +1047,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
                 getLog().error(sm.getString("abstractConnectionHandler.error"), e);
-            } finally {
-                ContainerThreadMarker.clear();
             }
 
             // Make sure socket/processor is removed from the list of current

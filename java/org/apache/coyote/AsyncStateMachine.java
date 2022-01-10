@@ -305,7 +305,8 @@ class AsyncStateMachine {
 
 
     synchronized boolean asyncComplete() {
-        if (!ContainerThreadMarker.isContainerThread() &&
+        Request request = processor.getRequest();
+        if ((request == null || !request.isRequestThread()) &&
                 (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP)) {
             updateState(AsyncState.COMPLETE_PENDING);
             return false;
@@ -367,7 +368,8 @@ class AsyncStateMachine {
 
 
     synchronized boolean asyncDispatch() {
-        if (!ContainerThreadMarker.isContainerThread() &&
+        Request request = processor.getRequest();
+        if ((request == null || !request.isRequestThread()) &&
                 (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP)) {
             updateState(AsyncState.DISPATCH_PENDING);
             return false;
@@ -436,7 +438,9 @@ class AsyncStateMachine {
         } else {
             updateState(AsyncState.ERROR);
         }
-        return !ContainerThreadMarker.isContainerThread();
+
+        Request request = processor.getRequest();
+        return request == null || !request.isRequestThread();
     }
 
 
