@@ -194,6 +194,12 @@
        container dispatch to another container thread. (remm)
       </fix>
       <fix>
+        Expand the fix for <bug>65757</bug> so that rather than just checking if
+        processing is happening on a container thread, the check is now if
+        processing is happening on the container thread currently allocated to
+        this request/response. (markt)
+      </fix>
+      <fix>
         Avoid a potential deadlock during the concurrent processing of incoming
         HTTP/2 frames for a stream and that stream being reset. (markt)
       </fix>
