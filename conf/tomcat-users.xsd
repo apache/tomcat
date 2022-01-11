@@ -45,6 +45,7 @@
             <xs:attribute name="password" type="xs:string" />
             <xs:attribute name="roles" type="xs:string" />
             <xs:attribute name="groups" type="xs:string" />
+            <xs:anyAttribute processContents="skip" />
           </xs:complexType>
         </xs:element>
       </xs:choice>
