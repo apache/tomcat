@@ -385,12 +385,6 @@
     <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
   </Match>
   <Match>
-    <!-- Object is used via side-effect of creation. -->
-    <Class name="org.apache.catalina.mbeans.JmxRemoteLifecycleListener" />
-    <Method name="createServer" />
-    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
-  </Match>
-  <Match>
     <!-- SQL construction is safe since it is from trusted config -->
     <Or>
       <Class name="org.apache.catalina.realm.DataSourceRealm" />

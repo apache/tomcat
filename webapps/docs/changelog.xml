@@ -115,6 +115,9 @@
         Add recycling check in the input and output stream isReady to try to
         give a more informative ISE when the facade has been recycled. (remm)
       </fix>
+      <update>
+        Remove the deprecated <code>JmxRemoteLifecycleListener</code>. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
