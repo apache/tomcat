@@ -190,7 +190,7 @@ public class MemoryUserDatabaseTests {
     public void testSerializePrincipal()
         throws Exception {
         User user = db.findUser("admin");
-        GenericPrincipal gpIn = new UserDatabaseRealm.UserDatabasePrincipal(user, db);
+        GenericPrincipal gpIn = new UserDatabaseRealm.UserDatabasePrincipal(user, db, null);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(gpIn);

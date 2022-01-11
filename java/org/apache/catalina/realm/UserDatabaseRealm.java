@@ -296,12 +296,15 @@ public class UserDatabaseRealm extends RealmBase {
         if (user == null) {
             return null;
         } else {
-            UserDatabasePrincipal principal =
-                    new UserDatabasePrincipal(user, database, getUserAttributesList(user));
+            List<String> userAttrs = getUserAttributesList(user);
             if (useStaticPrincipal) {
-                return principal.getStaticPrincipal();
+                if (userAttrs == null) {
+                    return new GenericPrincipal(username, Arrays.asList(getRoles(user)));
+                } else {
+                    return new UserDatabasePrincipal(user, database, userAttrs).getStaticPrincipal();
+                }
             } else {
-                return principal;
+                return new UserDatabasePrincipal(user, database, userAttrs);
             }
         }
     }
@@ -418,7 +421,7 @@ public class UserDatabaseRealm extends RealmBase {
     public static final class UserDatabasePrincipal extends GenericPrincipal {
         private static final long serialVersionUID = 1L;
         private final transient UserDatabase database;
-        private final List<String> userAttributesList;
+        private final transient List<String> userAttributesList;
 
         public UserDatabasePrincipal(User user, UserDatabase database, List<String> userAttributesList) {
             super(user.getName());
@@ -493,7 +496,7 @@ public class UserDatabaseRealm extends RealmBase {
             if (database == null) {
                 return super.getAttribute(name);
             }
-            User user = database.findUser(name);
+            User user = database.findUser(this.name);
             if (user == null) {
                 return null;
             }

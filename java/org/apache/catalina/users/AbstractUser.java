@@ -16,8 +16,8 @@
  */
 package org.apache.catalina.users;
 
-
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +34,12 @@ import org.apache.catalina.User;
  * @since 4.1
  */
 public abstract class AbstractUser implements User {
+
+
+    /**
+     * Reserved attribute names (none by default).
+     */
+    private static final Set<String> RESERVED_ATTRIBUTE_NAMES = new HashSet<>();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -278,7 +284,9 @@ public abstract class AbstractUser implements User {
      * Return a set of reserved names that cannot be used as attribute names.
      */
     @Override
-    public abstract Set<String> getReservedAttributeNames();
+    public Set<String> getReservedAttributeNames() {
+        return RESERVED_ATTRIBUTE_NAMES;
+    };
 
 
     // ------------------------------------------------------ Principal Methods

@@ -20,13 +20,9 @@ package org.apache.catalina.users;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.catalina.Group;
-import org.apache.catalina.Role;
 import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.security.Escape;
