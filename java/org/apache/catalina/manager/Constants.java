@@ -129,7 +129,7 @@ public class Constants {
         HTML_TAIL_SECTION =
             "<hr size=\"1\" noshade=\"noshade\">\n" +
             "<center><font size=\"-1\" color=\"#525D76\">\n" +
-            " <em>Copyright &copy; 1999-2021, Apache Software Foundation</em>" +
+            " <em>Copyright &copy; 1999-2022, Apache Software Foundation</em>" +
             "</font></center>\n" +
             "\n" +
             "</body>\n" +
