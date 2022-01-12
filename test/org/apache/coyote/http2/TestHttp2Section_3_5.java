@@ -50,7 +50,6 @@ public class TestHttp2Section_3_5 extends Http2TestBase {
         try {
             sendPing();
         } catch (IOException e) {
-            e.printStackTrace();
             // Ignore
         }
 
