@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 
 import javax.net.SocketFactory;
@@ -107,7 +108,13 @@ public class TestUpgrade extends TomcatBaseTest {
         UpgradeConnection conn = doUpgrade(upgradeHandlerClass);
 
         Reader r = conn.getReader();
-        int c = r.read();
+        int c;
+        try {
+            c = r.read();
+        } catch (SocketException se) {
+            // Some platforms will throw an exception rather than returning -1
+            c = -1;
+        }
 
         Assert.assertEquals(-1, c);
     }
