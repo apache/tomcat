@@ -41,7 +41,18 @@ public class TestHttp2Section_3_5 extends Http2TestBase {
         // Send two pings (2*(9+8)=34 bytes) as server looks for entire preface
         // of 24 bytes.
         sendPing();
-        sendPing();
+        // Depending on timing, this ping may fail after the header has been
+        // sent but before the ping body since:
+        // 9 (ping 1 header) + 8 (ping 1 body) + 9 (ping 2 header) = 26 which
+        // which is enough data for the server to determine that the preface is
+        // invalid and close the connection. A subsequent attempt to send ping 2
+        // body will fail.
+        try {
+            sendPing();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Ignore
+        }
 
         // If the client preface had been valid, this would be an
         // acknowledgement. Of the settings. As the preface was invalid, it
