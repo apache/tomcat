@@ -118,6 +118,10 @@
       <update>
         Remove the deprecated <code>JmxRemoteLifecycleListener</code>. (markt)
       </update>
+      <fix>
+        Make the calculation of the session storage location more robust when
+        using file based persistent storage. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
