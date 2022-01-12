@@ -124,6 +124,11 @@
         Make the calculation of the session storage location more robust when
         using file based persistent storage. (markt)
       </fix>
+      <add>
+        Add support for additional user attributes to <code>TomcatPrincipal</code>
+        and <code>GenericPrincipal</code>. Patch provided by Carsten Klein.
+        (the_committer)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

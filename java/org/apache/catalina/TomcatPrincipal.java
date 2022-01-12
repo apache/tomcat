@@ -17,6 +17,7 @@
 package org.apache.catalina;
 
 import java.security.Principal;
+import java.util.Enumeration;
 
 import org.ietf.jgss.GSSCredential;
 
@@ -47,4 +48,37 @@ public interface TomcatPrincipal extends Principal {
      *                   exception to LoginContext
      */
     void logout() throws Exception;
+
+    /**
+     * Returns the value of the named attribute as an <code>Object</code>, or
+     * <code>null</code> if no attribute of the given name exists, or if
+     * <code>null</code> has been specified as the attribute's name.
+     * <p>
+     * Only the servlet container may set attributes to make available custom
+     * information about a Principal or the user it represents. For example, some of
+     * the Realm implementations can be configured to additionally query user
+     * attributes from the <i>user database</i>, which then are provided through the
+     * Principal's attributes map.
+     * <p>
+     * Attribute names and naming conventions are maintained by the Tomcat
+     * components that contribute to this map, like some of the Realm
+     * implementations.
+     *
+     * @param name a <code>String</code> specifying the name of the attribute
+     * @return an <code>Object</code> containing the value of the attribute, or
+     *         <code>null</code> if the attribute does not exist, or if
+     *         <code>null</code> has been specified as the attribute's name
+     */
+    Object getAttribute(String name);
+
+    /**
+     * Returns an <code>Enumeration</code> containing the names of the
+     * attributes available to this Principal. This method returns an empty
+     * <code>Enumeration</code> if the Principal has no attributes available to
+     * it.
+     *
+     * @return an <code>Enumeration</code> of strings containing the names of
+     *         the Principal's attributes
+     */
+    Enumeration<String> getAttributeNames();
 }
