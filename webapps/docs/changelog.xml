@@ -115,6 +115,10 @@
         Add recycling check in the input and output stream isReady to try to
         give a more informative ISE when the facade has been recycled. (remm)
       </fix>
+      <fix>
+        Make the calculation of the session storage location more robust when
+        using file based persistent storage. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
