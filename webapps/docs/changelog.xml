@@ -110,7 +110,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Add missing check in <code>SessionCookieConfig.setSttribute()</code> to
+        Add missing check in <code>SessionCookieConfig.setAttribute()</code> to
         ensure that the method fails if called after the web application has
         started. (markt)
       </fix>
