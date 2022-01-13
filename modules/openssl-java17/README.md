@@ -49,48 +49,6 @@ native code:
 export JAVA_OPTS="--enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.foreign"
 ```
 
-## Running the testsuite
-
-Use the following patch for `build.xml` before running the testuite:
-```
-diff --git a/build.xml b/build.xml
-index dc1260b..dd9fba9 100644
---- a/build.xml
-+++ b/build.xml
-@@ -213,6 +213,8 @@
-   <defaultexcludes remove="**/.gitignore" />
-   <!--<defaultexcludes echo="true" />-->
-
-   <!-- Classpaths -->
-   <path id="compile.classpath">
-     <pathelement location="${bnd.jar}"/>
-@@ -240,6 +242,7 @@
-     <pathelement location="${derby.jar}"/>
-     <pathelement location="${derby-shared.jar}"/>
-     <pathelement location="${derby-tools.jar}"/>
-+    <pathelement location="output/build/lib/tomcat-coyote-openssl-java17-0.1.jar"/>
-     <path refid="compile.classpath" />
-     <path refid="tomcat.classpath" />
-   </path>
-@@ -1944,7 +1947,6 @@
-
-           <jvmarg value="${test.jvmarg.egd}"/>
-           <jvmarg value="-Dfile.encoding=UTF-8"/>
--          <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
-           <jvmarg value="${test.formatter}"/>
-           <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
-           <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
-@@ -1952,6 +1954,9 @@
-           <jvmarg value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
-           <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
-           <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
-+          <jvmarg value="--enable-native-access=ALL-UNNAMED"/>
-+          <jvmarg value="--add-modules"/>
-+          <jvmarg value="jdk.incubator.foreign"/>
-
-           <classpath refid="tomcat.test.classpath" />
-```
-
 ## Generating the OpenSSL API code using jextract (optional)
 
 This step is only useful to be able to use additional native APIs from OpenSSL

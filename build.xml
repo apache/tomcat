@@ -239,6 +239,7 @@
     <pathelement location="${derby.jar}"/>
     <pathelement location="${derby-shared.jar}"/>
     <pathelement location="${derby-tools.jar}"/>
+    <pathelement location="${openssl-lib.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
   </path>
@@ -1473,6 +1474,19 @@
     </delete>
     <copy file="${migration-lib.jar}" todir="${tomcat.build}/lib"/>
 
+    <!-- Delete all other versions of OpenSSL support for Tomcat and copy the current one -->
+    <!-- After module release
+    <local name="openssl-lib.jar.filename" />
+    <basename property="openssl-lib.jar.filename" file="${openssl-lib.jar}"/>
+    <delete verbose="true">
+      <fileset dir="${tomcat.build}/lib">
+        <include name="tomcat-coyote-openssl-*.jar"/>
+        <exclude name="${openssl-lib.jar.filename}"/>
+      </fileset>
+    </delete>
+    <copy file="${openssl-lib.jar}" todir="${tomcat.build}/lib"/>
+    -->
+
     <!-- Add sources for examples -->
     <antcall target="examples-sources" />
   </target>
@@ -1911,6 +1925,23 @@
     </condition>
   </target>
 
+  <!-- Set Java 17 specific properties -->
+  <condition property="java17.nativeaccess" value="--enable-native-access=ALL-UNNAMED"><javaversion exactly="17"/></condition>
+  <property name="java17.nativeaccess" value="-Dtest.1=1"/>
+  <condition property="java17.addmodules" value="--add-modules"><javaversion exactly="17"/></condition>
+  <property name="java17.addmodules" value="-Dtest.2=2"/>
+  <condition property="java17.incubatorforeign" value="jdk.incubator.foreign"><javaversion exactly="17"/></condition>
+  <property name="java17.incubatorforeign" value="-Dtest.3=3"/>
+  <condition property="runtests.librarypath" value="-Dtest.4=4">
+    <and>
+      <javaversion exactly="17"/>
+      <resourceexists>
+        <file file="${openssl-lib.jar}"/>
+      </resourceexists>
+    </and>
+  </condition>
+  <property name="runtests.librarypath" value="-Djava.library.path=${test.apr.loc}"/>
+
   <macrodef name="runtests"
             description="Runs the unit tests using the specified connector.
               Does not stop on errors, but sets 'test.result.error' and 'test.result.failure' properties.">
@@ -1933,7 +1964,7 @@
 
           <jvmarg value="${test.jvmarg.egd}"/>
           <jvmarg value="-Dfile.encoding=UTF-8"/>
-          <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
+          <jvmarg value="${runtests.librarypath}"/>
           <jvmarg value="${test.formatter}"/>
           <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
           <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
@@ -1941,6 +1972,9 @@
           <jvmarg value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
           <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
           <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
+          <jvmarg value="${java17.nativeaccess}"/>
+          <jvmarg value="${java17.addmodules}"/>
+          <jvmarg value="${java17.incubatorforeign}"/>
 
           <classpath refid="tomcat.test.classpath" />
 
