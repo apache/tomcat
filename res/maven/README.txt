@@ -20,7 +20,7 @@ General preparations before any publishing:
 2 - cd res/maven
 3 - Copy mvn.properties.default to mvn.properties and adjust it as necessary.
     You will need to set asf.ldap.username and you'll probably need to set
-    gpg.exec
+    gpg.exec; triple-check maven.asf.release.deploy.version
     The other properties should be OK. Note: you will be prompted for your
     GPG pass-phrase and LDAP password when the script runs.
 
