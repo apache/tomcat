@@ -93,8 +93,6 @@
   <property name="tomcat.pool"           value="${tomcat.output}/jdbc-pool"/>
 
   <!-- Servlet 3.1 spec requires Java 7+ -->
-  <property name="compile.source" value="7"/>
-  <property name="compile.target" value="7"/>
   <property name="compile.release" value="7"/>
   <property name="min.java.version" value="7"/>
 
@@ -204,33 +202,6 @@
   <defaultexcludes add="**/.git/**" />
   <defaultexcludes remove="**/.gitignore" />
   <!--<defaultexcludes echo="true" />-->
-
-  <!-- Java 9 -->
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.javadoc.options"
-             value="-html5"/>
-  <property name="java9.javadoc.options" value=""/>
-
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.1"
-             value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
-  <property name="java9.test.option.1" value="-Dtest.1=1"/>
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.2"
-             value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
-  <property name="java9.test.option.2" value="-Dtest.2=2"/>
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.3"
-             value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
-  <property name="java9.test.option.3" value="-Dtest.3=3"/>
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.4"
-             value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
-  <property name="java9.test.option.4" value="-Dtest.4=4"/>
-  <available classname="java.lang.reflect.InaccessibleObjectException"
-             property="java9.test.option.5"
-             value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
-  <property name="java9.test.option.5" value="-Dtest.5=5"/>
 
   <!-- Classpaths -->
   <path id="compile.classpath">
@@ -660,8 +631,6 @@
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
            release="${compile.release}"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
@@ -715,8 +684,7 @@
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
+           release="${compile.release}"
            encoding="ISO-8859-1"
            includeAntRuntime="true" >
       <!-- Uncomment this to show unchecked warnings:
@@ -750,8 +718,8 @@
   <target name="build-manifests" unless="manifests.uptodate"
           depends="build-prepare">
     <!-- Filtering tokens for JAR manifests-->
-    <filter token="source.jdk" value="${compile.source}"/>
-    <filter token="target.jdk" value="${compile.target}"/>
+    <filter token="source.jdk" value="${compile.release}"/>
+    <filter token="target.jdk" value="${compile.release}"/>
     <filter token="servlet.revision" value="${servlet.revision}"/>
     <filter token="jsp.revision" value="${jsp.revision}"/>
     <filter token="el.revision" value="${el.revision}"/>
@@ -1183,8 +1151,6 @@
     <javac   srcdir="webapps/examples/WEB-INF/classes"
              destdir="${tomcat.build}/webapps/examples/WEB-INF/classes"
              debug="${compile.debug}" deprecation="${compile.deprecation}"
-             source="${compile.source}"
-             target="${compile.target}"
              release="${compile.release}"
              classpath="${tomcat.classes}"
              encoding="ISO-8859-1"
@@ -1195,8 +1161,6 @@
     <javac   srcdir="webapps/examples/jsp/plugin/applet"
              destdir="${tomcat.build}/webapps/examples/jsp/plugin/applet"
              debug="${compile.debug}" deprecation="${compile.deprecation}"
-             source="${compile.source}"
-             target="${compile.target}"
              release="${compile.release}"
              classpath="${tomcat.classes}"
              encoding="ISO-8859-1"
@@ -1438,8 +1402,6 @@
     <javac srcdir="test" destdir="${test.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
            release="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="true">
@@ -1567,12 +1529,11 @@
           <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
           <jvmarg value="-Dorg.apache.tomcat.util.net.NioSelectorShared=${org.apache.tomcat.util.net.NioSelectorShared}"/>
 
-          <!-- Java 9 -->
-          <jvmarg value="${java9.test.option.1}"/>
-          <jvmarg value="${java9.test.option.2}"/>
-          <jvmarg value="${java9.test.option.3}"/>
-          <jvmarg value="${java9.test.option.4}"/>
-          <jvmarg value="${java9.test.option.5}"/>
+          <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+          <jvmarg value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
+          <jvmarg value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
+          <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+          <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
 
           <classpath refid="tomcat.test.classpath" />
 
@@ -1862,8 +1823,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
-      source="${compile.source}"
+      additionalparam="-breakiterator -notimestamp -html5"
+      source="${compile.release}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1884,8 +1845,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
-      source="${compile.source}"
+      additionalparam="-breakiterator -notimestamp -html5"
+      source="${compile.release}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1906,8 +1867,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
-      source="${compile.source}"
+      additionalparam="-breakiterator -notimestamp -html5"
+      source="${compile.release}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1928,8 +1889,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
-      source="${compile.source}"
+      additionalparam="-breakiterator -notimestamp -html5"
+      source="${compile.release}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1950,8 +1911,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options}"
-      source="${compile.source}"
+      additionalparam="-breakiterator -notimestamp -html5"
+      source="${compile.release}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
@@ -1991,8 +1952,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp ${java9.javadoc.options} -J-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -XDignore.symbol.file"
-      source="${compile.source}"
+      additionalparam="-breakiterator -notimestamp -html5"
+      source="${compile.release}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
