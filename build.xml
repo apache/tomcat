@@ -104,6 +104,7 @@
   <!-- Jakarta EE 10 platform requires Java 11+ -->
   <property name="compile.release" value="11"/>
   <property name="min.java.version" value="11"/>
+  <property name="build.java.version" value="11"/>
 
   <!-- Locations to create the JAR artifacts -->
   <!-- Standard JARs -->
@@ -260,6 +261,7 @@
     <filter token="JDT_VERSION" value="${jdt.version}"/>
     <filter token="GIT_BRANCH" value="${git.branch}"/>
     <filter token="MIN_JAVA_VERSION" value="${min.java.version}"/>
+    <filter token="BUILD_JAVA_VERSION" value="${build.java.version}"/>
   </filterset>
 
   <!-- Files to change line endings for depending on target platform -->
