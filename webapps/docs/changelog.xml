@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.59 (remm)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Switch to building with Java 11 and using <code>--release</code> to
+        target Java 8. Once back-ported to all currently supported branches,
+        this will reduce the number of Java versions developers need to juggle.
+        (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.58 (remm)" rtext="release in progress 2022-01-15">
   <subsection name="Coyote">
