@@ -147,9 +147,21 @@ public final class ObjectReflectionPropertyInspector {
             (method.getParameterTypes() == null ||
             method.getParameterTypes().length == 0) &&
             ALLOWED_TYPES.contains(method.getReturnType()) &&
-            !Modifier.isPrivate(method.getModifiers());
+            !Modifier.isPrivate(method.getModifiers()) &&
+            isPresentInJava8Api(method);
     }
 
+    private static boolean isPresentInJava8Api(Method method) {
+        // Up to Java 18 EA 30 this was the only problematic method so this
+        // approach is OK. If we get more than a few of these this code may
+        // need to be refactored.
+        if (ClassLoader.class.isAssignableFrom(method.getDeclaringClass())) {
+            if ("getName".equals(method.getName())) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     private static SetPropertyClass getOrCreateSetPropertyClass(Class<?> clazz) {
         boolean base = (clazz.getSuperclass() == null || clazz.getSuperclass() == Object.class);
