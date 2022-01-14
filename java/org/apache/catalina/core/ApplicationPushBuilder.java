@@ -157,10 +157,12 @@ public class ApplicationPushBuilder {
                 cookies.add(new Cookie(responseCookie.getName(), responseCookie.getValue()));
             }
         }
-        List<String> cookieValues = new ArrayList<>(1);
-        cookieValues.add(generateCookieHeader(cookies,
-                catalinaRequest.getContext().getCookieProcessor()));
-        headers.put("cookie", cookieValues);
+        if (cookies.size() > 0) {
+            List<String> cookieValues = new ArrayList<>(1);
+            cookieValues.add(generateCookieHeader(cookies,
+                    catalinaRequest.getContext().getCookieProcessor()));
+            headers.put("cookie", cookieValues);
+        }
 
         // Authentication
         if (catalinaRequest.getPrincipal() != null) {
