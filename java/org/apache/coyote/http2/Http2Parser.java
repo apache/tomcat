@@ -109,7 +109,7 @@ class Http2Parser {
             readSettingsFrame(flags, payloadSize, null);
             break;
         case PUSH_PROMISE:
-            readPushPromiseFrame(streamId, null);
+            readPushPromiseFrame(streamId, flags, payloadSize, null);
             break;
         case PING:
             readPingFrame(flags, null);
@@ -349,12 +349,16 @@ class Http2Parser {
      * re-used for client side parsing, this method should be overridden with an
      * appropriate implementation.
      *
-     * @param streamId The pushed stream
-     * @param buffer   The payload, if available
+     * @param streamId      The pushed stream
+     * @param flags         The flags set in the frame header
+     * @param payloadSize   The size of the payload in bytes
+     * @param buffer        The payload, if available
      *
      * @throws Http2Exception Always
+     * @throws IOException May be thrown by sub-classes that parse this frame
      */
-    protected void readPushPromiseFrame(int streamId, ByteBuffer buffer) throws Http2Exception {
+    protected void readPushPromiseFrame(int streamId, int flags, int payloadSize, ByteBuffer buffer)
+            throws Http2Exception, IOException {
         throw new ConnectionException(sm.getString("http2Parser.processFramePushPromise",
                 connectionId, Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR);
     }

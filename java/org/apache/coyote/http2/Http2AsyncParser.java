@@ -260,7 +260,7 @@ class Http2AsyncParser extends Http2Parser {
                                 readSettingsFrame(flags, payloadSize, payload);
                                 break;
                             case PUSH_PROMISE:
-                                readPushPromiseFrame(streamId, payload);
+                                readPushPromiseFrame(streamId, flags, payloadSize, payload);
                                 break;
                             case PING:
                                 readPingFrame(flags, payload);
