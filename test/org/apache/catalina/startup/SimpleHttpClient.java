@@ -199,7 +199,7 @@ public abstract class SimpleHttpClient {
         reader = new BufferedReader(r);
     }
     public void connect() throws UnknownHostException, IOException {
-        connect(5000, 5000);
+        connect(10000, 10000);
     }
 
     protected OutputStream createOutputStream(Socket socket) throws IOException {
