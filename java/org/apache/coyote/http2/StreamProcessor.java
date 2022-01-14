@@ -18,7 +18,9 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -49,9 +51,17 @@ class StreamProcessor extends AbstractProcessor {
     private static final Log log = LogFactory.getLog(StreamProcessor.class);
     private static final StringManager sm = StringManager.getManager(StreamProcessor.class);
 
+    private static final Set<String> H2_PSEUDO_HEADERS_REQUEST = new HashSet<>();
+
     private final Http2UpgradeHandler handler;
     private final Stream stream;
 
+    static {
+        H2_PSEUDO_HEADERS_REQUEST.add(":method");
+        H2_PSEUDO_HEADERS_REQUEST.add(":scheme");
+        H2_PSEUDO_HEADERS_REQUEST.add(":authority");
+        H2_PSEUDO_HEADERS_REQUEST.add(":path");
+    }
 
     StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter,
             SocketWrapperBase<?> socketWrapper) {
@@ -456,9 +466,16 @@ class StreamProcessor extends AbstractProcessor {
 
         // HTTP header names must be tokens.
         MimeHeaders headers = request.getMimeHeaders();
+        boolean previousHeaderWasPseudoHeader = true;
         Enumeration<String> names = headers.names();
         while (names.hasMoreElements()) {
-            if (!HttpParser.isToken(names.nextElement())) {
+            String name = names.nextElement();
+            if (H2_PSEUDO_HEADERS_REQUEST.contains(name)) {
+                if (!previousHeaderWasPseudoHeader) {
+                    return false;
+                }
+            } else if (!HttpParser.isToken(name)) {
+                previousHeaderWasPseudoHeader = false;
                 return false;
             }
         }
