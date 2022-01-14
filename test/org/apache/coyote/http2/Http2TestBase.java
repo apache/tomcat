@@ -200,7 +200,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void buildGetRequest(byte[] frameHeader, ByteBuffer headersPayload, byte[] padding,
             int streamId, String url) {
-        List<Header> headers = new ArrayList<>(3);
+        List<Header> headers = new ArrayList<>(4);
         headers.add(new Header(":method", "GET"));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", url));
@@ -1002,6 +1002,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         private boolean traceBody = false;
         private ByteBuffer bodyBuffer = null;
         private long bytesRead;
+        private volatile HpackDecoder hpackDecoder = null;
 
         public void setTraceBody(boolean traceBody) {
             this.traceBody = traceBody;
@@ -1010,7 +1011,14 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         @Override
         public HpackDecoder getHpackDecoder() {
-            return new HpackDecoder(remoteSettings.getHeaderTableSize());
+            if (hpackDecoder == null) {
+                synchronized (this) {
+                    if (hpackDecoder == null) {
+                        hpackDecoder = new HpackDecoder(remoteSettings.getHeaderTableSize());
+                    }
+                }
+            }
+            return hpackDecoder;
         }
 
 
@@ -1187,6 +1195,14 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             // NO-OP
             // Many tests swallow request bodies which triggers this
             // notification. It is added to the trace to reduce noise.
+        }
+
+
+        public void pushPromise(int streamId, int pushedStreamId) {
+            trace.append(streamId);
+            trace.append("-PushPromise-");
+            trace.append(pushedStreamId);
+            trace.append("\n");
         }
 
 
