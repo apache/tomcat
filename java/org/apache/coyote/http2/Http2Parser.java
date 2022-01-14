@@ -36,7 +36,7 @@ class Http2Parser {
             "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
     private final String connectionId;
-    private final Input input;
+    protected final Input input;
     private final Output output;
     private final byte[] frameHeaderBuffer = new byte[9];
 
@@ -408,7 +408,7 @@ class Http2Parser {
     }
 
 
-    private void readHeaderPayload(int streamId, int payloadSize)
+    protected void readHeaderPayload(int streamId, int payloadSize)
             throws Http2Exception, IOException {
 
         if (log.isDebugEnabled()) {
