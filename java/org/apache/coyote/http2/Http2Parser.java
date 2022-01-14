@@ -107,7 +107,7 @@ class Http2Parser {
             readSettingsFrame(flags, payloadSize);
             break;
         case PUSH_PROMISE:
-            readPushPromiseFrame(streamId);
+            readPushPromiseFrame(streamId, flags, payloadSize);
             break;
         case PING:
             readPingFrame(flags);
@@ -316,7 +316,20 @@ class Http2Parser {
     }
 
 
-    private void readPushPromiseFrame(int streamId) throws Http2Exception {
+    /**
+     * This default server side implementation always throws an exception. If
+     * re-used for client side parsing, this method should be overridden with an
+     * appropriate implementation.
+     *
+     * @param streamId      The pushed stream
+     * @param flags         The flags set in the frame header
+     * @param payloadSize   The size of the payload in bytes
+     *
+     * @throws Http2Exception Always
+     * @throws IOException May be thrown by sub-classes that parse this frame
+     */
+    protected void readPushPromiseFrame(int streamId, int flags, int payloadSize)
+            throws Http2Exception, IOException {
         throw new ConnectionException(sm.getString("http2Parser.processFramePushPromise",
                 connectionId, Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR);
     }
