@@ -947,7 +947,6 @@
       <!-- Uncomment this to show unchecked warnings:
       <compilerarg value="-Xlint:unchecked"/>
       -->
-      <compilerarg value="-XDignore.symbol.file"/>
       <classpath refid="compile.classpath" />
     </javac>
     <!-- Copy static resource files -->
