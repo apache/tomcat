@@ -3284,7 +3284,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <fileset file="${jsign.jar}" />
     </path>
 
-    <taskdef name="jsign" classname="net.jsign.PESignerTask" classpathref="jsign.classpath" />
+    <taskdef name="jsign" classname="net.jsign.JsignTask" classpathref="jsign.classpath" />
   </target>
 
   <macrodef name="jarIt" description="utility macro for standard JAR packaging">

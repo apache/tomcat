@@ -111,15 +111,13 @@ base-commons.loc.2=${base-apache.loc.2}/commons
 base-tomcat.loc.1=${base-apache.loc.1}/tomcat
 base-tomcat.loc.2=${base-apache.loc.2}/tomcat
 
+base-gh.loc=https://github.com
 base-sf.loc=https://downloads.sourceforge.net
 # repo.maven.apache.org is the same as repo2.maven.org
 base-maven.loc=https://repo.maven.apache.org/maven2
 
 # Mirror, was used when there were problems with the main SF downloads site
 # base-sf.loc=https://sunet.dl.sourceforge.net
-
-# checkstyle-backport-jre6
-base-checkstyle.loc=https://rnveach.github.io/checkstyle-backport-jre6/maven2
 
 # ----- Webservices - JAX RPC -----
 jaxrpc-lib.version=1.1-rc4
@@ -237,12 +235,11 @@ hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
 hamcrest.jar=${hamcrest.home}/hamcrest-${hamcrest.version}.jar
 hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest/${hamcrest.version}/hamcrest-${hamcrest.version}.jar
 
-# ----- EasyMock, version 3.6 or later -----
-# 3.6 is the last version that runs on Java 7
-easymock.version=3.6
+# ----- EasyMock, version 3.2 or later -----
+easymock.version=4.3
 easymock.checksum.enabled=true
-easymock.checksum.algorithm=SHA-512
-easymock.checksum.value=b49673e7872aa8b006d377a4ca56eed8f6e98e45ea4efe26d24cafe81ea569b557f5a326edcd387288267db8c4b59f2c3c61010f3ad01c4d1067a35430533794
+easymock.checksum.algorithm=MD5|SHA-1
+easymock.checksum.value=f4d141b8c32c022def9089ee4f890c90|b0dbe2df1a71b8115835561f46a8f06cb168a94f
 easymock.home=${base.path}/easymock-${easymock.version}
 easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
 easymock.loc=${base-maven.loc}/org/easymock/easymock/${easymock.version}/easymock-${easymock.version}.jar
@@ -257,11 +254,10 @@ cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
 
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
-# 2.6 is the last version that runs on Java 7
-objenesis.version=2.6
+objenesis.version=3.2
 objenesis.checksum.enabled=true
-objenesis.checksum.algorithm=SHA-512
-objenesis.checksum.value=23a593bded8cb43236faad2018b008da47bf4e29cc60c2e98fd4f2ed578fe2baddd3a98547dc14273017c82cb19ce8eaaab71d49273411856a2ba1a5d51015fc
+objenesis.checksum.algorithm=MD5|SHA-1
+objenesis.checksum.value=5c1ee20481a06561af295034ea89c4b4|7fadf57620c8b8abdf7519533e5527367cb51f09
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
@@ -276,15 +272,13 @@ unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-# Checkstyle 7 requires Java 8
-# Therefore, use checkstyle-backport-jre6
-checkstyle.version=8.43
+checkstyle.version=9.2.1
 checkstyle.checksum.enabled=true
-checkstyle.checksum.algorithm=MD5|SHA-1
-checkstyle.checksum.value=e62de5cde6a85e90de1027c9c0593a99|94993f0d96460a80ba044c281872f479625a8d5a
-checkstyle.home=${base.path}/checkstyle-backport-jre6-${checkstyle.version}
+checkstyle.checksum.algorithm=SHA-512
+checkstyle.checksum.value=01f6576d988ee7ef5d7a6a528439263205c956a020c6479430992aebbe49186bb962015941161959c019daea567818b35f8cfb5157ae3b1ce1625f3699226611
+checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
-checkstyle.loc=${base-checkstyle.loc}/com/puppycrawl/tools/checkstyle-backport-jre6/${checkstyle.version}/checkstyle-backport-jre6-${checkstyle.version}-all.jar
+checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- JaCoCo code coverage tool -----
 jacoco.version=0.8.7
@@ -296,25 +290,24 @@ jacoco.jar=${jacoco.home}/lib/jacocoant.jar
 jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
 
 # ----- SpotBugs (originally FindBugs) -----
-# 3.1.12 is the last version that runs on Java 7
-spotbugs.version=3.1.12
+spotbugs.version=4.5.2
 spotbugs.checksum.enabled=true
-spotbugs.checksum.algorithm=MD5|SHA-1
-spotbugs.checksum.value=8c54502a8e1b78ea6b173a186ce6f379|95114d9aaeeba7bd4ea5a3d6a2167cd6c87bb943
+spotbugs.checksum.algorithm=SHA-512
+spotbugs.checksum.value=6e6d4aab1a935f47f9cf4983c30c5c338a257339bd2a6ae4fea2204683d973a67bb95a9204e387ebf9c31070a998367afa12a3b1f812b01f2e27715b704bf194
 spotbugs.home=${base.path}/spotbugs-${spotbugs.version}
 spotbugs.jar=${spotbugs.home}/lib/spotbugs-ant.jar
 spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/spotbugs-${spotbugs.version}.tgz
 
-# ----- JSign, version 4.0 -----
-# JSign 3.0 onwards requires Java 8 by default
-# Use Java 7 build
+# ----- JSign, version 4.0 or later -----
 jsign.version=4.0
 
 # checksums for JSign 4.0
 jsign.checksum.enabled=true
-jsign.checksum.algorithm=SHA-512
-jsign.checksum.value=14e4de1755df3a616ef2725f54542a532c7b86d6fdbc214e355554c554068471e74f348eeafebf3074afcbec53786e5b3219de61cb52ad9b01120f03c304a4e9
+jsign.checksum.algorithm=MD5|SHA-1
+jsign.checksum.value=50982facf864df4f08a051b43f7d2e42|3d203fbffdc45e837f98b7c9c5d311b615661a75
 
-jsign.home=${base.path}/jsign-${jsign.version}-java7
-jsign.jar=${jsign.home}/jsign-${jsign.version}-java7.jar
-jsign.loc=https://github.com/ebourg/jsign/releases/download/${jsign.version}/jsign-${jsign.version}-java7.jar
+jsign.home=${base.path}/jsign-${jsign.version}
+jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
+jsign.loc=${base-maven.loc}/net/jsign/jsign/${jsign.version}/jsign-${jsign.version}.jar
+
+
