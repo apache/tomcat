@@ -273,8 +273,10 @@
     <include name="**/*.dtd"/>
     <include name="**/*.htm"/>
     <include name="**/*.html"/>
+    <include name="**/*.iml"/>
     <include name="**/*.ini"/>
     <include name="**/*.java"/>
+    <include name="**/*.jj"/>
     <include name="**/*.jjt"/>
     <include name="**/*.json"/>
     <include name="**/*.jsp"/>
@@ -415,7 +417,6 @@
     <!-- Modules -->
     <exclude name="org/apache/catalina/ant/**" />
     <exclude name="org/apache/catalina/ha/**" />
-    <exclude name="org/apache/catalina/mbeans/JmxRemote*" />
     <exclude name="org/apache/catalina/tribes/**" />
     <exclude name="org/apache/catalina/storeconfig/**" />
     <exclude name="org/apache/naming/factory/webservices/**" />
@@ -585,6 +586,7 @@
         <exclude name="**/*_2.xml"/>
         <exclude name="res/checkstyle/header-al2.txt"/>
         <!-- Exclude auto-generated files -->
+        <exclude name="java/org/apache/el/parser/ELParser.jj" />
         <exclude name="java/org/apache/el/parser/ELParser*.java" />
         <exclude name="java/org/apache/el/parser/Node.java" />
         <exclude name="java/org/apache/**/parser/JJT*ParserState.java" />
@@ -646,7 +648,7 @@
              classname="org.apache.tomcat.buildutil.CheckEol"
              classpath="${tomcat.classes}" />
 
-    <checkeol>
+    <checkeol mode="LF">
       <fileset dir="." >
         <patternset refid="text.files" />
         <include name="**/*.bat"/>
@@ -692,7 +694,6 @@
       <!-- Uncomment this to show unchecked warnings:
       <compilerarg value="-Xlint:unchecked"/>
       -->
-      <compilerarg value="-XDignore.symbol.file"/>
       <classpath refid="compile.classpath" />
       <exclude name="org/apache/naming/factory/webservices/**" />
     </javac>
@@ -1600,7 +1601,7 @@
       <executiondata>
         <file file="${coverage.datafile}"/>
       </executiondata>
-      <structure name="Tomcat 10.0.x Code Coverage">
+      <structure name="Tomcat 8.5.x Code Coverage">
         <classfiles>
           <fileset dir="${tomcat.classes}"/>
         </classfiles>
@@ -2088,13 +2089,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
             </and>
             <filename name="**/*.asc" />
             <filename name="**/*.tmp" />
-            <filename name="**/*.jj" />
             <filename name="**/maven-resolver-ant-tasks-*.jar" />
             <filename name="**/thumbs.db" />
             <filename name="**/Thumbs.db" />
             <filename name="*.launch"/>
             <filename name="bin/setenv.*" />
             <filename name="java/org/apache/catalina/startup/catalina.properties" />
+            <filename name="java/org/apache/el/parser/ELParser.jj" />
             <filename name="logs/**" />
             <filename name="webapps/docs/jdbc-pool.xml" />
             <filename name="work/**" />
