@@ -168,7 +168,6 @@ public class TestJNDIRealm {
 
     private NamingEnumeration<SearchResult> mockSearchResults(String password)
             throws NamingException {
-        @SuppressWarnings("unchecked")
         NamingEnumeration<SearchResult> searchResults =
                 EasyMock.createNiceMock(NamingEnumeration.class);
         EasyMock.expect(Boolean.valueOf(searchResults.hasMore()))
