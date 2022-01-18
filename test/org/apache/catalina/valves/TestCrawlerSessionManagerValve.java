@@ -58,13 +58,13 @@ public class TestCrawlerSessionManagerValve {
         CrawlerSessionManagerValve valve = new CrawlerSessionManagerValve();
         valve.setCrawlerIps("216\\.58\\.206\\.174");
         valve.setCrawlerUserAgents(valve.getCrawlerUserAgents());
-        valve.setNext(EasyMock.createMock(Valve.class));
+        valve.setNext((Valve) EasyMock.createMock(Valve.class));
         HttpSession session = createSessionExpectations(valve, true);
         Request request = createRequestExpectations("216.58.206.174", session, true);
 
         EasyMock.replay(request, session);
 
-        valve.invoke(request, EasyMock.createMock(Response.class));
+        valve.invoke(request, (Response) EasyMock.createMock(Response.class));
 
         EasyMock.verify(request, session);
     }
@@ -74,13 +74,13 @@ public class TestCrawlerSessionManagerValve {
         CrawlerSessionManagerValve valve = new CrawlerSessionManagerValve();
         valve.setCrawlerIps("216\\.58\\.206\\.174");
         valve.setCrawlerUserAgents(valve.getCrawlerUserAgents());
-        valve.setNext(EasyMock.createMock(Valve.class));
+        valve.setNext((Valve) EasyMock.createMock(Valve.class));
         HttpSession session = createSessionExpectations(valve, false);
         Request request = createRequestExpectations("127.0.0.1", session, false);
 
         EasyMock.replay(request, session);
 
-        valve.invoke(request, EasyMock.createMock(Response.class));
+        valve.invoke(request, (Response) EasyMock.createMock(Response.class));
 
         EasyMock.verify(request, session);
     }
@@ -91,7 +91,7 @@ public class TestCrawlerSessionManagerValve {
         valve.setCrawlerUserAgents(valve.getCrawlerUserAgents());
         valve.setHostAware(true);
         valve.setContextAware(true);
-        valve.setNext(EasyMock.createMock(Valve.class));
+        valve.setNext((Valve) EasyMock.createMock(Valve.class));
 
         verifyCrawlingLocalhost(valve, "localhost");
         verifyCrawlingLocalhost(valve, "example.invalid");
@@ -103,7 +103,7 @@ public class TestCrawlerSessionManagerValve {
         valve.setCrawlerUserAgents(valve.getCrawlerUserAgents());
         valve.setHostAware(true);
         valve.setContextAware(true);
-        valve.setNext(EasyMock.createMock(Valve.class));
+        valve.setNext((Valve) EasyMock.createMock(Valve.class));
 
         verifyCrawlingContext(valve, "/examples");
         verifyCrawlingContext(valve, null);
@@ -114,7 +114,7 @@ public class TestCrawlerSessionManagerValve {
         CrawlerSessionManagerValve valve = new CrawlerSessionManagerValve();
         valve.setCrawlerIps("216\\.58\\.206\\.174");
         valve.setCrawlerUserAgents(valve.getCrawlerUserAgents());
-        valve.setNext(EasyMock.createMock(Valve.class));
+        valve.setNext((Valve) EasyMock.createMock(Valve.class));
         valve.setSessionInactiveInterval(0);
         StandardSession session = new StandardSession(TEST_MANAGER);
         session.setId("id");
@@ -124,7 +124,7 @@ public class TestCrawlerSessionManagerValve {
 
         EasyMock.replay(request);
 
-        valve.invoke(request, EasyMock.createMock(Response.class));
+        valve.invoke(request, (Response) EasyMock.createMock(Response.class));
 
         EasyMock.verify(request);
 
@@ -143,7 +143,7 @@ public class TestCrawlerSessionManagerValve {
 
         EasyMock.replay(request, session);
 
-        valve.invoke(request, EasyMock.createMock(Response.class));
+        valve.invoke(request, (Response) EasyMock.createMock(Response.class));
 
         EasyMock.verify(request, session);
     }
@@ -156,7 +156,7 @@ public class TestCrawlerSessionManagerValve {
 
         EasyMock.replay(request, session);
 
-        valve.invoke(request, EasyMock.createMock(Response.class));
+        valve.invoke(request, (Response) EasyMock.createMock(Response.class));
 
         EasyMock.verify(request, session);
     }

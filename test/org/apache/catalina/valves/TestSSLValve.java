@@ -37,7 +37,7 @@ public class TestSSLValve {
     public static class MockRequest extends Request {
 
         public MockRequest() {
-            setConnector(EasyMock.createMock(Connector.class));
+            setConnector((Connector) EasyMock.createMock(Connector.class));
             setCoyoteRequest(new org.apache.coyote.Request());
         }
 
