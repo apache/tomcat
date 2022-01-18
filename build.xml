@@ -2249,7 +2249,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp -html5"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">
