@@ -24,8 +24,7 @@ import java.lang.reflect.Modifier;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -112,7 +111,7 @@ public final class ObjectReflectionPropertyInspector {
     }
 
     //types of properties that IntrospectionUtils.setProperty supports
-    private static final Set<Class<?>> ALLOWED_TYPES = Collections.unmodifiableSet(new HashSet<>(
+    private static final Set<Class<?>> ALLOWED_TYPES = Collections.unmodifiableSet(new LinkedHashSet<>(
         Arrays.asList(
             Boolean.TYPE,
             Integer.TYPE,
@@ -121,7 +120,7 @@ public final class ObjectReflectionPropertyInspector {
             InetAddress.class
         )
     ));
-    private static Map<Class<?>, SetPropertyClass> classes = new HashMap<>();
+    private static Map<Class<?>, SetPropertyClass> classes = new LinkedHashMap<>();
 
     public static void generateCode(Set<SetPropertyClass> baseClasses, String packageName, File location, String className) throws Exception {
         String packageDirectory = packageName.replace('.','/');
