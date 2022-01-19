@@ -94,7 +94,7 @@ public final class FastHttpDateFormat {
      */
     public static final String getCurrentDate() {
         long now = System.currentTimeMillis();
-        if ((now - currentDateGenerated) > 1000) {
+        if (Math.abs(now - currentDateGenerated) > 1000) {
             currentDate = FORMAT_RFC5322.format(new Date(now));
             currentDateGenerated = now;
         }
