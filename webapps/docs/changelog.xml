@@ -152,6 +152,12 @@
         OpenSSL for TLS between MacOS and Linux/Windows as the root cause was
         traced to configuration differences. (markt)
       </fix>
+      <fix>
+        <pr>467</pr>: When system time moves backwards (e.g. after clock
+        correction), ensure that the cached formatted current date used for
+        HTTP headers tracks this change. Pull request provided by zhenguoli.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
