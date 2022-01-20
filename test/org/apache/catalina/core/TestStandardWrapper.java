@@ -196,7 +196,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-servletsecurity");
+        File appDir = new File("test/webapp-servletsecurity-a");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         tomcat.start();
@@ -215,7 +215,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-servletsecurity2");
+        File appDir = new File("test/webapp-servletsecurity-b");
         tomcat.addWebapp(null, "", appDir.getAbsolutePath());
 
         tomcat.start();
