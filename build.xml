@@ -1480,16 +1480,6 @@
              includeantruntime="false">
     </javac>
 
-    <mkdir dir="${tomcat.build}/webapps/examples/jsp/plugin/applet"/>
-    <javac   srcdir="webapps/examples/jsp/plugin/applet"
-             destdir="${tomcat.build}/webapps/examples/jsp/plugin/applet"
-             debug="${compile.debug}" deprecation="${compile.deprecation}"
-             release="${compile.release}"
-             classpath="${tomcat.classes}"
-             encoding="ISO-8859-1"
-             includeantruntime="false">
-    </javac>
-
     <!-- Convert the message files of the examples webapp from UTF-8 to ASCII.
     This can be removed after upgrading to Java 9+ as the minimum JRE and
     specifying the encoding when loading the ResourceBundles -->
