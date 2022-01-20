@@ -149,6 +149,14 @@ mvn package</source>
     information on this process.
   </p>
 
+  <p>
+    Even though all classes that are used have to be complied AOT into the
+    native image, webapps must still be left unchanged, and continue including
+    all needed classes and JARs in the <code>WEB-INF</code> folder. Although
+    these classes will not actually be run or loaded, access to them is
+    required.
+  </p>
+
   </section>
 
   <section name="Building the native image">
