@@ -211,7 +211,7 @@
                http://tomcat.apache.org/jsp2-example-taglib
             </taglib-uri>
             <taglib-location>
-               /WEB-INF/jsp2/jsp2-example-taglib.tld
+               /WEB-INF/jsp/jsp2-example-taglib.tld
             </taglib-location>
         </taglib>
 
