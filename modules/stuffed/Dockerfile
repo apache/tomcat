@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM openjdk:8-jre
-# FROM openjdk:11-jre
+FROM openjdk:11-jre
 # FROM openjdk:17-jdk
+# Tomcat 10.1+ no longer supports Java 8 
+# FROM openjdk:8-jre
 VOLUME /tmp
 
 USER root
