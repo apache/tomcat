@@ -120,6 +120,11 @@
         Remove the applet example from the example web application as applets
         are no longer supported in any major browser. (markt)
       </fix>
+      <scode>
+        Refactor a small number of pages in the examples web application to
+        avoid an issue with reproducible builds due to differences in file
+        ordering across different operating systems with Ant's zip task. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
