@@ -75,7 +75,7 @@
            includes="${files}"
            debug="true"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
+           source="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="false">
       <classpath path="${nb-test.classpath}"/>
