@@ -24,7 +24,7 @@ Export-Package: \
 -includepackage: \
     org.apache.tomcat.websocket.pojo
 
--includeresource.meta-inf: /META-INF/=../META-INF/tomcat-websocket.jar/
+-includeresource.meta-inf: /META-INF/=../../output/manifests/tomcat-websocket.jar/
 
 -jpms-module-info: \
     ${module.name};\

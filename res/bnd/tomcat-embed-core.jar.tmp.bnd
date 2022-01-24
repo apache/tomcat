@@ -96,8 +96,8 @@ Export-Package: \
     org.apache.tomcat.util.net.jsse,\
     org.apache.tomcat.util.threads.res
 
--includeresource.notice2: META-INF/NOTICE;literal="${replace;${cat;../META-INF/servlet-api.jar.notice};@YEAR@;${year}}\n"
--includeresource.license2: {META-INF/LICENSE=../META-INF/servlet-api.jar.license}
+-includeresource.notice2: META-INF/NOTICE=../../output/manifests/servlet-api.jar.notice
+-includeresource.license2: META-INF/LICENSE=../../output/manifests/servlet-api.jar.license
 
 Provide-Capability: \
     osgi.contract;\
