@@ -719,6 +719,16 @@
     when loading the ResourceBundles -->
     <native2ascii src="java" dest="${tomcat.classes}" includes="**/LocalStrings.properties,**/Messages*.properties" encoding="UTF-8"/>
     <native2ascii src="java" dest="${tomcat.i18n}" includes="**/LocalStrings_*.properties" encoding="UTF-8"/>
+
+    <!-- Ensure consistent line-endings for reproducible builds -->
+    <fixcrlf srcdir="${tomcat.classes}" eol="lf"
+        encoding="UTF-8" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
+    <fixcrlf srcdir="${tomcat.i18n}" eol="lf"
+        encoding="UTF-8" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
   </target>
 
   <target name="build-manifests" unless="manifests.uptodate"
