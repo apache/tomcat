@@ -997,6 +997,13 @@
       <filterset refid="version.filters"/>
       <fileset dir="${tomcat.home}/res/META-INF" />
     </copy>
+
+    <!-- Ensure text files in JARs have consistent line endings. Required for
+    reproducible builds. -->
+    <fixcrlf srcdir="${tomcat.manifests}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" >
+      <patternset refid="text.files" />
+    </fixcrlf>
   </target>
 
   <target name="package" depends="compile,build-manifests" >
