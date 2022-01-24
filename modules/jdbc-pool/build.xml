@@ -153,8 +153,6 @@
     <javac srcdir="${basedir}/src/main/java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
            release="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="false">
@@ -193,8 +191,6 @@
     <javac srcdir="${basedir}/src/test/java" destdir="${tomcat.testclasses}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
            release="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="false">
