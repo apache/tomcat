@@ -127,6 +127,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <scode>
+        Use LF line endings for text files in JARs to support reproducible
+        builds across different operating systems. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <scode>
