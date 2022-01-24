@@ -3757,6 +3757,9 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <copy todir="${tomcat.graal}/${graalPrefix}">
       <fileset dir="${basedir}/${graalFiles}" />
     </copy>
+    <!-- Reproducible builds: consistent line endings  for graal files -->
+    <fixcrlf srcdir="${tomcat.graal}/${graalPrefix}" eol="lf"
+        encoding="ISO-8859-1" fixlast="false" />
     <zip destfile="${jarfile}" update="true" filesonly="true"
          modificationtime="${tstamp.file}"
          encoding="UTF8">
