@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.17 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add <code>ha-api-*.jar</code> and <code>jaxws-rt-*.jar</code> to the
+        list of JARs to skip when scanning for TLDs, web fragments and
+        annotations. (michaelo)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
