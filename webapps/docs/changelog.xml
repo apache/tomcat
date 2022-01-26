@@ -138,6 +138,12 @@
   <subsection name="Other">
     <changelog>
       <scode>
+        Switch to building with Java 11 and using <code>--release</code> to
+        target Java 8. Once back-ported to all currently supported branches,
+        this will reduce the number of Java versions developers need to juggle.
+        (markt)
+      </scode>
+      <scode>
         Use LF line endings for text files in JARs to support reproducible
         builds across different operating systems. (markt)
       </scode>
