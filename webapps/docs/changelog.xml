@@ -135,6 +135,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Use LF line endings for text files in JARs to support reproducible
+        builds across different operating systems. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.75 (schultz)" rtext="2022-01-17">
   <subsection name="Coyote">
