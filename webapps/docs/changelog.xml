@@ -143,6 +143,10 @@
         this will reduce the number of Java versions developers need to juggle.
         (markt)
       </scode>
+      <scode>
+        Use LF line endings for text files in JARs to support reproducible
+        builds across different operating systems. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
