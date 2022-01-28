@@ -2632,7 +2632,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 if (name.startsWith("servlet.jsp.jstl.", 8)) {
                     return false;
                 }
-                if (name.startsWith("el.", 8) ||
+                if (name.startsWith("annotation.", 8) ||
+                    name.startsWith("el.", 8) ||
                     name.startsWith("servlet.", 8) ||
                     name.startsWith("websocket.", 8) ||
                     name.startsWith("security.auth.message.", 8)) {
@@ -2643,7 +2644,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 if (name.startsWith("servlet/jsp/jstl/", 8)) {
                     return false;
                 }
-                if (name.startsWith("el/", 8) ||
+                if (name.startsWith("annotation/", 8) ||
+                    name.startsWith("el/", 8) ||
                     name.startsWith("servlet/", 8) ||
                     name.startsWith("websocket/", 8) ||
                     name.startsWith("security/auth/message/", 8)) {
