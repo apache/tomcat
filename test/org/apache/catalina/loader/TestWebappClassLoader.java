@@ -99,6 +99,7 @@ public class TestWebappClassLoader extends TomcatBaseTest {
             "org.apache.juli",
             "org.apache.naming",
             "org.apache.tomcat",
+            "jakarta.annotation",
             "jakarta.el",
             "jakarta.servlet",
             "jakarta.websocket",
