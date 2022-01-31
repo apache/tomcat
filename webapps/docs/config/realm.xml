@@ -361,8 +361,8 @@
       </attribute>
 
       <attribute name="protocol" required="false">
-         <p>A string specifying the security protocol to use. If not given
-         the providers default is used.</p>
+         <p>A string specifying the TLS protocol to use. If not given, the
+         Java runtime's default is used.</p>
       </attribute>
 
       <attribute name="readTimeout" required="false">
