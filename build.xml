@@ -1934,15 +1934,16 @@
   </target>
 
   <!-- Set Java 17 specific properties -->
-  <condition property="java17.nativeaccess" value="--enable-native-access=ALL-UNNAMED"><javaversion exactly="17"/></condition>
+  <condition property="java17.nativeaccess" value="--enable-native-access=ALL-UNNAMED"><javaversion atleast="17"/></condition>
   <property name="java17.nativeaccess" value="-Dtest.1=1"/>
   <condition property="java17.addmodules" value="--add-modules"><javaversion exactly="17"/></condition>
+  <condition property="java17.addmodules" value="--enable-preview"><javaversion atleast="19"/></condition>
   <property name="java17.addmodules" value="-Dtest.2=2"/>
   <condition property="java17.incubatorforeign" value="jdk.incubator.foreign"><javaversion exactly="17"/></condition>
   <property name="java17.incubatorforeign" value="-Dtest.3=3"/>
   <condition property="runtests.librarypath" value="-Dtest.4=4">
     <and>
-      <javaversion exactly="17"/>
+      <javaversion atleast="17"/>
       <resourceexists>
         <file file="${openssl-lib.jar}"/>
       </resourceexists>
