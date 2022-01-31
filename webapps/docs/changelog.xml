@@ -130,6 +130,10 @@
         avoid an issue with reproducible builds due to differences in file
         ordering across different operating systems with Ant's zip task. (markt)
       </scode>
+      <fix>
+        Better documentation for the <code>protocol</code> attribute of the
+        <code>JNDIRealm</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
