@@ -196,6 +196,10 @@ Tomcat cluster. These include:</p>
                   Channel.SND_TX_SEQ (2) |
                   Channel.MBR_RX_SEQ (4) |
                   Channel.MBR_TX_SEQ (8);</source>
+      <p>When using the static membership service
+      <code>org.apache.catalina.tribes.membership.StaticMembershipService</code>
+      you must ensure that this attribute is configured to use the default
+      value.</p>
     </attribute>
 
     <attribute name="heartbeatBackgroundEnabled" required="false">

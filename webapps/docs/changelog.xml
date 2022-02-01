@@ -134,6 +134,10 @@
         Better documentation for the <code>protocol</code> attribute of the
         <code>JNDIRealm</code>. (markt)
       </fix>
+      <fix>
+        Clarify the settings described in the documentation web application to
+        configure a cluster using static membership. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
