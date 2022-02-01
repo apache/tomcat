@@ -63,7 +63,7 @@
         </code>. The filter is a regular expression using
         <code>java.util.regex</code>. If no filter pattern specified or if the
         filter pattern is configured to be the empty string, no filtering will
-        take place. 
+        take place.
       </attribute>
       <attribute name="primaryIndicator" required="false">
         Boolean value, so to true, and the replication valve will insert a request attribute with the name
