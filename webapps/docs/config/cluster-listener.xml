@@ -49,19 +49,14 @@
 
 <section name="Attributes">
 
-  <subsection name="Common Attributes">
-
   <attributes>
 
     <attribute name="className" required="true">
-
+        Set value to <code>org.apache.catalina.ha.session.ClusterSessionListener</code>
     </attribute>
 
 
   </attributes>
-
-
-  </subsection>
 
 
 </section>

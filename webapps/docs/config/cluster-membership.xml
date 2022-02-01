@@ -179,6 +179,11 @@
   </subsection>
 
   <subsection name="Static Membership Attributes">
+
+    <p>When using the static membership service you must ensure that the
+    <code>channelStartOptions</code> attribute of the <code>Cluster</code>
+    element is set to the default value of <code>15</code>.</p>
+
     <attributes>
       <attribute name="className" required="true">
         <p>
