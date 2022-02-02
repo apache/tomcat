@@ -119,6 +119,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>65848</bug>: Revert the change that attempted to align the
+        behaviour of client certificate authentication with NIO or NIO2 with
+        OpenSSL for TLS between MacOS and Linux/Windows as the root cause was
+        traced to configuration differences. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
