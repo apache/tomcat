@@ -54,7 +54,6 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
@@ -77,6 +76,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PermissionCheck;
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
  * Specialized web application class loader.
@@ -1833,15 +1833,21 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         }
 
                         // "java.util.concurrent" code is in public domain,
-                        // so all implementations are similar
+                        // so all implementations are similar including our
+                        // internal fork.
                         if (target != null && target.getClass().getCanonicalName() != null &&
-                                target.getClass().getCanonicalName().equals(
-                                        "java.util.concurrent.ThreadPoolExecutor.Worker")) {
+                                (target.getClass().getCanonicalName().equals(
+                                        "org.apache.tomcat.util.threads.ThreadPoolExecutor.Worker") ||
+                                        target.getClass().getCanonicalName().equals(
+                                                "java.util.concurrent.ThreadPoolExecutor.Worker"))) {
                             Field executorField = target.getClass().getDeclaredField("this$0");
                             executorField.setAccessible(true);
                             Object executor = executorField.get(target);
                             if (executor instanceof ThreadPoolExecutor) {
                                 ((ThreadPoolExecutor) executor).shutdownNow();
+                                usingExecutor = true;
+                            } else if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+                                ((java.util.concurrent.ThreadPoolExecutor) executor).shutdownNow();
                                 usingExecutor = true;
                             }
                         }
