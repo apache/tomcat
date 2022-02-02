@@ -148,6 +148,11 @@
         Clarify the some custer settings described in the documentation web
         application. (markt)
       </fix>
+      <add>
+        Add information on the <code>OpenSSLConf</code> and
+        <code>OpenSSLConfCmd</code> elements to the HTTP SSL configuration page
+        in the documentation web applications. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

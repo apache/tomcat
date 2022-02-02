@@ -1115,6 +1115,13 @@
   <strong>SSLHostConfig</strong>. For further information, see the SSL Support
   section below.</p>
 
+  <p>When OpenSSL is providing the TLS implementation, one or more
+  <strong>OpenSSLConfCmd</strong> elements may be nested inside a
+  <strong>OpenSSLConf</strong> element to configure OpenSSL via OpenSSL's
+  <code>SSL_CONF</code> API. A single <strong>OpenSSLConf</strong> element may
+  be nested in a <strong>SSLHostConfig</strong> element. For further
+  information, see the SSL Support section below</p>
+
 </section>
 
 
@@ -1631,6 +1638,44 @@
       configuration styles can be used, as long as the two types are not mixed
       (for example, it is not allowed to define use of a Java keystore and
       specify a separate pem private key using the OpenSSL attribute).</p>
+    </attribute>
+
+  </attributes>
+
+  </subsection>
+
+  <subsection name="SSL Support - OpenSSL's SSL_CONF API">
+
+  <p>When OpenSSL is providing the TLS implementation, one or more
+  <strong>OpenSSLConfCmd</strong> elements may be nested inside a
+  <strong>OpenSSLConf</strong> element to configure OpenSSL via OpenSSL's
+  <code>SSL_CONF</code> API. A single <strong>OpenSSLConf</strong> element may
+  be nested in a <strong>SSLHostConfig</strong> element.</p>
+
+  <p>The set of configuration file commands available depends on the OpenSSL
+  version being used. For a list of supported command names and values, see the
+  section Supported configuration file commands in the <a
+  href="https://www.openssl.org/docs/manmaster/man3/SSL_CONF_cmd.html#SUPPORTED-CONFIGURATION-FILE-COMMANDS"
+  >SSL_CONF_cmd(3)</a> manual page for OpenSSL. Some of the configuration file
+  commands can be used as alternatives to <strong>SSLHostConfig</strong>
+  attributes. It is recommended that configuration file commands are only used
+  where the feature cannot be configured using <strong>SSLHostConfig</strong>
+  attributes.</p>
+
+  <p>The <strong>OpenSSLConf</strong> element does not support any
+  attributes.</p>
+
+  <p>The <strong>OpenSSLConfCmd</strong> element supports the following
+  attributes.</p>
+
+  <attributes>
+
+    <attribute name="name" required="true">
+      <p>The name of the configuration file command.</p>
+    </attribute>
+
+    <attribute name="name" required="false">
+      <p>The value to use for the configuration file command.</p>
     </attribute>
 
   </attributes>
