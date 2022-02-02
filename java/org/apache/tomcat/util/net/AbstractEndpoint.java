@@ -692,12 +692,12 @@ public abstract class AbstractEndpoint<S,U> {
     public void setMinSpareThreads(int minSpareThreads) {
         this.minSpareThreads = minSpareThreads;
         Executor executor = this.executor;
-        if (internalExecutor && executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+        if (internalExecutor && executor instanceof ThreadPoolExecutor) {
             // The internal executor should always be an instance of
-            // j.u.c.ThreadPoolExecutor but it may be null if the endpoint is
-            // not running.
+            // org.apache.tomcat.util.threads.ThreadPoolExecutor but it may be
+            // null if the endpoint is not running.
             // This check also avoids various threading issues.
-            ((java.util.concurrent.ThreadPoolExecutor) executor).setCorePoolSize(minSpareThreads);
+            ((ThreadPoolExecutor) executor).setCorePoolSize(minSpareThreads);
         }
     }
     public int getMinSpareThreads() {
@@ -719,12 +719,12 @@ public abstract class AbstractEndpoint<S,U> {
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
         Executor executor = this.executor;
-        if (internalExecutor && executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+        if (internalExecutor && executor instanceof ThreadPoolExecutor) {
             // The internal executor should always be an instance of
-            // j.u.c.ThreadPoolExecutor but it may be null if the endpoint is
-            // not running.
+            // org.apache.tomcat.util.threads.ThreadPoolExecutor but it may be
+            // null if the endpoint is not running.
             // This check also avoids various threading issues.
-            ((java.util.concurrent.ThreadPoolExecutor) executor).setMaximumPoolSize(maxThreads);
+            ((ThreadPoolExecutor) executor).setMaximumPoolSize(maxThreads);
         }
     }
     public int getMaxThreads() {
@@ -914,6 +914,8 @@ public abstract class AbstractEndpoint<S,U> {
         if (executor != null) {
             if (executor instanceof ThreadPoolExecutor) {
                 return ((ThreadPoolExecutor) executor).getPoolSize();
+            } else if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+                return ((java.util.concurrent.ThreadPoolExecutor) executor).getPoolSize();
             } else if (executor instanceof ResizableExecutor) {
                 return ((ResizableExecutor) executor).getPoolSize();
             } else {
@@ -934,6 +936,8 @@ public abstract class AbstractEndpoint<S,U> {
         if (executor != null) {
             if (executor instanceof ThreadPoolExecutor) {
                 return ((ThreadPoolExecutor) executor).getActiveCount();
+            } else if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+                return ((java.util.concurrent.ThreadPoolExecutor) executor).getActiveCount();
             } else if (executor instanceof ResizableExecutor) {
                 return ((ResizableExecutor) executor).getActiveCount();
             } else {
