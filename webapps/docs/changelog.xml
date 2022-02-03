@@ -117,6 +117,12 @@
         <code>ServletResponse.setLocale()</code> to include a mapping from the
         <code>ja</code> locale to the <code>Shift_JIS</code> encoding. (markt)
       </add>
+      <fix>
+        <bug>65806</bug>: Improve the handling of session ID generation when the
+        default algorithm for <code>SecureRandom</code> (<code>SHA1PRNG</code>)
+        is not supported by the configured providers as will be the case for a
+        FIPS compliant configuration. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
