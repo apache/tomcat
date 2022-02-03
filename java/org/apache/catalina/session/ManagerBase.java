@@ -87,19 +87,20 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     /**
      * The name of the algorithm to use to create instances of
-     * {@link java.security.SecureRandom} which are used to generate session IDs.
-     * If no algorithm is specified, SHA1PRNG is used. To use the platform
-     * default (which may be SHA1PRNG), specify the empty string. If an invalid
+     * {@link java.security.SecureRandom} which are used to generate session
+     * IDs. If no algorithm is specified, SHA1PRNG is used. If SHA1PRNG is not
+     * available, the platform default will be used. To use the platform default
+     * (which may be SHA1PRNG), specify the empty string. If an invalid
      * algorithm and/or provider is specified the SecureRandom instances will be
      * created using the defaults. If that fails, the SecureRandom instances
      * will be created using platform defaults.
      */
-    protected String secureRandomAlgorithm = "SHA1PRNG";
+    protected String secureRandomAlgorithm = SessionIdGeneratorBase.DEFAULT_SECURE_RANDOM_ALGORITHM;
 
     /**
      * The name of the provider to use to create instances of
-     * {@link java.security.SecureRandom} which are used to generate session IDs.
-     * If no algorithm is specified the of SHA1PRNG default is used. If an
+     * {@link java.security.SecureRandom} which are used to generate session
+     * IDs. If no provider is specified the platform default is used. If an
      * invalid algorithm and/or provider is specified the SecureRandom instances
      * will be created using the defaults. If that fails, the SecureRandom
      * instances will be created using platform defaults.
