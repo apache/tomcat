@@ -67,9 +67,7 @@ public interface TomcatPrincipal extends Principal {
      *         <code>null</code> if the attribute does not exist, or if
      *         <code>null</code> has been specified as the attribute's name
      */
-    default Object getAttribute(String name) {
-        return null;
-    }
+    Object getAttribute(String name);
 
     /**
      * Returns an <code>Enumeration</code> containing the names of the
@@ -80,7 +78,5 @@ public interface TomcatPrincipal extends Principal {
      * @return an <code>Enumeration</code> of strings containing the names of
      *         the Principal's attributes
      */
-    default Enumeration<String> getAttributeNames() {
-        return Collections.emptyEnumeration();
-    }
+    Enumeration<String> getAttributeNames();
 }
