@@ -176,7 +176,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         }
         this.loginContext = loginContext;
         this.gssCredential = gssCredential;
-        this.attributes = Collections.unmodifiableMap(attributes);
+        this.attributes = attributes != null ? Collections.unmodifiableMap(attributes) : null;
     }
 
 
