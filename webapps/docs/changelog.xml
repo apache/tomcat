@@ -191,6 +191,10 @@
         Use LF line endings for text files in JARs to support reproducible
         builds across different operating systems. (markt)
       </scode>
+      <fix>
+        Fix dependencies for individual test targets in Ant build file. Based on
+        <pr>468</pr> provided by Totoo chenyonghui. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
