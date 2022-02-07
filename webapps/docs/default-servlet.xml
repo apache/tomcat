@@ -206,6 +206,10 @@ Tomcat.</p>
         partial PUT? Note that RFC 7233 clarified that Range headers are only
         valid for GET requests. [true]
   </property>
+  <property name="dirRedirectUse301">
+        When a directory redirect (trailing slash missing) is made
+        use a 301. [false]
+  </property>
 </properties>
 </section>
 

@@ -114,6 +114,9 @@
   <!--                       with a Range header as a partial PUT? Note     -->
   <!--                       that RFC 7233 clarified that Range headers are -->
   <!--                       only valid for GET requests. [true]            -->
+  <!--                                                                      -->
+  <!--   dirRedirectUse301   Use a 301 (instead of 302) for redirects       -->
+  <!--                       when a pathless directory was requested.[false]-->
 
     <servlet>
         <servlet-name>default</servlet-name>

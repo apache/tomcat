@@ -198,6 +198,12 @@ public class DefaultServlet extends HttpServlet {
     protected boolean listings = false;
 
     /**
+     * Should we use a 301 for directory redirects? Default is no
+     */
+    protected boolean dirRedirectUse301 = false;
+
+
+    /**
      * Read only flag. By default, it's set to true.
      */
     protected boolean readOnly = true;
@@ -307,6 +313,10 @@ public class DefaultServlet extends HttpServlet {
             output = Integer.parseInt(getServletConfig().getInitParameter("output"));
 
         listings = Boolean.parseBoolean(getServletConfig().getInitParameter("listings"));
+
+        if (getServletConfig().getInitParameter("dirRedirectUse301") != null)
+            dirRedirectUse301 = Boolean.parseBoolean(getServletConfig().getInitParameter("dirRedirectUse301"));
+        }
 
         if (getServletConfig().getInitParameter("readonly") != null)
             readOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("readonly"));
@@ -1419,7 +1429,12 @@ public class DefaultServlet extends HttpServlet {
         while (location.length() > 1 && location.charAt(1) == '/') {
             location.deleteCharAt(0);
         }
-        response.sendRedirect(response.encodeRedirectURL(location.toString()));
+        if (dirRedirectUse301) {
+            response.setStatus(301);
+        } else {
+            response.setStatus(302);
+        }
+        response.setHeader("Location", response.encodeRedirectURL(location.toString()));
     }
 
     /**
