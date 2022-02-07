@@ -123,6 +123,11 @@
         is not supported by the configured providers as will be the case for a
         FIPS compliant configuration. (markt)
       </fix>
+      <fix>
+        <pr>469</pr>: Include the Java Annotations API in the classes that
+        Tomcat will not load from web applications. Pull request provided by
+        ppkarwasz. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
