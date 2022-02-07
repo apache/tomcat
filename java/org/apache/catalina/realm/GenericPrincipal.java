@@ -176,7 +176,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         }
         this.loginContext = loginContext;
         this.gssCredential = gssCredential;
-        this.attributes = attributes;
+        this.attributes = Collections.unmodifiableMap(attributes);
     }
 
 
@@ -294,16 +294,10 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("GenericPrincipal[");
-        boolean first = true;
         sb.append(this.name);
         sb.append('(');
         for (String role : roles) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(',');
-            }
-            sb.append(role);
+            sb.append(role).append(',');
         }
         sb.append(")]");
         return sb.toString();
