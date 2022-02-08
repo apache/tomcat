@@ -345,10 +345,6 @@
     <doMavenDeployNoSrc artifactId="tomcat-i18n-zh-CN"/>
 
     <!-- Extras jars -->
-    <doMavenDeploy artifactId="tomcat-catalina-jmx-remote"
-        groupId="org.apache.tomcat.extras"
-        file="${tomcat.extras.path}/catalina-jmx-remote.jar"
-        src="${tomcat.extras.src.path}/catalina-jmx-remote-src.jar" />
     <doMavenDeploy artifactId="tomcat-catalina-ws"
         groupId="org.apache.tomcat.extras"
         file="${tomcat.extras.path}/catalina-ws.jar"
