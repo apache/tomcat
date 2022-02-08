@@ -123,6 +123,11 @@
         is not supported by the configured providers as will be the case for a
         FIPS compliant configuration. (markt)
       </fix>
+      <add>
+        <pr>XXX</pr>: Add support for additional user attributes to
+        <code>TomcatPrincipal</code> and <code>GenericPrincipal</code>.
+        Patch provided by Carsten Klein. (michaelo)
+      </add>
       <fix>
         <pr>469</pr>: Include the Jakarata Annotations API in the classes that
         Tomcat will not load from web applications. Pull request provided by

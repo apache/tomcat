@@ -19,7 +19,10 @@ package org.apache.catalina.realm;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.login.LoginContext;
 
@@ -120,7 +123,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      */
     public GenericPrincipal(String name, List<String> roles,
             Principal userPrincipal, LoginContext loginContext) {
-        this(name, roles, userPrincipal, loginContext, null);
+        this(name, roles, userPrincipal, loginContext, null, null);
     }
 
     /**
@@ -140,7 +143,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     @Deprecated
     public GenericPrincipal(String name, String password, List<String> roles,
             Principal userPrincipal, LoginContext loginContext) {
-        this(name, roles, userPrincipal, loginContext, null);
+        this(name, roles, userPrincipal, loginContext, null, null);
     }
 
     /**
@@ -154,10 +157,12 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      * @param loginContext  - If provided, this will be used to log out the user
      *        at the appropriate time
      * @param gssCredential - If provided, the user's delegated credentials
+     * @param attributes - If provided, additional attributes associated with
+     *        this Principal
      */
     public GenericPrincipal(String name, List<String> roles,
             Principal userPrincipal, LoginContext loginContext,
-            GSSCredential gssCredential) {
+            GSSCredential gssCredential, Map<String, Object> attributes) {
         super();
         this.name = name;
         this.userPrincipal = userPrincipal;
@@ -171,6 +176,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         }
         this.loginContext = loginContext;
         this.gssCredential = gssCredential;
+        this.attributes = attributes != null ? Collections.unmodifiableMap(attributes) : null;
     }
 
 
@@ -193,7 +199,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     public GenericPrincipal(String name, String password, List<String> roles,
             Principal userPrincipal, LoginContext loginContext,
             GSSCredential gssCredential) {
-        this(name, roles, userPrincipal, loginContext, gssCredential);
+        this(name, roles, userPrincipal, loginContext, gssCredential, null);
     }
 
 
@@ -254,6 +260,11 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         this.gssCredential = gssCredential;
     }
 
+    /**
+     * The additional attributes associated with this Principal.
+     */
+    protected final Map<String, Object> attributes;
+
 
     // ---------------------------------------------------------- Public Methods
 
@@ -304,10 +315,28 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     }
 
 
+    @Override
+    public Object getAttribute(String name) {
+        if (attributes == null || name == null) {
+            return null;
+        }
+        return attributes.get(name);
+    }
+
+
+    @Override
+    public Enumeration<String> getAttributeNames() {
+        if (attributes == null) {
+            return Collections.emptyEnumeration();
+        }
+        return Collections.enumeration(attributes.keySet());
+    }
+
+
     // ----------------------------------------------------------- Serialization
 
     private Object writeReplace() {
-        return new SerializablePrincipal(name, roles, userPrincipal);
+        return new SerializablePrincipal(name, roles, userPrincipal, attributes);
     }
 
     private static class SerializablePrincipal implements Serializable {
@@ -316,9 +345,10 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         private final String name;
         private final String[] roles;
         private final Principal principal;
+        private final Map<String, Object> attributes;
 
         public SerializablePrincipal(String name, String[] roles,
-                Principal principal) {
+                Principal principal, Map<String, Object> attributes) {
             this.name = name;
             this.roles = roles;
             if (principal instanceof Serializable) {
@@ -326,10 +356,12 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
             } else {
                 this.principal = null;
             }
+            this.attributes = attributes;
         }
 
         private Object readResolve() {
-            return new GenericPrincipal(name, Arrays.asList(roles), principal);
+            return new GenericPrincipal(name, Arrays.asList(roles), principal, null, null,
+                    attributes);
         }
     }
 }

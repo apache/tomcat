@@ -2516,7 +2516,7 @@ public class JNDIRealm extends RealmBase {
         }
 
         if (user != null) {
-            return new GenericPrincipal(user.getUserName(), roles, null, null, gssCredential);
+            return new GenericPrincipal(user.getUserName(), roles, null, null, gssCredential, null);
         }
 
         return null;
