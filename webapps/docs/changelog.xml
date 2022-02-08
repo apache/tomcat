@@ -128,6 +128,11 @@
         Tomcat will not load from web applications. Pull request provided by
         ppkarwasz. (markt)
       </fix>
+      <add>
+        <pr>472</pr>: Add support for additional user attributes to
+        <code>TomcatPrincipal</code> and <code>GenericPrincipal</code>.
+        Patch provided by Carsten Klein. (michaelo)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
