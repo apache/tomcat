@@ -163,10 +163,7 @@
 
   <!-- Extras JARs & source JARs -->
   <property name="catalina-ws.jar" value="${tomcat.extras}/catalina-ws.jar"/>
-  <property name="catalina-jmx-remote.jar" value="${tomcat.extras}/catalina-jmx-remote.jar"/>
-
   <property name="catalina-ws-src.jar" value="${tomcat.extras.sources}/catalina-ws-src.jar"/>
-  <property name="catalina-jmx-remote-src.jar" value="${tomcat.extras.sources}/catalina-jmx-remote-src.jar"/>
 
   <!-- jdbc-pool JARs & source JARs -->
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
@@ -514,10 +511,6 @@
   <!-- Pattern sets for extras JARs -->
   <patternset id="files.tomcat-extras-ws">
     <include name="org/apache/naming/factory/webservices/**" />
-  </patternset>
-
-  <patternset id="files.tomcat-extras-jmxremote">
-    <include name="org/apache/catalina/mbeans/JmxRemote*" />
   </patternset>
 
   <!-- =========================== Build targets =========================== -->
@@ -1716,24 +1709,8 @@
 
   </target>
 
-  <target name="extras-jmx-remote"
-          depends="extras-prepare,compile,build-manifests"
-          description="Build JMX remote extras package">
-
-    <jarIt jarfile="${catalina-jmx-remote.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.tomcat-extras-jmxremote" />
-
-    <hashAndSign file="${catalina-jmx-remote.jar}" />
-
-    <jarIt jarfile="${catalina-jmx-remote-src.jar}"
-      filesDir="java"
-      filesId="files.tomcat-extras-jmxremote" />
-
-  </target>
-
   <target name="extras"
-          depends="extras-webservices,extras-jmx-remote"
+          depends="extras-webservices"
           description="Build all extras packages">
   </target>
 
