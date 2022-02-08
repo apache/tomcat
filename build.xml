@@ -1688,8 +1688,6 @@
     <javac srcdir="java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
            release="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="false">
