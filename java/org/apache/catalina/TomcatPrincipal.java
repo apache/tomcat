@@ -17,7 +17,6 @@
 package org.apache.catalina;
 
 import java.security.Principal;
-import java.util.Collections;
 import java.util.Enumeration;
 
 import org.ietf.jgss.GSSCredential;
