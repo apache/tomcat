@@ -57,6 +57,10 @@
                  type="java.lang.String"
                  writeable="false"/>
 
+    <attribute   name="userAttributes"
+          description="Comma separated list of user attributes (columns) to additionally query from the user table"
+                 type="java.lang.String"/>
+
     <attribute   name="userCredCol"
           description="The column in the user table that holds the user's credentials"
                  type="java.lang.String"/>

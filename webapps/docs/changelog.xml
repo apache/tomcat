@@ -128,6 +128,10 @@
         <code>TomcatPrincipal</code> and <code>GenericPrincipal</code>.
         Patch provided by Carsten Klein. (michaelo)
       </add>
+      <add>
+        <pr>xxx</pr>: Add support for additional user attributes to
+        <code>DataSourceRealm</code>. Patch provided by Carsten Klein. (michaelo)
+      </add>
       <fix>
         <pr>469</pr>: Include the Jakarata Annotations API in the classes that
         Tomcat will not load from web applications. Pull request provided by
