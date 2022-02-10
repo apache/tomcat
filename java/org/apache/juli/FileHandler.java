@@ -376,7 +376,7 @@ public class FileHandler extends Handler {
 
         String className = this.getClass().getName(); //allow classes to override
 
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoader cl = ClassLoaderLogManager.getClassLoader();
 
         // Retrieve configuration of logging file name
         if (rotatable == null) {
