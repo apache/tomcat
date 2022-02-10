@@ -1508,6 +1508,12 @@
     </condition>
   </target>
 
+  <property name="opens.javalang" value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+  <property name="opens.javaio" value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
+  <property name="opens.sunrmi" value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
+  <property name="opens.javautil" value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+  <property name="opens.javautilconcurrent" value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
+
   <macrodef name="runtests"
             description="Runs the unit tests using the specified connector.
               Does not stop on errors, but sets 'test.result.error' and 'test.result.failure' properties.">
@@ -1535,11 +1541,11 @@
           <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
           <jvmarg value="-Dorg.apache.tomcat.util.net.NioSelectorShared=${org.apache.tomcat.util.net.NioSelectorShared}"/>
 
-          <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
-          <jvmarg value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
-          <jvmarg value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
-          <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
-          <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
+          <jvmarg value="${opens.javalang}"/>
+          <jvmarg value="${opens.javaio}"/>
+          <jvmarg value="${opens.sunrmi}"/>
+          <jvmarg value="${opens.javautil}"/>
+          <jvmarg value="${opens.javautilconcurrent}"/>
 
           <classpath refid="tomcat.test.classpath" />
 
