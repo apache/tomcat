@@ -86,7 +86,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
     private SynchronizedStack<Nio2Channel> nioChannels;
 
     private SocketAddress previousAcceptedSocketRemoteAddress = null;
-    private long previouspreviousAcceptedSocketNanoTime = 0;
+    private long previousAcceptedSocketNanoTime = 0;
 
 
     // ------------------------------------------------------------- Properties
@@ -380,11 +380,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             SocketAddress currentRemoteAddress = result.getRemoteAddress();
             long currentNanoTime = System.nanoTime();
             if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&
-                    currentNanoTime - previouspreviousAcceptedSocketNanoTime < 1000) {
+                    currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
                 throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
             }
             previousAcceptedSocketRemoteAddress = currentRemoteAddress;
-            previouspreviousAcceptedSocketNanoTime = currentNanoTime;
+            previousAcceptedSocketNanoTime = currentNanoTime;
         }
 
         return result;

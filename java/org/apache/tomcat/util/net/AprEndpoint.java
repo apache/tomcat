@@ -115,7 +115,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
     private int previousAcceptedPort = -1;
     private String previousAcceptedAddress = null;
-    private long previouspreviousAcceptedSocketNanoTime = 0;
+    private long previousAcceptedSocketNanoTime = 0;
 
 
     // ------------------------------------------------------------ Constructor
@@ -814,14 +814,14 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 long currentNanoTime = System.nanoTime();
                 if (wrapper.getRemotePort() == previousAcceptedPort) {
                     if (wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
-                        if (currentNanoTime - previouspreviousAcceptedSocketNanoTime < 1000) {
+                        if (currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
                             throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
                         }
                     }
                 }
                 previousAcceptedPort = wrapper.getRemotePort();
                 previousAcceptedAddress = wrapper.getRemoteAddr();
-                previouspreviousAcceptedSocketNanoTime = currentNanoTime;
+                previousAcceptedSocketNanoTime = currentNanoTime;
             }
 
             connections.put(socket, wrapper);
