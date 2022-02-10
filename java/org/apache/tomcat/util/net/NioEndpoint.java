@@ -58,6 +58,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
@@ -109,10 +110,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     private SynchronizedStack<NioChannel> nioChannels;
 
     private SocketAddress previousAcceptedSocketRemoteAddress = null;
+    private long previouspreviousAcceptedSocketNanoTime = 0;
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Use System.inheritableChannel to obtain channel from stdin/stdout.
@@ -543,11 +544,18 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     @Override
     protected SocketChannel serverSocketAccept() throws Exception {
         SocketChannel result = serverSock.accept();
-        SocketAddress currentRemoteAddress = result.getRemoteAddress();
-        if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress)) {
-            throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+
+        // Bug does not affect Windows. Skip the check on that platform.
+        if (!JrePlatform.IS_WINDOWS) {
+            SocketAddress currentRemoteAddress = result.getRemoteAddress();
+            long currentNanoTime = System.nanoTime();
+            if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&
+                    currentNanoTime - previouspreviousAcceptedSocketNanoTime < 1000) {
+                throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+            }
+            previousAcceptedSocketRemoteAddress = currentRemoteAddress;
+            previouspreviousAcceptedSocketNanoTime = currentNanoTime;
         }
-        previousAcceptedSocketRemoteAddress = currentRemoteAddress;
 
         return result;
     }

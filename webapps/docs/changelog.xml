@@ -143,6 +143,10 @@
         ignored when the Connector used an internal executor. (markt)
       </fix>
       <fix>
+        <bug>65776</bug>: Improve the detection of the Linux duplicate accept
+        bug and reduce (hopefully avoid) instances of false positives. (markt)
+      </fix>
+      <fix>
         <bug>65848</bug>: Revert the change that attempted to align the
         behaviour of client certificate authentication with NIO or NIO2 with
         OpenSSL for TLS between MacOS and Linux/Windows as the root cause was
