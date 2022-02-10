@@ -150,8 +150,7 @@ public class ClassLoaderLogManager extends LogManager {
 
         final String loggerName = logger.getName();
 
-        ClassLoader classLoader =
-            Thread.currentThread().getContextClassLoader();
+        ClassLoader classLoader = getClassLoader();
         ClassLoaderLogInfo info = getClassLoaderInfo(classLoader);
         if (info.loggers.containsKey(loggerName)) {
             return false;
@@ -244,8 +243,7 @@ public class ClassLoaderLogManager extends LogManager {
      */
     @Override
     public synchronized Logger getLogger(final String name) {
-        ClassLoader classLoader = Thread.currentThread()
-                .getContextClassLoader();
+        ClassLoader classLoader = getClassLoader();
         return getClassLoaderInfo(classLoader).loggers.get(name);
     }
 
@@ -256,8 +254,7 @@ public class ClassLoaderLogManager extends LogManager {
      */
     @Override
     public synchronized Enumeration<String> getLoggerNames() {
-        ClassLoader classLoader = Thread.currentThread()
-                .getContextClassLoader();
+        ClassLoader classLoader = getClassLoader();
         return Collections.enumeration(getClassLoaderInfo(classLoader).loggers.keySet());
     }
 
@@ -300,7 +297,7 @@ public class ClassLoaderLogManager extends LogManager {
 
 
     private synchronized String findProperty(String name) {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader classLoader = getClassLoader();
         ClassLoaderLogInfo info = getClassLoaderInfo(classLoader);
         String result = info.props.getProperty(name);
         // If the property was not found, and the current classloader had no
@@ -333,7 +330,7 @@ public class ClassLoaderLogManager extends LogManager {
 
         checkAccess();
 
-        readConfiguration(Thread.currentThread().getContextClassLoader());
+        readConfiguration(getClassLoader());
 
     }
 
@@ -344,7 +341,7 @@ public class ClassLoaderLogManager extends LogManager {
         checkAccess();
         reset();
 
-        readConfiguration(is, Thread.currentThread().getContextClassLoader());
+        readConfiguration(is, getClassLoader());
 
     }
 
@@ -357,7 +354,7 @@ public class ClassLoaderLogManager extends LogManager {
             // because we have our own shutdown hook
             return;
         }
-        ClassLoader classLoader = thread.getContextClassLoader();
+        ClassLoader classLoader = getClassLoader();
         ClassLoaderLogInfo clLogInfo = getClassLoaderInfo(classLoader);
         resetLoggers(clLogInfo);
         // Do not call super.reset(). It should be a NO-OP as all loggers should
@@ -409,16 +406,17 @@ public class ClassLoaderLogManager extends LogManager {
 
     /**
      * Retrieve the configuration associated with the specified classloader. If
-     * it does not exist, it will be created.
+     * it does not exist, it will be created. If no class loader is specified,
+     * the class loader used to load this class is used.
      *
-     * @param classLoader The classloader for which we will retrieve or build the
-     *                    configuration
+     * @param classLoader The class loader for which we will retrieve or build
+     *                    the configuration
      * @return the log configuration
      */
     protected synchronized ClassLoaderLogInfo getClassLoaderInfo(ClassLoader classLoader) {
 
         if (classLoader == null) {
-            classLoader = ClassLoader.getSystemClassLoader();
+            classLoader = this.getClass().getClassLoader();
         }
         ClassLoaderLogInfo info = classLoaderLoggers.get(classLoader);
         if (info == null) {
@@ -679,7 +677,7 @@ public class ClassLoaderLogManager extends LogManager {
 
 
     private String replaceWebApplicationProperties(String propName) {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoader cl = getClassLoader();
         if (cl instanceof WebappProperties) {
             WebappProperties wProps = (WebappProperties) cl;
             if ("classloader.webappName".equals(propName)) {
@@ -697,8 +695,27 @@ public class ClassLoaderLogManager extends LogManager {
     }
 
 
-    // ---------------------------------------------------- LogNode Inner Class
+    /**
+     * Obtain the class loader to use to lookup loggers, obtain configuration
+     * etc. The search order is:
+     * <ol>
+     * <li>Thread.currentThread().getContextClassLoader()</li>
+     * <li>The class laoder of this class</li>
+     * </ol>
+     *
+     * @return The class loader to use to lookup loggers, obtain configuration
+     *         etc.
+     */
+    static ClassLoader getClassLoader() {
+        ClassLoader result = Thread.currentThread().getContextClassLoader();
+        if (result == null) {
+            result = ClassLoaderLogManager.class.getClassLoader();
+        }
+        return result;
+    }
 
+
+    // ---------------------------------------------------- LogNode Inner Class
 
     protected static final class LogNode {
         Logger logger;
