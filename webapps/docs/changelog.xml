@@ -200,6 +200,9 @@
         Fix dependencies for individual test targets in Ant build file. Based on
         <pr>468</pr> provided by Totoo chenyonghui. (markt)
       </fix>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.26. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
