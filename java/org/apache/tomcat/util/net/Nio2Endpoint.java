@@ -44,6 +44,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
@@ -84,6 +85,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     private SynchronizedStack<Nio2Channel> nioChannels;
 
     private SocketAddress previousAcceptedSocketRemoteAddress = null;
+    private long previousAcceptedSocketNanoTime = 0;
 
 
     public Nio2Endpoint() {
@@ -414,12 +416,17 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         // socket
                         socket = serverSock.accept().get();
 
-                        SocketAddress currentRemoteAddress = socket.getRemoteAddress();
-                        if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress)) {
-                            throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                        // Bug does not affect Windows. Skip the check on that platform.
+                        if (!JrePlatform.IS_WINDOWS) {
+                            SocketAddress currentRemoteAddress = socket.getRemoteAddress();
+                            long currentNanoTime = System.nanoTime();
+                            if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&
+                                    currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
+                                throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                            }
+                            previousAcceptedSocketRemoteAddress = currentRemoteAddress;
+                            previousAcceptedSocketNanoTime = currentNanoTime;
                         }
-                        previousAcceptedSocketRemoteAddress = currentRemoteAddress;
-
                     } catch (Exception e) {
                         // We didn't get a socket
                         countDownConnection();

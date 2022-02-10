@@ -57,6 +57,7 @@ import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.openssl.OpenSSLContext;
@@ -109,6 +110,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     private int previousAcceptedPort = -1;
     private String previousAcceptedAddress = null;
+    private long previouspreviousAcceptedSocketNanoTime = 0;
+
 
 
     private final Map<Long,AprSocketWrapper> connections = new ConcurrentHashMap<>();
@@ -127,8 +130,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         setMaxConnections(8 * 1024);
     }
 
-    // ------------------------------------------------------------- Properties
 
+    // ------------------------------------------------------------- Properties
 
     /**
      * Defer accept.
@@ -772,13 +775,19 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 // Do the duplicate accept check here rather than in Acceptor.run()
                 // so we can cache the results in the SocketWrapper
                 AprSocketWrapper wrapper = new AprSocketWrapper(Long.valueOf(socket), this);
-                if (wrapper.getRemotePort() == previousAcceptedPort) {
-                    if (wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
-                        throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                // Bug does not affect Windows. Skip the check on that platform.
+                if (!JrePlatform.IS_WINDOWS) {
+                    long currentNanoTime = System.nanoTime();
+                    if (wrapper.getRemotePort() == previousAcceptedPort) {
+                        if (wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
+                            if (currentNanoTime - previouspreviousAcceptedSocketNanoTime < 1000) {
+                                throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                            }
+                        }
                     }
+                    previousAcceptedPort = wrapper.getRemotePort();
+                    previousAcceptedAddress = wrapper.getRemoteAddr();
                 }
-                previousAcceptedPort = wrapper.getRemotePort();
-                previousAcceptedAddress = wrapper.getRemoteAddr();
 
                 wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
                 wrapper.setReadTimeout(getConnectionTimeout());

@@ -52,6 +52,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
@@ -104,10 +105,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     private SynchronizedStack<NioChannel> nioChannels;
 
     private SocketAddress previousAcceptedSocketRemoteAddress = null;
+    private long previousAcceptedSocketNanoTime = 0;
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Generic properties, introspected
@@ -514,11 +515,17 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         // socket
                         socket = serverSock.accept();
 
-                        SocketAddress currentRemoteAddress = socket.getRemoteAddress();
-                        if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress)) {
-                            throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                        // Bug does not affect Windows. Skip the check on that platform.
+                        if (!JrePlatform.IS_WINDOWS) {
+                            SocketAddress currentRemoteAddress = socket.getRemoteAddress();
+                            long currentNanoTime = System.nanoTime();
+                            if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&
+                                    currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
+                                throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+                            }
+                            previousAcceptedSocketRemoteAddress = currentRemoteAddress;
+                            previousAcceptedSocketNanoTime = currentNanoTime;
                         }
-                        previousAcceptedSocketRemoteAddress = currentRemoteAddress;
                     } catch (IOException ioe) {
                         // We didn't get a socket
                         countDownConnection();
