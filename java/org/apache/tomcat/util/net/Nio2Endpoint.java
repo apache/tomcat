@@ -365,7 +365,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         AsynchronousSocketChannel result = serverSock.accept().get();
 
         // Bug does not affect Windows. Skip the check on that platform.
-        if (JrePlatform.IS_WINDOWS) {
+        if (!JrePlatform.IS_WINDOWS) {
             SocketAddress currentRemoteAddress = result.getRemoteAddress();
             long currentNanoTime = System.nanoTime();
             if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&

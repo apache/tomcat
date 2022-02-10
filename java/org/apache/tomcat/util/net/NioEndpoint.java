@@ -519,7 +519,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         SocketChannel result = serverSock.accept();
 
         // Bug does not affect Windows. Skip the check on that platform.
-        if (JrePlatform.IS_WINDOWS) {
+        if (!JrePlatform.IS_WINDOWS) {
             SocketAddress currentRemoteAddress = result.getRemoteAddress();
             long currentNanoTime = System.nanoTime();
             if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&
