@@ -124,6 +124,12 @@
         FIPS compliant configuration. (markt)
       </fix>
       <fix>
+        <pr>464</pr>: Fall back to the class loader used to load JULI when the
+        thread context class loader is not set. In a normal Tomcat
+        configuration, this will be the system class loader. Based on a pull
+        request by jackshirazi. (markt)
+      </fix>
+      <fix>
         <pr>469</pr>: Include the Jakarata Annotations API in the classes that
         Tomcat will not load from web applications. Pull request provided by
         ppkarwasz. (markt)
