@@ -1915,7 +1915,6 @@
     </condition>
   </target>
 
-  <property name="runtests.librarypath" value="-Djava.library.path=${test.apr.loc}"/>
   <property name="opens.javalang" value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
   <property name="opens.javaio" value="--add-opens=java.base/java.io=ALL-UNNAMED"/>
   <property name="opens.sunrmi" value="--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"/>
