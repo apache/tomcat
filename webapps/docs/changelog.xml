@@ -213,6 +213,11 @@
       <update>
         Update the OWB module to Apache OpenWebBeans 2.0.26. (remm)
       </update>
+      <fix>
+        Revert the cherry-pick of JavaDoc fix from DBCP applied in 10.1.0.M9
+        that broke the <code>DataSourceMXBean</code> by using a type that isn't
+        supported by MXBeans. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
