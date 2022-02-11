@@ -1921,22 +1921,18 @@ public class WebdavServlet extends DefaultServlet {
      * @param req Servlet request
      * @param resp Servlet response
      * @param errorList List of error to be displayed
+     *
      * @throws IOException If an IO error occurs
      */
     private void sendReport(HttpServletRequest req, HttpServletResponse resp,
-                            Hashtable<String,Integer> errorList)
-            throws IOException {
+            Hashtable<String,Integer> errorList) throws IOException {
 
         resp.setStatus(WebdavStatus.SC_MULTI_STATUS);
-
-        String absoluteUri = req.getRequestURI();
-        String relativePath = getRelativePath(req);
 
         XMLWriter generatedXML = new XMLWriter();
         generatedXML.writeXMLHeader();
 
-        generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus",
-                XMLWriter.OPENING);
+        generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
 
         Enumeration<String> pathList = errorList.keys();
         while (pathList.hasMoreElements()) {
@@ -1947,18 +1943,14 @@ public class WebdavServlet extends DefaultServlet {
             generatedXML.writeElement("D", "response", XMLWriter.OPENING);
 
             generatedXML.writeElement("D", "href", XMLWriter.OPENING);
-            String toAppend = errorPath.substring(relativePath.length());
-            if (!toAppend.startsWith("/")) {
-                toAppend = "/" + toAppend;
-            }
-            generatedXML.writeText(absoluteUri + toAppend);
+            generatedXML.writeText(getServletContext().getContextPath() + errorPath);
             generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
+
             generatedXML.writeElement("D", "status", XMLWriter.OPENING);
             generatedXML.writeText("HTTP/1.1 " + errorCode + " ");
             generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
 
             generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
-
         }
 
         generatedXML.writeElement("D", "multistatus", XMLWriter.CLOSING);
@@ -1966,7 +1958,6 @@ public class WebdavServlet extends DefaultServlet {
         Writer writer = resp.getWriter();
         writer.write(generatedXML.toString());
         writer.close();
-
     }
 
 

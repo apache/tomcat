@@ -139,6 +139,12 @@
         <code>TomcatPrincipal</code> and <code>GenericPrincipal</code>.
         Patch provided by Carsten Klein. (michaelo)
       </add>
+      <fix>
+        Fix a potential <code>StringIndexOutOfBoundsException</code> exception
+        when generating a WebDAV multi-status response after an error during a
+        copy or delete. Report the paths relative to the server root for any
+        resources with an error. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
