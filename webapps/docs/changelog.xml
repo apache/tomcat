@@ -222,7 +222,7 @@
       <fix>
         Revert the cherry-pick of JavaDoc fix from DBCP applied in 9.0.57 that
         broke the <code>DataSourceMXBean</code> by using a type that isn't
-        supported by MXBeans. (markt) 
+        supported by MXBeans. (markt)
       </fix>
     </changelog>
   </subsection>
