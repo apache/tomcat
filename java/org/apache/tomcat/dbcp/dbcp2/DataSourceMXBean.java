@@ -17,7 +17,6 @@
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.sql.SQLException;
-import java.time.Duration;
 
 /**
  * Defines the methods that will be made available via
@@ -139,21 +138,10 @@ public interface DataSourceMXBean {
     boolean getLogExpiredConnections();
 
     /**
-     * See {@link BasicDataSource#getMaxConnDuration()}.
-     *
-     * @return {@link BasicDataSource#getMaxConnDuration()}.
-     * @since 2.10.0
-     */
-    Duration getMaxConnDuration();
-
-    /**
      * See {@link BasicDataSource#getMaxConnLifetimeMillis()}.
      *
      * @return {@link BasicDataSource#getMaxConnLifetimeMillis()}.
-     *
-     * @deprecated Use {@link #getMaxConnDuration()}.
      */
-    @Deprecated
     long getMaxConnLifetimeMillis();
 
     /**
@@ -178,39 +166,17 @@ public interface DataSourceMXBean {
     int getMaxTotal();
 
     /**
-     * See {@link BasicDataSource#getMaxWaitDuration()}.
-     *
-     * @return {@link BasicDataSource#getMaxWaitDuration()}.
-     * @since 2.10.0
-     */
-    Duration getMaxWaitDuration();
-
-    /**
      * See {@link BasicDataSource#getMaxWaitMillis()}.
      *
      * @return {@link BasicDataSource#getMaxWaitMillis()}.
-     *
-     * @deprecated Use {@link #getMaxWaitDuration()}.
      */
-    @Deprecated
     long getMaxWaitMillis();
-
-    /**
-     * See {@link BasicDataSource#getMinEvictableIdleDuration()}.
-     *
-     * @return {@link BasicDataSource#getMinEvictableIdleDuration()}.
-     * @since 2.10.0
-     */
-    Duration getMinEvictableIdleDuration();
 
     /**
      * See {@link BasicDataSource#getMinEvictableIdleTimeMillis()}.
      *
      * @return {@link BasicDataSource#getMinEvictableIdleTimeMillis()}.
-     *
-     * @deprecated Use {@link #getMinEvictableIdleDuration()}.
      */
-    @Deprecated
     long getMinEvictableIdleTimeMillis();
 
     /**
@@ -256,39 +222,17 @@ public interface DataSourceMXBean {
     boolean getRemoveAbandonedOnMaintenance();
 
     /**
-     * See {@link BasicDataSource#getRemoveAbandonedTimeoutDuration()}.
-     *
-     * @return {@link BasicDataSource#getRemoveAbandonedTimeoutDuration()}.
-     * @since 2.10.0
-     */
-    Duration getRemoveAbandonedTimeoutDuration();
-
-    /**
      * See {@link BasicDataSource#getRemoveAbandonedTimeout()}.
      *
      * @return {@link BasicDataSource#getRemoveAbandonedTimeout()}.
-     *
-     * @deprecated Use {@link #getRemoveAbandonedTimeoutDuration()}.
      */
-    @Deprecated
     int getRemoveAbandonedTimeout();
-
-    /**
-     * See {@link BasicDataSource#getSoftMinEvictableIdleDuration()}.
-     *
-     * @return {@link BasicDataSource#getSoftMinEvictableIdleDuration()}.
-     * @since 2.10.0
-     */
-    Duration getSoftMinEvictableIdleDuration();
 
     /**
      * See {@link BasicDataSource#getSoftMinEvictableIdleTimeMillis()}.
      *
      * @return {@link BasicDataSource#getSoftMinEvictableIdleTimeMillis()}.
-     *
-     * @deprecated Use {@link #getSoftMinEvictableIdleDuration()}.
      */
-    @Deprecated
     long getSoftMinEvictableIdleTimeMillis();
 
     /**
@@ -313,20 +257,10 @@ public interface DataSourceMXBean {
     boolean getTestWhileIdle();
 
     /**
-     * See {@link BasicDataSource#getDurationBetweenEvictionRuns()}.
-     *
-     * @return {@link BasicDataSource#getDurationBetweenEvictionRuns()}.
-     * @since 2.10.0
-     */
-    Duration getDurationBetweenEvictionRuns();
-
-    /**
      * See {@link BasicDataSource#getTimeBetweenEvictionRunsMillis()}.
      *
      * @return {@link BasicDataSource#getTimeBetweenEvictionRunsMillis()}.
-     * @deprecated Use {@link #getDurationBetweenEvictionRuns()}.
      */
-    @Deprecated
     long getTimeBetweenEvictionRunsMillis();
 
     /**
@@ -351,21 +285,10 @@ public interface DataSourceMXBean {
     String getValidationQuery();
 
     /**
-     * See {@link BasicDataSource#getValidationQueryTimeoutDuration()}.
-     *
-     * @return {@link BasicDataSource#getValidationQueryTimeoutDuration()}.
-     * @since 2.10.0
-     */
-    Duration getValidationQueryTimeoutDuration();
-
-    /**
      * See {@link BasicDataSource#getValidationQueryTimeout()}.
      *
      * @return {@link BasicDataSource#getValidationQueryTimeout()}.
-     *
-     * @deprecated Use {@link #getValidationQueryTimeoutDuration()}.
      */
-    @Deprecated
     int getValidationQueryTimeout();
 
     /**
