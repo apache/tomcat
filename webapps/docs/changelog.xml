@@ -140,6 +140,11 @@
         copy or delete. Report the paths relative to the server root for any
         resources with an error. (markt)
       </fix>
+      <fix>
+        Improve the format of WebDAV XML responses to make them easier for
+        humans to read. The change ensures that there is always a line break
+        before starting a new element. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
