@@ -56,6 +56,27 @@ public interface TomcatPrincipal extends Principal {
      * <p>
      * Only the servlet container may set attributes to make available custom
      * information about a Principal or the user it represents.
+     * <p>
+     * The purpose of the method is to implement read only access to attributes
+     * which may be stored in the <code>Realm</code> implementation's backend
+     * due to its inherent design.
+     * <p>
+     * As using this method from application code will make it non portable to
+     * other EE compliant containers, it is advised this should never be used
+     * as an object storage facility tied to the <code>Principal</code>, but
+     * rather as simple extra additional metadata. It is recommended that a
+     * container level object is used to further process the attributes that
+     * may be associated with the <code>Principal</code>.
+     * <p>
+     * <code>Realm</code> implementations that are provided by Tomcat will
+     * not provide complex type mapping, but will in most cases always
+     * return a result as a <code>String</code> object which may need custom
+     * decoding.
+     * <p>
+     * <code>Realm</code> implementations that are provided by Tomcat will
+     * not provide an implementation for this facility unless it is inherent
+     * to the storage backend of the <code>Realm</code> itself and metadata
+     * is available without additional user intervention or configuration.
      *
      * @param name a <code>String</code> specifying the name of the attribute
      * @return an <code>Object</code> containing the value of the attribute, or
