@@ -555,7 +555,9 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
         @Override
         public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
-            wrapped.putContext(key, contextObject);
+            if (key != JspContext.class) {
+                wrapped.putContext(key, contextObject);
+            }
         }
 
         @Override

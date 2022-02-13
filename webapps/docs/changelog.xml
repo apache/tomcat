@@ -172,6 +172,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <pr>474</pr>: Prevent a tag file from corrupting the ELContext of the
+        calling page. Pull request provided by Dmitri Blinov. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
