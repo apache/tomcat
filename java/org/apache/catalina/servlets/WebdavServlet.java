@@ -22,6 +22,8 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Enumeration;
@@ -47,7 +49,6 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.util.XMLWriter;
-import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
@@ -1541,76 +1542,76 @@ public class WebdavServlet extends DefaultServlet {
      *
      * @param req Servlet request
      * @param resp Servlet response
+     *
      * @return boolean true if the copy is successful
+     *
      * @throws IOException If an IO error occurs
      */
-    private boolean copyResource(HttpServletRequest req,
-                                 HttpServletResponse resp)
-            throws IOException {
+    private boolean copyResource(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        // Check the source exists
+        String path = getRelativePath(req);
+        WebResource source = resources.getResource(path);
+        if (!source.exists()) {
+            resp.sendError(WebdavStatus.SC_NOT_FOUND);
+            return false;
+        }
 
         // Parsing destination header
+        // See RFC 4918
+        String destinationHeader = req.getHeader("Destination");
 
-        String destinationPath = req.getHeader("Destination");
-
-        if (destinationPath == null) {
+        if (destinationHeader == null  || destinationHeader.isEmpty()) {
             resp.sendError(WebdavStatus.SC_BAD_REQUEST);
             return false;
         }
 
-        // Remove url encoding from destination
-        destinationPath = UDecoder.URLDecode(destinationPath, StandardCharsets.UTF_8);
+        URI destinationUri;
+        try {
+            destinationUri = new URI (destinationHeader);
+        } catch (URISyntaxException e) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return false;
+        }
 
-        int protocolIndex = destinationPath.indexOf("://");
-        if (protocolIndex >= 0) {
-            // if the Destination URL contains the protocol, we can safely
-            // trim everything upto the first "/" character after "://"
-            int firstSeparator =
-                destinationPath.indexOf('/', protocolIndex + 4);
-            if (firstSeparator < 0) {
-                destinationPath = "/";
-            } else {
-                destinationPath = destinationPath.substring(firstSeparator);
-            }
-        } else {
-            String hostName = req.getServerName();
-            if ((hostName != null) && (destinationPath.startsWith(hostName))) {
-                destinationPath = destinationPath.substring(hostName.length());
-            }
+        String destinationPath = destinationUri.getPath();
 
-            int portIndex = destinationPath.indexOf(':');
-            if (portIndex >= 0) {
-                destinationPath = destinationPath.substring(portIndex);
-            }
+        // Destination isn't allowed to use '.' or '..' segments
+        if (!destinationPath.equals(RequestUtil.normalize(destinationPath))) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return false;
+        }
 
-            if (destinationPath.startsWith(":")) {
-                int firstSeparator = destinationPath.indexOf('/');
-                if (firstSeparator < 0) {
-                    destinationPath = "/";
+        if (destinationUri.isAbsolute()) {
+            // Scheme and host need to match
+            if (!req.getScheme().equals(destinationUri.getScheme()) ||
+                    !req.getServerName().equals(destinationUri.getHost())) {
+                resp.sendError(WebdavStatus.SC_FORBIDDEN);
+                return false;
+            }
+            // Port needs to match too but handled separately as the logic is a
+            // little more complicated
+            if (req.getServerPort() != destinationUri.getPort()) {
+                if (destinationUri.getPort() == -1 &&
+                        ("http".equals(req.getScheme()) && req.getServerPort() == 80 ||
+                        "https".equals(req.getScheme()) && req.getServerPort() == 443)) {
+                    // All good.
                 } else {
-                    destinationPath =
-                        destinationPath.substring(firstSeparator);
+                    resp.sendError(WebdavStatus.SC_FORBIDDEN);
+                    return false;
                 }
             }
         }
 
-        // Normalise destination path (remove '.' and '..')
-        destinationPath = RequestUtil.normalize(destinationPath);
-
-        String contextPath = req.getContextPath();
-        if ((contextPath != null) &&
-            (destinationPath.startsWith(contextPath))) {
-            destinationPath = destinationPath.substring(contextPath.length());
+        // Cross-context operations aren't supported
+        String reqContextPath = req.getContextPath();
+        if (!destinationPath.startsWith(reqContextPath + "/")) {
+            resp.sendError(WebdavStatus.SC_FORBIDDEN);
+            return false;
         }
 
-        String pathInfo = req.getPathInfo();
-        if (pathInfo != null) {
-            String servletPath = req.getServletPath();
-            if ((servletPath != null) &&
-                (destinationPath.startsWith(servletPath))) {
-                destinationPath = destinationPath
-                    .substring(servletPath.length());
-            }
-        }
+        // Remove context path & servlet path
+        destinationPath = destinationPath.substring(reqContextPath.length() + req.getServletPath().length());
 
         if (debug > 0) {
             log("Dest path :" + destinationPath);
@@ -1622,18 +1623,20 @@ public class WebdavServlet extends DefaultServlet {
             return false;
         }
 
-        String path = getRelativePath(req);
-
         if (destinationPath.equals(path)) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return false;
         }
 
-        // Parsing overwrite header
+        // Check src / dest are not sub-dirs of each other
+        if (destinationPath.startsWith(path) && destinationPath.charAt(path.length()) == '/' ||
+                path.startsWith(destinationPath) && path.charAt(destinationPath.length()) == '/') {
+            resp.sendError(WebdavStatus.SC_FORBIDDEN);
+            return false;
+        }
 
         boolean overwrite = true;
         String overwriteHeader = req.getHeader("Overwrite");
-
         if (overwriteHeader != null) {
             if (overwriteHeader.equalsIgnoreCase("T")) {
                 overwrite = true;
@@ -1643,9 +1646,7 @@ public class WebdavServlet extends DefaultServlet {
         }
 
         // Overwriting the destination
-
         WebResource destination = resources.getResource(destinationPath);
-
         if (overwrite) {
             // Delete destination resource, if it exists
             if (destination.exists()) {

@@ -150,6 +150,10 @@
         humans to read. The change ensures that there is always a line break
         before starting a new element. (markt)
       </fix>
+      <fix>
+        Improve validation of the <code>Destination</code> header for WebDAV
+        <code>MOVE</code> and <code>COPY</code> requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
