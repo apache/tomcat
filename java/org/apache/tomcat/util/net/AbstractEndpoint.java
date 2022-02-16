@@ -453,12 +453,6 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Acceptor thread count.
-     */
-    protected int acceptorThreadCount = 1;
-
-
-    /**
      * Priority of the acceptor threads.
      */
     protected int acceptorThreadPriority = Thread.NORM_PRIORITY;
