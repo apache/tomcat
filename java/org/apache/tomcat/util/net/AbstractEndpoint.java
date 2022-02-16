@@ -506,8 +506,7 @@ public abstract class AbstractEndpoint<S> {
             initializeConnectionLatch();
         }
     }
-
-    public int  getMaxConnections() { return this.maxConnections; }
+    public int getMaxConnections() { return this.maxConnections; }
 
     /**
      * Return the current count of connections handled by this endpoint, if the
