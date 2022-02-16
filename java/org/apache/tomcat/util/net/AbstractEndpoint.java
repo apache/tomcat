@@ -453,8 +453,12 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Acceptor thread count.
+     * Unused.
+     *
+     * @deprecated  This attribute is hard-coded to {@code 1} and is no longer
+     *              configurable. It will be removed in Tomcat 10.1.
      */
+    @Deprecated
     protected int acceptorThreadCount = 1;
 
 
