@@ -449,7 +449,7 @@ public abstract class AbstractEndpoint<S> {
      * Unused.
      *
      * @deprecated  This attribute is hard-coded to {@code 1} and is no longer
-     *              configurable.
+     *              configurable. It will be removed in Tomcat 10.1.
      */
     @Deprecated
     protected int acceptorThreadCount = 1;
@@ -460,7 +460,7 @@ public abstract class AbstractEndpoint<S> {
      * @param acceptorThreadCount   Ignored
      *
      * @deprecated  This attribute is hard-coded to {@code 1} and is no longer
-     *              configurable.
+     *              configurable. This setter will be removed in Tomcat 10.
      */
     @Deprecated
     public void setAcceptorThreadCount(int acceptorThreadCount) {
@@ -473,7 +473,7 @@ public abstract class AbstractEndpoint<S> {
      * @return  Always returns {@code 1}
      *
      * @deprecated  This attribute is hard-coded to {@code 1} and is no longer
-     *              configurable.
+     *              configurable. This getter will be removed in Tomcat 10.
      */
     @Deprecated
     public int getAcceptorThreadCount() {
