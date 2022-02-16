@@ -35,9 +35,9 @@ public class Nio2Channel implements AsynchronousByteChannel {
 
     protected static final ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
+    protected final SocketBufferHandler bufHandler;
     protected AsynchronousSocketChannel sc = null;
     protected SocketWrapperBase<Nio2Channel> socket = null;
-    protected final SocketBufferHandler bufHandler;
 
     public Nio2Channel(SocketBufferHandler bufHandler) {
         this.bufHandler = bufHandler;
@@ -135,7 +135,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
 
     @Override
     public String toString() {
-        return super.toString()+":"+this.sc.toString();
+        return super.toString() + ":" + sc.toString();
     }
 
     @Override
@@ -212,7 +212,6 @@ public class Nio2Channel implements AsynchronousByteChannel {
     public Future<Boolean> flush() {
         return DONE;
     }
-
 
     private ApplicationBufferHandler appReadBufHandler;
     public void setAppReadBufHandler(ApplicationBufferHandler handler) {

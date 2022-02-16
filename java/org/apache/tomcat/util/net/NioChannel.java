@@ -39,10 +39,10 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
 
     protected static final ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
+    protected final SocketBufferHandler bufHandler;
     protected SocketChannel sc = null;
     protected SocketWrapperBase<NioChannel> socketWrapper = null;
 
-    protected final SocketBufferHandler bufHandler;
 
     protected Poller poller;
 
@@ -110,11 +110,10 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      * Close the connection.
      *
      * @param force Should the underlying socket be forcibly closed?
-     *
      * @throws IOException If closing the secure channel fails.
      */
     public void close(boolean force) throws IOException {
-        if (isOpen() || force ) {
+        if (isOpen() || force) {
             close();
         }
     }
@@ -229,7 +228,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
 
     @Override
     public String toString() {
-        return super.toString()+":"+this.sc.toString();
+        return super.toString() + ":" + sc.toString();
     }
 
     public int getOutboundRemaining() {
@@ -240,7 +239,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      * Return true if the buffer wrote data. NO-OP for non-secure channel.
      *
      * @return Always returns {@code false} for non-secure channel
-     *
      * @throws IOException Never for non-secure channel
      */
     public boolean flushOutbound() throws IOException {
@@ -256,6 +254,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      * socket is removed from the poller without the socket being selected. This
      * results in a connection limit leak for NIO as the endpoint expects the
      * socket to be selected even in error conditions.
+     *
      * @throws IOException If the current thread was interrupted
      */
     protected void checkInterruptStatus() throws IOException {
@@ -263,7 +262,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
             throw new IOException(sm.getString("channel.nio.interrupted"));
         }
     }
-
 
     private ApplicationBufferHandler appReadBufHandler;
     public void setAppReadBufHandler(ApplicationBufferHandler handler) {
