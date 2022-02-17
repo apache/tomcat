@@ -63,7 +63,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * current async generation. This prevents the response mix-up.
      */
     private volatile long asyncTimeoutGeneration = 0;
-    protected final AbstractEndpoint<?> endpoint;
+    protected final AbstractEndpoint<?,?> endpoint;
     protected final Request request;
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
@@ -77,12 +77,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     protected final UserDataHelper userDataHelper;
 
-    public AbstractProcessor(AbstractEndpoint<?> endpoint) {
+    public AbstractProcessor(AbstractEndpoint<?,?> endpoint) {
         this(endpoint, new Request(), new Response());
     }
 
 
-    protected AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest,
+    protected AbstractProcessor(AbstractEndpoint<?,?> endpoint, Request coyoteRequest,
             Response coyoteResponse) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine(this);

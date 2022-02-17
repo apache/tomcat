@@ -59,7 +59,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     private final CompressionConfig compressionConfig = new CompressionConfig();
 
 
-    public AbstractHttp11Protocol(AbstractEndpoint<S> endpoint) {
+    public AbstractHttp11Protocol(AbstractEndpoint<S,?> endpoint) {
         super(endpoint);
         setConnectionTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
@@ -120,7 +120,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * Over-ridden here to make the method visible to nested classes.
      */
     @Override
-    protected AbstractEndpoint<S> getEndpoint() {
+    protected AbstractEndpoint<S,?> getEndpoint() {
         return super.getEndpoint();
     }
 

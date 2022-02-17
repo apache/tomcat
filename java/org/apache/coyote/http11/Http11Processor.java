@@ -183,7 +183,7 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @SuppressWarnings("deprecation")
-    public Http11Processor(AbstractHttp11Protocol<?> protocol, AbstractEndpoint<?> endpoint) {
+    public Http11Processor(AbstractHttp11Protocol<?> protocol, AbstractEndpoint<?,?> endpoint) {
         super(endpoint);
         this.protocol = protocol;
 
