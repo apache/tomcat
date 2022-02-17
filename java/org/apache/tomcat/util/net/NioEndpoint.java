@@ -613,7 +613,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     // ----------------------------------------------------- Poller Inner Classes
 
     /**
-     *
      * PollerEvent, cacheable object for poller events to avoid GC
      */
     public static class PollerEvent implements Runnable {
@@ -692,7 +691,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 new SynchronizedQueue<>();
 
         private volatile boolean close = false;
-        private long nextExpiration = 0;//optimize expiration handling
+        // Optimize expiration handling
+        private long nextExpiration = 0;
 
         private AtomicLong wakeupCounter = new AtomicLong(0);
 
@@ -704,7 +704,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         public int getKeyCount() { return keyCount; }
 
-        public Selector getSelector() { return selector;}
+        public Selector getSelector() { return selector; }
 
         /**
          * Destroy the poller.
@@ -997,7 +997,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         socketWrapper.updateLastWrite();
                     }
                 } else {
-                    long written = sd.fchannel.transferTo(sd.pos,sd.length,wc);
+                    long written = sd.fchannel.transferTo(sd.pos, sd.length, wc);
                     if (written > 0) {
                         sd.pos += written;
                         sd.length -= written;
@@ -1062,9 +1062,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                     return SendfileState.PENDING;
                 }
-            } catch (IOException x) {
+            } catch (IOException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to complete sendfile request:", x);
+                    log.debug("Unable to complete sendfile request:", e);
                 }
                 if (!calledByProcessor && sc != null) {
                     close(sc, sk);
@@ -1429,19 +1429,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         protected void populateRemoteAddr() {
-            InetAddress inetAddr = getSocket().getIOChannel().socket().getInetAddress();
-            if (inetAddr != null) {
-                remoteAddr = inetAddr.getHostAddress();
-            }
-        }
-
-
-        @Override
-        protected void populateRemoteHost() {
-            InetAddress inetAddr = getSocket().getIOChannel().socket().getInetAddress();
-            if (inetAddr != null) {
-                remoteHost = inetAddr.getHostName();
-                if (remoteAddr == null) {
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                InetAddress inetAddr = sc.socket().getInetAddress();
+                if (inetAddr != null) {
                     remoteAddr = inetAddr.getHostAddress();
                 }
             }
@@ -1449,32 +1440,59 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
 
         @Override
+        protected void populateRemoteHost() {
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                InetAddress inetAddr = sc.socket().getInetAddress();
+                if (inetAddr != null) {
+                    remoteHost = inetAddr.getHostName();
+                    if (remoteAddr == null) {
+                        remoteAddr = inetAddr.getHostAddress();
+                    }
+                }
+            }
+        }
+
+
+        @Override
         protected void populateRemotePort() {
-            remotePort = getSocket().getIOChannel().socket().getPort();
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                remotePort = sc.socket().getPort();
+            }
         }
 
 
         @Override
         protected void populateLocalName() {
-            InetAddress inetAddr = getSocket().getIOChannel().socket().getLocalAddress();
-            if (inetAddr != null) {
-                localName = inetAddr.getHostName();
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                InetAddress inetAddr = sc.socket().getLocalAddress();
+                if (inetAddr != null) {
+                    localName = inetAddr.getHostName();
+                }
             }
         }
 
 
         @Override
         protected void populateLocalAddr() {
-            InetAddress inetAddr = getSocket().getIOChannel().socket().getLocalAddress();
-            if (inetAddr != null) {
-                localAddr = inetAddr.getHostAddress();
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                InetAddress inetAddr = sc.socket().getLocalAddress();
+                if (inetAddr != null) {
+                    localAddr = inetAddr.getHostAddress();
+                }
             }
         }
 
 
         @Override
         protected void populateLocalPort() {
-            localPort = getSocket().getIOChannel().socket().getLocalPort();
+            SocketChannel sc = getSocket().getIOChannel();
+            if (sc != null) {
+                localPort = sc.socket().getLocalPort();
+            }
         }
 
 
@@ -1714,6 +1732,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
         }
     }
+
 
     // ----------------------------------------------- SendfileData Inner Class
 
