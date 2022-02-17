@@ -58,24 +58,24 @@ public class SecureNio2Channel extends Nio2Channel  {
     // various scenarios
     private static final int DEFAULT_NET_BUFFER_SIZE = 16921;
 
+    protected final Nio2Endpoint endpoint;
+
     protected ByteBuffer netInBuffer;
     protected ByteBuffer netOutBuffer;
 
     protected SSLEngine sslEngine;
-    protected final Nio2Endpoint endpoint;
 
     protected volatile boolean sniComplete = false;
 
-    private volatile boolean handshakeComplete;
+    private volatile boolean handshakeComplete = false;
     private volatile HandshakeStatus handshakeStatus; //gets set by handshake
-
-    private volatile boolean unwrapBeforeRead;
 
     protected boolean closed;
     protected boolean closing;
 
     private final Map<String,List<String>> additionalTlsAttributes = new HashMap<>();
 
+    private volatile boolean unwrapBeforeRead;
     private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> handshakeReadCompletionHandler;
     private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> handshakeWriteCompletionHandler;
 
