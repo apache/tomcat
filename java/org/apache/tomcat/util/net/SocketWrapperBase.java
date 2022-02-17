@@ -380,8 +380,7 @@ public abstract class SocketWrapperBase<E> {
      */
     public void unRead(ByteBuffer returnedInput) {
         if (returnedInput != null) {
-            socketBufferHandler.configureReadBufferForWrite();
-            socketBufferHandler.getReadBuffer().put(returnedInput);
+            socketBufferHandler.unReadReadBuffer(returnedInput);
         }
     }
 
