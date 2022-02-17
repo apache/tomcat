@@ -638,11 +638,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     /**
      * PollerEvent, cacheable object for poller events to avoid GC
      */
-    public static class PollerEvent implements Runnable {
+    public static class PollerEvent {
 
         private NioChannel socket;
-        private int interestOps;
         private NioSocketWrapper socketWrapper;
+        private int interestOps;
 
         public PollerEvent(NioChannel ch, NioSocketWrapper w, int intOps) {
             reset(ch, w, intOps);
@@ -654,47 +654,20 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             socketWrapper = w;
         }
 
-        public void reset() {
-            reset(null, null, 0);
+        public NioSocketWrapper getSocketWrapper() {
+            return socketWrapper;
         }
 
-        @Override
-        public void run() {
-            if (interestOps == OP_REGISTER) {
-                try {
-                    socket.getIOChannel().register(
-                            socket.getPoller().getSelector(), SelectionKey.OP_READ, socketWrapper);
-                } catch (Exception x) {
-                    log.error(sm.getString("endpoint.nio.registerFail"), x);
-                }
-            } else {
-                final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-                try {
-                    if (key == null) {
-                        // The key was cancelled (e.g. due to socket closure)
-                        // and removed from the selector while it was being
-                        // processed. Count down the connections at this point
-                        // since it won't have been counted down when the socket
-                        // closed.
-                        socket.socketWrapper.getEndpoint().countDownConnection();
-                        ((NioSocketWrapper) socket.socketWrapper).closed = true;
-                    } else {
-                        final NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
-                        if (socketWrapper != null) {
-                            //we are registering the key to start with, reset the fairness counter.
-                            int ops = key.interestOps() | interestOps;
-                            socketWrapper.interestOps(ops);
-                            key.interestOps(ops);
-                        } else {
-                            socket.getPoller().cancelledKey(key);
-                        }
-                    }
-                } catch (CancelledKeyException ckx) {
-                    try {
-                        socket.getPoller().cancelledKey(key);
-                    } catch (Exception ignore) {}
-                }
-            }
+        public NioChannel getSocket() {
+            return socket;
+        }
+
+        public int getInterestOps() {
+            return interestOps;
+        }
+
+        public void reset() {
+            reset(null, null, 0);
         }
 
         @Override
@@ -786,8 +759,45 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             PollerEvent pe = null;
             for (int i = 0, size = events.size(); i < size && (pe = events.poll()) != null; i++ ) {
                 result = true;
+                NioSocketWrapper socketWrapper = pe.getSocketWrapper();
+                NioChannel socket = pe.getSocket();
+                int interestOps = pe.getInterestOps();
                 try {
-                    pe.run();
+                    if (interestOps == OP_REGISTER) {
+                        try {
+                            socket.getIOChannel().register(
+                                    socket.getPoller().getSelector(), SelectionKey.OP_READ, socketWrapper);
+                        } catch (Exception x) {
+                            log.error(sm.getString("endpoint.nio.registerFail"), x);
+                        }
+                    } else {
+                        final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+                        try {
+                            if (key == null) {
+                                // The key was cancelled (e.g. due to socket closure)
+                                // and removed from the selector while it was being
+                                // processed. Count down the connections at this point
+                                // since it won't have been counted down when the socket
+                                // closed.
+                                socket.socketWrapper.getEndpoint().countDownConnection();
+                                ((NioSocketWrapper) socket.socketWrapper).closed = true;
+                            } else {
+                                final NioSocketWrapper attachment = (NioSocketWrapper) key.attachment();
+                                if (attachment != null) {
+                                    //we are registering the key to start with, reset the fairness counter.
+                                    int ops = key.interestOps() | interestOps;
+                                    attachment.interestOps(ops);
+                                    key.interestOps(ops);
+                                } else {
+                                    socket.getPoller().cancelledKey(key);
+                                }
+                            }
+                        } catch (CancelledKeyException ckx) {
+                            try {
+                                socket.getPoller().cancelledKey(key);
+                            } catch (Exception ignore) {}
+                        }
+                    }
                     if (running && eventCache != null) {
                         pe.reset();
                         eventCache.push(pe);
