@@ -41,7 +41,6 @@ import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.net.ssl.SSLEngine;
@@ -145,11 +144,23 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
 
     /**
-     * Poller thread count.
+     * NO-OP.
+     *
+     * @param pollerThreadCount Unused
+     *
+     * @deprecated Will be removed in Tomcat 10.
      */
-    private int pollerThreadCount = Math.min(2,Runtime.getRuntime().availableProcessors());
-    public void setPollerThreadCount(int pollerThreadCount) { this.pollerThreadCount = pollerThreadCount; }
-    public int getPollerThreadCount() { return pollerThreadCount; }
+    @Deprecated
+    public void setPollerThreadCount(int pollerThreadCount) { }
+    /**
+     * Always returns 1.
+     *
+     * @return Always 1.
+     *
+     * @deprecated Will be removed in Tomcat 10.
+     */
+    @Deprecated
+    public int getPollerThreadCount() { return 1; }
 
     private long selectorTimeout = 1000;
     public void setSelectorTimeout(long timeout) { this.selectorTimeout = timeout;}
@@ -158,16 +169,17 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     /**
      * The socket poller.
      */
-    private Poller[] pollers = null;
-    private AtomicInteger pollerRotater = new AtomicInteger(0);
+    private Poller poller = null;
     /**
-     * Return an available poller in true round robin fashion.
+     * Not used.
      *
-     * @return The next poller in sequence
+     * @return The poller
+     *
+     * @deprecated Will be removed in Tomcat 9.
      */
+    @Deprecated
     public Poller getPoller0() {
-        int idx = Math.abs(pollerRotater.incrementAndGet()) % pollers.length;
-        return pollers[idx];
+        return poller;
     }
 
 
@@ -198,14 +210,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      *         for the next request to be received on the socket
      */
     public int getKeepAliveCount() {
-        if (pollers == null) {
+        if (poller == null) {
             return 0;
         } else {
-            int sum = 0;
-            for (int i=0; i<pollers.length; i++) {
-                sum += pollers[i].getKeyCount();
-            }
-            return sum;
+            return poller.getKeyCount();
         }
     }
 
@@ -217,13 +225,20 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     @Override
     public void bind() throws Exception {
+        initServerSocket();
 
-        if (!getUseInheritedChannel()) {
-            serverSock = ServerSocketChannel.open();
-            socketProperties.setProperties(serverSock.socket());
-            InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
-            serverSock.socket().bind(addr,getAcceptCount());
-        } else {
+        setStopLatch(new CountDownLatch(1));
+
+        // Initialize SSL if needed
+        initialiseSsl();
+
+        selectorPool.open();
+    }
+
+    // Separated out to make it easier for folks that extend NioEndpoint to
+    // implement custom [server]sockets
+    protected void initServerSocket() throws Exception {
+        if (getUseInheritedChannel()) {
             // Retrieve the channel provided by the OS
             Channel ic = System.inheritedChannel();
             if (ic instanceof ServerSocketChannel) {
@@ -232,19 +247,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             if (serverSock == null) {
                 throw new IllegalArgumentException(sm.getString("endpoint.init.bind.inherited"));
             }
+        } else {
+            serverSock = ServerSocketChannel.open();
+            socketProperties.setProperties(serverSock.socket());
+            InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
+            serverSock.socket().bind(addr,getAcceptCount());
         }
         serverSock.configureBlocking(true); //mimic APR behavior
-
-        if (pollerThreadCount <= 0) {
-            //minimum one poller thread
-            pollerThreadCount = 1;
-        }
-        setStopLatch(new CountDownLatch(pollerThreadCount));
-
-        // Initialize SSL if needed
-        initialiseSsl();
-
-        selectorPool.open();
     }
 
 
@@ -272,15 +281,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
             initializeConnectionLatch();
 
-            // Start poller threads
-            pollers = new Poller[getPollerThreadCount()];
-            for (int i=0; i<pollers.length; i++) {
-                pollers[i] = new Poller();
-                Thread pollerThread = new Thread(pollers[i], getName() + "-ClientPoller-"+i);
-                pollerThread.setPriority(threadPriority);
-                pollerThread.setDaemon(true);
-                pollerThread.start();
-            }
+            // Start poller thread
+            poller = new Poller();
+            Thread pollerThread = new Thread(poller, getName() + "-Poller");
+            pollerThread.setPriority(threadPriority);
+            pollerThread.setDaemon(true);
+            pollerThread.start();
 
             startAcceptorThreads();
         }
@@ -299,12 +305,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         if (running) {
             running = false;
             unlockAccept();
-            for (int i=0; pollers!=null && i<pollers.length; i++) {
-                if (pollers[i]==null) {
-                    continue;
-                }
-                pollers[i].destroy();
-                pollers[i] = null;
+            if (poller != null) {
+                poller.destroy();
+                poller = null;
             }
             try {
                 if (!getStopLatch().await(selectorTimeout + 100, TimeUnit.MILLISECONDS)) {
@@ -425,7 +428,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 channel.setIOChannel(socket);
                 channel.reset();
             }
-            getPoller0().register(channel);
+            poller.register(channel);
+            return true;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             try {
@@ -433,10 +437,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } catch (Throwable tt) {
                 ExceptionUtils.handleThrowable(tt);
             }
-            // Tell to close the socket
-            return false;
         }
-        return true;
+        // Tell to close the socket if needed
+        return false;
     }
 
 
