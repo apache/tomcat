@@ -225,8 +225,8 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
-    public int decrementKeepAlive() { return (--keepAliveLeft);}
+    public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft; }
+    public int decrementKeepAlive() { return (--keepAliveLeft); }
 
     public String getRemoteHost() {
         if (remoteHost == null) {
