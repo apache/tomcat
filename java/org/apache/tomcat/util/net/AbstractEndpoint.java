@@ -1146,7 +1146,10 @@ public abstract class AbstractEndpoint<S,U> {
             if (socketWrapper == null) {
                 return false;
             }
-            SocketProcessorBase<S> sc = processorCache.pop();
+            SocketProcessorBase<S> sc = null;
+            if (processorCache != null) {
+                sc = processorCache.pop();
+            }
             if (sc == null) {
                 sc = createSocketProcessor(socketWrapper, event);
             } else {

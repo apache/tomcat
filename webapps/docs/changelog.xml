@@ -178,7 +178,11 @@
         Remove <code>pollerThreadCount</code> Connector attribute for NIO.
         One poller thread is sufficient. (remm/markt)
       </update>
-    </changelog>
+      <fix>
+        Avoid creating and using object caches when they are disabled.
+        (remm/markt)
+      </fix>
+  </changelog>
   </subsection>
   <subsection name="Jasper">
     <changelog>

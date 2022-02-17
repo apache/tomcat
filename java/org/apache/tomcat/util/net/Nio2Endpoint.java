@@ -167,13 +167,17 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             running = true;
             paused = false;
 
-            processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getProcessorCache());
-            nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getBufferPool());
+            if (socketProperties.getProcessorCache() != 0) {
+                processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getProcessorCache());
+            }
+            if (socketProperties.getBufferPool() != 0) {
+                nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getBufferPool());
+            }
 
             // Create worker collection
-            if ( getExecutor() == null ) {
+            if (getExecutor() == null) {
                 createExecutor();
             }
 
@@ -212,11 +216,17 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     }
                 }
             });
-            Nio2Channel socket;
-            while ((socket = nioChannels.pop()) != null) {
-                socket.free();
+            if (nioChannels != null) {
+                Nio2Channel socket;
+                while ((socket = nioChannels.pop()) != null) {
+                    socket.free();
+                }
+                nioChannels = null;
             }
-            processorCache.clear();
+            if (processorCache != null) {
+                processorCache.clear();
+                processorCache = null;
+            }
         }
     }
 
@@ -304,7 +314,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
     protected boolean setSocketOptions(AsynchronousSocketChannel socket) {
         try {
             socketProperties.setProperties(socket);
-            Nio2Channel channel = nioChannels.pop();
+            Nio2Channel channel = null;
+            if (nioChannels != null) {
+                channel = nioChannels.pop();
+            }
             if (channel == null) {
                 SocketBufferHandler bufhandler = new SocketBufferHandler(
                         socketProperties.getAppReadBufSize(),
@@ -1654,7 +1667,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         // Close socket and pool
                         socketWrapper.close();
                         if (running) {
-                            if (!nioChannels.push(socketWrapper.getSocket())) {
+                            if (nioChannels == null || !nioChannels.push(socketWrapper.getSocket())) {
                                 socketWrapper.getSocket().free();
                             }
                         }
@@ -1665,7 +1678,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
                     socketWrapper.close();
                     if (running) {
-                        if (!nioChannels.push(socketWrapper.getSocket())) {
+                        if (nioChannels == null || !nioChannels.push(socketWrapper.getSocket())) {
                             socketWrapper.getSocket().free();
                         }
                     }
@@ -1691,7 +1704,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 socketWrapper = null;
                 event = null;
                 //return to cache
-                if (running) {
+                if (running && processorCache != null) {
                     processorCache.push(this);
                 }
             }

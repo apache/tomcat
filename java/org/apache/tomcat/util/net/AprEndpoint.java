@@ -455,8 +455,10 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             running = true;
             paused = false;
 
-            processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getProcessorCache());
+            if (socketProperties.getProcessorCache() != 0) {
+                processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getProcessorCache());
+            }
 
             // Create worker collection
             if (getExecutor() == null) {
@@ -2213,7 +2215,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 socketWrapper = null;
                 event = null;
                 //return to cache
-                if (running) {
+                if (running && processorCache != null) {
                     processorCache.push(this);
                 }
             }

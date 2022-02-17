@@ -267,12 +267,18 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             running = true;
             paused = false;
 
-            processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getProcessorCache());
-            eventCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                            socketProperties.getEventCache());
-            nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getBufferPool());
+            if (socketProperties.getProcessorCache() != 0) {
+                processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getProcessorCache());
+            }
+            if (socketProperties.getEventCache() != 0) {
+                eventCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getEventCache());
+            }
+            if (socketProperties.getBufferPool() != 0) {
+                nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getBufferPool());
+            }
 
             // Create worker collection
             if (getExecutor() == null) {
@@ -317,12 +323,21 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 log.warn(sm.getString("endpoint.nio.stopLatchAwaitInterrupted"), e);
             }
             shutdownExecutor();
-            eventCache.clear();
-            NioChannel socket;
-            while ((socket = nioChannels.pop()) != null) {
-                socket.free();
+            if (eventCache != null) {
+                eventCache.clear();
+                eventCache = null;
             }
-            processorCache.clear();
+            if (nioChannels != null) {
+                NioChannel socket;
+                while ((socket = nioChannels.pop()) != null) {
+                    socket.free();
+                }
+                nioChannels = null;
+            }
+            if (processorCache != null) {
+                processorCache.clear();
+                processorCache = null;
+            }
         }
     }
 
@@ -333,7 +348,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     @Override
     public void unbind() throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("Destroy initiated for "+new InetSocketAddress(getAddress(),getPort()));
+            log.debug("Destroy initiated for " +
+                    new InetSocketAddress(getAddress(),getPort()));
         }
         if (running) {
             stop();
@@ -350,7 +366,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
         selectorPool.close();
         if (log.isDebugEnabled()) {
-            log.debug("Destroy completed for "+new InetSocketAddress(getAddress(),getPort()));
+            log.debug("Destroy completed for " +
+                    new InetSocketAddress(getAddress(), getPort()));
         }
     }
 
@@ -413,7 +430,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             Socket sock = socket.socket();
             socketProperties.setProperties(sock);
 
-            NioChannel channel = nioChannels.pop();
+            NioChannel channel = null;
+            if (nioChannels != null) {
+                channel = nioChannels.pop();
+            }
             if (channel == null) {
                 SocketBufferHandler bufhandler = new SocketBufferHandler(
                         socketProperties.getAppReadBufSize(),
@@ -603,7 +623,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     log.debug("Socket: [" + socket + "] closed");
                 }
                 if (running) {
-                    if (!nioChannels.push(socket)) {
+                    if (nioChannels == null || !nioChannels.push(socket)) {
                         socket.free();
                     }
                 }
@@ -738,7 +758,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
          *                    the Poller
          */
         public void add(final NioChannel socket, final int interestOps) {
-            PollerEvent r = eventCache.pop();
+            PollerEvent r = null;
+            if (eventCache != null) {
+                r = eventCache.pop();
+            }
             if (r == null) {
                 r = new PollerEvent(socket,null,interestOps);
             } else {
@@ -765,8 +788,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 result = true;
                 try {
                     pe.run();
-                    pe.reset();
-                    if (running) {
+                    if (running && eventCache != null) {
+                        pe.reset();
                         eventCache.push(pe);
                     }
                 } catch ( Throwable x ) {
@@ -792,14 +815,17 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             ka.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
             ka.setReadTimeout(getConnectionTimeout());
             ka.setWriteTimeout(getConnectionTimeout());
-            PollerEvent r = eventCache.pop();
             ka.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
-            if ( r==null) {
-                r = new PollerEvent(socket,ka,OP_REGISTER);
-            } else {
-                r.reset(socket,ka,OP_REGISTER);
+            PollerEvent event = null;
+            if (eventCache != null) {
+                event = eventCache.pop();
             }
-            addEvent(r);
+            if (event == null) {
+                event = new PollerEvent(socket, ka, OP_REGISTER);
+            } else {
+                event.reset(socket, ka, OP_REGISTER);
+            }
+            addEvent(event);
         }
 
         public NioSocketWrapper cancelledKey(SelectionKey key) {
@@ -935,10 +961,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             try {
                 if (close) {
                     cancelledKey(sk);
-                } else if ( sk.isValid() && attachment != null ) {
+                } else if (sk.isValid() && attachment != null ) {
                     if (sk.isReadable() || sk.isWritable() ) {
-                        if ( attachment.getSendfileData() != null ) {
-                            processSendfile(sk,attachment, false);
+                        if (attachment.getSendfileData() != null ) {
+                            processSendfile(sk, attachment, false);
                         } else {
                             unreg(sk, attachment, sk.readyOps());
                             boolean closeSocket = false;
@@ -1059,9 +1085,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         log.debug("OP_WRITE for sendfile: " + sd.fileName);
                     }
                     if (calledByProcessor) {
-                        add(socketWrapper.getSocket(),SelectionKey.OP_WRITE);
+                        add(socketWrapper.getSocket(), SelectionKey.OP_WRITE);
                     } else {
-                        reg(sk,socketWrapper,SelectionKey.OP_WRITE);
+                        reg(sk, socketWrapper, SelectionKey.OP_WRITE);
                     }
                     return SendfileState.PENDING;
                 }
@@ -1162,7 +1188,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
     }
 
-    // ---------------------------------------------------- Key Attachment Class
+    // --------------------------------------------------- Socket Wrapper Class
+
     public static class NioSocketWrapper extends SocketWrapperBase<NioChannel> {
 
         private final NioSelectorPool pool;
@@ -1729,7 +1756,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 socketWrapper = null;
                 event = null;
                 //return to cache
-                if (running) {
+                if (running && processorCache != null) {
                     processorCache.push(this);
                 }
             }
