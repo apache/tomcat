@@ -828,21 +828,21 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             addEvent(event);
         }
 
-        public NioSocketWrapper cancelledKey(SelectionKey key) {
+        public NioSocketWrapper cancelledKey(SelectionKey sk) {
             NioSocketWrapper ka = null;
             try {
-                if ( key == null )
+                if ( sk == null )
                  {
                     return null;//nothing to do
                 }
-                ka = (NioSocketWrapper) key.attach(null);
+                ka = (NioSocketWrapper) sk.attach(null);
                 if (ka != null) {
                     // If attachment is non-null then there may be a current
                     // connection with an associated processor.
                     getHandler().release(ka);
                 }
-                if (key.isValid()) {
-                    key.cancel();
+                if (sk.isValid()) {
+                    sk.cancel();
                 }
                 // If it is available, close the NioChannel first which should
                 // in turn close the underlying SocketChannel. The NioChannel
@@ -860,9 +860,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
                 // The SocketChannel is also available via the SelectionKey. If
                 // it hasn't been closed in the block above, close it now.
-                if (key.channel().isOpen()) {
+                if (sk.channel().isOpen()) {
                     try {
-                        key.channel().close();
+                        sk.channel().close();
                     } catch (Exception e) {
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString(
@@ -957,25 +957,25 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             getStopLatch().countDown();
         }
 
-        protected void processKey(SelectionKey sk, NioSocketWrapper attachment) {
+        protected void processKey(SelectionKey sk, NioSocketWrapper socketWrapper) {
             try {
                 if (close) {
                     cancelledKey(sk);
-                } else if (sk.isValid() && attachment != null ) {
+                } else if (sk.isValid() && socketWrapper != null ) {
                     if (sk.isReadable() || sk.isWritable() ) {
-                        if (attachment.getSendfileData() != null ) {
-                            processSendfile(sk, attachment, false);
+                        if (socketWrapper.getSendfileData() != null ) {
+                            processSendfile(sk, socketWrapper, false);
                         } else {
-                            unreg(sk, attachment, sk.readyOps());
+                            unreg(sk, socketWrapper, sk.readyOps());
                             boolean closeSocket = false;
                             // Read goes before write
                             if (sk.isReadable()) {
-                                if (!processSocket(attachment, SocketEvent.OPEN_READ, true)) {
+                                if (!processSocket(socketWrapper, SocketEvent.OPEN_READ, true)) {
                                     closeSocket = true;
                                 }
                             }
                             if (!closeSocket && sk.isWritable()) {
-                                if (!processSocket(attachment, SocketEvent.OPEN_WRITE, true)) {
+                                if (!processSocket(socketWrapper, SocketEvent.OPEN_WRITE, true)) {
                                     closeSocket = true;
                                 }
                             }
@@ -1133,34 +1133,37 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             try {
                 for (SelectionKey key : selector.keys()) {
                     keycount++;
+                    NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
                     try {
-                        NioSocketWrapper ka = (NioSocketWrapper) key.attachment();
-                        if ( ka == null ) {
-                            cancelledKey(key); //we don't support any keys without attachments
+                        if (socketWrapper == null) {
+                            // We don't support any keys without attachments
+                            cancelledKey(key);
                         } else if (close) {
                             key.interestOps(0);
-                            ka.interestOps(0); //avoid duplicate stop calls
-                            processKey(key,ka);
-                        } else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
-                                  (ka.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                            // Avoid duplicate stop calls
+                            socketWrapper.interestOps(0);
+                            processKey(key, socketWrapper);
+                        } else if ((socketWrapper.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ ||
+                                  (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                             boolean isTimedOut = false;
                             // Check for read timeout
-                            if ((ka.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
-                                long delta = now - ka.getLastRead();
-                                long timeout = ka.getReadTimeout();
+                            if ((socketWrapper.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+                                long delta = now - socketWrapper.getLastRead();
+                                long timeout = socketWrapper.getReadTimeout();
                                 isTimedOut = timeout > 0 && delta > timeout;
                             }
                             // Check for write timeout
-                            if (!isTimedOut && (ka.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
-                                long delta = now - ka.getLastWrite();
-                                long timeout = ka.getWriteTimeout();
+                            if (!isTimedOut && (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                                long delta = now - socketWrapper.getLastWrite();
+                                long timeout = socketWrapper.getWriteTimeout();
                                 isTimedOut = timeout > 0 && delta > timeout;
                             }
                             if (isTimedOut) {
                                 key.interestOps(0);
-                                ka.interestOps(0); //avoid duplicate timeout calls
-                                ka.setError(new SocketTimeoutException());
-                                if (!processSocket(ka, SocketEvent.ERROR, true)) {
+                                // Avoid duplicate timeout calls
+                                socketWrapper.interestOps(0);
+                                socketWrapper.setError(new SocketTimeoutException());
+                                if (!processSocket(socketWrapper, SocketEvent.ERROR, true)) {
                                     cancelledKey(key);
                                 }
                             }
