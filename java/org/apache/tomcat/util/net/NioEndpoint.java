@@ -453,7 +453,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             try {
-                log.error("",t);
+                log.error(sm.getString("endpoint.socketOptionsError"), t);
             } catch (Throwable tt) {
                 ExceptionUtils.handleThrowable(tt);
             }
@@ -885,7 +885,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) {
-                    log.error("",e);
+                    log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
                 }
             }
             return ka;
@@ -927,7 +927,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                 } catch (Throwable x) {
                     ExceptionUtils.handleThrowable(x);
-                    log.error("",x);
+                    log.error(sm.getString("endpoint.nio.selectorLoopError"), x);
                     continue;
                 }
                 // Either we timed out or we woke up, process events first
@@ -992,7 +992,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 cancelledKey(sk);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                log.error("",t);
+                log.error(sm.getString("endpoint.nio.keyProcessingError"), t);
             }
         }
 
@@ -1035,8 +1035,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         // Unusual not to be able to transfer any bytes
                         // Check the length was set correctly
                         if (sd.fchannel.size() <= sd.pos) {
-                            throw new IOException("Sendfile configured to " +
-                                    "send more data than was available");
+                            throw new IOException(sm.getString("endpoint.sendfile.tooMuchData"));
                         }
                     }
                 }
@@ -1100,7 +1099,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 }
                 return SendfileState.ERROR;
             } catch (Throwable t) {
-                log.error("", t);
+                log.error(sm.getString("endpoint.sendfile.error"), t);
                 if (!calledByProcessor && sc != null) {
                     close(sc, sk);
                 }

@@ -799,8 +799,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
         } catch (RejectedExecutionException x) {
-            log.warn("Socket processing request was rejected for:"+socket,x);
-            return false;
+            log.warn(sm.getString("endpoint.rejectedExecution", socket), x);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that

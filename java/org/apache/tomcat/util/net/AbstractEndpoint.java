@@ -1073,7 +1073,7 @@ public abstract class AbstractEndpoint<S,U> {
         } catch(Throwable t) {
             ExceptionUtils.handleThrowable(t);
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("endpoint.debug.unlock.fail", "" + getPort()), t);
+                getLog().debug(sm.getString("endpoint.debug.unlock.fail", String.valueOf(getPort())), t);
             }
         }
     }
