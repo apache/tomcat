@@ -341,7 +341,7 @@
     </attribute>
 
     <attribute name="acceptorThreadPriority" required="false">
-      <p>The priority of the acceptor threads. The threads used to accept
+      <p>The priority of the acceptor thread. The thread used to accept
       new connections. The default value is <code>5</code> (the value of the
       <code>java.lang.Thread.NORM_PRIORITY</code> constant). See the JavaDoc
       for the <code>java.lang.Thread</code> class for more details on what
@@ -1616,8 +1616,9 @@
 
   <subsection name="SSL Support - Connector - NIO and NIO2">
 
-  <p>When APR/native is enabled, the connectors will default to using OpenSSL through JSSE,
-  which may be more optimized than the JSSE Java implementation depending on the processor being used,
+  <p>When APR/native is enabled, the connectors will default to using
+  OpenSSL through JSSE, which may be more optimized than the JSSE Java
+  implementation depending on the processor being used,
   and can be complemented with many commercial accelerator components.</p>
 
   <p>The following NIO and NIO2 SSL configuration attributes are not specific to
