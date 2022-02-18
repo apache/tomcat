@@ -46,6 +46,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 /**
@@ -88,18 +89,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
     private long previousAcceptedSocketNanoTime = 0;
 
 
-    public Nio2Endpoint() {
-        // Override the defaults for NIO2
-        // Disable maxConnections by default for NIO2 (see BZ58103)
-        setMaxConnections(-1);
-    }
-
-
     // ------------------------------------------------------------- Properties
-
-    public void setSocketProperties(SocketProperties socketProperties) {
-        this.socketProperties = socketProperties;
-    }
 
     /**
      * Is deferAccept supported?
@@ -181,23 +171,42 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
 
             initializeConnectionLatch();
-            startAcceptorThreads();
+            startAcceptorThread();
         }
     }
 
+    @Override
+    protected void startAcceptorThread() {
+        // Instead of starting a real acceptor thread, this will instead call
+        // an asynchronous accept operation
+        if (acceptor == null) {
+            acceptor = new Nio2Acceptor(this);
+            acceptor.setThreadName(getName() + "-Acceptor");
+        }
+        acceptor.state = AcceptorState.RUNNING;
+        getExecutor().execute(acceptor);
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+        if (isRunning()) {
+            acceptor.state = AcceptorState.RUNNING;
+            getExecutor().execute(acceptor);
+        }
+    }
 
     /**
      * Stop the endpoint. This will cause all processing threads to stop.
      */
     @Override
     public void stopInternal() {
-        releaseConnectionLatch();
         if (!paused) {
             pause();
         }
         if (running) {
             running = false;
-            unlockAccept();
+            acceptor.stop(10);
             // Use the executor to avoid binding the main thread if something bad
             // occurs and unbind will also wait for a bit for it to complete
             getExecutor().execute(new Runnable() {
@@ -205,8 +214,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 public void run() {
                     // Then close all active connections if any remain
                     try {
-                        for (Nio2Channel channel : getHandler().getOpenSockets()) {
-                            channel.getSocket().close();
+                        for (SocketWrapperBase<Nio2Channel> wrapper : getConnections()) {
+                            wrapper.close();
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
@@ -289,20 +298,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
     // ------------------------------------------------------ Protected Methods
 
-
-    public int getWriteBufSize() {
-        return socketProperties.getTxBufSize();
-    }
-
-    public int getReadBufSize() {
-        return socketProperties.getRxBufSize();
-    }
-
-    @Override
-    protected AbstractEndpoint.Acceptor createAcceptor() {
-        return new Acceptor();
-    }
-
     /**
      * Process the specified connection.
      * @param socket The socket channel
@@ -310,9 +305,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
      *  and processing may continue, <code>false</code> if the socket needs to be
      *  close immediately
      */
+    @Override
     protected boolean setSocketOptions(AsynchronousSocketChannel socket) {
+        Nio2SocketWrapper socketWrapper = null;
         try {
-            socketProperties.setProperties(socket);
+            // Allocate channel and wrapper
             Nio2Channel channel = null;
             if (nioChannels != null) {
                 channel = nioChannels.pop();
@@ -328,34 +325,47 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     channel = new Nio2Channel(bufhandler);
                 }
             }
-            Nio2SocketWrapper socketWrapper = new Nio2SocketWrapper(channel, this);
-            channel.reset(socket, socketWrapper);
-            socketWrapper.setReadTimeout(getSocketProperties().getSoTimeout());
-            socketWrapper.setWriteTimeout(getSocketProperties().getSoTimeout());
-            socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
+            Nio2SocketWrapper newWrapper = new Nio2SocketWrapper(channel, this);
+            channel.reset(socket, newWrapper);
+            connections.put(socket, newWrapper);
+            socketWrapper = newWrapper;
+
+            // Set socket properties
+            socketProperties.setProperties(socket);
+
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
-            // Continue processing on another thread
-            return processSocket(socketWrapper, SocketEvent.OPEN_READ, true);
+            socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
+            // Continue processing on the same thread as the acceptor is async
+            return processSocket(socketWrapper, SocketEvent.OPEN_READ, false);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error("",t);
+            log.error(sm.getString("endpoint.socketOptionsError"), t);
+            if (socketWrapper == null) {
+                destroySocket(socket);
+            }
         }
-        // Tell to close the socket
+        // Tell to close the socket if needed
         return false;
     }
 
 
     @Override
-    protected SocketProcessorBase<Nio2Channel> createSocketProcessor(
-            SocketWrapperBase<Nio2Channel> socketWrapper, SocketEvent event) {
-        return new SocketProcessor(socketWrapper, event);
+    protected void destroySocket(AsynchronousSocketChannel socket) {
+        countDownConnection();
+        try {
+            socket.close();
+        } catch (IOException ioe) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("endpoint.err.close"), ioe);
             }
-
-    @Override
-    protected Log getLog() {
-        return log;
         }
+    }
+
+
+    protected SynchronizedStack<Nio2Channel> getNioChannels() {
+        return nioChannels;
+    }
 
 
     @Override
@@ -364,125 +374,139 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
     }
 
 
-    // --------------------------------------------------- Acceptor Inner Class
-    /**
-     * With NIO2, the main acceptor thread only initiates the initial accept
-     * but periodically checks that the connector is still accepting (if not
-     * it will attempt to start again).
-     */
-    protected class Acceptor extends AbstractEndpoint.Acceptor {
+    @Override
+    protected AsynchronousSocketChannel serverSocketAccept() throws Exception {
+        AsynchronousSocketChannel result = serverSock.accept().get();
+
+        // Bug does not affect Windows. Skip the check on that platform.
+        if (!JrePlatform.IS_WINDOWS) {
+            SocketAddress currentRemoteAddress = result.getRemoteAddress();
+            long currentNanoTime = System.nanoTime();
+            if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&
+                    currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
+                throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+            }
+            previousAcceptedSocketRemoteAddress = currentRemoteAddress;
+            previousAcceptedSocketNanoTime = currentNanoTime;
+        }
+
+        return result;
+    }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
+    }
+
+
+    @Override
+    protected SocketProcessorBase<Nio2Channel> createSocketProcessor(
+            SocketWrapperBase<Nio2Channel> socketWrapper, SocketEvent event) {
+        return new SocketProcessor(socketWrapper, event);
+    }
+
+
+    protected class Nio2Acceptor extends Acceptor<AsynchronousSocketChannel>
+        implements CompletionHandler<AsynchronousSocketChannel, Void> {
+
+        protected int errorDelay = 0;
+
+        public Nio2Acceptor(AbstractEndpoint<?, AsynchronousSocketChannel> endpoint) {
+            super(endpoint);
+        }
 
         @Override
         public void run() {
-
-            int errorDelay = 0;
-            long pauseStart = 0;
-
-            // Loop until we receive a shutdown command
-            while (running) {
-
-                // Loop if endpoint is paused.
-                // There are two likely scenarios here.
-                // The first scenario is that Tomcat is shutting down. In this
-                // case - and particularly for the unit tests - we want to exit
-                // this loop as quickly as possible. The second scenario is a
-                // genuine pause of the connector. In this case we want to avoid
-                // excessive CPU usage.
-                // Therefore, we start with a tight loop but if there isn't a
-                // rapid transition to stop then sleeps are introduced.
-                // < 1ms       - tight loop
-                // 1ms to 10ms - 1ms sleep
-                // > 10ms      - 10ms sleep
-                while (paused && running) {
-                    if (state != AcceptorState.PAUSED) {
-                        pauseStart = System.nanoTime();
-                        // Entered pause state
-                        state = AcceptorState.PAUSED;
-                    }
-                    if ((System.nanoTime() - pauseStart) > 1_000_000) {
-                        // Paused for more than 1ms
-                        try {
-                            if ((System.nanoTime() - pauseStart) > 10_000_000) {
-                                Thread.sleep(10);
-                            } else {
-                                Thread.sleep(1);
-                            }
-                        } catch (InterruptedException e) {
-                            // Ignore
-                        }
-                    }
-                }
-
-                if (!running) {
-                    break;
-                }
-                state = AcceptorState.RUNNING;
-
+            // The initial accept will be called in a separate utility thread
+            if (!isPaused()) {
+                //if we have reached max connections, wait
                 try {
-                    //if we have reached max connections, wait
                     countUpOrAwaitConnection();
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                if (!isPaused()) {
+                    // Note: as a special behavior, the completion handler for accept is
+                    // always called in a separate thread.
+                    serverSock.accept(null, this);
+                } else {
+                    state = AcceptorState.PAUSED;
+                }
+            } else {
+                state = AcceptorState.PAUSED;
+            }
+        }
 
-                    AsynchronousSocketChannel socket = null;
+        /**
+         * Signals the Acceptor to stop.
+         *
+         * @param waitSeconds Ignored for NIO2.
+         *
+         */
+        @Override
+        public void stop(int waitSeconds) {
+            acceptor.state = AcceptorState.ENDED;
+        }
+
+        @Override
+        public void completed(AsynchronousSocketChannel socket,
+                Void attachment) {
+            // Successful accept, reset the error delay
+            errorDelay = 0;
+            // Continue processing the socket on the current thread
+            // Configure the socket
+            if (isRunning() && !isPaused()) {
+                if (getMaxConnections() == -1) {
+                    serverSock.accept(null, this);
+                } else if (getConnectionCount() < getMaxConnections()) {
                     try {
-                        // Accept the next incoming connection from the server
-                        // socket
-                        socket = serverSock.accept().get();
-
-                        // Bug does not affect Windows. Skip the check on that platform.
-                        if (!JrePlatform.IS_WINDOWS) {
-                            SocketAddress currentRemoteAddress = socket.getRemoteAddress();
-                            long currentNanoTime = System.nanoTime();
-                            if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&
-                                    currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
-                                throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
-                            }
-                            previousAcceptedSocketRemoteAddress = currentRemoteAddress;
-                            previousAcceptedSocketNanoTime = currentNanoTime;
-                        }
-                    } catch (Exception e) {
-                        // We didn't get a socket
-                        countDownConnection();
-                        if (running) {
-                            // Introduce delay if necessary
-                            errorDelay = handleExceptionWithDelay(errorDelay);
-                            // re-throw
-                            throw e;
-                        } else {
-                            break;
-                        }
+                        // This will not block
+                        countUpOrAwaitConnection();
+                    } catch (InterruptedException e) {
+                        // Ignore
                     }
-                    // Successful accept, reset the error delay
-                    errorDelay = 0;
+                    serverSock.accept(null, this);
+                } else {
+                    // Accept again on a new thread since countUpOrAwaitConnection may block
+                    getExecutor().execute(this);
+                }
+                if (!setSocketOptions(socket)) {
+                    closeSocket(socket);
+                }
+            } else {
+                if (isRunning()) {
+                    state = AcceptorState.PAUSED;
+                }
+                destroySocket(socket);
+            }
+        }
 
-                    // Configure the socket
-                    if (running && !paused) {
-                        // setSocketOptions() will hand the socket off to
-                        // an appropriate processor if successful
-                        if (!setSocketOptions(socket)) {
-                            closeSocket(socket);
-                       }
+        @Override
+        public void failed(Throwable t, Void attachment) {
+            if (isRunning()) {
+                if (!isPaused()) {
+                    if (getMaxConnections() == -1) {
+                        serverSock.accept(null, this);
                     } else {
-                        closeSocket(socket);
+                        // Accept again on a new thread since countUpOrAwaitConnection may block
+                        getExecutor().execute(this);
                     }
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    log.error(sm.getString("endpoint.accept.fail"), t);
+                } else {
+                    state = AcceptorState.PAUSED;
                 }
-            }
-            state = AcceptorState.ENDED;
-        }
-
-
-        private void closeSocket(AsynchronousSocketChannel socket) {
-            countDownConnection();
-            try {
-                socket.close();
-            } catch (IOException ioe) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("endpoint.err.close"), ioe);
-                }
+                // We didn't get a socket
+                countDownConnection();
+                // Introduce delay if necessary
+                errorDelay = handleExceptionWithDelay(errorDelay);
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("endpoint.accept.fail"), t);
+            } else {
+                // We didn't get a socket
+                countDownConnection();
             }
         }
+
     }
 
     public static class Nio2SocketWrapper extends SocketWrapperBase<Nio2Channel> {
@@ -492,13 +516,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private SendfileData sendfileData = null;
 
         private final CompletionHandler<Integer, ByteBuffer> readCompletionHandler;
-        private final Semaphore readPending = new Semaphore(1);
         private boolean readInterest = false; // Guarded by readCompletionHandler
         private boolean readNotify = false;
 
         private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
         private final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
-        private final Semaphore writePending = new Semaphore(1);
         private boolean writeInterest = false; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
 
@@ -586,7 +608,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         public Nio2SocketWrapper(Nio2Channel channel, final Nio2Endpoint endpoint) {
             super(channel, endpoint);
-            nioChannels = endpoint.nioChannels;
+            nioChannels = endpoint.getNioChannels();
             socketBufferHandler = channel.getBufHandler();
 
             this.readCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
@@ -928,24 +950,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         @Override
         protected void doClose() {
             if (log.isDebugEnabled()) {
-                log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])", new Exception());
+                log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])");
             }
             try {
-                getEndpoint().getHandler().release(this);
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                if (log.isDebugEnabled()) {
-                    log.error("Channel close error", e);
+                getEndpoint().connections.remove(getSocket().getIOChannel());
+                if (getSocket().isOpen()) {
+                    getSocket().close(true);
                 }
-            }
-            try {
-                synchronized (getSocket()) {
-                    getEndpoint().countDownConnection();
-                    if (getSocket().isOpen()) {
-                        getSocket().close(true);
-                    }
-                }
-                if (getEndpoint().running && !getEndpoint().paused) {
+                if (getEndpoint().running) {
                     if (nioChannels == null || !nioChannels.push(getSocket())) {
                         getSocket().free();
                     }

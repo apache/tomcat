@@ -25,8 +25,10 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -42,7 +44,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
+import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.LimitLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
@@ -102,7 +104,10 @@ public abstract class AbstractEndpoint<S,U> {
          *
          * @return The sockets for which the handler is tracking a currently
          *         open connection
+         * @deprecated Unused, will be removed in Tomcat 10, replaced
+         *         by AbstractEndpoint.getConnections
          */
+        @Deprecated
         public Set<S> getOpenSockets();
 
         /**
@@ -129,31 +134,11 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     protected enum BindState {
-        UNBOUND, BOUND_ON_INIT, BOUND_ON_START, SOCKET_CLOSED_ON_STOP
+        UNBOUND,
+        BOUND_ON_INIT,
+        BOUND_ON_START,
+        SOCKET_CLOSED_ON_STOP
     }
-
-    public abstract static class Acceptor implements Runnable {
-        public enum AcceptorState {
-            NEW, RUNNING, PAUSED, ENDED
-        }
-
-        protected volatile AcceptorState state = AcceptorState.NEW;
-        public final AcceptorState getState() {
-            return state;
-        }
-
-        private String threadName;
-        protected final void setThreadName(final String threadName) {
-            this.threadName = threadName;
-        }
-        protected final String getThreadName() {
-            return threadName;
-        }
-    }
-
-
-    private static final int INITIAL_ERROR_DELAY = 50;
-    private static final int MAX_ERROR_DELAY = 1600;
 
 
     public static long toTimeout(long timeout) {
@@ -188,16 +173,15 @@ public abstract class AbstractEndpoint<S,U> {
     /**
      * Socket properties
      */
-    protected SocketProperties socketProperties = new SocketProperties();
+    protected final SocketProperties socketProperties = new SocketProperties();
     public SocketProperties getSocketProperties() {
         return socketProperties;
     }
 
     /**
      * Thread used to accept new connections and pass them to worker threads.
-     * This is hard-coded to use a single acceptor.
      */
-    protected Acceptor[] acceptors;
+    protected Acceptor<U> acceptor;
 
     /**
      * Cache for SocketProcessor objects
@@ -205,6 +189,19 @@ public abstract class AbstractEndpoint<S,U> {
     protected SynchronizedStack<SocketProcessorBase<S>> processorCache;
 
     private ObjectName oname = null;
+
+    /**
+     * Map holding all current connections keyed with the sockets.
+     */
+    protected Map<U, SocketWrapperBase<S>> connections = new ConcurrentHashMap<>();
+
+    /**
+     * Get a set with the current open connections.
+     * @return A set with the open socket wrappers
+     */
+    public Set<SocketWrapperBase<S>> getConnections() {
+        return new HashSet<>(connections.values());
+    }
 
     // ----------------------------------------------------------------- Properties
 
@@ -494,7 +491,7 @@ public abstract class AbstractEndpoint<S,U> {
     public int getAcceptorThreadPriority() { return acceptorThreadPriority; }
 
 
-    private int maxConnections = 10000;
+    private int maxConnections = 8*1024;
     public void setMaxConnections(int maxCon) {
         this.maxConnections = maxCon;
         LimitLatch latch = this.connectionLimitLatch;
@@ -982,17 +979,11 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     /**
-     * Unlock the server socket accept using a bogus connection.
+     * Unlock the server socket acceptor threads using bogus connections.
      */
     protected void unlockAccept() {
         // Only try to unlock the acceptor if it is necessary
-        int unlocksRequired = 0;
-        for (Acceptor acceptor : acceptors) {
-            if (acceptor.getState() == AcceptorState.RUNNING) {
-                unlocksRequired++;
-            }
-        }
-        if (unlocksRequired == 0) {
+        if (acceptor == null || acceptor.getState() != AcceptorState.RUNNING) {
             return;
         }
 
@@ -1011,49 +1002,36 @@ public abstract class AbstractEndpoint<S,U> {
         try {
             unlockAddress = getUnlockAddress(localAddress);
 
-            for (int i = 0; i < unlocksRequired; i++) {
-                try (java.net.Socket s = new java.net.Socket()) {
-                    int stmo = 2 * 1000;
-                    int utmo = 2 * 1000;
-                    if (getSocketProperties().getSoTimeout() > stmo) {
-                        stmo = getSocketProperties().getSoTimeout();
-                    }
-                    if (getSocketProperties().getUnlockTimeout() > utmo) {
-                        utmo = getSocketProperties().getUnlockTimeout();
-                    }
-                    s.setSoTimeout(stmo);
-                    s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("About to unlock socket for:" + unlockAddress);
-                    }
-                    s.connect(unlockAddress,utmo);
-                    if (getDeferAccept()) {
-                        /*
-                         * In the case of a deferred accept / accept filters we need to
-                         * send data to wake up the accept. Send OPTIONS * to bypass
-                         * even BSD accept filters. The Acceptor will discard it.
-                         */
-                        OutputStreamWriter sw;
-
-                        sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
-                        sw.write("OPTIONS * HTTP/1.0\r\n" +
-                                 "User-Agent: Tomcat wakeup connection\r\n\r\n");
-                        sw.flush();
-                    }
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("Socket unlock completed for:" + unlockAddress);
-                    }
+            try (java.net.Socket s = new java.net.Socket()) {
+                int stmo = 2 * 1000;
+                int utmo = 2 * 1000;
+                if (getSocketProperties().getSoTimeout() > stmo) {
+                    stmo = getSocketProperties().getSoTimeout();
                 }
-            }
-            // Wait for upto 1000ms acceptor threads to unlock
-            // Should only be one thread but retain this code in case the
-            // acceptor start has been customised.
-            long waitLeft = 1000;
-            for (Acceptor acceptor : acceptors) {
-                while (waitLeft > 0 &&
-                        acceptor.getState() == AcceptorState.RUNNING) {
-                    Thread.sleep(5);
-                    waitLeft -= 5;
+                if (getSocketProperties().getUnlockTimeout() > utmo) {
+                    utmo = getSocketProperties().getUnlockTimeout();
+                }
+                s.setSoTimeout(stmo);
+                s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("About to unlock socket for:" + unlockAddress);
+                }
+                s.connect(unlockAddress,utmo);
+                if (getDeferAccept()) {
+                    /*
+                     * In the case of a deferred accept / accept filters we need to
+                     * send data to wake up the accept. Send OPTIONS * to bypass
+                     * even BSD accept filters. The Acceptor will discard it.
+                     */
+                    OutputStreamWriter sw;
+
+                    sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
+                    sw.write("OPTIONS * HTTP/1.0\r\n" +
+                            "User-Agent: Tomcat wakeup connection\r\n\r\n");
+                    sw.flush();
+                }
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Socket unlock completed for:" + unlockAddress);
                 }
             }
             // Wait for up to 1000ms acceptor threads to unlock. Particularly
@@ -1063,17 +1041,16 @@ public abstract class AbstractEndpoint<S,U> {
             // initially wait for the unlock in a tight loop but if that takes
             // more than 1ms we start using short sleeps to reduce CPU usage.
             long startTime = System.nanoTime();
-            for (Acceptor acceptor : acceptors) {
-                while (startTime + 1_000_000_000 > System.nanoTime() && acceptor.getState() == AcceptorState.RUNNING) {
-                    if (startTime + 1_000_000 < System.nanoTime()) {
-                        Thread.sleep(1);
-                    }
+            while (startTime + 1_000_000_000 > System.nanoTime() && acceptor.getState() == AcceptorState.RUNNING) {
+                if (startTime + 1_000_000 < System.nanoTime()) {
+                    Thread.sleep(1);
                 }
             }
         } catch(Throwable t) {
             ExceptionUtils.handleThrowable(t);
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("endpoint.debug.unlock.fail", String.valueOf(getPort())), t);
+                getLog().debug(sm.getString(
+                        "endpoint.debug.unlock.fail", String.valueOf(getPort())), t);
             }
         }
     }
@@ -1193,9 +1170,23 @@ public abstract class AbstractEndpoint<S,U> {
     public abstract void startInternal() throws Exception;
     public abstract void stopInternal() throws Exception;
 
+
+    private void bindWithCleanup() throws Exception {
+        try {
+            bind();
+        } catch (Throwable t) {
+            // Ensure open sockets etc. are cleaned up if something goes
+            // wrong during bind
+            ExceptionUtils.handleThrowable(t);
+            unbind();
+            throw t;
+        }
+    }
+
+
     public void init() throws Exception {
         if (bindOnInit) {
-            bind();
+            bindWithCleanup();
             bindState = BindState.BOUND_ON_INIT;
         }
         if (this.domain != null) {
@@ -1268,19 +1259,18 @@ public abstract class AbstractEndpoint<S,U> {
 
     public final void start() throws Exception {
         if (bindState == BindState.UNBOUND) {
-            bind();
+            bindWithCleanup();
             bindState = BindState.BOUND_ON_START;
         }
         startInternal();
     }
 
-    protected final void startAcceptorThreads() {
-        acceptors = new Acceptor[1];
 
-        acceptors[0] = createAcceptor();
-        String threadName = getName() + "-Acceptor-0";
-        acceptors[0].setThreadName(threadName);
-        Thread t = new Thread(acceptors[0], threadName);
+    protected void startAcceptorThread() {
+        acceptor = new Acceptor<>(this);
+        String threadName = getName() + "-Acceptor";
+        acceptor.setThreadName(threadName);
+        Thread t = new Thread(acceptor, threadName);
         t.setPriority(getAcceptorThreadPriority());
         t.setDaemon(getDaemon());
         t.start();
@@ -1288,18 +1278,13 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Hook to allow Endpoints to provide a specific Acceptor implementation.
-     * @return the acceptor
-     */
-    protected abstract Acceptor createAcceptor();
-
-
-    /**
-     * Pause the endpoint, which will stop it accepting new connections.
+     * Pause the endpoint, which will stop it accepting new connections and
+     * unlock the acceptor.
      */
     public void pause() {
         if (running && !paused) {
             paused = true;
+            releaseConnectionLatch();
             unlockAccept();
             getHandler().pause();
         }
@@ -1383,37 +1368,6 @@ public abstract class AbstractEndpoint<S,U> {
         }
     }
 
-    /**
-     * Provides a common approach for sub-classes to handle exceptions where a
-     * delay is required to prevent a Thread from entering a tight loop which
-     * will consume CPU and may also trigger large amounts of logging. For
-     * example, this can happen with the Acceptor thread if the ulimit for open
-     * files is reached.
-     *
-     * @param currentErrorDelay The current delay being applied on failure
-     * @return  The delay to apply on the next failure
-     */
-    protected int handleExceptionWithDelay(int currentErrorDelay) {
-        // Don't delay on first exception
-        if (currentErrorDelay > 0) {
-            try {
-                Thread.sleep(currentErrorDelay);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-        }
-
-        // On subsequent exceptions, start the delay at 50ms, doubling the delay
-        // on every subsequent exception until the delay reaches 1.6 seconds.
-        if (currentErrorDelay == 0) {
-            return INITIAL_ERROR_DELAY;
-        } else if (currentErrorDelay < MAX_ERROR_DELAY) {
-            return currentErrorDelay * 2;
-        } else {
-            return MAX_ERROR_DELAY;
-        }
-    }
-
 
     /**
      * Close the server socket (to prevent further connections) if the server
@@ -1424,6 +1378,16 @@ public abstract class AbstractEndpoint<S,U> {
      */
     public final void closeServerSocketGraceful() {
         if (bindState == BindState.BOUND_ON_START) {
+            // Stop accepting new connections
+            acceptor.stop(-1);
+            // Release locks that may be preventing the acceptor from stopping
+            releaseConnectionLatch();
+            unlockAccept();
+            // Signal to any multiplexed protocols (HTTP/2) that they may wish
+            // to stop accepting new streams
+            getHandler().pause();
+            // Update the bindState. This has the side-effect of disabling
+            // keep-alive for any in-progress connections
             bindState = BindState.SOCKET_CLOSED_ON_STOP;
             try {
                 doCloseServerSocket();
@@ -1435,11 +1399,60 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
+     * Wait for the client connections to the server to close gracefully. The
+     * method will return when all of the client connections have closed or the
+     * method has been waiting for {@code waitTimeMillis}.
+     *
+     * @param waitMillis    The maximum time to wait in milliseconds for the
+     *                      client connections to close.
+     *
+     * @return The wait time, if any remaining when the method returned
+     */
+    public final long awaitConnectionsClose(long waitMillis) {
+        while (waitMillis > 0 && !connections.isEmpty()) {
+            try {
+                Thread.sleep(50);
+                waitMillis -= 50;
+            } catch (InterruptedException e) {
+                Thread.interrupted();
+                waitMillis = 0;
+            }
+        }
+        return waitMillis;
+    }
+
+
+    /**
      * Actually close the server socket but don't perform any other clean-up.
      *
      * @throws IOException If an error occurs closing the socket
      */
     protected abstract void doCloseServerSocket() throws IOException;
 
+    protected abstract U serverSocketAccept() throws Exception;
+
+    protected abstract boolean setSocketOptions(U socket);
+
+    /**
+     * Close the socket when the connection has to be immediately closed when
+     * an error occurs while configuring the accepted socket or trying to
+     * dispatch it for processing. The wrapper associated with the socket will
+     * be used for the close.
+     * @param socket The newly accepted socket
+     */
+    protected void closeSocket(U socket) {
+        SocketWrapperBase<S> socketWrapper = connections.get(socket);
+        if (socketWrapper != null) {
+            socketWrapper.close();
+        }
+    }
+
+    /**
+     * Close the socket. This is used when the connector is not in a state
+     * which allows processing the socket, or if there was an error which
+     * prevented the allocation of the socket wrapper.
+     * @param socket The newly accepted socket
+     */
+    protected abstract void destroySocket(U socket);
 }
 

@@ -73,10 +73,7 @@ public class SecureNioChannel extends NioChannel {
 
     private final Map<String,List<String>> additionalTlsAttributes = new HashMap<>();
 
-    protected NioSelectorPool pool;
-
-    public SecureNioChannel(SocketChannel channel, SocketBufferHandler bufHandler,
-            NioSelectorPool pool, NioEndpoint endpoint) {
+    public SecureNioChannel(SocketBufferHandler bufHandler, NioEndpoint endpoint) {
         super(bufHandler);
 
         // Create the network buffers (these hold the encrypted data).
@@ -88,8 +85,6 @@ public class SecureNioChannel extends NioChannel {
             netOutBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
         }
 
-        // selector pool for blocking operations
-        this.pool = pool;
         this.endpoint = endpoint;
     }
 
@@ -116,28 +111,6 @@ public class SecureNioChannel extends NioChannel {
 //===========================================================================================
 //                  NIO SSL METHODS
 //===========================================================================================
-
-    /**
-     * Flush the channel.
-     *
-     * @param block     Should a blocking write be used?
-     * @param s         The selector to use for blocking, if null then a busy
-     *                  write will be initiated
-     * @param timeout   The timeout for this write operation in milliseconds,
-     *                  -1 means no timeout
-     * @return <code>true</code> if the network buffer has been flushed out and
-     *         is empty else <code>false</code>
-     * @throws IOException If an I/O error occurs during the operation
-     */
-    @Override
-    public boolean flush(boolean block, Selector s, long timeout) throws IOException {
-        if (!block) {
-            flush(netOutBuffer);
-        } else {
-            pool.write(netOutBuffer, this, s, timeout, block);
-        }
-        return !netOutBuffer.hasRemaining();
-    }
 
     /**
      * Flushes the buffer to the network, non blocking
@@ -587,7 +560,6 @@ public class SecureNioChannel extends NioChannel {
         } finally {
             if (force || closed) {
                 closed = true;
-                sc.socket().close();
                 sc.close();
             }
         }
@@ -817,8 +789,6 @@ public class SecureNioChannel extends NioChannel {
     public int write(ByteBuffer src) throws IOException {
         checkInterruptStatus();
         if (src == this.netOutBuffer) {
-            //we can get here through a recursive call
-            //by using the NioBlockingSelector
             int written = sc.write(src);
             return written;
         } else {
@@ -829,6 +799,11 @@ public class SecureNioChannel extends NioChannel {
 
             if (!flush(netOutBuffer)) {
                 // We haven't emptied out the buffer yet
+                return 0;
+            }
+
+            if (!src.hasRemaining()) {
+                // Nothing left to write
                 return 0;
             }
 

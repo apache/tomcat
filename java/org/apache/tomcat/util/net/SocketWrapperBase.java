@@ -105,6 +105,12 @@ public abstract class SocketWrapperBase<E> {
     protected final Semaphore writePending;
     protected volatile OperationState<?> writeOperation = null;
 
+    /**
+     * The org.apache.coyote.Processor instance currently associated
+     * with the wrapper.
+     */
+    protected Object currentProcessor = null;
+
     public SocketWrapperBase(E socket, AbstractEndpoint<E,?> endpoint) {
         this.socket = socket;
         this.endpoint = endpoint;
@@ -127,6 +133,14 @@ public abstract class SocketWrapperBase<E> {
 
     public AbstractEndpoint<E,?> getEndpoint() {
         return endpoint;
+    }
+
+    public Object getCurrentProcessor() {
+        return currentProcessor;
+    }
+
+    public void setCurrentProcessor(Object currentProcessor) {
+        this.currentProcessor = currentProcessor;
     }
 
     /**
@@ -396,7 +410,17 @@ public abstract class SocketWrapperBase<E> {
      */
     public void close() {
         if (closed.compareAndSet(false, true)) {
-            doClose();
+            try {
+                getEndpoint().getHandler().release(this);
+            } catch (Throwable e) {
+                ExceptionUtils.handleThrowable(e);
+                if (log.isDebugEnabled()) {
+                    log.error(sm.getString("endpoint.debug.handlerRelease"), e);
+                }
+            } finally {
+                getEndpoint().countDownConnection();
+                doClose();
+            }
         }
     }
 

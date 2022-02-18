@@ -21,12 +21,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ScatteringByteChannel;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
 import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
-import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -42,10 +40,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
 
     protected final SocketBufferHandler bufHandler;
     protected SocketChannel sc = null;
-    protected SocketWrapperBase<NioChannel> socketWrapper = null;
-
-
-    protected Poller poller;
+    protected NioSocketWrapper socketWrapper = null;
 
     public NioChannel(SocketBufferHandler bufHandler) {
         this.bufHandler = bufHandler;
@@ -67,12 +62,8 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     /**
      * @return the socketWrapper
      */
-    SocketWrapperBase<NioChannel> getSocketWrapper() {
+    NioSocketWrapper getSocketWrapper() {
         return socketWrapper;
-    }
-
-    void setSocketWrapper(SocketWrapperBase<NioChannel> socketWrapper) {
-        this.socketWrapper = socketWrapper;
     }
 
     /**
@@ -180,20 +171,8 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         return sc.read(dsts, offset, length);
     }
 
-    public Object getAttachment() {
-        Poller pol = getPoller();
-        Selector sel = pol!=null?pol.getSelector():null;
-        SelectionKey key = sel!=null?getIOChannel().keyFor(sel):null;
-        Object att = key!=null?key.attachment():null;
-        return att;
-    }
-
     public SocketBufferHandler getBufHandler() {
         return bufHandler;
-    }
-
-    public Poller getPoller() {
-        return poller;
     }
 
     public SocketChannel getIOChannel() {
@@ -219,10 +198,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      */
     public int handshake(boolean read, boolean write) throws IOException {
         return 0;
-    }
-
-    public void setPoller(Poller poller) {
-        this.poller = poller;
     }
 
     @Override
@@ -283,6 +258,10 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         }
         @Override
         public void free() {
+        }
+        @Override
+        protected ApplicationBufferHandler getAppReadBufHandler() {
+            return ApplicationBufferHandler.EMPTY;
         }
         @Override
         public void setAppReadBufHandler(ApplicationBufferHandler handler) {

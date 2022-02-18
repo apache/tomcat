@@ -38,7 +38,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
 
     protected final SocketBufferHandler bufHandler;
     protected AsynchronousSocketChannel sc = null;
-    protected SocketWrapperBase<Nio2Channel> socket = null;
+    protected SocketWrapperBase<Nio2Channel> socketWrapper = null;
 
     public Nio2Channel(SocketBufferHandler bufHandler) {
         this.bufHandler = bufHandler;
@@ -48,14 +48,14 @@ public class Nio2Channel implements AsynchronousByteChannel {
      * Reset the channel.
      *
      * @param channel The new async channel to associate with this NIO2 channel
-     * @param socket  The new socket to associate with this NIO2 channel
+     * @param socketWrapper The new socket to associate with this NIO2 channel
      *
      * @throws IOException If a problem was encountered resetting the channel
      */
-    public void reset(AsynchronousSocketChannel channel, SocketWrapperBase<Nio2Channel> socket)
+    public void reset(AsynchronousSocketChannel channel, SocketWrapperBase<Nio2Channel> socketWrapper)
             throws IOException {
         this.sc = channel;
-        this.socket = socket;
+        this.socketWrapper = socketWrapper;
         bufHandler.reset();
     }
 
@@ -66,8 +66,8 @@ public class Nio2Channel implements AsynchronousByteChannel {
         bufHandler.free();
     }
 
-    public SocketWrapperBase<Nio2Channel> getSocket() {
-        return socket;
+    SocketWrapperBase<Nio2Channel> getSocketWrapper() {
+        return socketWrapper;
     }
 
 
