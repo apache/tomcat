@@ -25,6 +25,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
+import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -46,17 +47,20 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
 
     protected Poller poller;
 
-    public NioChannel(SocketChannel channel, SocketBufferHandler bufHandler) {
-        this.sc = channel;
+    public NioChannel(SocketBufferHandler bufHandler) {
         this.bufHandler = bufHandler;
     }
 
     /**
      * Reset the channel
      *
+     * @param channel the socket channel
+     * @param socketWrapper the socket wrapper
      * @throws IOException If a problem was encountered resetting the channel
      */
-    public void reset() throws IOException {
+    public void reset(SocketChannel channel, NioSocketWrapper socketWrapper) throws IOException {
+        this.sc = channel;
+        this.socketWrapper = socketWrapper;
         bufHandler.reset();
     }
 
@@ -221,10 +225,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         this.poller = poller;
     }
 
-    public void setIOChannel(SocketChannel sc) {
-        this.sc = sc;
-    }
-
     @Override
     public String toString() {
         return super.toString() + ":" + sc.toString();
@@ -273,7 +273,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     static final NioChannel CLOSED_NIO_CHANNEL = new ClosedNioChannel();
     public static class ClosedNioChannel extends NioChannel {
         public ClosedNioChannel() {
-            super(null, SocketBufferHandler.EMPTY);
+            super(SocketBufferHandler.EMPTY);
         }
         @Override
         public void close() throws IOException {
@@ -283,7 +283,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
             return false;
         }
         @Override
-        public void reset() throws IOException {
+        public void reset(SocketChannel channel, NioSocketWrapper socketWrapper) throws IOException {
         }
         @Override
         public void free() {

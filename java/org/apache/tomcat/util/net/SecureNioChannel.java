@@ -39,6 +39,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.TLSClientHelloExtractor.ExtractorResult;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
@@ -76,7 +77,7 @@ public class SecureNioChannel extends NioChannel {
 
     public SecureNioChannel(SocketChannel channel, SocketBufferHandler bufHandler,
             NioSelectorPool pool, NioEndpoint endpoint) {
-        super(channel, bufHandler);
+        super(bufHandler);
 
         // Create the network buffers (these hold the encrypted data).
         if (endpoint.getSocketProperties().getDirectSslBuffer()) {
@@ -93,8 +94,8 @@ public class SecureNioChannel extends NioChannel {
     }
 
     @Override
-    public void reset() throws IOException {
-        super.reset();
+    public void reset(SocketChannel channel, NioSocketWrapper socketWrapper) throws IOException {
+        super.reset(channel, socketWrapper);
         sslEngine = null;
         sniComplete = false;
         handshakeComplete = false;
