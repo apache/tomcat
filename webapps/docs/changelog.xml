@@ -167,6 +167,13 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>65408</bug>: Backport the socket close refactoring - along with
+        supporting changes - that ensures that a socket is only closed once.
+        Pooled objects associated with the socket are now replaced with dummy
+        instances to protect against applications that attempt to continue to
+        use the socket after it has been closed. (markt/remm)
+      </fix>
+      <fix>
         Correct a regression in the fix for <bug>65454</bug> that meant that
         <code>minSpareThreads</code> and <code>maxThreads</code> settings were
         ignored when the Connector used an internal executor. (markt)
