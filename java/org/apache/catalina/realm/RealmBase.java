@@ -1038,7 +1038,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
             return true;
         }
         // Initialize variables we need to determine the appropriate action
-        int redirectPort = request.getConnector().getRedirectPort();
+        int redirectPort = request.getConnector().getRedirectPortWithOffset();
 
         // Is redirecting disabled?
         if (redirectPort <= 0) {

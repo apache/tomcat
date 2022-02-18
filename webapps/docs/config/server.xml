@@ -75,6 +75,12 @@
       gracefully.</p>
     </attribute>
 
+    <attribute name="portOffset" required="false">
+      <p>The offset to apply to <code>port</code> and to the ports of any
+      nested connectors. It must be a non-negative integer. If not specified,
+      the default value of <code>0</code> is used.</p>
+    </attribute>
+
     <attribute name="shutdown" required="true">
       <p>The command string that must be received via a TCP/IP connection
       to the specified port number, in order to shut down Tomcat.</p>

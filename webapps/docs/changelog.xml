@@ -108,6 +108,12 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>61171</bug>: Add the <code>portOffset</code> attribute to the
+        <code>Server</code> element which is added to the configured shutdown
+        and <code>Connector</code> ports. Based on a patch by Marek Czernek.
+        (markt)
+      </add>
+      <add>
         <bug>64080</bug>: Enhance the graceful shutdown feature. Includes a new
         option for <code>StandardService</code>,
         <code>gracefulStopAwaitMillis</code>, that allows a time to be

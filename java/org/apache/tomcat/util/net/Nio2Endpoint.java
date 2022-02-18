@@ -137,7 +137,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         serverSock = AsynchronousServerSocketChannel.open(threadGroup);
         socketProperties.setProperties(serverSock);
-        InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
+        InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
         serverSock.bind(addr, getAcceptCount());
 
         // Initialize SSL if needed

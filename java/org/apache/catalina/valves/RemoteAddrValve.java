@@ -51,7 +51,7 @@ public final class RemoteAddrValve extends RequestFilterValve {
         }
         if (getAddConnectorPort()) {
             property = property + ";" +
-                request.getConnector().getPort();
+                request.getConnector().getPortWithOffset();
         }
         process(property, request, response);
     }

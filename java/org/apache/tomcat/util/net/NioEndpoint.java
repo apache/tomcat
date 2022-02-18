@@ -220,7 +220,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         } else {
             serverSock = ServerSocketChannel.open();
             socketProperties.setProperties(serverSock.socket());
-            InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
+            InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
             serverSock.socket().bind(addr,getAcceptCount());
         }
         serverSock.configureBlocking(true); //mimic APR behavior
@@ -318,7 +318,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     public void unbind() throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("Destroy initiated for " +
-                    new InetSocketAddress(getAddress(),getPort()));
+                    new InetSocketAddress(getAddress(),getPortWithOffset()));
         }
         if (running) {
             stop();
@@ -335,7 +335,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
         if (log.isDebugEnabled()) {
             log.debug("Destroy completed for " +
-                    new InetSocketAddress(getAddress(), getPort()));
+                    new InetSocketAddress(getAddress(), getPortWithOffset()));
         }
     }
 

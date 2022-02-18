@@ -310,6 +310,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    public int getPortOffset() { return endpoint.getPortOffset(); }
+    public void setPortOffset(int portOffset) {
+        endpoint.setPortOffset(portOffset);
+    }
+
+
+    public int getPortWithOffset() { return endpoint.getPortWithOffset(); }
+
+
     public int getLocalPort() { return endpoint.getLocalPort(); }
 
     /*
@@ -406,7 +415,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             name.append(getAddress().getHostAddress());
             name.append('-');
         }
-        int port = getPort();
+        int port = getPortWithOffset();
         if (port == 0) {
             // Auto binding is in use. Check if port is known
             name.append("auto-");
@@ -571,9 +580,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         StringBuilder name = new StringBuilder(getDomain());
         name.append(":type=ProtocolHandler,port=");
-        int port = getPort();
+        int port = getPortWithOffset();
         if (port > 0) {
-            name.append(getPort());
+            name.append(port);
         } else {
             name.append("auto-");
             name.append(getNameIndex());
@@ -599,6 +608,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public void init() throws Exception {
         if (getLog().isInfoEnabled()) {
             getLog().info(sm.getString("abstractProtocolHandler.init", getName()));
+            logPortOffset();
         }
 
         if (oname == null) {
@@ -628,6 +638,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public void start() throws Exception {
         if (getLog().isInfoEnabled()) {
             getLog().info(sm.getString("abstractProtocolHandler.start", getName()));
+            logPortOffset();
         }
 
         endpoint.start();
@@ -669,6 +680,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public void stop() throws Exception {
         if(getLog().isInfoEnabled()) {
             getLog().info(sm.getString("abstractProtocolHandler.stop", getName()));
+            logPortOffset();
         }
 
         if (asyncTimeout != null) {
@@ -683,6 +695,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public void destroy() throws Exception {
         if(getLog().isInfoEnabled()) {
             getLog().info(sm.getString("abstractProtocolHandler.destroy", getName()));
+            logPortOffset();
         }
 
         try {
@@ -721,6 +734,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         getLog().info(sm.getString("abstractProtocol.closeConnectionsAwait",
                 Long.valueOf(waitMillis), getName()));
         return endpoint.awaitConnectionsClose(waitMillis);
+    }
+
+
+    private void logPortOffset() {
+        if (getPort() != getPortWithOffset()) {
+            getLog().info(sm.getString("abstractProtocolHandler.portOffset", getName(),
+                    String.valueOf(getPort()), String.valueOf(getPortOffset())));
+        }
     }
 
 
