@@ -765,37 +765,34 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
      */
     protected boolean processSocketWithOptions(long socket) {
         try {
-            // During shutdown, executor may be null - avoid NPE
-            if (running) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("endpoint.debug.socket",
-                            Long.valueOf(socket)));
-                }
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("endpoint.debug.socket", socket));
+            }
 
-                // Do the duplicate accept check here rather than in Acceptor.run()
-                // so we can cache the results in the SocketWrapper
-                AprSocketWrapper wrapper = new AprSocketWrapper(Long.valueOf(socket), this);
-                // Bug does not affect Windows. Skip the check on that platform.
-                if (!JrePlatform.IS_WINDOWS) {
-                    long currentNanoTime = System.nanoTime();
-                    if (wrapper.getRemotePort() == previousAcceptedPort) {
-                        if (wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
-                            if (currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
-                                throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
-                            }
+            // Do the duplicate accept check here rather than in Acceptor.run()
+            // so we can cache the results in the SocketWrapper
+            AprSocketWrapper wrapper = new AprSocketWrapper(Long.valueOf(socket), this);
+            // Bug does not affect Windows. Skip the check on that platform.
+            if (!JrePlatform.IS_WINDOWS) {
+                long currentNanoTime = System.nanoTime();
+                if (wrapper.getRemotePort() == previousAcceptedPort) {
+                    if (wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
+                        if (currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
+                            throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
                         }
                     }
-                    previousAcceptedPort = wrapper.getRemotePort();
-                    previousAcceptedAddress = wrapper.getRemoteAddr();
-                    previousAcceptedSocketNanoTime = currentNanoTime;
                 }
-
-                wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
-                wrapper.setReadTimeout(getConnectionTimeout());
-                wrapper.setWriteTimeout(getConnectionTimeout());
-                connections.put(Long.valueOf(socket), wrapper);
-                getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
+                previousAcceptedPort = wrapper.getRemotePort();
+                previousAcceptedAddress = wrapper.getRemoteAddr();
+                previousAcceptedSocketNanoTime = currentNanoTime;
             }
+
+            connections.put(Long.valueOf(socket), wrapper);
+            wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
+            wrapper.setReadTimeout(getConnectionTimeout());
+            wrapper.setWriteTimeout(getConnectionTimeout());
+            getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
+            return true;
         } catch (RejectedExecutionException x) {
             log.warn(sm.getString("endpoint.rejectedExecution", socket), x);
         } catch (Throwable t) {
@@ -803,9 +800,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
         }
-        return true;
+        return false;
     }
 
 
@@ -2437,6 +2433,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
         @Override
         protected void doClose() {
+            if (log.isDebugEnabled()) {
+                log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])");
+            }
             try {
                 getEndpoint().getHandler().release(this);
             } catch (Throwable e) {

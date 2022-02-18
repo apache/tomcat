@@ -532,8 +532,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                                 break;
                             }
                             case PIPELINED: {
-                                getEndpoint().processSocket(Nio2SocketWrapper.this,
-                                        SocketEvent.OPEN_READ, true);
+                                if (!getEndpoint().processSocket(Nio2SocketWrapper.this, SocketEvent.OPEN_READ, true)) {
+                                    close();
+                                }
                                 break;
                             }
                             case OPEN: {
@@ -627,9 +628,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         // notify/dispatch to do the release.
                         readPending.release();
                         // If already closed, don't call onError and close again
-                        return;
+                        getEndpoint().processSocket(Nio2SocketWrapper.this, SocketEvent.STOP, false);
+                    } else if (!getEndpoint().processSocket(Nio2SocketWrapper.this, SocketEvent.ERROR, true)) {
+                        close();
                     }
-                    getEndpoint().processSocket(Nio2SocketWrapper.this, SocketEvent.ERROR, true);
                 }
             };
 
@@ -666,7 +668,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         }
                     }
                     if (notify) {
-                        endpoint.processSocket(Nio2SocketWrapper.this, SocketEvent.OPEN_WRITE, true);
+                        if (!endpoint.processSocket(Nio2SocketWrapper.this, SocketEvent.OPEN_WRITE, true)) {
+                            close();
+                        }
                     }
                 }
                 @Override
@@ -679,7 +683,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     }
                     setError(ioe);
                     writePending.release();
-                    endpoint.processSocket(Nio2SocketWrapper.this, SocketEvent.ERROR, true);
+                    if (!endpoint.processSocket(Nio2SocketWrapper.this, SocketEvent.ERROR, true)) {
+                        close();
+                    }
                 }
             };
 
@@ -712,7 +718,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         }
                     }
                     if (notify) {
-                        endpoint.processSocket(Nio2SocketWrapper.this, SocketEvent.OPEN_WRITE, true);
+                        if (!endpoint.processSocket(Nio2SocketWrapper.this, SocketEvent.OPEN_WRITE, true)) {
+                            close();
+                        }
                     }
                 }
                 @Override
@@ -725,7 +733,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     }
                     setError(ioe);
                     writePending.release();
-                    endpoint.processSocket(Nio2SocketWrapper.this, SocketEvent.ERROR, true);
+                    if (!endpoint.processSocket(Nio2SocketWrapper.this, SocketEvent.ERROR, true)) {
+                        close();
+                    }
                }
             };
 
@@ -1392,7 +1402,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         if (fillReadBuffer(false) > 0) {
                             // Special case where the read completed inline, there is no notification
                             // in that case so it has to be done here
-                            getEndpoint().processSocket(this, SocketEvent.OPEN_READ, true);
+                            if (!getEndpoint().processSocket(this, SocketEvent.OPEN_READ, true)) {
+                                close();
+                            }
                         }
                     } catch (IOException e) {
                         // Will never happen
@@ -1416,7 +1428,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 writeInterest = true;
                 if (writePending.availablePermits() == 1) {
                     // If no write is pending, notify that writing is possible
-                    getEndpoint().processSocket(this, SocketEvent.OPEN_WRITE, true);
+                    if (!getEndpoint().processSocket(this, SocketEvent.OPEN_WRITE, true)) {
+                        close();
+                    }
                 }
             }
         }
