@@ -640,26 +640,20 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     public static class PollerEvent {
 
-        private NioChannel socket;
         private NioSocketWrapper socketWrapper;
         private int interestOps;
 
-        public PollerEvent(NioChannel ch, NioSocketWrapper w, int intOps) {
-            reset(ch, w, intOps);
+        public PollerEvent(NioSocketWrapper socketWrapper, int intOps) {
+            reset(socketWrapper, intOps);
         }
 
-        public void reset(NioChannel ch, NioSocketWrapper w, int intOps) {
-            socket = ch;
+        public void reset(NioSocketWrapper socketWrapper, int intOps) {
+            this.socketWrapper = socketWrapper;
             interestOps = intOps;
-            socketWrapper = w;
         }
 
         public NioSocketWrapper getSocketWrapper() {
             return socketWrapper;
-        }
-
-        public NioChannel getSocket() {
-            return socket;
         }
 
         public int getInterestOps() {
@@ -667,12 +661,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
 
         public void reset() {
-            reset(null, null, 0);
+            reset(null, 0);
         }
 
         @Override
         public String toString() {
-            return "Poller event: socket [" + socket + "], socketWrapper [" + socketWrapper +
+            return "Poller event: socket [" + socketWrapper.getSocket() + "], socketWrapper [" + socketWrapper +
                     "], interestOps [" + interestOps + "]";
         }
     }
@@ -726,24 +720,23 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
          * of time equal to pollTime (in most cases, latency will be much lower,
          * however).
          *
-         * @param socket to add to the poller
+         * @param socketWrapper to add to the poller
          * @param interestOps Operations for which to register this socket with
          *                    the Poller
          */
-        public void add(final NioChannel socket, final int interestOps) {
+        public void add(NioSocketWrapper socketWrapper, int interestOps) {
             PollerEvent r = null;
             if (eventCache != null) {
                 r = eventCache.pop();
             }
             if (r == null) {
-                r = new PollerEvent(socket,null,interestOps);
+                r = new PollerEvent(socketWrapper, interestOps);
             } else {
-                r.reset(socket,null,interestOps);
+                r.reset(socketWrapper, interestOps);
             }
             addEvent(r);
             if (close) {
-                NioEndpoint.NioSocketWrapper ka = (NioEndpoint.NioSocketWrapper)socket.getAttachment();
-                processSocket(ka, SocketEvent.STOP, false);
+                processSocket(socketWrapper, SocketEvent.STOP, false);
             }
         }
 
@@ -760,50 +753,43 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             for (int i = 0, size = events.size(); i < size && (pe = events.poll()) != null; i++ ) {
                 result = true;
                 NioSocketWrapper socketWrapper = pe.getSocketWrapper();
-                NioChannel socket = pe.getSocket();
+                SocketChannel sc = socketWrapper.getSocket().getIOChannel();
                 int interestOps = pe.getInterestOps();
-                try {
-                    if (interestOps == OP_REGISTER) {
-                        try {
-                            socket.getIOChannel().register(
-                                    socket.getPoller().getSelector(), SelectionKey.OP_READ, socketWrapper);
-                        } catch (Exception x) {
-                            log.error(sm.getString("endpoint.nio.registerFail"), x);
-                        }
+                if (interestOps == OP_REGISTER) {
+                    try {
+                        sc.register(getSelector(), SelectionKey.OP_READ, socketWrapper);
+                    } catch (Exception x) {
+                        log.error(sm.getString("endpoint.nio.registerFail"), x);
+                    }
+                } else {
+                    final SelectionKey key = sc.keyFor(getSelector());
+                    if (key == null) {
+                        // The key was cancelled (e.g. due to socket closure)
+                        // and removed from the selector while it was being
+                        // processed. Count down the connections at this point
+                        // since it won't have been counted down when the socket
+                        // closed.
+                        socketWrapper.getEndpoint().countDownConnection();
+                        ((NioSocketWrapper) socketWrapper).closed = true;
                     } else {
-                        final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-                        try {
-                            if (key == null) {
-                                // The key was cancelled (e.g. due to socket closure)
-                                // and removed from the selector while it was being
-                                // processed. Count down the connections at this point
-                                // since it won't have been counted down when the socket
-                                // closed.
-                                socket.socketWrapper.getEndpoint().countDownConnection();
-                                ((NioSocketWrapper) socket.socketWrapper).closed = true;
-                            } else {
-                                final NioSocketWrapper attachment = (NioSocketWrapper) key.attachment();
-                                if (attachment != null) {
-                                    //we are registering the key to start with, reset the fairness counter.
-                                    int ops = key.interestOps() | interestOps;
-                                    attachment.interestOps(ops);
-                                    key.interestOps(ops);
-                                } else {
-                                    socket.getPoller().cancelledKey(key);
-                                }
-                            }
-                        } catch (CancelledKeyException ckx) {
+                        final NioSocketWrapper attachment = (NioSocketWrapper) key.attachment();
+                        if (attachment != null) {
+                            // We are registering the key to start with, reset the fairness counter.
                             try {
-                                socket.getPoller().cancelledKey(key);
-                            } catch (Exception ignore) {}
+                                int ops = key.interestOps() | interestOps;
+                                attachment.interestOps(ops);
+                                key.interestOps(ops);
+                            } catch (CancelledKeyException ckx) {
+                                cancelledKey(key);
+                            }
+                        } else {
+                            cancelledKey(key);
                         }
                     }
-                    if (running && eventCache != null) {
-                        pe.reset();
-                        eventCache.push(pe);
-                    }
-                } catch ( Throwable x ) {
-                    log.error("",x);
+                }
+                if (running && eventCache != null) {
+                    pe.reset();
+                    eventCache.push(pe);
                 }
             }
 
@@ -831,9 +817,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 event = eventCache.pop();
             }
             if (event == null) {
-                event = new PollerEvent(socket, ka, OP_REGISTER);
+                event = new PollerEvent(ka, OP_REGISTER);
             } else {
-                event.reset(socket, ka, OP_REGISTER);
+                event.reset(ka, OP_REGISTER);
             }
             addEvent(event);
         }
@@ -1094,7 +1080,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         log.debug("OP_WRITE for sendfile: " + sd.fileName);
                     }
                     if (calledByProcessor) {
-                        add(socketWrapper.getSocket(), SelectionKey.OP_WRITE);
+                        add(socketWrapper, SelectionKey.OP_WRITE);
                     } else {
                         reg(sk, socketWrapper, SelectionKey.OP_WRITE);
                     }
@@ -1440,7 +1426,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("endpoint.debug.registerRead", this));
             }
-            getPoller().add(getSocket(), SelectionKey.OP_READ);
+            getPoller().add(this, SelectionKey.OP_READ);
         }
 
 
@@ -1449,7 +1435,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("endpoint.debug.registerWrite", this));
             }
-            getPoller().add(getSocket(), SelectionKey.OP_WRITE);
+            getPoller().add(this, SelectionKey.OP_WRITE);
         }
 
 
