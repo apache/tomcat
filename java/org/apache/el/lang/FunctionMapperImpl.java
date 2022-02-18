@@ -122,18 +122,27 @@ public class FunctionMapperImpl extends FunctionMapper implements
         public void writeExternal(ObjectOutput out) throws IOException {
             out.writeUTF((this.prefix != null) ? this.prefix : "");
             out.writeUTF(this.localName);
-            // make sure m isn't null
-            getMethod();
-            out.writeUTF((this.owner != null) ?
-                     this.owner :
-                     this.m.getDeclaringClass().getName());
-            out.writeUTF((this.name != null) ?
-                     this.name :
-                     this.m.getName());
-            out.writeObject((this.types != null) ?
-                     this.types :
-                     ReflectionUtil.toTypeNameArray(this.m.getParameterTypes()));
-
+            if (this.owner != null) {
+                out.writeUTF(this.owner);
+            } else {
+                // make sure m isn't null
+                getMethod();
+                out.writeUTF(this.m.getDeclaringClass().getName());
+            }
+            if (this.name != null) {
+                out.writeUTF(this.name);
+            } else {
+                // make sure m isn't null
+                getMethod();
+                out.writeUTF(this.m.getName());
+            }
+            if (this.types != null) {
+                out.writeObject(this.types);
+            } else {
+                // make sure m isn't null
+                getMethod();
+                out.writeObject(ReflectionUtil.toTypeNameArray(this.m.getParameterTypes()));
+            }
         }
 
         /*
