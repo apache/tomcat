@@ -102,8 +102,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
      */
     @Override
     public void close() throws IOException {
-        getIOChannel().socket().close();
-        getIOChannel().close();
+        sc.close();
     }
 
     /**
@@ -222,8 +221,8 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         this.poller = poller;
     }
 
-    public void setIOChannel(SocketChannel IOChannel) {
-        this.sc = IOChannel;
+    public void setIOChannel(SocketChannel sc) {
+        this.sc = sc;
     }
 
     @Override
@@ -269,5 +268,48 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     }
     protected ApplicationBufferHandler getAppReadBufHandler() {
         return appReadBufHandler;
+    }
+
+    static final NioChannel CLOSED_NIO_CHANNEL = new ClosedNioChannel();
+    public static class ClosedNioChannel extends NioChannel {
+        public ClosedNioChannel() {
+            super(null, null);
+        }
+        @Override
+        public void close() throws IOException {
+        }
+        @Override
+        public boolean isOpen() {
+            return false;
+        }
+        @Override
+        public void reset() throws IOException {
+        }
+        @Override
+        public void free() {
+        }
+        @Override
+        public int read(ByteBuffer dst) throws IOException {
+            return -1;
+        }
+        @Override
+        public long read(ByteBuffer[] dsts, int offset, int length)
+                throws IOException {
+            return -1L;
+        }
+        @Override
+        public int write(ByteBuffer src) throws IOException {
+            checkInterruptStatus();
+            return -1;
+        }
+        @Override
+        public long write(ByteBuffer[] srcs, int offset, int length)
+                throws IOException {
+            return -1L;
+        }
+        @Override
+        public String toString() {
+            return "Closed NioChannel";
+        }
     }
 }

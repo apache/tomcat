@@ -41,8 +41,10 @@ public abstract class SocketWrapperBase<E> {
 
     protected static final StringManager sm = StringManager.getManager(SocketWrapperBase.class);
 
-    private final E socket;
+    private E socket;
     private final AbstractEndpoint<E,?> endpoint;
+
+    protected final AtomicBoolean closed = new AtomicBoolean(false);
 
     // Volatile because I/O and setting the timeout values occurs on a different
     // thread to the thread checking the timeout.
@@ -117,6 +119,10 @@ public abstract class SocketWrapperBase<E> {
 
     public E getSocket() {
         return socket;
+    }
+
+    protected void reset(E closedSocket) {
+        socket = closedSocket;
     }
 
     public AbstractEndpoint<E,?> getEndpoint() {
@@ -385,8 +391,27 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    public abstract void close() throws IOException;
-    public abstract boolean isClosed();
+    /**
+     * Close the socket wrapper.
+     */
+    public void close() {
+        if (closed.compareAndSet(false, true)) {
+            doClose();
+        }
+    }
+
+    /**
+     * Perform the actual close. The closed atomic boolean guarantees this will
+     * be called only once per wrapper.
+     */
+    protected abstract void doClose();
+
+    /**
+     * @return true if the wrapper has been closed
+     */
+    public boolean isClosed() {
+        return closed.get();
+    }
 
 
     /**

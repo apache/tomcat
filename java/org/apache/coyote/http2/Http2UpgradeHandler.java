@@ -1202,8 +1202,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
         try {
             socketWrapper.close();
-        } catch (IOException ioe) {
-            log.debug(sm.getString("upgradeHandler.socketCloseFailed"), ioe);
+        } catch (Exception e) {
+            log.debug(sm.getString("upgradeHandler.socketCloseFailed"), e);
         }
     }
 
