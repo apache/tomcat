@@ -113,7 +113,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
      * Number of keep-alive sockets.
      *
@@ -141,7 +140,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         if (getExecutor() instanceof ExecutorService) {
             threadGroup = AsynchronousChannelGroup.withThreadPool((ExecutorService) getExecutor());
         }
-        // AsynchronousChannelGroup currently needs exclusive access to its executor service
+        // AsynchronousChannelGroup needs exclusive access to its executor service
         if (!internalExecutor) {
             log.warn(sm.getString("endpoint.nio2.exclusiveExecutor"));
         }
@@ -485,7 +484,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
         }
     }
-
 
     public static class Nio2SocketWrapper extends SocketWrapperBase<Nio2Channel> {
 
