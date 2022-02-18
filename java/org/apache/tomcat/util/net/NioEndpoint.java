@@ -52,9 +52,9 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.NioChannel.ClosedNioChannel;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 /**
@@ -1335,7 +1335,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         private int fillReadBuffer(boolean block, ByteBuffer to) throws IOException {
             int nRead;
             NioChannel socket = getSocket();
-            if (socket instanceof ClosedNioChannel) {
+            if (socket == NioChannel.CLOSED_NIO_CHANNEL) {
                 throw new ClosedChannelException();
             }
             if (block) {
@@ -1665,8 +1665,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         protected void doRun() {
-            NioChannel socket = socketWrapper.getSocket();
-            SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+            /*
+             * Do not cache and re-use the value of socketWrapper.getSocket() in
+             * this method. If the socket closes the value will be updated to
+             * CLOSED_NIO_CHANNEL and the previous value potentially re-used for
+             * a new connection. That can result in a stale cached value which
+             * in turn can result in unintentionally closing currently active
+             * connections.
+             */
             Poller poller = NioEndpoint.this.poller;
             if (poller == null) {
                 socketWrapper.close();
@@ -1676,27 +1682,25 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             try {
                 int handshake = -1;
                 try {
-                    if (key != null) {
-                        if (socket.isHandshakeComplete()) {
-                            // No TLS handshaking required. Let the handler
-                            // process this socket / event combination.
-                            handshake = 0;
-                        } else if (event == SocketEvent.STOP || event == SocketEvent.DISCONNECT ||
-                                event == SocketEvent.ERROR) {
-                            // Unable to complete the TLS handshake. Treat it as
-                            // if the handshake failed.
-                            handshake = -1;
-                        } else {
-                            handshake = socket.handshake(key.isReadable(), key.isWritable());
-                            // The handshake process reads/writes from/to the
-                            // socket. status may therefore be OPEN_WRITE once
-                            // the handshake completes. However, the handshake
-                            // happens when the socket is opened so the status
-                            // must always be OPEN_READ after it completes. It
-                            // is OK to always set this as it is only used if
-                            // the handshake completes.
-                            event = SocketEvent.OPEN_READ;
-                        }
+                    if (socketWrapper.getSocket().isHandshakeComplete()) {
+                        // No TLS handshaking required. Let the handler
+                        // process this socket / event combination.
+                        handshake = 0;
+                    } else if (event == SocketEvent.STOP || event == SocketEvent.DISCONNECT ||
+                            event == SocketEvent.ERROR) {
+                        // Unable to complete the TLS handshake. Treat it as
+                        // if the handshake failed.
+                        handshake = -1;
+                    } else {
+                        handshake = socketWrapper.getSocket().handshake(event == SocketEvent.OPEN_READ, event == SocketEvent.OPEN_WRITE);
+                        // The handshake process reads/writes from/to the
+                        // socket. status may therefore be OPEN_WRITE once
+                        // the handshake completes. However, the handshake
+                        // happens when the socket is opened so the status
+                        // must always be OPEN_READ after it completes. It
+                        // is OK to always set this as it is only used if
+                        // the handshake completes.
+                        event = SocketEvent.OPEN_READ;
                     }
                 } catch (IOException x) {
                     handshake = -1;
@@ -1715,23 +1719,23 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         state = getHandler().process(socketWrapper, event);
                     }
                     if (state == SocketState.CLOSED) {
-                        poller.cancelledKey(key, socketWrapper);
+                        poller.cancelledKey(getSelectionKey(), socketWrapper);
                     }
                 } else if (handshake == -1 ) {
                     getHandler().process(socketWrapper, SocketEvent.CONNECT_FAIL);
-                    poller.cancelledKey(key, socketWrapper);
-                } else if (handshake == SelectionKey.OP_READ) {
+                    poller.cancelledKey(getSelectionKey(), socketWrapper);
+                } else if (handshake == SelectionKey.OP_READ){
                     socketWrapper.registerReadInterest();
                 } else if (handshake == SelectionKey.OP_WRITE){
                     socketWrapper.registerWriteInterest();
                 }
             } catch (CancelledKeyException cx) {
-                socket.getPoller().cancelledKey(key, socketWrapper);
+                poller.cancelledKey(getSelectionKey(), socketWrapper);
             } catch (VirtualMachineError vme) {
                 ExceptionUtils.handleThrowable(vme);
             } catch (Throwable t) {
-                log.error("", t);
-                socket.getPoller().cancelledKey(key, socketWrapper);
+                log.error(sm.getString("endpoint.processing.fail"), t);
+                poller.cancelledKey(getSelectionKey(), socketWrapper);
             } finally {
                 socketWrapper = null;
                 event = null;
@@ -1740,6 +1744,20 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     processorCache.push(this);
                 }
             }
+        }
+
+        private SelectionKey getSelectionKey() {
+            // Shortcut for Java 11 onwards
+            if (JreCompat.isJre11Available()) {
+                return null;
+            }
+
+            SocketChannel socketChannel = socketWrapper.getSocket().getIOChannel();
+            if (socketChannel == null) {
+                return null;
+            }
+
+            return socketChannel.keyFor(NioEndpoint.this.poller.getSelector());
         }
     }
 

@@ -270,11 +270,7 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         return appReadBufHandler;
     }
 
-    static final NioChannel CLOSED_NIO_CHANNEL = new ClosedNioChannel();
-    public static class ClosedNioChannel extends NioChannel {
-        public ClosedNioChannel() {
-            super(SocketBufferHandler.EMPTY);
-        }
+    static final NioChannel CLOSED_NIO_CHANNEL = new NioChannel(SocketBufferHandler.EMPTY) {
         @Override
         public void close() throws IOException {
         }
@@ -314,5 +310,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         public String toString() {
             return "Closed NioChannel";
         }
-    }
+    };
+
 }

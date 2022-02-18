@@ -43,6 +43,7 @@ public class JreCompat {
     private static final JreCompat instance;
     private static StringManager sm =
             StringManager.getManager(JreCompat.class.getPackage().getName());
+    private static final boolean jre11Available;
     private static final boolean jre9Available;
     private static final boolean jre8Available;
 
@@ -62,9 +63,10 @@ public class JreCompat {
             jre8Available = true;
         } else {
             instance = new JreCompat();
-            jre9Available = false;
             jre8Available = false;
+            jre9Available = false;
         }
+        jre11Available = instance.jarFileRuntimeMajorVersion() >= 11;
     }
 
 
@@ -77,6 +79,11 @@ public class JreCompat {
 
     public static boolean isJre8Available() {
         return jre8Available;
+    }
+
+
+    public static boolean isJre11Available() {
+        return jre11Available;
     }
 
 
