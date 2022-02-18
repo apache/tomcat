@@ -113,6 +113,19 @@ public interface ProtocolHandler {
 
 
     /**
+     * Wait for the client connections to the server to close gracefully. The
+     * method will return when all of the client connections have closed or the
+     * method has been waiting for {@code waitTimeMillis}.
+     *
+     * @param waitMillis    The maximum time to wait in milliseconds for the
+     *                      client connections to close.
+     *
+     * @return The wait time, if any remaining when the method returned
+     */
+    public long awaitConnectionsClose(long waitMillis);
+
+
+    /**
      * Requires APR/native library
      *
      * @return <code>true</code> if this Protocol Handler requires the
@@ -130,10 +143,31 @@ public interface ProtocolHandler {
     public boolean isSendfileSupported();
 
 
+    /**
+     * Add a new SSL configuration for a virtual host.
+     * @param sslHostConfig the configuration
+     */
     public void addSslHostConfig(SSLHostConfig sslHostConfig);
+
+
+    /**
+     * Find all configured SSL virtual host configurations which will be used
+     * by SNI.
+     * @return the configurations
+     */
     public SSLHostConfig[] findSslHostConfigs();
 
 
+    /**
+     * Add a new protocol for used by HTTP/1.1 upgrade or ALPN.
+     * @param upgradeProtocol the protocol
+     */
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol);
+
+
+    /**
+     * Return all configured upgrade protocols.
+     * @return the protocols
+     */
     public UpgradeProtocol[] findUpgradeProtocols();
 }

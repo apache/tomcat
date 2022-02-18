@@ -134,10 +134,26 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     protected enum BindState {
-        UNBOUND,
-        BOUND_ON_INIT,
-        BOUND_ON_START,
-        SOCKET_CLOSED_ON_STOP
+        UNBOUND(false, false),
+        BOUND_ON_INIT(true, true),
+        BOUND_ON_START(true, true),
+        SOCKET_CLOSED_ON_STOP(false, true);
+
+        private final boolean bound;
+        private final boolean wasBound;
+
+        private BindState(boolean bound, boolean wasBound) {
+            this.bound = bound;
+            this.wasBound = wasBound;
+        }
+
+        public boolean isBound() {
+            return bound;
+        }
+
+        public boolean wasBound() {
+            return wasBound;
+        }
     }
 
 
@@ -610,6 +626,9 @@ public abstract class AbstractEndpoint<S,U> {
     public boolean getBindOnInit() { return bindOnInit; }
     public void setBindOnInit(boolean b) { this.bindOnInit = b; }
     private volatile BindState bindState = BindState.UNBOUND;
+    protected BindState getBindState() {
+        return bindState;
+    }
 
     /**
      * Keepalive timeout, if not set the soTimeout is used.
@@ -753,7 +772,12 @@ public abstract class AbstractEndpoint<S,U> {
      */
     private int maxKeepAliveRequests=100; // as in Apache HTTPD server
     public int getMaxKeepAliveRequests() {
-        return maxKeepAliveRequests;
+        // Disable keep-alive if the server socket is not bound
+        if (bindState.isBound()) {
+            return maxKeepAliveRequests;
+        } else {
+            return 1;
+        }
     }
     public void setMaxKeepAliveRequests(int maxKeepAliveRequests) {
         this.maxKeepAliveRequests = maxKeepAliveRequests;

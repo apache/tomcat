@@ -80,6 +80,16 @@
   common attributes listed above):</p>
 
   <attributes>
+
+    <attribute name="gracefulStopAwaitMillis" required="false">
+      <p>The time to wait, in milliseconds, when stopping the Service for the
+      client connections to finish processing and close before the Service's
+      container hierarchy is stopped. The wait only applies to Connectors
+      configured with a <code>bindOnInit</code> value of <code>false</code>.
+      Any value of zero or less means there will be no wait. If not specified,
+      the default value of zero will be used.</p>
+    </attribute>
+
   </attributes>
 
   </subsection>

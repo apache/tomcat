@@ -108,6 +108,13 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>64080</bug>: Enhance the graceful shutdown feature. Includes a new
+        option for <code>StandardService</code>,
+        <code>gracefulStopAwaitMillis</code>, that allows a time to be
+        specified to wait for client connections to complete and close before
+        the Container hierarchy is stopped. (markt/remm)
+      </add>
+      <add>
         Add <code>ha-api-*.jar</code> and <code>jaxws-rt-*.jar</code> to the
         list of JARs to skip when scanning for TLDs, web fragments and
         annotations. (michaelo)

@@ -287,6 +287,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
 
 
+    /**
+     * The time Tomcat will wait for a subsequent request before closing the
+     * connection. The default is {@link #getConnectionTimeout()}.
+     *
+     * @return The timeout in milliseconds
+     */
     public int getKeepAliveTimeout() { return endpoint.getKeepAliveTimeout(); }
     public void setKeepAliveTimeout(int keepAliveTimeout) {
         endpoint.setKeepAliveTimeout(keepAliveTimeout);
@@ -707,6 +713,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     @Override
     public void closeServerSocketGraceful() {
         endpoint.closeServerSocketGraceful();
+    }
+
+
+    @Override
+    public long awaitConnectionsClose(long waitMillis) {
+        getLog().info(sm.getString("abstractProtocol.closeConnectionsAwait",
+                Long.valueOf(waitMillis), getName()));
+        return endpoint.awaitConnectionsClose(waitMillis);
     }
 
 
