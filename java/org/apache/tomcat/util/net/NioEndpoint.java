@@ -28,6 +28,7 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.Channel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NetworkChannel;
@@ -53,6 +54,7 @@ import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.NioChannel.ClosedNioChannel;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 /**
@@ -1335,7 +1337,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         private int fillReadBuffer(boolean block, ByteBuffer to) throws IOException {
             int nRead;
-            NioChannel channel = getSocket();
+            NioChannel socket = getSocket();
+            if (socket instanceof ClosedNioChannel) {
+                throw new ClosedChannelException();
+            }
             if (block) {
                 Selector selector = null;
                 try {
@@ -1344,19 +1349,19 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     // Ignore
                 }
                 try {
-                    NioEndpoint.NioSocketWrapper att = (NioEndpoint.NioSocketWrapper) channel
+                    NioEndpoint.NioSocketWrapper att = (NioEndpoint.NioSocketWrapper) socket
                             .getAttachment();
                     if (att == null) {
                         throw new IOException("Key must be cancelled.");
                     }
-                    nRead = pool.read(to, channel, selector, att.getReadTimeout());
+                    nRead = pool.read(to, socket, selector, att.getReadTimeout());
                 } finally {
                     if (selector != null) {
                         pool.put(selector);
                     }
                 }
             } else {
-                nRead = channel.read(to);
+                nRead = socket.read(to);
                 if (nRead == -1) {
                     throw new EOFException();
                 }
