@@ -1111,7 +1111,7 @@ public class HostConfig implements LifecycleListener {
      *       to servicedSet before calling this method.
      *
      * @param cn The context name
-     * @param dir The path to the root folder of the weapp
+     * @param dir The path to the root folder of the webapp
      */
     protected void deployDirectory(ContextName cn, File dir) {
 
