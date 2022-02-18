@@ -921,14 +921,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         }
                         break;
                     }
+                    // Either we timed out or we woke up, process events first
+                    if (keyCount == 0) {
+                        hasEvents = (hasEvents | events());
+                    }
                 } catch (Throwable x) {
                     ExceptionUtils.handleThrowable(x);
                     log.error(sm.getString("endpoint.nio.selectorLoopError"), x);
                     continue;
-                }
-                // Either we timed out or we woke up, process events first
-                if (keyCount == 0) {
-                    hasEvents = (hasEvents | events());
                 }
 
                 Iterator<SelectionKey> iterator =
