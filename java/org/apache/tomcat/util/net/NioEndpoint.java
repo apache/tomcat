@@ -1141,25 +1141,38 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             processKey(key, socketWrapper);
                         } else if ((socketWrapper.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ ||
                                   (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
-                            boolean isTimedOut = false;
+                            boolean readTimeout = false;
+                            boolean writeTimeout = false;
                             // Check for read timeout
                             if ((socketWrapper.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                                 long delta = now - socketWrapper.getLastRead();
                                 long timeout = socketWrapper.getReadTimeout();
-                                isTimedOut = timeout > 0 && delta > timeout;
+                                if (timeout > 0 && delta > timeout) {
+                                    readTimeout = true;
+                                }
                             }
                             // Check for write timeout
-                            if (!isTimedOut && (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                            if (!readTimeout && (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                                 long delta = now - socketWrapper.getLastWrite();
                                 long timeout = socketWrapper.getWriteTimeout();
-                                isTimedOut = timeout > 0 && delta > timeout;
+                                if (timeout > 0 && delta > timeout) {
+                                    writeTimeout = true;
+                                }
                             }
-                            if (isTimedOut) {
+                            if (readTimeout || writeTimeout) {
                                 key.interestOps(0);
                                 // Avoid duplicate timeout calls
                                 socketWrapper.interestOps(0);
                                 socketWrapper.setError(new SocketTimeoutException());
-                                if (!processSocket(socketWrapper, SocketEvent.ERROR, true)) {
+                                if (readTimeout && socketWrapper.readOperation != null) {
+                                    if (!socketWrapper.readOperation.process()) {
+                                        cancelledKey(key);
+                                    }
+                                } else if (writeTimeout && socketWrapper.writeOperation != null) {
+                                    if (!socketWrapper.writeOperation.process()) {
+                                        cancelledKey(key);
+                                    }
+                                } else if (!processSocket(socketWrapper, SocketEvent.ERROR, true)) {
                                     cancelledKey(key);
                                 }
                             }
