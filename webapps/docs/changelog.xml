@@ -248,6 +248,10 @@
       <add>
         Improvements to French translations. (remm)
       </add>
+      <add>
+        Improvements to German translations contributed by Andreas Abraham.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
