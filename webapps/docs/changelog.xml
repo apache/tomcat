@@ -187,6 +187,10 @@
         <pr>474</pr>: Prevent a tag file from corrupting the ELContext of the
         calling page. Pull request provided by Dmitri Blinov. (markt)
       </fix>
+      <fix>
+        Minor optimisation of serialization for <code>FunctionMapperImpl</code>
+        in response to pull request <pr>476</pr>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
