@@ -241,6 +241,10 @@
         that broke the <code>DataSourceMXBean</code> by using a type that isn't
         supported by MXBeans. (markt)
       </fix>
+      <add>
+        Improvements to Chinese translations contributed by cloudgyb, totoo and
+        Chenyonghui1028. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
