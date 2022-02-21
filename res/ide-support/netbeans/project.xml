@@ -189,7 +189,7 @@
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
-                <classpath mode="compile">output/classes:output/testclasses:${base.path}/junit-4.13/junit-4.13.jar:${base.path}/easymock-4.3/easymock-4.3.jar:${base.path}/objenesis-3.2/objenesis-3.2.jar:${base.path}/cglib-3.3.0/cglib-nodep-3.3.0.jar:${base.path}/hamcrest/hamcrest-2.2.jar</classpath>
+                <classpath mode="compile">output/classes:output/testclasses:${base.path}/junit-4.13.2/junit-4.13.2.jar:${base.path}/easymock-4.3/easymock-4.3.jar:${base.path}/objenesis-3.2/objenesis-3.2.jar:${base.path}/cglib-3.3.0/cglib-nodep-3.3.0.jar:${base.path}/hamcrest/hamcrest-2.2.jar</classpath>
                 <source-level>1.7</source-level>
             </compilation-unit>
         </java-data>
