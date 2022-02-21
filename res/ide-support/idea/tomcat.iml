@@ -41,7 +41,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-            <root url="jar://$TOMCAT_BUILD_LIBS$/junit-4.13/junit-4.13.jar!/" />
+            <root url="jar://$TOMCAT_BUILD_LIBS$/junit-4.13.2/junit-4.13.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
