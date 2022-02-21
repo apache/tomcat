@@ -2533,11 +2533,11 @@ skip.installer property in build.properties" />
       description="Builds and optionally signs the Windows installer"
       depends="-installer,setup-jsign" if="${do.codesigning}" >
     <jsign file="${tomcat.release}/v${version}/bin/${final.name}.exe"
-      storepass="${codesigning.storepass}"
-      storetype="${codesigning.storetype}"
-      alias="${codesigning.alias}"
-      alg="${codesigning.digest}"
-      tsaurl="http://timestamp.digicert.com"/>
+        storepass="${codesigning.storepass}"
+        storetype="${codesigning.storetype}"
+        alias="${codesigning.alias}"
+        alg="${codesigning.digest}"
+        tsaurl="http://timestamp.digicert.com"/>
     <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
