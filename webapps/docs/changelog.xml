@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.60 (remm)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the name of the <code>value</code> attribute in the new
+        documentation of <code>OpenSSLConfCmd</code> elements. (rjung)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.59 (remm)" rtext="in progress">
   <subsection name="Catalina">

@@ -1690,7 +1690,7 @@
       <p>The name of the configuration file command.</p>
     </attribute>
 
-    <attribute name="name" required="false">
+    <attribute name="value" required="false">
       <p>The value to use for the configuration file command.</p>
     </attribute>
 
