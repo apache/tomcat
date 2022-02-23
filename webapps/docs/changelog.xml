@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Fix typo in JPMS substitution configuration for WebSocket client module.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M11 (markt)" rtext="release in progress">
   <subsection name="Catalina">

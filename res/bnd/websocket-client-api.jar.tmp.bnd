@@ -42,5 +42,5 @@ Require-Capability: \
         access=32;\
         version=${websocket.spec.version}
 -jpms-module-info-options: \
-    jakarta.websocke.clientt;\
+    jakarta.websocket.client;\
         substitute=websocket-client-api
