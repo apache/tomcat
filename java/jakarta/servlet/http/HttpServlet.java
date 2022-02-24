@@ -104,11 +104,16 @@ public abstract class HttpServlet extends GenericServlet {
     public static final String LEGACY_DO_HEAD = "jakarta.servlet.http.legacyDoHead";
 
     private final transient Object cachedAllowHeaderValueLock = new Object();
+
     /**
      * Cached value of the HTTP {@code Allow} header for this servlet.
      */
     private volatile String cachedAllowHeaderValue = null;
 
+    /**
+     * Cached value read from {@link HttpServlet#LEGACY_DO_HEAD} system
+     * property.
+     */
     private volatile boolean cachedUseLegacyDoHead;
 
     /**
