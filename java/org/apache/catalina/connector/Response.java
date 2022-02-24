@@ -1363,17 +1363,22 @@ public class Response implements HttpServletResponse {
 
         // Generate a temporary redirect to the specified location
         try {
+            Context context = getContext();
+            // If no ROOT context is defined, the context can be null.
+            // In this case, the default Tomcat values are assumed, but without
+            // reference to org.apache.catalina.STRICT_SERVLET_COMPLIANCE.
+            boolean reqHasContext = context == null;
             String locationUri;
             // Relative redirects require HTTP/1.1
             if (getRequest().getCoyoteRequest().getSupportsRelativeRedirects() &&
-                    getContext().getUseRelativeRedirects()) {
+                    (!reqHasContext || context.getUseRelativeRedirects())) {
                 locationUri = location;
             } else {
                 locationUri = toAbsolute(location);
             }
             setStatus(status);
             setHeader("Location", locationUri);
-            if (getContext().getSendRedirectBody()) {
+            if (reqHasContext && context.getSendRedirectBody()) {
                 PrintWriter writer = getWriter();
                 writer.print(sm.getString("coyoteResponse.sendRedirect.note",
                         Escape.htmlElementContent(locationUri)));
