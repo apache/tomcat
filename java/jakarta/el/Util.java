@@ -198,7 +198,7 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
-    static Method findMethod(Class<?> clazz, Object base, String methodName,
+    static Method findMethod(ELContext context, Class<?> clazz, Object base, String methodName,
             Class<?>[] paramTypes, Object[] paramValues) {
 
         if (clazz == null || methodName == null) {
@@ -215,7 +215,7 @@ class Util {
 
         List<Wrapper<Method>> wrappers = Wrapper.wrap(methods, methodName);
 
-        Wrapper<Method> result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
+        Wrapper<Method> result = findWrapper(context, clazz, wrappers, methodName, paramTypes, paramValues);
 
         return getMethod(clazz, base, result.unWrap());
     }
@@ -225,7 +225,7 @@ class Util {
      * making changes keep the code in sync.
      */
     @SuppressWarnings("null")
-    private static <T> Wrapper<T> findWrapper(Class<?> clazz, List<Wrapper<T>> wrappers,
+    private static <T> Wrapper<T> findWrapper(ELContext context, Class<?> clazz, List<Wrapper<T>> wrappers,
             String name, Class<?>[] paramTypes, Object[] paramValues) {
 
         Map<Wrapper<T>,MatchResult> candidates = new HashMap<>();
@@ -291,7 +291,7 @@ class Util {
                                 noMatch = true;
                                 break;
                             } else {
-                                if (isCoercibleFrom(paramValues[j], varType)) {
+                                if (isCoercibleFrom(context, paramValues[j], varType)) {
                                     coercibleMatch++;
                                     varArgsMatch++;
                                 } else {
@@ -314,7 +314,7 @@ class Util {
                             noMatch = true;
                             break;
                         } else {
-                            if (isCoercibleFrom(paramValues[i], mParamTypes[i])) {
+                            if (isCoercibleFrom(context, paramValues[i], mParamTypes[i])) {
                                 coercibleMatch++;
                             } else {
                                 noMatch = true;
@@ -510,11 +510,11 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
-    private static boolean isCoercibleFrom(Object src, Class<?> target) {
+    private static boolean isCoercibleFrom(ELContext context, Object src, Class<?> target) {
         // TODO: This isn't pretty but it works. Significant refactoring would
         //       be required to avoid the exception.
         try {
-            getExpressionFactory().coerceToType(src, target);
+            context.convertToType(src, target);
         } catch (ELException e) {
             return false;
         }
@@ -580,7 +580,7 @@ class Util {
     }
 
 
-    static Constructor<?> findConstructor(Class<?> clazz, Class<?>[] paramTypes,
+    static Constructor<?> findConstructor(ELContext context, Class<?> clazz, Class<?>[] paramTypes,
             Object[] paramValues) {
 
         String methodName = "<init>";
@@ -599,7 +599,7 @@ class Util {
 
         List<Wrapper<Constructor<?>>> wrappers = Wrapper.wrap(constructors);
 
-        Wrapper<Constructor<?>> wrapper = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
+        Wrapper<Constructor<?>> wrapper = findWrapper(context, clazz, wrappers, methodName, paramTypes, paramValues);
 
         Constructor<?> constructor = wrapper.unWrap();
 
@@ -622,9 +622,7 @@ class Util {
     }
 
 
-    static Object[] buildParameters(Class<?>[] parameterTypes,
-            boolean isVarArgs,Object[] params) {
-        ExpressionFactory factory = getExpressionFactory();
+    static Object[] buildParameters(ELContext context, Class<?>[] parameterTypes, boolean isVarArgs,Object[] params) {
         Object[] parameters = null;
         if (parameterTypes.length > 0) {
             parameters = new Object[parameterTypes.length];
@@ -637,22 +635,19 @@ class Util {
                 int varArgIndex = parameterTypes.length - 1;
                 // First argCount-1 parameters are standard
                 for (int i = 0; (i < varArgIndex); i++) {
-                    parameters[i] = factory.coerceToType(params[i],
-                            parameterTypes[i]);
+                    parameters[i] = context.convertToType(params[i], parameterTypes[i]);
                 }
                 // Last parameter is the varargs
                 Class<?> varArgClass = parameterTypes[varArgIndex].getComponentType();
                 final Object varargs = Array.newInstance(varArgClass, (paramCount - varArgIndex));
                 for (int i = (varArgIndex); i < paramCount; i++) {
-                    Array.set(varargs, i - varArgIndex,
-                            factory.coerceToType(params[i], varArgClass));
+                    Array.set(varargs, i - varArgIndex, context.convertToType(params[i], varArgClass));
                 }
                 parameters[varArgIndex] = varargs;
             } else {
                 parameters = new Object[parameterTypes.length];
                 for (int i = 0; i < parameterTypes.length; i++) {
-                    parameters[i] = factory.coerceToType(params[i],
-                            parameterTypes[i]);
+                    parameters[i] = context.convertToType(params[i], parameterTypes[i]);
                 }
             }
         }

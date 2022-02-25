@@ -92,11 +92,10 @@ public class StaticFieldELResolver extends ELResolver {
             String methodName = (String) method;
 
             if ("<init>".equals(methodName)) {
-                Constructor<?> match =
-                        Util.findConstructor(clazz, paramTypes, params);
+                Constructor<?> match = Util.findConstructor(context, clazz, paramTypes, params);
 
                 Object[] parameters = Util.buildParameters(
-                        match.getParameterTypes(), match.isVarArgs(), params);
+                        context, match.getParameterTypes(), match.isVarArgs(), params);
 
                 Object result = null;
 
@@ -113,7 +112,7 @@ public class StaticFieldELResolver extends ELResolver {
 
             } else {
                 // Static method so base should be null
-                Method match = Util.findMethod(clazz, null, methodName, paramTypes, params);
+                Method match = Util.findMethod(context, clazz, null, methodName, paramTypes, params);
 
                 if (match == null) {
                     throw new MethodNotFoundException(Util.message(context,
@@ -122,7 +121,7 @@ public class StaticFieldELResolver extends ELResolver {
                 }
 
                 Object[] parameters = Util.buildParameters(
-                        match.getParameterTypes(), match.isVarArgs(), params);
+                        context, match.getParameterTypes(), match.isVarArgs(), params);
 
                 Object result = null;
                 try {
