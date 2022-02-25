@@ -93,11 +93,10 @@ public class StaticFieldELResolver extends ELResolver {
             String methodName = (String) method;
 
             if ("<init>".equals(methodName)) {
-                Constructor<?> match =
-                        Util.findConstructor(clazz, paramTypes, params);
+                Constructor<?> match = Util.findConstructor(context, clazz, paramTypes, params);
 
                 Object[] parameters = Util.buildParameters(
-                        match.getParameterTypes(), match.isVarArgs(), params);
+                        context, match.getParameterTypes(), match.isVarArgs(), params);
 
                 Object result = null;
 
@@ -114,7 +113,7 @@ public class StaticFieldELResolver extends ELResolver {
 
             } else {
                 // Static method so base should be null
-                Method match = Util.findMethod(clazz, null, methodName, paramTypes, params);
+                Method match = Util.findMethod(context, clazz, null, methodName, paramTypes, params);
 
                 // Note: On Java 9 and above, the isStatic check becomes
                 // unnecessary because the canAccess() call in Util.findMethod()
@@ -126,7 +125,7 @@ public class StaticFieldELResolver extends ELResolver {
                 }
 
                 Object[] parameters = Util.buildParameters(
-                        match.getParameterTypes(), match.isVarArgs(), params);
+                        context, match.getParameterTypes(), match.isVarArgs(), params);
 
                 Object result = null;
                 try {

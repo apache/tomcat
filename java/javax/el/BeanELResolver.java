@@ -137,12 +137,10 @@ public class BeanELResolver extends ELResolver {
         String methodName = (String) factory.coerceToType(method, String.class);
 
         // Find the matching method
-        Method matchingMethod =
-                Util.findMethod(base.getClass(), base, methodName, paramTypes, params);
+        Method matchingMethod = Util.findMethod(context, base.getClass(), base, methodName, paramTypes, params);
 
         Object[] parameters = Util.buildParameters(
-                matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(),
-                params);
+                context, matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(), params);
 
         Object result = null;
         try {

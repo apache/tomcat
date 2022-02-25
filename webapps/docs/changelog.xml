@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.60 (remm)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        When resolving methods in EL expressions that use beans and/or static
+        fields, ensure that any custom type conversion is considered when
+        identifying the method to call. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
