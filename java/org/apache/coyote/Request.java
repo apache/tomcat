@@ -706,6 +706,10 @@ public final class Request {
         return threadId;
     }
 
+    public void clearRequestThread() {
+        threadId = 0;
+    }
+
     public void setRequestThread() {
         threadId = Thread.currentThread().getId();
     }
