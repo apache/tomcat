@@ -979,6 +979,34 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
     }
 
+    @Test
+    public void testDelayedNBReadWrite() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = tomcat.addContext("", null);
+        CountDownLatch latch1 = new CountDownLatch(2);
+        DelayedNBReadWriteServlet servlet = new DelayedNBReadWriteServlet(latch1);
+        String servletName = DelayedNBReadWriteServlet.class.getName();
+        Tomcat.addServlet(ctx, servletName, servlet);
+        ctx.addServletMappingDecoded("/", servletName);
+
+        tomcat.start();
+
+        CountDownLatch latch2 = new CountDownLatch(1);
+        List<Throwable> exceptions = new ArrayList<>();
+
+        Thread t = new Thread(
+            new RequestPostExecutor("http://localhost:" + getPort() + "/", latch2, exceptions));
+        t.start();
+
+        latch1.await(3000, TimeUnit.MILLISECONDS);
+        latch2.await(3000, TimeUnit.MILLISECONDS);
+
+        if (exceptions.size() > 0) {
+            Assert.fail();
+        }
+    }
+
     private static final class RequestExecutor implements Runnable {
         private final String url;
         private final CountDownLatch latch;
@@ -995,6 +1023,34 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             try {
                 ByteChunk result = new ByteChunk();
                 int rc = getUrl(url, result, null);
+                Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+                Assert.assertTrue(result.toString().contains("OK"));
+            } catch (Throwable e) {
+                e.printStackTrace();
+                exceptions.add(e);
+            } finally {
+                latch.countDown();
+            }
+        }
+
+    }
+
+    private static final class RequestPostExecutor implements Runnable {
+        private final String url;
+        private final CountDownLatch latch;
+        private final List<Throwable> exceptions;
+
+        public RequestPostExecutor(String url, CountDownLatch latch, List<Throwable> exceptions) {
+            this.url = url;
+            this.latch = latch;
+            this.exceptions = exceptions;
+        }
+
+        @Override
+        public void run() {
+            try {
+                ByteChunk result = new ByteChunk();
+                int rc = postUrl("body".getBytes("utf-8"), url, result, null);
                 Assert.assertEquals(HttpServletResponse.SC_OK, rc);
                 Assert.assertTrue(result.toString().contains("OK"));
             } catch (Throwable e) {
@@ -1037,6 +1093,105 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
 
     }
+
+    @WebServlet(asyncSupported = true)
+    private static final class DelayedNBReadWriteServlet extends TesterServlet {
+        private static final long serialVersionUID = 1L;
+        private final transient CountDownLatch latch;
+
+        public DelayedNBReadWriteServlet(CountDownLatch latch) {
+            this.latch = latch;
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+            final AsyncContext ctx = request.startAsync();
+            ctx.setTimeout(1000);
+
+            Thread readWriteListener =  new Thread(new ReadWriteListener(latch, ctx));
+            readWriteListener.start();
+        }
+    }
+
+    private static final class ReadWriteListener implements Runnable {
+        private final transient CountDownLatch latch;
+        private final transient AsyncContext ctx;
+
+        public ReadWriteListener(CountDownLatch latch, AsyncContext ctx){
+            this.latch = latch;
+            this.ctx = ctx;
+        }
+
+        @Override
+        public void run() {
+            try {
+                setListeners();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void setListeners() throws IOException {
+            final ServletInputStream is = ctx.getRequest().getInputStream();
+            final ServletOutputStream os = ctx.getResponse().getOutputStream();
+
+            is.setReadListener(new ReadListener() {
+                @Override
+                public void onDataAvailable() {
+
+                    try {
+                        byte buffer[] = new byte[1 * 4];
+                        while (is.isReady() && !is.isFinished()) {
+                            is.read(buffer);
+                        }
+                        String body = new String(buffer, StandardCharsets.UTF_8);
+                        Assert.assertTrue(body.equals("body"));
+
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onAllDataRead() {
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                }
+            });
+
+            os.setWriteListener(new WriteListener() {
+                private boolean written = false;
+
+                @Override
+                public void onWritePossible() throws IOException {
+                    ServletOutputStream out = ctx.getResponse().getOutputStream();
+                    if (out.isReady() && !written) {
+                        out.println("OK");
+                        written = true;
+                    }
+                    if (out.isReady() && written) {
+                        out.flush();
+                        if (out.isReady()) {
+                            ctx.complete();
+                            latch.countDown();
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    t.printStackTrace();
+                }
+
+            });
+        }
+
+    }
+
 
     private static final class Emitter implements Serializable {
 
@@ -1111,7 +1266,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         protected void doPost(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
-            CountDownLatch latch = new CountDownLatch(1);
+            final CountDownLatch latch = new CountDownLatch(1);
 
             // Dispatch to "/error" will end up here
             if (req.getDispatcherType().equals(DispatcherType.ASYNC)) {
@@ -1120,8 +1275,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 return;
             }
 
-            AsyncContext asyncCtx = req.startAsync();
-            ServletInputStream is = req.getInputStream();
+            final AsyncContext asyncCtx = req.startAsync();
+            final ServletInputStream is = req.getInputStream();
             is.setReadListener(new ReadListener() {
 
                 @Override
@@ -1156,7 +1311,6 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 }
                 asyncCtx.dispatch("/error");
             }).start();
-
         }
     }
 

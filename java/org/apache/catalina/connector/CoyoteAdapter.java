@@ -300,6 +300,7 @@ public class CoyoteAdapter implements Adapter {
             }
 
             req.getRequestProcessor().setWorkerThreadName(null);
+            req.clearRequestThread();
             // Recycle the wrapper request and response
             if (!success || !request.isAsync()) {
                 updateWrapperErrorCount(request, response);
@@ -432,6 +433,7 @@ public class CoyoteAdapter implements Adapter {
             }
 
             req.getRequestProcessor().setWorkerThreadName(null);
+            req.clearRequestThread();
 
             // Recycle the wrapper request and response
             if (!async) {
