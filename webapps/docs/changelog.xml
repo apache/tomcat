@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.77 (schultz)" rtext="In development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix regression introduced with <bug>65757</bug> bugfix which better
+        identified non request threads but which introduced a similar problem
+        when user code was doing sequential operations in a single thread.
+        Test case code submitted by Istvan Szekely. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
@@ -384,7 +394,7 @@
       </fix>
       <fix>
         <bug>65757</bug>: Missing initial IO listener notification on Servlet
-       container dispatch to another container thread. (remm)
+        container dispatch to another container thread. (remm)
       </fix>
       <fix>
         Expand the fix for <bug>65757</bug> so that rather than just checking if
