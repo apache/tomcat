@@ -112,6 +112,11 @@
         Apache Log4j JAR for Jakarta EE platforms. Pull request by Michael
         Seele. (markt)
       </fix>
+      <fix>
+        <bug>65921</bug>: The <code>type</code> substitution flag for the
+        rewrite valve should set the content type for the response, not the
+        request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
