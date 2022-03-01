@@ -445,7 +445,7 @@ public class RewriteValve extends ValveBase {
                 // - content type (note: this will not force the content type, use a filter
                 //   to do that)
                 if (rule.isType() && newtest != null) {
-                    request.setContentType(rule.getTypeValue());
+                    response.setContentType(rule.getTypeValue());
                 }
 
                 // Control flow processing
