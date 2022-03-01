@@ -117,6 +117,11 @@
         rewrite valve should set the content type for the response, not the
         request. (markt)
       </fix>
+      <fix>
+        <pr>479</pr>: Enable the rewrite valve to redirect requests when the
+        original request cannot be mapped to a context. This typically happens
+        when no ROOT context is defined. Pull request by elkman. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
