@@ -360,7 +360,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
 
     /**
-     * Return the Cluster with which this Container is associated.  If there is
+     * Return the Cluster with which this Container is associated. If there is
      * no associated Cluster, return the Cluster associated with our parent
      * Container (if any); otherwise return <code>null</code>.
      */
