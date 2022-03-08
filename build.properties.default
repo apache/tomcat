@@ -81,19 +81,11 @@ gpg.exec=/path/to/gpg
 # Code signing of Windows installer
 # See https://infra.apache.org/digicert-use.html for setup instructions
 do.codesigning=false
-#codesigning.alias=Tomcat-PMC-cert-2021-11
+codesigning.alias=Tomcat-PMC-cert-2021-11
 codesigning.digest=SHA-512
-#codesigning.storetype=DIGICERTONE
+codesigning.storetype=DIGICERTONE
 # Set codesigning.storepass in build.properties with the following syntax
 #codesigning.storepass=<api-key>|/path/to/Certificate_pkcs12.p12|<password>
-# Once DigiCert fix the broken REST API
-# - Uncomment alias & storetype above
-# - Remove the four lines below
-# - Remove the keystore field from build.xml
-codesigning.keystore=${user.home}/.digicertone/pkcs11properties.cfg
-codesigning.storepass=NONE
-codesigning.storetype=PKCS11
-codesigning.alias=Tomcat-PMC-key-2021-11
 
 # ----- Settings to use when downloading files -----
 trydownload.httpusecaches=true
