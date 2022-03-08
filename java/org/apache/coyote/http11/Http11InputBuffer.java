@@ -845,8 +845,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     /**
      * Parse an HTTP header.
      *
-     * @return false after reading a blank line (which indicates that the
-     * HTTP header parsing is done
+     * @return One of {@link HeaderParseStatus#NEED_MORE_DATA},
+     * {@link HeaderParseStatus#HAVE_MORE_HEADERS} or
+     * {@link HeaderParseStatus#DONE}.
      */
     private HeaderParseStatus parseHeader() throws IOException {
 
@@ -854,8 +855,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
             // Read new bytes if needed
             if (byteBuffer.position() >= byteBuffer.limit()) {
-                if (!fill(false)) {// parse header
-                    headerParsePos = HeaderParsePosition.HEADER_START;
+                if (!fill(false)) {
                     return HeaderParseStatus.NEED_MORE_DATA;
                 }
             }
