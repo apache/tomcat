@@ -127,6 +127,11 @@
         when user code was doing sequential operations in a single thread.
         Test case code submitted by Istvan Szekely. (remm)
       </fix>
+      <fix>
+        Fix potential thread-safety issue that could cause HTTP/1.1 request
+        processing to wait, and potentially timeout, waiting for additional
+        data when the full request has been received. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
