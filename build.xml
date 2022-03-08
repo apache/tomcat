@@ -2562,7 +2562,6 @@ skip.installer property in build.properties" />
       unless="skip.installer" depends="-installer-create-uninstaller,setup-jsign"
       if="${do.codesigning}">
     <jsign file="${tomcat.dist}/Uninstall.exe"
-        keystore="${codesigning.keystore}"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
         alias="${codesigning.alias}"
@@ -2591,7 +2590,6 @@ skip.installer property in build.properties" />
       description="Builds and optionally signs the Windows installer"
       depends="-installer,setup-jsign" if="${do.codesigning}" >
     <jsign file="${tomcat.release}/v${version}/bin/${final.name}.exe"
-        keystore="${codesigning.keystore}"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
         alias="${codesigning.alias}"
