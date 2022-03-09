@@ -136,6 +136,12 @@
         processing to wait, and potentially timeout, waiting for additional
         data when the full request has been received. (markt)
       </fix>
+      <fix>
+        Throw <code>IOException</code> rather than
+        <code>IllegalStateException</code> when the application attempts to
+        write to an GHTTP/2 stream after the client has closed the stream.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
