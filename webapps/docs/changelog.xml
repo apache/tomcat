@@ -122,6 +122,10 @@
         original request cannot be mapped to a context. This typically happens
         when no ROOT context is defined. Pull request by elkman. (markt)
       </fix>
+      <fix>
+        <bug>65940</bug>: Fix <code>NullPointerException</code> if an exception
+        occurs during the destruction of a Servlet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
