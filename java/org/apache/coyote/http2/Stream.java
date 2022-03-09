@@ -824,7 +824,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         @Override
         public final synchronized int doWrite(ByteBuffer chunk) throws IOException {
             if (closed) {
-                throw new IllegalStateException(
+                throw new IOException (
                         sm.getString("stream.closed", getConnectionId(), getIdAsString()));
             }
             int totalThisTime = 0;
