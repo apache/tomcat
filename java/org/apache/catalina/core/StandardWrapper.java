@@ -1337,7 +1337,6 @@ public class StandardWrapper extends ContainerBase
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
-                instance = null;
                 instancePool = null;
                 nInstances = 0;
                 fireContainerEvent("unload", this);
@@ -1366,12 +1365,13 @@ public class StandardWrapper extends ContainerBase
                         }
                     }
                 }
+                instance = null;
+                instanceInitialized = false;
             }
         }
 
         // Deregister the destroyed instance
         instance = null;
-        instanceInitialized = false;
 
         if (isJspServlet && jspMonitorON != null ) {
             Registry.getRegistry(null, null).unregisterComponent(jspMonitorON);
