@@ -144,7 +144,7 @@
       <fix>
         Throw <code>IOException</code> rather than
         <code>IllegalStateException</code> when the application attempts to
-        write to an GHTTP/2 stream after the client has closed the stream.
+        write to an HTTP/2 stream after the client has closed the stream.
         (markt)
       </fix>
     </changelog>
