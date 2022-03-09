@@ -159,7 +159,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     /**
      * The child Containers belonging to this Container, keyed by name.
      */
-    protected final HashMap<String, Container> children = new HashMap<>();
+    protected final LinkedHashMap<String, Container> children = new LinkedHashMap<>();
 
 
     /**
