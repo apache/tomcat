@@ -153,6 +153,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Correct a spelling mistake in the German translations. Thanks to Thomas
+        Hoffmann. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.76 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
