@@ -216,7 +216,7 @@
     <li>compression</li>
     <li>compressionMinSize</li>
     <li>maxCookieCount</li>
-    <li>maxHeaderSize</li>
+    <li>maxHttpHeaderSize</li>
     <li>maxParameterCount</li>
     <li>maxPostSize</li>
     <li>maxSavePostSize</li>
