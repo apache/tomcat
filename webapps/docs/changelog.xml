@@ -105,6 +105,23 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M13 (markt)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>65947</bug>: Correct the name of HTTP/1.1 configuration property
+        (<code>maxHttpHeaderSize</code>) that is inherited by the HTTP/2 upgrade
+        protocol. Thanks to Thomas Hoffmann. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Correct a spelling mistake in the German translations. Thanks to Thomas
+        Hoffmann. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M12 (markt)" rtext="release in progress">
   <subsection name="Catalina">
