@@ -111,6 +111,10 @@
         Correct a spelling mistake in the German translations. Thanks to Thomas
         Hoffmann. (markt)
       </fix>
+      <fix>
+        <bug>65951</bug>: Use the <code>tomcat.output</code> property for OSGi bundle
+        manifest paths. (isapir)
+      </fix>
     </changelog>
   </subsection>
 </section>
