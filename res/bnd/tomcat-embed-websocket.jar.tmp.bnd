@@ -25,7 +25,7 @@ Export-Package: \
 -includepackage: \
     org.apache.tomcat.websocket.pojo
 
--includeresource.meta-inf: /META-INF/=../../output/manifests/tomcat-websocket.jar/
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/tomcat-websocket.jar/
 
 Provide-Capability: \
     osgi.contract;\
