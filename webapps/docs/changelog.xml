@@ -127,7 +127,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 10.1.0-M12 (markt)" rtext="release in progress">
+<section name="Tomcat 10.1.0-M12 (markt)" rtext="2022-03-14">
   <subsection name="Catalina">
     <changelog>
       <fix>
