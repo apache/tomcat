@@ -303,7 +303,7 @@ public final class IntrospectionUtils {
     private static String replaceProperties(String value,
             Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
             ClassLoader classLoader, int iterationCount) {
-        if (value.indexOf("${") < 0) {
+        if (value == null || value.indexOf("${") < 0) {
             return value;
         }
         if (iterationCount >=20) {
