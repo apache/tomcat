@@ -1144,7 +1144,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     try {
                         byte buffer[] = new byte[1 * 4];
                         while (is.isReady() && !is.isFinished()) {
-                            is.read(buffer);
+                            @SuppressWarnings("unused")
+                            int ignore = is.read(buffer);
                         }
                         String body = new String(buffer, StandardCharsets.UTF_8);
                         Assert.assertTrue(body.equals("body"));
