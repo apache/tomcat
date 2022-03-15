@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.78 (schultz)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>65952</bug>: Align <code>--add-opens</code> configuration for jsvc
+        with the current Tomcat scripts. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
