@@ -84,16 +84,10 @@
 
   <attributes>
 
-    <attribute name="ajpFlush" required="false">
-      <p>A boolean value which can be used to enable or disable sending
-      AJP flush messages to the fronting proxy whenever an explicit
-      flush happens. The default value is <code>true</code>.<br/>
-      An AJP flush message is a SEND_BODY_CHUNK packet with no body content.
-      Proxy implementations like mod_jk or mod_proxy_ajp will flush the
-      data buffered in the web server to the client when they receive
-      such a packet. Setting this to <code>false</code> can reduce
-      AJP packet traffic but might delay sending packets to the client.
-      At the end of the response, AJP does always flush to the client.</p>
+    <attribute name="allowBackslash" required="false">
+      <p>If this is <code>true</code> the '\' character will be permitted as a
+      path delimiter.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </attribute>
 
     <attribute name="allowTrace" required="false">
@@ -105,6 +99,15 @@
       <p>The default timeout for asynchronous requests in milliseconds. If not
       specified, this attribute is set to the Servlet specification default of
       30000 (30 seconds).</p>
+    </attribute>
+
+    <attribute name="discardFacades" required="false">
+      <p>A boolean value which can be used to enable or disable the recycling
+      of the facade objects that isolate the container internal request
+      processing objects. If set to <code>true</code> the facades will be
+      set for garbage collection after every request, otherwise they will be
+      reused. This setting has no effect when the security manager is enabled.
+      If not specified, this attribute is set to <code>true</code>.</p>
     </attribute>
 
     <attribute name="enableLookups" required="false">
@@ -127,11 +130,21 @@
       If not specified the default value is <code>reject</code>.</p>
     </attribute>
 
-    <attribute name="maxHeaderCount" required="false">
-      <p>The maximum number of headers in a request that are allowed by the
-      container. A request that contains more headers than the specified limit
-      will be rejected. A value of less than 0 means no limit.
-      If not specified, a default of 100 is used.</p>
+    <attribute name="enforceEncodingInGetWriter" required="false">
+      <p>If this is <code>true</code> then
+      a call to <code>Response.getWriter()</code> if no character encoding
+      has been specified will result in subsequent calls to
+      <code>Response.getCharacterEncoding()</code> returning
+      <code>ISO-8859-1</code> and the <code>Content-Type</code> response header
+      will include a <code>charset=ISO-8859-1</code> component. (SRV.15.2.22.1)</p>
+      <p>If not specified, the default specification compliant value of
+      <code>true</code> will be used.</p>
+    </attribute>
+
+    <attribute name="maxCookieCount" required="false">
+      <p>The maximum number of cookies that are permitted for a request. A value
+      of less than zero means no limit. If not specified, a default value of 200
+      will be used.</p>
     </attribute>
 
     <attribute name="maxParameterCount" required="false">
@@ -332,6 +345,18 @@
       configured with <code>::</code>.</p>
     </attribute>
 
+    <attribute name="ajpFlush" required="false">
+      <p>A boolean value which can be used to enable or disable sending
+      AJP flush messages to the fronting proxy whenever an explicit
+      flush happens. The default value is <code>true</code>.<br/>
+      An AJP flush message is a SEND_BODY_CHUNK packet with no body content.
+      Proxy implementations like mod_jk or mod_proxy_ajp will flush the
+      data buffered in the web server to the client when they receive
+      such a packet. Setting this to <code>false</code> can reduce
+      AJP packet traffic but might delay sending packets to the client.
+      At the end of the response, AJP does always flush to the client.</p>
+    </attribute>
+
     <attribute name="allowedRequestAttributesPattern" required="false">
       <p>The AJP protocol passes some information from the reverse proxy to the
       AJP connector using request attributes. These attributes are:</p>
@@ -428,10 +453,11 @@
       maxConnections feature and connections will not be counted.</p>
     </attribute>
 
-    <attribute name="maxCookieCount" required="false">
-      <p>The maximum number of cookies that are permitted for a request. A value
-      of less than zero means no limit. If not specified, a default value of 200
-      will be used.</p>
+    <attribute name="maxHeaderCount" required="false">
+      <p>The maximum number of headers in a request that are allowed by the
+      container. A request that contains more headers than the specified limit
+      will be rejected. A value of less than 0 means no limit.
+      If not specified, a default of 100 is used.</p>
     </attribute>
 
     <attribute name="maxThreads" required="false">
