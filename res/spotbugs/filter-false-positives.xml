@@ -592,6 +592,12 @@
     <Bug pattern="DM_EXIT" />
   </Match>
   <Match>
+    <!-- Genric error handling -->
+    <Class name="org.apache.catalina.startup.Catalina" />
+    <Method name="stopServer" />
+    <Bug pattern="REC_CATCH_EXCEPTION" />
+  </Match>
+  <Match>
     <!-- Catalina isn't used when embedding -->
     <Class name="org.apache.catalina.startup.Catalina" />
     <Method name="stopServer" />
@@ -605,6 +611,12 @@
       <Method name="getWebXmlSource" />
     </Or>
     <Bug code="OBL" />
+  </Match>
+  <Match>
+    <!-- There is no null check (SpotBugs bug?) -->
+    <Class name="org.apache.catalina.startup.ContextConfig" />
+    <Method name="populateJavaClassCache" />
+    <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE" />
   </Match>
   <Match>
     <!-- Method checks result and logs error later -->
@@ -840,6 +852,12 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- There is no null check (SpotBugs bug?) -->
+    <Class name="org.apache.catalina.webresources.AbstractArchiveResource" />
+    <Method name="getContent" />
+    <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE" />
+  </Match>
+  <Match>
     <!-- Array contents is not mutated -->
     <Class name="org.apache.catalina.webresources.CachedResource"/>
     <Or>
@@ -1011,6 +1029,12 @@
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
+    <!-- There is no null check (SpotBugs bug?) -->
+    <Class name="org.apache.jasper.compiler.JDTCompiler$1" />
+    <Method name="findType" />
+    <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE" />
+  </Match>
+  <Match>
     <!-- Sync is not protecting these fields -->
     <Class name="org.apache.jasper.compiler.JspConfig"/>
     <Or>
@@ -1112,6 +1136,12 @@
     <Class name="org.apache.juli.ClassLoaderLogManager"/>
     <Method name="readConfiguration"/>
     <Bug code="OBL"/>
+  </Match>
+  <Match>
+    <!-- There is no null-check -->
+    <Class name="org.apache.juli.FileHandler$2"/>
+    <Method name="run" />
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
   </Match>
   <Match>
     <!-- If encoding is specified it will be used,
@@ -1575,6 +1605,13 @@
     <Bug code="ML" />
   </Match>
   <Match>
+    <!-- Sync is on closed to ensure that actions taken because the socket  -->
+    <!-- open remain valid until the action is completed.                   -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$AprSocketWrapper"/>
+    <Field name="closed"/>
+    <Bug pattern="JLM_JSR166_UTILCONCURRENT_MONITORENTER"/>
+  </Match>
+  <Match>
     <!-- Return value is ignored at this point but logic further up call     -->
     <!-- stack will ensure that a SocketTimeoutException is thrown           -->
     <Class name="org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper"/>
@@ -1589,6 +1626,12 @@
     </Or>
     <Method name="run"/>
     <Bug code="ML"/>
+  </Match>
+  <Match>
+    <!-- Single condition so notify() is OK -->
+    <Class name="org.apache.tomcat.util.net.NioEndpoint$Poller"/>
+    <Method name="processKey"/>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
   <Match>
     <!-- Single condition so no need for wait to be in loop -->
