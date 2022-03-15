@@ -121,6 +121,9 @@
       <update>
         Update to Checkstyle 10.0. (markt)
       </update>
+      <update>
+        Update to SpotBugs 4.6.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
