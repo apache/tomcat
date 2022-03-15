@@ -2050,7 +2050,10 @@
   <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI"/>
-    <Method name="testDelayedNBWrite"/>
+    <Or>
+      <Method name="testDelayedNBReadWrite"/>
+      <Method name="testDelayedNBWrite"/>
+    </Or>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
@@ -2253,13 +2256,17 @@
     <Bug code="DE" />
   </Match>
   <Match>
-    <!-- Non-constant is just a split constant -->
     <Class name="org.apache.catalina.users.DataSourceUserDatabaseTests"/>
     <Or>
       <Method name="testBasicUserRoleDatabase"/>
       <Method name="testUserDatabase"/>
     </Or>
-    <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
+    <Or>
+      <!-- There is no null check - SpotBugs bug? -->
+      <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+      <!-- Non-constant is just a split constant -->
+      <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
+    </Or>
   </Match>
   <Match>
     <!-- Concrete Map type not affected -->
@@ -2622,5 +2629,11 @@
       <Method name="testQuote1" />
     </Or>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
+      <!-- There is no null check - SpotBugs bug? -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsServerContainer" />
+    <Method name="testBug58232" />
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
   </Match>
 </FindBugsFilter>
