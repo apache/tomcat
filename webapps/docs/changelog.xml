@@ -124,6 +124,9 @@
         <bug>65951</bug>: Use the <code>tomcat.output</code> property for OSGi
         bundle manifest paths. (isapir)
       </fix>
+      <update>
+        Update to Commons Daemon 1.3.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
