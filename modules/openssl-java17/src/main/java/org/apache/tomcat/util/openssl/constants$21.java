@@ -64,10 +64,6 @@ class constants$21 {
         C_INT,
         C_INT
     );
-    static final MethodHandle SSL_CTX_set_tmp_dh_callback$dh$MH = RuntimeHelper.downcallHandle(
-        "(Ljdk/incubator/foreign/MemoryAddress;II)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$21.SSL_CTX_set_tmp_dh_callback$dh$FUNC, false
-    );
 }
 
 

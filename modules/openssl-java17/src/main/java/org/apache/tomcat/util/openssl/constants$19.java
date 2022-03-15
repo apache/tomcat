@@ -26,6 +26,14 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$19 {
 
+    static final FunctionDescriptor SSL_shutdown$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER
+    );
+    static final MethodHandle SSL_shutdown$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_shutdown",
+        "(Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$19.SSL_shutdown$FUNC, false
+    );
     static final FunctionDescriptor SSL_verify_client_post_handshake$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER
     );
@@ -67,14 +75,6 @@ class constants$19 {
         openssl_h.LIBRARIES, "SSL_set_connect_state",
         "(Ljdk/incubator/foreign/MemoryAddress;)V",
         constants$19.SSL_set_connect_state$FUNC, false
-    );
-    static final FunctionDescriptor SSL_set_accept_state$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER
-    );
-    static final MethodHandle SSL_set_accept_state$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_set_accept_state",
-        "(Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$19.SSL_set_accept_state$FUNC, false
     );
 }
 

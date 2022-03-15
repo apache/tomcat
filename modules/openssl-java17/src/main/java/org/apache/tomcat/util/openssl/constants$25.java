@@ -26,6 +26,15 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$25 {
 
+    static final FunctionDescriptor RAND_seed$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER,
+        C_INT
+    );
+    static final MethodHandle RAND_seed$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "RAND_seed",
+        "(Ljdk/incubator/foreign/MemoryAddress;I)V",
+        constants$25.RAND_seed$FUNC, false
+    );
     static final FunctionDescriptor RAND_load_file$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER,
         C_LONG
@@ -68,14 +77,6 @@ class constants$25 {
         openssl_h.LIBRARIES, "ENGINE_ctrl_cmd_string",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
         constants$25.ENGINE_ctrl_cmd_string$FUNC, false
-    );
-    static final FunctionDescriptor ENGINE_free$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER
-    );
-    static final MethodHandle ENGINE_free$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "ENGINE_free",
-        "(Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$25.ENGINE_free$FUNC, false
     );
 }
 

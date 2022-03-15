@@ -26,6 +26,14 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$17 {
 
+    static final FunctionDescriptor SSL_new$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_new$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_new",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$17.SSL_new$FUNC, false
+    );
     static final FunctionDescriptor SSL_free$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER
     );
@@ -72,12 +80,6 @@ class constants$17 {
         openssl_h.LIBRARIES, "SSL_get_version",
         "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$17.SSL_get_version$FUNC, false
-    );
-    static final FunctionDescriptor TLS_server_method$FUNC = FunctionDescriptor.of(C_POINTER);
-    static final MethodHandle TLS_server_method$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "TLS_server_method",
-        "()Ljdk/incubator/foreign/MemoryAddress;",
-        constants$17.TLS_server_method$FUNC, false
     );
 }
 

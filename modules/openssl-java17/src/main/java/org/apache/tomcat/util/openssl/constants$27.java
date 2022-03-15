@@ -26,6 +26,14 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$27 {
 
+    static final FunctionDescriptor OCSP_response_get1_basic$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle OCSP_response_get1_basic$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "OCSP_response_get1_basic",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$27.OCSP_response_get1_basic$FUNC, false
+    );
     static final FunctionDescriptor OCSP_resp_get0$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER,
         C_INT
@@ -72,16 +80,6 @@ class constants$27 {
         openssl_h.LIBRARIES, "OCSP_RESPONSE_free",
         "(Ljdk/incubator/foreign/MemoryAddress;)V",
         constants$27.OCSP_RESPONSE_free$FUNC, false
-    );
-    static final FunctionDescriptor d2i_OCSP_RESPONSE$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER,
-        C_POINTER,
-        C_LONG
-    );
-    static final MethodHandle d2i_OCSP_RESPONSE$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "d2i_OCSP_RESPONSE",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;J)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$27.d2i_OCSP_RESPONSE$FUNC, false
     );
 }
 

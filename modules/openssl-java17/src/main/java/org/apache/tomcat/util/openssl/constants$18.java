@@ -26,6 +26,12 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$18 {
 
+    static final FunctionDescriptor TLS_server_method$FUNC = FunctionDescriptor.of(C_POINTER);
+    static final MethodHandle TLS_server_method$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "TLS_server_method",
+        "()Ljdk/incubator/foreign/MemoryAddress;",
+        constants$18.TLS_server_method$FUNC, false
+    );
     static final FunctionDescriptor SSL_get_ciphers$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
     );
@@ -65,14 +71,6 @@ class constants$18 {
         openssl_h.LIBRARIES, "SSL_renegotiate_pending",
         "(Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$18.SSL_renegotiate_pending$FUNC, false
-    );
-    static final FunctionDescriptor SSL_shutdown$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER
-    );
-    static final MethodHandle SSL_shutdown$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_shutdown",
-        "(Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$18.SSL_shutdown$FUNC, false
     );
 }
 

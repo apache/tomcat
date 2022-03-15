@@ -26,6 +26,15 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$15 {
 
+    static final FunctionDescriptor SSL_SESSION_get_id$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_SESSION_get_id$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_SESSION_get_id",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$15.SSL_SESSION_get_id$FUNC, false
+    );
     static final FunctionDescriptor SSL_get_peer_certificate$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
     );
@@ -59,16 +68,6 @@ class constants$15 {
     static final MethodHandle SSL_CTX_set_cert_verify_callback$cb$MH = RuntimeHelper.downcallHandle(
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$15.SSL_CTX_set_cert_verify_callback$cb$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CTX_set_cert_verify_callback$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_CTX_set_cert_verify_callback$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CTX_set_cert_verify_callback",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$15.SSL_CTX_set_cert_verify_callback$FUNC, false
     );
 }
 

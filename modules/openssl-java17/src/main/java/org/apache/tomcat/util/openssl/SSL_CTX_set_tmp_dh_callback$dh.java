@@ -36,7 +36,7 @@ public interface SSL_CTX_set_tmp_dh_callback$dh {
     static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemoryAddress addr) {
         return (jdk.incubator.foreign.MemoryAddress x0, int x1, int x2) -> {
             try {
-                return (jdk.incubator.foreign.MemoryAddress)constants$21.SSL_CTX_set_tmp_dh_callback$dh$MH.invokeExact((Addressable)addr, x0, x1, x2);
+                return (jdk.incubator.foreign.MemoryAddress)constants$22.SSL_CTX_set_tmp_dh_callback$dh$MH.invokeExact((Addressable)addr, x0, x1, x2);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }

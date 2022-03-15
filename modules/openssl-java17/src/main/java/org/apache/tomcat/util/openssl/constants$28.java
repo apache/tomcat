@@ -26,6 +26,16 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$28 {
 
+    static final FunctionDescriptor d2i_OCSP_RESPONSE$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER,
+        C_POINTER,
+        C_LONG
+    );
+    static final MethodHandle d2i_OCSP_RESPONSE$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "d2i_OCSP_RESPONSE",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;J)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$28.d2i_OCSP_RESPONSE$FUNC, false
+    );
     static final FunctionDescriptor OCSP_CERTID_free$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER
     );
@@ -57,7 +67,7 @@ class constants$28 {
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$28.i2d_OCSP_REQUEST$FUNC, false
     );
-    static final MemorySegment OPENSSL_FILE$SEGMENT = CLinker.toCString("/tmp/jextract$18067138764655173084.h", ResourceScope.newImplicitScope());
+    static final MemorySegment OPENSSL_FILE$SEGMENT = CLinker.toCString("/tmp/jextract$18358922675719620067.h", ResourceScope.newImplicitScope());
 }
 
 

@@ -26,6 +26,12 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$24 {
 
+    static final FunctionDescriptor ERR_clear_error$FUNC = FunctionDescriptor.ofVoid();
+    static final MethodHandle ERR_clear_error$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "ERR_clear_error",
+        "()V",
+        constants$24.ERR_clear_error$FUNC, false
+    );
     static final FunctionDescriptor ERR_error_string$FUNC = FunctionDescriptor.of(C_POINTER,
         C_LONG,
         C_POINTER
@@ -73,15 +79,6 @@ class constants$24 {
         openssl_h.LIBRARIES, "d2i_PKCS12_bio",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$24.d2i_PKCS12_bio$FUNC, false
-    );
-    static final FunctionDescriptor RAND_seed$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER,
-        C_INT
-    );
-    static final MethodHandle RAND_seed$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "RAND_seed",
-        "(Ljdk/incubator/foreign/MemoryAddress;I)V",
-        constants$24.RAND_seed$FUNC, false
     );
 }
 

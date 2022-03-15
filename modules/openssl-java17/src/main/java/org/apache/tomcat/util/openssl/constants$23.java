@@ -26,6 +26,15 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$23 {
 
+    static final FunctionDescriptor SSL_CONF_CTX_set_ssl_ctx$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CONF_CTX_set_ssl_ctx$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CONF_CTX_set_ssl_ctx",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
+        constants$23.SSL_CONF_CTX_set_ssl_ctx$FUNC, false
+    );
     static final FunctionDescriptor SSL_CONF_cmd$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER,
         C_POINTER,
@@ -65,12 +74,6 @@ class constants$23 {
         openssl_h.LIBRARIES, "ERR_peek_last_error",
         "()J",
         constants$23.ERR_peek_last_error$FUNC, false
-    );
-    static final FunctionDescriptor ERR_clear_error$FUNC = FunctionDescriptor.ofVoid();
-    static final MethodHandle ERR_clear_error$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "ERR_clear_error",
-        "()V",
-        constants$23.ERR_clear_error$FUNC, false
     );
 }
 

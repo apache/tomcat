@@ -151,6 +151,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
+    private final int minTlsVersion;
+    private final int maxTlsVersion;
+
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private final boolean alpn;
@@ -274,9 +277,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             } else if ((protocol & SSL_PROTOCOL_SSLV3) > 0) {
                 prot = SSL3_VERSION();
             }
+            maxTlsVersion = prot;
             // # define SSL_CTX_set_max_proto_version(sslCtx, version) \
             //          SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION, version, NULL)
-            SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION(), prot, MemoryAddress.NULL);
+            SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION(), maxTlsVersion, MemoryAddress.NULL);
             if (prot == TLS1_3_VERSION() && (protocol & SSL_PROTOCOL_TLSV1_2) > 0) {
                 prot = TLS1_2_VERSION();
             }
@@ -289,9 +293,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (prot == TLS1_VERSION() && (protocol & SSL_PROTOCOL_SSLV3) > 0) {
                 prot = SSL3_VERSION();
             }
+            minTlsVersion = prot;
             //# define SSL_CTX_set_min_proto_version(sslCtx, version) \
             //         SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MIN_PROTO_VERSION, version, NULL)
-            SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MIN_PROTO_VERSION(), prot, MemoryAddress.NULL);
+            SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MIN_PROTO_VERSION(), minTlsVersion, MemoryAddress.NULL);
 
             // Disable compression, usually unsafe
             SSL_CTX_set_options(sslCtx, SSL_OP_NO_COMPRESSION());
@@ -559,8 +564,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             // List the ciphers that the client is permitted to negotiate
-            if (SSL_CTX_set_cipher_list(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), state.contextScope)) <= 0) {
-                log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
+            if (minTlsVersion <= TLS1_2_VERSION()) {
+                if (SSL_CTX_set_cipher_list(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), state.contextScope)) <= 0) {
+                    log.warn(sm.getString("engine.failedCipherList", sslHostConfig.getCiphers()));
+                }
+            }
+            if (maxTlsVersion >= TLS1_3_VERSION()) {
+                if (SSL_CTX_set_ciphersuites(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), state.contextScope)) <= 0) {
+                    log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
+                }
             }
 
             if (certificate.getCertificateFile() == null) {
@@ -635,19 +647,21 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()), state.contextScope) : null;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
                         ? CLinker.toCString(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()), state.contextScope) : null;
-                if (SSL_CTX_load_verify_locations(state.sslCtx,
-                        caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative,
+                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) 
+                        && SSL_CTX_load_verify_locations(state.sslCtx,
+                                caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative,
                                 caCertificatePathNative == null ? MemoryAddress.NULL : caCertificatePathNative) <= 0) {
                     logLastError(allocator, "openssl.errorConfiguringLocations");
                 } else {
                     var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
                     if (MemoryAddress.NULL.equals(caCerts)) {
-                        caCerts = SSL_load_client_CA_file(caCertificateFileNative);
+                        caCerts = SSL_load_client_CA_file(caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative);
                         if (!MemoryAddress.NULL.equals(caCerts)) {
                             SSL_CTX_set_client_CA_list(state.sslCtx, caCerts);
                         }
                     } else {
-                        if (SSL_add_file_cert_subjects_to_stack(caCerts, caCertificateFileNative) <= 0) {
+                        if (SSL_add_file_cert_subjects_to_stack(caCerts,
+                                caCertificateFileNative == null ? MemoryAddress.NULL : caCertificateFileNative) <= 0) {
                             caCerts = MemoryAddress.NULL;
                         }
                     }

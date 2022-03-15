@@ -26,6 +26,15 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$14 {
 
+    static final FunctionDescriptor SSL_CTX_set_ciphersuites$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle SSL_CTX_set_ciphersuites$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_set_ciphersuites",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$14.SSL_CTX_set_ciphersuites$FUNC, false
+    );
     static final FunctionDescriptor SSL_set_verify$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER,
         C_INT,
@@ -69,15 +78,6 @@ class constants$14 {
         openssl_h.LIBRARIES, "SSL_SESSION_get_time",
         "(Ljdk/incubator/foreign/MemoryAddress;)J",
         constants$14.SSL_SESSION_get_time$FUNC, false
-    );
-    static final FunctionDescriptor SSL_SESSION_get_id$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_SESSION_get_id$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_SESSION_get_id",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$14.SSL_SESSION_get_id$FUNC, false
     );
 }
 
