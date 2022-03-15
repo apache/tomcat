@@ -120,6 +120,11 @@
         <bug>65952</bug>: Align <code>--add-opens</code> configuration for jsvc
         with the current Tomcat scripts. (markt)
       </fix>
+      <fix>
+        Correct the AJP and HTTP/1.1 Connector configuration pages in the
+        documentation web application to show which attributes are applicable to
+        all Connectors and which are implementation specific. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -88,31 +88,6 @@
       30000 (30 seconds).</p>
     </attribute>
 
-    <attribute name="continueResponseTiming" required="false">
-      <p>When to respond with a <code>100</code> intermediate response code to a
-      request containing an <code>Expect: 100-continue</code> header.
-      The following values may used:
-      <ul>
-      <li><code>immediately</code> - an intermediate 100 status response
-      will be returned as soon as practical</li>
-      <li><code>onRead</code> - an intermediate 100 status
-      response will be returned only when the Servlet reads the request body,
-      allowing the servlet to inspect the headers and possibly respond
-      before the user agent sends a possibly large request body.</li>
-      </ul>
-      </p>
-    </attribute>
-
-    <attribute name="defaultSSLHostConfigName" required="false">
-      <p>The name of the default <strong>SSLHostConfig</strong> that will be
-      used for secure connections (if this connector is configured for secure
-      connections) if the client connection does not provide SNI or if the SNI
-      is provided but does not match any configured
-      <strong>SSLHostConfig</strong>. If not specified the default value of
-      <code>_default_</code> will be used. Provided values are always converted
-      to lower case.</p>
-    </attribute>
-
     <attribute name="discardFacades" required="false">
       <p>A boolean value which can be used to enable or disable the recycling
       of the facade objects that isolate the container internal request
@@ -148,11 +123,10 @@
       set.</p>
     </attribute>
 
-    <attribute name="maxHeaderCount" required="false">
-      <p>The maximum number of headers in a request that are allowed by the
-      container. A request that contains more headers than the specified limit
-      will be rejected. A value of less than 0 means no limit.
-      If not specified, a default of 100 is used.</p>
+    <attribute name="maxCookieCount" required="false">
+      <p>The maximum number of cookies that are permitted for a request. A value
+      of less than zero means no limit. If not specified, a default value of 200
+      will be used.</p>
     </attribute>
 
     <attribute name="maxParameterCount" required="false">
@@ -281,14 +255,6 @@
       SSL Connector or a non SSL connector that is receiving data from a
       SSL accelerator, like a crypto card, an SSL appliance or even a webserver.
       The default value is <code>false</code>.</p>
-    </attribute>
-
-    <attribute name="sendReasonPhrase" required="false">
-      <p>Set this attribute to <code>true</code> if you wish to have
-      a reason phrase in the response.
-      The default value is <code>false</code>.</p>
-      <p><strong>Note:</strong> This option is deprecated and will be removed
-      in Tomcat 9. The reason phrase will not be sent.</p>
     </attribute>
 
     <attribute name="URIEncoding" required="false">
@@ -467,6 +433,31 @@
       </p>
     </attribute>
 
+    <attribute name="continueResponseTiming" required="false">
+      <p>When to respond with a <code>100</code> intermediate response code to a
+      request containing an <code>Expect: 100-continue</code> header.
+      The following values may used:
+      <ul>
+      <li><code>immediately</code> - an intermediate 100 status response
+      will be returned as soon as practical</li>
+      <li><code>onRead</code> - an intermediate 100 status
+      response will be returned only when the Servlet reads the request body,
+      allowing the servlet to inspect the headers and possibly respond
+      before the user agent sends a possibly large request body.</li>
+      </ul>
+      </p>
+    </attribute>
+
+    <attribute name="defaultSSLHostConfigName" required="false">
+      <p>The name of the default <strong>SSLHostConfig</strong> that will be
+      used for secure connections (if this connector is configured for secure
+      connections) if the client connection does not provide SNI or if the SNI
+      is provided but does not match any configured
+      <strong>SSLHostConfig</strong>. If not specified the default value of
+      <code>_default_</code> will be used. Provided values are always converted
+      to lower case.</p>
+    </attribute>
+
     <attribute name="disableUploadTimeout" required="false">
       <p>This flag allows the servlet container to use a different, usually
       longer connection timeout during data upload. If not specified, this
@@ -513,16 +504,17 @@
       maxConnections feature and connections will not be counted.</p>
     </attribute>
 
-    <attribute name="maxCookieCount" required="false">
-      <p>The maximum number of cookies that are permitted for a request. A value
-      of less than zero means no limit. If not specified, a default value of 200
-      will be used.</p>
-    </attribute>
-
     <attribute name="maxExtensionSize" required="false">
       <p>Limits the total length of chunk extensions in chunked HTTP requests.
       If the value is <code>-1</code>, no limit will be imposed. If not
       specified, the default value of <code>8192</code> will be used.</p>
+    </attribute>
+
+    <attribute name="maxHeaderCount" required="false">
+      <p>The maximum number of headers in a request that are allowed by the
+      container. A request that contains more headers than the specified limit
+      will be rejected. A value of less than 0 means no limit.
+      If not specified, a default of 100 is used.</p>
     </attribute>
 
     <attribute name="maxHttpHeaderSize" required="false">
@@ -652,6 +644,14 @@
       HTTP/1.1 or HTTP/1.0 keep alive should not be used, even if the clients
       advertise support for these features.
       The default value is an empty String (regexp matching disabled).</p>
+    </attribute>
+
+    <attribute name="sendReasonPhrase" required="false">
+      <p>Set this attribute to <code>true</code> if you wish to have
+      a reason phrase in the response.
+      The default value is <code>false</code>.</p>
+      <p><strong>Note:</strong> This option is deprecated and will be removed
+      in Tomcat 9. The reason phrase will not be sent.</p>
     </attribute>
 
     <attribute name="server" required="false">
