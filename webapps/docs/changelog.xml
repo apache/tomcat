@@ -124,6 +124,10 @@
       <update>
         Update to SpotBugs 4.6.0. (markt)
       </update>
+      <add>
+        Expand the <code>spotbugs</code> Ant task to also cover test code.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
