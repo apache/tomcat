@@ -112,6 +112,10 @@
         (<code>maxHttpHeaderSize</code>) that is inherited by the HTTP/2 upgrade
         protocol. Thanks to Thomas Hoffmann. (markt)
       </fix>
+      <fix>
+        <bug>65952</bug>: Align <code>--add-opens</code> configuration for jsvc
+        with the current Tomcat scripts. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

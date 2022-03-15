@@ -153,6 +153,8 @@ cd $CATALINA_HOME
     -errfile $CATALINA_BASE/logs/catalina.err \
     --add-opens=java.base/java.lang=ALL-UNNAMED \
     --add-opens=java.base/java.io=ALL-UNNAMED \
+    --add-opens=java.base/java.util=ALL-UNNAMED \
+    --add-opens=java.base/java.util.concurrent=ALL-UNNAMED \
     --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
     -Dcatalina.home=$CATALINA_HOME \
     -Dcatalina.base=$CATALINA_BASE \
