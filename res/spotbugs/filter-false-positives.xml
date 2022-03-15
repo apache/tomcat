@@ -579,6 +579,12 @@
     <Bug code="OBL" />
   </Match>
   <Match>
+    <!-- There is no null check (SpotBugs bug?) -->
+    <Class name="org.apache.catalina.startup.ContextConfig" />
+    <Method name="populateJavaClassCache" />
+    <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE" />
+  </Match>
+  <Match>
     <!-- Method checks result and logs error later -->
     <Class name="org.apache.catalina.startup.ExpandWar" />
     <Method name="deleteDir" />
@@ -855,6 +861,12 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- There is no null check (SpotBugs bug?) -->
+    <Class name="org.apache.catalina.webresources.AbstractArchiveResource" />
+    <Method name="getContent" />
+    <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE" />
+  </Match>
+  <Match>
     <!-- Array contents is not mutated -->
     <Class name="org.apache.catalina.webresources.CachedResource"/>
     <Or>
@@ -1039,6 +1051,12 @@
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
+    <!-- There is no null check (SpotBugs bug?) -->
+    <Class name="org.apache.jasper.compiler.JDTCompiler$1" />
+    <Method name="findType" />
+    <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE" />
+  </Match>
+  <Match>
     <!-- Sync is not protecting these fields -->
     <Class name="org.apache.jasper.compiler.JspConfig"/>
     <Or>
@@ -1128,6 +1146,12 @@
     <Class name="org.apache.juli.ClassLoaderLogManager"/>
     <Method name="readConfiguration"/>
     <Bug code="OBL"/>
+  </Match>
+  <Match>
+    <!-- There is no null-check -->
+    <Class name="org.apache.juli.FileHandler"/>
+    <Method name="lambda$clean$0" />
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
   </Match>
   <Match>
     <!-- If encoding is specified it will be used,
