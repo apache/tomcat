@@ -127,6 +127,9 @@
       <update>
         Update to Commons Daemon 1.3.0. (markt)
       </update>
+      <update>
+        Update to Checkstyle 10.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
