@@ -42,6 +42,12 @@
     <Bug code="NP" />
   </Match>
   <Match>
+    <!-- Class lock is not an instance lock -->
+    <Class name="jakarta.security.auth.message.config.AuthConfigFactory"/>
+    <Field name="factory"/>
+    <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA"/>
+  </Match>
+  <Match>
     <!-- Null is not possible here -->
     <Class name="jakarta.servlet.http.HttpServlet$NoBodyPrintWriter"/>
     <Method name="resetBuffer"/>
@@ -426,6 +432,12 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC " />
   </Match>
   <Match>
+    <!-- Class lock is not an instance lock -->
+    <Class name="org.apache.catalina.realm.MemoryRealm" />
+    <Field name="digester"/>
+    <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA"/>
+  </Match>
+  <Match>
     <!-- request.getRequestPathMB(), request.getQueryString() can be null because
     o.a.t.util.buf.MessageBytes.toString() can return NULL -->
     <Class name="org.apache.catalina.realm.RealmBase"/>
@@ -641,6 +653,12 @@
     <Bug pattern="WA_NOT_IN_LOOP"/>
   </Match>
   <Match>
+    <!-- Class lock is not an instance lock -->
+    <Class name="org.apache.catalina.tribes.io.BufferPool" />
+    <Field name="instance"/>
+    <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.membership.McastServiceImpl"/>
     <Method name="stop"/>
     <Bug code="DE"/>
@@ -844,6 +862,12 @@
       <Field name="cachedContent"/>
     </Or>
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Class lock is not an instance lock -->
+    <Class name="org.apache.catalina.webresources.TomcatURLStreamHandlerFactory"/>
+    <Field name="instance"/>
+    <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA"/>
   </Match>
   <Match>
     <!-- Switch fall-though is deliberate -->
@@ -1149,6 +1173,12 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Class lock is not an instance lock -->
+    <Class name="org.apache.naming.java.javaURLContextFactory" />
+    <Field name="initialContext"/>
+    <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA"/>
+  </Match>
+  <Match>
     <!-- Utility classes used to import/export l10n strings -->
     <!-- This code does not need to be robust -->
     <Or>
@@ -1234,6 +1264,15 @@
     <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
     <Method name="allocate" />
     <Bug pattern="VO_VOLATILE_INCREMENT" />
+  </Match>
+  <Match>
+    <!-- Class lock is not an instance lock -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.EvictionTimer$Reaper" />
+    <Or>
+      <Field name="executor"/>
+      <Field name="taskMap"/>
+    </Or>
+    <Bug pattern="SSD_DO_NOT_USE_INSTANCE_LOCK_ON_SHARED_STATIC_DATA"/>
   </Match>
   <Match>
     <!-- Fields do not need to be sync'd for toString() -->
