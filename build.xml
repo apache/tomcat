@@ -2033,7 +2033,7 @@
 
   <target name="spotbugs"
           if="${execute.spotbugs}"
-          depends="compile,download-spotbugs">
+          depends="test-compile,download-spotbugs">
 
     <path id="spotbugs.classpath">
       <fileset file="${spotbugs.jar}" />
