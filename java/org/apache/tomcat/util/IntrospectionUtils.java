@@ -312,7 +312,7 @@ public final class IntrospectionUtils {
             Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
             ClassLoader classLoader) {
 
-        if (value.indexOf('$') < 0) {
+        if (value == null || value.indexOf('$') < 0) {
             return value;
         }
         StringBuilder sb = new StringBuilder();
