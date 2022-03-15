@@ -25,8 +25,8 @@ Implementation-Vendor: Apache Software Foundation
 X-Compile-Source-JDK: ${compile.release}
 X-Compile-Target-JDK: ${compile.release}
 
--includeresource.notice: META-INF/NOTICE=../../output/manifests/default.notice
--includeresource.license: META-INF/LICENSE=../../output/manifests/default.license
+-includeresource.notice: META-INF/NOTICE=${tomcat.output}/manifests/default.notice
+-includeresource.license: META-INF/LICENSE=${tomcat.output}/manifests/default.license
 
 -noclassforname: true
 
