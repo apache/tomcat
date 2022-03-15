@@ -27,13 +27,15 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.transport.nio.NioReceiver;
 
 public class SocketNioReceive {
-    static int count = 0;
-    static int accept = 0;
-    static long start = 0;
-    static double mb = 0;
-    static int len = 0;
-    static DecimalFormat df = new DecimalFormat("##.00");
-    static double seconds = 0;
+    private static int count = 0;
+    private static final Object countLock = new Object();
+    private static int accept = 0;
+    private static final Object acceptLock = new Object();
+    private static long start = 0;
+    private static double mb = 0;
+    private static int len = 0;
+    private static DecimalFormat df = new DecimalFormat("##.00");
+    private static double seconds = 0;
 
     protected static final Object mutex = new Object();
     public static void main(String[] args) throws Exception {
@@ -74,7 +76,9 @@ public class SocketNioReceive {
                 start = System.currentTimeMillis();
             }
             mb += ( (double) len) / 1024 / 1024;
-            synchronized (this) {count++;}
+            synchronized (countLock) {
+                count++;
+            }
             if ( ( (count) % 10000) == 0) {
                 long time = System.currentTimeMillis();
                 seconds = ( (double) (time - start)) / 1000;
@@ -84,7 +88,9 @@ public class SocketNioReceive {
 
         @Override
         public boolean accept(ChannelMessage msg) {
-            synchronized (this) {accept++;}
+            synchronized (acceptLock) {
+                accept++;
+            }
             return true;
         }
 
