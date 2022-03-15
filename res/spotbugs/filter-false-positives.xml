@@ -2000,7 +2000,10 @@
   <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI"/>
-    <Method name="testDelayedNBWrite"/>
+    <Or>
+      <Method name="testDelayedNBReadWrite"/>
+      <Method name="testDelayedNBWrite"/>
+    </Or>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
@@ -2551,5 +2554,11 @@
       <Method name="testQuote1" />
     </Or>
     <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
+      <!-- There is no null check - SpotBugs bug? -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsServerContainer" />
+    <Method name="testBug58232" />
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
   </Match>
 </FindBugsFilter>
