@@ -297,12 +297,12 @@ spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/
 
 # ----- bnd, version 6.0.0 or later  -----
 # ----- provides OSGI metadata for JARs       -----
-bnd.version=6.1.0
+bnd.version=6.2.0
 
-# checksums for biz.aQute.bnd-6.1.0.jar
+# checksums for biz.aQute.bnd-6.2.0.jar
 bnd.checksum.enabled=true
 bnd.checksum.algorithm=MD5|SHA-1
-bnd.checksum.value=3f4bcd3e67f31a563d49370364b62915|d54eba8fb11eb43bb40eac7e3cb92e906b9fa567
+bnd.checksum.value=4ebce64639ebe72f5b665faebd8dea30|28eaa28c9b5382687e0b83cc69aa540de1f6f56e
 
 bnd.home=${base.path}/bnd-${bnd.version}
 bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
