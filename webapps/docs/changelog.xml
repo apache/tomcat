@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M13 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Update the JASPIC 2.0 API to Jakarta Authentication 3.0 (JASPIC was
+        renamed for Jakarta EE 10) including the implementation of the new
+        methods on <code>AuthConfigFactory</code>. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

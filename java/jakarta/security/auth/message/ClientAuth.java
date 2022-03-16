@@ -22,9 +22,13 @@ public interface ClientAuth {
 
     AuthStatus secureRequest(MessageInfo messageInfo, Subject clientSubject) throws AuthException;
 
-    AuthStatus validateResponse(MessageInfo messageInfo, Subject clientSubject,
-            Subject serviceSubject) throws AuthException;
+    default AuthStatus validateResponse(MessageInfo messageInfo, Subject clientSubject,
+            Subject serviceSubject) throws AuthException {
+        return AuthStatus.SUCCESS;
+    }
 
-    void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException;
+    default void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
+        // NO-OP
+    }
 }
 

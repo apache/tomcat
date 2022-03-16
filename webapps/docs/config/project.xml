@@ -90,7 +90,8 @@
 
     <menu name="Other">
         <item name="System properties"     href="systemprops.html"/>
-        <item name="JASPIC"                href="jaspic.html"/>
+        <item name="Jakarta Authentication"
+              href="jaspic.html"/>
     </menu>
   </body>
 

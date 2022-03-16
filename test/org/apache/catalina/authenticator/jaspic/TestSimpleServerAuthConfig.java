@@ -32,7 +32,7 @@ public class TestSimpleServerAuthConfig {
     private static final String SERVER_AUTH_MODULE_KEY_PREFIX =
             "org.apache.catalina.authenticator.jaspic.ServerAuthModule.";
 
-    private static final Map<String,String> CONFIG_PROPERTIES;
+    private static final Map<String,Object> CONFIG_PROPERTIES;
     static {
         CONFIG_PROPERTIES = new HashMap<>();
         CONFIG_PROPERTIES.put(SERVER_AUTH_MODULE_KEY_PREFIX + "1",

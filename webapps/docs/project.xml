@@ -88,7 +88,8 @@
         <item name="EL 5.0 Javadocs"       href="elapi/index.html"/>
         <item name="WebSocket 2.1 Javadocs"
               href="websocketapi/index.html"/>
-        <item name="JASPIC 2.0 Javadocs"   href="jaspicapi/index.html"/>
+        <item name="Authentication 3.0 Javadocs"
+              href="jaspicapi/index.html"/>
         <item name="Annotations 2.0 Javadocs"
               href="annotationapi/index.html"/>
         <item name="JK 1.2 Documentation"

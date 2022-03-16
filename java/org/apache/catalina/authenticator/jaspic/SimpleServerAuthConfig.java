@@ -48,12 +48,12 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     private final String layer;
     private final String appContext;
     private final CallbackHandler handler;
-    private final Map<String,String> properties;
+    private final Map<String,Object> properties;
 
     private volatile ServerAuthContext serverAuthContext;
 
     public SimpleServerAuthConfig(String layer, String appContext, CallbackHandler handler,
-            Map<String,String> properties) {
+            Map<String,Object> properties) {
         this.layer = layer;
         this.appContext = appContext;
         this.handler = handler;
@@ -91,15 +91,14 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     }
 
 
-    @SuppressWarnings({"rawtypes", "unchecked"}) // JASPIC API uses raw types
     @Override
     public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject,
-            Map properties) throws AuthException {
+            Map<String,Object> properties) throws AuthException {
         ServerAuthContext serverAuthContext = this.serverAuthContext;
         if (serverAuthContext == null) {
             synchronized (this) {
                 if (this.serverAuthContext == null) {
-                    Map<String,String> mergedProperties = new HashMap<>();
+                    Map<String,Object> mergedProperties = new HashMap<>();
                     if (this.properties != null) {
                         mergedProperties.putAll(this.properties);
                     }
@@ -110,10 +109,10 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                     List<ServerAuthModule> modules = new ArrayList<>();
                     int moduleIndex = 1;
                     String key = SERVER_AUTH_MODULE_KEY_PREFIX + moduleIndex;
-                    String moduleClassName = mergedProperties.get(key);
-                    while (moduleClassName != null) {
+                    Object moduleClassName = mergedProperties.get(key);
+                    while (moduleClassName instanceof String) {
                         try {
-                            Class<?> clazz = Class.forName(moduleClassName);
+                            Class<?> clazz = Class.forName((String) moduleClassName);
                             ServerAuthModule module =
                                     (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
