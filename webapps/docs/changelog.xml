@@ -141,6 +141,9 @@
         Expand the <code>spotbugs</code> Ant task to also cover test code.
         (markt)
       </add>
+      <update>
+        Update to bnd 6.2.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
