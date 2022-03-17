@@ -215,7 +215,6 @@
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${bnd.jar}"/>
-    <pathelement location="${osgi-annotations.jar}"/>
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${jaxrpc-lib.jar}"/>
     <pathelement location="${wsdl4j-lib.jar}"/>
@@ -2328,7 +2327,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <classpath>
         <path refid="compile.classpath"/>
         <path location="${ant.core.lib}"/>
-        <path location="${osgi-annotations.jar}"/>
       </classpath>
       <link href="../annotationapi"/>
       <link href="../servletapi"/>
@@ -3723,15 +3721,6 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <param name="checksum.enabled" value="${bnd.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${bnd.checksum.algorithm}"/>
       <param name="checksum.value" value="${bnd.checksum.value}"/>
-    </antcall>
-    <!-- Download OSGi annotations -->
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${osgi-annotations.loc}"/>
-      <param name="destfile" value="${osgi-annotations.jar}"/>
-      <param name="destdir" value="${osgi-annotations.home}"/>
-      <param name="checksum.enabled" value="${osgi-annotations.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${osgi-annotations.checksum.algorithm}"/>
-      <param name="checksum.value" value="${osgi-annotations.checksum.value}"/>
     </antcall>
   </target>
 
