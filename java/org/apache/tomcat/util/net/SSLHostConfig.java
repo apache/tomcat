@@ -54,6 +54,7 @@ public class SSLHostConfig implements Serializable {
     // keys in Maps.
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
     protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
+    public static final String DEFAULT_TLS_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
 
     static {
         /* Default used if protocols are not configured, also used if
@@ -95,7 +96,7 @@ public class SSLHostConfig implements Serializable {
     private int certificateVerificationDepth = 10;
     // Used to track if certificateVerificationDepth has been explicitly set
     private boolean certificateVerificationDepthConfigured = false;
-    private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
+    private String ciphers = DEFAULT_TLS_CIPHERS;
     private LinkedHashSet<Cipher> cipherList = null;
     private List<String> jsseCipherNames = null;
     private boolean honorCipherOrder = false;
