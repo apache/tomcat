@@ -112,6 +112,10 @@
         specific error codes and/or exception types with the
         <code>ErrorReportValve</code>. (markt)
       </add>
+      <scode>
+        Harden the CredentialHandler implementations by switching to a
+        constant-time implementation for credential comparisons. (schultz/markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Web applications">

@@ -100,7 +100,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
 
         if (getAlgorithm() == null) {
             // No digests, compare directly
-            return storedCredentials.equals(inputCredentials);
+            return DigestCredentialHandlerBase.equals(inputCredentials, storedCredentials, false);
         } else {
             // Some directories and databases prefix the password with the hash
             // type. The string is in a format compatible with Base64.encode not
@@ -112,7 +112,8 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
                 byte[] userDigest = ConcurrentMessageDigest.digest(
                         getAlgorithm(), inputCredentials.getBytes(StandardCharsets.ISO_8859_1));
                 String base64UserDigest = Base64.encodeBase64String(userDigest);
-                return base64UserDigest.equals(base64ServerDigest);
+
+                return DigestCredentialHandlerBase.equals(base64UserDigest, base64ServerDigest, false);
             } else if (storedCredentials.startsWith("{SSHA}")) {
                 // "{SSHA}<sha-1 digest:20><salt:n>"
                 // Need to convert the salt to bytes to apply it to the user's
