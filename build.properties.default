@@ -308,16 +308,6 @@ bnd.home=${base.path}/bnd-${bnd.version}
 bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
 bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
 
-# ----- OSGi annotations bundle, version 1.0.0 or later            -----
-# ----- required to avoid Javadoc error when using bnd annotations -----
-osgi-annotations.version=1.1.1
-osgi-annotations.checksum.enabled=true
-osgi-annotations.checksum.algorithm=MD5|SHA-1
-osgi-annotations.checksum.value=04e5db48a469cb53dd0e4e954deab2e0|a1644f3dbbb614f2a44671d27dd13c4d9142007d
-osgi-annotations.home=${base.path}/osgi-annotations-${osgi-annotations.version}
-osgi-annotations.jar=${osgi-annotations.home}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar
-osgi-annotations.loc=${base-maven.loc}/org/osgi/org.osgi.annotation.bundle/${osgi-annotations.version}/org.osgi.annotation.bundle-${osgi-annotations.version}.jar
-
 # ----- Tomcat Migration Tool for Jakarta EE -----
 migration-lib.version=1.0.0
 
