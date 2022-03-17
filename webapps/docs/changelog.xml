@@ -131,6 +131,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Use a constant for the default TLS cipher suite. This will allow
+        skipping setting it in some cases (for example, it does not make
+        sense for OpenSSL TLS 1.3). (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
