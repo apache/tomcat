@@ -112,6 +112,10 @@
         renamed for Jakarta EE 10) including the implementation of the new
         methods on <code>AuthConfigFactory</code>. (markt)
       </scode>
+      <scode>
+        Harden the CredentialHandler implementations by switching to a
+        constant-time implementation for credential comparisons. (schultz/markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Web applications">
