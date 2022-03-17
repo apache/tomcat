@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.61 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Harden the CredentialHandler implementations by switching to a
+        constant-time implementation for credential comparisons. (schultz/markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
