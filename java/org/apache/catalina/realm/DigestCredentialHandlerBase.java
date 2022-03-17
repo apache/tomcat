@@ -297,8 +297,8 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
     /**
      * Implements String equality which always compares all characters in the
      * string, without stopping early if any characters do not match.
-     *
-     * @implNote
+     * <p>
+     * <i>Note:</i>
      * This implementation was adapted from {@link MessageDigest#isEqual}
      * which we assume is as optimizer-defeating as possible.
      *
@@ -347,8 +347,8 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
     /**
      * Implements byte-array equality which always compares all bytes in the
      * array, without stopping early if any bytes do not match.
-     *
-     * @implNote
+     * <p>
+     * <i>Note:</i>
      * Implementation note: this method delegates to {@link MessageDigest#isEqual}
      * under the assumption that it provides a constant-time comparison of the
      * bytes in the arrays. Java 7+ has such an implementation, but neither the
