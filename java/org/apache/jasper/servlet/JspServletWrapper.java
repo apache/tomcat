@@ -215,6 +215,10 @@ public class JspServletWrapper {
         return ctxt.getServletContext();
     }
 
+    public JasperException getCompileException() {
+        return compileException;
+    }
+
     /**
      * Sets the compilation exception for this JspServletWrapper.
      *

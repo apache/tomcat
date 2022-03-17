@@ -448,7 +448,7 @@ public abstract class Compiler {
 
             if (jsw.getLastModificationTest()
                     + (ctxt.getOptions().getModificationTestInterval() * 1000) > System
-                    .currentTimeMillis()) {
+                    .currentTimeMillis() && jsw.getCompileException() == null) {
                 return false;
             }
             jsw.setLastModificationTest(System.currentTimeMillis());
