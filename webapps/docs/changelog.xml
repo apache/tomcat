@@ -162,6 +162,9 @@
         Remove OSGi annotations dependency as it is no longer required with bnd
         6.2.0. (markt)
       </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.23. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
