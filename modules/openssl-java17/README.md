@@ -9,6 +9,7 @@ at `https://openjdk.java.net/jeps/412`.
 
 The module can be built using Java 17. This will be the only Java version that
 is supported as the JEP 412 API is incubating and will continue to evolve.
+It can be built and run with Apache Tomcat 9.0 or newer.
 
 ## Running
 
