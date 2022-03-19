@@ -1659,7 +1659,7 @@
       </fix>
       <scode>
         Remove the deprecated method
-        <code>MethodExpression.getParmetersProvided()</code> from the EL API to
+        <code>MethodExpression.isParmetersProvided()</code> from the EL API to
         align with the current EL 5.0 development branch. (markt)
       </scode>
       <fix>
