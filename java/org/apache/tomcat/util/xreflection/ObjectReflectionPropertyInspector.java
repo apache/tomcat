@@ -53,7 +53,7 @@ public final class ObjectReflectionPropertyInspector {
         Set<SetPropertyClass> baseClasses = getKnownClasses()
             .stream()
             .map(ObjectReflectionPropertyInspector::processClass)
-            .collect(Collectors.toSet());
+            .collect(Collectors.toCollection(LinkedHashSet::new));
         generateCode(
             baseClasses,
             "org.apache.tomcat.util",
