@@ -129,7 +129,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
             } else {
                 out.writeUTF(this.m.getDeclaringClass().getName());
                 out.writeUTF(this.m.getName());
-                out.writeObject(this.m.getParameterTypes());
+                out.writeObject(ReflectionUtil.toTypeNameArray(this.m.getParameterTypes()));
             }
         }
 
