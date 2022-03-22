@@ -160,8 +160,8 @@ Var ServiceInstallLog
 
   ReserveFile System.dll
   ReserveFile nsDialogs.dll
-  ReserveFile confinstall\tomcat-users_1.xml
-  ReserveFile confinstall\tomcat-users_2.xml
+  ReserveFile tomcat-users_1.xml
+  ReserveFile tomcat-users_2.xml
 
 ;--------------------------------
 ;Installer Sections
@@ -1091,8 +1091,8 @@ Function configure
   ; that is automatically deleted when the installer exits.
   InitPluginsDir
   SetOutPath $PLUGINSDIR
-  File confinstall\tomcat-users_1.xml
-  File confinstall\tomcat-users_2.xml
+  File tomcat-users_1.xml
+  File tomcat-users_2.xml
 
   ; Build final tomcat-users.xml
   Delete "$INSTDIR\conf\tomcat-users.xml"
