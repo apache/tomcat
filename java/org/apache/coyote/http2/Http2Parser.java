@@ -337,7 +337,12 @@ class Http2Parser {
                 }
                 int id = ByteUtil.getTwoBytes(setting, 0);
                 long value = ByteUtil.getFourBytes(setting, 2);
-                output.setting(Setting.valueOf(id), value);
+                Setting key = Setting.valueOf(id);
+                if (log.isDebugEnabled() && key == Setting.UNKNOWN) {
+                    log.warn(sm.getString("connectionSettings.unknown",
+                        connectionId, key, Long.toString(value))); 
+                }
+                output.setting(key, value);
             }
         }
         output.settingsEnd(ack);
