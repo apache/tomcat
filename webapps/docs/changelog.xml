@@ -146,6 +146,11 @@
         Expand the <code>spotbugs</code> Ant task to also cover test code.
         (markt)
       </add>
+      <scode>
+        Refactor the resource files for the Apache Tomcat installer for Windows
+        so that all the resource files are located in a single directory in the
+        source tree. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
