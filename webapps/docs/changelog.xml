@@ -170,6 +170,11 @@
         Remove OSGi annotations dependency as it is no longer required with bnd
         6.2.0. (markt)
       </update>
+      <scode>
+        Refactor the resource files for the Apache Tomcat installer for Windows
+        so that all the resource files are located in a single directory in the
+        source tree. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
