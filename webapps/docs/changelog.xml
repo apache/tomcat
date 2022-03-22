@@ -151,6 +151,10 @@
         so that all the resource files are located in a single directory in the
         source tree. (markt)
       </scode>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.32 to
+        pick up Windows binaries built with OpenSSL 1.1.1n.(markt)
+      </update>
     </changelog>
   </subsection>
 </section>
