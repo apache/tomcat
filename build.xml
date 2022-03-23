@@ -2808,7 +2808,25 @@ skip.installer property in build.properties" />
       <patternset refid="text.files" />
     </fixcrlf>
 
-    <!-- Reproducible builds: consistent timestamps for distributed files -->
+    <!-- Reproducible builds: consistent timestamps for distributed files.   -->
+    <!-- Javadocs need additional processing.                                -->
+    <!-- 1. line endings vary between platforms for some files               -->
+    <!-- 2. The contents of generated zip files don't have fixed timestamps  --> 
+    <!-- Process the zip files first as the resulting zip files will need    -->
+    <!-- the last modified timestamp to be changed as well.                  -->
+    <fixcrlf srcdir="${tomcat.dist}/webapps/docs" eol="lf"
+        encoding="UTF-8" fixlast="false" >
+      <include name="**/*.js" />
+      <include name="**/element-list" />
+    </fixcrlf>
+    <taskdef name="repeatableArchive"
+             classname="org.apache.tomcat.buildutil.RepeatableArchive"
+             classpath="${tomcat.classes}" />
+    <repeatableArchive datetime="${ant.tstamp.now}">
+      <fileset dir="${tomcat.dist}/webapps/docs">
+        <include name="**/*.zip"/>
+      </fileset>
+    </repeatableArchive>
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
     </touch>
