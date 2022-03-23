@@ -88,8 +88,6 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
             break;
         case UNKNOWN:
             // Unrecognised. Ignore it.
-            log.warn(sm.getString("connectionSettings.unknown",
-                    connectionId, setting, Long.toString(value)));
             return;
         }
 

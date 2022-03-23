@@ -120,6 +120,10 @@
         skipping setting it in some cases (for example, it does not make
         sense for OpenSSL TLS 1.3). (remm)
       </fix>
+      <fix>
+        <pr>487</pr>: Improve logging of unknown settings frames. Pull request
+        by Thomas Hoffmann. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
