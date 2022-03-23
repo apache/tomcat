@@ -2474,8 +2474,13 @@ skip.installer property in build.properties" />
         <include name="*.bmp" />
         <include name="*.ico" />
         <include name="*.xml" />
+        <include name="Uninstall.exe.sig" />
       </fileset>
     </copy>
+    <copy file="res/install-win/tomcat-installer.exe.sig"
+        tofile="${tomcat.release}/v${version}/bin/${final.name}.exe.sig"
+        failonerror="false"
+        quiet="true" />
     <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
@@ -2528,12 +2533,18 @@ skip.installer property in build.properties" />
   <target name="-installer-sign-uninstaller"
       unless="skip.installer" depends="-installer-create-uninstaller,setup-jsign"
       if="${do.codesigning}">
+    <!-- If the detached signature doesn't exist, this will sign the file    -->
+    <!-- and create the detached signature. If the detached signature does   -->
+    <!-- exist it will be attached to the file.                              -->
     <jsign file="${tomcat.dist}/Uninstall.exe"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
-        tsaurl="http://timestamp.digicert.com"/>
+        tsaurl="http://timestamp.digicert.com"
+        detached="true"/>
+    <!-- Copy detached signature to source tree -->
+    <copy file="${tomcat.dist}/Uninstall.exe.sig" todir="res/install-win"/>
     <!-- Reproducible builds: consistent timestamps for installer files -->
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
@@ -2565,7 +2576,12 @@ skip.installer property in build.properties" />
         storetype="${codesigning.storetype}"
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
-        tsaurl="http://timestamp.digicert.com"/>
+        tsaurl="http://timestamp.digicert.com"
+        detached="true" />
+    <!-- Copy detached signature to source tree -->
+    <copy file="${tomcat.release}/v${version}/bin/${final.name}.exe.sig"
+        tofile="res/install-win/tomcat-installer.exe.sig"/>
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sig" />
     <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
