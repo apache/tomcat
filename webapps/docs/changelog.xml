@@ -118,6 +118,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <pr>487</pr>: Improve logging of unknown settings frames. Pull request
+        by Thomas Hoffmann. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
