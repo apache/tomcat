@@ -233,7 +233,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 for (int i = 0; i < settings.length % 6; i++) {
                     int id = ByteUtil.getTwoBytes(settings, i * 6);
                     long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
-                    remoteSettings.set(Setting.valueOf(id), value);
+                    Setting key = Setting.valueOf(id);
+                    if (log.isDebugEnabled() && key == Setting.UNKNOWN) {
+                        log.warn(sm.getString("connectionSettings.unknown",
+                            connectionId, Integer.toString(id), Long.toString(value)));
+                    }
+                    remoteSettings.set(key, value);
                 }
             } catch (Http2Exception e) {
                 throw new ProtocolException(
