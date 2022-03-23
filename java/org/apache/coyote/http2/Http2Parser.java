@@ -340,7 +340,7 @@ class Http2Parser {
                 Setting key = Setting.valueOf(id);
                 if (log.isDebugEnabled() && key == Setting.UNKNOWN) {
                     log.warn(sm.getString("connectionSettings.unknown",
-                        connectionId, key, Long.toString(value))); 
+                        connectionId, id, Long.toString(value))); 
                 }
                 output.setting(key, value);
             }
