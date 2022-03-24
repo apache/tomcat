@@ -58,7 +58,6 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.file.ConfigFileLoader;
-import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.net.jsse.PEMFile;
 import org.apache.tomcat.util.res.StringManager;
@@ -113,10 +112,13 @@ public abstract class SSLUtilBase implements SSLUtil {
         this.enabledProtocols = enabledProtocols.toArray(new String[0]);
 
         if (enabledProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
-                sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL &&
+                sslHostConfig.getCertificateVerification().isOptional() &&
                 !isTls13RenegAuthAvailable() && warnTls13) {
             log.warn(sm.getString("sslUtilBase.tls13.auth"));
         }
+
+        // Make TLS 1.3 renegotiation status visible further up the stack
+        sslHostConfig.setTls13RenegotiationAvailable(isTls13RenegAuthAvailable());
 
         // Calculate the enabled ciphers
         List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();

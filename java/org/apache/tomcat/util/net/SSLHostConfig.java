@@ -77,6 +77,8 @@ public class SSLHostConfig implements Serializable {
     // reference is held on the certificate.
     private transient Long openSslContext = Long.valueOf(0);
 
+    private boolean tls13RenegotiationAvailable = false;
+
     // Configuration properties
 
     // Internal
@@ -127,6 +129,16 @@ public class SSLHostConfig implements Serializable {
     public SSLHostConfig() {
         // Set defaults that can't be (easily) set when defining the fields.
         setProtocols(Constants.SSL_PROTO_ALL);
+    }
+
+
+    public boolean isTls13RenegotiationAvailable() {
+        return tls13RenegotiationAvailable;
+    }
+
+
+    public void setTls13RenegotiationAvailable(boolean tls13RenegotiationAvailable) {
+        this.tls13RenegotiationAvailable = tls13RenegotiationAvailable;
     }
 
 
