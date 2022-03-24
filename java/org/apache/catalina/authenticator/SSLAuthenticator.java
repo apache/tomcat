@@ -35,8 +35,6 @@ import org.apache.coyote.ActionCode;
  */
 public class SSLAuthenticator extends AuthenticatorBase {
 
-    // --------------------------------------------------------- Public Methods
-
     /**
      * Authenticate the user by checking for the existence of a certificate
      * chain, validating it against the trust manager for the connector and then
