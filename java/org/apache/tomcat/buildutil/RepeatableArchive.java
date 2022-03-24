@@ -23,6 +23,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +51,8 @@ public class RepeatableArchive extends Task {
 
     private final List<FileSet> filesets = new LinkedList<>();
 
-    private long datetime;
+    private String datetime;
+    private String pattern;
 
     /**
      * Sets the files to be processed
@@ -60,16 +64,29 @@ public class RepeatableArchive extends Task {
     }
 
 
-    public void setDatetime(long datetime) {
+    public void setDatetime(String datetime) {
         this.datetime = datetime;
+    }
+
+
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
     }
 
 
     @Override
     public void execute() throws BuildException {
 
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        Date date;
+        try {
+            date = sdf.parse(datetime);
+        } catch (ParseException e) {
+            throw new BuildException(e);
+        }
+
         byte[] buf = new byte[8192];
-        FileTime lastModified = FileTime.fromMillis(datetime);
+        FileTime lastModified = FileTime.fromMillis(date.getTime());
 
         for (FileSet fs : filesets) {
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());

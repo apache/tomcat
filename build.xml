@@ -2512,7 +2512,7 @@ skip.installer property in build.properties" />
     <taskdef name="repeatableArchive"
              classname="org.apache.tomcat.buildutil.RepeatableArchive"
              classpath="${tomcat.classes}" />
-    <repeatableArchive datetime="${ant.tstamp.now}">
+    <repeatableArchive datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}/webapps/docs">
         <include name="**/*.zip"/>
       </fileset>
