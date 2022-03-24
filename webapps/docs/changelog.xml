@@ -124,6 +124,12 @@
         <pr>487</pr>: Improve logging of unknown settings frames. Pull request
         by Thomas Hoffmann. (remm)
       </fix>
+      <add>
+        <bug>65975</bug>: Add a warning if a TLS vitual host is configured with
+        optional certificate authentication and the containing connector is also
+        configured to support HTTP/2 as HTTP/2 does not permit optional
+        certificate authentication. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

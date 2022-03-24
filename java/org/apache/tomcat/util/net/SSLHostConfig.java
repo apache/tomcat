@@ -900,10 +900,20 @@ public class SSLHostConfig implements Serializable {
 
 
     public enum CertificateVerification {
-        NONE,
-        OPTIONAL_NO_CA,
-        OPTIONAL,
-        REQUIRED;
+        NONE(false),
+        OPTIONAL_NO_CA(true),
+        OPTIONAL(true),
+        REQUIRED(false);
+
+        private final boolean optional;
+
+        private CertificateVerification(boolean optional) {
+            this.optional = optional;
+        }
+
+        public boolean isOptional() {
+           return optional;
+        }
 
         public static CertificateVerification fromString(String value) {
             if ("true".equalsIgnoreCase(value) ||
