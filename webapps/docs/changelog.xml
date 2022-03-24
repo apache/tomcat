@@ -125,10 +125,18 @@
         by Thomas Hoffmann. (remm)
       </fix>
       <add>
-        <bug>65975</bug>: Add a warning if a TLS vitual host is configured with
+        <bug>65975</bug>: Add a warning if a TLS virtual host is configured with
         optional certificate authentication and the containing connector is also
         configured to support HTTP/2 as HTTP/2 does not permit optional
         certificate authentication. (markt)
+      </add>
+      <add>
+        <bug>65975</bug>: Add a warning if a TLS virtual host is configured for
+        TLS 1.3 with a JSSE implementation and a web application is configured
+        for <code>CLIENT-CERT</code> authentication. <code>CLIENT-CERT</code>
+        authentication requires post-handshake authentication (PHA) when used
+        with TLS 1.3 but the JSSE TLS 1.3 implementation does not support PHA.
+        (markt)
       </add>
     </changelog>
   </subsection>
