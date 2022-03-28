@@ -107,7 +107,7 @@ public class RepeatableArchive extends Task {
                             ZipEntry oldEntry = oldEntries.nextElement();
 
                             ZipEntry entry = new ZipEntry(oldEntry.getName());
-                            entry.setLastModifiedTime(lastModified);
+                            entry.setTime(lastModified.toMillis());
 
                             zipOut.putNextEntry(entry);
 
