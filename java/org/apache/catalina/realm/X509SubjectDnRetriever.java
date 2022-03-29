@@ -18,6 +18,8 @@ package org.apache.catalina.realm;
 
 import java.security.cert.X509Certificate;
 
+import javax.security.auth.x500.X500Principal;
+
 /**
  * An X509UsernameRetriever that returns a certificate's entire
  * SubjectDN as the username.
@@ -26,6 +28,6 @@ public class X509SubjectDnRetriever implements X509UsernameRetriever {
 
     @Override
     public String getUsername(X509Certificate clientCert) {
-        return clientCert.getSubjectX500Principal().getName();
+        return clientCert.getSubjectX500Principal().getName(X500Principal.RFC1779);
     }
 }
