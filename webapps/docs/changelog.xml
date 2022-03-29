@@ -143,6 +143,10 @@
         with TLS 1.3 but the JSSE TLS 1.3 implementation does not support PHA.
         (markt)
       </add>
+      <fix>
+        Improve the recycling of Processor objects to make it more robust.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

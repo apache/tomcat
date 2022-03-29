@@ -30,6 +30,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import jakarta.servlet.ServletConnection;
 
@@ -122,10 +123,12 @@ public abstract class SocketWrapperBase<E> {
     protected volatile OperationState<?> writeOperation = null;
 
     /**
-     * The org.apache.coyote.Processor instance currently associated
-     * with the wrapper.
+     * The org.apache.coyote.Processor instance currently associated with the
+     * wrapper. Only populated when required to maintain wrapper<->Processor
+     * mapping between calls to
+     * {@link AbstractEndpoint.Handler#process(SocketWrapperBase, SocketEvent)}.
      */
-    protected Object currentProcessor = null;
+    private final AtomicReference<Object> currentProcessor = new AtomicReference<>();
 
     public SocketWrapperBase(E socket, AbstractEndpoint<E,?> endpoint) {
         this.socket = socket;
@@ -153,11 +156,15 @@ public abstract class SocketWrapperBase<E> {
     }
 
     public Object getCurrentProcessor() {
-        return currentProcessor;
+        return currentProcessor.get();
     }
 
     public void setCurrentProcessor(Object currentProcessor) {
-        this.currentProcessor = currentProcessor;
+        this.currentProcessor.set(currentProcessor);
+    }
+
+    public Object takeCurrentProcessor() {
+        return currentProcessor.getAndSet(null);
     }
 
     /**
