@@ -2501,7 +2501,7 @@ skip.installer property in build.properties" />
     <!-- Reproducible builds: consistent timestamps for distributed files.   -->
     <!-- Javadocs need additional processing.                                -->
     <!-- 1. line endings vary between platforms for some files               -->
-    <!-- 2. The contents of generated zip files don't have fixed timestamps  --> 
+    <!-- 2. The contents of generated zip files don't have fixed timestamps  -->
     <!-- Process the zip files first as the resulting zip files will need    -->
     <!-- the last modified timestamp to be changed as well.                  -->
     <fixcrlf srcdir="${tomcat.dist}/webapps/docs" eol="lf"
