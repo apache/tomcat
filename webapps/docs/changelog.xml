@@ -212,6 +212,9 @@
         Improvements to Chinese translations contributed by 15625988003. (markt)
       </add>
       <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
         Expand coverage of translations for <code>jakarta.el</code> package.
         Based on <pr>488</pr> from Volodymyr Siedlecki. (markt)
       </add>
