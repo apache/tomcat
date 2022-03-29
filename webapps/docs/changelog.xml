@@ -208,6 +208,13 @@
         Update the packaged version of the Tomcat Native Library to 1.2.32 to
         pick up Windows binaries built with OpenSSL 1.1.1n.(markt)
       </update>
+      <add>
+        Improvements to Chinese translations contributed by 15625988003. (markt)
+      </add>
+      <add>
+        Expand coverage of translations for <code>jakarta.el</code> package.
+        Based on <pr>488</pr> from Volodymyr Siedlecki. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
