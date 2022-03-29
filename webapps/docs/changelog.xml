@@ -225,6 +225,10 @@
       <add>
         Improvements to Japanese translations contributed by tak7iji. (markt)
       </add>
+      <add>
+        Expand coverage of translations for <code>jakarta.el</code> package.
+        Based on <pr>488</pr> from Volodymyr Siedlecki. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
