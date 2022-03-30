@@ -35,6 +35,7 @@ import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 import org.apache.naming.ResourceRef;
+import org.apache.naming.StringManager;
 
 /**
  * Object factory for any Resource conforming to the JavaBean spec.
@@ -87,23 +88,9 @@ import org.apache.naming.ResourceRef;
  *
  * @author Aner Perez [aner at ncstech.com]
  */
-public class BeanFactory
-    implements ObjectFactory {
+public class BeanFactory implements ObjectFactory {
 
-    // ----------------------------------------------------------- Constructors
-
-
-    // -------------------------------------------------------------- Constants
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    // -------------------------------------------------- ObjectFactory Methods
-
+    private static final StringManager sm = StringManager.getManager(BeanFactory.class);
 
     /**
      * Create a new Bean instance.
@@ -111,34 +98,26 @@ public class BeanFactory
      * @param obj The reference object describing the Bean
      */
     @Override
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable<?,?> environment)
-        throws NamingException {
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
+            throws NamingException {
 
         if (obj instanceof ResourceRef) {
 
             try {
-
                 Reference ref = (Reference) obj;
                 String beanClassName = ref.getClassName();
                 Class<?> beanClass = null;
-                ClassLoader tcl =
-                    Thread.currentThread().getContextClassLoader();
-                if (tcl != null) {
-                    try {
+                ClassLoader tcl = Thread.currentThread().getContextClassLoader();
+                try {
+                    if (tcl != null) {
                         beanClass = tcl.loadClass(beanClassName);
-                    } catch(ClassNotFoundException e) {
-                    }
-                } else {
-                    try {
+                    } else {
                         beanClass = Class.forName(beanClassName);
-                    } catch(ClassNotFoundException e) {
-                        e.printStackTrace();
                     }
-                }
-                if (beanClass == null) {
-                    throw new NamingException
-                        ("Class not found: " + beanClassName);
+                } catch(ClassNotFoundException cnfe) {
+                    NamingException ne = new NamingException(sm.getString("beanFactory.classNotFound", beanClassName));
+                    ne.initCause(cnfe);
+                    throw ne;
                 }
 
                 BeanInfo bi = Introspector.getBeanInfo(beanClass);
@@ -174,8 +153,7 @@ public class BeanFactory
                                          param.substring(1);
                         }
                         try {
-                            forced.put(param,
-                                       beanClass.getMethod(setterName, paramTypes));
+                            forced.put(param, beanClass.getMethod(setterName, paramTypes));
                         } catch (NoSuchMethodException|SecurityException ex) {
                             throw new NamingException
                                 ("Forced String setter " + setterName +
@@ -219,7 +197,7 @@ public class BeanFactory
                     }
 
                     int i = 0;
-                    for (i = 0; i<pda.length; i++) {
+                    for (i = 0; i < pda.length; i++) {
 
                         if (pda[i].getName().equals(propName)) {
 
@@ -227,58 +205,41 @@ public class BeanFactory
 
                             if (propType.equals(String.class)) {
                                 valueArray[0] = value;
-                            } else if (propType.equals(Character.class)
-                                       || propType.equals(char.class)) {
-                                valueArray[0] =
-                                    Character.valueOf(value.charAt(0));
-                            } else if (propType.equals(Byte.class)
-                                       || propType.equals(byte.class)) {
+                            } else if (propType.equals(Character.class) || propType.equals(char.class)) {
+                                valueArray[0] = Character.valueOf(value.charAt(0));
+                            } else if (propType.equals(Byte.class) || propType.equals(byte.class)) {
                                 valueArray[0] = Byte.valueOf(value);
-                            } else if (propType.equals(Short.class)
-                                       || propType.equals(short.class)) {
+                            } else if (propType.equals(Short.class) || propType.equals(short.class)) {
                                 valueArray[0] = Short.valueOf(value);
-                            } else if (propType.equals(Integer.class)
-                                       || propType.equals(int.class)) {
+                            } else if (propType.equals(Integer.class) || propType.equals(int.class)) {
                                 valueArray[0] = Integer.valueOf(value);
-                            } else if (propType.equals(Long.class)
-                                       || propType.equals(long.class)) {
+                            } else if (propType.equals(Long.class) || propType.equals(long.class)) {
                                 valueArray[0] = Long.valueOf(value);
-                            } else if (propType.equals(Float.class)
-                                       || propType.equals(float.class)) {
+                            } else if (propType.equals(Float.class) || propType.equals(float.class)) {
                                 valueArray[0] = Float.valueOf(value);
-                            } else if (propType.equals(Double.class)
-                                       || propType.equals(double.class)) {
+                            } else if (propType.equals(Double.class) || propType.equals(double.class)) {
                                 valueArray[0] = Double.valueOf(value);
-                            } else if (propType.equals(Boolean.class)
-                                       || propType.equals(boolean.class)) {
+                            } else if (propType.equals(Boolean.class) || propType.equals(boolean.class)) {
                                 valueArray[0] = Boolean.valueOf(value);
                             } else {
-                                throw new NamingException
-                                    ("String conversion for property " + propName +
-                                     " of type '" + propType.getName() +
-                                     "' not available");
+                                throw new NamingException(
+                                        sm.getString("beanFactory.noStringConversion", propName, propType.getName()));
                             }
 
                             Method setProp = pda[i].getWriteMethod();
                             if (setProp != null) {
                                 setProp.invoke(bean, valueArray);
                             } else {
-                                throw new NamingException
-                                    ("Write not allowed for property: "
-                                     + propName);
+                                throw new NamingException(sm.getString("beanFactory.readOnlyProperty", propName));
                             }
 
                             break;
-
                         }
-
                     }
 
                     if (i == pda.length) {
-                        throw new NamingException
-                            ("No set method found for property: " + propName);
+                        throw new NamingException(sm.getString("beanFactory.noSetMethod", propName));
                     }
-
                 }
 
                 return bean;
@@ -303,6 +264,5 @@ public class BeanFactory
         } else {
             return null;
         }
-
     }
 }
