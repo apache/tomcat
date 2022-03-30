@@ -113,6 +113,12 @@
         for an alternative setter with the same name that accepts a
         <code>String</code>. This is a security hardening measure. (markt)
       </fix>
+      <add>
+         Effectively disable the
+         <code>WebappClassLoaderBase.getResources()</code> method as it is not
+         used and if something accidently exposes the class loader this method
+         can be used to gain access to Tomcat internals. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
