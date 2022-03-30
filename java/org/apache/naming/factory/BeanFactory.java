@@ -19,13 +19,9 @@ package org.apache.naming.factory;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Locale;
-import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.Name;
@@ -34,6 +30,8 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ResourceRef;
 import org.apache.naming.StringManager;
 
@@ -92,6 +90,8 @@ public class BeanFactory implements ObjectFactory {
 
     private static final StringManager sm = StringManager.getManager(BeanFactory.class);
 
+    private final Log log = LogFactory.getLog(BeanFactory.class); // Not static
+
     /**
      * Create a new Bean instance.
      *
@@ -125,44 +125,14 @@ public class BeanFactory implements ObjectFactory {
 
                 Object bean = beanClass.getConstructor().newInstance();
 
-                /* Look for properties with explicitly configured setter */
+                // Look for the removed forceString option
                 RefAddr ra = ref.get("forceString");
-                Map<String, Method> forced = new HashMap<>();
-                String value;
-
                 if (ra != null) {
-                    value = (String)ra.getContent();
-                    Class<?> paramTypes[] = new Class[1];
-                    paramTypes[0] = String.class;
-                    String setterName;
-                    int index;
-
-                    /* Items are given as comma separated list */
-                    for (String param: value.split(",")) {
-                        param = param.trim();
-                        /* A single item can either be of the form name=method
-                         * or just a property name (and we will use a standard
-                         * setter) */
-                        index = param.indexOf('=');
-                        if (index >= 0) {
-                            setterName = param.substring(index + 1).trim();
-                            param = param.substring(0, index).trim();
-                        } else {
-                            setterName = "set" +
-                                         param.substring(0, 1).toUpperCase(Locale.ENGLISH) +
-                                         param.substring(1);
-                        }
-                        try {
-                            forced.put(param, beanClass.getMethod(setterName, paramTypes));
-                        } catch (NoSuchMethodException|SecurityException ex) {
-                            throw new NamingException
-                                ("Forced String setter " + setterName +
-                                 " not found for property " + param);
-                        }
-                    }
+                    log.warn(sm.getString("beanFactory.noForceString"));
                 }
 
                 Enumeration<RefAddr> e = ref.getAll();
+                String value;
 
                 while (e.hasMoreElements()) {
 
@@ -180,28 +150,13 @@ public class BeanFactory implements ObjectFactory {
 
                     Object[] valueArray = new Object[1];
 
-                    /* Shortcut for properties with explicitly configured setter */
-                    Method method = forced.get(propName);
-                    if (method != null) {
-                        valueArray[0] = value;
-                        try {
-                            method.invoke(bean, valueArray);
-                        } catch (IllegalAccessException|
-                                 IllegalArgumentException|
-                                 InvocationTargetException ex) {
-                            throw new NamingException
-                                ("Forced String setter " + method.getName() +
-                                 " threw exception for property " + propName);
-                        }
-                        continue;
-                    }
-
                     int i = 0;
                     for (i = 0; i < pda.length; i++) {
 
                         if (pda[i].getName().equals(propName)) {
 
                             Class<?> propType = pda[i].getPropertyType();
+                            Method setProp = pda[i].getWriteMethod();
 
                             if (propType.equals(String.class)) {
                                 valueArray[0] = value;
@@ -221,12 +176,22 @@ public class BeanFactory implements ObjectFactory {
                                 valueArray[0] = Double.valueOf(value);
                             } else if (propType.equals(Boolean.class) || propType.equals(boolean.class)) {
                                 valueArray[0] = Boolean.valueOf(value);
+                            } else if (setProp != null) {
+                                // This is a Tomcat specific extension and is not part of the
+                                // Java Bean specification.
+                                String setterName = setProp.getName();
+                                try {
+                                    setProp = bean.getClass().getMethod(setterName, String.class);
+                                    valueArray[0] = value;
+                                } catch (NoSuchMethodException nsme) {
+                                    throw new NamingException(sm.getString(
+                                            "beanFactory.noStringConversion", propName, propType.getName()));
+                                }
                             } else {
-                                throw new NamingException(
-                                        sm.getString("beanFactory.noStringConversion", propName, propType.getName()));
+                                throw new NamingException(sm.getString(
+                                        "beanFactory.noStringConversion", propName, propType.getName()));
                             }
 
-                            Method setProp = pda[i].getWriteMethod();
                             if (setProp != null) {
                                 setProp.invoke(bean, valueArray);
                             } else {

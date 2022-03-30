@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M14 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>65736</bug>: Disable the <code>forceString</code> option for the
+        JNDI <code>BeanFactory</code> and replace it with an automatic search
+        for an alternative setter with the same name that accepts a
+        <code>String</code>. This is a security hardening measure. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M13 (markt)" rtext="release in progress">
   <subsection name="Catalina">
