@@ -428,19 +428,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     // ------------------------------------------------------------- Properties
 
     /**
-     * Unused. Always returns {@code null}.
-     *
-     * @return associated resources.
-     *
-     * @deprecated This will be removed in Tomcat 10.1.x onwards
-     */
-    @Deprecated
-    public WebResourceRoot getResources() {
-        return null;
-    }
-
-
-    /**
      * Set associated resources.
      * @param resources the resources from which the classloader will
      *     load the classes
