@@ -163,7 +163,7 @@ On Windows, %CATALINA_BASE%\bin\setenv.bat:
 On *nix, $CATALINA_BASE/bin/setenv.sh:
 
   JRE_HOME=/usr/java/latest
-  CATALINA_PID="$CATALINA_BASE/tomcat.pid"
+  CATALINA_PID="/run/tomcat.pid"
 
 
 The CATALINA_HOME and CATALINA_BASE variables cannot be configured in the
