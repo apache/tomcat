@@ -107,6 +107,12 @@
 <section name="Tomcat 9.0.63 (remm)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>65736</bug>: Disable the <code>forceString</code> option for the
+        JNDI <code>BeanFactory</code> and replace it with an automatic search
+        for an alternative setter with the same name that accepts a
+        <code>String</code>. This is a security hardening measure. (markt)
+      </fix>
       <scode>
         <bug>65853</bug>: Refactor the <code>CsrfPreventionFilter</code> to make
         it easier for sub-classes to modify the nonce generation and storage.
