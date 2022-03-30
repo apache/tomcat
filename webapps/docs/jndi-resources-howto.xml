@@ -333,15 +333,15 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     BeanFactory will convert the value to the appropriate primitive or
     primitive wrapper and then use that value when calling the setter. Some
     beans have properties with types that cannot automatically be converted
-    from <code>String</code>. If the bean provides an alternative setter with 
+    from <code>String</code>. If the bean provides an alternative setter with
     the same name that does take a <code>String</code>, the BeanFactory will
     attempt to use that setter. If the BeanFactory cannot use the value or
     perform an appropriate conversion, setting the property will fail with a
     NamingException.</p>
-    
+
     <p>The <code>forceString</code> property available in earlier Tomcat
     releases has been removed as a security hardening measure.</p>
-    
+
   </subsection>
 
 
