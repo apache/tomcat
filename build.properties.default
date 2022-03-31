@@ -38,8 +38,8 @@ version.suffix=-dev
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds
 # Note: The value is in seconds (unlike milliseconds used by System.currentTimeMillis()).
-#2022-03-30T00:00:00Z
-#ant.tstamp.now=1648598400
++#2022-03-31T12:00:00Z
++#ant.tstamp.now=1648728000
 
 # ----- Source control flags -----
 git.branch=9.0.x
