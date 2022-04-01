@@ -106,7 +106,7 @@
 -->
 <section name="Tomcat 10.0.21 (markt)" rtext="in development">
 </section>
-<section name="Tomcat 10.0.20 (markt)" rtext="release in progress">
+<section name="Tomcat 10.0.20 (markt)" rtext="2022-04-01">
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -118,7 +118,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 10.0.19 (markt)" rtext="release in progress">
+<section name="Tomcat 10.0.19 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <scode>
