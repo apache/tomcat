@@ -131,7 +131,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * Fair retrieval of an object in the queue.
-     * Objects are returned in the order the threads requested them.
+     * Objects are returned for the order the threads requested them.
      * {@inheritDoc}
      */
     @Override
