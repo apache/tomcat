@@ -569,7 +569,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     log.warn(sm.getString("engine.failedCipherList", sslHostConfig.getCiphers()));
                 }
             }
-            if (maxTlsVersion >= TLS1_3_VERSION()) {
+            if (maxTlsVersion >= TLS1_3_VERSION() && (sslHostConfig.getCiphers() != SSLHostConfig.DEFAULT_TLS_CIPHERS)) {
                 if (SSL_CTX_set_ciphersuites(state.sslCtx, CLinker.toCString(sslHostConfig.getCiphers(), state.contextScope)) <= 0) {
                     log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
                 }
