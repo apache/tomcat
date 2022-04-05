@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M15 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>65991</bug>: Avoid NPE with <code>SSLAuthenticator</code> when
+        <code>boundOnInit</code> is used on a connector, during the check
+        for client certificate authentication availability. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M14 (markt)" rtext="2022-04-01">
   <subsection name="Catalina">
