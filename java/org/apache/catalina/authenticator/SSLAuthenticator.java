@@ -198,6 +198,10 @@ public class SSLAuthenticator extends AuthenticatorBase {
             for (SSLHostConfig sslHostConfig : sslHostConfigs) {
                 if (!sslHostConfig.isTls13RenegotiationAvailable()) {
                     String[] enabledProtocols = sslHostConfig.getEnabledProtocols();
+                    if (enabledProtocols == null) {
+                        // Possibly boundOnInit is used, so use the less accurate protocols
+                        enabledProtocols = sslHostConfig.getProtocols().toArray(new String[0]);
+                    }
                     for (String enbabledProtocol : enabledProtocols) {
                         if (Constants.SSL_PROTO_TLSv1_3.equals(enbabledProtocol)) {
                             log.warn(sm.getString("sslAuthenticatorValve.tls13", context.getName(), host.getName(), connector));
