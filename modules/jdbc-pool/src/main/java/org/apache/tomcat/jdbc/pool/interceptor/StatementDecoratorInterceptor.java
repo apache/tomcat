@@ -121,7 +121,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      *                          the proxy
      * @param statement     The statement object that is to be proxied
      * @param constructor   The constructor for the desired proxy
-     * @param sql           The sql of of the statement
+     * @param sql           The sql of the statement
      *
      * @return  A new proxy for the Statement
      * @throws InstantiationException Couldn't instantiate object
