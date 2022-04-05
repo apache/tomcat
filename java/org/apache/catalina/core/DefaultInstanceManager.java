@@ -708,7 +708,7 @@ public class DefaultInstanceManager implements InstanceManager {
             if (method.getName().equals(methodNameFromXml)) {
                 if (!Introspection.isValidLifecycleCallback(method)) {
                     throw new IllegalArgumentException(
-                            "Invalid " + annotation.getName() + " annotation");
+                            sm.getString("defaultInstanceManager.invalidAnnotation", annotation.getName()));
                 }
                 result = method;
             }
@@ -716,7 +716,7 @@ public class DefaultInstanceManager implements InstanceManager {
             if (method.isAnnotationPresent(annotation)) {
                 if (currentMethod != null || !Introspection.isValidLifecycleCallback(method)) {
                     throw new IllegalArgumentException(
-                            "Invalid " + annotation.getName() + " annotation");
+                            sm.getString("defaultInstanceManager.invalidAnnotation", annotation.getName()));
                 }
                 result = method;
             }
