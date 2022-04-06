@@ -339,11 +339,6 @@
         list of JARs to skip when scanning for TLDs, web fragments and
         annotations. (michaelo)
       </add>
-      <add>
-        Expand the default mappings used by
-        <code>ServletResponse.setLocale()</code> to include a mapping from the
-        <code>ja</code> locale to the <code>Shift_JIS</code> encoding. (markt)
-      </add>
       <fix>
         <bug>65806</bug>: Improve the handling of session ID generation when the
         default algorithm for <code>SecureRandom</code> (<code>SHA1PRNG</code>)
