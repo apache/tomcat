@@ -1188,7 +1188,7 @@ public class RemoteIpFilter implements Filter {
     /**
      * <p>
      * Header that holds the incoming host, usually named
-     * <code>X-Forwarded-HOst</code>.
+     * <code>X-Forwarded-Host</code>.
      * </p>
      * <p>
      * Default value : <code>null</code>
