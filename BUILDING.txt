@@ -344,10 +344,10 @@ where the library binaries are located.
 
 By default the "test.apr.loc" property specifies the following location:
 
-    output/build/bin/native/
+    output/build/bin/
 
 If you are on Windows and want to test the APR connector you can put the
-tcnative-1.dll file into ${tomcat.source}/bin/native/ and it will be copied
+tcnative-1.dll file into ${tomcat.source}/bin/ and it will be copied
 into the above directory when the build runs.
 
 The unit tests include tests of the clustering functionality which require
