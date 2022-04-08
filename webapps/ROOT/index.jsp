@@ -94,7 +94,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                 <div class="col25">
                     <div class="container">
                         <p><a href="https://wiki.apache.org/tomcat/Specifications">Servlet Specifications</a></p>
-                        <p><a href="https://wiki.apache.org/tomcat/TomcatVersions">Tomcat Versions</a></p>
+                        <p><a href="https://wiki.apache.org/tomcat/Tomcat+Versions">Tomcat Versions</a></p>
                     </div>
                 </div>
                 <br class="separator" />
