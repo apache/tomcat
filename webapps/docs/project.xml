@@ -99,7 +99,7 @@
     <menu name="Apache Tomcat Development">
         <item name="Building"              href="building.html"/>
         <item name="Changelog"             href="changelog.html"/>
-        <item name="Status"                href="https://wiki.apache.org/tomcat/TomcatVersions"/>
+        <item name="Status"                href="https://wiki.apache.org/tomcat/Tomcat+Versions"/>
         <item name="Developers"            href="developers.html"/>
         <item name="Architecture"          href="architecture/index.html" />
         <item name="Tribes"                href="tribes/introduction.html"/>
