@@ -114,6 +114,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <pr>501</pr>: Add new <code>maxHttpRequestHeaderSize</code> and
+        <code>maxHttpResponseHeaderSize</code> attributes which allow setting
+        the maximum HTTP header sizes independently. If not specified, the
+        value of the <code>maxHttpHeaderSize</code> connector attribute will
+        be used. Submitted by Zhongming Hua. (remm)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.20 (markt)" rtext="2022-04-01">
   <subsection name="Catalina">
