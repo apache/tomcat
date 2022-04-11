@@ -518,6 +518,18 @@
       in bytes. If not specified, this attribute is set to 8192 (8 KB).</p>
     </attribute>
 
+    <attribute name="maxHttpRequestHeaderSize" required="false">
+      <p>The maximum size of the request HTTP header, specified
+      in bytes. If not specified, this attribute is set to the value of
+      the <code>maxHttpHeaderSize</code> attribute.</p>
+    </attribute>
+
+    <attribute name="maxHttpResponseHeaderSize" required="false">
+      <p>The maximum size of the response HTTP header, specified
+      in bytes. If not specified, this attribute is set to the value of
+      the <code>maxHttpHeaderSize</code> attribute.</p>
+    </attribute>
+
     <attribute name="maxKeepAliveRequests" required="false">
       <p>The maximum number of HTTP requests which can be pipelined until
       the connection is closed by the server. Setting this attribute to 1 will
