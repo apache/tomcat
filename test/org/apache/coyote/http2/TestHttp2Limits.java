@@ -97,8 +97,8 @@ public class TestHttp2Limits extends Http2TestBase {
     @Test
     public void testHeaderLimits20x32WithLimit10() throws Exception {
         // Check lower count limit is enforced
-        doTestHeaderLimits(20, 32, -1, 10, Constants.DEFAULT_MAX_HEADER_SIZE, 0,
-                FailureMode.STREAM_RESET);
+        doTestHeaderLimits(20, 32, -1, 10, Constants.DEFAULT_MAX_HEADER_SIZE,
+            -1, -1, 0, FailureMode.STREAM_RESET);
     }
 
 
@@ -120,8 +120,24 @@ public class TestHttp2Limits extends Http2TestBase {
     @Test
     public void testHeaderLimits3x1024WithLimit2048() throws Exception {
         // Check lower size limit is enforced
-        doTestHeaderLimits(3, 1024, -1, Constants.DEFAULT_MAX_HEADER_COUNT, 2 * 1024, 0,
-                FailureMode.STREAM_RESET);
+        doTestHeaderLimits(3, 1024, -1, Constants.DEFAULT_MAX_HEADER_COUNT, 2 * 1024,
+            -1, -1, 0, FailureMode.STREAM_RESET);
+    }
+
+
+    @Test
+    public void testHeaderLimits3x1024WithRequestLimit2048() throws Exception {
+        // Check lower size limit is enforced
+        doTestHeaderLimits(3, 1024, -1, Constants.DEFAULT_MAX_HEADER_COUNT, Constants.DEFAULT_MAX_HEADER_SIZE,
+            2 * 1024, -1, 0, FailureMode.STREAM_RESET);
+    }
+
+
+    @Test
+    public void testHeaderLimits3x1024WithResponseLimit2048() throws Exception {
+        // Check lower size limit is enforced
+        doTestHeaderLimits(3, 1024, -1, Constants.DEFAULT_MAX_HEADER_COUNT, Constants.DEFAULT_MAX_HEADER_SIZE,
+            -1, 2 * 1024, 0, FailureMode.STREAM_RESET);
     }
 
 
@@ -205,13 +221,14 @@ public class TestHttp2Limits extends Http2TestBase {
     private void doTestHeaderLimits(int headerCount, int headerSize, int maxHeaderPayloadSize,
             int delayms, FailureMode failMode) throws Exception {
         doTestHeaderLimits(headerCount, headerSize, maxHeaderPayloadSize,
-                Constants.DEFAULT_MAX_HEADER_COUNT, Constants.DEFAULT_MAX_HEADER_SIZE, delayms,
-                failMode);
+                Constants.DEFAULT_MAX_HEADER_COUNT, Constants.DEFAULT_MAX_HEADER_SIZE, -1, -1,
+                delayms, failMode);
     }
 
 
     private void doTestHeaderLimits(int headerCount, int headerSize, int maxHeaderPayloadSize,
-            int maxHeaderCount, int maxHeaderSize, int delayms, FailureMode failMode)
+            int maxHeaderCount, int maxHeaderSize, int maxRequestHeaderSize, int maxResponseHeaderSize,
+            int delayms, FailureMode failMode)
             throws Exception {
 
         // Build the custom headers
@@ -232,7 +249,15 @@ public class TestHttp2Limits extends Http2TestBase {
         configureAndStartWebApplication();
 
         http2Protocol.setMaxHeaderCount(maxHeaderCount);
-        ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setMaxHttpHeaderSize(maxHeaderSize);
+        (http2Protocol.getHttp11Protocol()).setMaxHttpHeaderSize(maxHeaderSize);
+
+        if (maxRequestHeaderSize != -1){
+            (http2Protocol.getHttp11Protocol()).setMaxHttpRequestHeaderSize(maxRequestHeaderSize);
+        }
+
+        if (maxResponseHeaderSize != -1){
+            (http2Protocol.getHttp11Protocol()).setMaxHttpResponseHeaderSize(maxResponseHeaderSize);
+        }
 
         openClientConnection();
         doHttpUpgrade();
