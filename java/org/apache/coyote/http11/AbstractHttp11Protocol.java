@@ -244,6 +244,34 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
 
 
+    /**
+     * Maximum size of the HTTP request message header.
+     */
+    private int maxHttpRequestHeaderSize = maxHttpHeaderSize;
+
+    public int getMaxHttpRequestHeaderSize() {
+        return maxHttpRequestHeaderSize;
+    }
+
+    public void setMaxHttpRequestHeaderSize(int valueI) {
+        maxHttpRequestHeaderSize = valueI;
+    }
+
+
+    /**
+     * Maximum size of the HTTP response message header.
+     */
+    private int maxHttpResponseHeaderSize = maxHttpHeaderSize;
+
+    public int getMaxHttpResponseHeaderSize() {
+        return maxHttpResponseHeaderSize;
+    }
+
+    public void setMaxHttpResponseHeaderSize(int valueI) {
+        maxHttpResponseHeaderSize = valueI;
+    }
+
+
     private int connectionUploadTimeout = 300000;
     /**
      * Specifies a different (usually longer) connection timeout during data
