@@ -262,7 +262,7 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     public int getMaxHeaderSize() {
-        return http11Protocol.getMaxHttpHeaderSize();
+        return http11Protocol.getMaxHttpRequestHeaderSize();
     }
 
 
