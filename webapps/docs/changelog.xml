@@ -112,6 +112,12 @@
         <code>boundOnInit</code> is used on a connector, during the check
         for client certificate authentication availability. (remm)
       </fix>
+      <fix>
+        <bug>66009</bug>: Use <code>getSubjectX500Principal().toString()</code>
+        rather than <code>getSubjectX500Principal().getName(...)</code> to
+        retrieve a certificate DN, to match the output of the deprecated
+        <code>getSubjectDN().getName()</code> that was used previously. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
