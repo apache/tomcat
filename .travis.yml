@@ -48,8 +48,8 @@ install:
     - wget -q $JDK_URL && tar xzf OpenJDK*.tar.gz
     - mv jdk-11* jdk
     - export JAVA_HOME=`pwd`/jdk
-    - wget -q https://mirrors.netix.net/apache/ant/binaries/apache-ant-1.10.11-bin.tar.gz && tar xzf apache-ant-*-bin.tar.gz
-    - export ANT_HOME=`pwd`/apache-ant-1.10.11
+    - wget -q https://mirrors.netix.net/apache/ant/binaries/apache-ant-1.10.12-bin.tar.gz && tar xzf apache-ant-*-bin.tar.gz
+    - export ANT_HOME=`pwd`/apache-ant-1.10.12
     - export PATH="$JAVA_HOME/bin:$ANT_HOME/bin:$PATH"
     - java -version
     - ant -version
