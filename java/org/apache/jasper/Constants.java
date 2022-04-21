@@ -102,10 +102,14 @@ public class Constants {
 
     /**
      * Default URLs to download the plugin for Netscape and IE.
+     *
+     * @deprecated Will be removed in Tomcat 10.1 onwards
      */
+    @Deprecated
     public static final String NS_PLUGIN_URL =
         "http://java.sun.com/products/plugin/";
 
+    @Deprecated
     public static final String IE_PLUGIN_URL =
         "http://java.sun.com/products/plugin/1.2.2/jinstall-1_2_2-win.cab#Version=1,2,2,0";
 
