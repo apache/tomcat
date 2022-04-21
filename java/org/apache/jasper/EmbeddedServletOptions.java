@@ -321,7 +321,10 @@ public final class EmbeddedServletOptions implements Options {
 
     /**
      * Class ID for use in the plugin tag when the browser is IE.
+     *
+     * @deprecated Will be removed in Tomcat 10.1
      */
+    @Deprecated
     @Override
     public String getIeClassId() {
         return ieClassId;

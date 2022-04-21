@@ -104,6 +104,7 @@ public class JspC extends Task implements Options {
         JspFactory.setDefaultFactory(new JspFactoryImpl());
     }
 
+    @Deprecated
     public static final String DEFAULT_IE_CLASS_ID =
             "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93";
 
@@ -185,6 +186,7 @@ public class JspC extends Task implements Options {
     protected boolean mappedFile = false;
     protected boolean poolingEnabled = true;
     protected File scratchDir;
+
     protected String ieClassId = DEFAULT_IE_CLASS_ID;
     protected String targetPackage;
     protected String targetClassName;
@@ -707,14 +709,15 @@ public class JspC extends Task implements Options {
      *
      * @param ieClassId
      *            Class-id value
+     *
+     * @deprecated Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public void setIeClassId(String ieClassId) {
         this.ieClassId = ieClassId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Deprecated
     @Override
     public String getIeClassId() {
         return ieClassId;

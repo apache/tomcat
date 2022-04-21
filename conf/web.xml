@@ -190,7 +190,8 @@
   <!--                       arrays, to improve performance in some cases?  -->
   <!--                       [false]                                        -->
   <!--                                                                      -->
-  <!--   ieClassId           The class-id value to be sent to Internet      -->
+  <!--   ieClassId           Deprecated. Will be removed in Tomcat 10.1     -->
+  <!--                       The class-id value to be sent to Internet      -->
   <!--                       Explorer when using <jsp:plugin> tags.         -->
   <!--                       [clsid:8AD9C840-044E-11D1-B3E9-00805F499D93]   -->
   <!--                                                                      -->
