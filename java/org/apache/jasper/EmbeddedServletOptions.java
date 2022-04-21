@@ -112,13 +112,6 @@ public final class EmbeddedServletOptions implements Options {
     private File scratchDir;
 
     /**
-     * Need to have this as is for versions 4 and 5 of IE. Can be set from
-     * the initParams so if it changes in the future all that is needed is
-     * to have a jsp initParam of type ieClassId="<value>"
-     */
-    private String ieClassId = "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93";
-
-    /**
      * What classpath should I use while compiling generated servlets?
      */
     private String classpath = null;
@@ -343,17 +336,6 @@ public final class EmbeddedServletOptions implements Options {
     @Override
     public boolean genStringAsCharArray() {
         return this.genStringAsCharArray;
-    }
-
-    /**
-     * Class ID for use in the plugin tag when the browser is IE.
-     *
-     * @deprecated Will be removed in Tomcat 10.1
-     */
-    @Deprecated
-    @Override
-    public String getIeClassId() {
-        return ieClassId;
     }
 
     /**
@@ -734,11 +716,6 @@ public final class EmbeddedServletOptions implements Options {
                     log.warn(Localizer.getMessage("jsp.warning.errBean"));
                 }
             }
-        }
-
-        String ieClassId = config.getInitParameter("ieClassId");
-        if (ieClassId != null) {
-            this.ieClassId = ieClassId;
         }
 
         String classpath = config.getInitParameter("classpath");

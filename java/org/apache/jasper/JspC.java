@@ -187,7 +187,6 @@ public class JspC extends Task implements Options {
     protected boolean poolingEnabled = true;
     protected File scratchDir;
 
-    protected String ieClassId = DEFAULT_IE_CLASS_ID;
     protected String targetPackage;
     protected String targetClassName;
     protected String uriBase;
@@ -701,26 +700,6 @@ public class JspC extends Task implements Options {
     @Override
     public boolean genStringAsCharArray() {
         return genStringAsCharArray;
-    }
-
-    /**
-     * Sets the class-id value to be sent to Internet Explorer when using
-     * &lt;jsp:plugin&gt; tags.
-     *
-     * @param ieClassId
-     *            Class-id value
-     *
-     * @deprecated Will be removed in Tomcat 10.1
-     */
-    @Deprecated
-    public void setIeClassId(String ieClassId) {
-        this.ieClassId = ieClassId;
-    }
-
-    @Deprecated
-    @Override
-    public String getIeClassId() {
-        return ieClassId;
     }
 
     /**

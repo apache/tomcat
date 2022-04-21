@@ -110,16 +110,6 @@ public interface Options {
     public TrimSpacesOption getTrimSpaces();
 
     /**
-     * Gets the class-id value that is sent to Internet Explorer when using
-     * &lt;jsp:plugin&gt; tags.
-     * @return Class-id value
-     *
-     * @deprecated Will be removed in Tomcat 10.1.x
-     */
-    @Deprecated
-    public String getIeClassId();
-
-    /**
      * @return the work folder
      */
     public File getScratchDir();
