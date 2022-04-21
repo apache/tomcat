@@ -147,7 +147,8 @@ performed in a separate JVM from Tomcat? <code>true</code> or
 <li><strong>genStringAsCharArray</strong> - Should text strings be generated as char
 arrays, to improve performance in some cases? Default <code>false</code>.</li>
 
-<li><strong>ieClassId</strong> - The class-id value to be sent to Internet
+<li><strong>ieClassId</strong> - Deprecated. Will be removed in Tomact 10.1.
+The class-id value to be sent to Internet
 Explorer when using &lt;jsp:plugin&gt; tags.   Default
 <code>clsid:8AD9C840-044E-11D1-B3E9-00805F499D93</code>.</li>
 
