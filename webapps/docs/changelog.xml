@@ -129,6 +129,14 @@
         value of the <code>maxHttpHeaderSize</code> connector attribute will
         be used. Submitted by Zhongming Hua. (remm)
       </add>
+      <fix>
+        The root cause of the Linux kernel duplicate accept bug has been
+        identified along with the version of the kernel that includes the fix.
+        The error message displayed when this bug occurs has been updated to
+        reflect this new information and to advise users to update to a version
+        of the OS that uses kernel 5.10 or later. Thanks to Christopher Gual for
+        the research into this issue. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
