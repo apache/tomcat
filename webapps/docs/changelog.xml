@@ -139,6 +139,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>66031</bug>: Fix NPE when using a custom JspFactory. Patch by
+        Jean-Louis Monteiro. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.0.20 (markt)" rtext="2022-04-01">
   <subsection name="Catalina">

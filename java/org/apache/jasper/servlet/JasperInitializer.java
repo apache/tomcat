@@ -43,7 +43,6 @@ public class JasperInitializer implements ServletContainerInitializer {
     private static final String MSG = "org.apache.jasper.servlet.JasperInitializer";
     private final Log log = LogFactory.getLog(JasperInitializer.class); // must not be static
 
-    private static JspFactoryImpl defaultFactory;
     /**
      * Preload classes required at runtime by a JSP servlet so that
      * we don't get a defineClassInPackage security exception.
@@ -53,7 +52,6 @@ public class JasperInitializer implements ServletContainerInitializer {
         SecurityClassLoad.securityClassLoad(factory.getClass().getClassLoader());
         if (JspFactory.getDefaultFactory() == null) {
             JspFactory.setDefaultFactory(factory);
-            defaultFactory = factory;
         }
     }
 
@@ -105,7 +103,10 @@ public class JasperInitializer implements ServletContainerInitializer {
                 throw new ServletException(e);
             }
         }
-        defaultFactory.setPoolSize(poolSize);
+        JspFactory factory = JspFactory.getDefaultFactory();
+        if (factory instanceof JspFactoryImpl) {
+            ((JspFactoryImpl) factory).setPoolSize(poolSize);
+        }
 
     }
 
