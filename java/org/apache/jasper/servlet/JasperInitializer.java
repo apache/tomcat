@@ -54,6 +54,8 @@ public class JasperInitializer implements ServletContainerInitializer {
         if (JspFactory.getDefaultFactory() == null) {
             JspFactory.setDefaultFactory(factory);
             defaultFactory = factory;
+        } else {
+            defaultFactory = (JspFactoryImpl) JspFactory.getDefaultFactory();
         }
     }
 
