@@ -148,6 +148,10 @@
         is be because the associated HTML elements are no longer supported by
         any major browser. (markt)
       </update>
+      <fix>
+        <bug>66031</bug>: Fix NPE when using a custom JspFactory. Patch by
+        Jean-Louis Monteiro. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
