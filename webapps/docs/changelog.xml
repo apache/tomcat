@@ -137,6 +137,12 @@
         of the OS that uses kernel 5.10 or later. Thanks to Christopher Gual for
         the research into this issue. (markt)
       </fix>
+      <scode>
+        Remove the custom UTF-decoder that was introduced to work around various
+        UTF-8 decoding bugs in Java. These issues were fixed in early Java 8
+        releases. Now the minimum Java version is 11, we can be sure that Tomcat
+        will not be running on a JRE where these issues are present. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

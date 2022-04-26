@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -90,14 +89,7 @@ public class B2CConverter {
         } else {
             action = CodingErrorAction.REPORT;
         }
-        // Special case. Use the Apache Harmony based UTF-8 decoder because it
-        // - a) rejects invalid sequences that the JVM decoder does not
-        // - b) fails faster for some invalid sequences
-        if (charset.equals(StandardCharsets.UTF_8)) {
-            decoder = new Utf8Decoder();
-        } else {
-            decoder = charset.newDecoder();
-        }
+        decoder = charset.newDecoder();
         decoder.onMalformedInput(action);
         decoder.onUnmappableCharacter(action);
     }

@@ -317,15 +317,6 @@ public class TestUtf8 {
     }
 
     @Test
-    public void testHarmonyDecoder() {
-        CharsetDecoder decoder = new Utf8Decoder();
-        for (Utf8TestCase testCase : TEST_CASES) {
-            doTest(decoder, testCase);
-        }
-    }
-
-
-    @Test
     public void testJvmDecoder() {
         CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
         int testCount = 0;
