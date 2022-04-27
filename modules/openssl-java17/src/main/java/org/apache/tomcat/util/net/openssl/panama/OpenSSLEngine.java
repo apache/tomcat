@@ -1568,6 +1568,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     var allocator = SegmentAllocator.ofScope(engineScope);
                     MemorySegment lenPointer = allocator.allocate(CLinker.C_POINTER);
                     var session = SSL_get_session(state.ssl);
+                    if (MemoryAddress.NULL.equals(session)) {
+                        return new byte[0];
+                    }
                     MemoryAddress sessionId = SSL_SESSION_get_id(session, lenPointer);
                     int length = MemoryAccess.getInt(lenPointer);
                     id = (length == 0) ? new byte[0] : sessionId.asSegment(length, engineScope).toByteArray();
@@ -1589,7 +1592,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             synchronized (OpenSSLEngine.this) {
                 if (!destroyed) {
                     var session = SSL_get_session(state.ssl);
-                    creationTime = SSL_SESSION_get_time(session);
+                    if (!MemoryAddress.NULL.equals(session)) {
+                        creationTime = SSL_SESSION_get_time(session);
+                    }
                 }
             }
             return creationTime * 1000L;

@@ -144,6 +144,10 @@
         Tomcat will not be running on a JRE where these issues are present.
         (markt)
       </scode>
+      <fix>
+        <bug>66035</bug>: Add NULL check on the SSL session reference in the
+        Panama code before accessing the session id and creation time. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
