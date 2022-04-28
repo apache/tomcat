@@ -276,8 +276,8 @@ char arrays, set this to <code>true</code>.</li>
 <li><strong>modificationTestInterval</strong> - If development has to be set to
 <code>true</code> for any reason (such as dynamic generation of JSPs), setting
 this to a high value will improve performance a lot.</li>
-<li><strong>trimSpaces</strong> - To remove useless bytes from the response,
-set this to <code>true</code>.</li>
+<li><strong>trimSpaces</strong> - To remove unnecessary bytes from the response,
+consider setting this to <code>single</code> or <code>extended</code>.</li>
 </ul>
 
 </section>

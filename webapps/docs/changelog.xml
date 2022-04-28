@@ -145,6 +145,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>66008</bug>: In the documentation web application, clarify the
+        recommendation for the use the <code>trimSpaces</code> option for Jasper
+        in production environments. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.62 (remm)" rtext="2022-04-01">
   <subsection name="Catalina">
