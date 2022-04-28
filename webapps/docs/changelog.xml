@@ -118,6 +118,12 @@
         retrieve a certificate DN, to match the output of the deprecated
         <code>getSubjectDN().getName()</code> that was used previously. (remm)
       </fix>
+      <add>
+        Revert the change in 8.5.76 that added a mapping of
+        <code>Shift_JIS</code> for the <code>ja</code> locale to the default
+        mappings used by <code>ServletResponse.setLocale()</code> as it
+        caused regressions for applications using UTF-8. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
