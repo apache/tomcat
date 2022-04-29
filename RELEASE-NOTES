@@ -132,7 +132,7 @@ Symlinking static resources:
 By default, Unix symlinks will not work when used in a web application to link
 resources located outside the web application root directory.
 
-This behavior is optional, and the "allowLinking" flag may be used to disable
+This behavior is optional, and the "allowLinking" flag may be used to deactivate
 the check.
 
 
