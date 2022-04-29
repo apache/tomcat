@@ -151,6 +151,10 @@
         (markt)
       </scode>
       <fix>
+        <bug>66023</bug>: Improve the fix for <bug>65726</bug> and support HTTP
+        upgrade with a request body for a wider set of use cases. (markt)
+      </fix>
+      <fix>
         <bug>66035</bug>: Add NULL check on the SSL session reference in the
         Panama code before accessing the session id and creation time. (remm)
       </fix>
