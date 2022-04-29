@@ -143,6 +143,10 @@
         of the OS that uses kernel 5.10 or later. Thanks to Christopher Gual for
         the research into this issue. (markt)
       </fix>
+      <fix>
+        <bug>66023</bug>: Improve the fix for <bug>65726</bug> and support HTTP
+        upgrade with a request body for a wider set of use cases. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Webapps">
