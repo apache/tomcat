@@ -31,6 +31,7 @@ import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
+import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -96,12 +97,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         if (coyoteRequest == null) {
             // HTTP/2 new request
             this.coyoteRequest = new Request();
-            this.inputBuffer = new StreamInputBuffer();
+            this.inputBuffer = new StandardStreamInputBuffer();
             this.coyoteRequest.setInputBuffer(inputBuffer);
         } else {
             // HTTP/2 Push or HTTP/1.1 upgrade
             this.coyoteRequest = coyoteRequest;
-            this.inputBuffer = null;
+            this.inputBuffer = new SavedRequestStreamInputBuffer(
+                    (SavedRequestInputFilter) coyoteRequest.getInputBuffer());
             // Headers have been read by this point
             state.receivedStartOfHeaders();
             if (HTTP_UPGRADE_STREAM.equals(identifier)) {
@@ -1008,7 +1010,27 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     }
 
 
-    class StreamInputBuffer implements InputBuffer {
+    abstract class StreamInputBuffer implements InputBuffer {
+
+        abstract void receiveReset();
+
+        abstract void swallowUnread() throws IOException;
+
+        abstract void notifyEof();
+
+        abstract ByteBuffer getInBuffer();
+
+        abstract void onDataAvailable() throws IOException;
+
+        abstract boolean isReadyForRead();
+
+        abstract boolean isRequestBodyFullyRead();
+
+        abstract void insertReplayedBody(ByteChunk body);
+    }
+
+
+    class StandardStreamInputBuffer extends StreamInputBuffer {
 
         /* Two buffers are required to avoid various multi-threading issues.
          * These issues arise from the fact that the Stream (or the
@@ -1259,7 +1281,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
 
-        private final ByteBuffer getInBuffer() {
+        final ByteBuffer getInBuffer() {
             ensureBuffersExist();
             return inBuffer;
         }
@@ -1286,7 +1308,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
 
-        private final void receiveReset() {
+        final void receiveReset() {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
                     resetReceived = true;
@@ -1295,7 +1317,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
 
-        private final void notifyEof() {
+        final void notifyEof() {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
                     inBuffer.notifyAll();
@@ -1303,7 +1325,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
 
-        private final void swallowUnread() throws IOException {
+        final void swallowUnread() throws IOException {
             synchronized (this) {
                 closed = true;
             }
@@ -1327,6 +1349,67 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     handler.onSwallowedDataFramePayload(getIdAsInt(), unreadByteCount);
                 }
             }
+        }
+    }
+
+
+    class SavedRequestStreamInputBuffer extends StreamInputBuffer {
+
+        private final SavedRequestInputFilter inputFilter;
+
+        SavedRequestStreamInputBuffer(SavedRequestInputFilter inputFilter) {
+            this.inputFilter = inputFilter;
+        }
+
+
+        @Override
+        public int doRead(ApplicationBufferHandler handler) throws IOException {
+            return inputFilter.doRead(handler);
+        }
+
+        @Override
+        public int available() {
+            return inputFilter.available();
+        }
+
+        @Override
+        void receiveReset() {
+            // NO-OP
+        }
+
+        @Override
+        void swallowUnread() throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        void notifyEof() {
+            // NO-OP
+        }
+
+        @Override
+        ByteBuffer getInBuffer() {
+            return null;
+        }
+
+        @Override
+        void onDataAvailable() throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        boolean isReadyForRead() {
+            return true;
+        }
+
+        @Override
+        boolean isRequestBodyFullyRead() {
+            return inputFilter.isFinished();
+        }
+
+        @Override
+        void insertReplayedBody(ByteChunk body) {
+            // NO-OP
         }
     }
 }

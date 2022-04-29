@@ -72,18 +72,54 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
 
     @Test
-    public void testUpgradeWithRequestBody() throws Exception {
-        doTestUpgradeWithRequestBody(false);
+    public void testUpgradeWithRequestBodyGet() throws Exception {
+        doTestUpgradeWithRequestBody(false, false, false);
     }
 
 
     @Test
-    public void testUpgradeWithRequestBodyTooBig() throws Exception {
-        doTestUpgradeWithRequestBody(true);
+    public void testUpgradeWithRequestBodyGetTooBig() throws Exception {
+        doTestUpgradeWithRequestBody(false, false, true);
     }
 
 
-    private void doTestUpgradeWithRequestBody(boolean tooBig) throws Exception {
+    @Test
+    public void testUpgradeWithRequestBodyPost() throws Exception {
+        doTestUpgradeWithRequestBody(true, false, false);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyPostTooBig() throws Exception {
+        doTestUpgradeWithRequestBody(true, false, true);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyGetReader() throws Exception {
+        doTestUpgradeWithRequestBody(false, true, false);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyGetReaderTooBig() throws Exception {
+        doTestUpgradeWithRequestBody(false, true, true);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyPostReader() throws Exception {
+        doTestUpgradeWithRequestBody(true, true, false);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyPostReaderTooBig() throws Exception {
+        doTestUpgradeWithRequestBody(true, true, true);
+    }
+
+
+    private void doTestUpgradeWithRequestBody(boolean usePost, boolean useReader, boolean tooBig) throws Exception {
         enableHttp2();
 
         Tomcat tomcat = getTomcatInstance();
@@ -100,7 +136,8 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         openClientConnection();
 
-        byte[] upgradeRequest = ("GET / HTTP/1.1\r\n" +
+        byte[] upgradeRequest = ((usePost ? "POST" : "GET") +
+                " /" + (useReader ? "?useReader=true " : " ") + "HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
                 "Content-Length: 18\r\n" +
                 "Connection: Upgrade,HTTP2-Settings\r\n" +
