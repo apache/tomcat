@@ -273,7 +273,7 @@ You can build them by using the following commands:
     You do not need it if you do not plan to sign the release.
 
     If "gpg.exec" property does not point to an existing file, it will be
-    ignored and this feature will be disabled.
+    ignored and this feature will be deactivated.
 
     You will be prompted for the GPG passphrase when the release build
     starts, unless "gpg.passphrase" property is set.
@@ -330,7 +330,7 @@ By default the testsuite is run twice to test the 2 different implementations
 of Tomcat connectors: NIO and NIO2. (If you are not familiar with Tomcat
 connectors, see config/http.html in documentation for details).
 
-The 2 runs are enabled and disabled individually by the following
+The 2 runs are activated and deactivated individually by the following
 properties, which all are "true" by default:
 
     execute.test.nio=true
@@ -431,7 +431,7 @@ as for the property "test.name".
  Configuration properties are "junit.formatter.type",
  "junit.formatter.extension" and "junit.formatter.usefile".
 
- For example the following property disables generation of separate report
+ For example the following property deactivates generation of separate report
  files:
 
         junit.formatter.usefile=false
@@ -455,7 +455,7 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
  Using Cobertura currently requires setting test.threads configuration
  property to the value of 1. Setting that property to a different value
- will disable code coverage.
+ will deactivate code coverage.
 
  The report files by default are written to
 
@@ -466,7 +466,7 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
     processes are running.
 
     These assumptions are not always true (e.g. on CI systems running in a
-    virtual machine) so the performance tests may be disabled by using the
+    virtual machine) so the performance tests may be deactivated by using the
     following property:
 
         test.excludePerformance=true
@@ -484,7 +484,7 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
         java.net.preferIPv4Stack=true
 
  10. By default the output of unit tests is sent to the console and can be
-     quite verbose. The output can be disabled by setting the property:
+     quite verbose. The output can be deactivated by setting the property:
 
         test.verbose=false
 

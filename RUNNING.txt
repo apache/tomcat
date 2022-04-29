@@ -132,8 +132,8 @@ belong to CATALINA_OPTS.
 
 Another frequently used variable is CATALINA_PID (on *nix only). It
 specifies the location of the file where process id of the forked Tomcat
-java process will be written. This setting is optional. It will enable the
-following features:
+java process will be written. This setting is optional. It will activate
+the following features:
 
  *  better protection against duplicate start attempts and
  *  allows forceful termination of Tomcat process when it does not react to
@@ -411,9 +411,9 @@ For further reading:
 
       https://httpd.apache.org/
 
-To disable Apache Tomcat Native library:
+To deactivate Apache Tomcat Native library:
 
- - To disable Apache Tomcat Native library when it is installed, or
+ - To deactivate Apache Tomcat Native library when it is installed, or
  - To remove the warning that is logged during Tomcat startup when the
    library is not installed:
 
