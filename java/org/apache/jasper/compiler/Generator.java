@@ -1545,6 +1545,7 @@ class Generator {
             return " " + attr + "=\"" + value + '\"';
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public void visit(Node.PlugIn n) throws JasperException {
 
