@@ -2204,6 +2204,108 @@
 
 </section>
 
+<section name="Redirect Error Report Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Redirect Error Report Valve</strong> is a simple error handler
+    for HTTP status codes that will issue a redirect to another location responsible for generation of the error report.</p>
+
+    <p>By specifying this class in <code>errorReportValveClass</code> attribute
+    in <code>HOST</code>, it will be used instead of
+    <code>ErrorReportValve</code> and will return a redirect url instead of HTML.
+    </p>
+
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Redirect Error Report Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.RedirectErrorReportValve</strong>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Configuration">
+
+	<p>The <strong>Redirect Error Report Valve</strong> requires <strong>RedirectErrorReportValve.properties</strong>
+   to be in a class path, where each entry is a statusCode=baseUrl. baseUrl should not include any url parameters. statusCode, statusDescription, requestUri, and throwable will be automatically appended.</p>
+	<attributes>
+
+      <attribute name="default" required="true">
+        <p>/error.jsp</p>
+      </attribute>
+
+      <attribute name="nnn" required="false">
+        <p>/nnn.jsp</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+<section name="Proxy Error Report Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Proxy Error Report Valve</strong> is a simple error handler
+    for HTTP status codes that will proxy to another location responsible for generation of the error report.</p>
+
+    <p>By specifying this class in <code>errorReportValveClass</code> attribute
+    in <code>HOST</code>, it will be used instead of
+    <code>ErrorReportValve</code> and will return a redirect url instead of HTML.
+    </p>
+
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Proxy Error Report Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.ProxyErrorReportValve</strong>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Configuration">
+
+	<p>The <strong>Proxy Error Report Valve</strong> requires <strong>ProxyErrorReportValve.properties</strong>
+   to be in a class path, where each entry is a statusCode=baseUrl. baseUrl should not include any url parameters. statusCode, statusDescription, requestUri, and throwable will be automatically appended.</p>
+	<attributes>
+
+      <attribute name="default" required="true">
+        <p>http://localhost:8080/error.jsp</p>
+      </attribute>
+
+      <attribute name="nnn" required="false">
+        <p>http://localhost:8080/nnn.jsp</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
 <section name="Crawler Session Manager Valve">
 
   <subsection name="Introduction">
