@@ -31,10 +31,10 @@ Require-Capability: \
 
 -namesection: jakarta/websocket/client*/;\
     Specification-Title=Jakarta WebSocket Client;\
-    Specification-Version=${websocket.spec.version};\
+    Specification-Version=${websocket.spec.version}${websocket.revision};\
     Specification-Vendor=Eclipse Foundation;\
     Implementation-Title=jakarta.websocket;\
-    Implementation-Version=${websocket.spec.version}.${websocket.revision};\
+    Implementation-Version=${version};\
     Implementation-Vendor=Apache Software Foundation
 
 -jpms-module-info: \

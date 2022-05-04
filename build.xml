@@ -62,7 +62,7 @@
   <property name="el.spec.version"         value="5.0" />
   <property name="el.revision"             value="-SNAPSHOT" />
   <property name="websocket.spec.version"  value="2.1" />
-  <property name="websocket.revision"      value="-SNAPSHOT" />
+  <property name="websocket.revision"      value="" />
   <property name="jaspic.spec.version"     value="3.0" />
   <property name="jaspic.revision"         value="-SNAPSHOT" />
   <property name="annotation.spec.version" value="2.1" />
