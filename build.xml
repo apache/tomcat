@@ -2526,6 +2526,10 @@ skip.installer property in build.properties" />
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
         tsaurl="http://timestamp.digicert.com"/>
+    <!-- Reproducible builds: consistent timestamps for installer files -->
+    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
+      <fileset dir="${tomcat.dist}"/>
+    </touch>
   </target>
 
   <target name="-installer" unless="skip.installer"
