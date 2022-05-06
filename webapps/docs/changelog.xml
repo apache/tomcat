@@ -158,6 +158,24 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to German translations contributed by Thomas Hoffmann.
+        (markt)
+      </add>
+      <add>
+        Improvements to Japanese translations contributed by Shirayuking.
+        (markt)
+      </add>
+      <add>
+        Improvements to Korean translations. (woonsan)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.78 (markt)" rtext="2022-04-01">
   <subsection name="Catalina">
