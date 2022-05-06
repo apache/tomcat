@@ -50,9 +50,7 @@ public class HealthFilter extends GenericFilter {
 	 */
 	@Override
 	public void init() throws ServletException {
-		pathHealth = getInitParameter(PATH_HEALTH);
-      log.info("Health Filter init");
+	   pathHealth = getInitParameter(PATH_HEALTH);
+       log.info("Health Filter init");
 	}
-
-
 }
