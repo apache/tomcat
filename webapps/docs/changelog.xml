@@ -184,6 +184,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to Chinese translations contributed by shawn. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M14 (markt)" rtext="2022-04-01">
   <subsection name="Catalina">
