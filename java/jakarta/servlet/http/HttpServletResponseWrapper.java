@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import io.cloudevents.CloudEvent;
 import jakarta.servlet.ServletResponseWrapper;
 
 /**
@@ -260,4 +261,15 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     public Supplier<Map<String, String>> getTrailerFields() {
         return this._getHttpServletResponse().getTrailerFields();
     }
+
+
+    /**
+     * Sends a CloudEvent as response to the request
+     * @param ev the event to send
+     * @throws IOException
+     */
+    public void sendCloudEvent(CloudEvent ev) throws IOException{
+        this._getHttpServletResponse().sendCloudEvent(ev);
+    }
+
 }

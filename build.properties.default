@@ -114,6 +114,24 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # Mirror, was used when there were problems with the main SF downloads site
 # base-sf.loc=https://sunet.dl.sourceforge.net
 
+# ---- CloudEvents
+cev.version=2.3.0
+
+# ---- CloudEvents Core
+cev.core.home=${base.path}/cloudevents-core-${cev.version}
+cev.core.jar=${cev.core.home}/cloudevents-core-${cev.version}.jar
+cev.core.loc=https://repo1.maven.org/maven2/io/cloudevents/cloudevents-core/${cev.version}/cloudevents-core-${cev.version}.jar
+
+# ---- CloudEvents API
+cev.api.home=${base.path}/cloudevents-api-${cev.version}
+cev.api.jar=${cev.api.home}/cloudevents-api-${cev.version}.jar
+cev.api.loc=https://repo1.maven.org/maven2/io/cloudevents/cloudevents-api/${cev.version}/cloudevents-api-${cev.version}.jar
+
+# ---- CloudEvents http basic
+cev.http.home=${base.path}/cloudevents-http-basic-${cev.version}
+cev.http.jar=${cev.http.home}/cloudevents-http-basic-${cev.version}.jar
+cev.http.loc=https://repo1.maven.org/maven2/io/cloudevents/cloudevents-http-basic/${cev.version}/cloudevents-http-basic-${cev.version}.jar
+
 # ----- Webservices - JAX RPC -----
 jaxrpc-lib.version=1.1-rc4
 jaxrpc-lib.checksum.enabled=true
@@ -360,5 +378,3 @@ derby-shared.jar=${derby.home}/derby-shared-${derby.version}.jar
 derby-shared.loc=${base-maven.loc}/org/apache/derby/derbyshared/${derby.version}/derbyshared-${derby.version}.jar
 derby-tools.jar=${derby.home}/derby-tools-${derby.version}.jar
 derby-tools.loc=${base-maven.loc}/org/apache/derby/derbytools/${derby.version}/derbytools-${derby.version}.jar
-
-

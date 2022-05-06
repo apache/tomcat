@@ -21,7 +21,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import io.cloudevents.CloudEvent;
 import jakarta.servlet.ServletResponse;
+
 
 /**
  * Extends the {@link ServletResponse} interface to provide HTTP-specific
@@ -306,6 +308,7 @@ public interface HttpServletResponse extends ServletResponse {
      */
     public Collection<String> getHeaderNames();
 
+
     /**
      * Configure the supplier of the trailer headers. The supplier will be
      * called in the scope of the thread that completes the response.
@@ -339,6 +342,15 @@ public interface HttpServletResponse extends ServletResponse {
     public default Supplier<Map<String, String>> getTrailerFields() {
         return null;
     }
+
+
+    /**
+     * Sends a CloudEvent as response to the request
+     * @param ev the event to send
+     * @throws IOException
+     */
+    public void sendCloudEvent(CloudEvent ev) throws IOException;
+
 
     /*
      * Server status codes; see RFC 7231.

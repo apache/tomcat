@@ -1,5 +1,12 @@
 ## Welcome to Apache Tomcat!
 
+### Changes to Apache Tomcat to deal with CloudEvents
+A new class, `CloudEventListener`,  has been added to process CloudEvents
+A new method, `sendEvent(CloudEvent)` has been added to the interface `HttpServletResponse`.
+Three filters are implemented to: provide basic metrics, provide a health endpoint, provide token auth.
+
+The idea is to ease the development of event-driven serverless function deployed on Knative.
+
 ### What Is It?
 
 The Apache Tomcat® software is an open source implementation of the Java
@@ -19,7 +26,7 @@ project. To learn more about getting involved,
 Apache Tomcat software powers numerous large-scale, mission-critical web
 applications across a diverse range of industries and organizations. Some of
 these users and their stories are listed on the
-[PoweredBy wiki page](https://cwiki.apache.org/confluence/display/tomcat/PoweredBy).
+[PoweredBy wiki page](https://wiki.apache.org/tomcat/PoweredBy).
 
 Apache Tomcat, Tomcat, Apache, the Apache feather, and the Apache Tomcat
 project logo are trademarks of the Apache Software Foundation.

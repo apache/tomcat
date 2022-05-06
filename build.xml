@@ -62,7 +62,7 @@
   <property name="el.spec.version"         value="5.0" />
   <property name="el.revision"             value="-SNAPSHOT" />
   <property name="websocket.spec.version"  value="2.1" />
-  <property name="websocket.revision"      value="" />
+  <property name="websocket.revision"      value="-SNAPSHOT" />
   <property name="jaspic.spec.version"     value="3.0" />
   <property name="jaspic.revision"         value="-SNAPSHOT" />
   <property name="annotation.spec.version" value="2.1" />
@@ -219,6 +219,9 @@
     <pathelement location="${jaxrpc-lib.jar}"/>
     <pathelement location="${wsdl4j-lib.jar}"/>
     <pathelement location="${migration-lib.jar}"/>
+    <pathelement location="${cev.api.jar}"/>
+    <pathelement location="${cev.core.jar}"/>
+    <pathelement location="${cev.http.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -339,6 +342,7 @@
     <include name="jakarta/servlet/annotation/**" />
     <include name="jakarta/servlet/descriptor/**" />
     <include name="jakarta/servlet/http/**" />
+    <include name="jakarta/servlet/events/**" />
     <include name="jakarta/servlet/resources/**" />
     <exclude name="jakarta/servlet/jsp"/>
   </patternset>
@@ -446,6 +450,7 @@
     <include name="jakarta/servlet/**" />
     <include name="jakarta/servlet/annotation/**" />
     <include name="jakarta/servlet/http/**" />
+    <include name="jakarta/servlet/events/**" />
     <exclude name="jakarta/servlet/descriptor/**" />
     <exclude name="jakarta/servlet/jsp/**"/>
     <exclude name="jakarta/servlet/resources/**" />
@@ -1643,6 +1648,8 @@
       </fileset>
     </txt2html>
   </target>
+
+
   <target name="embed-jars" description="Create experimental embedded jars"
     depends="build-manifests,setup-bnd,compile,package" >
 
@@ -1654,6 +1661,11 @@
       failonerror="false"/>
     <copy file="${jdt.jar}" todir="${tomcat.embed}" />
     <copy file="${annotations-api.jar}" todir="${tomcat.embed}" />
+    
+    <!-- Added cloud events jars -->
+    <copy file="${cev.core.jar}" todir="${tomcat.embed}" />
+    <copy file="${cev.api.jar}" todir="${tomcat.embed}" />
+    <copy file="${cev.http.jar}" todir="${tomcat.embed}" />
 
     <!-- Note the meta-inf below will work as long as there is only one JAR
          that needs to add entries. If there is more than one a more complex
@@ -2565,10 +2577,6 @@ skip.installer property in build.properties" />
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
         tsaurl="http://timestamp.digicert.com"/>
-    <!-- Reproducible builds: consistent timestamps for installer files -->
-    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
-      <fileset dir="${tomcat.dist}"/>
-    </touch>
   </target>
 
   <target name="-installer" unless="skip.installer"

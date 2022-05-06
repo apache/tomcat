@@ -35,6 +35,9 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.res.StringManager;
 
+
+
+import io.cloudevents.CloudEvent;
 /**
  * Facade class that wraps a Coyote response object.
  * All methods are delegated to the wrapped response.
@@ -42,7 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  */
 public class ResponseFacade implements HttpServletResponse {
-
+    
     // ----------------------------------------------------------- DoPrivileged
 
     private final class SetContentTypePrivilegedAction
@@ -617,5 +620,13 @@ public class ResponseFacade implements HttpServletResponse {
     @Override
     public Supplier<Map<String, String>> getTrailerFields() {
         return response.getTrailerFields();
+    }
+
+
+    @Override
+    public void sendCloudEvent(CloudEvent ev) throws IOException {
+        // TODO Auto-generated method stub
+        response.sendCloudEvent(ev);
+        
     }
 }

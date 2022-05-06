@@ -218,7 +218,6 @@ public class CorsFilter extends GenericFilter {
         return defaultValue;
     }
 
-
     /**
      * Handles a CORS request of type {@link CORSRequestType}.SIMPLE.
      *
