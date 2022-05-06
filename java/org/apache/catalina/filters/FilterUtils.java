@@ -18,8 +18,8 @@ public class FilterUtils {
       def.setFilterClass(HealthFilter.class.getName());
       def.setFilterName("healthFilter");
       def.addInitParameter(HealthFilter.PATH_HEALTH, pathFilter);
-      context.addFi(def);
-      FilterMap map = new ilterMap();
+      context.addFilterDef(def);
+      FilterMap map = new FilterMap();
       map.setFilterName("healthFilter");
       map.addURLPattern("/*");
       context.addFilterMap(map);
