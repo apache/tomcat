@@ -192,6 +192,10 @@
       <add>
         Improvements to French translations. (remm)
       </add>
+      <add>
+        Improvements to German translations contributed by Thomas Hoffmann.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
