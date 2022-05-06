@@ -26,10 +26,7 @@ public class MetricsFilter extends GenericFilter {
 
    private transient Log log = LogFactory.getLog(MetricsFilter.class); // must not be static
 
-   /**
-    * 
-    * @param json true: the response in JSON otherwise int text
-    */
+ 
    public MetricsFilter() {
       this.calls = new ConcurrentHashMap<>();
       this.meanTimes = new ConcurrentHashMap<>();
