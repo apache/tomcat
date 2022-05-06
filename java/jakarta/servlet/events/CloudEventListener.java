@@ -29,10 +29,6 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import org.xml.sax.InputSource;
-
-import jakarta.security.auth.message.callback.SecretKeyCallback.Request;
 import jakarta.servlet.GenericServlet;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -145,22 +141,15 @@ public abstract class CloudEventListener extends GenericServlet {
    }
 
    private CloudEvent readEvent(HttpServletRequest req) throws IOException {
-      if (req.getHeader("Content-Type").contains("content-type: application/cloudevents+json")) {
-         // Not implemented: read the body and convert from JSON to CloudEvent
-         // TODO
-         return null;
-
-      } else {
-         Consumer<BiConsumer<String, String>> forEachHeader = processHeader -> {
-            Enumeration<String> headerNames = req.getHeaderNames();
-            while (headerNames.hasMoreElements()) {
-               String name = headerNames.nextElement();
-               processHeader.accept(name, req.getHeader(name));
-            }
-         };
-         byte[] body = getBody(req);
-         return HttpMessageFactory.createReader(forEachHeader, body).toEvent();
-      }
+      Consumer<BiConsumer<String, String>> forEachHeader = processHeader -> {
+         Enumeration<String> headerNames = req.getHeaderNames();
+         while (headerNames.hasMoreElements()) {
+            String name = headerNames.nextElement();
+            processHeader.accept(name, req.getHeader(name));
+         }
+      };
+      byte[] body = getBody(req);
+      return HttpMessageFactory.createReader(forEachHeader, body).toEvent();
    }
 
    protected void service(HttpServletRequest req, HttpServletResponse resp)
@@ -197,5 +186,4 @@ public abstract class CloudEventListener extends GenericServlet {
       }
       service(request, response);
    }
-
 }
