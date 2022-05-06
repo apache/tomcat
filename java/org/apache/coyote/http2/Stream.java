@@ -1367,6 +1367,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             return inputFilter.doRead(handler);
         }
 
+        @Deprecated
+        @Override
+        public int doRead(ByteChunk chunk) throws IOException {
+            return inputBuffer.doRead(chunk);
+        }
+
         @Override
         public int available() {
             return inputFilter.available();
