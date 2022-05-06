@@ -125,15 +125,6 @@ public abstract class CloudEventListener extends GenericServlet {
       extValue = config.getInitParameter(EXT_VALUE);
    }
 
-   // Cambia el código para que use CloudEvent (en lugar de CloudEventV1)
-   // Intenta usar estas clases (para que sea más general):
-   //
-   // https://cloudevents.github.io/sdk-java/http-basic.html
-   // https://github.com/cloudevents/sdk-java/blob/master/examples/basic-http/src/main/java/io/cloudevents/examples/http/basic/JettyServer.java
-
-   // Dependencia (para añadir a properties y a build.xml)
-   // https://repo1.maven.org/maven2/io/cloudevents/cloudevents-http-basic/2.3.0/cloudevents-http-basic-2.3.0.jar
-
    public byte[] getBody(HttpServletRequest req) throws IOException {
       String tam = req.getHeader("Content-Length");
       byte[] body = null;
