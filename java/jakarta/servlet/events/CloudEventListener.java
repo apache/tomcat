@@ -54,7 +54,7 @@ import io.cloudevents.http.HttpMessageFactory;
  * This class only deals with POST requests. <br/>
  * A subclass of <code>CloudEventListener</code> must override the method:
  * <ul>
- * <li>consumeEvent(CloudEventV1 ev, HttpServletRequest req, HttpServletResponse
+ * <li>consumeEvent(CloudEvent ev, HttpServletRequest req, HttpServletResponse
  * resp)</li>
  * </ul>
  * <p>
