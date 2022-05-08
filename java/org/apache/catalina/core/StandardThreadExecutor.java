@@ -75,11 +75,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     protected String name;
 
     /**
-     * prestart threads?
-     */
-    protected boolean prestartminSpareThreads = false;
-
-    /**
      * The maximum number of elements that can queue up before we reject them
      */
     protected int maxQueueSize = Integer.MAX_VALUE;
@@ -121,9 +116,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
         executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
         executor.setThreadRenewalDelay(threadRenewalDelay);
-        if (prestartminSpareThreads) {
-            executor.prestartAllCoreThreads();
-        }
         taskqueue.setParent(executor);
 
         setState(LifecycleState.STARTING);
@@ -203,10 +195,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         return name;
     }
 
-    public boolean isPrestartminSpareThreads() {
-
-        return prestartminSpareThreads;
-    }
     public void setThreadPriority(int threadPriority) {
         this.threadPriority = threadPriority;
     }
@@ -238,10 +226,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         if (executor != null) {
             executor.setCorePoolSize(minSpareThreads);
         }
-    }
-
-    public void setPrestartminSpareThreads(boolean prestartminSpareThreads) {
-        this.prestartminSpareThreads = prestartminSpareThreads;
     }
 
     public void setName(String name) {
