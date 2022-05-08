@@ -1524,10 +1524,6 @@
                type="int"
                writeable="false" />
 
-    <attribute name="prestartminSpareThreads"
-               description="Prestart threads?"
-               is="true"
-               type="boolean"/>
 
     <attribute name="queueSize"
                description="Number of tasks waiting to be processed"
