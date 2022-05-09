@@ -179,6 +179,9 @@
         when configuring the Windows service with custom scripts as described in
         <bug>66055</bug>. (markt)
       </update>
+      <update>
+        Update to JSign 4.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
