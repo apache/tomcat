@@ -211,6 +211,10 @@
       <update>
         Update to JSign 4.1. (markt)
       </update>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.33 to
+        pick up Windows binaries built with OpenSSL 1.1.1o.(markt)
+      </update>
     </changelog>
   </subsection>
 </section>
