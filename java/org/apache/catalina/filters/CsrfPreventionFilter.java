@@ -179,16 +179,18 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 nonceCache = createNonceCache(req, session);
             }
 
-            String newNonce = generateNonce(req);
+            if (!skipNonceGeneration(req)) {
+                String newNonce = generateNonce(req);
 
-            nonceCache.add(newNonce);
+                nonceCache.add(newNonce);
 
-            // Take this request's nonce and put it into the request
-            // attributes so pages can make direct use of it, rather than
-            // requiring the use of response.encodeURL.
-            request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
+                // Take this request's nonce and put it into the request
+                // attributes so pages can make direct use of it, rather than
+                // requiring the use of response.encodeURL.
+                request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
 
-            wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce);
+                wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce);
+            }
         } else {
             wResponse = response;
         }
@@ -213,6 +215,22 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         }
 
         return true;
+    }
+
+
+    /**
+     * Determines whether a nonce should be created. This method is provided
+     * primarily for the benefit of sub-classes that wish to customise this
+     * behaviour.
+     *
+     * @param request   The request that triggered the need to potentially
+     *                      create the nonce.
+     *
+     * @return {@code true} if a nonce should be created, otherwise
+     *              {@code false}
+     */
+    protected boolean skipNonceGeneration(HttpServletRequest request) {
+        return false;
     }
 
 
