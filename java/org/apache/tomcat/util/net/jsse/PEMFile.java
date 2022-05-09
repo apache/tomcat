@@ -27,6 +27,7 @@ import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -43,6 +44,8 @@ import javax.crypto.Cipher;
 import javax.crypto.EncryptedPrivateKeyInfo;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.tomcat.util.buf.Asn1Parser;
@@ -98,6 +101,8 @@ public class PEMFile {
         this.filename = filename;
 
         List<Part> parts = new ArrayList<>();
+        String encryptionAlgorithm = null;
+        String roundDigest = null;
         try (InputStream inputStream = ConfigFileLoader.getSource().getResource(filename).getInputStream()) {
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.US_ASCII));
@@ -113,6 +118,16 @@ public class PEMFile {
                     part = null;
                 } else if (part != null && !line.contains(":") && !line.startsWith(" ")) {
                     part.content += line;
+                } else if (part != null && line.contains(":") && !line.startsWith(" ")) {
+                    /* Something like DEK-Info: DES-EDE3-CBC,B5A53CB8B7E50064 */
+                    if (line.startsWith("DEK-Info: ")) {
+                        String[] pieces = line.split(" ");
+                        pieces = pieces[1].split(",");
+                        if (pieces.length == 2) {
+                            encryptionAlgorithm = pieces[0];
+                            roundDigest = pieces[1];
+                        }
+                    }
                 }
             }
         }
@@ -120,16 +135,16 @@ public class PEMFile {
         for (Part part : parts) {
             switch (part.type) {
                 case Part.PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS8);
+                    privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS8, encryptionAlgorithm, roundDigest);
                     break;
                 case Part.EC_PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(null, "EC", Format.RFC5915);
+                    privateKey = part.toPrivateKey(null, "EC", Format.RFC5915, encryptionAlgorithm, roundDigest);
                     break;
                 case Part.ENCRYPTED_PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8);
+                    privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8, encryptionAlgorithm, roundDigest);
                     break;
                 case Part.RSA_PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1);
+                    privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS1, encryptionAlgorithm, roundDigest);
                     break;
                 case Part.CERTIFICATE:
                 case Part.X509_CERTIFICATE:
@@ -154,6 +169,16 @@ public class PEMFile {
         public String type;
         public String content = "";
 
+        private byte[] fromHex(String hexString) {
+            byte[] bytes = new byte[hexString.length() / 2];
+            for (int i = 0; i < hexString.length(); i += 2)
+            {
+                bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i + 1), 16));
+            }
+            return bytes;
+        }
+
         private byte[] decode() {
             return Base64.decodeBase64(content);
         }
@@ -163,7 +188,7 @@ public class PEMFile {
             return (X509Certificate) factory.generateCertificate(new ByteArrayInputStream(decode()));
         }
 
-        public PrivateKey toPrivateKey(String password, String keyAlgorithm, Format format)
+        public PrivateKey toPrivateKey(String password, String keyAlgorithm, Format format, String encryptionAlgorithm, String roundDigest)
                 throws GeneralSecurityException, IOException {
             KeySpec keySpec = null;
 
@@ -183,15 +208,38 @@ public class PEMFile {
                     }
                 }
             } else {
-                EncryptedPrivateKeyInfo privateKeyInfo = new EncryptedPrivateKeyInfo(decode());
-                String pbeAlgorithm = getPBEAlgorithm(privateKeyInfo);
-                SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(pbeAlgorithm);
-                SecretKey secretKey = secretKeyFactory.generateSecret(new PBEKeySpec(password.toCharArray()));
+                if (encryptionAlgorithm != null && "DES-EDE3-CBC".equals(encryptionAlgorithm)) {
+                    /* We have something like: DES-EDE3-CBC,B5A53CB8B7E50064 */
+                    byte[] pw = password.getBytes(StandardCharsets.UTF_8);
+                    byte[] iv = fromHex(roundDigest);
+                    MessageDigest digest = MessageDigest.getInstance("MD5");
+                    digest.update(pw);
+                    digest.update(iv, 0, 8);
+                    byte[] round1Digest = digest.digest();
+                    digest.update(round1Digest);
+                    digest.update(pw);
+                    digest.update(iv, 0, 8);
+                    byte[] round2Digest = digest.digest();
+                    byte[] key = new byte[24];
+                    System.arraycopy(round1Digest, 0, key, 0, 16);
+                    System.arraycopy(round2Digest, 0, key, 16, 8);
+                    SecretKey secretKey = new SecretKeySpec(key, "DESede");
+                    Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
+                    cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+                    byte[] pkcs1 = cipher.doFinal(decode());
+                    keySpec = parsePKCS1(pkcs1);
+                } else {
+                    /* Only Decode a PKCS #12 encrypted key */
+                    EncryptedPrivateKeyInfo privateKeyInfo = new EncryptedPrivateKeyInfo(decode());
+                    String pbeAlgorithm = getPBEAlgorithm(privateKeyInfo);
+                    SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(pbeAlgorithm);
+                    SecretKey secretKey = secretKeyFactory.generateSecret(new PBEKeySpec(password.toCharArray()));
 
-                Cipher cipher = Cipher.getInstance(pbeAlgorithm);
-                cipher.init(Cipher.DECRYPT_MODE, secretKey, privateKeyInfo.getAlgParameters());
+                    Cipher cipher = Cipher.getInstance(pbeAlgorithm);
+                    cipher.init(Cipher.DECRYPT_MODE, secretKey, privateKeyInfo.getAlgParameters());
 
-                keySpec = privateKeyInfo.getKeySpec(cipher);
+                    keySpec = privateKeyInfo.getKeySpec(cipher);
+                }
             }
 
             InvalidKeyException exception = new InvalidKeyException(sm.getString("pemFile.parseError", filename));
