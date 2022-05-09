@@ -203,6 +203,11 @@
       <add>
         Improvements to Korean translations. (woonsan)
       </add>
+      <update>
+        Update to Commons Daemon 1.3.1. This fixes a known regression in 1.3.0
+        when configuring the Windows service with custom scripts as described in
+        <bug>66055</bug>. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
