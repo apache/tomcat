@@ -107,6 +107,11 @@
 <section name="Tomcat 9.0.63 (remm)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <scode>
+        <bug>65853</bug>: Refactor the <code>CsrfPreventionFilter</code> to make
+        it easier for sub-classes to modify the nonce generation and storage.
+        Based on suggestions by Marvin Fröhlich. (markt)
+      </scode>
       <fix>
         <bug>65991</bug>: Avoid NPE with <code>SSLAuthenticator</code> when
         <code>boundOnInit</code> is used on a connector, during the check
