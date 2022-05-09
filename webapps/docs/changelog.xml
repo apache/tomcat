@@ -164,8 +164,8 @@
     <changelog>
       <update>
         To align with the JSP 3.1 specification, make the
-        <code>jsp:pluing</code> action a NO-OP. No HTML will be generated as a
-        result the <code>jsp:pluing</code> action being included in a JSP. This
+        <code>jsp:plugin</code> action a NO-OP. No HTML will be generated as a
+        result the <code>jsp:plugin</code> action being included in a JSP. This
         is be because the associated HTML elements are no longer supported by
         any major browser. (markt)
       </update>
