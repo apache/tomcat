@@ -211,7 +211,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
                 String nonceFromSessionStr = nonceFromSession.getNonce(request.getSession(false),
                         Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
                 if (nonceFromSessionStr == null) {
-                    nonceFromSessionStr = generateNonce();
+                    nonceFromSessionStr = generateNonce(request);
                     nonceToSession.setNonce(Objects.requireNonNull(request.getSession(true)),
                             Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME, nonceFromSessionStr);
                 }
