@@ -320,13 +320,13 @@ migration-lib.home=${base.path}/migration-${migration-lib.version}
 migration-lib.jar=${migration-lib.home}/jakartaee-migration-${migration-lib.version}-shaded.jar
 migration-lib.loc=${base-maven.loc}/org/apache/tomcat/jakartaee-migration/${migration-lib.version}/jakartaee-migration-${migration-lib.version}-shaded.jar
 
-# ----- JSign, version 4.0 or later -----
-jsign.version=4.0
+# ----- JSign, version 4.1 or later -----
+jsign.version=4.1
 
-# checksums for JSign 4.0
+# checksums for JSign 4.1
 jsign.checksum.enabled=true
 jsign.checksum.algorithm=MD5|SHA-1
-jsign.checksum.value=50982facf864df4f08a051b43f7d2e42|3d203fbffdc45e837f98b7c9c5d311b615661a75
+jsign.checksum.value=ba760e85fe0bdb1da12152822919caec|39fa41688de11b739278b8cb8533c05888d68d5a
 
 jsign.home=${base.path}/jsign-${jsign.version}
 jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
