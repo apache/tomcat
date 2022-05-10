@@ -120,7 +120,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             HttpSession session = req.getSession(false);
 
-            NonceCache<String> nonceCache = (session == null) ? null : getNonceCache(req, session);
+            NonceCache<String> nonceCache = getNonceCache(req, session);
 
             if (!skipNonceCheck(req)) {
                 String previousNonce = req.getParameter(nonceRequestParameterName);
@@ -265,6 +265,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      *         and/or session
      */
     protected NonceCache<String> getNonceCache(HttpServletRequest request, HttpSession session) {
+        if (session == null) {
+            return null;
+        }
         @SuppressWarnings("unchecked")
         NonceCache<String> nonceCache =
                 (NonceCache<String>) session.getAttribute(Constants.CSRF_NONCE_SESSION_ATTR_NAME);
