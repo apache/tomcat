@@ -66,6 +66,7 @@ public class PEMFile {
             new byte[] { 0x06, 0x07, 0x2A, (byte) 0x86, 0x48, (byte) 0xCE, 0x3D, 0x02, 0x01 };
 
     private static final String OID_PKCS5_PBES2 = "1.2.840.113549.1.5.13";
+    private static final String PBES2 = "PBES2";
 
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
         StringBuilder result = new StringBuilder();
@@ -277,7 +278,10 @@ public class PEMFile {
 
         private String getPBEAlgorithm(EncryptedPrivateKeyInfo privateKeyInfo) {
             AlgorithmParameters parameters = privateKeyInfo.getAlgParameters();
-            if (parameters != null && OID_PKCS5_PBES2.equals(privateKeyInfo.getAlgName())) {
+            String algName = privateKeyInfo.getAlgName();
+            // Java 11 returns OID_PKCS5_PBES2
+            // Java 17 returns PBES2
+            if (parameters != null && (OID_PKCS5_PBES2.equals(algName) || PBES2.equals(algName))) {
                 /*
                  * This should be "PBEWith<prf>And<encryption>".
                  * Relying on the toString() implementation is potentially
