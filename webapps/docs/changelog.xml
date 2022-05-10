@@ -168,6 +168,12 @@
         the internal, in memory key store. Based on <pr>511</pr>.
         (jfclere/markt)
       </add>
+      <fix>
+        Remove the <code>prestartminSpareThreads</code> attribute of the
+        <code>StandardThreadExecutor</code> since all core threads are always
+        started by default making this attribute meaningless. Pull request
+        <pr>510</pr> provided by Aooohan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
