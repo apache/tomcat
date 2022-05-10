@@ -158,6 +158,11 @@
         <bug>66023</bug>: Improve the fix for <bug>65726</bug> and support HTTP
         upgrade with a request body for a wider set of use cases. (markt)
       </fix>
+      <add>
+        Add support for encrypted PKCS#1 formatted private keys when configuring
+        the internal, in memory key store. Based on <pr>511</pr>.
+        (jfclere/markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Webapps">
