@@ -163,6 +163,11 @@
         <bug>66035</bug>: Add NULL check on the SSL session reference in the
         Panama code before accessing the session id and creation time. (remm)
       </fix>
+      <add>
+        Add support for encrypted PKCS#1 formatted private keys when configuring
+        the internal, in memory key store. Based on <pr>511</pr>.
+        (jfclere/markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
