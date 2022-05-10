@@ -262,7 +262,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      *                      cache. Unused by the default implementation.
      * @param session   The session associated with the request.
      *
-     * @return A newly created {@link NonceCache}
+     * @return The {@link NonceCache} currently associated with the request
+     *         and/or session
      */
     protected NonceCache<String> getNonceCache(HttpServletRequest request, HttpSession session) {
         @SuppressWarnings("unchecked")
