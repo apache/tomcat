@@ -183,6 +183,12 @@
         recommendation for the use the <code>trimSpaces</code> option for Jasper
         in production environments. (markt)
       </fix>
+      <fix>
+        Update the documentation web application to state that the
+        <code>EncryptInterceptor</code> does not provide sufficient protection
+        to run Tomcat clustering over an untrusted network. This is
+        CVE-2022-29885. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -127,8 +127,12 @@ Tomcat cluster. These include:</p>
   <li>private LAN</li>
   <li>a Virtual Private Network (VPN)</li>
   <li>IPSEC</li>
-  <li>Encrypt cluster traffic using the <a href="config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a></li>
 </ul>
+
+<p>The <a href="cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
+provides confidentiality and integrity protection but it does not protect
+against all risks associated with running a Tomcat cluster on an untrusted
+network, particularly DoS attacks.</p>
 
 </section>
 
