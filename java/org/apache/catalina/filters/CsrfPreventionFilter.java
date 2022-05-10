@@ -191,11 +191,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
                 wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce);
             }
-        } else {
-            wResponse = response;
         }
 
-        chain.doFilter(request, wResponse);
+        chain.doFilter(request, wResponse == null ? response : wResponse);
     }
 
 
