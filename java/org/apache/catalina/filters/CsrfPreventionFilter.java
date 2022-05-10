@@ -120,9 +120,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             HttpSession session = req.getSession(false);
 
-            NonceCache<String> nonceCache = getNonceCache(req, session);
+            boolean skipNonceCheck = skipNonceCheck(req);
+            NonceCache<String> nonceCache = null;
 
-            if (!skipNonceCheck(req)) {
+            if (!skipNonceCheck) {
                 String previousNonce = req.getParameter(nonceRequestParameterName);
 
                 if (previousNonce == null) {
@@ -135,7 +136,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
                     res.sendError(getDenyStatus());
                     return;
-                } else if (nonceCache == null) {
+                }
+
+                nonceCache = getNonceCache(req, session);
+                if (nonceCache == null) {
                     if (log.isDebugEnabled()) {
                         log.debug("Rejecting request for " + getRequestedPath(req)
                                   + ", session "
@@ -163,6 +167,10 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             }
 
             if (!skipNonceGeneration(req)) {
+                if (skipNonceCheck) {
+                    // Didn't look up nonce cache earlier so look it up now.
+                    nonceCache = getNonceCache(req, session);
+                }
                 if (nonceCache == null) {
                     if (log.isDebugEnabled()) {
                         log.debug("Creating new CSRF nonce cache with size=" + nonceCacheSize + " for session " + (null == session ? "(will create)" : session.getId()));
