@@ -129,6 +129,11 @@
         mappings used by <code>ServletResponse.setLocale()</code> as it
         caused regressions for applications using UTF-8. (markt)
       </add>
+      <add>
+        Provide a property source that sources values from Kubernetes service
+        bindings. Pull request <pr>512</pr> provided by Sumit Kulhadia and
+        Gareth Evans. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

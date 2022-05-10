@@ -16,15 +16,15 @@
  */
 package org.apache.tomcat.util.digester;
 
+import java.io.FilePermission;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Permission;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.security.PermissionCheck;
-import java.io.IOException;
-import java.io.FilePermission;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource}
@@ -70,7 +70,8 @@ import java.nio.file.Paths;
  *
  * @see Digester
  *
- * @see <a href="https://tomcat.apache.org/tomcat-9.0-doc/config/systemprops.html#Property_replacements">Tomcat Configuration Reference System Properties</a>
+ * @see <a href="https://tomcat.apache.org/tomcat-9.0-doc/config/systemprops.html#Property_replacements">Tomcat
+ *      Configuration Reference System Properties</a>
  */
 public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePropertySource {
 
