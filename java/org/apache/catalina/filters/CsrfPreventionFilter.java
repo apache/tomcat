@@ -163,23 +163,23 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 }
             }
 
-            if (nonceCache == null) {
-                if(log.isDebugEnabled()) {
-                    log.debug("Creating new CSRF nonce cache with size=" + nonceCacheSize + " for session " + (null == session ? "(will create)" : session.getId()));
-                }
-
-                if (session == null) {
+            if (!skipNonceGeneration(req)) {
+                if (nonceCache == null) {
                     if(log.isDebugEnabled()) {
-                         log.debug("Creating new session to store CSRF nonce cache");
+                        log.debug("Creating new CSRF nonce cache with size=" + nonceCacheSize + " for session " + (null == session ? "(will create)" : session.getId()));
                     }
 
-                    session = req.getSession(true);
+                    if (session == null) {
+                        if(log.isDebugEnabled()) {
+                             log.debug("Creating new session to store CSRF nonce cache");
+                        }
+
+                        session = req.getSession(true);
+                    }
+
+                    nonceCache = createNonceCache(req, session);
                 }
 
-                nonceCache = createNonceCache(req, session);
-            }
-
-            if (!skipNonceGeneration(req)) {
                 String newNonce = generateNonce(req);
 
                 nonceCache.add(newNonce);
