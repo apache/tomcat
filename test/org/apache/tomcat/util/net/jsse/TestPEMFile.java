@@ -78,7 +78,7 @@ public class TestPEMFile {
 
 
     private String getPath(String file) throws URISyntaxException, IOException {
-        String packageName = this.getClass().getPackageName();
+        String packageName = this.getClass().getPackage().getName();
         String path = packageName.replaceAll("\\.", File.separator);
         File f = new File("test" + File.separator + path + File.separator + file);
 
