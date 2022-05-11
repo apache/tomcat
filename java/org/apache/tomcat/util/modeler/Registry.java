@@ -462,7 +462,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
                     } else {
                         server = ManagementFactory.getPlatformMBeanServer();
                         if (log.isDebugEnabled()) {
-                            log.debug("Creating MBeanServer" + (System.currentTimeMillis() - t1));
+                            log.debug("Created MBeanServer" + (System.currentTimeMillis() - t1));
                         }
                     }
                 }
