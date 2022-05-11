@@ -2241,7 +2241,7 @@
    to be in a class path, where each entry is a statusCode=baseUrl. baseUrl should not include any url parameters. statusCode, statusDescription, requestUri, and throwable will be automatically appended.</p>
 	<attributes>
 
-      <attribute name="default" required="true">
+      <attribute name="0" required="true">
         <p>/error.jsp</p>
       </attribute>
 
@@ -2292,7 +2292,7 @@
    to be in a class path, where each entry is a statusCode=baseUrl. baseUrl should not include any url parameters. statusCode, statusDescription, requestUri, and throwable will be automatically appended.</p>
 	<attributes>
 
-      <attribute name="default" required="true">
+      <attribute name="0" required="true">
         <p>http://localhost:8080/error.jsp</p>
       </attribute>
 

@@ -33,7 +33,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * <p>Implementation of a Valve that forwards to jsps.</p>
+ * <p>Implementation of a Valve that redirects error reporting to other urls.</p>
  *
  * <p>This Valve should be attached at the Host level, although it will work
  * if attached to a Context.</p>
@@ -83,18 +83,36 @@ public class RedirectErrorReportValve extends ErrorReportValve {
 			return;
 		}
 
-		String urlString = getRedirectUrl(response)+"?requestUri="+request.getRequestURI()+"&statusCode="+statusCode;
+		String urlString = getRedirectUrl(response);
+
+		StringBuilder stringBuilder = new StringBuilder(urlString);
+		if(urlString.indexOf("?") > -1) {
+			stringBuilder.append("&");
+		} else {
+			stringBuilder.append("?");
+		}
+		stringBuilder.append("requestUri=");
+		stringBuilder.append(URLEncoder.encode(request.getRequestURI()));
+		stringBuilder.append("&statusCode=");
+		stringBuilder.append(URLEncoder.encode(String.valueOf(statusCode)));
 
 		try {
 			StringManager smClient = StringManager.getManager( Constants.Package, request.getLocales());
 			String statusDescription = smClient.getString("http." + statusCode);
-			urlString+="&statusDescription="+URLEncoder.encode(statusDescription);
+			stringBuilder.append("&statusDescription=");
+			stringBuilder.append(URLEncoder.encode(statusDescription));
 		} catch(Exception e) {
 			log.warn("Failed to get status description for "+statusCode, e);
 		}
 
 		if(null != throwable) {
-			urlString+="&throwable="+URLEncoder.encode(throwable.toString());
+			stringBuilder.append("&throwable=");
+			stringBuilder.append(URLEncoder.encode(throwable.toString()));
+		}
+
+		urlString = stringBuilder.toString();
+		if(log.isTraceEnabled()) {
+			log.trace("Redirecting error reporting to "+urlString);
 		}
 
 		response.sendRedirect(urlString);
