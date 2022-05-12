@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>23</version>
+        <version>26</version>
     </parent>
 
     <groupId>org.apache.tomcat</groupId>
@@ -36,7 +36,7 @@
         <geronimo-atinject.version>1.2</geronimo-atinject.version>
         <geronimo-interceptor.version>1.2</geronimo-interceptor.version>
         <geronimo-jcdi.version>1.3</geronimo-jcdi.version>
-        <tomcat.version>10.0.16</tomcat.version>
+        <tomcat.version>10.0.20</tomcat.version>
     </properties>
 
     <dependencies>
