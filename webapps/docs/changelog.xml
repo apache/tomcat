@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.80 (schultz)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>66064</bug>: Update the building page in the documentation web
+        application to reflect changes in required Java version and source
+        repository. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.79 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
