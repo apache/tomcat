@@ -39,7 +39,7 @@ Require-Capability: \
     Specification-Version=${el.spec.version};\
     Specification-Vendor=Eclipse Foundation;\
     Implementation-Title=jakarta.el;\
-    Implementation-Version=${el.spec.version}.${el.revision};\
+    Implementation-Version=${el.spec.version}${el.revision};\
     Implementation-Vendor=Apache Software Foundation
 
 -jpms-module-info: \
