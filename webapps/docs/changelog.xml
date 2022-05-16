@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.64 (remm)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>66064</bug>: Update the building page in the documentation web
+        application to reflect changes in required Java version and source
+        repository. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.63 (remm)" rtext="in progress">
   <subsection name="Catalina">
