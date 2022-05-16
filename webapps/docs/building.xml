@@ -43,12 +43,12 @@ The following is a quick step by step guide.
 
 </section>
 
-<section name="Download a Java Development Kit (JDK) version 8">
+<section name="Download a Java Development Kit (JDK) version 11 or later">
 
 <p>
-Building Apache Tomcat requires a JDK (version 8) to be installed. You can download one from<br />
-<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a><br/>
-<a href="http://openjdk.java.net/install/index.html">http://openjdk.java.net/install/index.html</a><br/>
+Building Apache Tomcat requires a JDK (version 11) or later to be installed. You
+can download one from
+<a href="https://adoptium.net/temurin/releases">https://adoptium.net/temurin/releases</a>
 or another JDK vendor.
 </p>
 
@@ -83,11 +83,11 @@ available, which will be used to actually perform the build.
 
 </section>
 
-<section name="Checkout or obtain the Tomcat source code">
+<section name="Obtain the Tomcat source code">
 
   <p>
-  Tomcat SVN repository URL:
-  <a href="https://svn.apache.org/repos/asf/tomcat/trunk/">https://svn.apache.org/repos/asf/tomcat/trunk/</a>
+  Tomcat Git repository URL:
+  <a href="https://github.com/apache/tomcat">https://github.com/apache/tomcat</a>
   </p>
   <p>
   Tomcat source packages:
@@ -95,8 +95,8 @@ available, which will be used to actually perform the build.
   </p>
 
   <p>
-  Checkout the source using SVN, selecting a tag for released version or
-  trunk for the current development code, or download and unpack a
+  Clone the source repository using Git, selecting a tag for released version or
+  main for the current development code, or download and unpack a
   source package. For the remainder of this guide, the symbolic name
   <code>${tomcat.source}</code> is used to refer to the
   location where the source has been placed.
