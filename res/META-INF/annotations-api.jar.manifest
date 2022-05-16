@@ -7,5 +7,5 @@ Specification-Title: Jakarta Annotations
 Specification-Version: @annotation.spec.version@
 Specification-Vendor: Eclipse Foundation
 Implementation-Title: jakarta.annotation
-Implementation-Version: @annotation.spec.version@.@annotation.revision@
+Implementation-Version: @annotation.spec.version@@annotation.revision@
 Implementation-Vendor: Apache Software Foundation
