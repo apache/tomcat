@@ -50,7 +50,7 @@ Require-Capability: \
     Specification-Version=${websocket.spec.version};\
     Specification-Vendor=Eclipse Foundation;\
     Implementation-Title=jakarta.websocket;\
-    Implementation-Version=${websocket.spec.version}.${websocket.revision};\
+    Implementation-Version=${websocket.spec.version}${websocket.revision};\
     Implementation-Vendor=Apache Software Foundation
 
 -jpms-module-info: \
