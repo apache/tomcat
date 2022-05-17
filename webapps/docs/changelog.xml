@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M16 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Update XML schema used for generated web fragments to use the Servlet
+        6.0 web fragment schema. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
