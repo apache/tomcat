@@ -47,7 +47,7 @@ to authenticate themselves.  If you are not utilizing these features, you can
 safely skip this document.</p>
 
 <p>For fundamental background information about container managed security,
-see the <a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">Servlet
+see the <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
 Specification (Version 2.4)</a>, Section 12.</p>
 
 <p>For information about utilizing the <em>Single Sign On</em> feature of

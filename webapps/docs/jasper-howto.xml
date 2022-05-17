@@ -37,7 +37,7 @@
 <section name="Introduction">
 
 <p>Tomcat <version-major-minor/> uses the Jasper 2 JSP Engine to implement
-the <a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">JavaServer Pages 2.3</a>
+the <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">JavaServer Pages 2.3</a>
 specification.</p>
 
 <p>Jasper 2 has been redesigned to significantly improve performance over
