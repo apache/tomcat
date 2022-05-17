@@ -72,9 +72,13 @@ public class TestImportHandlerStandardPackages {
                         try {
                             return Class.forName("java.lang." + c);   // Get the class object
                         } catch (ClassNotFoundException e) {
-                            throw new RuntimeException();
+                            throw new RuntimeException(c);
+                        } catch (Throwable t) {
+                            swallowEnablePreview(c, t);
+                            return null;
                         }
                     })
+                    .filter(c -> null != c)
                     .filter(c -> Modifier.isPublic(c.getModifiers())) // Exclude non-public classes
                     .map(c -> c.getName().substring(10))              // Back to the class name
                     .map(c -> c.replace('$',  '.'))
@@ -157,5 +161,26 @@ public class TestImportHandlerStandardPackages {
         @SuppressWarnings("unchecked")
         Stream<String> result = (Stream<String>) clazzModuleReader.getMethod("list").invoke(mr);
         return result;
+    }
+
+
+    /*
+     * This is a bit of a hack but there isn't a specific exception that can be
+     * caught.
+     */
+    private void swallowEnablePreview(String className, Throwable t) {
+        while (t != null) {
+            if (t.getMessage() != null && t.getMessage().contains("--enable-preview")) {
+                return;
+            }
+
+            Throwable cause = t.getCause();
+            if (t == cause) {
+                break;
+            }
+            t = cause;
+        }
+
+        throw new RuntimeException(className, t);
     }
 }
