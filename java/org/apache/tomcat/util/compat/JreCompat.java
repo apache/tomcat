@@ -19,6 +19,7 @@ package org.apache.tomcat.util.compat;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.SocketAddress;
@@ -45,6 +46,7 @@ public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean graalAvailable;
+    private static final boolean jre19Available;
     private static final boolean jre16Available;
     private static final boolean jre11Available;
     private static final boolean jre9Available;
@@ -67,18 +69,26 @@ public class JreCompat {
 
         // This is Tomcat 9 with a minimum Java version of Java 8.
         // Look for the highest supported JVM first
-        if (Jre16Compat.isSupported()) {
+        if (Jre19Compat.isSupported()) {
+            instance = new Jre19Compat();
+            jre9Available = true;
+            jre16Available = true;
+            jre19Available = true;
+        } else if (Jre16Compat.isSupported()) {
             instance = new Jre16Compat();
             jre9Available = true;
             jre16Available = true;
+            jre19Available = false;
         } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
             jre9Available = true;
             jre16Available = false;
+            jre19Available = false;
         } else {
             instance = new JreCompat();
             jre9Available = false;
             jre16Available = false;
+            jre19Available = false;
         }
         jre11Available = instance.jarFileRuntimeMajorVersion() >= 11;
 
@@ -124,6 +134,10 @@ public class JreCompat {
         return jre16Available;
     }
 
+
+    public static boolean isJre19Available() {
+        return jre19Available;
+    }
 
     // Java 8 implementation of Java 9 methods
 
@@ -303,6 +317,8 @@ public class JreCompat {
     }
 
 
+    // Java 8 implementations of Java 16 methods
+
     /**
      * Return Unix domain socket address for given path.
      * @param path The path
@@ -328,5 +344,64 @@ public class JreCompat {
      */
     public SocketChannel openUnixDomainSocketChannel() {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
+    }
+
+
+    // Java 8 implementations of Java 19 methods
+
+    /**
+     * Obtains the executor, if any, used to create the provided thread.
+     *
+     * @param thread    The thread to examine
+     *
+     * @return  The executor, if any, that created the provided thread
+     *
+     * @throws NoSuchFieldException
+     *              If a field used via reflection to obtain the executor cannot
+     *              be found
+     * @throws SecurityException
+     *              If a security exception occurs while trying to identify the
+     *              executor
+     * @throws IllegalArgumentException
+     *              If the instance object does not match the class of the field
+     *              when obtaining a field value via reflection
+     * @throws IllegalAccessException
+     *              If a field is not accessible due to access restrictions
+     */
+    public Object getExecutor(Thread thread)
+            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+
+        Object result = null;
+
+        // Runnable wrapped by Thread
+        // "target" in Sun/Oracle JDK
+        // "runnable" in IBM JDK
+        // "action" in Apache Harmony
+        Object target = null;
+        for (String fieldName : new String[] { "target", "runnable", "action" }) {
+            try {
+                Field targetField = thread.getClass().getDeclaredField(fieldName);
+                targetField.setAccessible(true);
+                target = targetField.get(thread);
+                break;
+            } catch (NoSuchFieldException nfe) {
+                continue;
+            }
+        }
+
+        // "java.util.concurrent" code is in public domain,
+        // so all implementations are similar including our
+        // internal fork.
+        if (target != null && target.getClass().getCanonicalName() != null &&
+                (target.getClass().getCanonicalName().equals(
+                        "org.apache.tomcat.util.threads.ThreadPoolExecutor.Worker") ||
+                        target.getClass().getCanonicalName().equals(
+                                "java.util.concurrent.ThreadPoolExecutor.Worker"))) {
+            Field executorField = target.getClass().getDeclaredField("this$0");
+            executorField.setAccessible(true);
+            result = executorField.get(target);
+        }
+
+        return result;
     }
 }
