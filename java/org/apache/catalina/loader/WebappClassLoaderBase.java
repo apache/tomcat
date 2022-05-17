@@ -1845,41 +1845,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     // shutting down the executor
                     boolean usingExecutor = false;
                     try {
-
-                        // Runnable wrapped by Thread
-                        // "target" in Sun/Oracle JDK
-                        // "runnable" in IBM JDK
-                        // "action" in Apache Harmony
-                        Object target = null;
-                        for (String fieldName : new String[] { "target", "runnable", "action" }) {
-                            try {
-                                Field targetField = thread.getClass().getDeclaredField(fieldName);
-                                targetField.setAccessible(true);
-                                target = targetField.get(thread);
-                                break;
-                            } catch (NoSuchFieldException nfe) {
-                                continue;
-                            }
-                        }
-
-                        // "java.util.concurrent" code is in public domain,
-                        // so all implementations are similar including our
-                        // internal fork.
-                        if (target != null && target.getClass().getCanonicalName() != null &&
-                                (target.getClass().getCanonicalName().equals(
-                                        "org.apache.tomcat.util.threads.ThreadPoolExecutor.Worker") ||
-                                        target.getClass().getCanonicalName().equals(
-                                                "java.util.concurrent.ThreadPoolExecutor.Worker"))) {
-                            Field executorField = target.getClass().getDeclaredField("this$0");
-                            executorField.setAccessible(true);
-                            Object executor = executorField.get(target);
-                            if (executor instanceof ThreadPoolExecutor) {
-                                ((ThreadPoolExecutor) executor).shutdownNow();
-                                usingExecutor = true;
-                            } else if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                                ((java.util.concurrent.ThreadPoolExecutor) executor).shutdownNow();
-                                usingExecutor = true;
-                            }
+                        Object executor = JreCompat.getInstance().getExecutor(thread);
+                        if (executor instanceof ThreadPoolExecutor) {
+                            ((ThreadPoolExecutor) executor).shutdownNow();
+                            usingExecutor = true;
+                        } else if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+                            ((java.util.concurrent.ThreadPoolExecutor) executor).shutdownNow();
+                            usingExecutor = true;
                         }
                     } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
                             IllegalAccessException | InaccessibleObjectException e) {
