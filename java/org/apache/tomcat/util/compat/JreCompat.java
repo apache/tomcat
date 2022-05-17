@@ -19,6 +19,7 @@ package org.apache.tomcat.util.compat;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -38,33 +39,36 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JreCompat {
 
+    private static final StringManager sm = StringManager.getManager(JreCompat.class);
+
     private static final int RUNTIME_MAJOR_VERSION = 7;
 
     private static final JreCompat instance;
-    private static StringManager sm =
-            StringManager.getManager(JreCompat.class.getPackage().getName());
+    private static final boolean jre19Available;
     private static final boolean jre11Available;
     private static final boolean jre9Available;
     private static final boolean jre8Available;
 
 
     static {
-        // This is Tomcat 8 with a minimum Java version of Java 7. The latest
-        // Java version the optional features require is Java 9.
+        // This is Tomcat 8 with a minimum Java version of Java 7.
+        // Compatibility code exists for Java 8, 9, 11 & 19
         // Look for the highest supported JVM first
-        if (Jre9Compat.isSupported()) {
-            instance = new Jre9Compat();
+        if (Jre19Compat.isSupported()) {
+            instance = new Jre19Compat();
+            jre19Available = true;
             jre9Available = true;
             jre8Available = true;
-        }
-        else if (Jre8Compat.isSupported()) {
-            instance = new Jre8Compat();
-            jre9Available = false;
+        } else if (Jre9Compat.isSupported()) {
+            instance = new Jre9Compat();
+            jre19Available = false;
+            jre9Available = true;
             jre8Available = true;
         } else {
             instance = new JreCompat();
-            jre8Available = false;
+            jre19Available = false;
             jre9Available = false;
+            jre8Available = false;
         }
         jre11Available = instance.jarFileRuntimeMajorVersion() >= 11;
     }
@@ -79,11 +83,6 @@ public class JreCompat {
 
     public static boolean isJre8Available() {
         return jre8Available;
-    }
-
-
-    public static boolean isJre11Available() {
-        return jre11Available;
     }
 
 
@@ -268,5 +267,76 @@ public class JreCompat {
      */
     public String getModuleName(Class<?> type) {
         return "NO_MODULE_JAVA_8";
+    }
+
+
+    // Java 7 implementations of Java 11 methods
+
+    public static boolean isJre11Available() {
+        return jre11Available;
+    }
+
+
+    // Java 7 implementations of Java 19 methods
+
+    public static boolean isJre19Available() {
+        return jre19Available;
+    }
+
+
+    /**
+     * Obtains the executor, if any, used to create the provided thread.
+     *
+     * @param thread    The thread to examine
+     *
+     * @return  The executor, if any, that created the provided thread
+     *
+     * @throws NoSuchFieldException
+     *              If a field used via reflection to obtain the executor cannot
+     *              be found
+     * @throws SecurityException
+     *              If a security exception occurs while trying to identify the
+     *              executor
+     * @throws IllegalArgumentException
+     *              If the instance object does not match the class of the field
+     *              when obtaining a field value via reflection
+     * @throws IllegalAccessException
+     *              If a field is not accessible due to access restrictions
+     */
+    public Object getExecutor(Thread thread)
+            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+
+        Object result = null;
+
+        // Runnable wrapped by Thread
+        // "target" in Sun/Oracle JDK
+        // "runnable" in IBM JDK
+        // "action" in Apache Harmony
+        Object target = null;
+        for (String fieldName : new String[] { "target", "runnable", "action" }) {
+            try {
+                Field targetField = thread.getClass().getDeclaredField(fieldName);
+                targetField.setAccessible(true);
+                target = targetField.get(thread);
+                break;
+            } catch (NoSuchFieldException nfe) {
+                continue;
+            }
+        }
+
+        // "java.util.concurrent" code is in public domain,
+        // so all implementations are similar including our
+        // internal fork.
+        if (target != null && target.getClass().getCanonicalName() != null &&
+                (target.getClass().getCanonicalName().equals(
+                        "org.apache.tomcat.util.threads.ThreadPoolExecutor.Worker") ||
+                        target.getClass().getCanonicalName().equals(
+                                "java.util.concurrent.ThreadPoolExecutor.Worker"))) {
+            Field executorField = target.getClass().getDeclaredField("this$0");
+            executorField.setAccessible(true);
+            result = executorField.get(target);
+        }
+
+        return result;
     }
 }
