@@ -62,12 +62,10 @@ public class TestImportHandlerStandardPackages {
                     .map(c -> c.substring(10, c.length() - 6))        // Extract class name
                     .map(c-> {
                         try {
-                            return Class.forName("java.lang." + c);   // Get the class object
+                            return Class.forName("java.lang." + c, false,
+                                    TesterImportHandlerPerformance.class.getClassLoader());   // Get the class object
                         } catch (ClassNotFoundException e) {
                             throw new RuntimeException(c);
-                        } catch (Throwable t) {
-                            swallowEnablePreview(c, t);
-                            return null;
                         }
                     })
                     .filter(c -> null != c)
@@ -132,26 +130,5 @@ public class TestImportHandlerStandardPackages {
                 }
             }
         }
-    }
-
-
-    /*
-     * This is a bit of a hack but there isn't a specific exception that can be
-     * caught.
-     */
-    private void swallowEnablePreview(String className, Throwable t) {
-        while (t != null) {
-            if (t.getMessage() != null && t.getMessage().contains("--enable-preview")) {
-                return;
-            }
-
-            Throwable cause = t.getCause();
-            if (t == cause) {
-                break;
-            }
-            t = cause;
-        }
-
-        throw new RuntimeException(className, t);
     }
 }
