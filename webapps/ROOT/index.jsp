@@ -38,7 +38,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                 <span id="nav-hosts"><a href="${tomcatDocUrl}">Documentation</a></span>
                 <span id="nav-config"><a href="${tomcatDocUrl}config/">Configuration</a></span>
                 <span id="nav-examples"><a href="${tomcatExamplesUrl}">Examples</a></span>
-                <span id="nav-wiki"><a href="https://cwiki.apache.org/confluence/display/tomcat/FrontPage">Wiki</a></span>
+                <span id="nav-wiki"><a href="https://cwiki.apache.org/confluence/display/TOMCAT/FrontPage">Wiki</a></span>
                 <span id="nav-lists"><a href="${tomcatUrl}lists.html">Mailing Lists</a></span>
                 <span id="nav-help"><a href="${tomcatUrl}findhelp.html">Find Help</a></span>
                 <br class="separator" />
@@ -93,7 +93,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                 </div>
                 <div class="col25">
                     <div class="container">
-                        <p><a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">Servlet Specifications</a></p>
+                        <p><a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet Specifications</a></p>
                         <p><a href="https://cwiki.apache.org/confluence/display/TOMCAT/Tomcat+Versions">Tomcat Versions</a></p>
                     </div>
                 </div>
@@ -120,7 +120,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <h3>Documentation</h3>
                         <h4><a href="${tomcatDocUrl}">Tomcat @VERSION_MAJOR_MINOR@ Documentation</a></h4>
                         <h4><a href="${tomcatDocUrl}config/">Tomcat @VERSION_MAJOR_MINOR@ Configuration</a></h4>
-                        <h4><a href="https://cwiki.apache.org/confluence/display/tomcat/FrontPage">Tomcat Wiki</a></h4>
+                        <h4><a href="https://cwiki.apache.org/confluence/display/TOMCAT/FrontPage">Tomcat Wiki</a></h4>
                         <p>Find additional important configuration information in:</p>
                         <pre>$CATALINA_HOME/RUNNING.txt</pre>
                         <p>Developers may be interested in:</p>
@@ -184,7 +184,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                             <li><a href="${tomcatUrl}getinvolved.html">Overview</a></li>
                             <li><a href="${tomcatUrl}source.html">Source Repositories</a></li>
                             <li><a href="${tomcatUrl}lists.html">Mailing Lists</a></li>
-                            <li><a href="https://cwiki.apache.org/confluence/display/tomcat/FrontPage">Wiki</a></li>
+                            <li><a href="https://cwiki.apache.org/confluence/display/TOMCAT/FrontPage">Wiki</a></li>
                         </ul>
                     </div>
                 </div>

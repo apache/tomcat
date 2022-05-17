@@ -151,7 +151,7 @@ cvs commit]]></source>
 
 Note that this is only an example web.xml file.  The full definition
 of the deployment descriptor file is in the
-<a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">Servlet Specification.</a>
+<a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet Specification.</a>
 
 </subsection>
 
