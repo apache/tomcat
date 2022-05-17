@@ -115,6 +115,10 @@
         Update the XML schema used by the web fragment defined for the Jasper EL
         JAR to use the Servlet 6.0 web fragment schema. (markt)
       </fix>
+      <fix>
+        Update <code>ImportHandler</code> optimisation for new classes
+        introduced in Java 19. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Socket">

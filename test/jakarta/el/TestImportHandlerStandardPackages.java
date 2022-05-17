@@ -54,7 +54,7 @@ public class TestImportHandlerStandardPackages {
             // The intention is that this test will catch new classes when the
             // tests are run on a newer JRE.
             // The latest version of the JRE where this test is known to pass is
-            // - OpenJDK 17 EA 28
+            // - OpenJDK 19 EA 22
             ModuleFinder.ofSystem().find("java.base").get().open().list()
                     .filter(c -> (c.startsWith("java/lang/")))
                     .filter(c -> c.lastIndexOf('/') == 9)             // Exclude sub-packages
