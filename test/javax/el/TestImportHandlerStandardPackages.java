@@ -70,7 +70,15 @@ public class TestImportHandlerStandardPackages {
                 }
                 // Extract class name
                 String className = fileName.substring(10, fileName.length() - 6);
-                Class<?> clazz = Class.forName("java.lang." + className);
+                Class<?> clazz = null;
+                try {
+                    clazz = Class.forName("java.lang." + className);
+                } catch (Throwable t) {
+                    swallowEnablePreview(className, t);
+                }
+                if (clazz == null) {
+                    continue;
+                }
                 if (!Modifier.isPublic(clazz.getModifiers())) {
                     // Exclude non-public classes
                     continue;
@@ -173,5 +181,26 @@ public class TestImportHandlerStandardPackages {
             result[i] = (String) names[i];
         }
         return result;
+    }
+
+
+    /*
+     * This is a bit of a hack but there isn't a specific exception that can be
+     * caught.
+     */
+    private void swallowEnablePreview(String className, Throwable t) {
+        while (t != null) {
+            if (t.getMessage() != null && t.getMessage().contains("--enable-preview")) {
+                return;
+            }
+
+            Throwable cause = t.getCause();
+            if (t == cause) {
+                break;
+            }
+            t = cause;
+        }
+
+        throw new RuntimeException(className, t);
     }
 }
