@@ -141,7 +141,7 @@ public class ImportHandler {
         standardPackages.put("javax.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
-        // Taken from Java 14 EA27 Javadoc
+        // Based on Java 19 EA22
         // Interfaces
         javaLangClassNames.add("Appendable");
         javaLangClassNames.add("AutoCloseable");
@@ -155,6 +155,9 @@ public class ImportHandler {
         javaLangClassNames.add("Runnable");
         javaLangClassNames.add("StackWalker.StackFrame");
         javaLangClassNames.add("System.Logger");
+        javaLangClassNames.add("Thread.Builder");
+        javaLangClassNames.add("Thread.Builder.OfPlatform");
+        javaLangClassNames.add("Thread.Builder.OfVirtual");
         javaLangClassNames.add("Thread.UncaughtExceptionHandler");
         //Classes
         javaLangClassNames.add("Boolean");
@@ -238,6 +241,7 @@ public class ImportHandler {
         javaLangClassNames.add("StringIndexOutOfBoundsException");
         javaLangClassNames.add("TypeNotPresentException");
         javaLangClassNames.add("UnsupportedOperationException");
+        javaLangClassNames.add("WrongThreadException");
         //Errors
         javaLangClassNames.add("AbstractMethodError");
         javaLangClassNames.add("AssertionError");
