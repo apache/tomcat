@@ -50,7 +50,7 @@
   unpacked contents, as described in the Servlet Specification (version
   2.2 or later).  For more information about web application archives,
   you can download the
-  <a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">Servlet
+  <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
   Specification</a>, and review the Tomcat
   <a href="../appdev/index.html">Application Developer's Guide</a>.</p>
 

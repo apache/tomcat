@@ -289,7 +289,7 @@ public class MyBean {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">Servlet
+    <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
     Specification</a> for details.</p>
 
   <h5>3.  Code Your Application's Use Of This Resource</h5>
@@ -669,7 +669,7 @@ create table user_roles (
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">Servlet
+    <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
     Specification</a> for details.</p>
 
     <h5>2.  Code Your Application's Use Of This Resource</h5>
@@ -838,7 +838,7 @@ Transport.send(message);]]></source>
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">Servlet
+    <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
     Specification</a> for details.</p>
 
     <h5>3.  Code Your Application's Use Of This Resource</h5>
@@ -1138,7 +1138,7 @@ public class MyBeanFactory implements ObjectFactory {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">Servlet
+    <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
     Specification</a> for details.</p>
 
   <h4>3.  Code Your Application's Use Of This Resource</h4>
