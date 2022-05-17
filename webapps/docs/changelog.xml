@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.0.22 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Update <code>ImportHandler</code> optimisation for new classes
+        introduced in Java 19. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
