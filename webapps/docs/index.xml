@@ -36,7 +36,7 @@
 <p>This is the top-level entry point of the documentation bundle for the
 <strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version
 <version-major-minor/> implements the Servlet 6.0 and JavaServer Pages 3.1
-<a href="https://cwiki.apache.org/confluence/display/tomcat/Specifications">specifications</a> from
+<a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">specifications</a> from
 <a href="https://jakarta.ee/">Jakarta EE</a>, and includes many
 additional features that make it a useful platform for developing and deploying
 web applications and web services.</p>

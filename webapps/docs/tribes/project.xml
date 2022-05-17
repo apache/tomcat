@@ -28,7 +28,7 @@
     <menu name="Links">
         <item name="Docs Home"             href="../index.html"/>
         <item name="Tribes Docs Home"      href="introduction.html"/>
-        <item name="FAQ"                   href="https://cwiki.apache.org/confluence/display/tomcat/FAQ" />
+        <item name="FAQ"                   href="https://cwiki.apache.org/confluence/display/TOMCAT/FAQ" />
         <item name="User Comments"         href="#comments_section"/>
     </menu>
 
