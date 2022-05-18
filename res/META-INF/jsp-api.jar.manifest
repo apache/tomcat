@@ -7,5 +7,5 @@ Specification-Title: Jakarta Server Pages
 Specification-Version: @jsp.spec.version@
 Specification-Vendor: Eclipse Foundation
 Implementation-Title: jakarta.servlet.jsp
-Implementation-Version: @jsp.spec.version@.@jsp.revision@
+Implementation-Version: @jsp.spec.version@@jsp.revision@
 Implementation-Vendor: Apache Software Foundation
