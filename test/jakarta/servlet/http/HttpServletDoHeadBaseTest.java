@@ -38,6 +38,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http2.Http2TestBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.compat.JreCompat;
 
 /*
  * Split into multiple tests as a single test takes so long it impacts the time
@@ -212,9 +213,50 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             this.explicitFlush = explicitFlush;
         }
 
+        @SuppressWarnings("removal")
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            resp.setBufferSize(bufferSize);
+
+            int adjustedBufferSize = bufferSize;
+
+            if (Boolean.parseBoolean(getServletConfig().getInitParameter(LEGACY_DO_HEAD)) &&
+                    useWriter && JreCompat.isJre19Available()) {
+                /*
+                 * Using legacy HEAD handling with a Writer on Java 19+.
+                 * HttpServlet wraps the response. The test is sensitive to
+                 * buffer sizes. The size of the buffer HttpServlet uses varies
+                 * with Java version. For the tests to pass the number of
+                 * characters that can be written before the response is
+                 * committed needs to be the same.
+                 *
+                 * Internally, Tomcat the response buffer is at least 8192
+                 * bytes. When a Writer is used, an additional 8192 byte buffer
+                 * is used for char -> byte.
+                 *
+                 * With Java <19, the char -> byte buffer is created as a 8192
+                 * byte buffer which is consistent with the buffer Tomcat uses
+                 * internally.
+                 *
+                 * With Java 19+, the char -> byte buffer is created as a 512
+                 * byte buffer. Need to adjust the size of the response buffer
+                 * to account for the smaller char -> byte buffer.
+                 *
+                 * This is why the legacy mode is problematic and the new
+                 * approach of the container handling HEAD is better.
+                 */
+
+                // Response buffer is always no smaller than 8192 bytes
+                if (adjustedBufferSize < 8192) {
+                    adjustedBufferSize = 8192;
+                }
+
+                // Adjust for smaller initial char -> byte buffer in Java 19+
+                // 8192 initial size in Java <19
+                // 512 initial size in Java 19+
+                adjustedBufferSize = adjustedBufferSize + 8192 - 512;
+            }
+
+            resp.setBufferSize(adjustedBufferSize);
 
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
