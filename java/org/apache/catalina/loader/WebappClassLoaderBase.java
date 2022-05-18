@@ -2025,7 +2025,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         } catch (InaccessibleObjectException e) {
             // Must be running on without the necessary command line options.
-            log.warn(sm.getString("webappClassLoader.addExportsThreadLocal", this.getClass().getModule().getName()));
+            log.warn(sm.getString("webappClassLoader.addExportsThreadLocal", getCurrentModuleName()));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString(
@@ -2283,7 +2283,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     getContextName()), e);
         } catch (InaccessibleObjectException e) {
             // Must be running on without the necessary command line options.
-            log.warn(sm.getString("webappClassLoader.addExportsRmi", this.getClass().getModule().getName()));
+            log.warn(sm.getString("webappClassLoader.addExportsRmi", getCurrentModuleName()));
         }
     }
 
@@ -2298,8 +2298,17 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
         } catch (InaccessibleObjectException e) {
             // Must be running on without the necessary command line options.
-            log.warn(sm.getString("webappClassLoader.addExportsJavaIo", this.getClass().getModule().getName()));
+            log.warn(sm.getString("webappClassLoader.addExportsJavaIo", getCurrentModuleName()));
         }
+    }
+
+
+    private String getCurrentModuleName() {
+        String moduleName = this.getClass().getModule().getName();
+        if (moduleName == null) {
+            moduleName = "ALL-UNNAMED";
+        }
+        return moduleName;
     }
 
 
