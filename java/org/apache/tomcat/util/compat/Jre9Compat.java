@@ -253,7 +253,11 @@ class Jre9Compat extends Jre8Compat {
     public String getModuleName(Class<?> type) {
         try {
             Object module = getModuleMethod.invoke(type);
-            return (String) getNameMethod.invoke(module);
+            String moduleName = (String) getNameMethod.invoke(module);
+            if (moduleName == null) {
+                moduleName = "ALL-UNNAMED";
+            }
+            return moduleName;
         } catch (ReflectiveOperationException e) {
             return "ERROR";
         }
