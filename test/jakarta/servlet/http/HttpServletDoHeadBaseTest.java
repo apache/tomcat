@@ -19,6 +19,7 @@ package jakarta.servlet.http;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -33,6 +34,9 @@ import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.OutputBuffer;
+import org.apache.catalina.connector.Response;
+import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http2.Http2TestBase;
@@ -217,10 +221,13 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+            int originalBufferSize = resp.getBufferSize();
             int adjustedBufferSize = bufferSize;
+            boolean resetBufferSize = false;
 
             if (Boolean.parseBoolean(getServletConfig().getInitParameter(LEGACY_DO_HEAD)) &&
-                    useWriter && JreCompat.isJre19Available()) {
+                    JreCompat.isJre19Available() && "HEAD".equals(req.getMethod()) && useWriter &&
+                    resetType != ResetType.NONE) {
                 /*
                  * Using legacy HEAD handling with a Writer on Java 19+.
                  * HttpServlet wraps the response. The test is sensitive to
@@ -229,31 +236,48 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
                  * characters that can be written before the response is
                  * committed needs to be the same.
                  *
-                 * Internally, Tomcat the response buffer is at least 8192
+                 * Internally, the Tomcat response buffer defaults to 8192
                  * bytes. When a Writer is used, an additional 8192 byte buffer
-                 * is used for char -> byte.
+                 * is used for char->byte.
                  *
-                 * With Java <19, the char -> byte buffer is created as a 8192
+                 * With Java <19, the char->byte buffer used by HttpServlet
+                 * processing HEAD requests in legacy mode is created as a 8192
                  * byte buffer which is consistent with the buffer Tomcat uses
                  * internally.
                  *
-                 * With Java 19+, the char -> byte buffer is created as a 512
-                 * byte buffer. Need to adjust the size of the response buffer
-                 * to account for the smaller char -> byte buffer.
+                 * With Java 19+, the char->byte buffer used by HttpServlet
+                 * processing HEAD requests in legacy mode is created as a 512
+                 * byte buffer.
+                 *
+                 * If the response isn't reset, none of this matters as it is
+                 * just the size of the response buffer and the size of the
+                 * response that determines if chunked encoding is used.
+                 * However, if the response is reset then things get interesting
+                 * as the amount of response data that can be written before
+                 * committing the response is the combination of the char->byte
+                 * buffer and the response buffer. Because the char->byte buffer
+                 * size in legacy mode varies with Java version, the size of the
+                 * response buffer needs to be adjusted to compensate so that
+                 * both GET and HEAD can write the same amount of data before
+                 * committing the response. To make matters worse, to obtain the
+                 * correct behaviour the response buffer size needs to be reset
+                 * back to 8192 after the reset.
                  *
                  * This is why the legacy mode is problematic and the new
                  * approach of the container handling HEAD is better.
                  */
 
-                // Response buffer is always no smaller than 8192 bytes
-                if (adjustedBufferSize < 8192) {
-                    adjustedBufferSize = 8192;
+                // Response buffer is always no smaller than originalBufferSize
+                if (adjustedBufferSize < originalBufferSize) {
+                    adjustedBufferSize = originalBufferSize;
                 }
 
                 // Adjust for smaller initial char -> byte buffer in Java 19+
-                // 8192 initial size in Java <19
+                // originalBufferSize initial size in Java <19
                 // 512 initial size in Java 19+
-                adjustedBufferSize = adjustedBufferSize + 8192 - 512;
+                adjustedBufferSize = adjustedBufferSize + originalBufferSize - 512;
+
+                resetBufferSize = true;
             }
 
             resp.setBufferSize(adjustedBufferSize);
@@ -284,10 +308,16 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
                     }
                     case BUFFER: {
                         resp.resetBuffer();
+                        if (resetBufferSize) {
+                            resetResponseBuffer(resp, originalBufferSize);
+                        }
                         break;
                     }
                     case FULL: {
                         resp.reset();
+                        if (resetBufferSize) {
+                            resetResponseBuffer(resp, originalBufferSize);
+                        }
                         break;
                     }
                 }
@@ -309,6 +339,27 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
                 pw.print(msg);
             } else {
                 os.write(msg.getBytes(StandardCharsets.UTF_8));
+            }
+        }
+
+        private void resetResponseBuffer(HttpServletResponse resp, int size) throws ServletException {
+            // This bypasses various checks but that is OK in this case.
+            try {
+                ResponseFacade responseFacade = (ResponseFacade) ((HttpServletResponseWrapper) resp).getResponse();
+
+                Field responseField = ResponseFacade.class.getDeclaredField("response");
+                responseField.setAccessible(true);
+                Response response = (Response) responseField.get(responseFacade);
+
+                Field outputBufferField = Response.class.getDeclaredField("outputBuffer");
+                outputBufferField.setAccessible(true);
+                OutputBuffer outputBuffer = (OutputBuffer) outputBufferField.get(response);
+
+                Field byteBufferField = OutputBuffer.class.getDeclaredField("bb");
+                byteBufferField.setAccessible(true);
+                byteBufferField.set(outputBuffer, ByteBuffer.allocate(Math.max(size, bufferSize)));
+            } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
+                throw new ServletException(e);
             }
         }
     }
