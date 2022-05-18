@@ -799,6 +799,10 @@
         therefore requires that the command line option
         <code>-XaddExports:java.base/java.io=ALL-UNNAMED</code> is set. If not
         specified, the default value of <code>true</code> will be used.</p>
+        <p>The memory leak associated with <code>ObjectStreamClass</code> has
+        been fixed in Java 19 onwards, Java 17.0.4 onwards and Java 11.0.16
+        onwards. The check will be disabled when running on a version
+        of Java that contains the fix.</p>
       </attribute>
 
       <attribute name="clearReferencesRmiTargets" required="false">

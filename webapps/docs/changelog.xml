@@ -115,6 +115,11 @@
         Improve the error message if a required <code>--add-opens</code> option
         is missing. (markt)
       </fix>
+      <fix>
+        Disable the memory leak correction code enabled by the Context attribute
+        <code>clearReferencesObjectStreamClassCaches</code> when running on a
+        JRE that includes a fix for the underlying memory leak. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

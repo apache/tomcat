@@ -2289,6 +2289,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     private void clearReferencesObjectStreamClassCaches() {
+        if (JreCompat.isJre19Available()) {
+            // The memory leak this fixes has been fixed in Java 19 onwards,
+            // 17.0.4 onwards and 11.0.16 onwards
+            // See https://bugs.openjdk.java.net/browse/JDK-8277072
+            return;
+        }
         try {
             Class<?> clazz = Class.forName("java.io.ObjectStreamClass$Caches");
             clearCache(clazz, "localDescs");
@@ -2316,14 +2322,19 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             throws ReflectiveOperationException, SecurityException, ClassCastException {
         Field f = target.getDeclaredField(mapName);
         f.setAccessible(true);
-        Map<?,?> map = (Map<?,?>) f.get(null);
-        Iterator<?> keys = map.keySet().iterator();
-        while (keys.hasNext()) {
-            Object key = keys.next();
-            if (key instanceof Reference) {
-                Object clazz = ((Reference<?>) key).get();
-                if (loadedByThisOrChild(clazz)) {
-                    keys.remove();
+        Object map = f.get(null);
+        // Avoid trying to clear references if Tomcat is running on a JRE that
+        // includes the fix for this memory leak
+        // See https://bugs.openjdk.java.net/browse/JDK-8277072
+        if (map instanceof Map<?,?>) {
+            Iterator<?> keys = ((Map<?,?>) map).keySet().iterator();
+            while (keys.hasNext()) {
+                Object key = keys.next();
+                if (key instanceof Reference) {
+                    Object clazz = ((Reference<?>) key).get();
+                    if (loadedByThisOrChild(clazz)) {
+                        keys.remove();
+                    }
                 }
             }
         }
