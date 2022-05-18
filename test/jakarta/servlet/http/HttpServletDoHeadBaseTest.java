@@ -134,16 +134,15 @@ public class HttpServletDoHeadBaseTest extends TomcatBaseTest {
             this.explicitFlush = explicitFlush;
         }
 
-        @SuppressWarnings("removal")
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             int adjustedBufferSize = bufferSize;
 
-            if (Boolean.parseBoolean(getServletConfig().getInitParameter(LEGACY_DO_HEAD)) &&
-                    useWriter && JreCompat.isJre19Available()) {
+            if (useWriter && JreCompat.isJre19Available()) {
                 /*
-                 * Using legacy HEAD handling with a Writer on Java 19+.
+                 * Using legacy (non-legacy isn't available until Servlet 6.0 /
+                 * Tomcat 10.1.x) HEAD handling with a Writer on Java 19+.
                  * HttpServlet wraps the response. The test is sensitive to
                  * buffer sizes. The size of the buffer HttpServlet uses varies
                  * with Java version. For the tests to pass the number of
