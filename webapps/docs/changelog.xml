@@ -111,6 +111,10 @@
         Update the memory leak protection code to support stopping application
         created executor threads when running on Java 19 and later. (markt)
       </fix>
+      <fix>
+        Improve the error message if a required <code>--add-opens</code> option
+        is missing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
