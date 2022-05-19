@@ -187,7 +187,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * Utility executor with scheduling capabilities.
      */
     private ScheduledThreadPoolExecutor utilityExecutor = null;
-    private final Object utilityExecutorObject = new Object();
+    private final Object utilityExecutorLock = new Object();
 
     /**
      * Utility executor wrapper.
@@ -433,7 +433,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     private void reconfigureUtilityExecutor(int threads) {
-        synchronized (utilityExecutorObject) {
+        synchronized (utilityExecutorLock) {
             // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
             if (utilityExecutor != null) {
                 utilityExecutor.setCorePoolSize(threads);
