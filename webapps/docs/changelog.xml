@@ -120,6 +120,10 @@
         <code>clearReferencesObjectStreamClassCaches</code> when running on a
         JRE that includes a fix for the underlying memory leak. (markt)
       </fix>
+      <fix>
+        <pr>515</pr>: Avoid deadlock on startup with some utility executor
+        configurations. Submitted by Han Li. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
