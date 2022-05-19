@@ -165,7 +165,6 @@ public class NioReplicationTask extends AbstractRxTask {
         reader.access();
         ReadableByteChannel channel = (ReadableByteChannel) key.channel();
         int count=-1;
-        buffer.clear();         // make buffer empty
         SocketAddress saddr = null;
 
         if (channel instanceof SocketChannel) {
@@ -279,8 +278,6 @@ public class NioReplicationTask extends AbstractRxTask {
             public void run() {
                 try {
                     if (key.isValid()) {
-                        // cycle the selector so this key is active again
-                        key.selector().wakeup();
                         // resume interest in OP_READ, OP_WRITE
                         int resumeOps = key.interestOps() | SelectionKey.OP_READ;
                         key.interestOps(resumeOps);
