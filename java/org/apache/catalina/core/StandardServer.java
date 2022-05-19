@@ -187,6 +187,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * Utility executor with scheduling capabilities.
      */
     private ScheduledThreadPoolExecutor utilityExecutor = null;
+    private final Object utilityExecutorLock = new Object();
 
     /**
      * Utility executor wrapper.
@@ -431,19 +432,21 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     }
 
 
-    private synchronized void reconfigureUtilityExecutor(int threads) {
-        // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
-        if (utilityExecutor != null) {
-            utilityExecutor.setCorePoolSize(threads);
-        } else {
-            ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
-                    new ScheduledThreadPoolExecutor(threads,
-                            new TaskThreadFactory("Catalina-utility-", utilityThreadsAsDaemon, Thread.MIN_PRIORITY));
-            scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
-            scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
-            scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-            utilityExecutor = scheduledThreadPoolExecutor;
-            utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(utilityExecutor);
+    private void reconfigureUtilityExecutor(int threads) {
+        synchronized (utilityExecutorLock) {
+            // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
+            if (utilityExecutor != null) {
+                utilityExecutor.setCorePoolSize(threads);
+            } else {
+                ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
+                        new ScheduledThreadPoolExecutor(threads,
+                                new TaskThreadFactory("Catalina-utility-", utilityThreadsAsDaemon, Thread.MIN_PRIORITY));
+                scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
+                scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
+                scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+                utilityExecutor = scheduledThreadPoolExecutor;
+                utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(utilityExecutor);
+            }
         }
     }
 
