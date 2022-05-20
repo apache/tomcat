@@ -1291,18 +1291,17 @@ public class Response implements HttpServletResponse {
             // If no ROOT context is defined, the context can be null.
             // In this case, the default Tomcat values are assumed, but without
             // reference to org.apache.catalina.STRICT_SERVLET_COMPLIANCE.
-            boolean reqHasContext = (context != null);
             String locationUri;
             // Relative redirects require HTTP/1.1
             if (getRequest().getCoyoteRequest().getSupportsRelativeRedirects() &&
-                    (!reqHasContext || context.getUseRelativeRedirects())) {
+                    (context == null || context.getUseRelativeRedirects())) {
                 locationUri = location;
             } else {
                 locationUri = toAbsolute(location);
             }
             setStatus(status);
             setHeader("Location", locationUri);
-            if (reqHasContext && context.getSendRedirectBody()) {
+            if (context != null && context.getSendRedirectBody()) {
                 PrintWriter writer = getWriter();
                 writer.print(sm.getString("coyoteResponse.sendRedirect.note",
                         Escape.htmlElementContent(locationUri)));
