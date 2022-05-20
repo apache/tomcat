@@ -143,6 +143,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Increase the default buffer size for replication messages from 43800 to
+        65536 bytes. This is expected to improve performance for large messages
+        when running on Linux based systems. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.63 (remm)" rtext="2022-05-16">
   <subsection name="Catalina">
