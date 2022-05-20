@@ -25,10 +25,10 @@ import org.apache.catalina.tribes.Member;
 public abstract class AbstractSender implements DataSender {
 
     private volatile boolean connected = false;
-    private int rxBufSize = 25188;
-    private int txBufSize = 43800;
-    private int udpRxBufSize = 25188;
-    private int udpTxBufSize = 43800;
+    private int rxBufSize = Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE;
+    private int txBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
+    private int udpRxBufSize = Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE;
+    private int udpTxBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
     private boolean directBuffer = false;
     private int keepAliveCount = -1;
     private int requestCount = 0;
