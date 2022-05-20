@@ -1295,7 +1295,7 @@
       </fileset>
     </txt2html>
   </target>
-  <target name="embed-jars" description="Create experimental embedded jars"
+  <target name="embed-jars" description="Create embedded jars"
     depends="build-manifests,compile" >
 
     <mkdir dir="${tomcat.embed}" />
@@ -1357,7 +1357,7 @@
   </target>
 
   <target name="embed"
-          description="Creates the experimental embedded release"
+          description="Creates the embedded release"
           depends="embed-jars,embed-sources" >
 
     <fixcrlf srcdir="${tomcat.embed}" eol="crlf"
