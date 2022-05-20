@@ -22,6 +22,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DecimalFormat;
 
+import org.apache.catalina.tribes.transport.Constants;
+
 public class SocketValidateReceive {
     static long start = 0;
     static double mb = 0;
@@ -34,7 +36,7 @@ public class SocketValidateReceive {
 
 
     public static void main(String[] args) throws Exception {
-        int size = 43800;
+        int size = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
         if (args.length > 0 ) {
           try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
         }

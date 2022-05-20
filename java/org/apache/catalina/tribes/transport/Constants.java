@@ -27,6 +27,9 @@ public class Constants {
 
     public static final String Package = "org.apache.catalina.tribes.transport";
 
+    public static final int DEFAULT_CLUSTER_MSG_BUFFER_SIZE = 43800;
+    public static final int DEFAULT_CLUSTER_ACK_BUFFER_SIZE = 25188;
+
     /*
      * Do not change any of these values!
      */
