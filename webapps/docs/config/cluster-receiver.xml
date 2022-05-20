@@ -114,7 +114,7 @@
       Boolean value for the socket OOBINLINE option. Possible values are <code>true</code> or <code>false</code>.
     </attribute>
     <attribute name="rxBufSize" required="false">
-      The receiver buffer size on the receiving sockets. Value is in bytes, the default value is <code>43800</code> bytes.
+      The receiver buffer size on the receiving sockets. Value is in bytes, the default value is <code>65536</code> bytes.
     </attribute>
     <attribute name="txBufSize" required="false">
       The sending buffer size on the receiving sockets. Value is in bytes, the default value is <code>25188</code> bytes.
@@ -125,7 +125,7 @@
     </attribute>
     <attribute name="udpTxBufSize" required="false">
        The send buffer size on the datagram socket.
-       Default value is <code>43800</code> bytes.
+       Default value is <code>65536</code> bytes.
     </attribute>
     <attribute name="soKeepAlive" required="false">
       Boolean value for the socket SO_KEEPALIVE option. Possible values are <code>true</code> or <code>false</code>.
