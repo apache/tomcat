@@ -372,12 +372,14 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             };
         }
 
+        @Override
         public void add(T key) {
             synchronized (cache) {
                 cache.put(key, null);
             }
         }
 
+        @Override
         public boolean contains(T key) {
             synchronized (cache) {
                 return cache.containsKey(key);

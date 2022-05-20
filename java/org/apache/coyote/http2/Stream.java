@@ -1167,6 +1167,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
 
+        @Override
         final boolean isReadyForRead() {
             ensureBuffersExist();
 
@@ -1183,6 +1184,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
 
+        @Override
         final synchronized boolean isRequestBodyFullyRead() {
             return (inBuffer == null || inBuffer.position() == 0) && isInputFinished();
         }
@@ -1200,6 +1202,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         /*
          * Called after placing some data in the inBuffer.
          */
+        @Override
         final synchronized void onDataAvailable() throws IOException {
             if (closed) {
                 swallowUnread();
@@ -1224,12 +1227,14 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
 
+        @Override
         final ByteBuffer getInBuffer() {
             ensureBuffersExist();
             return inBuffer;
         }
 
 
+        @Override
         final synchronized void insertReplayedBody(ByteChunk body) {
             inBuffer = ByteBuffer.wrap(body.getBytes(),  body.getOffset(),  body.getLength());
         }
@@ -1251,6 +1256,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
 
+        @Override
         final void receiveReset() {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
@@ -1260,6 +1266,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
 
+        @Override
         final void notifyEof() {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
@@ -1268,6 +1275,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
 
+        @Override
         final void swallowUnread() throws IOException {
             synchronized (this) {
                 closed = true;
