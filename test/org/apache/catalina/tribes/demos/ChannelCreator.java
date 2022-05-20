@@ -33,6 +33,7 @@ import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor;
 import org.apache.catalina.tribes.membership.McastService;
 import org.apache.catalina.tribes.membership.MemberImpl;
+import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.MultiPointSender;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
@@ -177,8 +178,8 @@ public class ChannelCreator {
         rx.setMaxThreads(tcpthreadcount);
         rx.setMinThreads(tcpthreadcount);
         rx.getBind();
-        rx.setRxBufSize(43800);
-        rx.setTxBufSize(25188);
+        rx.setRxBufSize(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE);
+        rx.setTxBufSize(Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE);
         rx.setAutoBind(autoBind);
 
 
@@ -188,8 +189,8 @@ public class ChannelCreator {
                 transport,true,ChannelCreator.class.getClassLoader()).getConstructor().newInstance();
         sender.setTimeout(acktimeout);
         sender.setMaxRetryAttempts(2);
-        sender.setRxBufSize(43800);
-        sender.setTxBufSize(25188);
+        sender.setRxBufSize(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE);
+        sender.setTxBufSize(Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE);
 
         for (Object o : transportProperties.keySet()) {
             String key = (String) o;
