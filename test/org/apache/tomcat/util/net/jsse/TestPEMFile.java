@@ -18,7 +18,6 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.security.PrivateKey;
 
 import org.junit.Assert;
@@ -77,7 +76,7 @@ public class TestPEMFile {
     }
 
 
-    private String getPath(String file) throws URISyntaxException, IOException {
+    private String getPath(String file) throws IOException {
         String packageName = this.getClass().getPackageName();
         String path = packageName.replace(".", File.separator);
         File f = new File("test" + File.separator + path + File.separator + file);
