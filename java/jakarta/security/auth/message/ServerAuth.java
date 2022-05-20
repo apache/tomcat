@@ -20,13 +20,52 @@ import javax.security.auth.Subject;
 
 public interface ServerAuth {
 
+    /**
+     * Validate the request.
+     *
+     * @param messageInfo       The associated request and response
+     * @param clientSubject     The subject that represents the source of the
+     *                          request
+     * @param serviceSubject    The subject that represents the recipient of the
+     *                          request
+     *
+     * @return An AuthStatus instance that represents the result of the
+     *         validation
+     *
+     * @throws AuthException If the a failure occurred in a manner that
+     *                       prevented the failure from being communicated via
+     *                       messageInfo
+     */
     AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
             Subject serviceSubject) throws AuthException;
 
+    /**
+     * Secure (authenticate) the response.
+     *
+     * @param messageInfo       The associated request and response
+     * @param serviceSubject    The subject that represents the source of the
+     *                          response
+     *
+     * @return An AuthStatus instance that represents the result of the
+     *         authentication
+     *
+     * @throws AuthException If the a failure occurred in a manner that
+     *                       prevented the failure from being communicated via
+     *                       messageInfo
+     */
     default AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject) throws AuthException {
         return AuthStatus.SUCCESS;
     }
 
+    /**
+     * Remove principals and/or credentials from the subject that were
+     * previously added by this authentication mechanism.
+     *
+     * @param messageInfo   The associated request and response
+     * @param subject       The subject to clean
+     *
+     * @throws AuthException If the a failure occurred
+     */
     default void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
         // NO-OP
     }
