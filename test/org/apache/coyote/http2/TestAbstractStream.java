@@ -360,6 +360,11 @@ public class TestAbstractStream {
         }
 
         @Override
+        protected boolean flushNonBlocking() throws IOException {
+            return false;
+        }
+
+        @Override
         protected void doWrite(boolean block, ByteBuffer from) throws IOException {
         }
 

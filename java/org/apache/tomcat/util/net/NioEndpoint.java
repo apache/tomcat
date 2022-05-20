@@ -1294,6 +1294,29 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
 
         @Override
+        protected boolean flushNonBlocking() throws IOException {
+            boolean dataLeft = !socketBufferHandler.isWriteBufferEmpty();
+
+            // Write to the socket, if there is anything to write
+            if (dataLeft) {
+                doWrite(false);
+                dataLeft = !socketBufferHandler.isWriteBufferEmpty();
+            }
+
+            if (!dataLeft && !nonBlockingWriteBuffer.isEmpty()) {
+                dataLeft = nonBlockingWriteBuffer.write(this, false);
+
+                if (!dataLeft && !socketBufferHandler.isWriteBufferEmpty()) {
+                    doWrite(false);
+                    dataLeft = !socketBufferHandler.isWriteBufferEmpty();
+                }
+            }
+
+            return dataLeft;
+        }
+
+
+        @Override
         protected void doWrite(boolean block, ByteBuffer buffer) throws IOException {
             int n = 0;
             if (getSocket() == NioChannel.CLOSED_NIO_CHANNEL) {
