@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -67,8 +68,9 @@ public class ObjectReader {
             this.buffer = new XByteBuffer(socket.getReceiveBufferSize(), true);
         }catch ( IOException x ) {
             //unable to get buffer size
-            log.warn(sm.getString("objectReader.retrieveFailed.socketReceiverBufferSize"));
-            this.buffer = new XByteBuffer(43800,true);
+            log.warn(sm.getString("objectReader.retrieveFailed.socketReceiverBufferSize",
+                    Integer.toString(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE)));
+            this.buffer = new XByteBuffer(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE, true);
         }
     }
 

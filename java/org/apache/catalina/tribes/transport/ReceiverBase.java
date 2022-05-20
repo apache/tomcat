@@ -56,10 +56,10 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private int port  = 4000;
     private int udpPort = -1;
     private int securePort = -1;
-    private int rxBufSize = 43800;
-    private int txBufSize = 25188;
-    private int udpRxBufSize = 43800;
-    private int udpTxBufSize = 25188;
+    private int rxBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
+    private int txBufSize = Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE;
+    private int udpRxBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
+    private int udpTxBufSize = Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE;
 
     private volatile boolean listen = false;
     private RxTaskPool pool;
