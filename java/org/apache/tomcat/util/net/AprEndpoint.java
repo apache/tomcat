@@ -2396,6 +2396,29 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         @Override
+        protected boolean flushNonBlocking() throws IOException {
+            boolean dataLeft = !socketBufferHandler.isWriteBufferEmpty();
+
+            // Write to the socket, if there is anything to write
+            if (dataLeft) {
+                doWrite(false);
+                dataLeft = !socketBufferHandler.isWriteBufferEmpty();
+            }
+
+            if (!dataLeft && !nonBlockingWriteBuffer.isEmpty()) {
+                dataLeft = nonBlockingWriteBuffer.write(this, false);
+
+                if (!dataLeft && !socketBufferHandler.isWriteBufferEmpty()) {
+                    doWrite(false);
+                    dataLeft = !socketBufferHandler.isWriteBufferEmpty();
+                }
+            }
+
+            return dataLeft;
+        }
+
+
+        @Override
         protected void doWrite(boolean block, ByteBuffer from) throws IOException {
             Lock readLock = getBlockingStatusReadLock();
             WriteLock writeLock = getBlockingStatusWriteLock();
