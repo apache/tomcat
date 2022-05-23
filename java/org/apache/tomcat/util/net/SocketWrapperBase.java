@@ -722,6 +722,12 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
+    /**
+     * Writes all remaining data from the buffers and blocks until the write is
+     * complete.
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
     protected void flushBlocking() throws IOException {
         doWrite(true);
 
@@ -736,6 +742,14 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
+    /**
+     * Writes as much data as possible from any that remains in the buffers.
+     *
+     * @return <code>true</code> if data remains to be flushed after this method
+     *         completes, otherwise <code>false</code>.
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
     protected abstract boolean flushNonBlocking() throws IOException;
 
 
@@ -1002,6 +1016,13 @@ public abstract class SocketWrapperBase<E> {
          */
         protected abstract boolean isInline();
 
+        protected boolean hasOutboundRemaining() {
+            // NIO2 and APR never have remaining outbound data when the
+            // completion handler is called. NIO needs to override this.
+            return false;
+        }
+
+
         /**
          * Process the operation using the connector executor.
          * @return true if the operation was accepted, false if the executor
@@ -1053,7 +1074,7 @@ public abstract class SocketWrapperBase<E> {
                 boolean completion = true;
                 if (state.check != null) {
                     CompletionHandlerCall call = state.check.callHandler(currentState, state.buffers, state.offset, state.length);
-                    if (call == CompletionHandlerCall.CONTINUE) {
+                    if (call == CompletionHandlerCall.CONTINUE || (!state.read && state.hasOutboundRemaining())) {
                         complete = false;
                     } else if (call == CompletionHandlerCall.NONE) {
                         completion = false;
