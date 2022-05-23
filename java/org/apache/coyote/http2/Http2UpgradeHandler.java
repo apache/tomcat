@@ -1957,7 +1957,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     socketWrapper.write(true, payload, 0, payload.length);
                     socketWrapper.flush(true);
                 } finally {
-                    socketWrapper.getLock().lock();
+                    socketWrapper.getLock().unlock();
                 }
             }
         }
@@ -1993,7 +1993,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     socketWrapper.write(true, payload, 0, payload.length);
                     socketWrapper.flush(true);
                 } finally {
-                    socketWrapper.getLock().lock();
+                    socketWrapper.getLock().unlock();
                 }
             }
         }
