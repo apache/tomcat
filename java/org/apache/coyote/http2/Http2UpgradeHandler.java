@@ -330,12 +330,15 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         try {
             switch (status) {
                 case OPEN_READ:
-                    synchronized (socketWrapper) {
+                    socketWrapper.getLock().lock();
+                    try {
                         if (socketWrapper.canWrite()) {
                             // Only send a ping if there is no other data waiting to be sent.
                             // Ping manager will ensure they aren't sent too frequently.
                             pingManager.sendPing(false);
                         }
+                    } finally {
+                        socketWrapper.getLock().unlock();
                     }
                     try {
                         // Disable the connection timeout while frames are processed
@@ -582,7 +585,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // may see out of order RST frames which may hard to follow if
         // the client is unaware the RST frames may be received out of
         // order.
-        synchronized (socketWrapper) {
+        socketWrapper.getLock().lock();
+        try {
             if (state != null) {
                 boolean active = state.isActive();
                 state.sendReset();
@@ -592,6 +596,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
             socketWrapper.write(true, rstFrame, 0, rstFrame.length);
             socketWrapper.flush(true);
+        } finally {
+            socketWrapper.getLock().unlock();
         }
     }
 
@@ -674,7 +680,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         byte[] payloadLength = new byte[3];
         ByteUtil.setThreeBytes(payloadLength, 0, len);
 
-        synchronized (socketWrapper) {
+        socketWrapper.getLock().lock();
+        try {
             socketWrapper.write(true, payloadLength, 0, payloadLength.length);
             socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
             socketWrapper.write(true, fixedPayload, 0, 8);
@@ -682,14 +689,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 socketWrapper.write(true, debugMsg, 0, debugMsg.length);
             }
             socketWrapper.flush(true);
+        } finally {
+            socketWrapper.getLock().unlock();
         }
     }
 
     void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize)
             throws IOException {
         // This ensures the Stream processing thread has control of the socket.
-        synchronized (socketWrapper) {
+        socketWrapper.getLock().lock();
+        try {
             doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
+        } finally {
+            socketWrapper.getLock().unlock();
         }
         stream.sentHeaders();
         if (endOfStream) {
@@ -802,17 +814,18 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
         if (writable) {
             ByteUtil.set31Bits(header, 5, stream.getIdAsInt());
-            synchronized (socketWrapper) {
-                try {
-                    socketWrapper.write(true, header, 0, header.length);
-                    int orgLimit = data.limit();
-                    data.limit(data.position() + len);
-                    socketWrapper.write(true, data);
-                    data.limit(orgLimit);
-                    socketWrapper.flush(true);
-                } catch (IOException ioe) {
-                    handleAppInitiatedIOException(ioe);
-                }
+            socketWrapper.getLock().lock();
+            try {
+                socketWrapper.write(true, header, 0, header.length);
+                int orgLimit = data.limit();
+                data.limit(data.position() + len);
+                socketWrapper.write(true, data);
+                data.limit(orgLimit);
+                socketWrapper.flush(true);
+            } catch (IOException ioe) {
+                handleAppInitiatedIOException(ioe);
+            } finally {
+                socketWrapper.getLock().unlock();
             }
         }
     }
@@ -848,7 +861,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             log.debug(sm.getString("upgradeHandler.windowUpdateConnection", getConnectionId(),
                     Integer.valueOf(increment)));
         }
-        synchronized (socketWrapper) {
+        socketWrapper.getLock().lock();
+        try {
             // Build window update frame for stream 0
             byte[] frame = new byte[13];
             ByteUtil.setThreeBytes(frame, 0, 4);
@@ -883,12 +897,15 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (needFlush) {
                 socketWrapper.flush(true);
             }
+        } finally {
+            socketWrapper.getLock().unlock();
         }
     }
 
 
     protected void processWrites() throws IOException {
-        synchronized (socketWrapper) {
+        socketWrapper.getLock().lock();
+        try {
             if (socketWrapper.flush(false)) {
                 socketWrapper.registerWriteInterest();
             } else {
@@ -896,6 +913,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 // Ping manager will ensure they aren't sent too frequently.
                 pingManager.sendPing(false);
             }
+        } finally {
+            socketWrapper.getLock().unlock();
         }
     }
 
@@ -1412,10 +1431,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Synchronized since PUSH_PROMISE frames have to be sent in order. Once
         // the stream has been created we need to ensure that the PUSH_PROMISE
         // is sent before the next stream is created for a PUSH_PROMISE.
-        synchronized (socketWrapper) {
+        socketWrapper.getLock().lock();
+        try {
             pushStream = createLocalStream(request);
             writeHeaders(associatedStream, pushStream.getIdAsInt(), request.getMimeHeaders(), false,
                     Constants.DEFAULT_HEADERS_FRAME_SIZE);
+        } finally {
+            socketWrapper.getLock().unlock();
         }
 
         pushStream.sentPushPromise();
@@ -1804,9 +1826,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 log.warn(sm.getString("upgradeHandler.unexpectedAck", connectionId, getIdAsString()));
             }
         } else {
-            synchronized (socketWrapper) {
+            socketWrapper.getLock().lock();
+            try {
                 socketWrapper.write(true, SETTINGS_ACK, 0, SETTINGS_ACK.length);
                 socketWrapper.flush(true);
+            } finally {
+                socketWrapper.getLock().unlock();
             }
         }
     }
@@ -1922,7 +1947,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (force || now - lastPingNanoTime > pingIntervalNano) {
                 lastPingNanoTime = now;
                 byte[] payload = new byte[8];
-                synchronized (socketWrapper) {
+                socketWrapper.getLock().lock();
+                try {
                     int sentSequence = ++sequence;
                     PingRecord pingRecord = new PingRecord(sentSequence, now);
                     inflightPings.add(pingRecord);
@@ -1930,6 +1956,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     socketWrapper.write(true, PING, 0, PING.length);
                     socketWrapper.write(true, payload, 0, payload.length);
                     socketWrapper.flush(true);
+                } finally {
+                    socketWrapper.getLock().lock();
                 }
             }
         }
@@ -1959,10 +1987,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
             } else {
                 // Client originated ping. Echo it back.
-                synchronized (socketWrapper) {
+                socketWrapper.getLock().lock();
+                try {
                     socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
                     socketWrapper.write(true, payload, 0, payload.length);
                     socketWrapper.flush(true);
+                } finally {
+                    socketWrapper.getLock().lock();
                 }
             }
         }
