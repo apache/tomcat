@@ -96,12 +96,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
     // ---------------------------------------------- Public Methods
 
-    @Override
-    protected void initInternal() throws LifecycleException {
-        super.initInternal();
-    }
-
-
     /**
      * Start the component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
@@ -138,12 +132,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         }
         executor = null;
         taskqueue = null;
-    }
-
-
-    @Override
-    protected void destroyInternal() throws LifecycleException {
-        super.destroyInternal();
     }
 
 
