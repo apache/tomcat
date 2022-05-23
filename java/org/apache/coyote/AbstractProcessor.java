@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
 
 import javax.servlet.RequestDispatcher;
 
@@ -856,7 +857,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         SocketWrapperBase<?> socketWrapper = getSocketWrapper();
         Iterator<DispatchType> dispatches = getIteratorAndClearDispatches();
         if (socketWrapper != null) {
-            synchronized (socketWrapper) {
+            Lock lock = socketWrapper.getLock();
+            lock.lock();
+            try {
                 /*
                  * This method is called when non-blocking IO is initiated by defining a read and/or write listener in a
                  * non-container thread. It is called once the non-container thread completes so that the first calls to
@@ -874,6 +877,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                     DispatchType dispatchType = dispatches.next();
                     socketWrapper.processSocket(dispatchType.getSocketStatus(), false);
                 }
+            } finally {
+                lock.unlock();
             }
         }
     }

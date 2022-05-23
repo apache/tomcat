@@ -30,6 +30,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -44,6 +46,7 @@ public abstract class SocketWrapperBase<E> {
 
     private E socket;
     private final AbstractEndpoint<E,?> endpoint;
+    private final Lock lock = new ReentrantLock();
 
     protected final AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -136,6 +139,10 @@ public abstract class SocketWrapperBase<E> {
 
     public AbstractEndpoint<E,?> getEndpoint() {
         return endpoint;
+    }
+
+    public Lock getLock() {
+        return lock;
     }
 
     public Object getCurrentProcessor() {

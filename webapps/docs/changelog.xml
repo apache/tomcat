@@ -195,6 +195,11 @@
         <code>ERR_HTTP2_SERVER_REFUSED_STREAM</code> for some connections.
         (markt)
       </fix>
+      <scode>
+        Refactor synchronization blocks locking on <code>SocketWrapper</code> to
+        use <code>ReentrantLock</code> to support users wishing to experiment
+        with project Loom. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
