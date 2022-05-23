@@ -1345,24 +1345,40 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         protected boolean flushNonBlocking() throws IOException {
-            boolean dataLeft = !socketBufferHandler.isWriteBufferEmpty();
+            boolean dataLeft = socketOrNetworkBufferHasDataLeft();
 
             // Write to the socket, if there is anything to write
             if (dataLeft) {
                 doWrite(false);
-                dataLeft = !socketBufferHandler.isWriteBufferEmpty();
+                dataLeft = socketOrNetworkBufferHasDataLeft();
             }
 
             if (!dataLeft && !nonBlockingWriteBuffer.isEmpty()) {
                 dataLeft = nonBlockingWriteBuffer.write(this, false);
 
-                if (!dataLeft && !socketBufferHandler.isWriteBufferEmpty()) {
+                if (!dataLeft && socketOrNetworkBufferHasDataLeft()) {
                     doWrite(false);
-                    dataLeft = !socketBufferHandler.isWriteBufferEmpty();
+                    dataLeft = socketOrNetworkBufferHasDataLeft();
                 }
             }
 
             return dataLeft;
+        }
+
+
+        /*
+         * https://bz.apache.org/bugzilla/show_bug.cgi?id=66076
+         *
+         * When using TLS an additional buffer is used for the encrypted data
+         * before it is written to the network. It is possible for this network
+         * output buffer to contain data while the socket write buffer is empty.
+         *
+         * For NIO with non-blocking I/O, this case is handling by ensuring that
+         * flush only returns false (i.e. no data left to flush) if all buffers
+         * are empty.
+         */
+        private boolean socketOrNetworkBufferHasDataLeft() {
+            return !socketBufferHandler.isWriteBufferEmpty() || getSocket().getOutboundRemaining() > 0;
         }
 
 

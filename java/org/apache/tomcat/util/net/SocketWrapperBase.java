@@ -722,6 +722,12 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
+    /**
+     * Writes all remaining data from the buffers and blocks until the write is
+     * complete.
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
     protected void flushBlocking() throws IOException {
         doWrite(true);
 
@@ -736,6 +742,14 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
+    /**
+     * Writes as much data as possible from any that remains in the buffers.
+     *
+     * @return <code>true</code> if data remains to be flushed after this method
+     *         completes, otherwise <code>false</code>.
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
     protected abstract boolean flushNonBlocking() throws IOException;
 
 
