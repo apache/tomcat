@@ -133,6 +133,10 @@
         use <code>ReentrantLock</code> to support users wishing to experiment
         with project Loom. (markt)
       </scode>
+      <fix>
+        <bug>66084</bug>: Correctly calculate bytes written to a response. Pull
+        request <pr>516</pr> provided by aooohan HanLi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
