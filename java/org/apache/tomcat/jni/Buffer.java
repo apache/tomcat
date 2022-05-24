@@ -28,7 +28,10 @@ public class Buffer {
      * Allocate a new ByteBuffer from memory
      * @param size The amount of memory to allocate
      * @return The ByteBuffer with allocated memory
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native ByteBuffer malloc(int size);
 
     /**
@@ -36,7 +39,10 @@ public class Buffer {
      * @param num Number of elements.
      * @param size Length in bytes of each element.
      * @return The ByteBuffer with allocated memory
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native ByteBuffer calloc(int num, int size);
 
     /**
@@ -44,7 +50,10 @@ public class Buffer {
      * @param p The pool to allocate from
      * @param size The amount of memory to allocate
      * @return The ByteBuffer with allocated memory
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native ByteBuffer palloc(long p, int size);
 
     /**
@@ -52,7 +61,10 @@ public class Buffer {
      * @param p The pool to allocate from
      * @param size The amount of memory to allocate
      * @return The ByteBuffer with allocated memory
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native ByteBuffer pcalloc(long p, int size);
 
     /**
@@ -62,7 +74,10 @@ public class Buffer {
      * @param mem The memory to use
      * @param size The amount of memory to use
      * @return The ByteBuffer with attached memory
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native ByteBuffer create(long mem, int size);
 
     /**
@@ -70,7 +85,10 @@ public class Buffer {
      * <br><b>Warning :</b> Call this method only on ByteBuffers
      * that were created by calling Buffer.alloc or Buffer.calloc.
      * @param buf Previously allocated ByteBuffer to be freed.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native void free(ByteBuffer buf);
 
     /**
@@ -84,7 +102,10 @@ public class Buffer {
      * Returns the allocated memory size of the ByteBuffer.
      * @param buf Previously allocated ByteBuffer.
      * @return the size
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native long size(ByteBuffer buf);
 
 }
