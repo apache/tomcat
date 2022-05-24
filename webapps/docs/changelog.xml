@@ -133,6 +133,10 @@
         connector, ensure that flushing the buffers attempts to empty all of the
         output buffers. (markt)
       </fix>
+      <fix>
+        <bug>66084</bug>: Correctly calculate bytes written to a response. Pull
+        request <pr>516</pr> provided by aooohan HanLi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
