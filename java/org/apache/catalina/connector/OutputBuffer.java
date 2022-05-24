@@ -399,8 +399,9 @@ public class OutputBuffer extends Writer {
             return;
         }
 
+        int remaining = from.remaining();
         append(from);
-        bytesWritten += from.remaining();
+        bytesWritten += remaining;
 
         // if called from within flush(), then immediately flush
         // remaining bytes
