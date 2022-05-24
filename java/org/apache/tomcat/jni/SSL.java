@@ -343,7 +343,7 @@ public final class SSL {
      * @return New BIO handle
      * @throws Exception An error occurred
      */
-     public static native long newBIO(long pool, BIOCallback callback)
+    public static native long newBIO(long pool, BIOCallback callback)
             throws Exception;
 
     /**
@@ -351,19 +351,19 @@ public final class SSL {
      * @param bio BIO to close and destroy.
      * @return APR Status code
      */
-     public static native int closeBIO(long bio);
+    public static native int closeBIO(long bio);
 
     /**
      * Set global Password callback for obtaining passwords.
      * @param callback PasswordCallback implementation to use.
      */
-     public static native void setPasswordCallback(PasswordCallback callback);
+    public static native void setPasswordCallback(PasswordCallback callback);
 
     /**
      * Set global Password for decrypting certificates and keys.
      * @param password Password to use.
      */
-     public static native void setPassword(String password);
+    public static native void setPassword(String password);
 
     /**
      * Return last SSL error string
