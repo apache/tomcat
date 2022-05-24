@@ -185,6 +185,7 @@ public final class Library {
     public static int APR_MMAP_LIMIT;
 
     /* return global TCN's APR pool */
+    @Deprecated
     public static native long globalPool();
 
     /**

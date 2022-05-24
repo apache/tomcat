@@ -19,7 +19,10 @@ package org.apache.tomcat.jni;
 /** PasswordCallback Interface
  *
  * @author Mladen Turk
+ *
+ * @deprecated Unused. Will be removed in Tomcat 10.1
  */
+@Deprecated
 public interface PasswordCallback {
 
     /**
