@@ -19,7 +19,10 @@ package org.apache.tomcat.jni;
 /** Error
  *
  * @author Mladen Turk
+ *
+ * @deprecated Unused. Will be removed in Tomcat 10.1
  */
+@Deprecated
 public class Error extends Exception {
 
     private static final long serialVersionUID = 1L;

@@ -306,7 +306,10 @@ public final class SSL {
      *        In case both files are unavailable builtin
      *        random seed generator is used.
      * @return <code>true</code> if the operation was successful
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native boolean randLoad(String filename);
 
     /**
@@ -315,7 +318,10 @@ public final class SSL {
      * by calling randLoad in a later session.
      * @param filename Filename to save the data
      * @return <code>true</code> if the operation was successful
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native boolean randSave(String filename);
 
     /**
@@ -324,12 +330,16 @@ public final class SSL {
      * @param len The length of random sequence in bytes
      * @param base64 Output the data in Base64 encoded format
      * @return <code>true</code> if the operation was successful
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native boolean randMake(String filename, int len,
                                           boolean base64);
 
     /**
      * Sets global random filename.
+     *
      * @param filename Filename to use.
      *        If set it will be used for SSL initialization
      *        and all contexts where explicitly not set.
@@ -342,7 +352,10 @@ public final class SSL {
      * @param callback BIOCallback to use
      * @return New BIO handle
      * @throws Exception An error occurred
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native long newBIO(long pool, BIOCallback callback)
             throws Exception;
 
@@ -350,25 +363,37 @@ public final class SSL {
      * Close BIO and dereference callback object
      * @param bio BIO to close and destroy.
      * @return APR Status code
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native int closeBIO(long bio);
 
     /**
      * Set global Password callback for obtaining passwords.
      * @param callback PasswordCallback implementation to use.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native void setPasswordCallback(PasswordCallback callback);
 
     /**
      * Set global Password for decrypting certificates and keys.
      * @param password Password to use.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native void setPassword(String password);
 
     /**
      * Return last SSL error string
      * @return the error string
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native String getLastError();
 
     /**
@@ -382,7 +407,10 @@ public final class SSL {
      * @param op Bitwise-OR of all SSL_OP_* to test.
      *
      * @return true if all SSL_OP_* are supported by OpenSSL library.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native boolean hasOp(int op);
 
     /**
@@ -423,7 +451,10 @@ public final class SSL {
      * @param ssl SSL pointer (SSL *)
      * @param rbio read BIO pointer (BIO *)
      * @param wbio write BIO pointer (BIO *)
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native void setBIO(long ssl, long rbio, long wbio);
 
     /**
@@ -431,7 +462,10 @@ public final class SSL {
      * @param ssl SSL pointer (SSL *)
      * @param ret TLS/SSL I/O return value
      * @return the error status
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native int getError(long ssl, int ret);
 
     /**
@@ -495,7 +529,10 @@ public final class SSL {
      * SSL_set_shutdown
      * @param ssl the SSL instance (SSL *)
      * @param mode Shutdown mode
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native void setShutdown(long ssl, int mode);
 
     /**

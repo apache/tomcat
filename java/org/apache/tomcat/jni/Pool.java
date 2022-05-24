@@ -40,7 +40,10 @@ public class Pool {
      * @param pool The pool to clear
      * This does not actually free the memory, it just allows the pool
      *         to re-use this memory for the next allocation.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native void clear(long pool);
 
     /**
@@ -55,7 +58,10 @@ public class Pool {
      * Get the parent pool of the specified pool.
      * @param pool The pool for retrieving the parent pool.
      * @return The parent of the given pool.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native long parentGet(long pool);
 
     /**
@@ -64,7 +70,10 @@ public class Pool {
      * @param b The pool to search for
      * @return True if a is an ancestor of b, NULL is considered an ancestor
      * of all pools.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native boolean isAncestor(long a, long b);
 
 
@@ -86,14 +95,20 @@ public class Pool {
      * @param o The object to call when the pool is cleared
      *                      or destroyed
      * @return The cleanup handler.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native long cleanupRegister(long pool, Object o);
 
     /**
      * Remove a previously registered cleanup function
      * @param pool The pool remove the cleanup from
      * @param data The cleanup handler to remove from cleanup
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native void cleanupKill(long pool, long data);
 
     /**
@@ -108,7 +123,10 @@ public class Pool {
      * APR_JUST_WAIT          -- wait forever for the process to complete
      * APR_KILL_ONLY_ONCE     -- send SIGTERM and then wait
      * </PRE>
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native void noteSubprocess(long a, long proc, int how);
 
     /**
@@ -116,7 +134,10 @@ public class Pool {
      * @param p The pool to allocate from
      * @param size The amount of memory to allocate
      * @return The ByteBuffer with allocated memory
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native ByteBuffer alloc(long p, int size);
 
     /**
@@ -124,7 +145,10 @@ public class Pool {
      * @param p The pool to allocate from
      * @param size The amount of memory to allocate
      * @return The ByteBuffer with allocated memory
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native ByteBuffer calloc(long p, int size);
 
     /*
@@ -142,7 +166,10 @@ public class Pool {
      * Object attached to the pool will be globally referenced
      * until the pool is cleared or dataSet is called with the null data.
      * @return APR Status code.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
      public static native int dataSet(long pool, String key, Object data);
 
     /**
@@ -150,13 +177,19 @@ public class Pool {
      * @param key The key for the data to retrieve
      * @param pool The current pool.
      * @return the data
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
      public static native Object dataGet(long pool, String key);
 
     /**
      * Run all of the child_cleanups, so that any unnecessary files are
      * closed because we are about to exec a new program
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1
      */
+    @Deprecated
     public static native void cleanupForExec();
 
 }
