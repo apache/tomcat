@@ -1623,6 +1623,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
 
             @Override
+            protected boolean hasOutboundRemaining() {
+                return getSocket().getOutboundRemaining() > 0;
+            }
+
+            @Override
             public void run() {
                 // Perform the IO operation
                 // Called from the poller to continue the IO operation
@@ -1654,13 +1659,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             } else {
                                 boolean doWrite = true;
                                 // Write from main buffer first
-                                if (!socketBufferHandler.isWriteBufferEmpty()) {
+                                if (socketOrNetworkBufferHasDataLeft()) {
                                     // There is still data inside the main write buffer, it needs to be written first
                                     socketBufferHandler.configureWriteBufferForRead();
                                     do {
                                         nBytes = getSocket().write(socketBufferHandler.getWriteBuffer());
-                                    } while (!socketBufferHandler.isWriteBufferEmpty() && nBytes > 0);
-                                    if (!socketBufferHandler.isWriteBufferEmpty()) {
+                                    } while (socketOrNetworkBufferHasDataLeft() && nBytes > 0);
+                                    if (socketOrNetworkBufferHasDataLeft()) {
                                         doWrite = false;
                                     }
                                     // Preserve a negative value since it is an error
@@ -1681,7 +1686,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                     updateLastWrite();
                                 }
                             }
-                            if (nBytes != 0 || !buffersArrayHasRemaining(buffers, offset, length)) {
+                            if (nBytes != 0 || (!buffersArrayHasRemaining(buffers, offset, length) &&
+                                    !socketOrNetworkBufferHasDataLeft())) {
                                 completionDone = false;
                             }
                         }
@@ -1689,7 +1695,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         setError(e);
                     }
                 }
-                if (nBytes > 0 || (nBytes == 0 && !buffersArrayHasRemaining(buffers, offset, length))) {
+                if (nBytes > 0 || (nBytes == 0 && !buffersArrayHasRemaining(buffers, offset, length) &&
+                        !socketOrNetworkBufferHasDataLeft())) {
                     // The bytes processed are only updated in the completion handler
                     completion.completed(Long.valueOf(nBytes), this);
                 } else if (nBytes < 0 || getError() != null) {
@@ -1708,9 +1715,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                 }
             }
-
         }
-
     }
 
 

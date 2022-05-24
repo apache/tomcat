@@ -1022,6 +1022,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
 
             @Override
+            protected boolean hasOutboundRemaining() {
+                // NIO2 never has remaining outbound data when the completion
+                // handler is called
+                return false;
+            }
+
+            @Override
             protected void start() {
                 if (read) {
                     // Disable any regular read notifications caused by registerReadInterest

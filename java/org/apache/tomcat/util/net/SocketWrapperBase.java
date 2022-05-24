@@ -1036,6 +1036,8 @@ public abstract class SocketWrapperBase<E> {
          */
         protected abstract boolean isInline();
 
+        protected abstract boolean hasOutboundRemaining();
+
         /**
          * Process the operation using the connector executor.
          * @return true if the operation was accepted, false if the executor
@@ -1087,7 +1089,7 @@ public abstract class SocketWrapperBase<E> {
                 boolean completion = true;
                 if (state.check != null) {
                     CompletionHandlerCall call = state.check.callHandler(currentState, state.buffers, state.offset, state.length);
-                    if (call == CompletionHandlerCall.CONTINUE) {
+                    if (call == CompletionHandlerCall.CONTINUE || state.hasOutboundRemaining()) {
                         complete = false;
                     } else if (call == CompletionHandlerCall.NONE) {
                         completion = false;
