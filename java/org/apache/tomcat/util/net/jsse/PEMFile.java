@@ -143,7 +143,10 @@ public class PEMFile {
                     privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8);
                     break;
                 case Part.RSA_PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS1);
+                    if (part.algorithm != null)
+                        privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS1);
+                    else
+                        privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1);
                     break;
                 case Part.CERTIFICATE:
                 case Part.X509_CERTIFICATE:
