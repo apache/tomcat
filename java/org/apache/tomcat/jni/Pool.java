@@ -18,18 +18,20 @@ package org.apache.tomcat.jni;
 
 import java.nio.ByteBuffer;
 
-/** Pool
- *
- * @author Mladen Turk
+/**
+ * Provides access to APR memory pools which are used to manage memory
+ * allocations for natively created instances.
  */
 public class Pool {
 
     /**
      * Create a new pool.
-     * @param parent The parent pool.  If this is 0, the new pool is a root
-     * pool.  If it is non-zero, the new pool will inherit all
-     * of its parent pool's attributes, except the apr_pool_t will
-     * be a sub-pool.
+     *
+     * @param parent The parent pool. If this is 0, the new pool is a root pool.
+     *               If it is non-zero, the new pool will inherit all of its
+     *               parent pool's attributes, except the apr_pool_t will be a
+     *               sub-pool.
+     *
      * @return The pool we have just created.
     */
     public static native long create(long parent);
@@ -48,8 +50,8 @@ public class Pool {
 
     /**
      * Destroy the pool. This takes similar action as apr_pool_clear() and then
-     * frees all the memory.
-     * This will actually free the memory
+     * frees all the memory. This will actually free the memory.
+     *
      * @param pool The pool to destroy
      */
     public static native void destroy(long pool);

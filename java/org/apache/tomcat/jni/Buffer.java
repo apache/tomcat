@@ -18,9 +18,9 @@ package org.apache.tomcat.jni;
 
 import java.nio.ByteBuffer;
 
-/** Buffer
- *
- * @author Mladen Turk
+/**
+ * Provides utilities related to the use of directly allocated
+ * {@link ByteBuffer} instances with native code.
  */
 public class Buffer {
 
@@ -93,7 +93,9 @@ public class Buffer {
 
     /**
      * Returns the memory address of the ByteBuffer.
+     *
      * @param buf Previously allocated ByteBuffer.
+     *
      * @return the memory address
      */
     public static native long address(ByteBuffer buf);
