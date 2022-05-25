@@ -630,16 +630,6 @@ public final class SSL {
      */
     public static native int isInInit(long ssl);
 
-    /**
-     * SSL_get0_next_proto_negotiated
-     * @param ssl the SSL instance (SSL *)
-     * @return the NPN protocol negotiated
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.1.x
-     */
-    @Deprecated
-    public static native String getNextProtoNegotiated(long ssl);
-
     /*
      * End Twitter API Additions
      */
