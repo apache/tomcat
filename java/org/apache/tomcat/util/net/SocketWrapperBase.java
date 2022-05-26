@@ -1089,7 +1089,7 @@ public abstract class SocketWrapperBase<E> {
                 boolean completion = true;
                 if (state.check != null) {
                     CompletionHandlerCall call = state.check.callHandler(currentState, state.buffers, state.offset, state.length);
-                    if (call == CompletionHandlerCall.CONTINUE || state.hasOutboundRemaining()) {
+                    if (call == CompletionHandlerCall.CONTINUE || (!state.read && state.hasOutboundRemaining())) {
                         complete = false;
                     } else if (call == CompletionHandlerCall.NONE) {
                         completion = false;
