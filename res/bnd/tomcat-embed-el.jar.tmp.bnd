@@ -27,7 +27,7 @@ Export-Package: \
     org.apache.el.stream,\
     org.apache.el.util
 
--includeresource.meta-inf: /META-INF/=../../output/manifests/jasper-el.jar/
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/jasper-el.jar/
 
 Provide-Capability: \
     osgi.contract;\
