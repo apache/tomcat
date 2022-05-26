@@ -142,6 +142,11 @@
         <bug>66084</bug>: Correctly calculate bytes written to a response. Pull
         request <pr>516</pr> provided by aooohan HanLi. (markt)
       </fix>
+      <add>
+        Correct a regression in the support added for encrypted PKCS#1 formatted
+        private keys in the previous release that broke support for unencrypted
+        PKCS#1 formatted private keys. (jfclere/markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

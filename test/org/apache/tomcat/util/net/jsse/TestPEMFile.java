@@ -41,6 +41,12 @@ public class TestPEMFile {
 
 
     @Test
+    public void testKeyPkcs1WithUnnecessaryPassword() throws Exception {
+        testKey(KEY_PKCS1, "ignore-me");
+    }
+
+
+    @Test
     public void testKeyEncryptedPkcs1DesEde3Cbc() throws Exception {
         testKeyEncrypted(KEY_ENCRYPTED_PKCS1_DES_EDE3_CBC);
     }
