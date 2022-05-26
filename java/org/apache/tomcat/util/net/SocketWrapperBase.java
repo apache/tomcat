@@ -1036,7 +1036,12 @@ public abstract class SocketWrapperBase<E> {
          */
         protected abstract boolean isInline();
 
-        protected abstract boolean hasOutboundRemaining();
+        protected boolean hasOutboundRemaining() {
+            // NIO2 and APR never have remaining outbound data when the
+            // completion handler is called. NIO needs to override this.
+            return false;
+        }
+
 
         /**
          * Process the operation using the connector executor.

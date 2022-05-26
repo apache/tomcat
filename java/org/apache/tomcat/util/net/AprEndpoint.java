@@ -2814,13 +2814,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             }
 
             @Override
-            protected boolean hasOutboundRemaining() {
-                // NIO2 never has remaining outbound data when the completion
-                // handler is called
-                return false;
-            }
-
-            @Override
             public void run() {
                 // Perform the IO operation
                 // Called from the poller to continue the IO operation
