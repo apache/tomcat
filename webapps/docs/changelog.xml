@@ -120,6 +120,11 @@
         <code>clearReferencesObjectStreamClassCaches</code> when running on a
         JRE that includes a fix for the underlying memory leak. (markt)
       </fix>
+      <fix>
+        <bug>66068</bug>: Ensure that the changes made to a request by the
+        <code>RemoteIPValve</code> persist after the request is put into
+        asynchronous mode. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
