@@ -508,20 +508,28 @@
     </attribute>
 
     <attribute name="maxHttpHeaderSize" required="false">
-      <p>The maximum size of the request and response HTTP header, specified
-      in bytes. If not specified, this attribute is set to 8192 (8 KB).</p>
+      <p>Provides the default value for
+      <strong>maxHttpRequestHeaderSize</strong> and
+      <strong>maxHttpResponseHeaderSize</strong>. If not specified, this
+      attribute is set to 8192 (8 KB).</p>
     </attribute>
 
     <attribute name="maxHttpRequestHeaderSize" required="false">
-      <p>The maximum size of the request HTTP header, specified
-      in bytes. If not specified, this attribute is set to the value of
-      the <code>maxHttpHeaderSize</code> attribute.</p>
+      <p>The maximum permitted size of the request line and headers associated
+      with an HTTP request, specified in bytes. This is compared to the number
+      of bytes received so includes line terminators and whitespace as well as
+      the request line, header names and header values. If not specified, this
+      attribute is set to the value of the <code>maxHttpHeaderSize</code>
+      attribute.</p>
     </attribute>
 
     <attribute name="maxHttpResponseHeaderSize" required="false">
-      <p>The maximum size of the response HTTP header, specified
-      in bytes. If not specified, this attribute is set to the value of
-      the <code>maxHttpHeaderSize</code> attribute.</p>
+      <p>The maximum permitted size of the response line and headers associated
+      with an HTTP response, specified in bytes. This is compared to the number
+      of bytes written so includes line terminators and whitespace as well as
+      the status line, header names and header values. If not specified, this
+      attribute is set to the value of the <code>maxHttpHeaderSize</code>
+      attribute.</p>
     </attribute>
 
     <attribute name="maxKeepAliveRequests" required="false">
