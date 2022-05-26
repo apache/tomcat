@@ -159,6 +159,11 @@
         application to reflect changes in required Java version and source
         repository. (markt)
       </fix>
+      <fix>
+        Documentation. Make the description of the HTTP/1.1 configuration
+        attributes that control the maximum allowed HTTP header size more
+        specific. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
