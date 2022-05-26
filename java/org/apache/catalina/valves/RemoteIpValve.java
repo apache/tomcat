@@ -740,28 +740,30 @@ public class RemoteIpValve extends ValveBase {
         try {
             getNext().invoke(request, response);
         } finally {
-            request.setRemoteAddr(originalRemoteAddr);
-            request.setRemoteHost(originalRemoteHost);
-            request.setSecure(originalSecure);
-            request.getCoyoteRequest().scheme().setString(originalScheme);
-            request.getCoyoteRequest().serverName().setString(originalServerName);
-            if (isChangeLocalName()) {
-                request.getCoyoteRequest().localName().setString(originalLocalName);
-            }
-            request.setServerPort(originalServerPort);
-            request.setLocalPort(originalLocalPort);
+            if (!request.isAsync()) {
+                request.setRemoteAddr(originalRemoteAddr);
+                request.setRemoteHost(originalRemoteHost);
+                request.setSecure(originalSecure);
+                request.getCoyoteRequest().scheme().setString(originalScheme);
+                request.getCoyoteRequest().serverName().setString(originalServerName);
+                if (isChangeLocalName()) {
+                    request.getCoyoteRequest().localName().setString(originalLocalName);
+                }
+                request.setServerPort(originalServerPort);
+                request.setLocalPort(originalLocalPort);
 
-            MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
-            if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
-                headers.removeHeader(proxiesHeader);
-            } else {
-                headers.setValue(proxiesHeader).setString(originalProxiesHeader);
-            }
+                MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
+                if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
+                    headers.removeHeader(proxiesHeader);
+                } else {
+                    headers.setValue(proxiesHeader).setString(originalProxiesHeader);
+                }
 
-            if (originalRemoteIpHeader == null || originalRemoteIpHeader.length() == 0) {
-                headers.removeHeader(remoteIpHeader);
-            } else {
-                headers.setValue(remoteIpHeader).setString(originalRemoteIpHeader);
+                if (originalRemoteIpHeader == null || originalRemoteIpHeader.length() == 0) {
+                    headers.removeHeader(remoteIpHeader);
+                } else {
+                    headers.setValue(remoteIpHeader).setString(originalRemoteIpHeader);
+                }
             }
         }
     }
