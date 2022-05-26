@@ -124,6 +124,11 @@
         <pr>515</pr>: Avoid deadlock on startup with some utility executor
         configurations. Submitted by Han Li. (remm)
       </fix>
+      <fix>
+        <bug>66068</bug>: Ensure that the changes made to a request by the
+        <code>RemoteIPValve</code> persist after the request is put into
+        asynchronous mode. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
