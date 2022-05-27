@@ -133,6 +133,11 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        Additional fix for <bug>65118</bug>. Fix a potential
+        <code>NullPointerException</code> when pruning closed HTTP/2 streams
+        from the connection. (markt)
+      </fix>
       <scode>
         Refactor synchronization blocks locking on <code>SocketWrapper</code> to
         use <code>ReentrantLock</code> to support users wishing to experiment

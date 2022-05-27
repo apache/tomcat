@@ -1678,15 +1678,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         increaseOverheadCount(FrameType.PRIORITY);
 
-        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId);
-        if (abstractNonZeroStream == null) {
-            abstractNonZeroStream = createRemoteStream(streamId);
-        }
-        AbstractStream parentStream = getAbstractNonZeroStream(parentStreamId);
-        if (parentStream == null) {
-            parentStream = this;
-        }
         synchronized (priorityTreeLock) {
+            // Need to look up stream and parent stream inside the lock else it
+            // is possible for a stream to be recycled before it is
+            // reprioritised. This can result in incorrect references to the
+            // non-recycled stream being retained after reprioritisation.
+            AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId);
+            if (abstractNonZeroStream == null) {
+                abstractNonZeroStream = createRemoteStream(streamId);
+            }
+            AbstractStream parentStream = getAbstractNonZeroStream(parentStreamId);
+            if (parentStream == null) {
+                parentStream = this;
+            }
             abstractNonZeroStream.rePrioritise(parentStream, exclusive, weight);
         }
     }
