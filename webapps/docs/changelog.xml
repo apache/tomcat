@@ -130,6 +130,11 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        Additional fix for <bug>65118</bug>. Fix a potential
+        <code>NullPointerException</code> when pruning closed HTTP/2 streams
+        from the connection. (markt)
+      </fix>
+      <fix>
         <bug>66076</bug>: When using TLS with non-blocking writes and the NIO
         connector, ensure that flushing the buffers attempts to empty all of the
         output buffers. (markt)
