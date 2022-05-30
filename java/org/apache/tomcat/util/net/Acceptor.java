@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jni.Error;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -65,6 +64,7 @@ public class Acceptor<U> implements Runnable {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public void run() {
 
@@ -157,8 +157,8 @@ public class Acceptor<U> implements Runnable {
                     String msg = sm.getString("endpoint.accept.fail");
                     // APR specific.
                     // Could push this down but not sure it is worth the trouble.
-                    if (t instanceof Error) {
-                        Error e = (Error) t;
+                    if (t instanceof org.apache.tomcat.jni.Error) {
+                        org.apache.tomcat.jni.Error e = (org.apache.tomcat.jni.Error) t;
                         if (e.getError() == 233) {
                             // Not an error on HP-UX so log as a warning
                             // so it can be filtered out on that platform
