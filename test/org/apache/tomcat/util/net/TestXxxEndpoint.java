@@ -27,7 +27,6 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.jni.Address;
-import org.apache.tomcat.jni.Error;
 import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.Socket;
@@ -49,6 +48,7 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private long createAprSocket(int port, long pool)
                  throws Exception {
         /**
@@ -82,8 +82,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         // Bind the server socket
         int ret = Socket.bind(serverSock, inetAddress);
         if (ret != 0) {
-            log.error("Could not bind: " + Error.strerror(ret));
-            throw (new Exception(Error.strerror(ret)));
+            log.error("Could not bind: " + org.apache.tomcat.jni.Error.strerror(ret));
+            throw (new Exception(org.apache.tomcat.jni.Error.strerror(ret)));
         }
         return serverSock;
     }
