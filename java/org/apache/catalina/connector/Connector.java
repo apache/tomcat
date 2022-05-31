@@ -1074,6 +1074,7 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void initInternal() throws LifecycleException {
 

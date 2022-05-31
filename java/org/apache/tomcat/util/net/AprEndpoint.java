@@ -74,7 +74,11 @@ import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
  *
  * @author Mladen Turk
  * @author Remy Maucherat
+ *
+ * @deprecated  The APR/Native Connector will be removed in Tomcat 10.1.x
+ *              onwards.
  */
+@Deprecated
 public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallBack {
 
     // -------------------------------------------------------------- Constants

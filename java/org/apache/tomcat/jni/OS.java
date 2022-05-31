@@ -19,12 +19,17 @@ package org.apache.tomcat.jni;
 /** OS
  *
  * @author Mladen Turk
+ *
+ * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+ *              10.1.x / Tomcat Native 2.x onwards to only include those
+ *              components required to provide OpenSSL integration with the NIO
+ *              and NIO2 connectors.
  */
+@Deprecated
 public class OS {
 
     /* OS Enums */
     private static final int UNIX      = 1;
-    private static final int NETWARE   = 2;
     private static final int WIN32     = 3;
     private static final int WIN64     = 4;
     private static final int LINUX     = 5;
@@ -46,7 +51,13 @@ public class OS {
     private static native boolean is(int type);
 
     public static final boolean IS_UNIX    = is(UNIX);
-    public static final boolean IS_NETWARE = is(NETWARE);
+    /**
+     * @deprecated Hard-coded to false since there has not been a supported
+     *             Netware platform for many years.
+     *             This will be removed in Tomcat 10 onwards
+     */
+    @Deprecated
+    public static final boolean IS_NETWARE = false;
     public static final boolean IS_WIN32   = is(WIN32);
     public static final boolean IS_WIN64   = is(WIN64);
     public static final boolean IS_LINUX   = is(LINUX);

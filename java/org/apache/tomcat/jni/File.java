@@ -21,7 +21,13 @@ import java.nio.ByteBuffer;
 /** File
  *
  * @author Mladen Turk
+ *
+ * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+ *              10.1.x / Tomcat Native 2.x onwards to only include those
+ *              components required to provide OpenSSL integration with the NIO
+ *              and NIO2 connectors.
  */
+@Deprecated
 public class File {
 
     /** Open the file for reading */
@@ -358,7 +364,7 @@ public class File {
      * @param thefile The file descriptor to write to.
      * @param buf The buffer which contains the data.
      * @param offset Start offset in buf
-     * @param nbytes The number of bytes to write; (-1) for full array.
+     * @param nbytes The number of bytes to write
      * @return The number of bytes written.
      */
     public static native int write(long thefile, byte[] buf, int offset, int nbytes);
@@ -399,7 +405,7 @@ public class File {
      * @param thefile The file descriptor to write to.
      * @param buf The buffer which contains the data.
      * @param offset Start offset in buf
-     * @param nbytes The number of bytes to write; (-1) for full array.
+     * @param nbytes The number of bytes to write
      * @return The number of bytes written.
      */
     public static native int writeFull(long thefile, byte[] buf, int offset, int nbytes);
@@ -468,7 +474,7 @@ public class File {
      * @param thefile The file descriptor to read from.
      * @param buf The buffer to store the data to.
      * @param offset Start offset in buf
-     * @param nbytes The number of bytes to read (-1) for full array.
+     * @param nbytes The number of bytes to read
      * @return the number of bytes read.
      */
     public static native int read(long thefile, byte[] buf,  int offset, int nbytes);
@@ -511,7 +517,7 @@ public class File {
      * @param thefile The file descriptor to read from.
      * @param buf The buffer to store the data to.
      * @param offset Start offset in buf
-     * @param nbytes The number of bytes to read (-1) for full array.
+     * @param nbytes The number of bytes to read
      * @return the number of bytes read.
      */
     public static native int readFull(long thefile, byte[] buf,  int offset, int nbytes);

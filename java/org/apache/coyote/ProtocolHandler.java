@@ -130,7 +130,10 @@ public interface ProtocolHandler {
      *
      * @return <code>true</code> if this Protocol Handler requires the
      *         APR/native library, otherwise <code>false</code>
+     *
+     * @deprecated This method will be removed in Tomcat 10.1.x onwards
      */
+    @Deprecated
     public boolean isAprRequired();
 
 
