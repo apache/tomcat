@@ -221,6 +221,17 @@ public class AprLifecycleListener implements LifecycleListener {
             log.warn(sm.getString("aprListener.aprInitError", t.getMessage()), t);
             return;
         }
+        if (major > 1 && "off".equalsIgnoreCase(SSLEngine)) {
+            log.error(sm.getString("aprListener.sslRequired", SSLEngine, Library.versionString()));
+            try {
+                // Tomcat Native 2.x onwards requires SSL
+                terminateAPR();
+            } catch (Throwable t) {
+                t = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(t);
+            }
+            return;
+        }
         if (apver < rqver) {
             log.error(sm.getString("aprListener.tcnInvalid",
                     Library.versionString(),

@@ -103,6 +103,9 @@
         <p>See the <a href="http://www.openssl.org/">Official OpenSSL website</a>
         for more details on supported SSL hardware engines and manufacturers.
         </p>
+        <p>Tomcat Native 2.x onwards requires SSL so if SSLEngine is set to
+        <code>off</code> when using Tomcat Native 2.x onwards, the APR/native
+        library will be disabled.</p>
       </attribute>
 
       <attribute name="SSLRandomSeed" required="false">
