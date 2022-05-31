@@ -1009,9 +1009,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         MemorySegment protocolPointer = allocator.allocate(CLinker.C_POINTER, MemoryAddress.NULL);
         SSL_get0_alpn_selected(state.ssl, protocolPointer, lenAddress);
         if (MemoryAddress.NULL.equals(protocolPointer.address())) {
-            SSL_get0_next_proto_negotiated(state.ssl, protocolPointer, lenAddress);
-        }
-        if (MemoryAddress.NULL.equals(protocolPointer.address())) {
             return null;
         }
         int length = MemoryAccess.getInt(lenAddress);
@@ -1808,14 +1805,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         public String getProtocol() {
             String applicationProtocol = OpenSSLEngine.this.applicationProtocol;
             if (applicationProtocol == null) {
-                synchronized (OpenSSLEngine.this) {
-                    if (!destroyed) {
-                        applicationProtocol = getProtocolNegotiated();
-                    }
-                }
-                if (applicationProtocol == null) {
-                    applicationProtocol = fallbackApplicationProtocol;
-                }
+                applicationProtocol = fallbackApplicationProtocol;
                 if (applicationProtocol != null) {
                     OpenSSLEngine.this.applicationProtocol = applicationProtocol.replace(':', '_');
                 } else {

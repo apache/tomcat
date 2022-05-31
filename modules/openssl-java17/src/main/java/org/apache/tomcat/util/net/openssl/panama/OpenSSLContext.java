@@ -678,8 +678,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         CLinker.getInstance().upcallStub(openSSLCallbackAlpnSelectProtoHandle,
                         openSSLCallbackAlpnSelectProtoFunctionDescriptor, state.contextScope);
                 SSL_CTX_set_alpn_select_cb(state.sslCtx, openSSLCallbackAlpnSelectProto, state.sslCtx);
-                // Skip NPN (annoying and likely not useful anymore)
-                //SSLContext.setNpnProtos(state.ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
             }
 
             // Apply OpenSSLConfCmd if used

@@ -35,16 +35,6 @@ class constants$11 {
         "(Ljdk/incubator/foreign/MemoryAddress;J)J",
         constants$11.SSL_set_options$FUNC, false
     );
-    static final FunctionDescriptor SSL_get0_next_proto_negotiated$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle SSL_get0_next_proto_negotiated$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_get0_next_proto_negotiated",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$11.SSL_get0_next_proto_negotiated$FUNC, false
-    );
     static final FunctionDescriptor SSL_CTX_set_alpn_select_cb$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER,
         C_POINTER,
