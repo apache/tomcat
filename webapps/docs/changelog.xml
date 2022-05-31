@@ -129,6 +129,10 @@
         <code>RemoteIPValve</code> persist after the request is put into
         asynchronous mode. (markt)
       </fix>
+      <add>
+        Include the major version in the recommended version used for Tomcat
+        Native with the <code>AprLifecycleListener</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
