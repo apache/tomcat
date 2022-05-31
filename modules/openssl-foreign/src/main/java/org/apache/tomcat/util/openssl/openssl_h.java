@@ -1002,17 +1002,6 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
-    public static MethodHandle SSL_get0_next_proto_negotiated$MH() {
-        return RuntimeHelper.requireNonNull(constants$12.SSL_get0_next_proto_negotiated$MH,"SSL_get0_next_proto_negotiated");
-    }
-    public static void SSL_get0_next_proto_negotiated ( Addressable s,  Addressable data,  Addressable len) {
-        var mh$ = RuntimeHelper.requireNonNull(constants$12.SSL_get0_next_proto_negotiated$MH, "SSL_get0_next_proto_negotiated");
-        try {
-            mh$.invokeExact(s, data, len);
-        } catch (Throwable ex$) {
-            throw new AssertionError("should not reach here", ex$);
-        }
-    }
     public static MethodHandle SSL_CTX_set_alpn_select_cb$MH() {
         return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_set_alpn_select_cb$MH,"SSL_CTX_set_alpn_select_cb");
     }

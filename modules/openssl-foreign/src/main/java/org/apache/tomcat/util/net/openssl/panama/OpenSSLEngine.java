@@ -305,7 +305,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         final int sslWrote;
 
         if (src.isDirect()) {
-            sslWrote = SSL_write(ssl, MemorySegment.ofByteBuffer(src), len);
+            sslWrote = SSL_write(ssl, MemorySegment.ofBuffer(src), len);
             if (sslWrote > 0) {
                 src.position(pos + sslWrote);
                 return sslWrote;
@@ -339,7 +339,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         final int pos = src.position();
         final int len = src.remaining();
         if (src.isDirect()) {
-            final int netWrote = BIO_write(networkBIO, MemorySegment.ofByteBuffer(src), len);
+            final int netWrote = BIO_write(networkBIO, MemorySegment.ofBuffer(src), len);
             if (netWrote > 0) {
                 src.position(pos + netWrote);
                 return netWrote;
@@ -352,7 +352,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             try {
                 buf.put(src);
                 buf.flip();
-                final int netWrote = BIO_write(networkBIO, MemorySegment.ofByteBuffer(buf), len);
+                final int netWrote = BIO_write(networkBIO, MemorySegment.ofBuffer(buf), len);
                 if (netWrote > 0) {
                     src.position(pos + netWrote);
                     return netWrote;
@@ -379,7 +379,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         if (dst.isDirect()) {
             final int len = dst.remaining();
-            final int sslRead = SSL_read(ssl, MemorySegment.ofByteBuffer(dst), len);
+            final int sslRead = SSL_read(ssl, MemorySegment.ofBuffer(dst), len);
             if (sslRead > 0) {
                 dst.position(dst.position() + sslRead);
                 return sslRead;
@@ -414,7 +414,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         clearLastError();
         final int pos = dst.position();
         if (dst.isDirect()) {
-            final int bioRead = BIO_read(networkBIO, MemorySegment.ofByteBuffer(dst), pending);
+            final int bioRead = BIO_read(networkBIO, MemorySegment.ofBuffer(dst), pending);
             if (bioRead > 0) {
                 dst.position(pos + bioRead);
                 return bioRead;
@@ -425,7 +425,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // This uses unsafe and does not need to be used: the connector should be configured with direct buffers
             final ByteBuffer buf = ByteBuffer.allocateDirect(pending);
             try {
-                final int bioRead = BIO_read(networkBIO, MemorySegment.ofByteBuffer(buf), pending);
+                final int bioRead = BIO_read(networkBIO, MemorySegment.ofBuffer(buf), pending);
                 if (bioRead > 0) {
                     buf.limit(bioRead);
                     int oldLimit = dst.limit();
@@ -1008,9 +1008,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         MemorySegment lenAddress = allocator.allocate(ValueLayout.JAVA_INT, 0);
         MemorySegment protocolPointer = allocator.allocate(ValueLayout.ADDRESS, MemoryAddress.NULL);
         SSL_get0_alpn_selected(state.ssl, protocolPointer, lenAddress);
-        if (MemoryAddress.NULL.equals(protocolPointer.address())) {
-            SSL_get0_next_proto_negotiated(state.ssl, protocolPointer, lenAddress);
-        }
         if (MemoryAddress.NULL.equals(protocolPointer.address())) {
             return null;
         }
@@ -1809,14 +1806,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         public String getProtocol() {
             String applicationProtocol = OpenSSLEngine.this.applicationProtocol;
             if (applicationProtocol == null) {
-                synchronized (OpenSSLEngine.this) {
-                    if (!destroyed) {
-                        applicationProtocol = getProtocolNegotiated();
-                    }
-                }
-                if (applicationProtocol == null) {
-                    applicationProtocol = fallbackApplicationProtocol;
-                }
+                applicationProtocol = fallbackApplicationProtocol;
                 if (applicationProtocol != null) {
                     OpenSSLEngine.this.applicationProtocol = applicationProtocol.replace(':', '_');
                 } else {

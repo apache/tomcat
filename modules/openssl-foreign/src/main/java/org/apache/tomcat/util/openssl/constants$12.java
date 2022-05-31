@@ -42,15 +42,6 @@ class constants$12 {
         "SSL_set_options",
         constants$12.SSL_set_options$FUNC, false
     );
-    static final FunctionDescriptor SSL_get0_next_proto_negotiated$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
-    );
-    static final MethodHandle SSL_get0_next_proto_negotiated$MH = RuntimeHelper.downcallHandle(
-        "SSL_get0_next_proto_negotiated",
-        constants$12.SSL_get0_next_proto_negotiated$FUNC, false
-    );
     static final FunctionDescriptor SSL_CTX_set_alpn_select_cb$FUNC = FunctionDescriptor.ofVoid(
         ADDRESS,
         ADDRESS,
