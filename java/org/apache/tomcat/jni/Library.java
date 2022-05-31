@@ -137,51 +137,81 @@ public final class Library {
     public static native String aprVersionString();
 
     /*  APR Feature Macros */
+    @Deprecated
     public static boolean APR_HAVE_IPV6           = false;
+    @Deprecated
     public static boolean APR_HAS_SHARED_MEMORY   = false;
+    @Deprecated
     public static boolean APR_HAS_THREADS         = false;
+    @Deprecated
     public static boolean APR_HAS_SENDFILE        = false;
+    @Deprecated
     public static boolean APR_HAS_MMAP            = false;
+    @Deprecated
     public static boolean APR_HAS_FORK            = false;
+    @Deprecated
     public static boolean APR_HAS_RANDOM          = false;
+    @Deprecated
     public static boolean APR_HAS_OTHER_CHILD     = false;
+    @Deprecated
     public static boolean APR_HAS_DSO             = false;
+    @Deprecated
     public static boolean APR_HAS_SO_ACCEPTFILTER = false;
+    @Deprecated
     public static boolean APR_HAS_UNICODE_FS      = false;
+    @Deprecated
     public static boolean APR_HAS_PROC_INVOKED    = false;
+    @Deprecated
     public static boolean APR_HAS_USER            = false;
+    @Deprecated
     public static boolean APR_HAS_LARGE_FILES     = false;
+    @Deprecated
     public static boolean APR_HAS_XTHREAD_FILES   = false;
+    @Deprecated
     public static boolean APR_HAS_OS_UUID         = false;
     /* Are we big endian? */
+    @Deprecated
     public static boolean APR_IS_BIGENDIAN        = false;
     /* APR sets APR_FILES_AS_SOCKETS to 1 on systems where it is possible
      * to poll on files/pipes.
      */
+    @Deprecated
     public static boolean APR_FILES_AS_SOCKETS    = false;
     /* This macro indicates whether or not EBCDIC is the native character set.
      */
+    @Deprecated
     public static boolean APR_CHARSET_EBCDIC      = false;
     /* Is the TCP_NODELAY socket option inherited from listening sockets?
      */
+    @Deprecated
     public static boolean APR_TCP_NODELAY_INHERITED = false;
     /* Is the O_NONBLOCK flag inherited from listening sockets?
      */
+    @Deprecated
     public static boolean APR_O_NONBLOCK_INHERITED  = false;
     /* Poll operations are interruptable by apr_pollset_wakeup().
      */
+    @Deprecated
     public static boolean APR_POLLSET_WAKEABLE      = false;
     /* Support for Unix Domain Sockets.
      */
+    @Deprecated
     public static boolean APR_HAVE_UNIX             = false;
 
 
+    @Deprecated
     public static int APR_SIZEOF_VOIDP;
+    @Deprecated
     public static int APR_PATH_MAX;
+    @Deprecated
     public static int APRMAXHOSTLEN;
+    @Deprecated
     public static int APR_MAX_IOVEC_SIZE;
+    @Deprecated
     public static int APR_MAX_SECS_TO_LINGER;
+    @Deprecated
     public static int APR_MMAP_THRESHOLD;
+    @Deprecated
     public static int APR_MMAP_LIMIT;
 
     /* return global TCN's APR pool */
