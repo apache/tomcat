@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -33,8 +32,6 @@ import org.apache.tomcat.jni.LibraryNotFoundError;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
-
-
 
 /**
  * Implementation of <code>LifecycleListener</code> that will init and
@@ -53,7 +50,9 @@ import org.apache.tomcat.util.res.StringManager;
 public class AprLifecycleListener implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(AprLifecycleListener.class);
+
     private static boolean instanceCreated = false;
+
     /**
      * Info messages during init() are cached until Lifecycle.BEFORE_INIT_EVENT
      * so that, in normal (non-error) cases, init() related log messages appear
@@ -69,15 +68,16 @@ public class AprLifecycleListener implements LifecycleListener {
 
     // ---------------------------------------------- Constants
 
-
     protected static final int TCN_REQUIRED_MAJOR = 1;
     protected static final int TCN_REQUIRED_MINOR = 2;
     protected static final int TCN_REQUIRED_PATCH = 14;
+    protected static final int TCN_RECOMMENDED_MAJOR = 1;
     protected static final int TCN_RECOMMENDED_MINOR = 2;
     protected static final int TCN_RECOMMENDED_PV = 30;
 
 
     // ---------------------------------------------- Properties
+
     protected static String SSLEngine = "on"; //default on
     protected static String FIPSMode = "off"; // default off, valid only when SSLEngine="on"
     protected static String SSLRandomSeed = "builtin";
@@ -197,7 +197,7 @@ public class AprLifecycleListener implements LifecycleListener {
         int patch = 0;
         int apver = 0;
         int rqver = TCN_REQUIRED_MAJOR * 1000 + TCN_REQUIRED_MINOR * 100 + TCN_REQUIRED_PATCH;
-        int rcver = TCN_REQUIRED_MAJOR * 1000 + TCN_RECOMMENDED_MINOR * 100 + TCN_RECOMMENDED_PV;
+        int rcver = TCN_RECOMMENDED_MAJOR * 1000 + TCN_RECOMMENDED_MINOR * 100 + TCN_RECOMMENDED_PV;
 
         if (aprInitialized) {
             return;
