@@ -30,7 +30,12 @@ import org.junit.Test;
 
 /**
  * Tests for server-side sockets using any local address (0.0.0.0 or ::).
+ *
+ * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+ *              10.1.x onwards to only those components required to provide
+ *              OpenSSL integration with the NIO and NIO2 connectors.
  */
+@Deprecated
 public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
 
     // Excessive but allows for slow systems

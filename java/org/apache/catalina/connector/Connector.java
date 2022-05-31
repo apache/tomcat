@@ -624,6 +624,7 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * @return the Coyote protocol handler in use.
      */
+    @SuppressWarnings("deprecation")
     public String getProtocol() {
         boolean apr = AprStatus.getUseAprConnector();
         if ((!apr && org.apache.coyote.http11.Http11NioProtocol.class.getName().equals(protocolHandlerClassName))
@@ -1001,6 +1002,7 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void initInternal() throws LifecycleException {
 

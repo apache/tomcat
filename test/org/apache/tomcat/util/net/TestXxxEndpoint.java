@@ -30,10 +30,7 @@ import org.junit.Test;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.jni.Address;
-import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Pool;
-import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.compat.JreCompat;
 
 /**
@@ -53,7 +50,12 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         }
     }
 
-    @SuppressWarnings("deprecation")
+    /*
+     * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+     *              10.1.x onwards to only those components required to provide
+     *              OpenSSL integration with the NIO and NIO2 connectors.
+     */
+    @Deprecated
     private long createAprSocket(int port, long pool)
                  throws Exception {
         /**
@@ -64,28 +66,28 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         String address = InetAddress.getByName("localhost").getHostAddress();
 
         // Create the APR address that will be bound
-        int family = Socket.APR_UNSPEC;
+        int family = org.apache.tomcat.jni.Socket.APR_UNSPEC;
 
         long inetAddress = 0;
         try {
-            inetAddress = Address.info(address, family,
+            inetAddress = org.apache.tomcat.jni.Address.info(address, family,
                                        port, 0, pool);
             // Create the APR server socket
-            serverSock = Socket.create(Address.getInfo(inetAddress).family,
-                                       Socket.SOCK_STREAM,
-                                       Socket.APR_PROTO_TCP, pool);
+            serverSock = org.apache.tomcat.jni.Socket.create(org.apache.tomcat.jni.Address.getInfo(inetAddress).family,
+                    org.apache.tomcat.jni.Socket.SOCK_STREAM,
+                    org.apache.tomcat.jni.Socket.APR_PROTO_TCP, pool);
         } catch (Exception ex) {
             log.error("Could not create socket for address '" + address + "'");
             return 0;
         }
 
-        if (OS.IS_UNIX) {
-            Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
+        if (org.apache.tomcat.jni.OS.IS_UNIX) {
+            org.apache.tomcat.jni.Socket.optSet(serverSock, org.apache.tomcat.jni.Socket.APR_SO_REUSEADDR, 1);
         }
         // Deal with the firewalls that tend to drop the inactive sockets
-        Socket.optSet(serverSock, Socket.APR_SO_KEEPALIVE, 1);
+        org.apache.tomcat.jni.Socket.optSet(serverSock, org.apache.tomcat.jni.Socket.APR_SO_KEEPALIVE, 1);
         // Bind the server socket
-        int ret = Socket.bind(serverSock, inetAddress);
+        int ret = org.apache.tomcat.jni.Socket.bind(serverSock, inetAddress);
         if (ret != 0) {
             log.error("Could not bind: " + org.apache.tomcat.jni.Error.strerror(ret));
             throw (new Exception(org.apache.tomcat.jni.Error.strerror(ret)));
@@ -93,11 +95,17 @@ public class TestXxxEndpoint extends TomcatBaseTest {
         return serverSock;
     }
 
+    /*
+     * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+     *              10.1.x onwards to only those components required to provide
+     *              OpenSSL integration with the NIO and NIO2 connectors.
+     */
+    @Deprecated
     private void destroyAprSocket(long serverSock, long pool) {
         if (serverSock != 0) {
-            Socket.shutdown(serverSock, Socket.APR_SHUTDOWN_READWRITE);
-            Socket.close(serverSock);
-            Socket.destroy(serverSock);
+            org.apache.tomcat.jni.Socket.shutdown(serverSock, org.apache.tomcat.jni.Socket.APR_SHUTDOWN_READWRITE);
+            org.apache.tomcat.jni.Socket.close(serverSock);
+            org.apache.tomcat.jni.Socket.destroy(serverSock);
         }
 
         if (pool != 0) {
