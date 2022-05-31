@@ -237,7 +237,10 @@ public final class Library {
      * configurations), so that it can be loaded by multiple Webapps.
      *
      * @param filename - absolute path of the native library
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1.x
      */
+    @Deprecated
     public static void load(String filename){
         System.load(filename);
     }
@@ -255,7 +258,10 @@ public final class Library {
      * configurations), so that it can be loaded by multiple Webapps.
      *
      * @param libname - the name of the native library
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1.x
      */
+    @Deprecated
     public static void loadLibrary(String libname){
         System.loadLibrary(libname);
     }
