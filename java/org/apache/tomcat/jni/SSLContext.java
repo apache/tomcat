@@ -532,7 +532,10 @@ public final class SSLContext {
      * @param nextProtos protocols in priority order
      * @param selectorFailureBehavior see {@link SSL#SSL_SELECTOR_FAILURE_NO_ADVERTISE}
      *                                and {@link SSL#SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL}
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.1.x
      */
+    @Deprecated
     public static native void setNpnProtos(long ctx, String[] nextProtos, int selectorFailureBehavior);
 
     /**
