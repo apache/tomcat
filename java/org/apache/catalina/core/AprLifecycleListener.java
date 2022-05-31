@@ -249,14 +249,6 @@ public class AprLifecycleListener implements LifecycleListener {
                 Library.versionString(),
                 Library.aprVersionString()));
 
-        // Log APR flags
-        initInfoLogMessages.add(sm.getString("aprListener.flags",
-                Boolean.valueOf(Library.APR_HAVE_IPV6),
-                Boolean.valueOf(Library.APR_HAS_SENDFILE),
-                Boolean.valueOf(Library.APR_HAS_SO_ACCEPTFILTER),
-                Boolean.valueOf(Library.APR_HAS_RANDOM),
-                Boolean.valueOf(Library.APR_HAVE_UNIX)));
-
         AprStatus.setAprAvailable(true);
     }
 

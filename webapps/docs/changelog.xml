@@ -133,6 +133,9 @@
         Include the major version in the recommended version used for Tomcat
         Native with the <code>AprLifecycleListener</code>. (markt)
       </add>
+      <scode>
+        Remove the reporting of the unused APR feature flags. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
