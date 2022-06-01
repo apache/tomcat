@@ -190,6 +190,20 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations contributed by Shirayuking and
+        tak7iji. (markt)
+      </add>
+      <add>
+        Improvements to Chinese translations contributed by Dingzi2012. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.79 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
