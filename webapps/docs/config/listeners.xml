@@ -115,17 +115,23 @@
       </attribute>
 
       <attribute name="FIPSMode" required="false">
-        <p>Set to <code>on</code> to request that OpenSSL be in FIPS mode
-        (if OpenSSL is already in FIPS mode, it will remain in FIPS mode).
-        Set to <code>enter</code> to force OpenSSL to enter FIPS mode (an error
-        will occur if OpenSSL is already in FIPS mode).
+        <p>The behaviour of this attribute depends on whether Tomcat Native has
+        been compiled against OpenSSL 1.x or OpenSSL 3.x.</p>
+        <p>For OpenSSL 1.x: Set to <code>on</code> to request that OpenSSL be in
+        FIPS mode (if OpenSSL is already in FIPS mode, it will remain in FIPS
+        mode).
+        Set to <code>enter</code> to force OpenSSL to enter FIPS mode (an
+        error will occur if OpenSSL is already in FIPS mode).
         Set to <code>require</code> to require that OpenSSL <i>already</i> be
         in FIPS mode (an error will occur if OpenSSL is not already in FIPS
         mode).</p>
-        <p>FIPS mode <em>requires you to have a FIPS-capable OpenSSL library which
-        you must build yourself</em>.
-        If this attribute is set to any of the above values, the <b>SSLEngine</b>
-        must be enabled as well.</p>
+        <p>For OpenSSL 3.x: <code>on</code>, <code>enter</code> and
+        <code>require</code> all behave the same way. If the FIPS provider is
+        the default provider, it will be used. If the FIPS provider is not the
+        default provider, an error will occur.</p>
+        <p>FIPS mode <em>requires you to have a FIPS-capable OpenSSL library</em>.
+        If this attribute is set to anything other than <code>off</code>, the
+        <b>SSLEngine</b> must be enabled as well.</p>
         <p>The default value is <code>off</code>.</p>
       </attribute>
 

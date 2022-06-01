@@ -76,6 +76,11 @@ public class AprLifecycleListener implements LifecycleListener {
 
     // ---------------------------------------------- Properties
 
+    private static int tcnMajor = 0;
+    private static int tcnMinor = 0;
+    private static int tcnPatch = 0;
+    private static int tcnVersion = 0;
+
     protected static String SSLEngine = "on"; //default on
     protected static String FIPSMode = "off"; // default off, valid only when SSLEngine="on"
     protected static String SSLRandomSeed = "builtin";
@@ -185,12 +190,7 @@ public class AprLifecycleListener implements LifecycleListener {
     }
 
     @SuppressWarnings("deprecation")
-    private static void init()
-    {
-        int major = 0;
-        int minor = 0;
-        int patch = 0;
-        int apver = 0;
+    private static void init() {
         int rqver = TCN_REQUIRED_MAJOR * 1000 + TCN_REQUIRED_MINOR * 100 + TCN_REQUIRED_PATCH;
         int rcver = TCN_RECOMMENDED_MAJOR * 1000 + TCN_RECOMMENDED_MINOR * 100 + TCN_RECOMMENDED_PV;
 
@@ -201,10 +201,10 @@ public class AprLifecycleListener implements LifecycleListener {
 
         try {
             Library.initialize(null);
-            major = Library.TCN_MAJOR_VERSION;
-            minor = Library.TCN_MINOR_VERSION;
-            patch = Library.TCN_PATCH_VERSION;
-            apver = major * 1000 + minor * 100 + patch;
+            tcnMajor = Library.TCN_MAJOR_VERSION;
+            tcnMinor = Library.TCN_MINOR_VERSION;
+            tcnPatch = Library.TCN_PATCH_VERSION;
+            tcnVersion = tcnMajor * 1000 + tcnMinor * 100 + tcnPatch;
         } catch (LibraryNotFoundError lnfe) {
             // Library not on path
             if (log.isDebugEnabled()) {
@@ -222,7 +222,7 @@ public class AprLifecycleListener implements LifecycleListener {
             log.warn(sm.getString("aprListener.aprInitError", t.getMessage()), t);
             return;
         }
-        if (major > 1 && "off".equalsIgnoreCase(SSLEngine)) {
+        if (tcnMajor > 1 && "off".equalsIgnoreCase(SSLEngine)) {
             log.error(sm.getString("aprListener.sslRequired", SSLEngine, Library.versionString()));
             try {
                 // Tomcat Native 2.x onwards requires SSL
@@ -233,7 +233,7 @@ public class AprLifecycleListener implements LifecycleListener {
             }
             return;
         }
-        if (apver < rqver) {
+        if (tcnVersion < rqver) {
             log.error(sm.getString("aprListener.tcnInvalid",
                     Library.versionString(),
                     TCN_REQUIRED_MAJOR + "." +
@@ -249,7 +249,7 @@ public class AprLifecycleListener implements LifecycleListener {
             }
             return;
         }
-        if (apver < rcver) {
+        if (tcnVersion < rcver) {
             initInfoLogMessages.add(sm.getString("aprListener.tcnVersion",
                     Library.versionString(),
                     TCN_REQUIRED_MAJOR + "." +
@@ -303,41 +303,66 @@ public class AprLifecycleListener implements LifecycleListener {
         method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
 
-        if (!(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
+        // OpenSSL 3 onwards uses providers
+        boolean usingProviders = tcnMajor > 1 || (tcnVersion > 1233 && (SSL.version() & 0xF0000000L) > 2);
 
+        // Tomcat Native 1.x built with OpenSSL 1.x without explicitly enabling
+        // FIPS and Tomcat Native < 1.2.34 built with OpenSSL 3.x will fail if
+        // any calls are made to SSL.fipsModeGet or SSL.fipsModeSet
+        if (usingProviders || !(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
             fipsModeActive = false;
-
             final boolean enterFipsMode;
             int fipsModeState = SSL.fipsModeGet();
 
             if(log.isDebugEnabled()) {
-                log.debug(sm.getString("aprListener.currentFIPSMode",
-                                       Integer.valueOf(fipsModeState)));
+                log.debug(sm.getString("aprListener.currentFIPSMode", Integer.valueOf(fipsModeState)));
             }
 
-            if ("on".equalsIgnoreCase(FIPSMode)) {
+            if (null == FIPSMode || "off".equalsIgnoreCase(FIPSMode)) {
                 if (fipsModeState == FIPS_ON) {
-                    log.info(sm.getString("aprListener.skipFIPSInitialization"));
+                    fipsModeActive = true;
+                }
+                enterFipsMode = false;
+            } else if ("on".equalsIgnoreCase(FIPSMode)) {
+                if (fipsModeState == FIPS_ON) {
+                    if (!usingProviders) {
+                        log.info(sm.getString("aprListener.skipFIPSInitialization"));
+                    }
                     fipsModeActive = true;
                     enterFipsMode = false;
                 } else {
-                    enterFipsMode = true;
+                    if (usingProviders) {
+                        throw new IllegalStateException(sm.getString("aprListener.FIPSProviderNotDefault", FIPSMode));
+                    } else {
+                        enterFipsMode = true;
+                    }
                 }
             } else if ("require".equalsIgnoreCase(FIPSMode)) {
                 if (fipsModeState == FIPS_ON) {
                     fipsModeActive = true;
                     enterFipsMode = false;
                 } else {
-                    throw new IllegalStateException(
-                            sm.getString("aprListener.requireNotInFIPSMode"));
+                    if (usingProviders) {
+                        throw new IllegalStateException(sm.getString("aprListener.FIPSProviderNotDefault", FIPSMode));
+                    } else {
+                        throw new IllegalStateException(sm.getString("aprListener.requireNotInFIPSMode"));
+                    }
                 }
             } else if ("enter".equalsIgnoreCase(FIPSMode)) {
                 if (fipsModeState == FIPS_OFF) {
-                    enterFipsMode = true;
+                    if (usingProviders) {
+                        throw new IllegalStateException(sm.getString("aprListener.FIPSProviderNotDefault", FIPSMode));
+                    } else {
+                        enterFipsMode = true;
+                    }
                 } else {
-                    throw new IllegalStateException(sm.getString(
-                            "aprListener.enterAlreadyInFIPSMode",
-                            Integer.valueOf(fipsModeState)));
+                    if (usingProviders) {
+                        fipsModeActive = true;
+                        enterFipsMode = false;
+                    } else {
+                        throw new IllegalStateException(sm.getString(
+                                "aprListener.enterAlreadyInFIPSMode", Integer.valueOf(fipsModeState)));
+                    }
                 }
             } else {
                 throw new IllegalArgumentException(sm.getString(
@@ -358,6 +383,10 @@ public class AprLifecycleListener implements LifecycleListener {
 
                 fipsModeActive = true;
                 log.info(sm.getString("aprListener.initializeFIPSSuccess"));
+            }
+
+            if (usingProviders && fipsModeActive) {
+                log.info(sm.getString("aprListener.usingFIPSProvider"));
             }
         }
 
