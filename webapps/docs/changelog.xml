@@ -122,6 +122,11 @@
         <code>org.apache.tomcat.util.net.Nio2Endpoint.handshake</code>) for TLS
         handshake failures. (markt)
       </add>
+      <add>
+        Enable the use of the FIPS provider for TLS enabled Connectors when
+        using Tomcat Native 1.2.34 onwards built with OpenSSL 3.0.x onwards.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
