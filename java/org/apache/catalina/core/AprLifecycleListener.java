@@ -184,6 +184,7 @@ public class AprLifecycleListener implements LifecycleListener {
         fipsModeActive = false;
     }
 
+    @SuppressWarnings("deprecation")
     private static void init()
     {
         int major = 0;
