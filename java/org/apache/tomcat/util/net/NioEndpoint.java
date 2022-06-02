@@ -546,6 +546,19 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         return new SocketProcessor(socketWrapper, event);
     }
 
+    protected PollerEvent createPollerEvent(NioSocketWrapper socketWrapper, int interestOps) {
+        PollerEvent r = null;
+        if (eventCache != null) {
+            r = eventCache.pop();
+        }
+        if (r == null) {
+            r = new PollerEvent(socketWrapper, interestOps);
+        } else {
+            r.reset(socketWrapper, interestOps);
+        }
+        return r;
+    }
+
     // ----------------------------------------------------- Poller Inner Classes
 
     /**
@@ -638,16 +651,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
          *                    the Poller
          */
         public void add(NioSocketWrapper socketWrapper, int interestOps) {
-            PollerEvent r = null;
-            if (eventCache != null) {
-                r = eventCache.pop();
-            }
-            if (r == null) {
-                r = new PollerEvent(socketWrapper, interestOps);
-            } else {
-                r.reset(socketWrapper, interestOps);
-            }
-            addEvent(r);
+            PollerEvent pollerEvent = createPollerEvent(socketWrapper, interestOps);
+            addEvent(pollerEvent);
             if (close) {
                 processSocket(socketWrapper, SocketEvent.STOP, false);
             }
@@ -718,16 +723,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
          */
         public void register(final NioSocketWrapper socketWrapper) {
             socketWrapper.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
-            PollerEvent event = null;
-            if (eventCache != null) {
-                event = eventCache.pop();
-            }
-            if (event == null) {
-                event = new PollerEvent(socketWrapper, OP_REGISTER);
-            } else {
-                event.reset(socketWrapper, OP_REGISTER);
-            }
-            addEvent(event);
+            PollerEvent pollerEvent = createPollerEvent(socketWrapper, OP_REGISTER);
+            addEvent(pollerEvent);
         }
 
         /**
@@ -1002,12 +999,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             // Avoid duplicate stop calls
                             socketWrapper.interestOps(0);
                             socketWrapper.close();
-                        } else if ((socketWrapper.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ ||
-                                  (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                        } else if (socketWrapper.interestOpsEquals(SelectionKey.OP_READ)||
+                                  socketWrapper.interestOpsEquals(SelectionKey.OP_WRITE)) {
                             boolean readTimeout = false;
                             boolean writeTimeout = false;
                             // Check for read timeout
-                            if ((socketWrapper.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+                            if (socketWrapper.interestOpsEquals(SelectionKey.OP_READ)) {
                                 long delta = now - socketWrapper.getLastRead();
                                 long timeout = socketWrapper.getReadTimeout();
                                 if (timeout > 0 && delta > timeout) {
@@ -1015,7 +1012,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 }
                             }
                             // Check for write timeout
-                            if (!readTimeout && (socketWrapper.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                            if (!readTimeout && socketWrapper.interestOpsEquals(SelectionKey.OP_WRITE)) {
                                 long delta = now - socketWrapper.getLastWrite();
                                 long timeout = socketWrapper.getWriteTimeout();
                                 if (timeout > 0 && delta > timeout) {
@@ -1102,6 +1099,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         public Poller getPoller() { return poller; }
         public int interestOps() { return interestOps; }
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
+        public boolean interestOpsEquals(int targetOps) {
+            return (this.interestOps() & targetOps) == targetOps;
+        }
 
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
         public SendfileData getSendfileData() { return this.sendfileData; }
