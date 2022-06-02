@@ -165,6 +165,13 @@
         Update <code>ImportHandler</code> optimisation for new classes
         introduced in Java 19. (markt)
       </fix>
+      <add>
+        Add support for specifying Java 19 (with the value <code>19</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will used.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
