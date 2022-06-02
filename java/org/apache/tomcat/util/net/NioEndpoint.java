@@ -546,19 +546,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         return new SocketProcessor(socketWrapper, event);
     }
 
-    protected PollerEvent createPollerEvent(NioSocketWrapper socketWrapper, int interestOps) {
-        PollerEvent r = null;
-        if (eventCache != null) {
-            r = eventCache.pop();
-        }
-        if (r == null) {
-            r = new PollerEvent(socketWrapper, interestOps);
-        } else {
-            r.reset(socketWrapper, interestOps);
-        }
-        return r;
-    }
-
     // ----------------------------------------------------- Poller Inner Classes
 
     /**
@@ -638,6 +625,19 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             if (wakeupCounter.incrementAndGet() == 0) {
                 selector.wakeup();
             }
+        }
+
+        private PollerEvent createPollerEvent(NioSocketWrapper socketWrapper, int interestOps) {
+            PollerEvent r = null;
+            if (eventCache != null) {
+                r = eventCache.pop();
+            }
+            if (r == null) {
+                r = new PollerEvent(socketWrapper, interestOps);
+            } else {
+                r.reset(socketWrapper, interestOps);
+            }
+            return r;
         }
 
         /**
