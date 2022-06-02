@@ -999,12 +999,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                             // Avoid duplicate stop calls
                             socketWrapper.interestOps(0);
                             socketWrapper.close();
-                        } else if (socketWrapper.interestOpsEquals(SelectionKey.OP_READ)||
-                                  socketWrapper.interestOpsEquals(SelectionKey.OP_WRITE)) {
+                        } else if (socketWrapper.interestOpsHas(SelectionKey.OP_READ)||
+                                  socketWrapper.interestOpsHas(SelectionKey.OP_WRITE)) {
                             boolean readTimeout = false;
                             boolean writeTimeout = false;
                             // Check for read timeout
-                            if (socketWrapper.interestOpsEquals(SelectionKey.OP_READ)) {
+                            if (socketWrapper.interestOpsHas(SelectionKey.OP_READ)) {
                                 long delta = now - socketWrapper.getLastRead();
                                 long timeout = socketWrapper.getReadTimeout();
                                 if (timeout > 0 && delta > timeout) {
@@ -1012,7 +1012,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 }
                             }
                             // Check for write timeout
-                            if (!readTimeout && socketWrapper.interestOpsEquals(SelectionKey.OP_WRITE)) {
+                            if (!readTimeout && socketWrapper.interestOpsHas(SelectionKey.OP_WRITE)) {
                                 long delta = now - socketWrapper.getLastWrite();
                                 long timeout = socketWrapper.getWriteTimeout();
                                 if (timeout > 0 && delta > timeout) {
@@ -1099,7 +1099,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         public Poller getPoller() { return poller; }
         public int interestOps() { return interestOps; }
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
-        public boolean interestOpsEquals(int targetOps) {
+        public boolean interestOpsHas(int targetOps) {
             return (this.interestOps() & targetOps) == targetOps;
         }
 
