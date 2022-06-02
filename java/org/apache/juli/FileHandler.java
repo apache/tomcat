@@ -131,8 +131,7 @@ public class FileHandler extends Handler {
                             Thread.currentThread()
                                     .setContextClassLoader(getClass().getClassLoader());
                         }
-                        Thread t = new Thread(group, r,
-                                NAME_PREFIX + threadNumber.getAndIncrement());
+                        Thread t = Thread.ofVirtual().name(NAME_PREFIX + threadNumber.getAndIncrement()).unstarted(r);//new Thread(group, r,NAME_PREFIX + threadNumber.getAndIncrement());
                         t.setDaemon(true);
                         return t;
                     } finally {

@@ -172,7 +172,7 @@ public class AsyncFileHandler extends FileHandler {
             int newCount = handlerCount.decrementAndGet();
             if (newCount == 0) {
                 try {
-                    Thread dummyHook = new Thread();
+                    Thread dummyHook =  Thread.ofVirtual().name("dummy").unstarted(()->{});
                     Runtime.getRuntime().addShutdownHook(dummyHook);
                     Runtime.getRuntime().removeShutdownHook(dummyHook);
                 } catch (IllegalStateException ise) {
