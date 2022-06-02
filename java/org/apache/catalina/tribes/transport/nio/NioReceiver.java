@@ -366,7 +366,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         Selector selector = this.selector.get();
         if (selector != null) {
             try {
-                // Unlock the thread if is is blocked waiting for input
+                // Unlock the thread if it is blocked waiting for input
                 selector.wakeup();
                 // Wait for the receiver thread to finish
                 int count = 0;
