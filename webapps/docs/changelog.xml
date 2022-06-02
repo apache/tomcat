@@ -105,6 +105,8 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M16 (markt)" rtext="in development">
+</section>
+<section name="Tomcat 10.1.0-M16 (markt)" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
       <fix>
