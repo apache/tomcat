@@ -538,7 +538,7 @@ public class FileHandler extends Handler {
     }
 
     private void clean() {
-        if (maxDays.intValue() <= 0) {
+        if (maxDays.intValue() <= 0 || Files.notExists(Path.of(directory))) {
             return;
         }
         DELETE_FILES_SERVICE.submit(() -> {
