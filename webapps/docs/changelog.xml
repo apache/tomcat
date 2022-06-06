@@ -129,6 +129,11 @@
         Include the major version in the recommended version used for Tomcat
         Native with the <code>AprLifecycleListener</code>. (markt)
       </add>
+      <fix>
+        <bug>66104</bug>: Avoid error message by not trying to clean up old
+        files from the logging directory before the directory has been created.
+        Based on <pr>521</pr> by HanLi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
