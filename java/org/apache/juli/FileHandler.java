@@ -25,7 +25,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.DirectoryStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.AccessController;
@@ -572,7 +571,7 @@ public class FileHandler extends Handler {
     }
 
     private Path getDirectoryAsPath() {
-        return FileSystems.getDefault().getPath(directory);
+        return Path.of(directory);
     }
 
     private String obtainDateFromPath(Path path) {
