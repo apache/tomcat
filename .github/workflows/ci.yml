@@ -23,6 +23,9 @@ on:
 env:
   LC_ALL: en_US.UTF-8
 
+permissions:
+  contents: read
+
 jobs:
   JDKxx_Matrix:
     strategy:
