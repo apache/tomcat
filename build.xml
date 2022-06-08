@@ -862,6 +862,7 @@
         <exclude name="test/webapp/jsp/encoding/**"/>
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
+        <exclude name="build-release.properties" />
         <exclude name="res/maven/mvn.properties" />
       </fileset>
       <fileset dir="modules/jdbc-pool" >
