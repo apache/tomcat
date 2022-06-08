@@ -34,6 +34,7 @@
   <!-- property values you may customize.                                    -->
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
+  <property file="build-release.properties"/>
   <property file="build.properties.default"/>
 
   <!-- Project Name -->
