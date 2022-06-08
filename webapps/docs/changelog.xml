@@ -125,6 +125,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to bnd 6.3.1. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.64 (remm)" rtext="in progress">
   <subsection name="Catalina">
