@@ -64,6 +64,11 @@ public class JreCompat {
             jre19Available = false;
             jre9Available = true;
             jre8Available = true;
+        } else if (Jre8Compat.isSupported()) {
+            instance = new Jre8Compat();
+            jre19Available = false;
+            jre9Available = false;
+            jre8Available = true;
         } else {
             instance = new JreCompat();
             jre19Available = false;
