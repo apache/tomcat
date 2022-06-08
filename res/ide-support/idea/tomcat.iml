@@ -113,7 +113,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/bnd-6.2.0/biz.aQute.bnd-6.2.0.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/bnd-6.3.1/biz.aQute.bnd-6.3.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

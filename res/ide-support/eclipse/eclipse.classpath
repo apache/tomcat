@@ -29,7 +29,7 @@
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/hamcrest-2.2/hamcrest-2.2.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/cglib-3.3.0/cglib-nodep-3.3.0.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/objenesis-3.2/objenesis-3.2.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/bnd-6.2.0/biz.aQute.bnd-6.2.0.jar"/>
+    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/bnd-6.3.1/biz.aQute.bnd-6.3.1.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/migration-1.0.0/jakartaee-migration-1.0.0-shaded.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/unboundid-6.0.3/unboundid-ldapsdk-6.0.3.jar"/>
     <classpathentry kind="output" path=".settings/output"/>
