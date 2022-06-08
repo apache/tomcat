@@ -2309,6 +2309,7 @@ asf.ldap.username=${release.asfusername}
 gpg.exec=${gpg.exec}
 maven.asf.release.deploy.version=${version}
 </echo>
+  <replace file="webapps/docs/changelog.xml" token="rtext=&quot;in development&quot;" value="rtext=&quot;release in progress&quot;" />
   </target>
 
   <target name="release"
