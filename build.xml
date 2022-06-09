@@ -2615,22 +2615,11 @@ skip.installer property in build.properties" />
     </fail>
   </target>
 
-  <target name="-ant-version-check" if="ant.tstamp.now.iso">
-    <antversion property="ant.current.version" />
-    <fail message="This build process requires ant 1.10.2 in order to use ant.tstamp.now.iso for reproducible builds, but you are running ant ${ant.current.version}.">
-      <condition>
-        <not>
-          <antversion atleast="1.10.2" />
-        </not>
-      </condition>
-    </fail>
-  </target>
-
   <target name="-pre-release-read-asf-username" unless="release.asfusername">
     <input message="Enter ASF username" addproperty="release.asfusername" defaultValue="${user.name}" />
   </target>
 
-  <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username, -ant-version-check" description="Prepares for a release build by writing build-release.properties which contains information about the release-build environment.">
+  <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username" description="Prepares for a release build by writing build-release.properties which contains information about the release-build environment.">
     <tstamp>
       <format pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" property="now-readable" timezone="UTC" />
     </tstamp>
@@ -2657,7 +2646,7 @@ maven.asf.release.deploy.version=${version}
   </target>
 
   <target name="release"
-    depends="-ant-version-check,clean,release-init,dist-deployer,installer-sign,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
+    depends="clean,release-init,dist-deployer,installer-sign,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
     description="Create a Tomcat packaged distribution">
 
     <copy file="KEYS"
