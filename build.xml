@@ -253,6 +253,7 @@
     <format property="today-iso-8601" pattern="yyyy-MM-dd" locale="en" timezone="UTC"/>
     <format property="tstamp" pattern="HH:mm:ss" locale="en" timezone="UTC"/>
     <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss"/>
+    <format property="tstamp.iso.release" pattern="yyyy-MM-dd'T'HH:mm:ssX" timezone="UTC"/>
   </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
@@ -1546,7 +1547,8 @@
     <echo message="Building Tomcat JDBC pool libraries"/>
     <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}"
          inheritAll="false" target="build">
-      <property name="ant.tstamp.now" value ="${ant.tstamp.now}" />
+      <property name="ant.tstamp.now.iso" value ="${ant.tstamp.now.iso}" />
+      <property name="tstamp.file" value ="${tstamp.file}" />
       <property name="tomcat.pool" value="${tomcat.pool}" />
       <property name="tomcat.juli.jar" value="${tomcat-juli.jar}" />
       <property name="skip.download" value="set"/>
@@ -2645,9 +2647,6 @@ skip.installer property in build.properties" />
 
   <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username"
       description="Prepares for a release build by writing build.properties.release which contains information about the release-build environment.">
-    <tstamp>
-      <format pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" property="now-readable" timezone="UTC" />
-    </tstamp>
     <echo file="build.properties.release"># -----------------------------------------------------------------------------
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -2666,7 +2665,7 @@ skip.installer property in build.properties" />
 # -----------------------------------------------------------------------------
 
 # These ant.tstamp properties specify the build-timestamp for repeatable builds.
-ant.tstamp.now.iso=${now-readable}
+ant.tstamp.now.iso=${tstamp.iso.release}
 # This is the ASF user who is the Release Manager for this release.
 release.asfusername=${release.asfusername}
 # Set the version-suffix to "" (empty string) as this is not a development release.
