@@ -19,8 +19,8 @@
             Building The Apache Tomcat @VERSION_MAJOR_MINOR@ Servlet/JSP Container
             ====================================================
 
-This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
-implements the Servlet 3.1, JSP 2.3, EL 3.0, WebSocket 1.1 and JASPIC 1.1
+This project contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
+implements the Servlet @SERVLET_SPEC_VERSION@, JSP @JSP_SPEC_VERSION@, EL @EL_SPEC_VERSION@, WebSocket @WEBSOCKET_SPEC_VERSION@ and JASPIC @JASPIC_SPEC_VERSION@
 specifications from the Java Community Process <https://www.jcp.org/>.
 
 Note: If you just need to run Apache Tomcat, it is not necessary to build
@@ -64,9 +64,9 @@ source distribution, do the following:
     into which you installed the JDK release.
 
 
-(2) Install Apache Ant version 1.9.10 or later on your computer.
+(2) Install Apache Ant version @ANT_VERSION_REQUIRED@ or later on your computer.
 
- 1. If Apache Ant version 1.9.10 or later is already installed on your
+ 1. If Apache Ant version @ANT_VERSION_REQUIRED@ or later is already installed on your
     computer, skip to (3).
 
  2. Download a binary distribution of Ant from:
@@ -94,7 +94,7 @@ source distribution, do the following:
 (3.1) Checkout or obtain the source code for Tomcat @VERSION_MAJOR_MINOR@
 
 Clone the source using git, then checkout a specific major branch or
-master for the latest code development, or download and unpack a source
+main for the latest code development, or download and unpack a source
 package.
 
  *  Tomcat GitHub repository URL:
@@ -298,15 +298,6 @@ You can build them by using the following commands:
         codesigning.storepass=request-via-pmc
 
     Release managers will be provided with the necessary credentials by the PMC.
-    It will also be necessary to enable TLS 1.2 and the correct cipher suite to
-    for the build process to communicate with the code signing service. The
-    simplest way is by setting the ANT_OPTS environment variable.
-    E.g. (for Windows):
-
-    set ANT_OPTS=-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -Dhttps.cipherSuites=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-
-    You will also need to download and install the Java 7 unlimited strength
-    jurisdiction policy files in order to use the above cipher suite.
 
  4. Build the release:
 

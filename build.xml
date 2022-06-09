@@ -37,10 +37,18 @@
   <property file="build-release.properties"/>
   <property file="build.properties.default"/>
 
+  <!-- Check Ant Version -->
+  <fail message="Ant version ${ant.version.required} or newer is required (${ant.version} is installed)">
+    <condition>
+      <not><antversion atleast="${ant.version.required}" /></not>
+    </condition>
+  </fail>
+
   <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
 
   <!-- Version numbers -->
+  <!-- Keep in sync with webapps/docs/tomcat-docs.xsl -->
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
@@ -94,6 +102,7 @@
   <property name="tomcat.pool"           value="${tomcat.output}/jdbc-pool"/>
 
   <!-- Java EE 7 platform requires Java 7+ -->
+  <!-- Keep in sync with webapps/docs/tomcat-docs.xsl -->
   <property name="compile.release" value="7"/>
   <property name="min.java.version" value="7"/>
   <property name="build.java.version" value="11"/>
@@ -252,6 +261,12 @@
     <filter token="GIT_BRANCH" value="${git.branch}"/>
     <filter token="MIN_JAVA_VERSION" value="${min.java.version}"/>
     <filter token="BUILD_JAVA_VERSION" value="${build.java.version}"/>
+    <filter token="ANT_VERSION_REQUIRED" value="${ant.version.required}"/>
+    <filter token="SERVLET_SPEC_VERSION" value="${servlet.spec.version}"/>
+    <filter token="JSP_SPEC_VERSION" value="${jsp.spec.version}"/>
+    <filter token="EL_SPEC_VERSION" value="${el.spec.version}"/>
+    <filter token="WEBSOCKET_SPEC_VERSION" value="${websocket.spec.version}"/>
+    <filter token="JASPIC_SPEC_VERSION" value="${jaspic.spec.version}"/>
   </filterset>
 
   <!-- Files to change line endings for depending on target platform -->
@@ -1834,9 +1849,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/servletapi"
       version="true"
-      windowtitle="Servlet {servlet.spec.version} API Documentation - Apache Tomcat ${version}"
-      doctitle="Servlet {servlet.spec.version} API - Apache Tomcat ${version}"
-      header="&lt;b&gt;Servlet {servlet.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="Servlet ${servlet.spec.version} API Documentation - Apache Tomcat ${version}"
+      doctitle="Servlet ${servlet.spec.version} API - Apache Tomcat ${version}"
+      header="&lt;b&gt;Servlet ${servlet.spec.version} - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="UTF-8"
       docencoding="UTF-8"
