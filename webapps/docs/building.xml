@@ -43,10 +43,10 @@ The following is a quick step by step guide.
 
 </section>
 
-<section name="Download a Java Development Kit (JDK) version 11 or later">
+<section name="Download a Java Development Kit (JDK)">
 
 <p>
-Building Apache Tomcat requires a JDK (version 11) or later to be installed. You
+Building Apache Tomcat requires a JDK (version <build-java-version/>) or later to be installed. You
 can download one from
 <a href="https://adoptium.net/temurin/releases">https://adoptium.net/temurin/releases</a>
 or another JDK vendor.
