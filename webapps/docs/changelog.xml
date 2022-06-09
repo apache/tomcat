@@ -130,6 +130,10 @@
       <update>
         Update to bnd 6.3.1. (markt)
       </update>
+      <update>
+        The minimum Ant version required to build Tomcat 10.1.x is now 1.10.2.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
