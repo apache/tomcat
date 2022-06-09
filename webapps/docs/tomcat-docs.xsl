@@ -35,10 +35,13 @@
   <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
   <xsl:param    name="subdir"              select="''"/>
   <xsl:param    name="relative-path"       select="'.'"/>
+  <!-- Keep versions in sync with build.xml -->
   <xsl:param    name="version"             select="'10.0.x'"/>
   <xsl:param    name="majorversion"        select="'10'"/>
   <xsl:param    name="majorminorversion"   select="'10.0'"/>
   <xsl:param    name="minjavaversion"      select="'8'"/>
+  <xsl:param    name="buildjavaversion"    select="'11'"/>
+  <xsl:param    name="antversionrequired"  select="'1.10.2'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
   <xsl:param    name="year"                select="'yyyy'"/>

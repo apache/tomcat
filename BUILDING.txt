@@ -20,8 +20,8 @@
             ====================================================
 
 This project contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
-implements the Jakarta Servlet 5.0, JSP 3.0, EL 4.0, WebSocket 2.0 and
-Authentication 2.0 specifications from the Jakarta EE project at Eclipse
+implements the Jakarta Servlet @SERVLET_SPEC_VERSION@, JSP @JSP_SPEC_VERSION@, EL @EL_SPEC_VERSION@, WebSocket @WEBSOCKET_SPEC_VERSION@ and
+Authentication @JASPIC_SPEC_VERSION@ specifications from the Jakarta EE project at Eclipse
 <https://jakarta.ee//>.
 
 Note: If you just need to run Apache Tomcat, it is not necessary to build
@@ -65,9 +65,9 @@ source distribution, do the following:
     into which you installed the JDK release.
 
 
-(2) Install Apache Ant version 1.9.10 or later on your computer.
+(2) Install Apache Ant version @ANT_VERSION_REQUIRED@ or later on your computer.
 
- 1. If Apache Ant version 1.9.10 or later is already installed on your
+ 1. If Apache Ant version @ANT_VERSION_REQUIRED@ or later is already installed on your
     computer, skip to (3).
 
  2. Download a binary distribution of Ant from:
