@@ -91,7 +91,7 @@ available, which will be used to actually perform the build.
   </p>
   <p>
   Tomcat source packages:
-  <download>https://tomcat.apache.org/download-<version-major/>0.cgi</download>.
+  <download>https://tomcat.apache.org/download-<version-major/>.cgi</download>.
   </p>
 
   <p>
