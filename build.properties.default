@@ -35,19 +35,35 @@ version.build=23
 version.patch=0
 version.suffix=-dev
 
+# ----- Build tools -----
+ant.version.required=1.9.10
+
 # ----- Reproducible builds -----
 # Uncomment and set to current time for reproducible builds
 # Note: The value is in seconds (unlike milliseconds used by System.currentTimeMillis()).
 #2022-03-31T12:00:00Z
 #ant.tstamp.now=1648728000
 
-# ----- Source control flags -----
+# ----- Build control flags -----
+compile.debug=true
+# Do not pass -deprecation (-Xlint:deprecation) flag to javac
+compile.deprecation=false
+
+# ----- Documentation properties -----
 git.branch=10.0.x
 
-# ----- Build control flags -----
+# ----- Code quality tools
 # Note enabling validation uses Checkstyle which is LGPL licensed
-ant.version.required=1.9.10
 execute.validate=false
+
+# Note the JaCoCo code coverage tool is EPLv2 licensed
+# Enabling code coverage extends the time taken to run the tests by ~50%
+test.coverage=false
+
+# Note the SpotBugs is LGPL licensed
+execute.spotbugs=false
+
+# ----- Test configuration -----
 execute.test.nio=true
 execute.test.nio2=true
 # Still requires APR/native library to be present
@@ -63,18 +79,12 @@ test.verbose=true
 # thread per core.
 test.threads=1
 
-# Note the JaCoCo code coverage tool is EPLv2 licensed
-# Enabling code coverage extends the time taken to run the tests by ~50%
-test.coverage=false
-
-# Note the SpotBugs is LGPL licensed
-execute.spotbugs=false
-
 # Some platforms (e.g. OSX El Capitan) require IPv4 to be the default for the
 # multicast tests to work
 java.net.preferIPv4Stack=false
 
-# Location of GPG executable (used only for releases)
+# ----- Release build settings -----
+# Location of GPG executable
 gpg.exec=/path/to/gpg
 
 # Code signing of Windows installer
@@ -90,17 +100,13 @@ codesigning.storetype=DIGICERTONE
 execute.download=true
 trydownload.httpusecaches=true
 
-# ----- Default Base Path for Dependent Packages -----
+# ----- Default base path for dependencies -----
 # Please note this path must be absolute, not relative,
 # as it is referenced with different working directory
 # contexts by the various build scripts.
 base.path=${user.home}/tomcat-build-libs
 
-compile.debug=true
-
-# Do not pass -deprecation (-Xlint:deprecation) flag to javac
-compile.deprecation=false
-
+# ---- Download locations for dependencies -----
 base-apache.loc.1=https://dlcdn.apache.org
 base-apache.loc.2=https://archive.apache.org/dist
 base-commons.loc.1=${base-apache.loc.1}/commons
