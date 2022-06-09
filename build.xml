@@ -263,6 +263,7 @@
     <filter token="GIT_BRANCH" value="${git.branch}"/>
     <filter token="MIN_JAVA_VERSION" value="${min.java.version}"/>
     <filter token="BUILD_JAVA_VERSION" value="${build.java.version}"/>
+    <filter token="ANT_VERSION_REQUIRED" value="${ant.version.required}"/>
   </filterset>
 
   <!-- Files to change line endings for depending on target platform -->

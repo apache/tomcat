@@ -65,9 +65,9 @@ source distribution, do the following:
     into which you installed the JDK release.
 
 
-(2) Install Apache Ant version 1.9.10 or later on your computer.
+(2) Install Apache Ant version @ANT_VERSION_REQUIRED@ or later on your computer.
 
- 1. If Apache Ant version 1.9.10 or later is already installed on your
+ 1. If Apache Ant version @ANT_VERSION_REQUIRED@ or later is already installed on your
     computer, skip to (3).
 
  2. Download a binary distribution of Ant from:
