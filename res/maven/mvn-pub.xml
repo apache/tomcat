@@ -21,6 +21,7 @@
          xmlns:unless="ant:unless">
 
   <property file="${basedir}/mvn.properties"/>
+  <property file="${basedir}/mvn.properties.release"/>
   <property file="${basedir}/mvn.properties.default"/>
   <property name="local.repo" value="${user.home}/.m2/repository"/>
   <property name="aether.checksums.algorithms" value="MD5,SHA-1,SHA-256,SHA-512"/>
