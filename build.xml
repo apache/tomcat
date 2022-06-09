@@ -2719,6 +2719,9 @@ gpg.exec=${gpg.exec}
 # Set the user name to use to upload the artefacts to Nexus
 asf.ldap.username=${release.asfusername}
 </echo>
+    <replace file="webapps/docs/changelog.xml"
+        token="rtext=&quot;in development&quot;"
+        value="rtext=&quot;&quot;" />
   </target>
 
   <target name="release"
