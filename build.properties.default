@@ -33,7 +33,8 @@ version.major=10
 version.minor=1
 version.build=0
 version.patch=0
-version.suffix=-M17-dev
+version.suffix=-M17
+version.dev=-dev
 
 # ----- Build tools -----
 ant.version.required=1.10.2
