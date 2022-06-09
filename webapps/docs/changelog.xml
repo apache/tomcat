@@ -137,7 +137,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.64 (remm)" rtext="in progress">
+<section name="Tomcat 9.0.64 (remm)" rtext="2022-06-09">
   <subsection name="Catalina">
     <changelog>
       <fix>
