@@ -266,6 +266,11 @@
     <filter token="MIN_JAVA_VERSION" value="${min.java.version}"/>
     <filter token="BUILD_JAVA_VERSION" value="${build.java.version}"/>
     <filter token="ANT_VERSION_REQUIRED" value="${ant.version.required}"/>
+    <filter token="SERVLET_SPEC_VERSION" value="${servlet.spec.version}"/>
+    <filter token="JSP_SPEC_VERSION" value="${jsp.spec.version}"/>
+    <filter token="EL_SPEC_VERSION" value="${el.spec.version}"/>
+    <filter token="WEBSOCKET_SPEC_VERSION" value="${websocket.spec.version}"/>
+    <filter token="JASPIC_SPEC_VERSION" value="${jaspic.spec.version}"/>
   </filterset>
 
   <!-- Files to change line endings for depending on target platform -->
