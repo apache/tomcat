@@ -48,7 +48,6 @@ git.branch=9.0.x
 # Note enabling validation uses Checkstyle which is LGPL licensed
 ant.version.required=1.9.10
 execute.validate=false
-execute.download=true
 execute.test.nio=true
 execute.test.nio2=true
 # Still requires APR/native library to be present
@@ -87,7 +86,8 @@ codesigning.storetype=DIGICERTONE
 # Set codesigning.storepass in build.properties with the following syntax
 #codesigning.storepass=<api-key>|/path/to/Certificate_pkcs12.p12|<password>
 
-# ----- Settings to use when downloading files -----
+# ----- Settings to control downloading of files -----
+execute.download=true
 trydownload.httpusecaches=true
 
 # ----- Default Base Path for Dependent Packages -----
