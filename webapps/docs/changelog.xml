@@ -134,6 +134,17 @@
         The minimum Ant version required to build Tomcat 9.0.x is now 1.10.2.
         (markt)
       </update>
+      <add>
+        Add additional automation to the build process to reduce the number of
+        manual steps that release managers must perform. (schultz)
+      </add>
+      <add>
+        Implement support for reproducible builds. Reproducible builds are
+        independent of operating system but require the same Ant version and
+        same JDK (vendor and version) to be used as associated version
+        information is embedded in a number of build outputs such as JAR file
+        manifests. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
