@@ -2304,12 +2304,18 @@ release.os=${os.arch} ${os.name} ${os.version}
 release.default.file.encoding=${file.encoding}
 release.ant.version=${ant.version}
 </echo>
+    <echo>Wrote file build-release.properties</echo>
+    <!-- Note that res/maven/mvn.properties is ignored by git and won't show
+         up as a "new file". We use ${version.major}.${version.minor}.${version.build}
+         instead of ${version} to explicitly remove the version suffix,
+         because we are preparing a release build. -->
     <echo file="res/maven/mvn.properties">
 asf.ldap.username=${release.asfusername}
 gpg.exec=${gpg.exec}
-maven.asf.release.deploy.version=${version}
+maven.asf.release.deploy.version=${version.major}.${version.minor}.${version.build}
 </echo>
-  <replace file="webapps/docs/changelog.xml" token="rtext=&quot;in development&quot;" value="rtext=&quot;release in progress&quot;" />
+    <echo>Wrote file res/maven/mvn.properties</echo>
+    <replace file="webapps/docs/changelog.xml" token="rtext=&quot;in development&quot;" value="rtext=&quot;release in progress&quot;" />
   </target>
 
   <target name="release"
