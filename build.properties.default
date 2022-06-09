@@ -42,7 +42,7 @@ ant.version.required=1.9.10
 # Uncomment and set to current time for reproducible builds
 # Note: The value is in seconds (unlike milliseconds used by System.currentTimeMillis()).
 #2022-03-31T12:00:00Z
-#ant.tstamp.now=1648728000
+#ant.tstamp.now.iso=1648728000
 
 # ----- Build control flags -----
 compile.debug=true
