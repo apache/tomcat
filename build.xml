@@ -34,7 +34,7 @@
   <!-- property values you may customize.                                    -->
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
-  <property file="build-release.properties"/>
+  <property file="build.properties.release"/>
   <property file="build.properties.default"/>
 
   <!-- Check Ant Version -->
@@ -58,7 +58,7 @@
 
   <!-- Version numbers -->
   <!-- Keep in sync with webapps/docs/tomcat-docs.xsl -->
-  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
+  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}${version.dev}" />
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
   <property name="version.major.minor"   value="${version.major}.${version.minor}" />
 
@@ -258,6 +258,7 @@
     <format property="today-iso-8601" pattern="yyyy-MM-dd" locale="en" timezone="UTC"/>
     <format property="tstamp" pattern="HH:mm:ss" locale="en" timezone="UTC"/>
     <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss"/>
+    <format property="tstamp.iso.release" pattern="yyyy-MM-dd'T'HH:mm:ssX" timezone="UTC"/>
   </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
@@ -320,6 +321,7 @@
     <include name="**/*.project"/>
     <include name="**/*.properties"/>
     <include name="**/*.properties.default"/>
+    <include name="**/*.properties.release"/>
     <include name="**/*.svg"/>
     <include name="**/*.tag"/>
     <include name="**/*.tagx"/>
@@ -623,7 +625,6 @@
         <exclude name="test/webapp/jsp/encoding/**"/>
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
-        <exclude name="build-release.properties" />
         <exclude name="res/maven/mvn.properties" />
       </fileset>
       <fileset dir="modules/jdbc-pool" >
@@ -1214,7 +1215,8 @@
     <echo message="Building Tomcat JDBC pool libraries"/>
     <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}"
          inheritAll="false" target="build">
-      <property name="ant.tstamp.now" value ="${ant.tstamp.now}" />
+      <property name="ant.tstamp.now.iso" value ="${ant.tstamp.now.iso}" />
+      <property name="tstamp.file" value ="${tstamp.file}" />
       <property name="tomcat.pool" value="${tomcat.pool}" />
       <property name="tomcat.juli.jar" value="${tomcat-juli.jar}" />
       <property name="skip.download" value="set"/>
@@ -2285,37 +2287,83 @@ skip.installer property in build.properties" />
     <input message="Enter ASF username" addproperty="release.asfusername" defaultValue="${user.name}" />
   </target>
 
-  <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username" description="Prepares for a release build by writing build-release.properties which contains information about the release-build environment.">
-    <tstamp>
-      <format pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" property="now-readable" timezone="UTC" />
-    </tstamp>
-    <echo file="build-release.properties">
-# These ant.tstamp properties specify the build-timestamp for repeatable builds.
-ant.tstamp.now.iso=${now-readable}
-# This is the ASF user who is the Release Manager for this release.
-release.asfusername=${release.asfusername}
-# Set the version-suffix to "" (empty string) as this is not a development release.
-version.suffix=
-# Release build environment information:
-release.java.version=${java.version}
-release.java.vm.name=${java.vm.name}
-release.java.vm.version=${java.vm.version}
-release.os=${os.arch} ${os.name} ${os.version}
-release.default.file.encoding=${file.encoding}
-release.ant.version=${ant.version}
+  <target name="pre-release" depends="-pre-release-lone-target-check, -pre-release-read-asf-username"
+      description="Prepares for a release build by writing build.properties.release which contains information about the release-build environment.">
+    <echo file="build.properties.release"># -----------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# -----------------------------------------------------------------------------
+
+# This file was auto-generated by the pre-release Ant target
+
+# Set the version-dev to "" (empty string) as this is not a development release.
+version.dev=
+
+# Ensure consistent timestamps for reproducible builds
+ant.tstamp.now.iso=${tstamp.iso.release}
+
+# Reproducible builds require the use of the build tools defined below. The
+# vendors (where appropriate) and versions must match exactly for a reproducible
+# build since this data is embedded in various files, particularly JAR file
+# manifests, as part of the build process
+#
+# Apache Ant:      ${ant.version}
+#
+# Java Name:       ${java.vm.name}
+# Java Vendor:     ${java.vm.vendor}
+# Java Version:    ${java.vm.version}
+
+# The following is provided for information only. Builds will be repeatable
+# whether or not the build ennvironment in consistent with this information
+#
+# OS:              ${os.arch} ${os.name} ${os.version}
+# File encoding:   ${file.encoding}
+#
+# Release Manager: ${release.asfusername}
 </echo>
-    <echo>Wrote file build-release.properties</echo>
-    <!-- Note that res/maven/mvn.properties is ignored by git and won't show
-         up as a "new file". We use ${version.major}.${version.minor}.${version.build}
-         instead of ${version} to explicitly remove the version suffix,
-         because we are preparing a release build. -->
-    <echo file="res/maven/mvn.properties">
-asf.ldap.username=${release.asfusername}
+    <echo file="res/maven/mvn.properties.release"># -----------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# -----------------------------------------------------------------------------
+
+# This file was auto-generated by the pre-release Ant target
+
+# Remove version-dev to from the version since this is not a development release.
+maven.asf.release.deploy.version=${version.major}.${version.minor}.${version.build}${version.suffix}
+
+# Re-use the same GPG executable
 gpg.exec=${gpg.exec}
-maven.asf.release.deploy.version=${version.major}.${version.minor}.${version.build}
+
+# Set the user name to use to upload the artefacts to Nexus
+asf.ldap.username=${release.asfusername}
 </echo>
-    <echo>Wrote file res/maven/mvn.properties</echo>
-    <replace file="webapps/docs/changelog.xml" token="rtext=&quot;in development&quot;" value="rtext=&quot;release in progress&quot;" />
+    <replace file="webapps/docs/changelog.xml"
+        token="rtext=&quot;in development&quot;"
+        value="rtext=&quot;&quot;" />
   </target>
 
   <target name="release"
