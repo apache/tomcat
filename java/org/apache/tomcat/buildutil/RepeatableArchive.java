@@ -120,7 +120,9 @@ public class RepeatableArchive extends Task {
                         }
                     }
 
-                    archive.setLastModified(lastModified.toMillis());
+                    if (!archive.setLastModified(lastModified.toMillis())) {
+                        throw new BuildException("setLastModified failed for [" + archive.getAbsolutePath() + "]");
+                    }
                     Files.delete(oldArchive.toPath());
                 } catch (IOException ioe) {
                     throw new BuildException(ioe);
