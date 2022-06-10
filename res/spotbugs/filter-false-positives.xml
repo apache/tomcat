@@ -396,6 +396,12 @@
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
   </Match>
   <Match>
+    <!-- Use of == rather than equals() is deliberate. -->
+    <Class name="org.apache.catalina.realm.DigestCredentialHandlerBase"/>
+    <Method name="equals"/>
+    <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+  </Match>
+  <Match>
     <!-- Random will be SecureRandom and will be used multiple times. -->
     <Class name="org.apache.catalina.realm.DigestCredentialHandlerBase"/>
     <Method name="mutate"/>
@@ -1418,6 +1424,12 @@
     <Class name="org.apache.tomcat.util.buf.UDecoder"/>
     <Method name="URLDecode"/>
     <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- Not an issue. Initialisation is as intended. -->
+    <Class name="org.apache.tomcat.util.compat.JreCompat"/>
+    <Method name="&lt;clinit&gt;"/>
+    <Bug pattern="IC_SUPERCLASS_USES_SUBCLASS_DURING_INITIALIZATION" />
   </Match>
   <Match>
     <!-- URLs used are always provided by the container so would normally be -->
