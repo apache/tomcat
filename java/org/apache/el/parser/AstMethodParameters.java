@@ -19,6 +19,7 @@ package org.apache.el.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.apache.el.lang.EvaluationContext;
 
@@ -39,15 +40,12 @@ public final class AstMethodParameters extends SimpleNode {
     public String toString() {
         // Purely for debug purposes. May not be complete or correct. Certainly
         // is not efficient. Be sure not to call this from 'real' code.
-        StringBuilder result = new StringBuilder();
-        result.append('(');
+        StringJoiner result = new StringJoiner(",","(",")");
         if (children != null) {
             for (Node n : children) {
-                result.append(n.toString());
-                result.append(',');
+                result.add(n.toString());
             }
         }
-        result.append(')');
         return result.toString();
     }
 }

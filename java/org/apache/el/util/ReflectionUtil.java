@@ -21,10 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import jakarta.el.ELException;
 import jakarta.el.MethodNotFoundException;
@@ -467,18 +464,15 @@ public class ReflectionUtil {
 
     private static final String paramString(Class<?>[] types) {
         if (types != null) {
-            StringBuilder sb = new StringBuilder();
+            StringJoiner sj = new StringJoiner(", ");
             for (Class<?> type : types) {
                 if (type == null) {
-                    sb.append("null, ");
+                    sj.add("null");
                 } else {
-                    sb.append(type.getName()).append(", ");
+                    sj.add(type.getName());
                 }
             }
-            if (sb.length() > 2) {
-                sb.setLength(sb.length() - 2);
-            }
-            return sb.toString();
+            return sj.toString();
         }
         return null;
     }

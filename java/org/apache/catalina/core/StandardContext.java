@@ -5863,7 +5863,7 @@ public class StandardContext extends ContainerBase
                 parent = parent.getParent();
             }
             while (!stk.empty()) {
-                buff.append("/" + stk.pop());
+                buff.append("/").append(stk.pop());
             }
             buff.append(getName());
             namingContextName = buff.toString();

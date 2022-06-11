@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
+import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.ReadListener;
@@ -841,7 +842,7 @@ public class CoyoteAdapter implements Adapter {
         if (!connector.getAllowTrace()
                 && req.method().equalsIgnoreCase("TRACE")) {
             Wrapper wrapper = request.getWrapper();
-            String header = null;
+            StringJoiner header = new StringJoiner(", ");
             if (wrapper != null) {
                 String[] methods = wrapper.getServletMethods();
                 if (methods != null) {
@@ -849,16 +850,12 @@ public class CoyoteAdapter implements Adapter {
                         if ("TRACE".equals(method)) {
                             continue;
                         }
-                        if (header == null) {
-                            header = method;
-                        } else {
-                            header += ", " + method;
-                        }
+                        header.add(method);
                     }
                 }
             }
-            if (header != null) {
-                res.addHeader("Allow", header);
+            if (header.length() != 0) {
+                res.addHeader("Allow", header.toString());
             }
             response.sendError(405, "TRACE method is not allowed");
             // Safe to skip the remainder of this method.
