@@ -117,8 +117,9 @@
   <subsection name="Coyote">
     <changelog>
       <add>
-        Provide a dedicated logger
-        (<code>org.apache.tomcat.util.net.NioEndpoint.handshake</code>) for TLS
+        Provide dedicated loggers
+        (<code>org.apache.tomcat.util.net.NioEndpoint.handshake</code> /
+        <code>org.apache.tomcat.util.net.Nio2Endpoint.handshake</code>) for TLS
         handshake failures. (markt)
       </add>
     </changelog>
