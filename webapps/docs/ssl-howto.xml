@@ -524,8 +524,12 @@ nsComment="Testing OCSP Certificate"
 
 <p>Additional information may be obtained about TLS handshake failures by
 configuring the dedicated TLS handshake logger to log debug level messages by
-adding the following to <code>$CATALINA_BASE/conf/logging.properties</code>:</p>
+adding the following to <code>$CATALINA_BASE/conf/logging.properties</code>:
 <source>org.apache.tomcat.util.net.NioEndpoint.handshake.level=FINE</source>
+or
+<source>org.apache.tomcat.util.net.Nio2Endpoint.handshake.level=FINE</source>
+depending on the <strong>Connector</strong> being used.
+</p>
 
 <p>Here is a list of common problems that you may encounter when setting up
 SSL communications, and what to do about them.</p>
