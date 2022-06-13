@@ -565,6 +565,11 @@ for more information about installation of APR. A basic OCSP-enabled connector
 
 <section name="Troubleshooting">
 
+<p>Additional information may be obtained about TLS handshake failures by
+configuring the dedicated TLS handshake logger to log debug level messages by
+adding the following to <code>$CATALINA_BASE/conf/logging.properties</code>:</p>
+<source>org.apache.tomcat.util.net.NioEndpoint.handshake.level=FINE</source>
+
 <p>Here is a list of common problems that you may encounter when setting up
 SSL communications, and what to do about them.</p>
 

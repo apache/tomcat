@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.82 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Provide a dedicated logger
+        (<code>org.apache.tomcat.util.net.NioEndpoint.handshake</code>) for TLS
+        handshake failures. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
