@@ -187,10 +187,8 @@ public class SecureNioChannel extends NioChannel {
                     try {
                         handshake = handshakeWrap(write);
                     } catch (SSLException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("channel.nio.ssl.wrapException"), e);
-                        }
                         handshake = handshakeWrap(write);
+                        throw e;
                     }
                     if (handshake.getStatus() == Status.OK) {
                         if (handshakeStatus == HandshakeStatus.NEED_TASK) {

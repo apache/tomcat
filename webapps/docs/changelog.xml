@@ -114,6 +114,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Provide a dedicated logger
+        (<code>org.apache.tomcat.util.net.NioEndpoint.handshake</code>) for TLS
+        handshake failures. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>

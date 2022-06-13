@@ -59,6 +59,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
     private static final Log log = LogFactory.getLog(Nio2Endpoint.class);
+    private static final Log logHandshake = LogFactory.getLog(Nio2Endpoint.class.getName() + ".handshake");
 
 
     // ----------------------------------------------------------------- Fields
@@ -1639,8 +1640,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     }
                 } catch (IOException x) {
                     handshake = -1;
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("endpoint.err.handshake"), x);
+                    if (logHandshake.isDebugEnabled()) {
+                        logHandshake.debug(sm.getString("endpoint.err.handshake",
+                                socketWrapper.getRemoteAddr(), Integer.toString(socketWrapper.getRemotePort())), x);
                     }
                 }
                 if (handshake == 0) {
