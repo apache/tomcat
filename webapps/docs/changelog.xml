@@ -115,6 +115,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Documentation. <bug>62245</bug>: Include <code>contextXsltFile</code>
+        when discussing options for configuring directory listings. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
