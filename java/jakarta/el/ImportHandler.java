@@ -140,7 +140,7 @@ public class ImportHandler {
         standardPackages.put("jakarta.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
-        // Based on Java 19 EA22
+        // Based on Java 19 EA26
         // Interfaces
         javaLangClassNames.add("Appendable");
         javaLangClassNames.add("AutoCloseable");
@@ -229,6 +229,7 @@ public class ImportHandler {
         javaLangClassNames.add("InstantiationException");
         javaLangClassNames.add("InterruptedException");
         javaLangClassNames.add("LayerInstantiationException");
+        javaLangClassNames.add("MatchException");
         javaLangClassNames.add("NegativeArraySizeException");
         javaLangClassNames.add("NoSuchFieldException");
         javaLangClassNames.add("NoSuchMethodException");
