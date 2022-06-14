@@ -221,13 +221,13 @@ to DefaultServlet servlet and make the appropriate adjustments. (If not,
 then that method isn't for you)
 </p>
 <p>
-You can use either  <code>localXsltFile</code> or
-<code>globalXsltFile</code> and DefaultServlet will create
+You can use either  <code>localXsltFile</code>, <code>contextXsltFile</code>
+or <code>globalXsltFile</code> and DefaultServlet will create
 an xml document and run it through an xsl transformation based
-on the values provided in <code>localXsltFile</code> and
-<code>globalXsltFile</code>. <code>localXsltFile</code> is first
-checked, followed by <code>globalXsltFile</code>, then default
-behaviors takes place.
+on the values provided in the XSLT file. <code>localXsltFile</code> is first
+checked, then <code>contextXsltFile</code>, followed by
+<code>globalXsltFile</code>. If no XSLT files are configured, default behavior
+is used.
 </p>
 
 <p>
