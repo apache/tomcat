@@ -140,6 +140,10 @@
         information is embedded in a number of build outputs such as JAR file
         manifests. (markt)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.34 to
+        improve the support for building with OpenSSL 3.0.x.(markt)
+      </update>
     </changelog>
   </subsection>
 </section>
