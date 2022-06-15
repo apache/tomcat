@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.runtime;
 
 import java.io.CharArrayReader;
@@ -55,7 +54,7 @@ public class BodyContentImpl extends BodyContent {
      * Constructor.
      * @param enclosingWriter The wrapped writer
      * @param limitBuffer <code>true</code> to discard large buffers
-     * @param tagBufferSize the buffer sise
+     * @param tagBufferSize the buffer size
      */
     public BodyContentImpl(JspWriter enclosingWriter, boolean limitBuffer, int tagBufferSize) {
         super(enclosingWriter);
@@ -115,8 +114,9 @@ public class BodyContentImpl extends BodyContent {
                 return;
             }
 
-            if (len >= bufferSize - nextChar)
+            if (len >= bufferSize - nextChar) {
                 reAllocBuff (len);
+            }
 
             System.arraycopy(cbuf, off, cb, nextChar, len);
             nextChar+=len;
@@ -152,8 +152,9 @@ public class BodyContentImpl extends BodyContent {
             writer.write(s, off, len);
         } else {
             ensureOpen();
-            if (len >= bufferSize - nextChar)
+            if (len >= bufferSize - nextChar) {
                 reAllocBuff(len);
+            }
 
             s.getChars(off, off + len, cb, nextChar);
             nextChar += len;
@@ -336,7 +337,9 @@ public class BodyContentImpl extends BodyContent {
      */
     @Override
     public void print(String s) throws IOException {
-        if (s == null) s = "null";
+        if (s == null) {
+            s = "null";
+        }
         if (writer != null) {
             writer.write(s);
         } else {

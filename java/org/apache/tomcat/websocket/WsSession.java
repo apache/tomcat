@@ -19,7 +19,6 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.channels.WritePendingException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Collections;
@@ -30,6 +29,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.naming.NamingException;
+
+import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.CloseReason.CloseCode;
 import jakarta.websocket.CloseReason.CloseCodes;
@@ -46,15 +48,20 @@ import jakarta.websocket.SendResult;
 import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
 import jakarta.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
+import org.apache.tomcat.websocket.server.DefaultServerEndpointConfigurator;
 
 public class WsSession implements Session {
+
+    private final Log log = LogFactory.getLog(WsSession.class); // must not be static
+    private static final StringManager sm = StringManager.getManager(WsSession.class);
 
     // An ellipsis is a single character that looks like three periods in a row
     // and is used to indicate a continuation.
@@ -62,10 +69,18 @@ public class WsSession implements Session {
     // An ellipsis is three bytes in UTF-8
     private static final int ELLIPSIS_BYTES_LEN = ELLIPSIS_BYTES.length;
 
-    private static final StringManager sm = StringManager.getManager(WsSession.class);
+    private static final boolean SEC_CONFIGURATOR_USES_IMPL_DEFAULT;
+
     private static AtomicLong ids = new AtomicLong(0);
 
-    private final Log log = LogFactory.getLog(WsSession.class); // must not be static
+    static {
+        // Use fake end point and path. They are never used, they just need to
+        // be sufficient to pass the validation tests.
+        ServerEndpointConfig.Builder builder = ServerEndpointConfig.Builder.create(Object.class, "/");
+        ServerEndpointConfig sec = builder.build();
+        SEC_CONFIGURATOR_USES_IMPL_DEFAULT =
+                sec.getConfigurator().getClass().equals(DefaultServerEndpointConfigurator.class);
+    }
 
     private final Endpoint localEndpoint;
     private final WsRemoteEndpointImplBase wsRemoteEndpoint;
@@ -97,20 +112,86 @@ public class WsSession implements Session {
     private volatile int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
-    private volatile long lastActive = System.currentTimeMillis();
+    private volatile long lastActiveRead = System.currentTimeMillis();
+    private volatile long lastActiveWrite = System.currentTimeMillis();
     private Map<FutureToSendHandler, FutureToSendHandler> futures = new ConcurrentHashMap<>();
 
+
     /**
-     * Creates a new WebSocket session for communication between the two
-     * provided end points. The result of {@link Thread#getContextClassLoader()}
-     * at the time this constructor is called will be used when calling
+     * Creates a new WebSocket session for communication between the provided
+     * client and remote end points. The result of
+     * {@link Thread#getContextClassLoader()} at the time this constructor is
+     * called will be used when calling
      * {@link Endpoint#onClose(Session, CloseReason)}.
      *
-     * @param localEndpoint        The end point managed by this code
-     * @param wsRemoteEndpoint     The other / remote endpoint
+     * @param clientEndpointHolder The end point managed by this code
+     * @param wsRemoteEndpoint     The other / remote end point
      * @param wsWebSocketContainer The container that created this session
-     * @param requestUri           The URI used to connect to this endpoint or
-     *                             <code>null</code> is this is a client session
+     * @param negotiatedExtensions The agreed extensions to use for this session
+     * @param subProtocol          The agreed sub-protocol to use for this
+     *                             session
+     * @param pathParameters       The path parameters associated with the
+     *                             request that initiated this session or
+     *                             <code>null</code> if this is a client session
+     * @param secure               Was this session initiated over a secure
+     *                             connection?
+     * @param clientEndpointConfig The configuration information for the client
+     *                             end point
+     * @throws DeploymentException if an invalid encode is specified
+     */
+    public WsSession(ClientEndpointHolder clientEndpointHolder,
+            WsRemoteEndpointImplBase wsRemoteEndpoint,
+            WsWebSocketContainer wsWebSocketContainer,
+            List<Extension> negotiatedExtensions, String subProtocol, Map<String, String> pathParameters,
+            boolean secure, ClientEndpointConfig clientEndpointConfig) throws DeploymentException {
+        this.wsRemoteEndpoint = wsRemoteEndpoint;
+        this.wsRemoteEndpoint.setSession(this);
+        this.remoteEndpointAsync = new WsRemoteEndpointAsync(wsRemoteEndpoint);
+        this.remoteEndpointBasic = new WsRemoteEndpointBasic(wsRemoteEndpoint);
+        this.webSocketContainer = wsWebSocketContainer;
+        applicationClassLoader = Thread.currentThread().getContextClassLoader();
+        wsRemoteEndpoint.setSendTimeout(wsWebSocketContainer.getDefaultAsyncSendTimeout());
+        this.maxBinaryMessageBufferSize = webSocketContainer.getDefaultMaxBinaryMessageBufferSize();
+        this.maxTextMessageBufferSize = webSocketContainer.getDefaultMaxTextMessageBufferSize();
+        this.maxIdleTimeout = webSocketContainer.getDefaultMaxSessionIdleTimeout();
+        this.requestUri = null;
+        this.requestParameterMap = Collections.emptyMap();
+        this.queryString = null;
+        this.userPrincipal = null;
+        this.httpSessionId = null;
+        this.negotiatedExtensions = negotiatedExtensions;
+        if (subProtocol == null) {
+            this.subProtocol = "";
+        } else {
+            this.subProtocol = subProtocol;
+        }
+        this.pathParameters = pathParameters;
+        this.secure = secure;
+        this.wsRemoteEndpoint.setEncoders(clientEndpointConfig);
+        this.endpointConfig = clientEndpointConfig;
+
+        this.userProperties.putAll(endpointConfig.getUserProperties());
+        this.id = Long.toHexString(ids.getAndIncrement());
+
+        this.localEndpoint = clientEndpointHolder.getInstance(getInstanceManager());
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("wsSession.created", id));
+        }
+    }
+
+
+    /**
+     * Creates a new WebSocket session for communication between the provided
+     * server and remote end points. The result of
+     * {@link Thread#getContextClassLoader()} at the time this constructor is
+     * called will be used when calling
+     * {@link Endpoint#onClose(Session, CloseReason)}.
+     *
+     * @param wsRemoteEndpoint     The other / remote end point
+     * @param wsWebSocketContainer The container that created this session
+     * @param requestUri           The URI used to connect to this end point or
+     *                             <code>null</code> if this is a client session
      * @param requestParameterMap  The parameters associated with the request
      *                             that initiated this session or
      *                             <code>null</code> if this is a client session
@@ -124,25 +205,24 @@ public class WsSession implements Session {
      *                             request that initiated this session or
      *                             <code>null</code> if this is a client session
      * @param negotiatedExtensions The agreed extensions to use for this session
-     * @param subProtocol          The agreed subprotocol to use for this
+     * @param subProtocol          The agreed sub-protocol to use for this
      *                             session
      * @param pathParameters       The path parameters associated with the
      *                             request that initiated this session or
      *                             <code>null</code> if this is a client session
      * @param secure               Was this session initiated over a secure
      *                             connection?
-     * @param endpointConfig       The configuration information for the
-     *                             endpoint
+     * @param serverEndpointConfig The configuration information for the server
+     *                             end point
      * @throws DeploymentException if an invalid encode is specified
      */
-    public WsSession(Endpoint localEndpoint,
-            WsRemoteEndpointImplBase wsRemoteEndpoint,
+    public WsSession(WsRemoteEndpointImplBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer,
             URI requestUri, Map<String, List<String>> requestParameterMap,
             String queryString, Principal userPrincipal, String httpSessionId,
             List<Extension> negotiatedExtensions, String subProtocol, Map<String, String> pathParameters,
-            boolean secure, EndpointConfig endpointConfig) throws DeploymentException {
-        this.localEndpoint = localEndpoint;
+            boolean secure, ServerEndpointConfig serverEndpointConfig) throws DeploymentException {
+
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
         this.remoteEndpointAsync = new WsRemoteEndpointAsync(wsRemoteEndpoint);
@@ -170,27 +250,60 @@ public class WsSession implements Session {
         }
         this.pathParameters = pathParameters;
         this.secure = secure;
-        this.wsRemoteEndpoint.setEncoders(endpointConfig);
-        this.endpointConfig = endpointConfig;
+        this.wsRemoteEndpoint.setEncoders(serverEndpointConfig);
+        this.endpointConfig = serverEndpointConfig;
 
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
 
-        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
-        if (instanceManager == null) {
-            instanceManager = InstanceManagerBindings.get(applicationClassLoader);
-        }
-        if (instanceManager != null) {
-            try {
-                instanceManager.newInstance(localEndpoint);
-            } catch (Exception e) {
-                throw new DeploymentException(sm.getString("wsSession.instanceNew"), e);
+        InstanceManager instanceManager = getInstanceManager();
+        Configurator configurator = serverEndpointConfig.getConfigurator();
+        Class<?> clazz = serverEndpointConfig.getEndpointClass();
+
+        Object endpointInstance;
+        try {
+            if (instanceManager == null || !isDefaultConfigurator(configurator)) {
+                endpointInstance = configurator.getEndpointInstance(clazz);
+                if (instanceManager != null) {
+                    try {
+                        instanceManager.newInstance(endpointInstance);
+                    } catch (ReflectiveOperationException | NamingException e) {
+                        throw new DeploymentException(sm.getString("wsSession.instanceNew"), e);
+                    }
+                }
+            } else {
+                endpointInstance = instanceManager.newInstance(clazz);
             }
+        } catch (ReflectiveOperationException | NamingException e) {
+            throw new DeploymentException(sm.getString("wsSession.instanceCreateFailed"), e);
+        }
+
+        if (endpointInstance instanceof Endpoint) {
+            this.localEndpoint = (Endpoint) endpointInstance;
+        } else {
+            this.localEndpoint = new PojoEndpointServer(pathParameters, endpointInstance);
         }
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("wsSession.created", id));
         }
+    }
+
+
+    private boolean isDefaultConfigurator(Configurator configurator) {
+        if (configurator.getClass().equals(DefaultServerEndpointConfigurator.class)) {
+            return true;
+        }
+        if (SEC_CONFIGURATOR_USES_IMPL_DEFAULT &&
+                configurator.getClass().equals(ServerEndpointConfig.Configurator.class)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public InstanceManager getInstanceManager() {
+        return webSocketContainer.getInstanceManager(applicationClassLoader);
     }
 
 
@@ -485,6 +598,8 @@ public class WsSession implements Session {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("wsSession.doClose", id));
             }
+
+            // This will trigger a flush of any batched messages.
             try {
                 wsRemoteEndpoint.setBatchingAllowed(false);
             } catch (IOException e) {
@@ -492,13 +607,20 @@ public class WsSession implements Session {
                 fireEndpointOnError(e);
             }
 
-            state = State.OUTPUT_CLOSED;
+            /*
+             * If the flush above fails the error handling could call this
+             * method recursively. Without this check, the close message and
+             * notifications could be sent multiple times.
+             */
+            if (state != State.OUTPUT_CLOSED) {
+                state = State.OUTPUT_CLOSED;
 
-            sendCloseMessage(closeReasonMessage);
-            if (closeSocket) {
-                wsRemoteEndpoint.close();
+                sendCloseMessage(closeReasonMessage);
+                if (closeSocket) {
+                    wsRemoteEndpoint.close();
+                }
+                fireEndpointOnClose(closeReasonLocal);
             }
-            fireEndpointOnClose(closeReasonLocal);
         }
 
         IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
@@ -544,10 +666,7 @@ public class WsSession implements Session {
 
         // Fire the onClose event
         Throwable throwable = null;
-        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
-        if (instanceManager == null) {
-            instanceManager = InstanceManagerBindings.get(applicationClassLoader);
-        }
+        InstanceManager instanceManager = getInstanceManager();
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
@@ -610,7 +729,7 @@ public class WsSession implements Session {
         msg.flip();
         try {
             wsRemoteEndpoint.sendMessageBlock(Constants.OPCODE_CLOSE, msg, true);
-        } catch (IOException | WritePendingException e) {
+        } catch (IOException | IllegalStateException e) {
             // Failed to send close message. Close the socket and let the caller
             // deal with the Exception
             if (log.isDebugEnabled()) {
@@ -805,25 +924,59 @@ public class WsSession implements Session {
     }
 
 
-    protected void updateLastActive() {
-        lastActive = System.currentTimeMillis();
+    protected void updateLastActiveRead() {
+        lastActiveRead = System.currentTimeMillis();
+    }
+
+
+    protected void updateLastActiveWrite() {
+        lastActiveWrite = System.currentTimeMillis();
     }
 
 
     protected void checkExpiration() {
+        // Local copies to ensure consistent behaviour during method execution
         long timeout = maxIdleTimeout;
-        if (timeout < 1) {
-            return;
+        long timeoutRead = getMaxIdleTimeoutRead();
+        long timeoutWrite = getMaxIdleTimeoutWrite();
+
+        long currentTime = System.currentTimeMillis();
+        String key = null;
+
+        if (timeoutRead > 0 && (currentTime - lastActiveRead) > timeoutRead) {
+            key = "wsSession.timeoutRead";
+        } else if (timeoutWrite > 0 && (currentTime - lastActiveWrite) > timeoutWrite) {
+            key = "wsSession.timeoutWrite";
+        } else if (timeout > 0 && (currentTime - lastActiveRead) > timeout &&
+                (currentTime - lastActiveWrite) > timeout) {
+            key = "wsSession.timeout";
         }
 
-        if (System.currentTimeMillis() - lastActive > timeout) {
-            String msg = sm.getString("wsSession.timeout", getId());
+        if (key != null) {
+            String msg = sm.getString(key, getId());
             if (log.isDebugEnabled()) {
                 log.debug(msg);
             }
-            doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
-                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+            doClose(new CloseReason(CloseCodes.GOING_AWAY, msg), new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
         }
+    }
+
+
+    private long getMaxIdleTimeoutRead() {
+        Object timeout = userProperties.get(Constants.READ_IDLE_TIMEOUT_MS);
+        if (timeout instanceof Long) {
+            return ((Long) timeout).longValue();
+        }
+        return 0;
+    }
+
+
+    private long getMaxIdleTimeoutWrite() {
+        Object timeout = userProperties.get(Constants.WRITE_IDLE_TIMEOUT_MS);
+        if (timeout instanceof Long) {
+            return ((Long) timeout).longValue();
+        }
+        return 0;
     }
 
 

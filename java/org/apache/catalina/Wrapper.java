@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 
@@ -33,8 +31,7 @@ import jakarta.servlet.UnavailableException;
  * <p>
  * Implementations of Wrapper are responsible for managing the servlet life
  * cycle for their underlying servlet class, including calling init() and
- * destroy() at appropriate times, as well as respecting the existence of
- * the SingleThreadModel declaration on the servlet class itself.
+ * destroy() at appropriate times.
  * <p>
  * The parent Container attached to a Wrapper will generally be an
  * implementation of Context, representing the servlet context (and
@@ -192,12 +189,8 @@ public interface Wrapper extends Container {
 
     /**
      * Allocate an initialized instance of this Servlet that is ready to have
-     * its <code>service()</code> method called.  If the Servlet class does
-     * not implement <code>SingleThreadModel</code>, the (only) initialized
-     * instance may be returned immediately.  If the Servlet class implements
-     * <code>SingleThreadModel</code>, the Wrapper implementation must ensure
-     * that this instance is not allocated again until it is deallocated by a
-     * call to <code>deallocate()</code>.
+     * its <code>service()</code> method called.  The previously initialized
+     * instance may be returned immediately.
      *
      * @exception ServletException if the Servlet init() method threw
      *  an exception
@@ -208,9 +201,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Return this previously allocated servlet to the pool of available
-     * instances.  If this servlet class does not implement SingleThreadModel,
-     * no action is actually required.
+     * Decrement the allocation count for the servlet instance.
      *
      * @param servlet The servlet to be returned
      *

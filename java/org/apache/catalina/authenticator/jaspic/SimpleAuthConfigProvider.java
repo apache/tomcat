@@ -33,11 +33,11 @@ import jakarta.security.auth.message.config.ServerAuthConfig;
  */
 public class SimpleAuthConfigProvider implements AuthConfigProvider {
 
-    private final Map<String,String> properties;
+    private final Map<String,Object> properties;
 
     private volatile ServerAuthConfig serverAuthConfig;
 
-    public SimpleAuthConfigProvider(Map<String,String> properties, AuthConfigFactory factory) {
+    public SimpleAuthConfigProvider(Map<String,Object> properties, AuthConfigFactory factory) {
         this.properties = properties;
         if (factory != null) {
             factory.registerConfigProvider(this, null, null, "Automatic registration");
@@ -75,7 +75,7 @@ public class SimpleAuthConfigProvider implements AuthConfigProvider {
 
 
     protected ServerAuthConfig createServerAuthConfig(String layer, String appContext,
-            CallbackHandler handler, Map<String,String> properties) {
+            CallbackHandler handler, Map<String,Object> properties) {
         return new SimpleServerAuthConfig(layer, appContext, handler, properties);
     }
 

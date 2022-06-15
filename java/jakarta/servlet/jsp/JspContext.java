@@ -64,7 +64,7 @@ import jakarta.el.ELContext;
  * Expression Language evaluator:
  * <code>getExpressionEvaluator()</code>, <code>getVariableResolver()</code>
  *
- * @since 2.0
+ * @since JSP 2.0
  */
 
 public abstract class JspContext {
@@ -220,14 +220,19 @@ public abstract class JspContext {
      * ExpressionEvaluator that can parse EL expressions.
      *
      * @return A valid instance of an ExpressionEvaluator.
-     * @since 2.0
+     * @since JSP 2.0
      * @deprecated As of JSP 2.1, replaced by
      *             JspApplicationContext.getExpressionFactory()
      */
     @Deprecated
     public abstract jakarta.servlet.jsp.el.ExpressionEvaluator getExpressionEvaluator();
 
-
+    /**
+     * Obtain the ELContext for this JSPContext. Each JSPContext has a dedicated
+     * ELCOntext.
+     *
+     * @return the ELContext for this JSPContext
+     */
     public abstract ELContext getELContext();
 
     /**
@@ -236,7 +241,7 @@ public abstract class JspContext {
      * as the context object.
      *
      * @return A valid instance of a VariableResolver.
-     * @since 2.0
+     * @since JSP 2.0
      * @deprecated As of JSP 2.1,
      *             replaced by jakarta.el.ELContext.getELResolver()
      *             which can be obtained by
@@ -263,7 +268,7 @@ public abstract class JspContext {
      * @param writer The Writer for the returned JspWriter to send
      *     output to.
      * @return a new JspWriter that writes to the given Writer.
-     * @since 2.0
+     * @since JSP 2.0
      */
     public JspWriter pushBody( java.io.Writer writer ) {
         return null; // XXX to implement

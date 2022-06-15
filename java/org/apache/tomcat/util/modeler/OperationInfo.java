@@ -32,7 +32,7 @@ import javax.management.MBeanParameterInfo;
  */
 public class OperationInfo extends FeatureInfo {
 
-    static final long serialVersionUID = 4418342922072614875L;
+    private static final long serialVersionUID = 4418342922072614875L;
 
     // ----------------------------------------------------------- Constructors
 
@@ -64,10 +64,11 @@ public class OperationInfo extends FeatureInfo {
     }
 
     public void setImpact(String impact) {
-        if (impact == null)
+        if (impact == null) {
             this.impact = null;
-        else
+        } else {
             this.impact = impact.toUpperCase(Locale.ENGLISH);
+        }
     }
 
 
@@ -147,12 +148,13 @@ public class OperationInfo extends FeatureInfo {
         if (info == null) {
             // Create and return a new information object
             int impact = MBeanOperationInfo.UNKNOWN;
-            if ("ACTION".equals(getImpact()))
+            if ("ACTION".equals(getImpact())) {
                 impact = MBeanOperationInfo.ACTION;
-            else if ("ACTION_INFO".equals(getImpact()))
+            } else if ("ACTION_INFO".equals(getImpact())) {
                 impact = MBeanOperationInfo.ACTION_INFO;
-            else if ("INFO".equals(getImpact()))
+            } else if ("INFO".equals(getImpact())) {
                 impact = MBeanOperationInfo.INFO;
+            }
 
             info = new MBeanOperationInfo(getName(), getDescription(),
                                           getMBeanParameterInfo(),
@@ -165,8 +167,9 @@ public class OperationInfo extends FeatureInfo {
         ParameterInfo params[] = getSignature();
         MBeanParameterInfo parameters[] =
             new MBeanParameterInfo[params.length];
-        for (int i = 0; i < params.length; i++)
+        for (int i = 0; i < params.length; i++) {
             parameters[i] = params[i].createParameterInfo();
+        }
         return parameters;
     }
 }

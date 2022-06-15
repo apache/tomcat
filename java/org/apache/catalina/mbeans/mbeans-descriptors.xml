@@ -105,15 +105,6 @@
                  type="int"/>
     </operation>
 
-    <operation   name="createJDBCRealm"
-          description="Create a new JDBC Realm"
-               impact="ACTION"
-           returnType="java.lang.String">
-      <parameter name="parent"
-          description="MBean Name of the associated parent component"
-                 type="java.lang.String"/>
-    </operation>
-
     <operation   name="createJNDIRealm"
           description="Create a new JNDI Realm"
                impact="ACTION"

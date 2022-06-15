@@ -14,49 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.dbcp.dbcp2.datasources;
 
 import javax.sql.PooledConnection;
 
-import org.apache.tomcat.dbcp.dbcp2.Utils;
-
 /**
- * Immutable poolable object holding a PooledConnection along with the user name and password used to create the
+ * Immutable poolable object holding a {@link PooledConnection} along with the user name and password used to create the
  * connection.
  *
  * @since 2.0
  */
 final class PooledConnectionAndInfo {
+
     private final PooledConnection pooledConnection;
-    private final char[] userPassword;
-    private final String userName;
-    private final UserPassKey upKey;
+
+    private final UserPassKey userPassKey;
 
     /**
+     * Constructs a new instance.
+     *
      * @since 2.4.0
      */
-    PooledConnectionAndInfo(final PooledConnection pc, final String userName, final char[] userPassword) {
-        this.pooledConnection = pc;
-        this.userName = userName;
-        this.userPassword = userPassword;
-        this.upKey = new UserPassKey(userName, userPassword);
+    PooledConnectionAndInfo(final PooledConnection pooledConnection, final char[] userName, final char[] userPassword) {
+        this(pooledConnection, new UserPassKey(userName, userPassword));
     }
 
-    /**
-     * @deprecated Since 2.4.0
-     */
-    @Deprecated
-    PooledConnectionAndInfo(final PooledConnection pc, final String userName, final String userPassword) {
-        this(pc, userName, Utils.toCharArray(userPassword));
-    }
-
-    PooledConnection getPooledConnection() {
-        return pooledConnection;
-    }
-
-    UserPassKey getUserPassKey() {
-        return upKey;
+    PooledConnectionAndInfo(final PooledConnection pooledConnection, final UserPassKey userPassKey) {
+        this.pooledConnection = pooledConnection;
+        this.userPassKey = userPassKey;
     }
 
     /**
@@ -65,17 +50,16 @@ final class PooledConnectionAndInfo {
      * @return value of password.
      */
     String getPassword() {
-        return Utils.toString(userPassword);
+        return userPassKey.getPassword();
     }
 
     /**
-     * Gets the value of password.
+     * Gets the pooled connection.
      *
-     * @return value of password.
-     * @since 2.4.0
+     * @return the pooled connection.
      */
-    char[] getPasswordCharArray() {
-        return userPassword;
+    PooledConnection getPooledConnection() {
+        return pooledConnection;
     }
 
     /**
@@ -83,7 +67,11 @@ final class PooledConnectionAndInfo {
      *
      * @return value of userName.
      */
-    String getUsername() {
-        return userName;
+    String getUserName() {
+        return userPassKey.getUserName();
+    }
+
+    UserPassKey getUserPassKey() {
+        return userPassKey;
     }
 }

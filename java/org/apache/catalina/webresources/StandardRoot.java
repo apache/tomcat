@@ -81,7 +81,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     private boolean trackLockedFiles = false;
     private final Set<TrackedWebResource> trackedResources =
-            Collections.newSetFromMap(new ConcurrentHashMap<TrackedWebResource,Boolean>());
+            Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     // Constructs to make iteration over all WebResourceSets simpler
     private final List<WebResourceSet> mainResources = new ArrayList<>();
@@ -237,7 +237,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
      * that the path is a String that starts with '/' and checks that the path
      * can be normalized without stepping outside of the root.
      *
-     * @param path
+     * @param path The path to validate
      * @return  the normalized path
      */
     private String validate(String path) {
@@ -498,6 +498,17 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return cachingAllowed;
     }
 
+
+    @Override
+    public CacheStrategy getCacheStrategy() {
+        return cache.getCacheStrategy();
+    }
+
+    @Override
+    public void setCacheStrategy(CacheStrategy strategy) {
+        cache.setCacheStrategy(strategy);
+    }
+
     @Override
     public long getCacheTtl() {
         return cache.getTtl();
@@ -677,14 +688,14 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     protected void initInternal() throws LifecycleException {
         super.initInternal();
 
-        cacheJmxName = register(cache, getObjectNameKeyProperties() + ",name=Cache");
-
-        registerURLStreamHandlerFactory();
-
         if (context == null) {
             throw new IllegalStateException(
                     sm.getString("standardRoot.noContext"));
         }
+
+        cacheJmxName = register(cache, getObjectNameKeyProperties() + ",name=Cache");
+
+        registerURLStreamHandlerFactory();
 
         for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {

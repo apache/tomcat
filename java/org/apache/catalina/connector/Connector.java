@@ -29,7 +29,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
-import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Adapter;
@@ -62,7 +62,6 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     // ------------------------------------------------------------ Constructor
-
 
     /**
      * Defaults to using HTTP/1.1 NIO implementation.
@@ -101,8 +100,8 @@ public class Connector extends LifecycleMBeanBase  {
         setThrowOnFailure(Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"));
     }
 
-    // ----------------------------------------------------- Instance Variables
 
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * The <code>Service</code> we are associated with (if any).
@@ -295,6 +294,9 @@ public class Connector extends LifecycleMBeanBase  {
      * URI encoding as body.
      */
     protected boolean useBodyEncodingForURI = false;
+
+
+    private boolean rejectSuspiciousURIs;
 
 
     // ------------------------------------------------------------- Properties
@@ -915,6 +917,16 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
 
+    public boolean getRejectSuspiciousURIs() {
+        return rejectSuspiciousURIs;
+    }
+
+
+    public void setRejectSuspiciousURIs(boolean rejectSuspiciousURIs) {
+        this.rejectSuspiciousURIs = rejectSuspiciousURIs;
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -950,23 +962,30 @@ public class Connector extends LifecycleMBeanBase  {
 
         StringBuilder sb = new StringBuilder("type=");
         sb.append(type);
-        sb.append(",port=");
-        int port = getPortWithOffset();
-        if (port > 0) {
-            sb.append(port);
+        String id = (protocolHandler != null) ? protocolHandler.getId() : null;
+        if (id != null) {
+            // Maintain MBean name compatibility, even if not accurate
+            sb.append(",port=0,address=");
+            sb.append(ObjectName.quote(id));
         } else {
-            sb.append("auto-");
-            sb.append(getProperty("nameIndex"));
-        }
-        String address = "";
-        if (addressObj instanceof InetAddress) {
-            address = ((InetAddress) addressObj).getHostAddress();
-        } else if (addressObj != null) {
-            address = addressObj.toString();
-        }
-        if (address.length() > 0) {
-            sb.append(",address=");
-            sb.append(ObjectName.quote(address));
+            sb.append(",port=");
+            int port = getPortWithOffset();
+            if (port > 0) {
+                sb.append(port);
+            } else {
+                sb.append("auto-");
+                sb.append(getProperty("nameIndex"));
+            }
+            String address = "";
+            if (addressObj instanceof InetAddress) {
+                address = ((InetAddress) addressObj).getHostAddress();
+            } else if (addressObj != null) {
+                address = addressObj.toString();
+            }
+            if (address.length() > 0) {
+                sb.append(",address=");
+                sb.append(ObjectName.quote(address));
+            }
         }
         return sb.toString();
     }
@@ -1022,15 +1041,7 @@ public class Connector extends LifecycleMBeanBase  {
             setParseBodyMethods(getParseBodyMethods());
         }
 
-        if (protocolHandler.isAprRequired() && !AprLifecycleListener.isInstanceCreated()) {
-            throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoAprListener",
-                    getProtocolHandlerClassName()));
-        }
-        if (protocolHandler.isAprRequired() && !AprLifecycleListener.isAprAvailable()) {
-            throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerNoAprLibrary",
-                    getProtocolHandlerClassName()));
-        }
-        if (AprLifecycleListener.isAprAvailable() && AprLifecycleListener.getUseOpenSSL() &&
+        if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
                 protocolHandler instanceof AbstractHttp11JsseProtocol) {
             AbstractHttp11JsseProtocol<?> jsseProtocolHandler =
                     (AbstractHttp11JsseProtocol<?>) protocolHandler;
@@ -1059,7 +1070,8 @@ public class Connector extends LifecycleMBeanBase  {
     protected void startInternal() throws LifecycleException {
 
         // Validate settings before starting
-        if (getPortWithOffset() < 0) {
+        String id = (protocolHandler != null) ? protocolHandler.getId() : null;
+        if (id == null && getPortWithOffset() < 0) {
             throw new LifecycleException(sm.getString(
                     "coyoteConnector.invalidPort", Integer.valueOf(getPortWithOffset())));
         }
@@ -1125,12 +1137,17 @@ public class Connector extends LifecycleMBeanBase  {
         StringBuilder sb = new StringBuilder("Connector[");
         sb.append(getProtocol());
         sb.append('-');
-        int port = getPortWithOffset();
-        if (port > 0) {
-            sb.append(port);
+        String id = (protocolHandler != null) ? protocolHandler.getId() : null;
+        if (id != null) {
+            sb.append(id);
         } else {
-            sb.append("auto-");
-            sb.append(getProperty("nameIndex"));
+            int port = getPortWithOffset();
+            if (port > 0) {
+                sb.append(port);
+            } else {
+                sb.append("auto-");
+                sb.append(getProperty("nameIndex"));
+            }
         }
         sb.append(']');
         return sb.toString();

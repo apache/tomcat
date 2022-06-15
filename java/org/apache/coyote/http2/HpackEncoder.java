@@ -44,7 +44,13 @@ class HpackEncoder {
         public boolean shouldUseIndexing(String headerName, String value) {
             //content length and date change all the time
             //no need to index them, or they will churn the table
-            return !headerName.equals("content-length") && !headerName.equals("date");
+            switch (headerName) {
+                case "content-length":
+                case "date":
+                    return false;
+                default:
+                    return true;
+            }
         }
 
         @Override
@@ -258,8 +264,8 @@ class HpackEncoder {
     private void preventPositionRollover() {
         //if the position counter is about to roll over we iterate all the table entries
         //and set their position to their actual position
-        for (Map.Entry<String, List<TableEntry>> entry : dynamicTable.entrySet()) {
-            for (TableEntry t : entry.getValue()) {
+        for (List<TableEntry> tableEntries : dynamicTable.values()) {
+            for (TableEntry t : tableEntries) {
                 t.position = t.getPosition();
             }
         }

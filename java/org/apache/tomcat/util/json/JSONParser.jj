@@ -47,7 +47,6 @@ PARSER_BEGIN(JSONParser)
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.util.json;
 
 /**
@@ -89,7 +88,7 @@ public class JSONParser {
     }
 
     /**
-     * Parses any JSON-parseable object, returning the value.
+     * Parses any JSON-parsable object, returning the value.
      */
     public Object parse() throws ParseException {
         Object toReturn = anything();
@@ -324,7 +323,7 @@ Number number(): {
         t = <NUMBER_DECIMAL>
         {
             if (nativeNumbers) {
-                return new Long(t.image);
+                return Long.valueOf(t.image);
             } else {
                 return new java.math.BigDecimal(t.image);
             }
@@ -333,7 +332,7 @@ Number number(): {
         t = <NUMBER_INTEGER>
         {
             if (nativeNumbers) {
-                return new Double(t.image);
+                return Double.valueOf(t.image);
             } else {
                 return new java.math.BigInteger(substringBefore(t.image, '.'));
             }

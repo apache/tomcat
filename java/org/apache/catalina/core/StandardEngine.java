@@ -211,9 +211,10 @@ public class StandardEngine extends ContainerBase implements Engine {
     @Override
     public void addChild(Container child) {
 
-        if (!(child instanceof Host))
+        if (!(child instanceof Host)) {
             throw new IllegalArgumentException
                 (sm.getString("standardEngine.notHost"));
+        }
         super.addChild(child);
 
     }
@@ -336,8 +337,9 @@ public class StandardEngine extends ContainerBase implements Engine {
      */
     @Override
     public ClassLoader getParentClassLoader() {
-        if (parentClassLoader != null)
+        if (parentClassLoader != null) {
             return parentClassLoader;
+        }
         if (service != null) {
             return service.getParentClassLoader();
         }
@@ -454,7 +456,9 @@ public class StandardEngine extends ContainerBase implements Engine {
 
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
-            if (disabled) return;
+            if (disabled) {
+                return;
+            }
 
             String type = event.getType();
             if (Lifecycle.AFTER_START_EVENT.equals(type) ||
@@ -470,7 +474,9 @@ public class StandardEngine extends ContainerBase implements Engine {
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            if (disabled) return;
+            if (disabled) {
+                return;
+            }
             if ("defaultHost".equals(evt.getPropertyName())) {
                 // Force re-calculation and disable listener since it won't
                 // be re-used
@@ -482,10 +488,12 @@ public class StandardEngine extends ContainerBase implements Engine {
         @Override
         public void containerEvent(ContainerEvent event) {
             // Only useful for hosts
-            if (disabled) return;
+            if (disabled) {
+                return;
+            }
             if (Container.ADD_CHILD_EVENT.equals(event.getType())) {
                 Context context = (Context) event.getData();
-                if ("".equals(context.getPath())) {
+                if (context.getPath().isEmpty()) {
                     // Force re-calculation and disable listener since it won't
                     // be re-used
                     engine.defaultAccessLog.set(null);

@@ -22,7 +22,7 @@ import jakarta.servlet.annotation.WebServlet;
  * Represents how the request from which this object was obtained was mapped to
  * the associated servlet.
  *
- * @since 4.0
+ * @since Servlet 4.0
  */
 public interface HttpServletMapping {
 

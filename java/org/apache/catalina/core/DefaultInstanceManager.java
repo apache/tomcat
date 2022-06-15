@@ -37,7 +37,6 @@ import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.xml.ws.WebServiceRef;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -45,6 +44,7 @@ import jakarta.annotation.Resource;
 import jakarta.ejb.EJB;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceUnit;
+import jakarta.xml.ws.WebServiceRef;
 
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
@@ -65,8 +65,7 @@ public class DefaultInstanceManager implements InstanceManager {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(DefaultInstanceManager.class);
 
     private static final boolean EJB_PRESENT;
     private static final boolean JPA_PRESENT;
@@ -91,7 +90,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         clazz = null;
         try {
-            clazz = Class.forName("javax.xml.ws.WebServiceRef");
+            clazz = Class.forName("jakarta.xml.ws.WebServiceRef");
         } catch (ClassNotFoundException cnfe) {
             // Expected
         }
@@ -226,13 +225,12 @@ public class DefaultInstanceManager implements InstanceManager {
         AnnotationCacheEntry[] annotations = annotationCache.get(clazz);
         for (AnnotationCacheEntry entry : annotations) {
             if (entry.getType() == AnnotationCacheEntryType.POST_CONSTRUCT) {
+                // This will always return a new Method instance
+                // Making this instance accessible does not affect other instances
                 Method postConstruct = getMethod(clazz, entry);
-                synchronized (postConstruct) {
-                    boolean accessibility = postConstruct.isAccessible();
-                    postConstruct.setAccessible(true);
-                    postConstruct.invoke(instance);
-                    postConstruct.setAccessible(accessibility);
-                }
+                // If this doesn't work, just let invoke() fail
+                postConstruct.trySetAccessible();
+                postConstruct.invoke(instance);
             }
         }
     }
@@ -264,13 +262,12 @@ public class DefaultInstanceManager implements InstanceManager {
         }
         for (AnnotationCacheEntry entry : annotations) {
             if (entry.getType() == AnnotationCacheEntryType.PRE_DESTROY) {
+                // This will always return a new Method instance
+                // Making this instance accessible does not affect other instances
                 Method preDestroy = getMethod(clazz, entry);
-                synchronized (preDestroy) {
-                    boolean accessibility = preDestroy.isAccessible();
-                    preDestroy.setAccessible(true);
-                    preDestroy.invoke(instance);
-                    preDestroy.setAccessible(accessibility);
-                }
+                // If this doesn't work, just let invoke() fail
+                preDestroy.trySetAccessible();
+                preDestroy.invoke(instance);
             }
         }
     }
@@ -573,7 +570,6 @@ public class DefaultInstanceManager implements InstanceManager {
             throws NamingException, IllegalAccessException {
 
         Object lookedupResource;
-        boolean accessibility;
 
         String normalizedName = normalize(name);
 
@@ -584,12 +580,11 @@ public class DefaultInstanceManager implements InstanceManager {
                 context.lookup(clazz.getName() + "/" + field.getName());
         }
 
-        synchronized (field) {
-            accessibility = field.isAccessible();
-            field.setAccessible(true);
-            field.set(instance, lookedupResource);
-            field.setAccessible(accessibility);
-        }
+        // This will always be a new Field instance
+        // Making this instance accessible does not affect other instances
+        // If this doens't work, just let set() fail
+        field.trySetAccessible();
+        field.set(instance, lookedupResource);
     }
 
     /**
@@ -615,7 +610,6 @@ public class DefaultInstanceManager implements InstanceManager {
         }
 
         Object lookedupResource;
-        boolean accessibility;
 
         String normalizedName = normalize(name);
 
@@ -626,12 +620,11 @@ public class DefaultInstanceManager implements InstanceManager {
                     clazz.getName() + "/" + Introspection.getPropertyName(method));
         }
 
-        synchronized (method) {
-            accessibility = method.isAccessible();
-            method.setAccessible(true);
-            method.invoke(instance, lookedupResource);
-            method.setAccessible(accessibility);
-        }
+        // This will always be a new Method instance
+        // Making this instance accessible does not affect other instances
+        // If this doens't work, just let invoke() fail
+        method.trySetAccessible();
+        method.invoke(instance, lookedupResource);
     }
 
     private static void loadProperties(Set<String> classNames, String resourceName,
@@ -720,7 +713,7 @@ public class DefaultInstanceManager implements InstanceManager {
             if (method.getName().equals(methodNameFromXml)) {
                 if (!Introspection.isValidLifecycleCallback(method)) {
                     throw new IllegalArgumentException(
-                            "Invalid " + annotation.getName() + " annotation");
+                            sm.getString("defaultInstanceManager.invalidAnnotation", annotation.getName()));
                 }
                 result = method;
             }
@@ -728,7 +721,7 @@ public class DefaultInstanceManager implements InstanceManager {
             if (method.isAnnotationPresent(annotation)) {
                 if (currentMethod != null || !Introspection.isValidLifecycleCallback(method)) {
                     throw new IllegalArgumentException(
-                            "Invalid " + annotation.getName() + " annotation");
+                            sm.getString("defaultInstanceManager.invalidAnnotation", annotation.getName()));
                 }
                 result = method;
             }

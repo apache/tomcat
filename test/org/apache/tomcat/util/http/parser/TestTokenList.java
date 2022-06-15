@@ -190,4 +190,33 @@ public class TestTokenList {
         Assert.assertFalse(result);
     }
 
+
+    @Test
+    public void testMultipleWithEmptyStart() throws IOException {
+        Set<String> expected = new HashSet<>();
+        expected.add("bar");
+        expected.add("foo");
+        expected.add("host");
+        doTestVary(",Host, Foo, Bar", expected, true);
+    }
+
+
+    @Test
+    public void testMultipleWithEmptyMiddle() throws IOException {
+        Set<String> expected = new HashSet<>();
+        expected.add("bar");
+        expected.add("foo");
+        expected.add("host");
+        doTestVary("Host, Foo,,Bar", expected, true);
+    }
+
+
+    @Test
+    public void testMultipleWithEmptyEnd() throws IOException {
+        Set<String> expected = new HashSet<>();
+        expected.add("bar");
+        expected.add("foo");
+        expected.add("host");
+        doTestVary("Host, Foo, Bar,", expected, true);
+    }
 }

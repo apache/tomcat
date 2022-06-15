@@ -42,7 +42,6 @@ public class SimpleServerAuthContext implements ServerAuthContext {
     }
 
 
-    @SuppressWarnings("unchecked") // JASPIC API uses raw types
     @Override
     public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
             Subject serviceSubject) throws AuthException {

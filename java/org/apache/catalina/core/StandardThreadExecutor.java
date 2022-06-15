@@ -14,10 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.core;
 
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.Executor;
@@ -33,8 +31,7 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 public class StandardThreadExecutor extends LifecycleMBeanBase
         implements Executor, ResizableExecutor {
 
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(StandardThreadExecutor.class);
 
     // ---------------------------------------------- Properties
     /**
@@ -78,11 +75,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     protected String name;
 
     /**
-     * prestart threads?
-     */
-    protected boolean prestartminSpareThreads = false;
-
-    /**
      * The maximum number of elements that can queue up before we reject them
      */
     protected int maxQueueSize = Integer.MAX_VALUE;
@@ -104,12 +96,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
     // ---------------------------------------------- Public Methods
 
-    @Override
-    protected void initInternal() throws LifecycleException {
-        super.initInternal();
-    }
-
-
     /**
      * Start the component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
@@ -124,9 +110,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
         executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
         executor.setThreadRenewalDelay(threadRenewalDelay);
-        if (prestartminSpareThreads) {
-            executor.prestartAllCoreThreads();
-        }
         taskqueue.setParent(executor);
 
         setState(LifecycleState.STARTING);
@@ -153,32 +136,11 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
 
     @Override
-    protected void destroyInternal() throws LifecycleException {
-        super.destroyInternal();
-    }
-
-
-    @Override
-    public void execute(Runnable command, long timeout, TimeUnit unit) {
-        if (executor != null) {
-            executor.execute(command,timeout,unit);
-        } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
-        }
-    }
-
-
-    @Override
     public void execute(Runnable command) {
         if (executor != null) {
-            try {
-                executor.execute(command);
-            } catch (RejectedExecutionException rx) {
-                //there could have been contention around the queue
-                if (!((TaskQueue) executor.getQueue()).force(command)) {
-                    throw new RejectedExecutionException(sm.getString("standardThreadExecutor.queueFull"));
-                }
-            }
+            // Note any RejectedExecutionException due to the use of TaskQueue
+            // will be handled by the o.a.t.u.threads.ThreadPoolExecutor
+            executor.execute(command);
         } else {
             throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
         }
@@ -221,10 +183,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         return name;
     }
 
-    public boolean isPrestartminSpareThreads() {
-
-        return prestartminSpareThreads;
-    }
     public void setThreadPriority(int threadPriority) {
         this.threadPriority = threadPriority;
     }
@@ -256,10 +214,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         if (executor != null) {
             executor.setCorePoolSize(minSpareThreads);
         }
-    }
-
-    public void setPrestartminSpareThreads(boolean prestartminSpareThreads) {
-        this.prestartminSpareThreads = prestartminSpareThreads;
     }
 
     public void setName(String name) {
@@ -315,8 +269,9 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
     @Override
     public boolean resizePool(int corePoolSize, int maximumPoolSize) {
-        if (executor == null)
+        if (executor == null) {
             return false;
+        }
 
         executor.setCorePoolSize(corePoolSize);
         executor.setMaximumPoolSize(maximumPoolSize);
@@ -338,8 +293,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
     @Override
     protected String getObjectNameKeyProperties() {
-        StringBuilder name = new StringBuilder("type=Executor,name=");
-        name.append(getName());
-        return name.toString();
+        return "type=Executor,name=" + getName();
     }
 }

@@ -43,10 +43,9 @@ public class StaticFieldELResolver extends ELResolver {
             try {
                 Field field = clazz.getField(name);
                 int modifiers = field.getModifiers();
-                JreCompat jreCompat = JreCompat.getInstance();
                 if (Modifier.isStatic(modifiers) &&
                         Modifier.isPublic(modifiers) &&
-                        jreCompat.canAcccess(null, field)) {
+                        Util.canAccess(null, field)) {
                     return field.get(null);
                 }
             } catch (IllegalArgumentException | IllegalAccessException |
@@ -75,7 +74,7 @@ public class StaticFieldELResolver extends ELResolver {
             String name = (String) property;
 
             throw new PropertyNotWritableException(Util.message(context,
-                    "staticFieldELResolver.notWriteable", name,
+                    "staticFieldELResolver.notWritable", name,
                     clazz.getName()));
         }
     }
@@ -93,11 +92,10 @@ public class StaticFieldELResolver extends ELResolver {
             String methodName = (String) method;
 
             if ("<init>".equals(methodName)) {
-                Constructor<?> match =
-                        Util.findConstructor(clazz, paramTypes, params);
+                Constructor<?> match = Util.findConstructor(context, clazz, paramTypes, params);
 
                 Object[] parameters = Util.buildParameters(
-                        match.getParameterTypes(), match.isVarArgs(), params);
+                        context, match.getParameterTypes(), match.isVarArgs(), params);
 
                 Object result = null;
 
@@ -114,19 +112,16 @@ public class StaticFieldELResolver extends ELResolver {
 
             } else {
                 // Static method so base should be null
-                Method match = Util.findMethod(clazz, null, methodName, paramTypes, params);
+                Method match = Util.findMethod(context, clazz, null, methodName, paramTypes, params);
 
-                // Note: On Java 9 and above, the isStatic check becomes
-                // unnecessary because the canAccess() call in Util.findMethod()
-                // effectively performs the same check
-                if (match == null || !Modifier.isStatic(match.getModifiers())) {
+                if (match == null) {
                     throw new MethodNotFoundException(Util.message(context,
                             "staticFieldELResolver.methodNotFound", methodName,
                             clazz.getName()));
                 }
 
                 Object[] parameters = Util.buildParameters(
-                        match.getParameterTypes(), match.isVarArgs(), params);
+                        context, match.getParameterTypes(), match.isVarArgs(), params);
 
                 Object result = null;
                 try {
@@ -157,11 +152,11 @@ public class StaticFieldELResolver extends ELResolver {
             try {
                 Field field = clazz.getField(name);
                 int modifiers = field.getModifiers();
-                JreCompat jreCompat = JreCompat.getInstance();
                 if (Modifier.isStatic(modifiers) &&
                         Modifier.isPublic(modifiers) &&
-                        jreCompat.canAcccess(null, field)) {
-                    return field.getType();
+                        Util.canAccess(null, field)) {
+                    // Resolver is read-only so returns null for resolved fields
+                    return null;
                 }
             } catch (IllegalArgumentException | NoSuchFieldException |
                     SecurityException e) {
@@ -192,7 +187,11 @@ public class StaticFieldELResolver extends ELResolver {
 
     /**
      * Always returns <code>null</code>.
+     *
+     * @deprecated This method will be removed, without replacement, in EL 6.0 /
+     *             Tomcat 11.
      */
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
             Object base) {

@@ -20,7 +20,7 @@ package org.apache.tomcat.util.http.fileupload;
  * <p>High level API for processing file uploads.</p>
  *
  * <p>This class handles multiple files per single HTML widget, sent using
- * <code>multipart/mixed</code> encoding type, as specified by
+ * {@code multipart/mixed} encoding type, as specified by
  * <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>.  Use {@link
  * #parseRequest(RequestContext)} to acquire a list
  * of {@link org.apache.tomcat.util.http.fileupload.FileItem FileItems} associated
@@ -43,27 +43,25 @@ public class FileUpload
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Constructs an uninitialised instance of this class.
+     * Constructs an uninitialized instance of this class.
      *
      * A factory must be
-     * configured, using <code>setFileItemFactory()</code>, before attempting
+     * configured, using {@code setFileItemFactory()}, before attempting
      * to parse requests.
      *
      * @see #FileUpload(FileItemFactory)
      */
     public FileUpload() {
-        super();
     }
 
     /**
      * Constructs an instance of this class which uses the supplied factory to
-     * create <code>FileItem</code> instances.
+     * create {@code FileItem} instances.
      *
      * @see #FileUpload()
      * @param fileItemFactory The factory to use for creating file items.
      */
-    public FileUpload(FileItemFactory fileItemFactory) {
-        super();
+    public FileUpload(final FileItemFactory fileItemFactory) {
         this.fileItemFactory = fileItemFactory;
     }
 
@@ -85,7 +83,7 @@ public class FileUpload
      * @param factory The factory class for new file items.
      */
     @Override
-    public void setFileItemFactory(FileItemFactory factory) {
+    public void setFileItemFactory(final FileItemFactory factory) {
         this.fileItemFactory = factory;
     }
 

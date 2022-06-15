@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11;
 
 import java.io.IOException;
@@ -73,14 +72,6 @@ public interface InputFilter extends InputBuffer {
      * @throws IOException If an error happens
      */
     public long end() throws IOException;
-
-
-    /**
-     * Amount of bytes still available in a buffer.
-     *
-     * @return The number of bytes in the buffer
-     */
-    public int available();
 
 
     /**

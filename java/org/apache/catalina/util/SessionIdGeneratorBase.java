@@ -19,7 +19,9 @@ package org.apache.catalina.util;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.catalina.LifecycleException;
@@ -29,15 +31,31 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class SessionIdGeneratorBase extends LifecycleBase
-        implements SessionIdGenerator {
+public abstract class SessionIdGeneratorBase extends LifecycleBase implements SessionIdGenerator {
 
     private final Log log = LogFactory.getLog(SessionIdGeneratorBase.class); // must not be static
 
+    private static final StringManager sm = StringManager.getManager("org.apache.catalina.util");
 
-    private static final StringManager sm =
-        StringManager.getManager("org.apache.catalina.util");
+    public static final String DEFAULT_SECURE_RANDOM_ALGORITHM;
 
+    static {
+        /*
+         * The default is normally SHA1PRNG. This was chosen because a) it is
+         * quick and b) it available by default in all JREs. However, it may not
+         * be available in some configurations such as those that use a FIPS
+         * certified provider. In those cases, use the platform default.
+         */
+        Set<String> algorithmNames = Security.getAlgorithms("SecureRandom");
+        if (algorithmNames.contains("SHA1PRNG")) {
+            DEFAULT_SECURE_RANDOM_ALGORITHM = "SHA1PRNG";
+        } else {
+            // Empty string - This will trigger the use of the platform default.
+            DEFAULT_SECURE_RANDOM_ALGORITHM = "";
+            Log log = LogFactory.getLog(SessionIdGeneratorBase.class);
+            log.warn(sm.getString("sessionIdGeneratorBase.noSHA1PRNG"));
+        }
+    }
 
     /**
      * Queue of random number generator objects to be used when creating session
@@ -50,7 +68,7 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase
 
     private String secureRandomClass = null;
 
-    private String secureRandomAlgorithm = "SHA1PRNG";
+    private String secureRandomAlgorithm = DEFAULT_SECURE_RANDOM_ALGORITHM;
 
     private String secureRandomProvider = null;
 
@@ -102,7 +120,8 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase
     /**
      * Specify a non-default algorithm to use to create instances of
      * {@link SecureRandom} which are used to generate session IDs. If no
-     * algorithm is specified, SHA1PRNG is used. To use the platform default
+     * algorithm is specified, SHA1PRNG will be used. If SHA1PRNG is not
+     * available, the platform default will be used. To use the platform default
      * (which may be SHA1PRNG), specify {@code null} or the empty string. If an
      * invalid algorithm and/or provider is specified the {@link SecureRandom}
      * instances will be created using the defaults for this
@@ -250,10 +269,12 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase
             }
         }
 
-        if (result == null && error) {
-            // Invalid provider / algorithm
+        // In theory, DEFAULT_SECURE_RANDOM_ALGORITHM should always work but
+        // with custom providers that might not be the case.
+        if (result == null && error && !DEFAULT_SECURE_RANDOM_ALGORITHM.equals(secureRandomAlgorithm)) {
+            // Invalid provider / algorithm - use the default
             try {
-                result = SecureRandom.getInstance("SHA1PRNG");
+                result = SecureRandom.getInstance(DEFAULT_SECURE_RANDOM_ALGORITHM);
             } catch (NoSuchAlgorithmException e) {
                 log.error(sm.getString("sessionIdGeneratorBase.randomAlgorithm",
                         secureRandomAlgorithm), e);

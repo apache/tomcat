@@ -97,8 +97,7 @@ public final class ApplicationFilterChain implements FilterChain {
     /**
      * The string manager for our package.
      */
-    private static final StringManager sm =
-      StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(ApplicationFilterChain.class);
 
 
     /**
@@ -138,25 +137,22 @@ public final class ApplicationFilterChain implements FilterChain {
             final ServletResponse res = response;
             try {
                 java.security.AccessController.doPrivileged(
-                    new java.security.PrivilegedExceptionAction<Void>() {
-                        @Override
-                        public Void run()
-                            throws ServletException, IOException {
+                        (java.security.PrivilegedExceptionAction<Void>) () -> {
                             internalDoFilter(req,res);
                             return null;
                         }
-                    }
                 );
             } catch( PrivilegedActionException pe) {
                 Exception e = pe.getException();
-                if (e instanceof ServletException)
+                if (e instanceof ServletException) {
                     throw (ServletException) e;
-                else if (e instanceof IOException)
+                } else if (e instanceof IOException) {
                     throw (IOException) e;
-                else if (e instanceof RuntimeException)
+                } else if (e instanceof RuntimeException) {
                     throw (RuntimeException) e;
-                else
+                } else {
                     throw new ServletException(e.getMessage(), e);
+                }
             }
         } else {
             internalDoFilter(request,response);
@@ -273,9 +269,11 @@ public final class ApplicationFilterChain implements FilterChain {
     void addFilter(ApplicationFilterConfig filterConfig) {
 
         // Prevent the same filter being added multiple times
-        for(ApplicationFilterConfig filter:filters)
-            if(filter==filterConfig)
+        for(ApplicationFilterConfig filter:filters) {
+            if(filter==filterConfig) {
                 return;
+            }
+        }
 
         if (n == filters.length) {
             ApplicationFilterConfig[] newFilters =

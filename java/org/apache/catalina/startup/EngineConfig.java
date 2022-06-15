@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
 
 
@@ -29,7 +27,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Startup event listener for a <b>Engine</b> that configures the properties
+ * Startup event listener for an <b>Engine</b> that configures the properties
  * of that Engine, and the associated defined contexts.
  *
  * @author Craig R. McClanahan
@@ -76,10 +74,11 @@ public class EngineConfig
         }
 
         // Process the event that has occurred
-        if (event.getType().equals(Lifecycle.START_EVENT))
+        if (event.getType().equals(Lifecycle.START_EVENT)) {
             start();
-        else if (event.getType().equals(Lifecycle.STOP_EVENT))
+        } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             stop();
+        }
 
     }
 
@@ -92,8 +91,9 @@ public class EngineConfig
      */
     protected void start() {
 
-        if (engine.getLogger().isDebugEnabled())
+        if (engine.getLogger().isDebugEnabled()) {
             engine.getLogger().debug(sm.getString("engineConfig.start"));
+        }
 
     }
 
@@ -103,8 +103,9 @@ public class EngineConfig
      */
     protected void stop() {
 
-        if (engine.getLogger().isDebugEnabled())
+        if (engine.getLogger().isDebugEnabled()) {
             engine.getLogger().debug(sm.getString("engineConfig.stop"));
+        }
 
     }
 

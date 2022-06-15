@@ -333,6 +333,7 @@
       <xsd:attribute name = "errorPage" type = "RelativeURL"/>
       <xsd:attribute name = "isErrorPage" default = "false" type = "Bool"/>
       <xsd:attribute name = "isELIgnored" type = "Bool"/>
+      <xsd:attribute name = "errorOnELNotFound" default = "false" type = "Bool"/>
     </xsd:complexType>
   </xsd:element>
 

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.servlet;
 
 /**
@@ -43,49 +42,15 @@ public class UnavailableException extends ServletException {
 
     private static final long serialVersionUID = 1L;
 
-    private final Servlet servlet; // what's unavailable
-    private final boolean permanent; // needs admin action?
-    private final int seconds; // unavailability estimate
+    /**
+     * Is the issue permanent - i.e. is administrator action required?
+     */
+    private final boolean permanent;
 
     /**
-     * @param servlet
-     *            the <code>Servlet</code> instance that is unavailable
-     * @param msg
-     *            a <code>String</code> specifying the descriptive message
-     * @deprecated As of Java Servlet API 2.2, use
-     *             {@link #UnavailableException(String)} instead.
+     * The estimate of how long the Servlet will be unavailable.
      */
-    @Deprecated
-    public UnavailableException(Servlet servlet, String msg) {
-        super(msg);
-        this.servlet = servlet;
-        permanent = true;
-        this.seconds = 0;
-    }
-
-    /**
-     * @param seconds
-     *            an integer specifying the number of seconds the servlet
-     *            expects to be unavailable; if zero or negative, indicates that
-     *            the servlet can't make an estimate
-     * @param servlet
-     *            the <code>Servlet</code> that is unavailable
-     * @param msg
-     *            a <code>String</code> specifying the descriptive message,
-     *            which can be written to a log file or displayed for the user.
-     * @deprecated As of Java Servlet API 2.2, use
-     *             {@link #UnavailableException(String, int)} instead.
-     */
-    @Deprecated
-    public UnavailableException(int seconds, Servlet servlet, String msg) {
-        super(msg);
-        this.servlet = servlet;
-        if (seconds <= 0)
-            this.seconds = -1;
-        else
-            this.seconds = seconds;
-        permanent = false;
-    }
+    private final int seconds;
 
     /**
      * Constructs a new exception with a descriptive message indicating that the
@@ -97,7 +62,6 @@ public class UnavailableException extends ServletException {
     public UnavailableException(String msg) {
         super(msg);
         seconds = 0;
-        servlet = null;
         permanent = true;
     }
 
@@ -123,11 +87,11 @@ public class UnavailableException extends ServletException {
     public UnavailableException(String msg, int seconds) {
         super(msg);
 
-        if (seconds <= 0)
+        if (seconds <= 0) {
             this.seconds = -1;
-        else
+        } else {
             this.seconds = seconds;
-        servlet = null;
+        }
         permanent = false;
     }
 
@@ -142,18 +106,6 @@ public class UnavailableException extends ServletException {
      */
     public boolean isPermanent() {
         return permanent;
-    }
-
-    /**
-     * Returns the servlet that is reporting its unavailability.
-     *
-     * @return the <code>Servlet</code> object that is throwing the
-     *         <code>UnavailableException</code>
-     * @deprecated As of Java Servlet API 2.2, with no replacement.
-     */
-    @Deprecated
-    public Servlet getServlet() {
-        return servlet;
     }
 
     /**

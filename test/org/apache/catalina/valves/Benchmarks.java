@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.valves;
 
 import java.text.SimpleDateFormat;
@@ -76,7 +75,7 @@ public class Benchmarks {
             return "ThreadLocals";
         }
 
-        private ThreadLocal<Long> currentMillisLocal = new ThreadLocal<Long>() {
+        private ThreadLocal<Long> currentMillisLocal = new ThreadLocal<>() {
             @Override
             protected Long initialValue() {
                 return Long.valueOf(0);
@@ -112,7 +111,7 @@ public class Benchmarks {
             long value = 0;
         }
 
-        private ThreadLocal<MutableLong> currentMillisLocal = new ThreadLocal<MutableLong>() {
+        private ThreadLocal<MutableLong> currentMillisLocal = new ThreadLocal<>() {
             @Override
             protected MutableLong initialValue() {
                 return new MutableLong();
@@ -149,7 +148,7 @@ public class Benchmarks {
             public Date currentDate;
         }
 
-        private ThreadLocal<Struct> currentStruct = new ThreadLocal<Struct>() {
+        private ThreadLocal<Struct> currentStruct = new ThreadLocal<>() {
             @Override
             protected Struct initialValue() {
                 return new Struct();
@@ -268,31 +267,31 @@ public class Benchmarks {
 
         private ThreadLocal<String> currentDateStringLocal = new ThreadLocal<>();
 
-        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>() {
+        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<>() {
             @Override
             protected Date initialValue() {
                 return new Date();
             }
         };
-        private ThreadLocal<SimpleDateFormat> dayFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+        private ThreadLocal<SimpleDateFormat> dayFormatterLocal = new ThreadLocal<>() {
             @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("dd");
             }
         };
-        private ThreadLocal<SimpleDateFormat> monthFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+        private ThreadLocal<SimpleDateFormat> monthFormatterLocal = new ThreadLocal<>() {
             @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("MM");
             }
         };
-        private ThreadLocal<SimpleDateFormat> yearFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+        private ThreadLocal<SimpleDateFormat> yearFormatterLocal = new ThreadLocal<>() {
             @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("yyyy");
             }
         };
-        private ThreadLocal<SimpleDateFormat> timeFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
+        private ThreadLocal<SimpleDateFormat> timeFormatterLocal = new ThreadLocal<>() {
             @Override
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("hh:mm:ss");
@@ -354,7 +353,7 @@ public class Benchmarks {
                     "hh:mm:ss");
         }
 
-        private ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
+        private ThreadLocal<Struct> structLocal = new ThreadLocal<>() {
             @Override
             protected Struct initialValue() {
                 return new Struct();
@@ -415,7 +414,7 @@ public class Benchmarks {
                     "hh:mm:ss");
         }
 
-        private ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
+        private ThreadLocal<Struct> structLocal = new ThreadLocal<>() {
             @Override
             protected Struct initialValue() {
                 return new Struct();

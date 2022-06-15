@@ -25,9 +25,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.security.AccessControlException;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -50,7 +47,6 @@ import org.apache.catalina.Service;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.mbeans.MBeanFactory;
 import org.apache.catalina.startup.Catalina;
-import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
@@ -71,10 +67,10 @@ import org.apache.tomcat.util.threads.TaskThreadFactory;
 public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     private static final Log log = LogFactory.getLog(StandardServer.class);
+    private static final StringManager sm = StringManager.getManager(StandardServer.class);
 
 
     // ------------------------------------------------------------ Constructor
-
 
     /**
      * Construct a default instance of this class.
@@ -151,13 +147,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
-    /**
      * The property change support for this component.
      */
     final PropertyChangeSupport support = new PropertyChangeSupport(this);
@@ -198,6 +187,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * Utility executor with scheduling capabilities.
      */
     private ScheduledThreadPoolExecutor utilityExecutor = null;
+    private final Object utilityExecutorLock = new Object();
 
     /**
      * Utility executor wrapper.
@@ -442,19 +432,21 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     }
 
 
-    private synchronized void reconfigureUtilityExecutor(int threads) {
-        // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
-        if (utilityExecutor != null) {
-            utilityExecutor.setCorePoolSize(threads);
-        } else {
-            ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
-                    new ScheduledThreadPoolExecutor(threads,
-                            new TaskThreadFactory("Catalina-utility-", utilityThreadsAsDaemon, Thread.MIN_PRIORITY));
-            scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
-            scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
-            scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-            utilityExecutor = scheduledThreadPoolExecutor;
-            utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(utilityExecutor);
+    private void reconfigureUtilityExecutor(int threads) {
+        synchronized (utilityExecutorLock) {
+            // The ScheduledThreadPoolExecutor doesn't use MaximumPoolSize, only CorePoolSize is available
+            if (utilityExecutor != null) {
+                utilityExecutor.setCorePoolSize(threads);
+            } else {
+                ScheduledThreadPoolExecutor scheduledThreadPoolExecutor =
+                        new ScheduledThreadPoolExecutor(threads,
+                                new TaskThreadFactory("Catalina-utility-", utilityThreadsAsDaemon, Thread.MIN_PRIORITY));
+                scheduledThreadPoolExecutor.setKeepAliveTime(10, TimeUnit.SECONDS);
+                scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
+                scheduledThreadPoolExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+                utilityExecutor = scheduledThreadPoolExecutor;
+                utilityExecutorWrapper = new org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor(utilityExecutor);
+            }
         }
     }
 
@@ -630,8 +622,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     // Read a set of characters from the socket
                     int expected = 1024; // Cut off to avoid DoS attack
                     while (expected < shutdown.length()) {
-                        if (random == null)
+                        if (random == null) {
                             random = new Random();
+                        }
                         expected += (random.nextInt() % 1024);
                     }
                     while (expected > 0) {
@@ -665,8 +658,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 if (match) {
                     log.info(sm.getString("standardServer.shutdownViaPort"));
                     break;
-                } else
+                } else {
                     log.warn(sm.getString("standardServer.invalidShutdownCommand", command.toString()));
+                }
             }
         } finally {
             ServerSocket serverSocket = awaitSocket;
@@ -744,8 +738,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                     break;
                 }
             }
-            if (j < 0)
+            if (j < 0) {
                 return;
+            }
             try {
                 services[j].stop();
             } catch (LifecycleException e) {
@@ -754,8 +749,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             int k = 0;
             Service results[] = new Service[services.length - 1];
             for (int i = 0; i < services.length; i++) {
-                if (i != j)
+                if (i != j) {
                     results[k++] = services[i];
+                }
             }
             services = results;
 
@@ -828,7 +824,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     public String toString() {
         StringBuilder sb = new StringBuilder("StandardServer[");
         sb.append(getPort());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -933,12 +929,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         if (periodicEventDelay > 0) {
             monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            startPeriodicLifecycleEvent();
-                        }
-                    }, 0, 60, TimeUnit.SECONDS);
+                    () -> startPeriodicLifecycleEvent(), 0, 60, TimeUnit.SECONDS);
         }
     }
 
@@ -954,12 +945,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 }
             }
             periodicLifecycleEventFuture = getUtilityExecutor().scheduleAtFixedRate(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null);
-                        }
-                    }, periodicEventDelay, periodicEventDelay, TimeUnit.SECONDS);
+                    () -> fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, null), periodicEventDelay, periodicEventDelay, TimeUnit.SECONDS);
         }
     }
 
@@ -1024,34 +1010,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         // Register the naming resources
         globalNamingResources.init();
 
-        // Populate the extension validator with JARs from common and shared
-        // class loaders
-        if (getCatalina() != null) {
-            ClassLoader cl = getCatalina().getParentClassLoader();
-            // Walk the class loader hierarchy. Stop at the system class loader.
-            // This will add the shared (if present) and common class loaders
-            while (cl != null && cl != ClassLoader.getSystemClassLoader()) {
-                if (cl instanceof URLClassLoader) {
-                    URL[] urls = ((URLClassLoader) cl).getURLs();
-                    for (URL url : urls) {
-                        if (url.getProtocol().equals("file")) {
-                            try {
-                                File f = new File (url.toURI());
-                                if (f.isFile() &&
-                                        f.getName().endsWith(".jar")) {
-                                    ExtensionValidator.addSystemResource(f);
-                                }
-                            } catch (URISyntaxException e) {
-                                // Ignore
-                            } catch (IOException e) {
-                                // Ignore
-                            }
-                        }
-                    }
-                }
-                cl = cl.getParent();
-            }
-        }
         // Initialize our defined Services
         for (Service service : services) {
             service.init();
@@ -1085,8 +1043,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     @Override
     public ClassLoader getParentClassLoader() {
-        if (parentClassLoader != null)
+        if (parentClassLoader != null) {
             return parentClassLoader;
+        }
         if (catalina != null) {
             return catalina.getParentClassLoader();
         }

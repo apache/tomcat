@@ -19,9 +19,14 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Container;
+import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 
@@ -35,7 +40,24 @@ public class HealthCheckValve extends ValveBase {
             "  \"status\": \"UP\",\n" +
             "  \"checks\": []\n" +
             "}";
+
+    private static final String DOWN =
+            "{\n" +
+            "  \"status\": \"DOWN\",\n" +
+            "  \"checks\": []\n" +
+            "}";
+
     private String path = "/health";
+
+    /**
+     * Will be set to true if the valve is associated with a context.
+     */
+    protected boolean context = false;
+
+    /**
+     * Check if all child containers are available.
+     */
+    protected boolean checkContainersAvailable = true;
 
     public HealthCheckValve() {
         super(true);
@@ -49,15 +71,49 @@ public class HealthCheckValve extends ValveBase {
         this.path = path;
     }
 
+    public boolean getCheckContainersAvailable() {
+        return this.checkContainersAvailable;
+    }
+
+    public void setCheckContainersAvailable(boolean checkContainersAvailable) {
+        this.checkContainersAvailable = checkContainersAvailable;
+    }
+
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        super.startInternal();
+        context = (getContainer() instanceof Context);
+    }
+
     @Override
     public void invoke(Request request, Response response)
             throws IOException, ServletException {
-        MessageBytes requestPathMB = request.getRequestPathMB();
-        if (requestPathMB.equals(path)) {
+        MessageBytes urlMB =
+                context ? request.getRequestPathMB() : request.getDecodedRequestURIMB();
+        if (urlMB.equals(path)) {
             response.setContentType("application/json");
-            response.getOutputStream().print(UP);
+            if (!checkContainersAvailable || isAvailable(getContainer())) {
+                response.getOutputStream().print(UP);
+            } else {
+                response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                response.getOutputStream().print(DOWN);
+            }
         } else {
             getNext().invoke(request, response);
         }
     }
+
+    protected boolean isAvailable(Container container) {
+        for (Container child : container.findChildren()) {
+            if (!isAvailable(child)) {
+                return false;
+            }
+        }
+        if (container instanceof LifecycleBase) {
+            return ((LifecycleBase) container).getState().isAvailable();
+        } else {
+            return true;
+        }
+    }
+
 }

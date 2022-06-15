@@ -14,15 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.manager;
 
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
-import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -38,7 +35,6 @@ import javax.management.ObjectName;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.security.Escape;
 
 /**
@@ -75,7 +71,9 @@ public class StatusTransformer {
     public static void writeHeader(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0){
             // HTML Header Section
-            writer.print(Constants.HTML_HEADER_SECTION);
+            writer.print(MessageFormat.format(
+                Constants.HTML_HEADER_SECTION, args
+            ));
         } else if (mode == 1){
             writer.write(Constants.XML_DECLARATION);
             writer.print(MessageFormat.format
@@ -140,73 +138,6 @@ public class StatusTransformer {
         } else if (mode == 1){
             writer.write("</status>");
         }
-    }
-
-
-    /**
-     * Write the OS state.
-     *
-     * @param writer The output writer
-     * @param mode Mode <code>0</code> will generate HTML.
-     *             Mode <code>1</code> will generate XML.
-     * @param args I18n labels for the OS state values
-     */
-    public static void writeOSState(PrintWriter writer, int mode, Object[] args) {
-        long[] result = new long[16];
-        boolean ok = false;
-        try {
-            String methodName = "info";
-            Class<?> paramTypes[] = new Class[1];
-            paramTypes[0] = result.getClass();
-            Object paramValues[] = new Object[1];
-            paramValues[0] = result;
-            Method method = Class.forName("org.apache.tomcat.jni.OS")
-                .getMethod(methodName, paramTypes);
-            method.invoke(null, paramValues);
-            ok = true;
-        } catch (Throwable t) {
-            t = ExceptionUtils.unwrapInvocationTargetException(t);
-            ExceptionUtils.handleThrowable(t);
-        }
-
-        if (ok) {
-            if (mode == 0){
-                writer.print("<h1>OS</h1>");
-
-                writer.print("<p>");
-                writer.print( args[0] );
-                writer.print(' ');
-                writer.print(formatSize(Long.valueOf(result[0]), true));
-                writer.print(' ');
-                writer.print(args[1]);
-                writer.print(' ');
-                writer.print(formatSize(Long.valueOf(result[1]), true));
-                writer.print(' ');
-                writer.print(args[2]);
-                writer.print(' ');
-                writer.print(formatSize(Long.valueOf(result[2]), true));
-                writer.print(' ');
-                writer.print(args[3]);
-                writer.print(' ');
-                writer.print(formatSize(Long.valueOf(result[3]), true));
-                writer.print(' ');
-                writer.print(args[4]);
-                writer.print(' ');
-                writer.print(Long.valueOf(result[6]));
-                writer.print("<br>");
-                writer.print(args[5]);
-                writer.print(' ');
-                writer.print(formatTime(Long.valueOf(result[11] / 1000), true));
-                writer.print(' ');
-                writer.print(args[6]);
-                writer.print(' ');
-                writer.print(formatTime(Long.valueOf(result[12] / 1000), true));
-                writer.print("</p>");
-            } else if (mode == 1){
-                // NO-OP
-            }
-        }
-
     }
 
 
@@ -338,11 +269,11 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration<ObjectName> enumeration =
-                globalRequestProcessors.elements();
+            Enumeration<ObjectName> enumeration = globalRequestProcessors.elements();
+            // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
             while (enumeration.hasMoreElements()) {
                 ObjectName objectName = enumeration.nextElement();
-                if (name.equals(objectName.getKeyProperty("name"))) {
+                if (name.equals(objectName.getKeyProperty("name")) && objectName.getKeyProperty("Upgrade") == null) {
                     grpName = objectName;
                 }
             }
@@ -408,11 +339,11 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration<ObjectName> enumeration =
-                globalRequestProcessors.elements();
+            Enumeration<ObjectName> enumeration = globalRequestProcessors.elements();
+            // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
             while (enumeration.hasMoreElements()) {
                 ObjectName objectName = enumeration.nextElement();
-                if (name.equals(objectName.getKeyProperty("name"))) {
+                if (name.equals(objectName.getKeyProperty("name")) && objectName.getKeyProperty("Upgrade") == null) {
                     grpName = objectName;
                 }
             }

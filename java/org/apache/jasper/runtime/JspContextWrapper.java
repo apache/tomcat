@@ -48,6 +48,7 @@ import jakarta.servlet.jsp.JspWriter;
 import jakarta.servlet.jsp.PageContext;
 import jakarta.servlet.jsp.el.ELException;
 import jakarta.servlet.jsp.el.ExpressionEvaluator;
+import jakarta.servlet.jsp.el.NotFoundELResolver;
 import jakarta.servlet.jsp.el.VariableResolver;
 import jakarta.servlet.jsp.tagext.BodyContent;
 import jakarta.servlet.jsp.tagext.JspTag;
@@ -200,7 +201,12 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
             o = rootJspCtxt.getAttribute(name, REQUEST_SCOPE);
             if (o == null) {
                 if (getSession() != null) {
-                    o = rootJspCtxt.getAttribute(name, SESSION_SCOPE);
+                    try {
+                        o = rootJspCtxt.getAttribute(name, SESSION_SCOPE);
+                    } catch (IllegalStateException ise) {
+                        // Session has been invalidated.
+                        // Ignore and fall through to application scope.
+                    }
                 }
                 if (o == null) {
                     o = rootJspCtxt.getAttribute(name, APPLICATION_SCOPE);
@@ -491,8 +497,9 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
      */
     private String findAlias(String varName) {
 
-        if (aliases == null)
+        if (aliases == null) {
             return varName;
+        }
 
         String alias = aliases.get(varName);
         if (alias == null) {
@@ -549,13 +556,23 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
         @Override
         public void putContext(Class<?> key, Object contextObject) {
-            wrapped.putContext(key, contextObject);
+            if (key != JspContext.class) {
+                wrapped.putContext(key, contextObject);
+            }
         }
 
         @Override
         public Object getContext(Class<?> key) {
             if (key == JspContext.class) {
                 return pageContext;
+            }
+            if (key == NotFoundELResolver.class) {
+                if (jspTag instanceof JspSourceDirectives) {
+                    return Boolean.valueOf(((JspSourceDirectives) jspTag).getErrorOnELNotFound());
+                } else {
+                    // returning Boolean.FALSE would have the same effect
+                    return null;
+                }
             }
             return wrapped.getContext(key);
         }
@@ -639,7 +656,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         }
 
         @Override
-        public Object convertToType(Object obj, Class<?> type) {
+        public <T> T convertToType(Object obj, Class<T> type) {
             return wrapped.convertToType(obj, type);
         }
 

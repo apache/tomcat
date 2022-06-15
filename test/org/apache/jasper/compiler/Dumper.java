@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import org.apache.jasper.JasperException;
@@ -26,8 +25,9 @@ class Dumper {
         private int indent = 0;
 
         private String getAttributes(Attributes attrs) {
-            if (attrs == null)
-                return "";
+            if (attrs == null) {
+              return "";
+            }
 
             StringBuilder buf = new StringBuilder();
             for (int i=0; i < attrs.getLength(); i++) {

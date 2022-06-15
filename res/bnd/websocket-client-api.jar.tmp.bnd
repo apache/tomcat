@@ -1,0 +1,46 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+-include: build-defaults.bnd, spec-defaults.bnd
+
+Bundle-Name: tomcat-websocket-client-api
+Bundle-SymbolicName: org.apache.tomcat-websocket-client-api
+Export-Package: \
+    jakarta.websocket;version=${websocket.spec.version}
+
+Require-Capability: \
+    osgi.extender;\
+        filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=jakarta.websocket.ContainerProvider)";\
+        osgi.serviceloader="jakarta.websocket.ContainerProvider",\
+    osgi.ee;\
+        filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+
+-namesection: jakarta/websocket/client*/;\
+    Specification-Title=Jakarta WebSocket Client;\
+    Specification-Version=${websocket.spec.version}${websocket.revision};\
+    Specification-Vendor=Eclipse Foundation;\
+    Implementation-Title=jakarta.websocket;\
+    Implementation-Version=${version};\
+    Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.websocket.client;\
+        access=32;\
+        version=${websocket.spec.version}
+-jpms-module-info-options: \
+    jakarta.websocket.client;\
+        substitute=websocket-client-api

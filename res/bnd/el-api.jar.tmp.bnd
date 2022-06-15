@@ -25,10 +25,27 @@ Provide-Capability: \
         version:Version=${el.spec.version};\
         uses:='${packages;NAMED;jakarta.el.*}'
 
+Require-Capability: \
+    osgi.extender;\
+        filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=jakarta.el.ExpressionFactory)";\
+        osgi.serviceloader="jakarta.el.ExpressionFactory",\
+    osgi.ee;\
+        filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+
 -namesection: jakarta/el*/;\
     Specification-Title=Jakarta Expression Language;\
     Specification-Version=${el.spec.version};\
     Specification-Vendor=Eclipse Foundation;\
     Implementation-Title=jakarta.el;\
-    Implementation-Version=${el.spec.version}.${el.revision};\
+    Implementation-Version=${el.spec.version}${el.revision};\
     Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.el;\
+        access=32;\
+        version=${el.spec.version}
+-jpms-module-info-options: \
+    jakarta.el;\
+        substitute=el-api

@@ -39,7 +39,6 @@ import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.modeler.modules.ModelerSource;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -136,11 +135,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      */
     public static synchronized Registry getRegistry(Object key, Object guard) {
         if (registry == null) {
-            if (JreCompat.isGraalAvailable()) {
-                disableRegistry();
-            } else {
-                registry = new Registry();
-            }
+            registry = new Registry();
+            registry.guard = guard;
         }
         if (registry.guard != null && registry.guard != guard) {
             return null;
@@ -257,8 +253,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
                 getMBeanServer().invoke(current, operation, new Object[] {}, new String[] {});
 
             } catch (Exception t) {
-                if (failFirst)
+                if (failFirst) {
                     throw t;
+                }
                 log.info(sm.getString("registry.initError"), t);
             }
         }
@@ -336,8 +333,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     public ManagedBean findManagedBean(String name) {
         // XXX Group ?? Use Group + Type
         ManagedBean mb = descriptors.get(name);
-        if (mb == null)
+        if (mb == null) {
             mb = descriptorsByClass.get(name);
+        }
         return mb;
     }
 
@@ -464,7 +462,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
                     } else {
                         server = ManagementFactory.getPlatformMBeanServer();
                         if (log.isDebugEnabled()) {
-                            log.debug("Creating MBeanServer" + (System.currentTimeMillis() - t1));
+                            log.debug("Created MBeanServer" + (System.currentTimeMillis() - t1));
                         }
                     }
                 }
@@ -714,10 +712,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
         String className = type;
         String pkg = className;
-        while (pkg.indexOf(".") > 0) {
-            int lastComp = pkg.lastIndexOf(".");
-            if (lastComp <= 0)
+        while (pkg.indexOf('.') > 0) {
+            int lastComp = pkg.lastIndexOf('.');
+            if (lastComp <= 0) {
                 return;
+            }
             pkg = pkg.substring(0, lastComp);
             if (searchedPaths.get(pkg) != null) {
                 return;
@@ -728,8 +727,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     private ModelerSource getModelerSource(String type) throws Exception {
-        if (type == null)
+        if (type == null) {
             type = "MbeansDescriptorsDigesterSource";
+        }
         if (!type.contains(".")) {
             type = "org.apache.tomcat.util.modeler.modules." + type;
         }

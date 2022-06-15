@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.core;
 
 import java.util.Arrays;
@@ -33,14 +32,12 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.res.StringManager;
 
-public class ApplicationFilterRegistration
-        implements FilterRegistration.Dynamic {
+public class ApplicationFilterRegistration implements FilterRegistration.Dynamic {
 
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-      StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(ApplicationFilterRegistration.class);
 
     private final FilterDef filterDef;
     private final Context context;

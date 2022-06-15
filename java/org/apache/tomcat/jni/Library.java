@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jni;
 
 import java.io.File;
@@ -26,7 +25,7 @@ import java.io.File;
 public final class Library {
 
     /* Default library names */
-    private static final String [] NAMES = {"tcnative-1", "libtcnative-1"};
+    private static final String [] NAMES = {"tcnative-2", "libtcnative-2", "tcnative-1", "libtcnative-1"};
     /*
      * A handle to the unique Library singleton instance.
      */
@@ -41,11 +40,7 @@ public final class Library {
             try {
                 System.load(library.getAbsolutePath());
                 loaded = true;
-            } catch (ThreadDeath t) {
-                throw t;
-            } catch (VirtualMachineError t) {
-                // Don't use a Java 7 multiple exception catch so we can keep
-                // the JNI code identical between Tomcat 6/7/8/9
+            } catch (ThreadDeath | VirtualMachineError t) {
                 throw t;
             } catch (Throwable t) {
                 if (library.exists()) {
@@ -68,11 +63,7 @@ public final class Library {
                 try {
                     System.loadLibrary(value);
                     loaded = true;
-                } catch (ThreadDeath t) {
-                    throw t;
-                } catch (VirtualMachineError t) {
-                    // Don't use a Java 7 multiple exception catch so we can keep
-                    // the JNI code identical between Tomcat 6/7/8/9
+                } catch (ThreadDeath | VirtualMachineError t) {
                     throw t;
                 } catch (Throwable t) {
                     String name = System.mapLibraryName(value);
@@ -117,11 +108,7 @@ public final class Library {
      */
     public static native void terminate();
     /* Internal function for loading APR Features */
-    private static native boolean has(int what);
-    /* Internal function for loading APR Features */
     private static native int version(int what);
-    /* Internal function for loading APR sizes */
-    private static native int size(int what);
 
     /* TCN_MAJOR_VERSION */
     public static int TCN_MAJOR_VERSION  = 0;
@@ -145,51 +132,6 @@ public final class Library {
     /* APR_VERSION_STRING */
     public static native String aprVersionString();
 
-    /*  APR Feature Macros */
-    public static boolean APR_HAVE_IPV6           = false;
-    public static boolean APR_HAS_SHARED_MEMORY   = false;
-    public static boolean APR_HAS_THREADS         = false;
-    public static boolean APR_HAS_SENDFILE        = false;
-    public static boolean APR_HAS_MMAP            = false;
-    public static boolean APR_HAS_FORK            = false;
-    public static boolean APR_HAS_RANDOM          = false;
-    public static boolean APR_HAS_OTHER_CHILD     = false;
-    public static boolean APR_HAS_DSO             = false;
-    public static boolean APR_HAS_SO_ACCEPTFILTER = false;
-    public static boolean APR_HAS_UNICODE_FS      = false;
-    public static boolean APR_HAS_PROC_INVOKED    = false;
-    public static boolean APR_HAS_USER            = false;
-    public static boolean APR_HAS_LARGE_FILES     = false;
-    public static boolean APR_HAS_XTHREAD_FILES   = false;
-    public static boolean APR_HAS_OS_UUID         = false;
-    /* Are we big endian? */
-    public static boolean APR_IS_BIGENDIAN        = false;
-    /* APR sets APR_FILES_AS_SOCKETS to 1 on systems where it is possible
-     * to poll on files/pipes.
-     */
-    public static boolean APR_FILES_AS_SOCKETS    = false;
-    /* This macro indicates whether or not EBCDIC is the native character set.
-     */
-    public static boolean APR_CHARSET_EBCDIC      = false;
-    /* Is the TCP_NODELAY socket option inherited from listening sockets?
-     */
-    public static boolean APR_TCP_NODELAY_INHERITED = false;
-    /* Is the O_NONBLOCK flag inherited from listening sockets?
-     */
-    public static boolean APR_O_NONBLOCK_INHERITED  = false;
-
-
-    public static int APR_SIZEOF_VOIDP;
-    public static int APR_PATH_MAX;
-    public static int APRMAXHOSTLEN;
-    public static int APR_MAX_IOVEC_SIZE;
-    public static int APR_MAX_SECS_TO_LINGER;
-    public static int APR_MMAP_THRESHOLD;
-    public static int APR_MMAP_LIMIT;
-
-    /* return global TCN's APR pool */
-    public static native long globalPool();
-
     /**
      * Setup any APR internal data structures.  This MUST be the first function
      * called for any APR library.
@@ -202,10 +144,11 @@ public final class Library {
      */
     public static synchronized boolean initialize(String libraryName) throws Exception {
         if (_instance == null) {
-            if (libraryName == null)
+            if (libraryName == null) {
                 _instance = new Library();
-            else
+            } else {
                 _instance = new Library(libraryName);
+            }
             TCN_MAJOR_VERSION  = version(0x01);
             TCN_MINOR_VERSION  = version(0x02);
             TCN_PATCH_VERSION  = version(0x03);
@@ -215,80 +158,11 @@ public final class Library {
             APR_PATCH_VERSION  = version(0x13);
             APR_IS_DEV_VERSION = version(0x14);
 
-            APR_SIZEOF_VOIDP        = size(1);
-            APR_PATH_MAX            = size(2);
-            APRMAXHOSTLEN           = size(3);
-            APR_MAX_IOVEC_SIZE      = size(4);
-            APR_MAX_SECS_TO_LINGER  = size(5);
-            APR_MMAP_THRESHOLD      = size(6);
-            APR_MMAP_LIMIT          = size(7);
-
-            APR_HAVE_IPV6           = has(0);
-            APR_HAS_SHARED_MEMORY   = has(1);
-            APR_HAS_THREADS         = has(2);
-            APR_HAS_SENDFILE        = has(3);
-            APR_HAS_MMAP            = has(4);
-            APR_HAS_FORK            = has(5);
-            APR_HAS_RANDOM          = has(6);
-            APR_HAS_OTHER_CHILD     = has(7);
-            APR_HAS_DSO             = has(8);
-            APR_HAS_SO_ACCEPTFILTER = has(9);
-            APR_HAS_UNICODE_FS      = has(10);
-            APR_HAS_PROC_INVOKED    = has(11);
-            APR_HAS_USER            = has(12);
-            APR_HAS_LARGE_FILES     = has(13);
-            APR_HAS_XTHREAD_FILES   = has(14);
-            APR_HAS_OS_UUID         = has(15);
-            APR_IS_BIGENDIAN        = has(16);
-            APR_FILES_AS_SOCKETS    = has(17);
-            APR_CHARSET_EBCDIC      = has(18);
-            APR_TCP_NODELAY_INHERITED = has(19);
-            APR_O_NONBLOCK_INHERITED  = has(20);
             if (APR_MAJOR_VERSION < 1) {
                 throw new UnsatisfiedLinkError("Unsupported APR Version (" +
                                                aprVersionString() + ")");
             }
-            if (!APR_HAS_THREADS) {
-                throw new UnsatisfiedLinkError("Missing threading support from APR");
-            }
         }
         return initialize();
     }
-
-    /**
-     * Calls System.load(filename). System.load() associates the
-     * loaded library with the class loader of the class that called
-     * the System method. A native library may not be loaded by more
-     * than one class loader, so calling the System method from a class that
-     * was loaded by a Webapp class loader will make it impossible for
-     * other Webapps to load it.
-     *
-     * Using this method will load the native library via a shared class
-     * loader (typically the Common class loader, but may vary in some
-     * configurations), so that it can be loaded by multiple Webapps.
-     *
-     * @param filename - absolute path of the native library
-     */
-    public static void load(String filename){
-        System.load(filename);
-    }
-
-    /**
-     * Calls System.loadLibrary(libname). System.loadLibrary() associates the
-     * loaded library with the class loader of the class that called
-     * the System method. A native library may not be loaded by more
-     * than one class loader, so calling the System method from a class that
-     * was loaded by a Webapp class loader will make it impossible for
-     * other Webapps to load it.
-     *
-     * Using this method will load the native library via a shared class
-     * loader (typically the Common class loader, but may vary in some
-     * configurations), so that it can be loaded by multiple Webapps.
-     *
-     * @param libname - the name of the native library
-     */
-    public static void loadLibrary(String libname){
-        System.loadLibrary(libname);
-    }
-
 }

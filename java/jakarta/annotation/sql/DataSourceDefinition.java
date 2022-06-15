@@ -17,6 +17,7 @@
 package jakarta.annotation.sql;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -26,23 +27,96 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(DataSourceDefinitions.class)
 public @interface DataSourceDefinition {
+
+    /**
+     * @return the className
+     */
     String className();
+
+    /**
+     * @return the name
+     */
     String name();
+
+    /**
+     * @return the description
+     */
     String description() default "";
+
+    /**
+     * @return the url
+     */
     String url() default "";
+
+    /**
+     * @return the user
+     */
     String user() default "";
+
+    /**
+     * @return the password
+     */
     String password() default "";
+
+    /**
+     * @return database name
+     */
     String databaseName() default "";
+
+    /**
+     * @return the port number
+     */
     int portNumber() default -1;
+
+    /**
+     * @return the server name
+     */
     String serverName() default "localhost";
+
+    /**
+     * @return the isolation level
+     */
     int isolationLevel() default -1;
+
+    /**
+     * @return true if the data source is transactional
+     */
     boolean transactional() default true;
+
+    /**
+     * @return the initial pool size
+     */
     int initialPoolSize() default -1;
+
+    /**
+     * @return the max pool size
+     */
     int maxPoolSize() default -1;
+
+    /**
+     * @return the min pool size
+     */
     int minPoolSize() default -1;
+
+    /**
+     * @return the max idle time
+     */
     int maxIdleTime() default -1;
+
+    /**
+     * @return the max statements
+     */
     int maxStatements() default -1;
+
+    /**
+     * @return a String[] with the properties
+     */
     String[] properties() default {};
+
+    /**
+     * @return the login timeout
+     */
     int loginTimeout() default 0;
 }

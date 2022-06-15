@@ -43,7 +43,6 @@ public class TesterServerAuthModuleA implements ServerAuthModule {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
         trace.append("cleanSubject()-");
@@ -57,9 +56,8 @@ public class TesterServerAuthModuleA implements ServerAuthModule {
         // NO-OP
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
-    public Class[] getSupportedMessageTypes() {
+    public Class<?>[] getSupportedMessageTypes() {
         return null;
     }
 }

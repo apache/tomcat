@@ -31,7 +31,7 @@
     if (table.getProcessError() == false) {
 %>
 
-<!-- html table goes here -->
+<!-- HTML table goes here -->
 <CENTER>
 <TABLE WIDTH=60% BGCOLOR=yellow CELLPADDING=15>
 <TR>

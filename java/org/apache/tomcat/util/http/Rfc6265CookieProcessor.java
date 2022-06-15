@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.FieldPosition;
 import java.util.BitSet;
 import java.util.Date;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -28,7 +29,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.descriptor.web.Constants;
 import org.apache.tomcat.util.http.parser.Cookie;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.res.StringManager;
 
 public class Rfc6265CookieProcessor extends CookieProcessorBase {
@@ -100,12 +103,6 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
 
     @Override
-    public String generateHeader(jakarta.servlet.http.Cookie cookie) {
-        return generateHeader(cookie, null);
-    }
-
-
-    @Override
     public String generateHeader(jakarta.servlet.http.Cookie cookie, HttpServletRequest request) {
 
         // Can't use StringBuilder due to DateFormat
@@ -170,11 +167,40 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             header.append("; HttpOnly");
         }
 
-        SameSiteCookies sameSiteCookiesValue = getSameSiteCookies();
-
-        if (!sameSiteCookiesValue.equals(SameSiteCookies.UNSET)) {
+        String cookieSameSite = cookie.getAttribute(Constants.COOKIE_SAME_SITE_ATTR);
+        if (cookieSameSite == null) {
+            // Use processor config
+            SameSiteCookies sameSiteCookiesValue = getSameSiteCookies();
+            if (!sameSiteCookiesValue.equals(SameSiteCookies.UNSET)) {
+                header.append("; SameSite=");
+                header.append(sameSiteCookiesValue.getValue());
+            }
+        } else {
+            // Use explict config
             header.append("; SameSite=");
-            header.append(sameSiteCookiesValue.getValue());
+            header.append(cookieSameSite);
+        }
+
+        // Add the remaining attributes
+        for (Map.Entry<String,String> entry : cookie.getAttributes().entrySet()) {
+            switch (entry.getKey()) {
+            case Constants.COOKIE_COMMENT_ATTR:
+            case Constants.COOKIE_DOMAIN_ATTR:
+            case Constants.COOKIE_MAX_AGE_ATTR:
+            case Constants.COOKIE_PATH_ATTR:
+            case Constants.COOKIE_SECURE_ATTR:
+            case Constants.COOKIE_HTTP_ONLY_ATTR:
+            case Constants.COOKIE_SAME_SITE_ATTR:
+                // Handled above so NO-OP
+                break;
+            default: {
+                validateAttribute(entry.getKey(), entry.getValue());
+                header.append("; ");
+                header.append(entry.getKey());
+                header.append('=');
+                header.append(entry.getValue());
+            }
+            }
         }
 
         return header.toString();
@@ -240,6 +266,21 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             if (ch < 0x20 || ch > 0x7E || ch == ';') {
                 throw new IllegalArgumentException(sm.getString(
                         "rfc6265CookieProcessor.invalidPath", path));
+            }
+        }
+    }
+
+
+    private void validateAttribute(String name, String value) {
+        if (!HttpParser.isToken(name)) {
+            throw new IllegalArgumentException(sm.getString("rfc6265CookieProcessor.invalidAttributeName", name));
+        }
+
+        char[] chars = value.toCharArray();
+        for (char ch : chars) {
+            if (ch < 0x20 || ch > 0x7E || ch == ';') {
+                throw new IllegalArgumentException(sm.getString(
+                        "rfc6265CookieProcessor.invalidAttributeValue", name, value));
             }
         }
     }

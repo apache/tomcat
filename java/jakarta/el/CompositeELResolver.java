@@ -132,6 +132,7 @@ public class CompositeELResolver extends ELResolver {
         return false;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         return new FeatureIterator(context, base, this.resolvers, this.size);
@@ -151,11 +152,11 @@ public class CompositeELResolver extends ELResolver {
     }
 
     @Override
-    public Object convertToType(ELContext context, Object obj, Class<?> type) {
+    public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
         context.setPropertyResolved(false);
         int sz = this.size;
         for (int i = 0; i < sz; i++) {
-            Object result = this.resolvers[i].convertToType(context, obj, type);
+            T result = this.resolvers[i].convertToType(context, obj, type);
             if (context.isPropertyResolved()) {
                 return result;
             }
@@ -163,6 +164,7 @@ public class CompositeELResolver extends ELResolver {
         return null;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     private static final class FeatureIterator implements Iterator<FeatureDescriptor> {
 
         private final ELContext context;
@@ -198,8 +200,9 @@ public class CompositeELResolver extends ELResolver {
 
         @Override
         public boolean hasNext() {
-            if (this.next != null)
+            if (this.next != null) {
                 return true;
+            }
             if (this.itr != null) {
                 while (this.next == null && itr.hasNext()) {
                     this.next = itr.next();

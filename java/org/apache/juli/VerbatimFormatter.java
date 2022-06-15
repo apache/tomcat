@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.juli;
 
 import java.util.logging.Formatter;
@@ -31,13 +30,8 @@ public class VerbatimFormatter extends Formatter {
 
     @Override
     public String format(LogRecord record) {
-        // Timestamp
-        StringBuilder sb = new StringBuilder(record.getMessage());
-
-        // New line for next record
-        sb.append(System.lineSeparator());
-
-        return sb.toString();
+        // Timestamp + New line for next record
+        return record.getMessage() + System.lineSeparator();
     }
 
 }

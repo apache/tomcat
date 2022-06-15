@@ -19,13 +19,35 @@ package jakarta.servlet.http;
 /**
  * Represents the ways that a request can be mapped to a servlet
  *
- * @since 4.0
+ * @since Servlet 4.0
  */
 public enum MappingMatch {
 
+    /**
+     * The request was mapped to the servlet via the context root URL pattern of
+     * {@code ""}.
+     */
     CONTEXT_ROOT,
+
+    /**
+     * The request was mapped to the servlet via the default servlet URL pattern
+     * of {@code "/"} .
+     */
     DEFAULT,
+
+    /**
+     * The request was mapped to the servlet using an exact URL pattern match.
+     */
     EXACT,
+
+    /**
+     * The request was mapped to the servlet using an extension URL pattern
+     * match.
+     */
     EXTENSION,
+
+    /**
+     * The request was mapped to the servlet using a path URL pattern.
+     */
     PATH
 }

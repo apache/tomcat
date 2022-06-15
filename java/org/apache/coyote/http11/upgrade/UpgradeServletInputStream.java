@@ -21,7 +21,7 @@ import java.io.IOException;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 
-import org.apache.coyote.ContainerThreadMarker;
+import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -37,6 +37,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
     private final UpgradeProcessorBase processor;
     private final SocketWrapperBase<?> socketWrapper;
+    private final UpgradeInfo upgradeInfo;
 
     private volatile boolean closed = false;
     private volatile boolean eof = false;
@@ -45,10 +46,11 @@ public class UpgradeServletInputStream extends ServletInputStream {
     private volatile ReadListener listener = null;
 
 
-    public UpgradeServletInputStream(UpgradeProcessorBase processor,
-            SocketWrapperBase<?> socketWrapper) {
+    public UpgradeServletInputStream(UpgradeProcessorBase processor, SocketWrapperBase<?> socketWrapper,
+            UpgradeInfo upgradeInfo) {
         this.processor = processor;
         this.socketWrapper = socketWrapper;
+        this.upgradeInfo = upgradeInfo;
     }
 
 
@@ -104,7 +106,8 @@ public class UpgradeServletInputStream extends ServletInputStream {
         this.listener = listener;
 
         // Container is responsible for first call to onDataAvailable().
-        if (ContainerThreadMarker.isContainerThread()) {
+        Request request = processor.getRequest();
+        if (request != null && request.isRequestThread()) {
             processor.addDispatch(DispatchType.NON_BLOCKING_READ);
         } else {
             socketWrapper.registerReadInterest();
@@ -139,7 +142,13 @@ public class UpgradeServletInputStream extends ServletInputStream {
                 break;
             }
         }
-        return count > 0 ? count : -1;
+
+        if (count > 0) {
+            upgradeInfo.addBytesReceived(count);
+            return count;
+        } else {
+            return -1;
+        }
     }
 
 
@@ -151,6 +160,8 @@ public class UpgradeServletInputStream extends ServletInputStream {
             int result = socketWrapper.read(listener == null, b, off, len);
             if (result == -1) {
                 eof = true;
+            } else {
+                upgradeInfo.addBytesReceived(result);
             }
             return result;
         } catch (IOException ioe) {
@@ -197,6 +208,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
             eof = true;
             return -1;
         } else {
+            upgradeInfo.addBytesReceived(1);
             return b[0] & 0xFF;
         }
     }

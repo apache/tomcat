@@ -154,25 +154,25 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
                }
            }
         }
-        if (classLoader != null && !"".equals(classLoader)) {
+        if (classLoader != null && !classLoader.isEmpty()) {
             if (isEcho()) {
-                handleOutput("create MBean " + name + " from class "
-                        + className + " with classLoader " + classLoader);
+                handleOutput("create MBean " + name + " from class " + className + " with classLoader " + classLoader);
             }
-            if(args == null)
+            if(args == null) {
                 jmxServerConnection.createMBean(className, new ObjectName(name), new ObjectName(classLoader));
-            else
+            } else {
                 jmxServerConnection.createMBean(className, new ObjectName(name), new ObjectName(classLoader),argsA,sigA);
+            }
 
         } else {
             if (isEcho()) {
-                handleOutput("create MBean " + name + " from class "
-                        + className);
+                handleOutput("create MBean " + name + " from class " + className);
             }
-            if(args == null)
+            if(args == null) {
                 jmxServerConnection.createMBean(className, new ObjectName(name));
-            else
+            } else {
                 jmxServerConnection.createMBean(className, new ObjectName(name),argsA,sigA);
+            }
         }
     }
 

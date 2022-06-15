@@ -16,8 +16,22 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.CompletionHandler;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
+import org.apache.tomcat.util.net.NioChannel;
+import org.apache.tomcat.util.net.NioEndpoint;
+import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.SendfileDataBase;
+import org.apache.tomcat.util.net.SendfileState;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /*
  * This tests use A=1, B=2, etc to map stream IDs to the names used in the
@@ -28,7 +42,8 @@ public class TestAbstractStream {
     @Test
     public void testDependenciesFig3() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
+        Http2UpgradeHandler handler =
+                new Http2UpgradeHandler(new Http2Protocol(), null, null, new TesterSocketWrapper());
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -59,7 +74,8 @@ public class TestAbstractStream {
     @Test
     public void testDependenciesFig4() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
+        Http2UpgradeHandler handler =
+                new Http2UpgradeHandler(new Http2Protocol(), null, null, new TesterSocketWrapper());
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -90,7 +106,8 @@ public class TestAbstractStream {
     @Test
     public void testDependenciesFig5NonExclusive() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
+        Http2UpgradeHandler handler =
+                new Http2UpgradeHandler(new Http2Protocol(), null, null, new TesterSocketWrapper());
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -132,7 +149,8 @@ public class TestAbstractStream {
     @Test
     public void testDependenciesFig5Exclusive() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
+        Http2UpgradeHandler handler =
+                new Http2UpgradeHandler(new Http2Protocol(), null, null, new TesterSocketWrapper());
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -174,7 +192,8 @@ public class TestAbstractStream {
     @Test
     public void testCircular01() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
+        Http2UpgradeHandler handler =
+                new Http2UpgradeHandler(new Http2Protocol(), null, null, new TesterSocketWrapper());
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -204,7 +223,8 @@ public class TestAbstractStream {
     @Test
     public void testCircular02() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
+        Http2UpgradeHandler handler =
+                new Http2UpgradeHandler(new Http2Protocol(), null, null, new TesterSocketWrapper());
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -250,7 +270,8 @@ public class TestAbstractStream {
     @Test
     public void testCircular03() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
+        Http2UpgradeHandler handler =
+                new Http2UpgradeHandler(new Http2Protocol(), null, null, new TesterSocketWrapper());
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(3), handler);
         Stream c = new Stream(Integer.valueOf(5), handler);
@@ -282,5 +303,105 @@ public class TestAbstractStream {
         Assert.assertEquals(1,  b.getChildStreams().size());
         Assert.assertTrue(b.getChildStreams().contains(d));
         Assert.assertEquals(0,  d.getChildStreams().size());
+    }
+
+
+    private static class TesterSocketWrapper extends SocketWrapperBase<NioChannel> {
+
+        public TesterSocketWrapper() {
+            super(null, new NioEndpoint());
+        }
+
+        @Override
+        protected void populateRemoteHost() {
+        }
+
+        @Override
+        protected void populateRemoteAddr() {
+        }
+
+        @Override
+        protected void populateRemotePort() {
+        }
+
+        @Override
+        protected void populateLocalName() {
+        }
+
+        @Override
+        protected void populateLocalAddr() {
+        }
+
+        @Override
+        protected void populateLocalPort() {
+        }
+
+        @Override
+        public int read(boolean block, byte[] b, int off, int len) throws IOException {
+            return 0;
+        }
+
+        @Override
+        public int read(boolean block, ByteBuffer to) throws IOException {
+            return 0;
+        }
+
+        @Override
+        public boolean isReadyForRead() throws IOException {
+            return false;
+        }
+
+        @Override
+        public void setAppReadBufHandler(ApplicationBufferHandler handler) {
+        }
+
+        @Override
+        protected void doClose() {
+        }
+
+        @Override
+        protected boolean flushNonBlocking() throws IOException {
+            return false;
+        }
+
+        @Override
+        protected void doWrite(boolean block, ByteBuffer from) throws IOException {
+        }
+
+        @Override
+        public void registerReadInterest() {
+        }
+
+        @Override
+        public void registerWriteInterest() {
+        }
+
+        @Override
+        public SendfileDataBase createSendfileData(String filename, long pos, long length) {
+            return null;
+        }
+
+        @Override
+        public SendfileState processSendfile(SendfileDataBase sendfileData) {
+            return null;
+        }
+
+        @Override
+        public void doClientAuth(SSLSupport sslSupport) throws IOException {
+        }
+
+        @Override
+        public SSLSupport getSslSupport() {
+            return null;
+        }
+
+        @Override
+        protected <A> SocketWrapperBase<NioChannel>.OperationState<A> newOperationState(
+                boolean read, ByteBuffer[] buffers, int offset, int length, BlockingMode block,
+                long timeout, TimeUnit unit, A attachment, CompletionCheck check,
+                CompletionHandler<Long, ? super A> handler, Semaphore semaphore,
+                SocketWrapperBase<NioChannel>.VectoredIOCompletionHandler<A> completion) {
+            return null;
+        }
     }
 }

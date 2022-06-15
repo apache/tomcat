@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
@@ -176,7 +175,8 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
      */
     @Override
     public int available() {
-        return 0;
+        // No data buffered here. Try the next filter in the chain.
+        return buffer.available();
     }
 
 

@@ -14,8 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
-
 package jakarta.servlet.jsp.tagext;
 
 /**
@@ -105,7 +103,7 @@ public abstract class TagExtraInfo {
      * @param data The TagData instance.
      * @return A null object, or zero length array if no errors, an
      *     array of ValidationMessages otherwise.
-     * @since 2.0
+     * @since JSP 2.0
      */
     public ValidationMessage[] validate( TagData data ) {
         ValidationMessage[] result = null;

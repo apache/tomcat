@@ -65,6 +65,15 @@
 </section>
 
 
+<section name="Known Issues">
+
+  <p>As of Java 17, the SecurityManager has been deprecated with the expectation
+  that it will be removed in a future Java version. Users currently using a
+  SecurityManager are recommended to start planning for its removal.</p>
+
+</section>
+
+
 <section name="Permissions">
 
   <p>Permission classes are used to define what Permissions a class loaded
@@ -115,10 +124,7 @@
   <p>The security policies implemented by the Java SecurityManager are
   configured in the <code>$CATALINA_BASE/conf/catalina.policy</code> file.
   This file completely replaces the <code>java.policy</code> file present
-  in your JDK system directories.  The <code>catalina.policy</code> file
-  can be edited by hand, or you can use the
-  <a href="http://docs.oracle.com/javase/6/docs/technotes/guides/security/PolicyGuide.html">policytool</a>
-  application that comes with Java 1.2 or later.</p>
+  in your JDK system directories.</p>
 
   <p>Entries in the <code>catalina.policy</code> file use the standard
   <code>java.policy</code> file format, as follows:</p>

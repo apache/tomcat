@@ -56,9 +56,14 @@ public final class IntrospectionUtils {
     @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value,
             boolean invokeSetProperty, StringBuilder actualMethod) {
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
+        }
+
+        if (actualMethod == null && XReflectionIntrospectionUtils.isEnabled()) {
+            return XReflectionIntrospectionUtils.setPropertyInternal(o, name, value, invokeSetProperty);
+        }
 
         String setter = "set" + capitalize(name);
 
@@ -125,8 +130,9 @@ public final class IntrospectionUtils {
                         try {
                             params[0] = InetAddress.getByName(value);
                         } catch (UnknownHostException exc) {
-                            if (log.isDebugEnabled())
+                            if (log.isDebugEnabled()) {
                                 log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
+                            }
                             ok = false;
                         }
                         if (actualMethod != null) {
@@ -134,9 +140,10 @@ public final class IntrospectionUtils {
                         }
                         // Unknown type
                     } else {
-                        if (log.isDebugEnabled())
+                        if (log.isDebugEnabled()) {
                             log.debug("IntrospectionUtils: Unknown type " +
                                     paramType.getName());
+                        }
                     }
 
                     if (ok) {
@@ -201,27 +208,32 @@ public final class IntrospectionUtils {
      */
     public static String escape(String s) {
 
-        if (s == null)
+        if (s == null) {
             return "";
+        }
 
         StringBuilder b = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c == '"')
+            if (c == '"') {
                 b.append('\\').append('"');
-            else if (c == '\\')
+            } else if (c == '\\') {
                 b.append('\\').append('\\');
-            else if (c == '\n')
+            } else if (c == '\n') {
                 b.append('\\').append('n');
-            else if (c == '\r')
+            } else if (c == '\r') {
                 b.append('\\').append('r');
-            else
+            } else {
                 b.append(c);
+            }
         }
         return b.toString();
     }
 
     public static Object getProperty(Object o, String name) {
+        if (XReflectionIntrospectionUtils.isEnabled()) {
+            return XReflectionIntrospectionUtils.getPropertyInternal(o, name);
+        }
         String getter = "get" + capitalize(name);
         String isGetter = "is" + capitalize(name);
 
@@ -285,8 +297,17 @@ public final class IntrospectionUtils {
     public static String replaceProperties(String value,
             Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
             ClassLoader classLoader) {
+            return replaceProperties(value, staticProp, dynamicProp, classLoader, 0);
+    }
 
-        if (value.indexOf('$') < 0) {
+    private static String replaceProperties(String value,
+            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
+            ClassLoader classLoader, int iterationCount) {
+        if (value == null || value.indexOf("${") < 0) {
+            return value;
+        }
+        if (iterationCount >=20) {
+            log.warn("System property failed to update and remains [" + value + "]");
             return value;
         }
         StringBuilder sb = new StringBuilder();
@@ -330,9 +351,20 @@ public final class IntrospectionUtils {
                 prev = endName + 1;
             }
         }
-        if (prev < value.length())
+        if (prev < value.length()) {
             sb.append(value.substring(prev));
-        return sb.toString();
+        }
+        String newval = sb.toString();
+        if (newval.indexOf("${") < 0) {
+            return newval;
+        }
+        if (newval.equals(value)) {
+            return value;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("IntrospectionUtils.replaceProperties iter on: " + newval);
+        }
+        return replaceProperties(newval, staticProp, dynamicProp, classLoader, iterationCount+1);
     }
 
     private static String getProperty(String name, Hashtable<Object, Object> staticProp,
@@ -379,8 +411,9 @@ public final class IntrospectionUtils {
 
     public static Method[] findMethods(Class<?> c) {
         Method methods[] = objectMethods.get(c);
-        if (methods != null)
+        if (methods != null) {
             return methods;
+        }
 
         methods = c.getMethods();
         objectMethods.put(c, methods);
@@ -420,20 +453,23 @@ public final class IntrospectionUtils {
         if (target == null || methodN == null || param1 == null) {
             throw new IllegalArgumentException(sm.getString("introspectionUtils.nullParameter"));
         }
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("IntrospectionUtils: callMethod1 " +
                     target.getClass().getName() + " " +
                     param1.getClass().getName() + " " + typeParam1);
+        }
 
         Class<?> params[] = new Class[1];
-        if (typeParam1 == null)
+        if (typeParam1 == null) {
             params[0] = param1.getClass();
-        else
+        } else {
             params[0] = cl.loadClass(typeParam1);
+        }
         Method m = findMethod(target.getClass(), methodN, params);
-        if (m == null)
+        if (m == null) {
             throw new NoSuchMethodException(target.getClass().getName() + " "
                     + methodN);
+        }
         try {
             return m.invoke(target, new Object[] { param1 });
         } catch (InvocationTargetException ie) {
@@ -447,9 +483,10 @@ public final class IntrospectionUtils {
         Method m = null;
         m = findMethod(target.getClass(), methodN, typeParams);
         if (m == null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("IntrospectionUtils: Can't find method " + methodN +
                         " in " + target + " CLASS " + target.getClass());
+            }
             return null;
         }
         try {
@@ -461,8 +498,9 @@ public final class IntrospectionUtils {
                 sb.append(target.getClass().getName()).append('.')
                         .append(methodN).append("( ");
                 for (int i = 0; i < params.length; i++) {
-                    if (i > 0)
+                    if (i > 0) {
                         sb.append(", ");
+                    }
                     sb.append(params[i]);
                 }
                 sb.append(")");
@@ -496,16 +534,18 @@ public final class IntrospectionUtils {
             try {
                 result = InetAddress.getByName(object);
             } catch (UnknownHostException exc) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("IntrospectionUtils: Unable to resolve host name:" +
                             object);
+                }
             }
 
             // Unknown type
         } else {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("IntrospectionUtils: Unknown type " +
                         paramType.getName());
+            }
         }
         if (result == null) {
             throw new IllegalArgumentException(sm.getString("introspectionUtils.conversionError", object, paramType.getName()));

@@ -51,22 +51,6 @@ public final class Globals {
 
 
     /**
-     * The request attribute used to expose the current connection ID associated
-     * with the request, if any. Used with multiplexing protocols such as
-     * HTTTP/2.
-     */
-    public static final String CONNECTION_ID = "org.apache.coyote.connectionID";
-
-
-    /**
-     * The request attribute used to expose the current stream ID associated
-     * with the request, if any. Used with multiplexing protocols such as
-     * HTTTP/2.
-     */
-    public static final String STREAM_ID = "org.apache.coyote.streamID";
-
-
-    /**
      * The request attribute that is set to {@code Boolean.TRUE} if some request
      * parameters have been ignored during request parameters parsing. It can
      * happen, for example, if there is a limit on the total count of parseable
@@ -271,8 +255,8 @@ public final class Globals {
     // -------------------------------------------------------- Global constants
 
     /**
-     * The master flag which controls strict servlet specification
-     * compliance.
+     * The flag which controls strict servlet specification compliance. Setting
+     * this flag to {@code true} will change the defaults for other settings.
      */
     public static final boolean STRICT_SERVLET_COMPLIANCE =
             Boolean.parseBoolean(System.getProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "false"));

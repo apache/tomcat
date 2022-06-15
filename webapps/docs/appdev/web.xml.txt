@@ -15,12 +15,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-
-<!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
-
-<web-app>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+  version="6.0">
 
 
     <!-- General description of your web application -->
@@ -53,7 +52,7 @@
     -->
 
     <context-param>
-      <param-name>webmaster</param-name>
+      <param-name>webadmin</param-name>
       <param-value>myaddress@mycompany.com</param-value>
       <description>
         The EMAIL address of the administrator to whom questions

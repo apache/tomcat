@@ -66,19 +66,29 @@ public abstract class MethodExpression extends Expression {
     }
 
     /**
-     * @since EL 2.2
+     * Obtain the {@link MethodReference} for the method to which this method
+     * expression resolves.
      *
-     * Note: The spelling mistake is deliberate.
-     * isParmetersProvided()  - Specification definition
-     * isParametersProvided() - Corrected spelling
+     * @param context The EL context for this evaluation
      *
-     * @return Always <code>false</code>
+     * @return This default implementation always returns <code>null</code>
      *
-     * @deprecated  Use {@link #isParametersProvided()}
+     * @throws NullPointerException
+     *              If the supplied context is <code>null</code>
+     * @throws PropertyNotFoundException
+     *              If a property/variable resolution failed because no match
+     *              was found or a match was found but was not readable
+     * @throws MethodNotFoundException
+     *              If no matching method can be found
+     * @throws ELException
+     *              Wraps any exception throw whilst resolving the property
+     *
+     * @since EL 5.0
      */
-    @Deprecated
-    public boolean isParmetersProvided() {
+    public MethodReference getMethodReference(ELContext context) {
         // Expected to be over-ridden by implementation
-        return false;
+        context.notifyBeforeEvaluation(getExpressionString());
+        context.notifyAfterEvaluation(getExpressionString());
+        return null;
     }
 }

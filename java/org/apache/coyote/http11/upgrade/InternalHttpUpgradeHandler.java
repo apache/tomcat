@@ -43,4 +43,8 @@ public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
     default boolean hasAsyncIO() {
         return false;
     }
+
+    default UpgradeInfo getUpgradeInfo() {
+        return null;
+    }
 }

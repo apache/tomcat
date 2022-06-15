@@ -26,4 +26,12 @@ Export-Package: \
     org.apache.el.stream,\
     org.apache.el.util
 
--includeresource.meta-inf: /META-INF/=../META-INF/jasper-el.jar/
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/jasper-el.jar/
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=jasper-el

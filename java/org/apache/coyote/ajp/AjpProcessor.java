@@ -23,6 +23,7 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
@@ -32,11 +33,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
@@ -669,6 +672,10 @@ public class AjpProcessor extends AbstractProcessor {
         requestHeaderMessage.getBytes(request.localName());
         request.setLocalPort(requestHeaderMessage.getInt());
 
+        if (socketWrapper != null) {
+            request.peerAddr().setString(socketWrapper.getRemoteAddr());
+        }
+
         boolean isSSL = requestHeaderMessage.getByte() != 0;
         if (isSSL) {
             request.scheme().setString("https");
@@ -1043,8 +1050,9 @@ public class AjpProcessor extends AbstractProcessor {
      */
     @Override
     protected final void finishResponse() throws IOException {
-        if (responseFinished)
+        if (responseFinished) {
             return;
+        }
 
         responseFinished = true;
 
@@ -1064,7 +1072,7 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void ack() {
+    protected final void ack(ContinueResponseTiming continueResponseTiming) {
         // NO-OP for AJP
     }
 
@@ -1087,7 +1095,7 @@ public class AjpProcessor extends AbstractProcessor {
         if (empty) {
             return 0;
         } else {
-            return bodyBytes.getByteChunk().getLength();
+            return request.getInputBuffer().available();
         }
     }
 
@@ -1174,10 +1182,7 @@ public class AjpProcessor extends AbstractProcessor {
                         jsseCerts = temp;
                     }
                 }
-            } catch (java.security.cert.CertificateException e) {
-                getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
-                return;
-            } catch (NoSuchProviderException e) {
+            } catch (CertificateException | NoSuchProviderException e) {
                 getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
                 return;
             }
@@ -1225,7 +1230,7 @@ public class AjpProcessor extends AbstractProcessor {
      *              called, should this call block until data becomes available?
      * @return  <code>true</code> if the requested number of bytes were read
      *          else <code>false</code>
-     * @throws IOException
+     * @throws IOException If an I/O error occurs during the read
      */
     private boolean read(byte[] buf, int pos, int n, boolean block) throws IOException {
         int read = socketWrapper.read(block, buf, pos, n);
@@ -1285,6 +1290,12 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
+    @Override
+    protected ServletConnection getServletConnection() {
+        return socketWrapper.getServletConnection("ajp", "");
+    }
+
+
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
     /**
@@ -1308,6 +1319,15 @@ public class AjpProcessor extends AbstractProcessor {
             handler.setByteBuffer(ByteBuffer.wrap(bc.getBuffer(), bc.getStart(), bc.getLength()));
             empty = true;
             return handler.getByteBuffer().remaining();
+        }
+
+        @Override
+        public int available() {
+            if (empty) {
+                return 0;
+            } else {
+                return bodyBytes.getByteChunk().getLength();
+            }
         }
     }
 

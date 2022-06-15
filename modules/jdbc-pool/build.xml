@@ -49,11 +49,12 @@
   <property name="final-src.name"        value="${project}-${version}-src" />
 
   <!-- Build Defaults -->
-  <property name="tomcat.pool" value="${basedir}/./output"/>
-  <property name="tomcat.build"      value="${tomcat.pool}/build"/>
-  <property name="tomcat.classes"    value="${tomcat.pool}/classes"/>
-  <property name="tomcat.api"    value="${tomcat.pool}/api"/>
+  <property name="tomcat.pool"           value="${basedir}/./output"/>
+  <property name="tomcat.build"          value="${tomcat.pool}/build"/>
+  <property name="tomcat.classes"        value="${tomcat.pool}/classes"/>
+  <property name="tomcat.api"            value="${tomcat.pool}/api"/>
   <property name="tomcat.testclasses"    value="${tomcat.pool}/testclasses"/>
+  <property name="tomcat.mbeans"         value="${tomcat.pool}/mbeans"/>
 
   <!-- JAR Artifacts -->
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
@@ -79,12 +80,15 @@
     <pathelement location="${h2.jar}"/>
   </path>
 
-  <fileset id="license.notice" dir="${basedir}">
+  <fileset id="license.notice" dir="${tomcat.pool}">
     <include name="NOTICE"/>
     <include name="LICENSE"/>
   </fileset>
 
   <!-- Version info filter set -->
+  <tstamp>
+    <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss"/>
+  </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
     <filter token="VERSION" value="${version}"/>
@@ -108,6 +112,15 @@
       </fileset>
       <filterset refid="version.filters"/>
     </copy>
+    <copy todir="${tomcat.mbeans}">
+      <fileset dir="${basedir}/src/main/java">
+        <include name="org/apache/tomcat/jdbc/**/*.xml" />
+      </fileset>
+    </copy>
+    <fixcrlf srcdir="${tomcat.pool}" includes="LICENSE,NOTICE" eol="lf"
+        encoding="UTF-8" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.mbeans}" eol="lf"
+        encoding="UTF-8" fixlast="false" />
   </target>
 
   <target name="javadoc" depends="prepare">
@@ -136,7 +149,9 @@
       <sourcepath location="${basedir}/src/main/java"/>
     </javadoc>
     <!-- connection pool API  file-->
-    <jar jarfile="${tomcat-jdbc-api.jar}" update="true">
+    <jar jarfile="${tomcat-jdbc-api.jar}"
+         update="true"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.api}"/>
       <fileset refid="license.notice"/>
     </jar>
@@ -148,8 +163,6 @@
     <javac srcdir="${basedir}/src/main/java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
            release="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="false">
@@ -158,13 +171,14 @@
     </javac>
 
     <!-- connection pool JAR File -->
-    <jar jarfile="${tomcat-jdbc.jar}" update="true" manifest="${tomcat.pool}/resources/MANIFEST.MF">
+    <jar jarfile="${tomcat-jdbc.jar}"
+         update="true"
+         manifest="${tomcat.pool}/resources/MANIFEST.MF"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
-      <fileset dir="${basedir}/src/main/java">
-        <include name="org/apache/tomcat/jdbc/**/*.xml" />
-      </fileset>
+      <fileset dir="${tomcat.mbeans}"/>
       <fileset refid="license.notice"/>
     </jar>
   </target>
@@ -185,8 +199,6 @@
     <javac srcdir="${basedir}/src/test/java" destdir="${tomcat.testclasses}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
            release="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="false">

@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
 import jakarta.servlet.http.HttpUpgradeHandler;
@@ -30,12 +29,14 @@ public final class UpgradeToken {
     private final ContextBind contextBind;
     private final HttpUpgradeHandler httpUpgradeHandler;
     private final InstanceManager instanceManager;
+    private final String protocol;
 
-    public UpgradeToken(HttpUpgradeHandler httpUpgradeHandler,
-            ContextBind contextBind, InstanceManager instanceManager) {
+    public UpgradeToken(HttpUpgradeHandler httpUpgradeHandler, ContextBind contextBind, InstanceManager instanceManager,
+            String protocol) {
         this.contextBind = contextBind;
         this.httpUpgradeHandler = httpUpgradeHandler;
         this.instanceManager = instanceManager;
+        this.protocol = protocol;
     }
 
     public final ContextBind getContextBind() {
@@ -50,4 +51,7 @@ public final class UpgradeToken {
         return instanceManager;
     }
 
+    public final String getProtocol() {
+        return protocol;
+    }
 }

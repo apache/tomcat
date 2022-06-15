@@ -117,30 +117,7 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
-    public Servlet getServlet(String name) throws ServletException {
-
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public Enumeration<Servlet> getServlets() {
-
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public Enumeration<String> getServletNames() {
-
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
     public void log(String msg) {
-        // NOOP
-    }
-
-    @Override
-    public void log(Exception exception, String msg) {
         // NOOP
     }
 

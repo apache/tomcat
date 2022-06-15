@@ -17,6 +17,7 @@
 package jakarta.el;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,7 +36,7 @@ public abstract class ELContext {
 
     private ImportHandler importHandler = null;
 
-    private List<EvaluationListener> listeners = new ArrayList<>();
+    private List<EvaluationListener> listeners;
 
     private Deque<Map<String,Object>> lambdaArguments = new LinkedList<>();
 
@@ -139,6 +140,10 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void addEvaluationListener(EvaluationListener listener) {
+        if (listeners == null) {
+            listeners = new ArrayList<>();
+        }
+
         listeners.add(listener);
     }
 
@@ -150,7 +155,7 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public List<EvaluationListener> getEvaluationListeners() {
-        return listeners;
+        return listeners == null ? Collections.emptyList() : listeners;
     }
 
     /**
@@ -161,6 +166,10 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void notifyBeforeEvaluation(String expression) {
+        if (listeners == null) {
+            return;
+        }
+
         for (EvaluationListener listener : listeners) {
             try {
                 listener.beforeEvaluation(this, expression);
@@ -179,6 +188,10 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void notifyAfterEvaluation(String expression) {
+        if (listeners == null) {
+            return;
+        }
+
         for (EvaluationListener listener : listeners) {
             try {
                 listener.afterEvaluation(this, expression);
@@ -198,6 +211,10 @@ public abstract class ELContext {
      * @since EL 3.0
      */
     public void notifyPropertyResolved(Object base, Object property) {
+        if (listeners == null) {
+            return;
+        }
+
         for (EvaluationListener listener : listeners) {
             try {
                 listener.propertyResolved(this, base, property);
@@ -272,6 +289,8 @@ public abstract class ELContext {
     /**
      * Coerce the supplied object to the requested type.
      *
+     * @param <T>  The type to which the object should be coerced
+     *
      * @param obj  The object to be coerced
      * @param type The type to which the object should be coerced
      *
@@ -282,14 +301,14 @@ public abstract class ELContext {
      *
      * @since EL 3.0
      */
-    public Object convertToType(Object obj, Class<?> type) {
+    public <T> T convertToType(Object obj, Class<T> type) {
 
         boolean originalResolved = isPropertyResolved();
         setPropertyResolved(false);
         try {
             ELResolver resolver = getELResolver();
             if (resolver != null) {
-                Object result = resolver.convertToType(this, obj, type);
+                T result = resolver.convertToType(this, obj, type);
                 if (isPropertyResolved()) {
                     return result;
                 }

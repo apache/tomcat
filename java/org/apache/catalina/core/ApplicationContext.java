@@ -139,18 +139,6 @@ public class ApplicationContext implements ServletContext {
 
 
     /**
-     * Empty String collection to serve as the basis for empty enumerations.
-     */
-    private static final List<String> emptyString = Collections.emptyList();
-
-
-    /**
-     * Empty Servlet collection to serve as the basis for empty enumerations.
-     */
-    private static final List<Servlet> emptyServlet = Collections.emptyList();
-
-
-    /**
      * The facade around this object.
      */
     private final ServletContext facade = new ApplicationContextFacade(this);
@@ -165,7 +153,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm = StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(ApplicationContext.class);
 
 
     /**
@@ -330,14 +318,17 @@ public class ApplicationContext implements ServletContext {
     @Override
     public String getMimeType(String file) {
 
-        if (file == null)
+        if (file == null) {
             return null;
+        }
         int period = file.lastIndexOf('.');
-        if (period < 0)
+        if (period < 0) {
             return null;
+        }
         String extension = file.substring(period + 1);
-        if (extension.length() < 1)
+        if (extension.length() < 1) {
             return null;
+        }
         return context.findMimeMapping(extension);
 
     }
@@ -353,13 +344,15 @@ public class ApplicationContext implements ServletContext {
     public RequestDispatcher getNamedDispatcher(String name) {
 
         // Validate the name argument
-        if (name == null)
+        if (name == null) {
             return null;
+        }
 
         // Create and return a corresponding request dispatcher
         Wrapper wrapper = (Wrapper) context.findChild(name);
-        if (wrapper == null)
+        if (wrapper == null) {
             return null;
+        }
 
         return new ApplicationDispatcher(wrapper, null, null, null, null, null, name);
 
@@ -511,7 +504,7 @@ public class ApplicationContext implements ServletContext {
     @Override
     public URL getResource(String path) throws MalformedURLException {
 
-        String validatedPath = validateResourcePath(path, false);
+        String validatedPath = validateResourcePath(path, !context.getContextGetResourceRequiresSlash());
 
         if (validatedPath == null) {
             throw new MalformedURLException(
@@ -530,7 +523,7 @@ public class ApplicationContext implements ServletContext {
     @Override
     public InputStream getResourceAsStream(String path) {
 
-        String validatedPath = validateResourcePath(path, false);
+        String validatedPath = validateResourcePath(path, !context.getContextGetResourceRequiresSlash());
 
         if (validatedPath == null) {
             return null;
@@ -549,20 +542,16 @@ public class ApplicationContext implements ServletContext {
      * Returns null if the input path is not valid or a path that will be
      * acceptable to resources.getResource().
      */
-    private String validateResourcePath(String path, boolean allowEmptyPath) {
+    private String validateResourcePath(String path, boolean addMissingInitialSlash) {
         if (path == null) {
             return null;
         }
 
-        if (path.length() == 0 && allowEmptyPath) {
-            return path;
-        }
-
         if (!path.startsWith("/")) {
-            if (context.getContextGetResourceRequiresSlash()) {
-                return null;
-            } else {
+            if (addMissingInitialSlash) {
                 return "/" + path;
+            } else {
+                return null;
             }
         }
 
@@ -597,42 +586,14 @@ public class ApplicationContext implements ServletContext {
 
 
     @Override
-    @Deprecated
-    public Servlet getServlet(String name) {
-        return null;
-    }
-
-
-    @Override
     public String getServletContextName() {
         return context.getDisplayName();
     }
 
 
     @Override
-    @Deprecated
-    public Enumeration<String> getServletNames() {
-        return Collections.enumeration(emptyString);
-    }
-
-
-    @Override
-    @Deprecated
-    public Enumeration<Servlet> getServlets() {
-        return Collections.enumeration(emptyServlet);
-    }
-
-
-    @Override
     public void log(String message) {
         context.getLogger().info(message);
-    }
-
-
-    @Override
-    @Deprecated
-    public void log(Exception exception, String message) {
-        context.getLogger().error(message, exception);
     }
 
 
@@ -1138,7 +1099,9 @@ public class ApplicationContext implements ServletContext {
             match = true;
         }
 
-        if (match) return;
+        if (match) {
+            return;
+        }
 
         if (t instanceof ServletContextListener) {
             throw new IllegalArgumentException(sm.getString(
@@ -1196,7 +1159,7 @@ public class ApplicationContext implements ServletContext {
         }
 
         for (String role : roleNames) {
-            if (role == null || "".equals(role)) {
+            if (role == null || role.isEmpty()) {
                 throw new IllegalArgumentException(
                         sm.getString("applicationContext.role.iae",
                                 getContextPath()));
@@ -1373,8 +1336,9 @@ public class ApplicationContext implements ServletContext {
      */
     void setAttributeReadOnly(String name) {
 
-        if (attributes.containsKey(name))
+        if (attributes.containsKey(name)) {
             readOnlyAttributes.put(name, name);
+        }
 
     }
 

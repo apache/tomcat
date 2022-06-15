@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ant.jmx;
 
 
@@ -113,8 +111,9 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
         if (result != null) {
             echoResult(attribute,result);
             createProperty(result);
-        } else
+        } else {
             error = "Attribute " + attribute + " is empty";
+        }
         return error;
     }
 }

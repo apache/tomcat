@@ -7,5 +7,5 @@ Specification-Title: Jakarta Servlet
 Specification-Version: @servlet.spec.version@
 Specification-Vendor: Eclipse Foundation
 Implementation-Title: jakarta.servlet
-Implementation-Version: @servlet.spec.version@.@servlet.revision@
+Implementation-Version: @servlet.spec.version@@servlet.revision@
 Implementation-Vendor: Apache Software Foundation

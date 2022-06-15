@@ -91,6 +91,13 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
      * @return - returns a constructor used to create new instances
      * @throws NoSuchMethodException Constructor not found
      */
+    /*
+     * Neither the class nor the constructor are exposed outside of jdbc-pool.
+     * Given the comments in the jdbc-pool code regarding caching for
+     * performance, continue to use Proxy.getProxyClass(). This will need to be
+     * revisited if that method is marked for removal.
+     */
+    @SuppressWarnings("deprecation")
     protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
         if (constructors[idx] == null) {
             Class<?> proxyClass = Proxy.getProxyClass(AbstractCreateStatementInterceptor.class.getClassLoader(),

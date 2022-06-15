@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.transport;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -84,7 +83,9 @@ public class RxTaskPool {
                     }
                 }
             }//while
-            if ( worker != null ) used.add(worker);
+            if ( worker != null ) {
+                used.add(worker);
+            }
         }
         return worker;
     }
@@ -103,8 +104,9 @@ public class RxTaskPool {
             synchronized (mutex) {
                 used.remove(worker);
                 //if ( idle.size() < minThreads && !idle.contains(worker)) idle.add(worker);
-                if ( idle.size() < maxTasks && !idle.contains(worker)) idle.add(worker); //let max be the upper limit
-                else {
+                if ( idle.size() < maxTasks && !idle.contains(worker)) {
+                    idle.add(worker); //let max be the upper limit
+                } else {
                     worker.close();
                 }
                 mutex.notifyAll();

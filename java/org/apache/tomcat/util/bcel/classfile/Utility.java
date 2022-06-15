@@ -44,12 +44,12 @@ final class Utility {
         return str.replace('/', '.'); // Is `/' on all systems, even DOS
     }
 
-    static String getClassName(final ConstantPool constant_pool, final int index) {
-        Constant c = constant_pool.getConstant(index, Const.CONSTANT_Class);
+    static String getClassName(final ConstantPool constantPool, final int index) {
+        Constant c = constantPool.getConstant(index, Const.CONSTANT_Class);
         int i = ((ConstantClass) c).getNameIndex();
 
         // Finally get the string from the constant pool
-        c = constant_pool.getConstant(i, Const.CONSTANT_Utf8);
+        c = constantPool.getConstant(i, Const.CONSTANT_Utf8);
         String name = ((ConstantUtf8) c).getBytes();
 
         return compactClassName(name);
@@ -59,19 +59,6 @@ final class Utility {
         int total = file.skipBytes(length);
         if (total != length) {
             throw new EOFException();
-        }
-    }
-
-    static void swallowFieldOrMethod(final DataInput file)
-            throws IOException {
-        // file.readUnsignedShort(); // Unused access flags
-        // file.readUnsignedShort(); // name index
-        // file.readUnsignedShort(); // signature index
-        skipFully(file, 6);
-
-        int attributes_count = file.readUnsignedShort();
-        for (int i = 0; i < attributes_count; i++) {
-            swallowAttribute(file);
         }
     }
 

@@ -42,13 +42,7 @@ public class JrePlatform {
             osName = System.getProperty(OS_NAME_PROPERTY);
         } else {
             osName = AccessController.doPrivileged(
-                    new PrivilegedAction<String>() {
-
-                    @Override
-                    public String run() {
-                        return System.getProperty(OS_NAME_PROPERTY);
-                    }
-                });
+                    (PrivilegedAction<String>) () -> System.getProperty(OS_NAME_PROPERTY));
         }
 
         IS_MAC_OS = osName.toLowerCase(Locale.ENGLISH).startsWith("mac os x");

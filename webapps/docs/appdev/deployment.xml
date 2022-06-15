@@ -53,8 +53,8 @@ distribute your application to be installed.</p>
 <p>The top-level directory of your web application hierarchy is also the
 <em>document root</em> of your application.  Here, you will place the HTML
 files and JSP pages that comprise your application's user interface.  When the
-system administrator deploys your application into a particular server, he
-or she assigns a <em>context path</em> to your application (a later section
+system administrator deploys your application into a particular server, they
+assign a <em>context path</em> to your application (a later section
 of this manual describes deployment on Tomcat).  Thus, if the
 system administrator assigns your application to the context path
 <code>/catalog</code>, then a request URI referring to
@@ -131,13 +131,13 @@ The location commonly used within a Tomcat installation for shared code is
 <strong>$CATALINA_HOME/lib</strong>. JAR files placed here are visible both to
 web applications and internal Tomcat code. This is a good place to put JDBC
 drivers that are required for both your application or internal Tomcat use
-(such as for a JDBCRealm).</p>
+(such as for a DataSourceRealm).</p>
 
 <p>Out of the box, a standard Tomcat installation includes a variety
 of pre-installed shared library files, including:</p>
 <ul>
-<li>The <em>Servlet 4.0</em> and <em>JSP 2.3</em> APIs that are fundamental
-    to writing servlets and JavaServer Pages.<br/><br/></li>
+<li>The <em>Servlet 6.0</em> and <em>JSP 3.1</em> APIs that are fundamental
+    to writing servlets and JSPs.<br/><br/></li>
 </ul>
 
 </section>

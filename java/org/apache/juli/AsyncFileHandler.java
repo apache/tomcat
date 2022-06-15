@@ -18,6 +18,7 @@ package org.apache.juli;
 
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.LogRecord;
 /**
  * A {@link FileHandler} implementation that uses a queue of log entries.
@@ -32,8 +33,6 @@ import java.util.logging.LogRecord;
  *    Default value: <code>1</code></li>
  *   <li><code>org.apache.juli.AsyncMaxRecordCount</code>
  *    Default value: <code>10000</code></li>
- *   <li><code>org.apache.juli.AsyncLoggerPollInterval</code>
- *    Default value: <code>1000</code></li>
  * </ul>
  *
  * <p>See the System Properties page in the configuration reference of Tomcat.</p>
@@ -47,7 +46,6 @@ public class AsyncFileHandler extends FileHandler {
 
     public static final int DEFAULT_OVERFLOW_DROP_TYPE = 1;
     public static final int DEFAULT_MAX_RECORDS        = 10000;
-    public static final int DEFAULT_LOGGER_SLEEP_TIME  = 1000;
 
     public static final int OVERFLOW_DROP_TYPE = Integer.parseInt(
             System.getProperty("org.apache.juli.AsyncOverflowDropType",
@@ -55,9 +53,6 @@ public class AsyncFileHandler extends FileHandler {
     public static final int MAX_RECORDS = Integer.parseInt(
             System.getProperty("org.apache.juli.AsyncMaxRecordCount",
                                Integer.toString(DEFAULT_MAX_RECORDS)));
-    public static final int LOGGER_SLEEP_TIME = Integer.parseInt(
-            System.getProperty("org.apache.juli.AsyncLoggerPollInterval",
-                               Integer.toString(DEFAULT_LOGGER_SLEEP_TIME)));
 
     protected static final LinkedBlockingDeque<LogEntry> queue =
             new LinkedBlockingDeque<>(MAX_RECORDS);
@@ -68,6 +63,7 @@ public class AsyncFileHandler extends FileHandler {
         logger.start();
     }
 
+    private final Object closeLock = new Object();
     protected volatile boolean closed = false;
 
     public AsyncFileHandler() {
@@ -87,7 +83,13 @@ public class AsyncFileHandler extends FileHandler {
         if (closed) {
             return;
         }
-        closed = true;
+        synchronized (closeLock) {
+            if (closed) {
+                return;
+            }
+            closed = true;
+        }
+        LoggerThread.deregisterHandler();
         super.close();
     }
 
@@ -96,7 +98,13 @@ public class AsyncFileHandler extends FileHandler {
         if (!closed) {
             return;
         }
-        closed = false;
+        synchronized (closeLock) {
+            if (!closed) {
+                return;
+            }
+            closed = false;
+        }
+        LoggerThread.registerHandler();
         super.open();
     }
 
@@ -146,6 +154,43 @@ public class AsyncFileHandler extends FileHandler {
     }
 
     protected static class LoggerThread extends Thread {
+
+        /*
+         * Implementation note: Use of this count could be extended to
+         * start/stop the LoggerThread but that would require careful locking as
+         * the current size of the queue also needs to be taken into account and
+         * there are lost of edge cases when rapidly starting and stopping
+         * handlers.
+         */
+        private static final AtomicInteger handlerCount = new AtomicInteger();
+
+        public static void registerHandler() {
+            handlerCount.incrementAndGet();
+        }
+
+        public static void deregisterHandler() {
+            int newCount = handlerCount.decrementAndGet();
+            if (newCount == 0) {
+                try {
+                    Thread dummyHook = new Thread();
+                    Runtime.getRuntime().addShutdownHook(dummyHook);
+                    Runtime.getRuntime().removeShutdownHook(dummyHook);
+                } catch (IllegalStateException ise) {
+                    // JVM is shutting down.
+                    // Allow up to 10s for for the queue to be emptied
+                    int sleepCount = 0;
+                    while (!AsyncFileHandler.queue.isEmpty() && sleepCount < 10000) {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
+                        sleepCount++;
+                    }
+                }
+            }
+        }
+
         public LoggerThread() {
             this.setDaemon(true);
             this.setName("AsyncFileHandlerWriter-" + System.identityHashCode(this));
@@ -155,10 +200,8 @@ public class AsyncFileHandler extends FileHandler {
         public void run() {
             while (true) {
                 try {
-                    LogEntry entry = queue.poll(LOGGER_SLEEP_TIME, TimeUnit.MILLISECONDS);
-                    if (entry != null) {
-                        entry.flush();
-                    }
+                    LogEntry entry = queue.take();
+                    entry.flush();
                 } catch (InterruptedException x) {
                     // Ignore the attempt to interrupt the thread.
                 } catch (Exception x) {

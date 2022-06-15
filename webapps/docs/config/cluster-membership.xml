@@ -179,6 +179,11 @@
   </subsection>
 
   <subsection name="Static Membership Attributes">
+
+    <p>When using the static membership service you must ensure that the
+    <code>channelStartOptions</code> attribute of the <code>Cluster</code>
+    element is set to the default value of <code>15</code>.</p>
+
     <attributes>
       <attribute name="className" required="true">
         <p>
@@ -231,7 +236,7 @@
     <p><b>LocalMember:</b> <br/>
     Static member that is the local member of the static cluster group.
     </p>
-    <p><strong>Note:</strong> In Tomcat 9.0.17 and later, The setting of local member is not required.
+    <p><strong>Note:</strong> The setting of local member is not required.
     It is possible to set up a list of all cluster members including local member instead of setting this components.
     </p>
     <attributes>
@@ -301,17 +306,7 @@
   </subsection>
 
   <subsection name="Setting">
-    <p><b>Before Tomcat 9.0.16</b> <br/>
-    <source><![CDATA[     <Membership className="org.apache.catalina.tribes.membership.StaticMembershipService">
-       <LocalMember className="org.apache.catalina.tribes.membership.StaticMember"
-                  uniqueId="{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}"/>
-       <Member className="org.apache.catalina.tribes.membership.StaticMember"
-                  port="4004"
-                  host="tomcat02.mydomain.com"
-                  uniqueId="{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1}"/>
-     </Membership>]]></source>
-     </p>
-     <p><b>Tomcat9.0.17 and later</b> <br/>
+     <p>
       <source><![CDATA[     <Membership className="org.apache.catalina.tribes.membership.StaticMembershipService">
        <Member className="org.apache.catalina.tribes.membership.StaticMember"
                   port="4004"

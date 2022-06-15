@@ -22,13 +22,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.AsyncContext;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
@@ -117,20 +121,57 @@ public class TestHttpServlet extends TomcatBaseTest {
 
 
     @Test
-    public void testChunkingWithHead() throws Exception {
+    public void testHeadWithChunking() throws Exception {
+        doTestHead(new ChunkingServlet());
+    }
+
+
+    @Test
+    public void testHeadWithResetBufferWriter() throws Exception {
+        doTestHead(new ResetBufferServlet(true));
+    }
+
+
+    @Test
+    public void testHeadWithResetBufferStream() throws Exception {
+        doTestHead(new ResetBufferServlet(false));
+    }
+
+
+    @Test
+    public void testHeadWithResetWriter() throws Exception {
+        doTestHead(new ResetServlet(true));
+    }
+
+
+    @Test
+    public void testHeadWithResetStream() throws Exception {
+        doTestHead(new ResetServlet(false));
+    }
+
+
+    @Test
+    public void testHeadWithNonBlocking() throws Exception {
+        // Less than buffer size
+        doTestHead(new NonBlockingWriteServlet(4 * 1024));
+    }
+
+
+    private void doTestHead(Servlet servlet) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
         StandardContext ctx = (StandardContext) tomcat.addContext("", null);
 
-        ChunkingServlet s = new ChunkingServlet();
-        Tomcat.addServlet(ctx, "ChunkingServlet", s);
-        ctx.addServletMappingDecoded("/chunking", "ChunkingServlet");
+        Wrapper w = Tomcat.addServlet(ctx, "TestServlet", servlet);
+        // Not all need/use this but it is simpler to set it for all
+        w.setAsyncSupported(true);
+        ctx.addServletMappingDecoded("/test", "TestServlet");
 
         tomcat.start();
 
         Map<String,List<String>> getHeaders = new CaseInsensitiveKeyMap<>();
-        String path = "http://localhost:" + getPort() + "/chunking";
+        String path = "http://localhost:" + getPort() + "/test";
         ByteChunk out = new ByteChunk();
 
         int rc = getUrl(path, out, getHeaders);
@@ -213,7 +254,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
 
     /*
-     * See org.aoache.coyote.http2.TestHttpServlet for the HTTP/2 version of
+     * See org.apache.coyote.http2.TestHttpServlet for the HTTP/2 version of
      * this test. It was placed in that package because it needed access to
      * package private classes.
      */
@@ -338,6 +379,125 @@ public class TestHttpServlet extends TomcatBaseTest {
             // Trigger chunking
             pw.write(new char[8192 * 16]);
             pw.println("Data");
+        }
+    }
+
+
+    private static class ResetBufferServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final boolean useWriter;
+
+        public ResetBufferServlet(boolean useWriter) {
+            this.useWriter = useWriter;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            if (useWriter) {
+                PrintWriter pw = resp.getWriter();
+                pw.write(new char[4 * 1024]);
+                resp.resetBuffer();
+                pw.write(new char[4 * 1024]);
+            } else {
+                ServletOutputStream sos = resp.getOutputStream();
+                sos.write(new byte [4 * 1024]);
+                resp.resetBuffer();
+                sos.write(new byte [4 * 1024]);
+            }
+        }
+    }
+
+
+    private static class ResetServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final boolean useWriter;
+
+        public ResetServlet(boolean useWriter) {
+            this.useWriter = useWriter;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            if (useWriter) {
+                PrintWriter pw = resp.getWriter();
+                resp.addHeader("aaa", "bbb");
+                pw.write(new char[4 * 1024]);
+                resp.resetBuffer();
+                resp.addHeader("ccc", "ddd");
+                pw.write(new char[4 * 1024]);
+            } else {
+                ServletOutputStream sos = resp.getOutputStream();
+                resp.addHeader("aaa", "bbb");
+                sos.write(new byte [4 * 1024]);
+                resp.resetBuffer();
+                resp.addHeader("ccc", "ddd");
+                sos.write(new byte [4 * 1024]);
+            }
+        }
+    }
+
+
+    private static class NonBlockingWriteServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final int bytesToWrite;
+
+        public NonBlockingWriteServlet(int bytesToWrite) {
+            this.bytesToWrite = bytesToWrite;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            AsyncContext ac = req.startAsync(req, resp);
+            ac.setTimeout(3000);
+            WriteListener wListener = new NonBlockingWriteListener(ac, bytesToWrite);
+            resp.getOutputStream().setWriteListener(wListener);
+        }
+
+        private static class NonBlockingWriteListener implements WriteListener {
+
+            private final AsyncContext ac;
+            private final ServletOutputStream sos;
+            private int bytesToWrite;
+
+            public NonBlockingWriteListener(AsyncContext ac, int bytesToWrite) throws IOException {
+                this.ac = ac;
+                this.sos = ac.getResponse().getOutputStream();
+                this.bytesToWrite = bytesToWrite;
+            }
+
+            @Override
+            public void onWritePossible() throws IOException {
+                do {
+                    // Write up to 1k a time
+                    int bytesThisTime = Math.min(bytesToWrite, 1024);
+                    sos.write(new byte[bytesThisTime]);
+                    bytesToWrite -= bytesThisTime;
+                } while (sos.isReady() && bytesToWrite > 0);
+
+                if (sos.isReady() && bytesToWrite == 0) {
+                    ac.complete();
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                throwable.printStackTrace();
+            }
         }
     }
 

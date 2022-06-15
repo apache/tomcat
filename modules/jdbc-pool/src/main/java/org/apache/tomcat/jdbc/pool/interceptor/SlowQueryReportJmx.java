@@ -144,7 +144,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     @Override
     protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
         query = super.reportFailedQuery(query, args, name, start, t);
-        if (isLogFailed()) notifyJmx(query,FAILED_QUERY_NOTIFICATION);
+        if (isLogFailed()) {
+          notifyJmx(query,FAILED_QUERY_NOTIFICATION);
+        }
         return query;
     }
 
@@ -178,7 +180,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     @Override
     protected String reportSlowQuery(String query, Object[] args, String name, long start, long delta) {
         query = super.reportSlowQuery(query, args, name, start, delta);
-        if (isLogSlow()) notifyJmx(query,SLOW_QUERY_NOTIFICATION);
+        if (isLogSlow()) {
+          notifyJmx(query,SLOW_QUERY_NOTIFICATION);
+        }
         return query;
     }
 
@@ -215,7 +219,9 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         ConcurrentHashMap<String,QueryStats> queries = perPoolStats.get(poolName);
         if (queries!=null) {
             Iterator<String> it = queries.keySet().iterator();
-            while (it.hasNext()) it.remove();
+            while (it.hasNext()) {
+              it.remove();
+            }
         }
     }
 

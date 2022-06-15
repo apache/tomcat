@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.io;
 
 import java.io.ByteArrayInputStream;
@@ -111,14 +110,17 @@ public class XByteBuffer implements Serializable {
     }
 
     public void setLength(int size) {
-        if ( size > buf.length ) throw new ArrayIndexOutOfBoundsException(sm.getString("xByteBuffer.size.larger.buffer"));
+        if ( size > buf.length ) {
+            throw new ArrayIndexOutOfBoundsException(sm.getString("xByteBuffer.size.larger.buffer"));
+        }
         bufSize = size;
     }
 
     public void trim(int length) {
-        if ( (bufSize - length) < 0 )
+        if ( (bufSize - length) < 0 ) {
             throw new ArrayIndexOutOfBoundsException(sm.getString("xByteBuffer.unableTrim",
                     Integer.toString(bufSize), Integer.toString(length)));
+        }
         bufSize -= length;
     }
 
@@ -271,25 +273,33 @@ public class XByteBuffer implements Serializable {
             int index = XByteBuffer.firstIndexOf(buf,start,START_DATA);
             //if the header (START_DATA) isn't the first thing or
             //the buffer isn't even 14 bytes
-            if ( index != start || ((bufSize-start)<14) ) break;
+            if ( index != start || ((bufSize-start)<14) ) {
+                break;
+            }
             //next 4 bytes are compress flag not needed for count packages
             //then get the size 4 bytes
             int size = toInt(buf, pos);
             //now the total buffer has to be long enough to hold
             //START_DATA.length+4+size+END_DATA.length
             pos = start + START_DATA.length + 4 + size;
-            if ( (pos + END_DATA.length) > bufSize) break;
+            if ( (pos + END_DATA.length) > bufSize) {
+                break;
+            }
             //and finally check the footer of the package END_DATA
             int newpos = firstIndexOf(buf, pos, END_DATA);
             //mismatch, there is no package
-            if (newpos != pos) break;
+            if (newpos != pos) {
+                break;
+            }
             //increase the packet count
             cnt++;
             //reset the values
             start = pos + END_DATA.length;
             pos = start + START_DATA.length;
             //we only want to verify that we have at least one package
-            if ( first ) break;
+            if ( first ) {
+                break;
+            }
         }
         return cnt;
     }
@@ -497,9 +507,15 @@ public class XByteBuffer implements Serializable {
      */
     public static int firstIndexOf(byte[] src, int srcOff, byte[] find){
         int result = -1;
-        if (find.length > src.length) return result;
-        if (find.length == 0 || src.length == 0) return result;
-        if (srcOff >= src.length ) throw new java.lang.ArrayIndexOutOfBoundsException();
+        if (find.length > src.length) {
+            return result;
+        }
+        if (find.length == 0 || src.length == 0) {
+            return result;
+        }
+        if (srcOff >= src.length ) {
+            throw new java.lang.ArrayIndexOutOfBoundsException();
+        }
         boolean found = false;
         int srclen = src.length;
         int findlen = find.length;
@@ -508,17 +524,20 @@ public class XByteBuffer implements Serializable {
         while (!found) {
             //find the first byte
             while (pos < srclen){
-                if (first == src[pos])
+                if (first == src[pos]) {
                     break;
+                }
                 pos++;
             }
-            if (pos >= srclen)
+            if (pos >= srclen) {
                 return -1;
+            }
 
             //we found the first character
             //match the rest of the bytes - they have to match
-            if ( (srclen - pos) < findlen)
+            if ( (srclen - pos) < findlen) {
                 return -1;
+            }
             //assume it does exist
             found = true;
             for (int i = 1; ( (i < findlen) && found); i++) {
@@ -552,7 +571,9 @@ public class XByteBuffer implements Serializable {
         throws IOException, ClassNotFoundException, ClassCastException {
         invokecount.addAndGet(1);
         Object message = null;
-        if ( cls == null ) cls = new ClassLoader[0];
+        if ( cls == null ) {
+            cls = new ClassLoader[0];
+        }
         if (data != null && length > 0) {
             InputStream  instream = new ByteArrayInputStream(data,offset,length);
             ObjectInputStream stream = null;
@@ -563,9 +584,9 @@ public class XByteBuffer implements Serializable {
         }
         if ( message == null ) {
             return null;
-        } else if (message instanceof Serializable)
+        } else if (message instanceof Serializable) {
             return (Serializable) message;
-        else {
+        } else {
             throw new ClassCastException(sm.getString("xByteBuffer.wrong.class", message.getClass().getName()));
         }
     }

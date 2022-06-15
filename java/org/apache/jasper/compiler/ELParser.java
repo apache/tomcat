@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import org.apache.jasper.JasperException;
@@ -141,7 +140,7 @@ public class ELParser {
     }
 
     /**
-     * Parse for a function FunctionInvokation ::= (identifier ':')? identifier
+     * Parse for a function FunctionInvocation ::= (identifier ':')? identifier
      * '(' (Expression (,Expression)*)? ')' Note: currently we don't parse
      * arguments
      */
@@ -237,7 +236,8 @@ public class ELParser {
      * for $ and # is optional.
      *
      * @param input Non-EL input to be escaped
-     * @param isDeferredSyntaxAllowedAsLiteral
+     * @param isDeferredSyntaxAllowedAsLiteral Flag that indicates if deferred
+     *          syntax (#{) is allowed as a literal.\
      *
      * @return The escaped version of the input
      */
@@ -407,8 +407,9 @@ public class ELParser {
         int start = index;
         while (hasNextChar()) {
             char c = expression.charAt(index);
-            if (c > ' ')
+            if (c > ' ') {
                 break;
+            }
             index++;
         }
         whiteSpace = expression.substring(start, index);

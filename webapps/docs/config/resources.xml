@@ -180,8 +180,8 @@
 
   <p>A web application&apos;s main resources are defined by the
   <strong>docBase</strong> defined for the <a href="context.html">Context</a>.
-  Additional resources may be made available to the web application by defining
-  one or more nested components.</p>
+  Additional configuration settings and/or resources may be made available to
+  the web application by defining one or more nested components.</p>
 
   <h3>PreResources</h3>
 
@@ -322,6 +322,23 @@
   mapped to <code>/WEB-INF/classes</code> rather than using a
   <code>FileResourceSet</code> mapped to <code>/WEB-INF/lib</code>.
   </p>
+
+  <h3>Cache Strategy</h3>
+
+  <p>Additional control over the caching of static resources can be obtained by
+     configuring a custom cache strategy. To configure a custom cache strategy,
+     nest a &lt;CacheStrategy&gt; element inside the &lt;Resources&gt; element
+     with the following attributes:</p>
+
+  <attributes>
+
+    <attribute name="className" required="true">
+      <p>Java class name of the implementation to use. This class must implement
+      the <code>org.apache.catalina.WebResourceRoot$CacheStrategy</code>
+      interface.</p>
+    </attribute>
+
+  </attributes>
 
 </section>
 

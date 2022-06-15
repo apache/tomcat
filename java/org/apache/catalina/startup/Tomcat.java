@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Stack;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -153,7 +152,7 @@ import org.apache.tomcat.util.res.StringManager;
  * see setters for doc. It can be used for simple tests and
  * demo.
  *
- * @see <a href="https://svn.apache.org/repos/asf/tomcat/trunk/test/org/apache/catalina/startup/TestTomcat.java">TestTomcat</a>
+ * @see <a href="https://gitbox.apache.org/repos/asf?p=tomcat.git;a=blob;f=test/org/apache/catalina/startup/TestTomcat.java">TestTomcat</a>
  * @author Costin Manolache
  */
 public class Tomcat {
@@ -552,9 +551,7 @@ public class Tomcat {
             return service.findConnectors()[0];
         }
         // The same as in standard Tomcat configuration.
-        // This creates an APR HTTP connector if AprLifecycleListener has been
-        // configured (created) and Tomcat Native library is available.
-        // Otherwise it creates a NIO HTTP connector.
+        // This creates a NIO HTTP connector.
         Connector connector = new Connector("HTTP/1.1");
         connector.setPort(port);
         service.addConnector(connector);
@@ -988,9 +985,9 @@ public class Tomcat {
         loggerName.append("].[");
         // Context name
         if (contextName == null || contextName.equals("")) {
-            loggerName.append("/");
+            loggerName.append('/');
         } else if (contextName.startsWith("##")) {
-            loggerName.append("/");
+            loggerName.append('/');
             loggerName.append(contextName);
         }
         loggerName.append(']');
@@ -1011,6 +1008,7 @@ public class Tomcat {
      * @return newly created {@link Context}
      */
     private Context createContext(Host host, String url) {
+        String defaultContextClass = StandardContext.class.getName();
         String contextClass = StandardContext.class.getName();
         if (host == null) {
             host = this.getHost();
@@ -1019,8 +1017,13 @@ public class Tomcat {
             contextClass = ((StandardHost) host).getContextClass();
         }
         try {
-            return (Context) Class.forName(contextClass).getConstructor()
+            if (defaultContextClass.equals(contextClass)) {
+                return new StandardContext();
+            } else {
+                return (Context) Class.forName(contextClass).getConstructor()
                     .newInstance();
+            }
+
         } catch (ReflectiveOperationException  | IllegalArgumentException | SecurityException e) {
             throw new IllegalArgumentException(sm.getString("tomcat.noContextClass", contextClass, host, url), e);
         }
@@ -1195,13 +1198,8 @@ public class Tomcat {
     public static class ExistingStandardWrapper extends StandardWrapper {
         private final Servlet existing;
 
-        @SuppressWarnings("deprecation")
         public ExistingStandardWrapper( Servlet existing ) {
             this.existing = existing;
-            if (existing instanceof jakarta.servlet.SingleThreadModel) {
-                singleThreadModel = true;
-                instancePool = new Stack<>();
-            }
             this.asyncSupported = hasAsync(existing);
         }
 
@@ -1217,22 +1215,11 @@ public class Tomcat {
 
         @Override
         public synchronized Servlet loadServlet() throws ServletException {
-            if (singleThreadModel) {
-                Servlet instance;
-                try {
-                    instance = existing.getClass().getConstructor().newInstance();
-                } catch (ReflectiveOperationException e) {
-                    throw new ServletException(e);
-                }
-                instance.init(facade);
-                return instance;
-            } else {
-                if (!instanceInitialized) {
-                    existing.init(facade);
-                    instanceInitialized = true;
-                }
-                return existing;
+            if (!instanceInitialized) {
+                existing.init(facade);
+                instanceInitialized = true;
             }
+            return existing;
         }
         @Override
         public long getAvailable() {

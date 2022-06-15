@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import org.junit.Assert;
@@ -24,105 +23,23 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Tests are duplicated in {@link TestParser} with the strict whitespace parsing
- * enabled by default.
+ * Tests duplicate those in {@link TestParser} where the strict whitespace
+ * parsing is enabled by default. Strict whitespace parsing is disabled for
+ * these tests in web.xml.
  */
 public class TestParserNoStrictWhitespace extends TomcatBaseTest {
-
-    @Override
-    public void setUp() throws Exception {
-        System.setProperty(
-                "org.apache.jasper.compiler.Parser.STRICT_WHITESPACE",
-                "false");
-        super.setUp();
-    }
-
-    @Test
-    public void testBug48627() throws Exception {
-        getTomcatInstanceTestWebapp(false, true);
-
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48nnn/bug48627.jsp");
-
-        String result = res.toString();
-        // Beware of the differences between escaping in JSP attributes and
-        // in Java Strings
-        assertEcho(result, "00-\\");
-        assertEcho(result, "01-\\");
-    }
-
-    @Test
-    public void testBug48668a() throws Exception {
-        getTomcatInstanceTestWebapp(false, true);
-
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48nnn/bug48668a.jsp");
-        String result = res.toString();
-        assertEcho(result, "00-Hello world</p>#{foo.bar}");
-        assertEcho(result, "01-Hello world</p>${foo.bar}");
-        assertEcho(result, "10-Hello ${'foo.bar}");
-        assertEcho(result, "11-Hello ${'foo.bar}");
-        assertEcho(result, "12-Hello #{'foo.bar}");
-        assertEcho(result, "13-Hello #{'foo.bar}");
-        assertEcho(result, "14-Hello ${'foo}");
-        assertEcho(result, "15-Hello ${'foo}");
-        assertEcho(result, "16-Hello #{'foo}");
-        assertEcho(result, "17-Hello #{'foo}");
-        assertEcho(result, "18-Hello ${'foo.bar}");
-        assertEcho(result, "19-Hello ${'foo.bar}");
-        assertEcho(result, "20-Hello #{'foo.bar}");
-        assertEcho(result, "21-Hello #{'foo.bar}");
-        assertEcho(result, "30-Hello ${'foo}");
-        assertEcho(result, "31-Hello ${'foo}");
-        assertEcho(result, "32-Hello #{'foo}");
-        assertEcho(result, "33-Hello #{'foo}");
-        assertEcho(result, "34-Hello ${'foo}");
-        assertEcho(result, "35-Hello ${'foo}");
-        assertEcho(result, "36-Hello #{'foo}");
-        assertEcho(result, "37-Hello #{'foo}");
-        assertEcho(result, "40-Hello ${'foo}");
-        assertEcho(result, "41-Hello ${'foo}");
-        assertEcho(result, "42-Hello #{'foo}");
-        assertEcho(result, "43-Hello #{'foo}");
-        assertEcho(result, "50-Hello ${'foo}");
-        assertEcho(result, "51-Hello ${'foo}");
-        assertEcho(result, "52-Hello #{'foo}");
-        assertEcho(result, "53-Hello #{'foo}");
-    }
-
-    @Test
-    public void testBug48668b() throws Exception {
-        getTomcatInstanceTestWebapp(false, true);
-
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug48nnn/bug48668b.jsp");
-        String result = res.toString();
-        assertEcho(result, "00-Hello world</p>#{foo.bar}");
-        assertEcho(result, "01-Hello world</p>#{foo2");
-    }
 
     @Test
     public void testBug49297NoSpaceNotStrict() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = new ByteChunk();
-        int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297NoSpace.jsp", res, null);
-
+        int sc = getUrl("http://localhost:" + getPort() + "/test/bug49nnn/bug49297NoSpace.jsp", res, null);
 
         Assert.assertEquals(200, sc);
         assertEcho(res.toString(), "Hello World");
     }
 
-    @Test
-    public void testBug49297DuplicateAttr() throws Exception {
-        getTomcatInstanceTestWebapp(false, true);
-
-        int sc = getUrl("http://localhost:" + getPort() +
-                "/test/bug49nnn/bug49297DuplicateAttr.jsp", new ByteChunk(), null);
-
-        Assert.assertEquals(500, sc);
-    }
 
     /** Assertion for text printed by tags:echo */
     private static void assertEcho(String result, String expected) {

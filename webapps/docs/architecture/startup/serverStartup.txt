@@ -45,7 +45,7 @@ What it does:
             Configures a digester for the main server.xml elements like
             org.apache.catalina.core.StandardServer (can change of course :)
             org.apache.catalina.deploy.NamingResources
-                Stores naming resources in the J2EE JNDI tree
+                Stores naming resources in the Jakarta EE JNDI tree
             org.apache.catalina.LifecycleListener
                 implements events for start/stop of major components
             org.apache.catalina.core.StandardService

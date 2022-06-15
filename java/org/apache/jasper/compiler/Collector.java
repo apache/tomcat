@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import org.apache.jasper.JasperException;
@@ -161,8 +160,9 @@ class Collector {
 
         @Override
         public void visit(Node.JspElement n) throws JasperException {
-            if (n.getNameAttribute().isExpression())
+            if (n.getNameAttribute().isExpression()) {
                 scriptingElementSeen = true;
+            }
 
             Node.JspAttribute[] attrs = n.getJspAttributes();
             for (Node.JspAttribute attr : attrs) {

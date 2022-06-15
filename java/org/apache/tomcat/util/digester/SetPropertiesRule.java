@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.digester;
 
 
@@ -85,7 +83,7 @@ public class SetPropertiesRule extends Rule {
 
         for (int i = 0; i < attributes.getLength(); i++) {
             String name = attributes.getLocalName(i);
-            if ("".equals(name)) {
+            if (name.isEmpty()) {
                 name = attributes.getQName(i);
             }
             String value = attributes.getValue(i);
@@ -95,8 +93,7 @@ public class SetPropertiesRule extends Rule {
                         "} Setting property '" + name + "' to '" +
                         value + "'");
             }
-            if (!digester.isFakeAttribute(top, name)
-                    && (excludes == null || (excludes != null && !excludes.containsKey(name)))) {
+            if (!digester.isFakeAttribute(top, name) && (excludes == null || !excludes.containsKey(name))) {
                 StringBuilder actualMethod = null;
                 if (code != null) {
                     actualMethod = new StringBuilder();
@@ -107,7 +104,7 @@ public class SetPropertiesRule extends Rule {
                     }
                 } else {
                     if (code != null) {
-                        code.append(variableName).append(".").append(actualMethod).append(";");
+                        code.append(variableName).append(".").append(actualMethod).append(';');
                         code.append(System.lineSeparator());
                     }
                 }
@@ -131,8 +128,6 @@ public class SetPropertiesRule extends Rule {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("SetPropertiesRule[");
-        sb.append("]");
-        return sb.toString();
+        return "SetPropertiesRule[]";
     }
 }

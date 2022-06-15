@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.el;
 
 import java.beans.FeatureDescriptor;
@@ -58,6 +57,10 @@ public class ResourceBundleELResolver extends ELResolver {
 
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(base, property);
+            /*
+             * ResourceBundles are always read-only so fall-through to return
+             * null
+             */
         }
 
         return null;
@@ -71,7 +74,7 @@ public class ResourceBundleELResolver extends ELResolver {
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(base, property);
             throw new PropertyNotWritableException(Util.message(context,
-                    "resolverNotWriteable", base.getClass().getName()));
+                    "resolverNotWritable", base.getClass().getName()));
         }
     }
 
@@ -87,6 +90,7 @@ public class ResourceBundleELResolver extends ELResolver {
         return false;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(
             ELContext context, Object base) {

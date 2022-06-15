@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ServletContext;
@@ -186,6 +187,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 majorVersion = 5;
                 minorVersion = 0;
                 break;
+            case "6.0":
+                majorVersion = 6;
+                minorVersion = 0;
+                break;
             default:
                 log.warn(sm.getString("webXml.version.unknown", version));
         }
@@ -237,7 +242,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
     // Derived major and minor version attributes
-    private int majorVersion = 5;
+    private int majorVersion = 6;
     private int minorVersion = 0;
     public int getMajorVersion() { return majorVersion; }
     public int getMinorVersion() { return minorVersion; }
@@ -752,6 +757,12 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             } else if ("4.0".equals(version)) {
                 javaeeNamespace = XmlIdentifiers.JAVAEE_8_NS;
                 webXmlSchemaLocation = XmlIdentifiers.WEB_40_XSD;
+            } else if ("5.0".equals(version)) {
+                javaeeNamespace = XmlIdentifiers.JAKARTAEE_9_NS;
+                webXmlSchemaLocation = XmlIdentifiers.WEB_50_XSD;
+            } else if ("6.0".equals(version)) {
+                javaeeNamespace = XmlIdentifiers.JAKARTAEE_10_NS;
+                webXmlSchemaLocation = XmlIdentifiers.WEB_60_XSD;
             }
             sb.append("<web-app xmlns=\"");
             sb.append(javaeeNamespace);
@@ -760,7 +771,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             sb.append("\"http://www.w3.org/2001/XMLSchema-instance\"\n");
             sb.append("         xsi:schemaLocation=\"");
             sb.append(javaeeNamespace);
-            sb.append(" ");
+            sb.append(' ');
             sb.append(webXmlSchemaLocation);
             sb.append("\"\n");
             sb.append("         version=\"");
@@ -1416,7 +1427,9 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     private static void appendElement(StringBuilder sb, String indent,
             String elementName, Object value) {
-        if (value == null) return;
+        if (value == null) {
+            return;
+        }
         appendElement(sb, indent, elementName, value.toString());
     }
 
@@ -1767,138 +1780,32 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             sessionConfig.setCookieName(
                     temp.getSessionConfig().getCookieName());
         }
-        if (sessionConfig.getCookieDomain() == null) {
-            for (WebXml fragment : fragments) {
-                String value = fragment.getSessionConfig().getCookieDomain();
-                if (value != null) {
-                    if (temp.getSessionConfig().getCookieDomain() == null) {
-                        temp.getSessionConfig().setCookieDomain(value);
-                    } else if (value.equals(
-                            temp.getSessionConfig().getCookieDomain())) {
-                        // Fragments use same value - no conflict
+
+        Map<String,String> mainAttributes = getSessionConfig().getCookieAttributes();
+        Map<String,String> mergedFragmentAttributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (WebXml fragment : fragments) {
+            for (Map.Entry<String,String> attribute : fragment.getSessionConfig().getCookieAttributes().entrySet()) {
+                // Skip any attribute in a fragment that is defined in the main web.xml
+                if (!mainAttributes.containsKey(attribute.getKey())) {
+                    if (mergedFragmentAttributes.containsKey(attribute.getKey())) {
+                        // Attribute has already been seen.
+                        // If values are the same, NO-OP. If they are different
+                        // trigger a merge error
+                        if (!mergedFragmentAttributes.get(attribute.getKey()).equals(attribute.getValue())) {
+                            log.error(sm.getString(
+                                    "webXml.mergeConflictSessionCookieAttributes",
+                                    fragment.getName(),
+                                    fragment.getURL()));
+                            return false;
+                        }
                     } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictSessionCookieDomain",
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
+                        // First time this attribute has been seen. Add it.
+                        mergedFragmentAttributes.put(attribute.getKey(), attribute.getValue());
                     }
                 }
             }
-            sessionConfig.setCookieDomain(
-                    temp.getSessionConfig().getCookieDomain());
         }
-        if (sessionConfig.getCookiePath() == null) {
-            for (WebXml fragment : fragments) {
-                String value = fragment.getSessionConfig().getCookiePath();
-                if (value != null) {
-                    if (temp.getSessionConfig().getCookiePath() == null) {
-                        temp.getSessionConfig().setCookiePath(value);
-                    } else if (value.equals(
-                            temp.getSessionConfig().getCookiePath())) {
-                        // Fragments use same value - no conflict
-                    } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictSessionCookiePath",
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
-                    }
-                }
-            }
-            sessionConfig.setCookiePath(
-                    temp.getSessionConfig().getCookiePath());
-        }
-        if (sessionConfig.getCookieComment() == null) {
-            for (WebXml fragment : fragments) {
-                String value = fragment.getSessionConfig().getCookieComment();
-                if (value != null) {
-                    if (temp.getSessionConfig().getCookieComment() == null) {
-                        temp.getSessionConfig().setCookieComment(value);
-                    } else if (value.equals(
-                            temp.getSessionConfig().getCookieComment())) {
-                        // Fragments use same value - no conflict
-                    } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictSessionCookieComment",
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
-                    }
-                }
-            }
-            sessionConfig.setCookieComment(
-                    temp.getSessionConfig().getCookieComment());
-        }
-        if (sessionConfig.getCookieHttpOnly() == null) {
-            for (WebXml fragment : fragments) {
-                Boolean value = fragment.getSessionConfig().getCookieHttpOnly();
-                if (value != null) {
-                    if (temp.getSessionConfig().getCookieHttpOnly() == null) {
-                        temp.getSessionConfig().setCookieHttpOnly(value.toString());
-                    } else if (value.equals(
-                            temp.getSessionConfig().getCookieHttpOnly())) {
-                        // Fragments use same value - no conflict
-                    } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictSessionCookieHttpOnly",
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
-                    }
-                }
-            }
-            if (temp.getSessionConfig().getCookieHttpOnly() != null) {
-                sessionConfig.setCookieHttpOnly(
-                        temp.getSessionConfig().getCookieHttpOnly().toString());
-            }
-        }
-        if (sessionConfig.getCookieSecure() == null) {
-            for (WebXml fragment : fragments) {
-                Boolean value = fragment.getSessionConfig().getCookieSecure();
-                if (value != null) {
-                    if (temp.getSessionConfig().getCookieSecure() == null) {
-                        temp.getSessionConfig().setCookieSecure(value.toString());
-                    } else if (value.equals(
-                            temp.getSessionConfig().getCookieSecure())) {
-                        // Fragments use same value - no conflict
-                    } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictSessionCookieSecure",
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
-                    }
-                }
-            }
-            if (temp.getSessionConfig().getCookieSecure() != null) {
-                sessionConfig.setCookieSecure(
-                        temp.getSessionConfig().getCookieSecure().toString());
-            }
-        }
-        if (sessionConfig.getCookieMaxAge() == null) {
-            for (WebXml fragment : fragments) {
-                Integer value = fragment.getSessionConfig().getCookieMaxAge();
-                if (value != null) {
-                    if (temp.getSessionConfig().getCookieMaxAge() == null) {
-                        temp.getSessionConfig().setCookieMaxAge(value.toString());
-                    } else if (value.equals(
-                            temp.getSessionConfig().getCookieMaxAge())) {
-                        // Fragments use same value - no conflict
-                    } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictSessionCookieMaxAge",
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
-                    }
-                }
-            }
-            if (temp.getSessionConfig().getCookieMaxAge() != null) {
-                sessionConfig.setCookieMaxAge(
-                        temp.getSessionConfig().getCookieMaxAge().toString());
-            }
-        }
+        mainAttributes.putAll(mergedFragmentAttributes);
 
         if (sessionConfig.getSessionTrackingModes().size() == 0) {
             for (WebXml fragment : fragments) {
@@ -2391,13 +2298,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             names.add(fragment.getName());
         }
         for (WebXml fragment : group) {
-            Iterator<String> after = fragment.getAfterOrdering().iterator();
-            while (after.hasNext()) {
-                String entry = after.next();
-                if (!names.contains(entry)) {
-                    after.remove();
-                }
-            }
+            fragment.getAfterOrdering().removeIf(entry -> !names.contains(entry));
         }
     }
     private static void orderFragments(Set<WebXml> orderedFragments,

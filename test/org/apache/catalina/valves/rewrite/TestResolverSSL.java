@@ -18,28 +18,64 @@ package org.apache.catalina.valves.rewrite;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.TesterSupport;
 
+@RunWith(Parameterized.class)
 public class TestResolverSSL extends TomcatBaseTest {
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        List<Object[]> parameterSets = new ArrayList<>();
+        parameterSets.add(new Object[] {
+                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+
+        return parameterSets;
+    }
+
+    @Parameter(0)
+    public String connectorName;
+
+    @Parameter(1)
+    public boolean needApr;
+
+    @Parameter(2)
+    public String sslImplementationName;
+
 
     @Test
     public void testSslEnv() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Container root = tomcat.getHost().findChild("");
         root.getPipeline().addValve(new ResolverTestValve());
+
+        // Enable session caching so the SSL Session is available when using OpenSSL
+        SSLHostConfig sslHostConfig = tomcat.getConnector().findSslHostConfigs()[0];
+        sslHostConfig.setSessionCacheSize(20 * 1024);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
@@ -106,7 +142,7 @@ public class TestResolverSSL extends TomcatBaseTest {
             "SSL_SRP_USERINFO",
             "SSL_TLS_SNI" };
 
-    public class ResolverTestValve extends ValveBase {
+    public static class ResolverTestValve extends ValveBase {
 
         @Override
         public void invoke(Request request, Response response)
@@ -133,5 +169,14 @@ public class TestResolverSSL extends TomcatBaseTest {
         TesterSupport.configureClientCertContext(tomcat);
 
         TesterSupport.configureClientSsl();
+
+        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+
+        if (needApr) {
+            AprLifecycleListener listener = new AprLifecycleListener();
+            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
+        }
     }
 }

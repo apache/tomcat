@@ -39,12 +39,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
@@ -59,6 +59,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
     private static final Log log = LogFactory.getLog(Nio2Endpoint.class);
+    private static final Log logHandshake = LogFactory.getLog(Nio2Endpoint.class.getName() + ".handshake");
 
 
     // ----------------------------------------------------------------- Fields
@@ -85,8 +86,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
      */
     private SynchronizedStack<Nio2Channel> nioChannels;
 
-    // --------------------------------------------------------- Public Methods
+    private SocketAddress previousAcceptedSocketRemoteAddress = null;
+    private long previousAcceptedSocketNanoTime = 0;
 
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Number of keep-alive sockets.
@@ -192,26 +196,26 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         }
         if (running) {
             running = false;
-            acceptor.state = AcceptorState.ENDED;
+            acceptor.stop(10);
             // Use the executor to avoid binding the main thread if something bad
             // occurs and unbind will also wait for a bit for it to complete
-            getExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    // Then close all active connections if any remain
-                    try {
-                        for (SocketWrapperBase<Nio2Channel> wrapper : getConnections()) {
-                            wrapper.close();
-                        }
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                    } finally {
-                        allClosed = true;
+            getExecutor().execute(() -> {
+                // Then close all active connections if any remain
+                try {
+                    for (SocketWrapperBase<Nio2Channel> wrapper : getConnections()) {
+                        wrapper.close();
                     }
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                } finally {
+                    allClosed = true;
                 }
             });
             if (nioChannels != null) {
-                nioChannels.clear();
+                Nio2Channel socket;
+                while ((socket = nioChannels.pop()) != null) {
+                    socket.free();
+                }
                 nioChannels = null;
             }
             if (processorCache != null) {
@@ -257,8 +261,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             try {
                 long timeout = getExecutorTerminationTimeoutMillis();
                 while (timeout > 0 && !allClosed) {
-                    timeout -= 100;
-                    Thread.sleep(100);
+                    timeout -= 1;
+                    Thread.sleep(1);
                 }
                 threadGroup.shutdownNow();
                 if (timeout > 0) {
@@ -359,7 +363,21 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
     @Override
     protected AsynchronousSocketChannel serverSocketAccept() throws Exception {
-        return serverSock.accept().get();
+        AsynchronousSocketChannel result = serverSock.accept().get();
+
+        // Bug does not affect Windows. Skip the check on that platform.
+        if (!JrePlatform.IS_WINDOWS) {
+            SocketAddress currentRemoteAddress = result.getRemoteAddress();
+            long currentNanoTime = System.nanoTime();
+            if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&
+                    currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
+                throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
+            }
+            previousAcceptedSocketRemoteAddress = currentRemoteAddress;
+            previousAcceptedSocketNanoTime = currentNanoTime;
+        }
+
+        return result;
     }
 
 
@@ -407,6 +425,17 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
         }
 
+        /**
+         * Signals the Acceptor to stop.
+         *
+         * @param waitSeconds Ignored for NIO2.
+         *
+         */
+        @Override
+        public void stop(int waitSeconds) {
+            acceptor.state = AcceptorState.ENDED;
+        }
+
         @Override
         public void completed(AsynchronousSocketChannel socket,
                 Void attachment) {
@@ -416,6 +445,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             // Configure the socket
             if (isRunning() && !isPaused()) {
                 if (getMaxConnections() == -1) {
+                    serverSock.accept(null, this);
+                } else if (getConnectionCount() < getMaxConnections()) {
+                    try {
+                        // This will not block
+                        countUpOrAwaitConnection();
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
                     serverSock.accept(null, this);
                 } else {
                     // Accept again on a new thread since countUpOrAwaitConnection may block
@@ -475,7 +512,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private boolean writeNotify = false;
 
         private CompletionHandler<Integer, SendfileData> sendfileHandler
-            = new CompletionHandler<Integer, SendfileData>() {
+            = new CompletionHandler<>() {
 
             @Override
             public void completed(Integer nWrite, SendfileData attachment) {
@@ -561,7 +598,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             nioChannels = endpoint.getNioChannels();
             socketBufferHandler = channel.getBufHandler();
 
-            this.readCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
+            this.readCompletionHandler = new CompletionHandler<>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
                     if (log.isDebugEnabled()) {
@@ -607,7 +644,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
             };
 
-            this.writeCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
+            this.writeCompletionHandler = new CompletionHandler<>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
                     writeNotify = false;
@@ -661,7 +698,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
             };
 
-            gatheringWriteCompletionHandler = new CompletionHandler<Long, ByteBuffer[]>() {
+            gatheringWriteCompletionHandler = new CompletionHandler<>() {
                 @Override
                 public void completed(Long nBytes, ByteBuffer[] attachment) {
                     writeNotify = false;
@@ -907,7 +944,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 if (getSocket().isOpen()) {
                     getSocket().close(true);
                 }
-                if (getEndpoint().running && !getEndpoint().paused) {
+                if (getEndpoint().running) {
                     if (nioChannels == null || !nioChannels.push(getSocket())) {
                         getSocket().free();
                     }
@@ -1516,19 +1553,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         }
 
 
-        /**
-         * {@inheritDoc}
-         * @param clientCertProvider Ignored for this implementation
-         */
         @Override
-        public SSLSupport getSslSupport(String clientCertProvider) {
+        public SSLSupport getSslSupport() {
             if (getSocket() instanceof SecureNio2Channel) {
                 SecureNio2Channel ch = (SecureNio2Channel) getSocket();
-                SSLEngine sslEngine = ch.getSslEngine();
-                if (sslEngine != null) {
-                    SSLSession session = sslEngine.getSession();
-                    return ((Nio2Endpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
-                }
+                return ch.getSSLSupport();
             }
             return null;
         }
@@ -1611,8 +1640,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     }
                 } catch (IOException x) {
                     handshake = -1;
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("endpoint.err.handshake"), x);
+                    if (logHandshake.isDebugEnabled()) {
+                        logHandshake.debug(sm.getString("endpoint.err.handshake",
+                                socketWrapper.getRemoteAddr(), Integer.toString(socketWrapper.getRemotePort())), x);
                     }
                 }
                 if (handshake == 0) {
@@ -1654,7 +1684,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 socketWrapper = null;
                 event = null;
                 //return to cache
-                if (running && !paused && processorCache != null) {
+                if (running && processorCache != null) {
                     processorCache.push(this);
                 }
             }

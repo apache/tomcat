@@ -471,6 +471,7 @@ public class TestBeanNameELResolver {
     /**
      * Confirm it returns null for 'valid' input.
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     public void testGetFeatureDescriptors01() {
         BeanNameELResolver resolver = createBeanNameELResolver();
         ELContext context =
@@ -486,6 +487,7 @@ public class TestBeanNameELResolver {
     /**
      * Confirm it returns null for invalid input.
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     public void testGetFeatureDescriptors02() {
         BeanNameELResolver resolver = createBeanNameELResolver();
 

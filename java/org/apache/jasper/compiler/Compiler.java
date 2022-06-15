@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.File;
@@ -32,6 +31,7 @@ import java.util.Map.Entry;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.Options;
+import org.apache.jasper.TrimSpacesOption;
 import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -131,6 +131,10 @@ public abstract class Compiler {
         if (jspProperty.isELIgnored() != null) {
             pageInfo.setELIgnored(JspUtil.booleanValue(jspProperty
                     .isELIgnored()));
+        }
+        if (jspProperty.getErrorOnELNotFound() != null) {
+            pageInfo.setErrorOnELNotFound(JspUtil.booleanValue(jspProperty
+                    .getErrorOnELNotFound()));
         }
         if (jspProperty.isScriptingInvalid() != null) {
             pageInfo.setScriptingInvalid(JspUtil.booleanValue(jspProperty
@@ -316,7 +320,12 @@ public abstract class Compiler {
                     javaEncoding);
         }
 
-        writer = new ServletWriter(new PrintWriter(osw));
+        if (ctxt.getOptions().getTrimSpaces().equals(TrimSpacesOption.EXTENDED)) {
+            writer = new NewlineReductionServletWriter(new PrintWriter(osw));
+        } else {
+            writer = new ServletWriter(new PrintWriter(osw));
+        }
+
         ctxt.setWriter(writer);
         return writer;
     }
@@ -537,9 +546,10 @@ public abstract class Compiler {
                     return true;
                 }
             } catch (Exception e) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("Problem accessing resource. Treat as outdated.",
                             e);
+                }
                 return true;
             }
         }
@@ -574,8 +584,9 @@ public abstract class Compiler {
 
         try {
             File javaFile = new File(ctxt.getServletJavaFileName());
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Deleting " + javaFile);
+            }
             if (javaFile.exists()) {
                 if (!javaFile.delete()) {
                     log.warn(Localizer.getMessage(
@@ -593,8 +604,9 @@ public abstract class Compiler {
     public void removeGeneratedClassFiles() {
         try {
             File classFile = new File(ctxt.getClassFileName());
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Deleting " + classFile);
+            }
             if (classFile.exists()) {
                 if (!classFile.delete()) {
                     log.warn(Localizer.getMessage(

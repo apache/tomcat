@@ -18,6 +18,7 @@ package org.apache.tomcat.util.scan;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.module.ResolvedModule;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -42,7 +44,6 @@ import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -272,15 +273,24 @@ public class StandardJarScanner implements JarScanner {
             classLoader = classLoader.getParent();
         }
 
-        if (JreCompat.isJre9Available()) {
-            // The application and platform class loaders are not
-            // instances of URLClassLoader. Use the class path in this
-            // case.
-            addClassPath(classPathUrlsToProcess);
-            // Also add any modules
-            JreCompat.getInstance().addBootModulePath(classPathUrlsToProcess);
-            processURLs(scanType, callback, processedURLs, false, classPathUrlsToProcess);
+        // The application and platform class loaders are not
+        // instances of URLClassLoader. Use the class path in this
+        // case.
+        addClassPath(classPathUrlsToProcess);
+
+        // Also add any modules
+        for (ResolvedModule module : ModuleLayer.boot().configuration().modules()) {
+            Optional<URI> uri = module.reference().location();
+            if (uri.isPresent()) {
+                try {
+                    classPathUrlsToProcess.add(uri.get().toURL());
+                } catch (MalformedURLException e) {
+                    log.warn(sm.getString("jarScan.invalidModuleUri", uri), e);
+                }
+            }
         }
+
+        processURLs(scanType, callback, processedURLs, false, classPathUrlsToProcess);
     }
 
 
@@ -412,9 +422,7 @@ public class StandardJarScanner implements JarScanner {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 // Wrap the exception and re-throw
-                IOException ioe = new IOException();
-                ioe.initCause(t);
-                throw ioe;
+                throw new IOException(t);
             }
         }
     }

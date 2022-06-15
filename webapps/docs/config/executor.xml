@@ -107,10 +107,6 @@
       <p>(int) The maximum number of runnable tasks that can queue up awaiting
         execution before we reject them. Default value is <code>Integer.MAX_VALUE</code></p>
     </attribute>
-    <attribute name="prestartminSpareThreads" required="false">
-      <p>(boolean) Whether minSpareThreads should be started when starting the Executor or not,
-          the default is <code>false</code></p>
-    </attribute>
     <attribute name="threadRenewalDelay" required="false">
       <p>(long) If a <a href="listeners.html">ThreadLocalLeakPreventionListener</a> is configured,
         it will notify this executor about stopped contexts.

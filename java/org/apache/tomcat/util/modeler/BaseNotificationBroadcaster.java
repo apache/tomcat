@@ -14,13 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.modeler;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
@@ -95,7 +92,9 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
                             oldFilter.clear();
                         } else {
                             if (oldNames.length != 0) {
-                                for (String newName : newNames) oldFilter.addAttribute(newName);
+                                for (String newName : newNames) {
+                                    oldFilter.addAttribute(newName);
+                                }
                             }
                         }
                         return;
@@ -135,13 +134,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
         throws ListenerNotFoundException {
 
         synchronized (entries) {
-            Iterator<BaseNotificationBroadcasterEntry> items =
-                entries.iterator();
-            while (items.hasNext()) {
-                BaseNotificationBroadcasterEntry item = items.next();
-                if (item.listener == listener)
-                    items.remove();
-            }
+            entries.removeIf(item -> item.listener == listener);
         }
 
     }
@@ -157,8 +150,9 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
         synchronized (entries) {
             for (BaseNotificationBroadcasterEntry item : entries) {
                 if ((item.filter != null) &&
-                    (!item.filter.isNotificationEnabled(notification)))
+                    (!item.filter.isNotificationEnabled(notification))) {
                     continue;
+                }
                 item.listener.handleNotification(notification, item.handback);
             }
         }

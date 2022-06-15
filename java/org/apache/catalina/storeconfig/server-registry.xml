@@ -180,7 +180,7 @@
         tag="Store"
         standard="false"
         default="false"
-        tagClass="org.apache.catalina.session.JDBCStore"
+        tagClass="org.apache.catalina.session.DataSourceStore"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description

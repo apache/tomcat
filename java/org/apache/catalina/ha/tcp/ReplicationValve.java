@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ha.tcp;
 
 import java.io.IOException;
@@ -325,7 +324,7 @@ public class ReplicationValve
                     log.debug(sm.getString("ReplicationValve.crossContext.add"));
                 }
                 //FIXME add Pool of Arraylists
-                crossContextSessions.set(new ArrayList<DeltaSession>());
+                crossContextSessions.set(new ArrayList<>());
             }
             getNext().invoke(request, response);
             if(context != null && cluster != null
@@ -346,13 +345,11 @@ public class ReplicationValve
         } finally {
             // Array must be remove: Current master request send endAccess at recycle.
             // Don't register this request session again!
-            if(isCrossContext) {
+            if (isCrossContext) {
                 if(log.isDebugEnabled()) {
                     log.debug(sm.getString("ReplicationValve.crossContext.remove"));
                 }
-                // crossContextSessions.remove() only exist at Java 5
-                // register ArrayList at a pool
-                crossContextSessions.set(null);
+                crossContextSessions.remove();
             }
         }
     }

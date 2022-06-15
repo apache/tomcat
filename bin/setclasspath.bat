@@ -16,8 +16,7 @@ rem limitations under the License.
 
 rem ---------------------------------------------------------------------------
 rem Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
-rem are valid and consistent with the selected start-up options and set up the
-rem endorsed directory.
+rem are valid and consistent with the selected start-up options.
 rem ---------------------------------------------------------------------------
 
 rem Make sure prerequisite environment variables are set
@@ -63,15 +62,6 @@ echo This environment variable is needed to run this program
 goto exit
 
 :okJava
-rem Don't override the endorsed dir if the user has set it previously
-if not "%JAVA_ENDORSED_DIRS%" == "" goto gotEndorseddir
-rem Java 9 no longer supports the java.endorsed.dirs
-rem system property. Only try to use it if
-rem CATALINA_HOME/endorsed exists.
-if not exist "%CATALINA_HOME%\endorsed" goto gotEndorseddir
-set "JAVA_ENDORSED_DIRS=%CATALINA_HOME%\endorsed"
-:gotEndorseddir
-
 rem Don't override _RUNJAVA if the user has set it previously
 if not "%_RUNJAVA%" == "" goto gotRunJava
 rem Set standard command for invoking Java.

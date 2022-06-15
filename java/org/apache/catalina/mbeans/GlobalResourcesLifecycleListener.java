@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
 
 
@@ -32,6 +31,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Role;
+import org.apache.catalina.Server;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.juli.logging.Log;
@@ -43,6 +43,8 @@ import org.apache.tomcat.util.res.StringManager;
  * Implementation of <code>LifecycleListener</code> that instantiates the
  * set of MBeans associated with global JNDI resources that are subject to
  * management.
+ * <p>
+ * This listener must only be nested within {@link Server} elements.
  *
  * @author Craig R. McClanahan
  * @since 4.1
@@ -72,6 +74,10 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.START_EVENT.equals(event.getType())) {
+            if (!(event.getLifecycle() instanceof Server)) {
+                log.warn(sm.getString("listener.notServer",
+                        event.getLifecycle().getClass().getSimpleName()));
+            }
             component = event.getLifecycle();
             createMBeans();
         } else if (Lifecycle.STOP_EVENT.equals(event.getType())) {
@@ -167,6 +173,11 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
             MBeanUtils.createMBean(database);
         } catch(Exception e) {
             throw new IllegalArgumentException(sm.getString("globalResources.createError.userDatabase", name), e);
+        }
+
+        if (database.isSparse()) {
+            // Avoid loading all the database as mbeans
+            return;
         }
 
         // Create the MBeans for each defined Role

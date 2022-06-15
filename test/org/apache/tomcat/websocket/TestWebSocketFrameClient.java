@@ -55,7 +55,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(TesterFirehoseServer.Config.class.getName());
+        ctx.addApplicationListener(TesterFirehoseServer.ConfigInline.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
@@ -78,7 +78,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
                 new URI("ws://localhost:" + getPort() +
-                        TesterFirehoseServer.Config.PATH));
+                        TesterFirehoseServer.PATH));
         CountDownLatch latch =
                 new CountDownLatch(TesterFirehoseServer.MESSAGE_COUNT);
         BasicText handler = new BasicText(latch);
@@ -117,6 +117,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
         echoTester("",null);
         echoTester("/",null);
+        // This will trigger a redirect so there will be 5 requests logged
         echoTester("/foo",null);
         echoTester("/foo/",null);
     }
@@ -186,7 +187,6 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PASSWORD, utf8Pass);
 
         echoTester(URI_PROTECTED, clientEndpointConfig);
-
     }
 
     @Test
@@ -223,7 +223,5 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PASSWORD,PWD);
 
         echoTester(URI_PROTECTED, clientEndpointConfig);
-
     }
-
 }

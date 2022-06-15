@@ -26,6 +26,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -81,7 +82,7 @@ final class StandardContextValve extends ValveBase {
 
         // Acknowledge the request
         try {
-            response.sendAcknowledgement();
+            response.sendAcknowledgement(ContinueResponseTiming.IMMEDIATELY);
         } catch (IOException ioe) {
             container.getLogger().error(sm.getString(
                     "standardContextValve.acknowledgeException"), ioe);

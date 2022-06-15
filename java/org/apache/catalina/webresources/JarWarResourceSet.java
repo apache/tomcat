@@ -33,7 +33,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.tomcat.util.buf.UriUtil;
-import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a JAR file
@@ -118,7 +117,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                         }
                         Manifest m = jarIs.getManifest();
                         setManifest(m);
-                        if (m != null && JreCompat.isJre9Available()) {
+                        if (m != null) {
                             String value = m.getMainAttributes().getValue("Multi-Release");
                             if (value != null) {
                                 multiRelease = Boolean.parseBoolean(value);
@@ -166,7 +165,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
     protected void processArchivesEntriesForMultiRelease() {
 
-        int targetVersion = JreCompat.getInstance().jarFileRuntimeMajorVersion();
+        int targetVersion = Runtime.version().feature();
 
         Map<String,VersionedJarEntry> versionedEntries = new HashMap<>();
         Iterator<Entry<String,JarEntry>> iter = archiveEntries.entrySet().iterator();

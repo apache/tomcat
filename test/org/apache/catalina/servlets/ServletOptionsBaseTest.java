@@ -99,7 +99,7 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
         client.connect();
         client.processRequest();
 
-        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
         Set<String> allowed = client.getAllowedMethods();
 
         client.disconnect();

@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
 
 
@@ -49,16 +47,19 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-final class StandardWrapperValve
-    extends ValveBase {
+final class StandardWrapperValve extends ValveBase {
+
+    private static final StringManager sm = StringManager.getManager(StandardWrapperValve.class);
+
 
     //------------------------------------------------------ Constructor
+
     public StandardWrapperValve() {
         super(true);
     }
 
-    // ----------------------------------------------------- Instance Variables
 
+    // ----------------------------------------------------- Instance Variables
 
     // Some JMX statistics. This valve is associated with a StandardWrapper.
     // We expose the StandardWrapper as JMX ( j2eeType=Servlet ). The fields
@@ -70,19 +71,11 @@ final class StandardWrapperValve
     private final AtomicInteger errorCount = new AtomicInteger(0);
 
 
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Invoke the servlet we are managing, respecting the rules regarding
-     * servlet lifecycle and SingleThreadModel support.
+     * servlet lifecycle support.
      *
      * @param request Request to be processed
      * @param response Response to be produced
@@ -165,7 +158,9 @@ final class StandardWrapperValve
 
         MessageBytes requestPathMB = request.getRequestPathMB();
         DispatcherType dispatcherType = DispatcherType.REQUEST;
-        if (request.getDispatcherType()==DispatcherType.ASYNC) dispatcherType = DispatcherType.ASYNC;
+        if (request.getDispatcherType()==DispatcherType.ASYNC) {
+            dispatcherType = DispatcherType.ASYNC;
+        }
         request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,dispatcherType);
         request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                 requestPathMB);
@@ -295,8 +290,12 @@ final class StandardWrapperValve
 
             long time=t2-t1;
             processingTime += time;
-            if( time > maxTime) maxTime=time;
-            if( time < minTime) minTime=time;
+            if( time > maxTime) {
+                maxTime=time;
+            }
+            if( time < minTime) {
+                minTime=time;
+            }
         }
     }
 

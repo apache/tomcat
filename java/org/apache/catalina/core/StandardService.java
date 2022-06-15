@@ -51,6 +51,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class StandardService extends LifecycleMBeanBase implements Service {
 
     private static final Log log = LogFactory.getLog(StandardService.class);
+    private static final StringManager sm = StringManager.getManager(StandardService.class);
 
 
     // ----------------------------------------------------- Instance Variables
@@ -60,12 +61,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     private String name = null;
 
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
     /**
      * The <code>Server</code> that owns this Service, if any.
@@ -105,7 +100,20 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     protected final MapperListener mapperListener = new MapperListener(this);
 
 
+    private long gracefulStopAwaitMillis = 0;
+
+
     // ------------------------------------------------------------- Properties
+
+    public long getGracefulStopAwaitMillis() {
+        return gracefulStopAwaitMillis;
+    }
+
+
+    public void setGracefulStopAwaitMillis(long gracefulStopAwaitMillis) {
+        this.gracefulStopAwaitMillis = gracefulStopAwaitMillis;
+    }
+
 
     @Override
     public Mapper getMapper() {
@@ -204,7 +212,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
      * Add a new Connector to the set of defined Connectors, and associate it
      * with this Service's Container.
@@ -282,8 +289,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                     break;
                 }
             }
-            if (j < 0)
+            if (j < 0) {
                 return;
+            }
             if (connectors[j].getState().isAvailable()) {
                 try {
                     connectors[j].stop();
@@ -297,8 +305,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             int k = 0;
             Connector results[] = new Connector[connectors.length - 1];
             for (int i = 0; i < connectors.length; i++) {
-                if (i != j)
+                if (i != j) {
                     results[k++] = connectors[i];
+                }
             }
             connectors = results;
 
@@ -325,7 +334,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     public String toString() {
         StringBuilder sb = new StringBuilder("StandardService[");
         sb.append(getName());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -374,8 +383,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     public Executor getExecutor(String executorName) {
         synchronized (executors) {
             for (Executor executor: executors) {
-                if (executorName.equals(executor.getName()))
+                if (executorName.equals(executor.getName())) {
                     return executor;
+                }
             }
         }
         return null;
@@ -411,8 +421,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if(log.isInfoEnabled())
+        if(log.isInfoEnabled()) {
             log.info(sm.getString("standardService.start.name", this.name));
+        }
         setState(LifecycleState.STARTING);
 
         // Start our defined Container first
@@ -453,21 +464,34 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     protected void stopInternal() throws LifecycleException {
 
-        // Pause connectors first
         synchronized (connectorsLock) {
+            // Initiate a graceful stop for each connector
+            // This will only work if the bindOnInit==false which is not the
+            // default.
+            for (Connector connector: connectors) {
+                connector.getProtocolHandler().closeServerSocketGraceful();
+            }
+
+            // Wait for the graceful shutdown to complete
+            long waitMillis = gracefulStopAwaitMillis;
+            if (waitMillis > 0) {
+                for (Connector connector: connectors) {
+                    waitMillis = connector.getProtocolHandler().awaitConnectionsClose(waitMillis);
+                }
+            }
+
+            // Pause the connectors
             for (Connector connector: connectors) {
                 connector.pause();
-                // Close server socket if bound on start
-                // Note: test is in AbstractEndpoint
-                connector.getProtocolHandler().closeServerSocketGraceful();
             }
         }
 
-        if(log.isInfoEnabled())
+        if(log.isInfoEnabled()) {
             log.info(sm.getString("standardService.stop.name", this.name));
+        }
         setState(LifecycleState.STOPPING);
 
-        // Stop our defined Container second
+        // Stop our defined Container once the Connectors are all paused
         if (engine != null) {
             synchronized (engine) {
                 engine.stop();
@@ -499,7 +523,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                 executor.stop();
             }
         }
-
     }
 
 
@@ -565,8 +588,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public ClassLoader getParentClassLoader() {
-        if (parentClassLoader != null)
+        if (parentClassLoader != null) {
             return parentClassLoader;
+        }
         if (server != null) {
             return server.getParentClassLoader();
         }

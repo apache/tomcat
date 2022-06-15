@@ -422,7 +422,7 @@ public final class ByteChunk extends AbstractChunk {
      * Transfers bytes from the buffer to the specified ByteBuffer. After the
      * operation the position of the ByteBuffer will be returned to the one
      * before the operation, the limit will be the position incremented by the
-     * number of the transfered bytes.
+     * number of the transferred bytes.
      *
      * @param to the ByteBuffer into which bytes are to be written.
      * @return an integer specifying the actual number of bytes read, or -1 if
@@ -465,7 +465,7 @@ public final class ByteChunk extends AbstractChunk {
     public void flushBuffer() throws IOException {
         // assert out!=null
         if (out == null) {
-            throw new IOException(sm.getString(
+            throw new BufferOverflowException(sm.getString(
                     "chunk.overflow", Integer.valueOf(getLimit()), Integer.valueOf(buff.length)));
         }
         out.realWriteBytes(buff, start, end - start);
@@ -829,5 +829,15 @@ public final class ByteChunk extends AbstractChunk {
             result[i] = (byte) value.charAt(i);
         }
         return result;
+    }
+
+
+    public static class BufferOverflowException extends IOException {
+
+        private static final long serialVersionUID = 1L;
+
+        public BufferOverflowException(String message) {
+            super(message);
+        }
     }
 }

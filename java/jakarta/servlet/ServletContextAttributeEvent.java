@@ -21,12 +21,20 @@ package jakarta.servlet;
  * the servlet context of a web application.
  *
  * @see ServletContextAttributeListener
- * @since v 2.3
+ *
+ * @since Servlet 2.3
  */
 public class ServletContextAttributeEvent extends ServletContextEvent {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Attribute name.
+     */
     private final String name;
+
+    /**
+     * Attribute value.
+     */
     private final Object value;
 
     /**

@@ -30,23 +30,58 @@ package org.apache.tomcat.dbcp.pool2;
  */
 public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool<T> {
 
+    private volatile boolean closed;
+
+    /**
+     * Not supported in this base implementation. Subclasses should override
+     * this behavior.
+     *
+     * @throws UnsupportedOperationException if the pool does not implement this
+     *          method
+     */
+    @Override
+    public void addObject() throws Exception, UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Throws an {@code IllegalStateException} when this pool has been
+     * closed.
+     *
+     * @throws IllegalStateException when this pool has been closed.
+     *
+     * @see #isClosed()
+     */
+    protected final void assertOpen() throws IllegalStateException {
+        if (isClosed()) {
+            throw new IllegalStateException("Pool not open");
+        }
+    }
+
     @Override
     public abstract T borrowObject() throws Exception;
-
-    @Override
-    public abstract void returnObject(T obj) throws Exception;
-
-    @Override
-    public abstract void invalidateObject(T obj) throws Exception;
 
     /**
      * Not supported in this base implementation.
      *
-     * @return a negative value.
+     * @throws UnsupportedOperationException if the pool does not implement this
+     *          method
      */
     @Override
-    public int getNumIdle() {
-        return -1;
+    public void clear() throws Exception, UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This affects the behavior of {@code isClosed} and
+     * {@code assertOpen}.
+     * </p>
+     */
+    @Override
+    public void close() {
+        closed = true;
     }
 
     /**
@@ -62,62 +97,27 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
     /**
      * Not supported in this base implementation.
      *
-     * @throws UnsupportedOperationException if the pool does not implement this
-     *          method
+     * @return a negative value.
      */
     @Override
-    public void clear() throws Exception, UnsupportedOperationException {
-        throw new UnsupportedOperationException();
+    public int getNumIdle() {
+        return -1;
     }
 
-    /**
-     * Not supported in this base implementation. Subclasses should override
-     * this behavior.
-     *
-     * @throws UnsupportedOperationException if the pool does not implement this
-     *          method
-     */
     @Override
-    public void addObject() throws Exception, UnsupportedOperationException {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This affects the behavior of <code>isClosed</code> and
-     * <code>assertOpen</code>.
-     * </p>
-     */
-    @Override
-    public void close() {
-        closed = true;
-    }
+    public abstract void invalidateObject(T obj) throws Exception;
 
     /**
      * Has this pool instance been closed.
      *
-     * @return <code>true</code> when this pool has been closed.
+     * @return {@code true} when this pool has been closed.
      */
     public final boolean isClosed() {
         return closed;
     }
 
-    /**
-     * Throws an <code>IllegalStateException</code> when this pool has been
-     * closed.
-     *
-     * @throws IllegalStateException when this pool has been closed.
-     *
-     * @see #isClosed()
-     */
-    protected final void assertOpen() throws IllegalStateException {
-        if (isClosed()) {
-            throw new IllegalStateException("Pool not open");
-        }
-    }
-
-    private volatile boolean closed = false;
+    @Override
+    public abstract void returnObject(T obj) throws Exception;
 
     @Override
     protected void toStringAppendFields(final StringBuilder builder) {

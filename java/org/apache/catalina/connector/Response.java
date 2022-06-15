@@ -50,6 +50,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -723,6 +724,12 @@ public class Response implements HttpServletResponse {
 
         if (type == null) {
             getCoyoteResponse().setContentType(null);
+            try {
+                getCoyoteResponse().setCharacterEncoding(null);
+            } catch (UnsupportedEncodingException e) {
+                // Can never happen when calling with null
+            }
+            isCharacterEncodingSet = false;
             return;
         }
 
@@ -790,7 +797,11 @@ public class Response implements HttpServletResponse {
             log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
             return;
         }
-        isCharacterEncodingSet = true;
+        if (charset == null) {
+            isCharacterEncodingSet = false;
+        } else {
+            isCharacterEncodingSet = true;
+        }
     }
 
 
@@ -824,16 +835,24 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        // In some error handling scenarios, the context is unknown
-        // (e.g. a 404 when a ROOT context is not present)
-        Context context = getContext();
-        if (context != null) {
-            String charset = context.getCharset(locale);
-            if (charset != null) {
-                try {
-                    getCoyoteResponse().setCharacterEncoding(charset);
-                } catch (UnsupportedEncodingException e) {
-                    log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+        if (locale == null) {
+            try {
+                getCoyoteResponse().setCharacterEncoding(null);
+            } catch (UnsupportedEncodingException e) {
+                // Impossible when calling with null
+            }
+        } else {
+            // In some error handling scenarios, the context is unknown
+            // (e.g. a 404 when a ROOT context is not present)
+            Context context = getContext();
+            if (context != null) {
+                String charset = context.getCharset(locale);
+                if (charset != null) {
+                    try {
+                        getCoyoteResponse().setCharacterEncoding(charset);
+                    } catch (UnsupportedEncodingException e) {
+                        log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+                    }
                 }
             }
         }
@@ -908,9 +927,6 @@ public class Response implements HttpServletResponse {
 
         String header = generateCookieString(cookie);
         //if we reached here, no exception, cookie is valid
-        // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
-        // RFC2965 is not supported by browsers and the Servlet spec
-        // asks for 2109.
         addHeader("Set-Cookie", header, getContext().getCookieProcessor().getCharset());
     }
 
@@ -1014,8 +1030,9 @@ public class Response implements HttpServletResponse {
 
         char cc=name.charAt(0);
         if (cc=='C' || cc=='c') {
-            if (checkSpecialHeader(name, value))
-            return;
+            if (checkSpecialHeader(name, value)) {
+                return;
+            }
         }
 
         getCoyoteResponse().addHeader(name, value, charset);
@@ -1124,23 +1141,6 @@ public class Response implements HttpServletResponse {
 
     /**
      * Encode the session identifier associated with this response
-     * into the specified redirect URL, if necessary.
-     *
-     * @param url URL to be encoded
-     * @return <code>true</code> if the URL was encoded
-     *
-     * @deprecated As of Version 2.1 of the Java Servlet API, use
-     *  <code>encodeRedirectURL()</code> instead.
-     */
-    @Override
-    @Deprecated
-    public String encodeRedirectUrl(String url) {
-        return encodeRedirectURL(url);
-    }
-
-
-    /**
-     * Encode the session identifier associated with this response
      * into the specified URL, if necessary.
      *
      * @param url URL to be encoded
@@ -1173,29 +1173,15 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * Encode the session identifier associated with this response
-     * into the specified URL, if necessary.
-     *
-     * @param url URL to be encoded
-     * @return <code>true</code> if the URL was encoded
-     *
-     * @deprecated As of Version 2.1 of the Java Servlet API, use
-     *  <code>encodeURL()</code> instead.
-     */
-    @Override
-    @Deprecated
-    public String encodeUrl(String url) {
-        return encodeURL(url);
-    }
-
-
-    /**
      * Send an acknowledgement of a request.
+     *
+     * @param continueResponseTiming Indicates when the request for the ACK
+     *                               originated so it can be compared with the
+     *                               configured timing for ACK responses.
      *
      * @exception IOException if an input/output error occurs
      */
-    public void sendAcknowledgement()
-        throws IOException {
+    public void sendAcknowledgement(ContinueResponseTiming continueResponseTiming) throws IOException {
 
         if (isCommitted()) {
             return;
@@ -1206,7 +1192,7 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        getCoyoteResponse().action(ActionCode.ACK, null);
+        getCoyoteResponse().action(ActionCode.ACK, continueResponseTiming);
     }
 
 
@@ -1301,17 +1287,21 @@ public class Response implements HttpServletResponse {
 
         // Generate a temporary redirect to the specified location
         try {
+            Context context = getContext();
+            // If no ROOT context is defined, the context can be null.
+            // In this case, the default Tomcat values are assumed, but without
+            // reference to org.apache.catalina.STRICT_SERVLET_COMPLIANCE.
             String locationUri;
             // Relative redirects require HTTP/1.1
             if (getRequest().getCoyoteRequest().getSupportsRelativeRedirects() &&
-                    getContext().getUseRelativeRedirects()) {
+                    (context == null || context.getUseRelativeRedirects())) {
                 locationUri = location;
             } else {
                 locationUri = toAbsolute(location);
             }
             setStatus(status);
             setHeader("Location", locationUri);
-            if (getContext().getSendRedirectBody()) {
+            if (context != null && context.getSendRedirectBody()) {
                 PrintWriter writer = getWriter();
                 writer.print(sm.getString("coyoteResponse.sendRedirect.note",
                         Escape.htmlElementContent(locationUri)));
@@ -1420,23 +1410,6 @@ public class Response implements HttpServletResponse {
      */
     @Override
     public void setStatus(int status) {
-        setStatus(status, null);
-    }
-
-
-    /**
-     * Set the HTTP status and message to be returned with this response.
-     *
-     * @param status The new HTTP status
-     * @param message The associated text message
-     *
-     * @deprecated As of Version 2.1 of the Java Servlet API, this method
-     *  has been deprecated due to the ambiguous meaning of the message
-     *  parameter.
-     */
-    @Override
-    @Deprecated
-    public void setStatus(int status, String message) {
 
         if (isCommitted()) {
             return;
@@ -1448,8 +1421,6 @@ public class Response implements HttpServletResponse {
         }
 
         getCoyoteResponse().setStatus(status);
-        getCoyoteResponse().setMessage(message);
-
     }
 
 
@@ -1592,10 +1563,7 @@ public class Response implements HttpServletResponse {
                 redirectURLCC.append(location, 0, location.length());
                 return redirectURLCC.toString();
             } catch (IOException e) {
-                IllegalArgumentException iae =
-                    new IllegalArgumentException(location);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(location, e);
             }
 
         } else if (leadingSlash || !UriUtil.hasScheme(location)) {
@@ -1623,12 +1591,9 @@ public class Response implements HttpServletResponse {
                     if (SecurityUtil.isPackageProtectionEnabled() ){
                         try{
                             encodedURI = AccessController.doPrivileged(
-                                    new PrivilgedEncodeUrl(urlEncoder, relativePath, pos));
+                                    new PrivilegedEncodeUrl(urlEncoder, relativePath, pos));
                         } catch (PrivilegedActionException pae){
-                            IllegalArgumentException iae =
-                                new IllegalArgumentException(location);
-                            iae.initCause(pae.getException());
-                            throw iae;
+                            throw new IllegalArgumentException(location, pae.getException());
                         }
                     } else {
                         encodedURI = urlEncoder.encodeURL(relativePath, 0, pos);
@@ -1641,10 +1606,7 @@ public class Response implements HttpServletResponse {
 
                 normalize(redirectURLCC);
             } catch (IOException e) {
-                IllegalArgumentException iae =
-                    new IllegalArgumentException(location);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(location, e);
             }
 
             return redirectURLCC.toString();
@@ -1797,10 +1759,10 @@ public class Response implements HttpServletResponse {
         }
         StringBuilder sb = new StringBuilder(path);
         if( sb.length() > 0 ) { // jsessionid can't be first.
-            sb.append(";");
+            sb.append(';');
             sb.append(SessionConfig.getSessionUriParamName(
                     request.getContext()));
-            sb.append("=");
+            sb.append('=');
             sb.append(sessionId);
         }
         sb.append(anchor);
@@ -1850,13 +1812,13 @@ public class Response implements HttpServletResponse {
     }
 
 
-    private static class PrivilgedEncodeUrl implements PrivilegedExceptionAction<CharChunk> {
+    private static class PrivilegedEncodeUrl implements PrivilegedExceptionAction<CharChunk> {
 
         private final UEncoder urlEncoder;
         private final String relativePath;
         private final int end;
 
-        public PrivilgedEncodeUrl(UEncoder urlEncoder, String relativePath, int end) {
+        public PrivilegedEncodeUrl(UEncoder urlEncoder, String relativePath, int end) {
             this.urlEncoder = urlEncoder;
             this.relativePath = relativePath;
             this.end = end;

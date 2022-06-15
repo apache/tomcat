@@ -28,6 +28,7 @@ import java.util.Map;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -53,7 +54,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-@SuppressWarnings("deprecation")
 public class RequestFacade implements HttpServletRequest {
 
 
@@ -616,18 +616,6 @@ public class RequestFacade implements HttpServletRequest {
     }
 
     @Override
-    public String getRealPath(String path) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
-        return request.getRealPath(path);
-    }
-
-
-    @Override
     public String getAuthType() {
 
         if (request == null) {
@@ -968,18 +956,6 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public boolean isRequestedSessionIdFromUrl() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
-        return request.isRequestedSessionIdFromURL();
-    }
-
-
-    @Override
     public String getLocalAddr() {
 
         if (request == null) {
@@ -1144,5 +1120,23 @@ public class RequestFacade implements HttpServletRequest {
     @Override
     public Map<String, String> getTrailerFields() {
         return request.getTrailerFields();
+    }
+
+
+    @Override
+    public String getRequestId() {
+        return request.getRequestId();
+    }
+
+
+    @Override
+    public String getProtocolRequestId() {
+        return request.getProtocolRequestId();
+    }
+
+
+    @Override
+    public ServletConnection getServletConnection() {
+        return request.getServletConnection();
     }
 }

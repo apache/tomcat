@@ -14,16 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.users;
 
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.apache.catalina.Group;
-import org.apache.catalina.Role;
 import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.security.Escape;
@@ -35,10 +28,7 @@ import org.apache.tomcat.util.security.Escape;
  * @author Craig R. McClanahan
  * @since 4.1
  */
-public class MemoryUser extends AbstractUser {
-
-
-    // ----------------------------------------------------------- Constructors
+public class MemoryUser extends GenericUser<MemoryUserDatabase> {
 
 
     /**
@@ -52,189 +42,7 @@ public class MemoryUser extends AbstractUser {
      */
     MemoryUser(MemoryUserDatabase database, String username,
                String password, String fullName) {
-
-        super();
-        this.database = database;
-        setUsername(username);
-        setPassword(password);
-        setFullName(fullName);
-
-    }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The {@link MemoryUserDatabase} that owns this user.
-     */
-    protected final MemoryUserDatabase database;
-
-
-    /**
-     * The set of {@link Group}s that this user is a member of.
-     */
-    protected final ArrayList<Group> groups = new ArrayList<>();
-
-
-    /**
-     * The set of {@link Role}s associated with this user.
-     */
-    protected final ArrayList<Role> roles = new ArrayList<>();
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return the set of {@link Group}s to which this user belongs.
-     */
-    @Override
-    public Iterator<Group> getGroups() {
-        synchronized (groups) {
-            return groups.iterator();
-        }
-    }
-
-
-    /**
-     * Return the set of {@link Role}s assigned specifically to this user.
-     */
-    @Override
-    public Iterator<Role> getRoles() {
-        synchronized (roles) {
-            return roles.iterator();
-        }
-    }
-
-
-    /**
-     * Return the {@link UserDatabase} within which this User is defined.
-     */
-    @Override
-    public UserDatabase getUserDatabase() {
-        return this.database;
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Add a new {@link Group} to those this user belongs to.
-     *
-     * @param group The new group
-     */
-    @Override
-    public void addGroup(Group group) {
-
-        synchronized (groups) {
-            if (!groups.contains(group)) {
-                groups.add(group);
-            }
-        }
-
-    }
-
-
-    /**
-     * Add a new {@link Role} to those assigned specifically to this user.
-     *
-     * @param role The new role
-     */
-    @Override
-    public void addRole(Role role) {
-
-        synchronized (roles) {
-            if (!roles.contains(role)) {
-                roles.add(role);
-            }
-        }
-
-    }
-
-
-    /**
-     * Is this user in the specified group?
-     *
-     * @param group The group to check
-     */
-    @Override
-    public boolean isInGroup(Group group) {
-        synchronized (groups) {
-            return groups.contains(group);
-        }
-    }
-
-
-    /**
-     * Is this user specifically assigned the specified {@link Role}?  This
-     * method does <strong>NOT</strong> check for roles inherited based on
-     * {@link Group} membership.
-     *
-     * @param role The role to check
-     */
-    @Override
-    public boolean isInRole(Role role) {
-        synchronized (roles) {
-            return roles.contains(role);
-        }
-    }
-
-
-    /**
-     * Remove a {@link Group} from those this user belongs to.
-     *
-     * @param group The old group
-     */
-    @Override
-    public void removeGroup(Group group) {
-
-        synchronized (groups) {
-            groups.remove(group);
-        }
-
-    }
-
-
-    /**
-     * Remove all {@link Group}s from those this user belongs to.
-     */
-    @Override
-    public void removeGroups() {
-
-        synchronized (groups) {
-            groups.clear();
-        }
-
-    }
-
-
-    /**
-     * Remove a {@link Role} from those assigned to this user.
-     *
-     * @param role The old role
-     */
-    @Override
-    public void removeRole(Role role) {
-
-        synchronized (roles) {
-            roles.remove(role);
-        }
-
-    }
-
-
-    /**
-     * Remove all {@link Role}s from those assigned to this user.
-     */
-    @Override
-    public void removeRoles() {
-
-        synchronized (roles) {
-            roles.clear();
-        }
-
+        super(database, username, password, fullName, null, null);
     }
 
 
@@ -259,20 +67,12 @@ public class MemoryUser extends AbstractUser {
             sb.append(Escape.xml(fullName));
             sb.append("\"");
         }
-        synchronized (groups) {
-            if (groups.size() > 0) {
-                sb.append(" groups=\"");
-                StringUtils.join(groups, ',', (x) -> Escape.xml(x.getGroupname()), sb);
-                sb.append("\"");
-            }
-        }
-        synchronized (roles) {
-            if (roles.size() > 0) {
-                sb.append(" roles=\"");
-                StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
-                sb.append("\"");
-            }
-        }
+        sb.append(" groups=\"");
+        StringUtils.join(groups, ',', (x) -> Escape.xml(x.getGroupname()), sb);
+        sb.append("\"");
+        sb.append(" roles=\"");
+        StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
+        sb.append("\"");
         sb.append("/>");
         return sb.toString();
     }
@@ -292,20 +92,12 @@ public class MemoryUser extends AbstractUser {
             sb.append(Escape.xml(fullName));
             sb.append("\"");
         }
-        synchronized (groups) {
-            if (groups.size() > 0) {
-                sb.append(", groups=\"");
-                StringUtils.join(groups, ',', (x) -> Escape.xml(x.getGroupname()), sb);
-                sb.append("\"");
-            }
-        }
-        synchronized (roles) {
-            if (roles.size() > 0) {
-                sb.append(", roles=\"");
-                StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
-                sb.append("\"");
-            }
-        }
+        sb.append(", groups=\"");
+        StringUtils.join(groups, ',', (x) -> Escape.xml(x.getGroupname()), sb);
+        sb.append("\"");
+        sb.append(", roles=\"");
+        StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), sb);
+        sb.append("\"");
         return sb.toString();
     }
 }

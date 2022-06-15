@@ -38,7 +38,7 @@ public class ImportHandler {
     private static final Map<String,Set<String>> standardPackages = new HashMap<>();
 
     static {
-        // Servlet 5.0
+        // Servlet 6.0
         Set<String> servletClassNames = new HashSet<>();
         // Interfaces
         servletClassNames.add("AsyncContext");
@@ -54,6 +54,7 @@ public class ImportHandler {
         servletClassNames.add("RequestDispatcher");
         servletClassNames.add("Servlet");
         servletClassNames.add("ServletConfig");
+        servletClassNames.add("ServletConnection");
         servletClassNames.add("ServletContainerInitializer");
         servletClassNames.add("ServletContext");
         servletClassNames.add("ServletContextAttributeListener");
@@ -65,7 +66,6 @@ public class ImportHandler {
         servletClassNames.add("ServletRequestListener");
         servletClassNames.add("ServletResponse");
         servletClassNames.add("SessionCookieConfig");
-        servletClassNames.add("SingleThreadModel");
         servletClassNames.add("WriteListener");
         // Classes
         servletClassNames.add("AsyncEvent");
@@ -91,7 +91,7 @@ public class ImportHandler {
         servletClassNames.add("UnavailableException");
         standardPackages.put("jakarta.servlet", servletClassNames);
 
-        // Servlet 5.0
+        // Servlet 6.0
         Set<String> servletHttpClassNames = new HashSet<>();
         // Interfaces
         servletHttpClassNames.add("HttpServletMapping");
@@ -101,7 +101,6 @@ public class ImportHandler {
         servletHttpClassNames.add("HttpSessionActivationListener");
         servletHttpClassNames.add("HttpSessionAttributeListener");
         servletHttpClassNames.add("HttpSessionBindingListener");
-        servletHttpClassNames.add("HttpSessionContext");
         servletHttpClassNames.add("HttpSessionIdListener");
         servletHttpClassNames.add("HttpSessionListener");
         servletHttpClassNames.add("HttpUpgradeHandler");
@@ -141,7 +140,7 @@ public class ImportHandler {
         standardPackages.put("jakarta.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
-        // Taken from Java 14 EA27 Javadoc
+        // Based on Java 19 EA26
         // Interfaces
         javaLangClassNames.add("Appendable");
         javaLangClassNames.add("AutoCloseable");
@@ -155,6 +154,9 @@ public class ImportHandler {
         javaLangClassNames.add("Runnable");
         javaLangClassNames.add("StackWalker.StackFrame");
         javaLangClassNames.add("System.Logger");
+        javaLangClassNames.add("Thread.Builder");
+        javaLangClassNames.add("Thread.Builder.OfPlatform");
+        javaLangClassNames.add("Thread.Builder.OfVirtual");
         javaLangClassNames.add("Thread.UncaughtExceptionHandler");
         //Classes
         javaLangClassNames.add("Boolean");
@@ -227,6 +229,7 @@ public class ImportHandler {
         javaLangClassNames.add("InstantiationException");
         javaLangClassNames.add("InterruptedException");
         javaLangClassNames.add("LayerInstantiationException");
+        javaLangClassNames.add("MatchException");
         javaLangClassNames.add("NegativeArraySizeException");
         javaLangClassNames.add("NoSuchFieldException");
         javaLangClassNames.add("NoSuchMethodException");
@@ -238,6 +241,7 @@ public class ImportHandler {
         javaLangClassNames.add("StringIndexOutOfBoundsException");
         javaLangClassNames.add("TypeNotPresentException");
         javaLangClassNames.add("UnsupportedOperationException");
+        javaLangClassNames.add("WrongThreadException");
         //Errors
         javaLangClassNames.add("AbstractMethodError");
         javaLangClassNames.add("AssertionError");
@@ -479,12 +483,11 @@ public class ImportHandler {
             return null;
         }
 
-        // Class must be public, non-abstract, not an interface and (for
-        // Java 9+) in an exported package
-        JreCompat jreCompat = JreCompat.getInstance();
+        // Class must be public, non-abstract, not an interface and in an
+        // exported package
         int modifiers = clazz.getModifiers();
         if (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) ||
-                Modifier.isInterface(modifiers) || !jreCompat.isExported(clazz)) {
+                Modifier.isInterface(modifiers) || !isExported(clazz)) {
             if (throwException) {
                 throw new ELException(Util.message(
                         null, "importHandler.invalidClass", name));
@@ -494,6 +497,13 @@ public class ImportHandler {
         }
 
         return clazz;
+    }
+
+
+    private static boolean isExported(Class<?> type) {
+        String packageName = type.getPackage().getName();
+        Module module = type.getModule();
+        return module.isExported(packageName);
     }
 
 

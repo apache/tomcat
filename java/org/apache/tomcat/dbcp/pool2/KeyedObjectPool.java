@@ -35,14 +35,14 @@ import java.util.NoSuchElementException;
  * <code style="color:#00C">try</code> {
  *     obj = pool.borrowObject(key);
  *     <code style="color:#0C0">//...use the object...</code>
- * } <code style="color:#00C">catch</code>(Exception e) {
+ * } <code style="color:#00C">catch</code> (Exception e) {
  *     <code style="color:#0C0">// invalidate the object</code>
  *     pool.invalidateObject(key, obj);
  *     <code style="color:#0C0">// do not return the object to the pool twice</code>
  *     obj = <code style="color:#00C">null</code>;
  * } <code style="color:#00C">finally</code> {
  *     <code style="color:#0C0">// make sure the object is returned to the pool</code>
- *     <code style="color:#00C">if</code>(<code style="color:#00C">null</code> != obj) {
+ *     <code style="color:#00C">if</code> (<code style="color:#00C">null</code> != obj) {
  *         pool.returnObject(key, obj);
  *     }
  * }</pre>
@@ -69,9 +69,9 @@ import java.util.NoSuchElementException;
 public interface KeyedObjectPool<K, V> extends Closeable {
 
     /**
-     * Create an object using the {@link KeyedPooledObjectFactory factory} or
+     * Creates an object using the {@link KeyedPooledObjectFactory factory} or
      * other implementation dependent mechanism, passivate it, and then place it
-     * in the idle object pool. <code>addObject</code> is useful for
+     * in the idle object pool. {@code addObject} is useful for
      * "pre-loading" a pool with idle objects (Optional operation).
      *
      * @param key the key a new instance should be added to
@@ -88,19 +88,19 @@ public interface KeyedObjectPool<K, V> extends Closeable {
 
     /**
      * Calls {@link KeyedObjectPool#addObject(Object)} with each
-     * key in <code>keys</code> for <code>count</code> number of times. This has
+     * key in {@code keys} for {@code count} number of times. This has
      * the same effect as calling {@link #addObjects(Object, int)}
-     * for each key in the <code>keys</code> collection.
+     * for each key in the {@code keys} collection.
      *
      * @param keys
      *            {@link Collection} of keys to add objects for.
      * @param count
-     *            the number of idle objects to add for each <code>key</code>.
+     *            the number of idle objects to add for each {@code key}.
      * @throws Exception
      *             when {@link KeyedObjectPool#addObject(Object)} fails.
      * @throws IllegalArgumentException
-     *             when <code>keyedPool</code>, <code>keys</code>, or any value
-     *             in <code>keys</code> is <code>null</code>.
+     *             when {@code keyedPool}, {@code keys}, or any value
+     *             in {@code keys} is {@code null}.
      * @see #addObjects(Object, int)
      */
     default void addObjects(final Collection<K> keys, final int count) throws Exception, IllegalArgumentException {
@@ -114,16 +114,16 @@ public interface KeyedObjectPool<K, V> extends Closeable {
 
     /**
      * Calls {@link KeyedObjectPool#addObject(Object)}
-     * <code>key</code> <code>count</code> number of times.
+     * {@code key} {@code count} number of times.
      *
      * @param key
      *            the key to add objects for.
      * @param count
-     *            the number of idle objects to add for <code>key</code>.
+     *            the number of idle objects to add for {@code key}.
      * @throws Exception
      *             when {@link KeyedObjectPool#addObject(Object)} fails.
      * @throws IllegalArgumentException
-     *             when <code>key</code> is <code>null</code>.
+     *             when {@code key} is {@code null}.
      * @since 2.8.0
      */
     default void addObjects(final K key, final int count) throws Exception, IllegalArgumentException {
@@ -136,7 +136,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
     }
 
     /**
-     * Obtains an instance from this pool for the specified <code>key</code>.
+     * Borrows an instance from this pool for the specified {@code key}.
      * <p>
      * Instances returned from this method will have been either newly created
      * with {@link KeyedPooledObjectFactory#makeObject makeObject} or will be
@@ -149,12 +149,12 @@ public interface KeyedObjectPool<K, V> extends Closeable {
      * By contract, clients <strong>must</strong> return the borrowed object
      * using {@link #returnObject returnObject},
      * {@link #invalidateObject invalidateObject}, or a related method as
-     * defined in an implementation or sub-interface, using a <code>key</code>
+     * defined in an implementation or sub-interface, using a {@code key}
      * that is {@link Object#equals equivalent} to the one used to borrow the
      * instance in the first place.
      * </p>
      * <p>
-     * The behaviour of this method when the pool has been exhausted is not
+     * The behavior of this method when the pool has been exhausted is not
      * strictly specified (although it may be specified by implementations).
      * </p>
      *
@@ -185,7 +185,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
 
     /**
      * Clears the specified pool, removing all pooled instances corresponding to
-     * the given <code>key</code> (optional operation).
+     * the given {@code key} (optional operation).
      *
      * @param key the key to clear
      *
@@ -197,7 +197,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
     void clear(K key) throws Exception, UnsupportedOperationException;
 
     /**
-     * Close this pool, and free any resources associated with it.
+     * Closes this pool, and free any resources associated with it.
      * <p>
      * Calling {@link #addObject addObject} or
      * {@link #borrowObject borrowObject} after invoking this method on a pool
@@ -211,7 +211,7 @@ public interface KeyedObjectPool<K, V> extends Closeable {
     void close();
 
     /**
-     * Returns the total number of instances currently borrowed from this pool but
+     * Gets the total number of instances currently borrowed from this pool but
      * not yet returned. Returns a negative value if this information is not
      * available.
      * @return the total number of instances currently borrowed from this pool but
@@ -220,41 +220,41 @@ public interface KeyedObjectPool<K, V> extends Closeable {
     int getNumActive();
 
     /**
-     * Returns the number of instances currently borrowed from but not yet
-     * returned to the pool corresponding to the given <code>key</code>.
+     * Gets the number of instances currently borrowed from but not yet
+     * returned to the pool corresponding to the given {@code key}.
      * Returns a negative value if this information is not available.
      *
      * @param key the key to query
      * @return the number of instances currently borrowed from but not yet
-     * returned to the pool corresponding to the given <code>key</code>.
+     * returned to the pool corresponding to the given {@code key}.
      */
     int getNumActive(K key);
 
     /**
-     * Returns the total number of instances currently idle in this pool.
+     * Gets the total number of instances currently idle in this pool.
      * Returns a negative value if this information is not available.
      * @return the total number of instances currently idle in this pool.
      */
     int getNumIdle();
 
     /**
-     * Returns the number of instances corresponding to the given
-     * <code>key</code> currently idle in this pool. Returns a negative value if
+     * Gets the number of instances corresponding to the given
+     * {@code key} currently idle in this pool. Returns a negative value if
      * this information is not available.
      *
      * @param key the key to query
      * @return the number of instances corresponding to the given
-     * <code>key</code> currently idle in this pool.
+     * {@code key} currently idle in this pool.
      */
     int getNumIdle(K key);
 
     /**
      * Invalidates an object from the pool.
      * <p>
-     * By contract, <code>obj</code> <strong>must</strong> have been obtained
+     * By contract, {@code obj} <strong>must</strong> have been obtained
      * using {@link #borrowObject borrowObject} or a related method as defined
-     * in an implementation or sub-interface using a <code>key</code> that is
-     * equivalent to the one used to borrow the <code>Object</code> in the first
+     * in an implementation or sub-interface using a {@code key} that is
+     * equivalent to the one used to borrow the {@code Object} in the first
      * place.
      * </p>
      * <p>
@@ -270,10 +270,36 @@ public interface KeyedObjectPool<K, V> extends Closeable {
     void invalidateObject(K key, V obj) throws Exception;
 
     /**
-     * Return an instance to the pool. By contract, <code>obj</code>
+     * Invalidates an object from the pool, using the provided
+     * {@link DestroyMode}.
+     * <p>
+     * By contract, {@code obj} <strong>must</strong> have been obtained
+     * using {@link #borrowObject borrowObject} or a related method as defined
+     * in an implementation or sub-interface using a {@code key} that is
+     * equivalent to the one used to borrow the {@code Object} in the first
+     * place.
+     * </p>
+     * <p>
+     * This method should be used when an object that has been borrowed is
+     * determined (due to an exception or other problem) to be invalid.
+     * </p>
+     *
+     * @param key the key used to obtain the object
+     * @param obj a {@link #borrowObject borrowed} instance to be returned.
+     * @param destroyMode destroy activation context provided to the factory
+     *
+     * @throws Exception if the instance cannot be invalidated
+     * @since 2.9.0
+     */
+    default void invalidateObject(final K key, final V obj, final DestroyMode destroyMode) throws Exception {
+        invalidateObject(key, obj);
+    }
+
+    /**
+     * Return an instance to the pool. By contract, {@code obj}
      * <strong>must</strong> have been obtained using
      * {@link #borrowObject borrowObject} or a related method as defined in an
-     * implementation or sub-interface using a <code>key</code> that is
+     * implementation or sub-interface using a {@code key} that is
      * equivalent to the one used to borrow the instance in the first place.
      *
      * @param key the key used to obtain the object

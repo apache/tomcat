@@ -33,14 +33,14 @@ import org.apache.tomcat.util.res.StringManager;
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {
 
     private static final long serialVersionUID = 1L;
-    protected static final StringManager sm = StringManager
-            .getManager("org.apache.tomcat.util.threads.res");
+    protected static final StringManager sm = StringManager.getManager(TaskQueue.class);
+    private static final int DEFAULT_FORCED_REMAINING_CAPACITY = -1;
 
     private transient volatile ThreadPoolExecutor parent = null;
 
     // No need to be volatile. This is written and read in a single thread
-    // (when stopping a context and firing the  listeners)
-    private Integer forcedRemainingCapacity = null;
+    // (when stopping a context and firing the listeners)
+    private int forcedRemainingCapacity = -1;
 
     public TaskQueue() {
         super();
@@ -58,26 +58,41 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
         parent = tp;
     }
 
+
+    /**
+     * Used to add a task to the queue if the task has been rejected by the Executor.
+     *
+     * @param o         The task to add to the queue
+     *
+     * @return          {@code true} if the task was added to the queue,
+     *                      otherwise {@code false}
+     */
     public boolean force(Runnable o) {
-        if (parent == null || parent.isShutdown()) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
+        if (parent == null || parent.isShutdown()) {
+            throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
+        }
         return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
     }
 
-    public boolean force(Runnable o, long timeout, TimeUnit unit) throws InterruptedException {
-        if (parent == null || parent.isShutdown()) throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
-        return super.offer(o,timeout,unit); //forces the item onto the queue, to be used if the task is rejected
-    }
 
     @Override
     public boolean offer(Runnable o) {
       //we can't do any checks
-        if (parent==null) return super.offer(o);
+        if (parent==null) {
+            return super.offer(o);
+        }
         //we are maxed out on threads, simply queue the object
-        if (parent.getPoolSize() == parent.getMaximumPoolSize()) return super.offer(o);
+        if (parent.getPoolSize() == parent.getMaximumPoolSize()) {
+            return super.offer(o);
+        }
         //we have idle threads, just add it to the queue
-        if (parent.getSubmittedCount()<=(parent.getPoolSize())) return super.offer(o);
+        if (parent.getSubmittedCount()<=(parent.getPoolSize())) {
+            return super.offer(o);
+        }
         //if we have less threads than maximum force creation of a new thread
-        if (parent.getPoolSize()<parent.getMaximumPoolSize()) return false;
+        if (parent.getPoolSize()<parent.getMaximumPoolSize()) {
+            return false;
+        }
         //if we reached here, we need to add it to the queue
         return super.offer(o);
     }
@@ -109,18 +124,22 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> {
 
     @Override
     public int remainingCapacity() {
-        if (forcedRemainingCapacity != null) {
+        if (forcedRemainingCapacity > DEFAULT_FORCED_REMAINING_CAPACITY) {
             // ThreadPoolExecutor.setCorePoolSize checks that
             // remainingCapacity==0 to allow to interrupt idle threads
             // I don't see why, but this hack allows to conform to this
             // "requirement"
-            return forcedRemainingCapacity.intValue();
+            return forcedRemainingCapacity;
         }
         return super.remainingCapacity();
     }
 
-    public void setForcedRemainingCapacity(Integer forcedRemainingCapacity) {
+    public void setForcedRemainingCapacity(int forcedRemainingCapacity) {
         this.forcedRemainingCapacity = forcedRemainingCapacity;
+    }
+
+    void resetForcedRemainingCapacity() {
+        this.forcedRemainingCapacity = DEFAULT_FORCED_REMAINING_CAPACITY;
     }
 
 }

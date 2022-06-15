@@ -28,7 +28,6 @@ import java.util.Set;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
 public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
@@ -83,6 +82,14 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
     @Override
     protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
+
+        // HTTP/2 does not permit optional certificate authentication with any
+        // version of TLS.
+        if (sslHostConfig.getCertificateVerification().isOptional() &&
+                negotiableProtocols.contains("h2")) {
+            getLog().warn(sm.getString("sslHostConfig.certificateVerificationWithHttp2", sslHostConfig.getHostName()));
+        }
+
         boolean firstCertificate = true;
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
@@ -123,7 +130,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
         SSLParameters sslParameters = engine.getSSLParameters();
         sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
-        if (JreCompat.isAlpnSupported() && clientRequestedApplicationProtocols != null
+        if (clientRequestedApplicationProtocols != null
                 && clientRequestedApplicationProtocols.size() > 0
                 && negotiableProtocols.size() > 0) {
             // Only try to negotiate if both client and server have at least
@@ -134,7 +141,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
             commonProtocols.retainAll(clientRequestedApplicationProtocols);
             if (commonProtocols.size() > 0) {
                 String[] commonProtocolsArray = commonProtocols.toArray(new String[0]);
-                JreCompat.getInstance().setApplicationProtocols(sslParameters, commonProtocolsArray);
+                sslParameters.setApplicationProtocols(commonProtocolsArray);
             }
         }
         switch (sslHostConfig.getCertificateVerification()) {
@@ -187,26 +194,6 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
         // No matches. Just return the first certificate. The handshake will
         // then fail due to no matching ciphers.
         return certificates.iterator().next();
-    }
-
-
-    @Override
-    public boolean isAlpnSupported() {
-        // ALPN requires TLS so if TLS is not enabled, ALPN cannot be supported
-        if (!isSSLEnabled()) {
-            return false;
-        }
-
-        // Depends on the SSLImplementation.
-        SSLImplementation sslImplementation;
-        try {
-            sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
-        } catch (ClassNotFoundException e) {
-            // Ignore the exception. It will be logged when trying to start the
-            // end point.
-            return false;
-        }
-        return sslImplementation.isAlpnSupported();
     }
 
 

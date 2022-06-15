@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
 import java.util.concurrent.TimeUnit;
@@ -96,6 +95,11 @@ public class RequestInfo  {
     public String getRemoteAddr() {
         req.action(ActionCode.REQ_HOST_ADDR_ATTRIBUTE, null);
         return req.remoteAddr().toString();
+    }
+
+    public String getPeerAddr() {
+        req.action(ActionCode.REQ_PEER_ADDR_ATTRIBUTE, null);
+        return req.peerAddr().toString();
     }
 
     /**

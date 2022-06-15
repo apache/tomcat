@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
 
 
@@ -58,7 +56,6 @@ import org.apache.naming.ResourceLinkRef;
 import org.apache.naming.ResourceRef;
 import org.apache.naming.ServiceRef;
 import org.apache.naming.TransactionRef;
-import org.apache.naming.factory.Constants;
 import org.apache.naming.factory.ResourceLinkFactory;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
@@ -84,6 +81,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class NamingContextListener implements LifecycleListener, PropertyChangeListener {
 
     private static final Log log = LogFactory.getLog(NamingContextListener.class);
+    protected static final StringManager sm = StringManager.getManager(NamingContextListener.class);
 
 
     // ----------------------------------------------------- Instance Variables
@@ -145,13 +143,6 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      * exception or if the request is ignored.
      */
     private boolean exceptionOnFailedWrite = true;
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // ------------------------------------------------------------- Properties
@@ -226,8 +217,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
         if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType())) {
 
-            if (initialized)
+            if (initialized) {
                 return;
+            }
 
             try {
                 Hashtable<String, Object> contextEnv = new Hashtable<>();
@@ -289,8 +281,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
         } else if (Lifecycle.CONFIGURE_STOP_EVENT.equals(event.getType())) {
 
-            if (!initialized)
+            if (!initialized) {
                 return;
+            }
 
             try {
                 // Setting the context in read/write mode
@@ -350,8 +343,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
     @Override
     public void propertyChange(PropertyChangeEvent event) {
 
-        if (!initialized)
+        if (!initialized) {
             return;
+        }
 
         Object source = event.getSource();
         if (source == namingResources) {
@@ -515,8 +509,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
         int i;
 
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Creating JNDI naming context");
+        }
 
         if (namingResources == null) {
             namingResources = new NamingResourcesImpl();
@@ -632,8 +627,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                         ",name=" + quotedResourceName);
         } else if (container instanceof Context) {
             String contextName = ((Context)container).getName();
-            if (!contextName.startsWith("/"))
+            if (!contextName.startsWith("/")) {
                 contextName = "/" + contextName;
+            }
             Host host = (Host) ((Context)container).getParent();
             name = new ObjectName(domain + ":type=DataSource" +
                     ",host=" + host.getName() +
@@ -749,8 +745,6 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                                 "naming.invalidEnvEntryType", env.getName()));
                     }
                 }
-            } catch (NumberFormatException e) {
-                log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()));
             } catch (IllegalArgumentException e) {
                 log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()));
             }
@@ -859,10 +853,11 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                         log.error(sm.getString("naming.wsdlFailed", e));
                     }
                 }
-                if (wsdlURL == null)
+                if (wsdlURL == null) {
                     service.setWsdlfile(null);
-                else
+                } else {
                     service.setWsdlfile(wsdlURL.toString());
+                }
             }
 
             if (service.getJaxrpcmappingfile() != null) {
@@ -891,10 +886,11 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                         log.error(sm.getString("naming.wsdlFailed", e));
                     }
                 }
-                if (jaxrpcURL == null)
+                if (jaxrpcURL == null) {
                     service.setJaxrpcmappingfile(null);
-                else
+                } else {
                     service.setJaxrpcmappingfile(jaxrpcURL.toString());
+                }
             }
 
             // Create a reference to the resource.
@@ -1065,8 +1061,9 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             "UserTransaction".equals(resourceLink.getName())
             ? compCtx : envCtx;
         try {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("  Adding resource link " + resourceLink.getName());
+            }
             createSubcontexts(envCtx, resourceLink.getName());
             ctx.bind(resourceLink.getName(), ref);
         } catch (NamingException e) {

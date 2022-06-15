@@ -21,6 +21,9 @@ import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,6 +38,7 @@ public class TestBeanELResolver {
     private static final String PROPERTY01_NAME = "valueA";
     private static final String PROPERTY02_NAME = "valueB";
     private static final String PROPERTY03_NAME = "name";
+    private static final String PROPERTY04_NAME = "valueC";
     private static final String PROPERTY_VALUE = "test1";
 
     @Test
@@ -57,9 +61,9 @@ public class TestBeanELResolver {
         } catch (PropertyNotFoundException pnfe) {
             e = pnfe;
         }
-        Assert.assertTrue("Wrong exception type",
-                e instanceof PropertyNotFoundException);
+        assertThat("Wrong exception type", e, instanceOf(PropertyNotFoundException.class));
         String type = Bean.class.getName();
+        @SuppressWarnings("null") // Not possible due to test above
         String msg = e.getMessage();
         Assert.assertTrue("No reference to type [" + type +
                 "] where property cannot be found in [" + msg + "]",
@@ -93,7 +97,8 @@ public class TestBeanELResolver {
 
         Class<?> result = resolver.getType(context, new Bean(), PROPERTY01_NAME);
 
-        Assert.assertEquals(String.class, result);
+        // Property is read-only so should return null
+        Assert.assertNull(result);
         Assert.assertTrue(context.isPropertyResolved());
     }
 
@@ -365,6 +370,7 @@ public class TestBeanELResolver {
      * Tests that a valid FeatureDescriptors are not returned if base is not
      * Map.
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     @Test
     public void testGetFeatureDescriptors01() {
         BeanELResolver resolver = new BeanELResolver();
@@ -378,6 +384,7 @@ public class TestBeanELResolver {
     /**
      * Tests that a valid FeatureDescriptors are returned.
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     @Test
     public void testGetFeatureDescriptors02() {
         BeanELResolver resolver = new BeanELResolver();
@@ -590,9 +597,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    // Ambiguous because the Strings coerce to both Boolean and Integer hence
-    // both varargs methods match.
-    @Test(expected=MethodNotFoundException.class)
+    @Test
     public void testInvokeVarargsCoerce13() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -625,9 +630,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    // Ambiguous because the Strings coerce to both Boolean and Integer hence
-    // both varargs methods match.
-    @Test(expected=MethodNotFoundException.class)
+    @Test
     public void testInvokeVarargsCoerce16() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -695,6 +698,31 @@ public class TestBeanELResolver {
         Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
                 new Class<?>[] { String.class, String.class, String.class, String.class, String.class },
                 new Object[] { "true", "10", "11", "12" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce22() {
+        BeanELResolver resolver = new BeanELResolver();
+        StandardELContext context = new StandardELContext(ELManager.getExpressionFactory());
+        context.addELResolver(new StringToLongNeverFailResolver());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class, String.class },
+                new Object[] { "AA", "BB", "CC" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=MethodNotFoundException.class)
+    public void testInvokeVarargsCoerce23() {
+        BeanELResolver resolver = new BeanELResolver();
+        StandardELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class, String.class },
+                new Object[] { "AA", "BB", "CC" });
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -938,13 +966,36 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    private static class Bean {
+    /**
+     * Tests that a valid property implemented by a default method is resolved.
+     */
+    @Test
+    public void testGetDefaultValue() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.getValue(context, new Bean(), PROPERTY04_NAME);
+
+        Assert.assertEquals("Default", result);
+        Assert.assertTrue(context.isPropertyResolved());
+    }
+
+
+    private static class Bean implements MyInterface {
 
         @SuppressWarnings("unused")
         public void setValueA(String valueA) {
             // NOOP
         }
     }
+
+
+    public interface MyInterface {
+        default String getValueC() {
+            return "Default";
+        }
+    }
+
 
     private void doNegativeTest(Object base, Object trigger, MethodUnderTest method,
             boolean checkResult) {
@@ -985,4 +1036,53 @@ public class TestBeanELResolver {
         GET_VALUE, SET_VALUE, GET_TYPE, INVOKE
     }
 
+
+    /*
+     * Custom resolver that will always convert a string to an integer. If the
+     * provided string is not a valid integer, zero will be returned.
+     */
+    private static class StringToLongNeverFailResolver extends ELResolver {
+
+        @Override
+        public Object getValue(ELContext context, Object base, Object property) {
+            return null;
+        }
+
+        @Override
+        public Class<?> getType(ELContext context, Object base, Object property) {
+            return null;
+        }
+
+        @Override
+        public void setValue(ELContext context, Object base, Object property, Object value) {
+            throw new PropertyNotWritableException();
+        }
+
+        @Override
+        public boolean isReadOnly(ELContext context, Object base, Object property) {
+            return true;
+        }
+
+        @Override
+        public Class<?> getCommonPropertyType(ELContext context, Object base) {
+            return null;
+        }
+
+        @Override
+        public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
+            if (Integer.class.equals(type) && obj instanceof String) {
+                context.setPropertyResolved(true);
+                Integer result;
+                try {
+                    result = Integer.valueOf((String) obj);
+                } catch (NumberFormatException e) {
+                    result = Integer.valueOf(0);
+                }
+                @SuppressWarnings("unchecked")
+                T t = (T) result;
+                return t;
+            }
+            return super.convertToType(context, obj, type);
+        }
+    }
 }

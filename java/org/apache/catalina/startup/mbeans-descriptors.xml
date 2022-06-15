@@ -90,8 +90,17 @@
                is="true"
                type="boolean"/>
 
+    <operation name="tryAddServiced"
+               description="Add a web application to the serviced list to show it is being serviced by another component returning true if the application was added and false if the application was already being serviced"
+               impact="ACTION"
+               returnType="boolean">
+      <parameter name="name"
+                 description="Application name"
+                 type="java.lang.String"/>
+    </operation>
+
     <operation name="addServiced"
-               description="Add a web application to the serviced list to show it gets serviced by another component"
+               description="DEPRECATED: Add a web application to the serviced list to show it is being serviced by another component"
                impact="ACTION"
                returnType="void">
       <parameter name="name"
@@ -133,7 +142,7 @@
     </operation>
 
     <operation name="isServiced"
-               description="Is a web application serviced by another component"
+               description="DEPRECATED: Is a web application serviced by another component"
                impact="ACTION"
                returnType="boolean">
       <parameter name="name"

@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ha.backend;
 
 import java.io.BufferedReader;
@@ -104,8 +102,9 @@ public class TcpSender
                         connections[i].bind(addrs);
                         addrs = new InetSocketAddress(proxies[i].address, proxies[i].port);
                         connections[i].connect(addrs);
-                    } else
+                    } else {
                         connections[i] = new Socket(proxies[i].address, proxies[i].port);
+                    }
                     connectionReaders[i] = new BufferedReader(new InputStreamReader(connections[i].getInputStream()));
                     connectionWriters[i] = new BufferedWriter(new OutputStreamWriter(connections[i].getOutputStream()));
                 } catch (Exception ex) {
@@ -114,7 +113,9 @@ public class TcpSender
                 }
             }
             if (connections[i] == null)
+             {
                 continue; // try next proxy in the list
+            }
             BufferedWriter writer = connectionWriters[i];
             try {
                 writer.write(requestLine);
@@ -131,7 +132,9 @@ public class TcpSender
                 close(i);
             }
             if (connections[i] == null)
+             {
                 continue; // try next proxy in the list
+            }
 
             /* Read httpd answer */
             String responseStatus = connectionReaders[i].readLine();
@@ -151,7 +154,7 @@ public class TcpSender
                 // read all the headers.
                 String header = connectionReaders[i].readLine();
                 int contentLength = 0;
-                while (!"".equals(header)) {
+                while (header != null && !header.isEmpty()) {
                     int colon = header.indexOf(':');
                     String headerName = header.substring(0, colon).trim();
                     String headerValue = header.substring(colon + 1).trim();

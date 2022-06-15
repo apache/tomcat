@@ -149,7 +149,7 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
      * @return true if there is no if condition, or the named property exists
      */
     protected boolean testIfCondition() {
-        if (ifCondition == null || "".equals(ifCondition)) {
+        if (ifCondition == null || ifCondition.isEmpty()) {
             return true;
         }
         return getProject().getProperty(ifCondition) != null;

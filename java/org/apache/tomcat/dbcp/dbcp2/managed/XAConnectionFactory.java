@@ -1,5 +1,4 @@
-/**
- *
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -7,13 +6,13 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.tomcat.dbcp.dbcp2.managed;
 
@@ -32,14 +31,6 @@ import org.apache.tomcat.dbcp.dbcp2.ConnectionFactory;
  */
 public interface XAConnectionFactory extends ConnectionFactory {
     /**
-     * Gets the TransactionRegistry for this connection factory which contains a the XAResource for every connection
-     * created by this factory.
-     *
-     * @return the transaction registry for this connection factory
-     */
-    TransactionRegistry getTransactionRegistry();
-
-    /**
      * Create a new {@link java.sql.Connection} in an implementation specific fashion.
      * <p>
      * An implementation can assume that the caller of this will wrap the connection in a proxy that protects access to
@@ -52,4 +43,12 @@ public interface XAConnectionFactory extends ConnectionFactory {
      */
     @Override
     Connection createConnection() throws SQLException;
+
+    /**
+     * Gets the TransactionRegistry for this connection factory which contains a the XAResource for every connection
+     * created by this factory.
+     *
+     * @return the transaction registry for this connection factory
+     */
+    TransactionRegistry getTransactionRegistry();
 }

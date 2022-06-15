@@ -24,7 +24,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -42,7 +41,6 @@ import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.SingleThreadModel;
 import jakarta.servlet.UnavailableException;
 import jakarta.servlet.annotation.MultipartConfig;
 
@@ -71,7 +69,6 @@ import org.apache.tomcat.util.modeler.Util;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-@SuppressWarnings("deprecation") // SingleThreadModel
 public class StandardWrapper extends ContainerBase
     implements ServletConfig, Wrapper, NotificationEmitter {
 
@@ -113,8 +110,7 @@ public class StandardWrapper extends ContainerBase
     protected final NotificationBroadcasterSupport broadcaster;
 
     /**
-     * The count of allocations that are currently active (even if they
-     * are for the same instance, as will be true on a non-STM servlet).
+     * The count of allocations that are currently active.
      */
     protected final AtomicInteger countAllocated = new AtomicInteger(0);
 
@@ -182,33 +178,9 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Does this servlet implement the SingleThreadModel interface?
-     */
-    protected volatile boolean singleThreadModel = false;
-
-
-    /**
      * Are we unloading our servlet instance at the moment?
      */
     protected volatile boolean unloading = false;
-
-
-    /**
-     * Maximum number of STM instances.
-     */
-    protected int maxInstances = 20;
-
-
-    /**
-     * Number of instances currently loaded for a STM servlet.
-     */
-    protected int nInstances = 0;
-
-
-    /**
-     * Stack containing the STM instances.
-     */
-    protected Stack<Servlet> instancePool = null;
 
 
     /**
@@ -310,19 +282,18 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void setAvailable(long available) {
         long oldAvailable = this.available;
-        if (available > System.currentTimeMillis())
+        if (available > System.currentTimeMillis()) {
             this.available = available;
-        else
+        } else {
             this.available = 0L;
+        }
         support.firePropertyChange("available", Long.valueOf(oldAvailable),
                                    Long.valueOf(this.available));
     }
 
 
     /**
-     * @return the number of active allocations of this servlet, even if they
-     * are all for the same instance (as will be true for servlets that do
-     * not implement <code>SingleThreadModel</code>.
+     * @return the number of active allocations of this servlet.
      */
     public int getCountAllocated() {
         return this.countAllocated.get();
@@ -336,7 +307,7 @@ public class StandardWrapper extends ContainerBase
     @Override
     public int getLoadOnStartup() {
 
-        if (isJspServlet && loadOnStartup < 0) {
+        if (isJspServlet && loadOnStartup == -1) {
             /*
              * JspServlet must always be preloaded, because its instance is
              * used during registerJMX (when registering the JSP
@@ -394,31 +365,6 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * @return maximum number of instances that will be allocated when a single
-     * thread model servlet is used.
-     */
-    public int getMaxInstances() {
-        return this.maxInstances;
-    }
-
-
-    /**
-     * Set the maximum number of instances that will be allocated when a single
-     * thread model servlet is used.
-     *
-     * @param maxInstances New value of maxInstances
-     */
-    public void setMaxInstances(int maxInstances) {
-
-        int oldMaxInstances = this.maxInstances;
-        this.maxInstances = maxInstances;
-        support.firePropertyChange("maxInstances", oldMaxInstances,
-                                   this.maxInstances);
-
-    }
-
-
-    /**
      * Set the parent Container of this Wrapper, but only if it is a Context.
      *
      * @param container Proposed parent Container
@@ -427,9 +373,10 @@ public class StandardWrapper extends ContainerBase
     public void setParent(Container container) {
 
         if ((container != null) &&
-            !(container instanceof Context))
+            !(container instanceof Context)) {
             throw new IllegalArgumentException
                 (sm.getString("standardWrapper.notContext"));
+        }
         if (container instanceof StandardContext) {
             swallowOutput = ((StandardContext)container).getSwallowOutput();
             unloadDelay = ((StandardContext)container).getUnloadDelay();
@@ -507,40 +454,21 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Does the servlet class represented by this component implement the
-     * <code>SingleThreadModel</code> interface? This can only be determined
-     * once the class is loaded. Calling this method will not trigger loading
-     * the class since that may cause the application to behave unexpectedly.
-     *
-     * @return {@code null} if the class has not been loaded, otherwise {@code
-     *         true} if the servlet does implement {@code SingleThreadModel} and
-     *         {@code false} if it does not.
-     */
-    public Boolean isSingleThreadModel() {
-        // If the servlet has been loaded either singleThreadModel will be true
-        // or instance will be non-null
-        if (singleThreadModel || instance != null) {
-            return Boolean.valueOf(singleThreadModel);
-        }
-        return null;
-    }
-
-
-    /**
      * @return <code>true</code> if the Servlet has been marked unavailable.
      */
     @Override
     public boolean isUnavailable() {
 
-        if (!isEnabled())
+        if (!isEnabled()) {
             return true;
-        else if (available == 0L)
+        } else if (available == 0L) {
             return false;
-        else if (available <= System.currentTimeMillis()) {
+        } else if (available <= System.currentTimeMillis()) {
             available = 0L;
             return false;
-        } else
+        } else {
             return true;
+        }
 
     }
 
@@ -617,8 +545,9 @@ public class StandardWrapper extends ContainerBase
     public void backgroundProcess() {
         super.backgroundProcess();
 
-        if (!getState().isAvailable())
+        if (!getState().isAvailable()) {
             return;
+        }
 
         if (getServlet() instanceof PeriodicEventListener) {
             ((PeriodicEventListener) getServlet()).periodicEvent();
@@ -640,8 +569,9 @@ public class StandardWrapper extends ContainerBase
         do {
             loops++;
             rootCauseCheck = rootCause.getCause();
-            if (rootCauseCheck != null)
+            if (rootCauseCheck != null) {
                 rootCause = rootCauseCheck;
+            }
         } while (rootCauseCheck != null && (loops < 20));
         return rootCause;
     }
@@ -696,8 +626,9 @@ public class StandardWrapper extends ContainerBase
         } finally {
             mappingsLock.writeLock().unlock();
         }
-        if(parent.getState().equals(LifecycleState.STARTED))
+        if(parent.getState().equals(LifecycleState.STARTED)) {
             fireContainerEvent(ADD_MAPPING_EVENT, mapping);
+        }
 
     }
 
@@ -725,12 +656,7 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * Allocate an initialized instance of this Servlet that is ready to have
-     * its <code>service()</code> method called.  If the servlet class does
-     * not implement <code>SingleThreadModel</code>, the (only) initialized
-     * instance may be returned immediately.  If the servlet class implements
-     * <code>SingleThreadModel</code>, the Wrapper implementation must ensure
-     * that this instance is not allocated again until it is deallocated by a
-     * call to <code>deallocate()</code>.
+     * its <code>service()</code> method called.
      *
      * @exception ServletException if the servlet init() method threw
      *  an exception
@@ -746,96 +672,46 @@ public class StandardWrapper extends ContainerBase
 
         boolean newInstance = false;
 
-        // If not SingleThreadedModel, return the same instance every time
-        if (!singleThreadModel) {
-            // Load and initialize our instance if necessary
-            if (instance == null || !instanceInitialized) {
-                synchronized (this) {
-                    if (instance == null) {
-                        try {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Allocating non-STM instance");
-                            }
-
-                            // Note: We don't know if the Servlet implements
-                            // SingleThreadModel until we have loaded it.
-                            instance = loadServlet();
-                            newInstance = true;
-                            if (!singleThreadModel) {
-                                // For non-STM, increment here to prevent a race
-                                // condition with unload. Bug 43683, test case
-                                // #3
-                                countAllocated.incrementAndGet();
-                            }
-                        } catch (ServletException e) {
-                            throw e;
-                        } catch (Throwable e) {
-                            ExceptionUtils.handleThrowable(e);
-                            throw new ServletException(sm.getString("standardWrapper.allocate"), e);
-                        }
-                    }
-                    if (!instanceInitialized) {
-                        initServlet(instance);
-                    }
-                }
-            }
-
-            if (singleThreadModel) {
-                if (newInstance) {
-                    // Have to do this outside of the sync above to prevent a
-                    // possible deadlock
-                    synchronized (instancePool) {
-                        instancePool.push(instance);
-                        nInstances++;
-                    }
-                }
-            } else {
-                if (log.isTraceEnabled()) {
-                    log.trace("  Returning non-STM instance");
-                }
-                // For new instances, count will have been incremented at the
-                // time of creation
-                if (!newInstance) {
-                    countAllocated.incrementAndGet();
-                }
-                return instance;
-            }
-        }
-
-        synchronized (instancePool) {
-            while (countAllocated.get() >= nInstances) {
-                // Allocate a new instance if possible, or else wait
-                if (nInstances < maxInstances) {
+        // Load and initialize our instance if necessary
+        if (instance == null || !instanceInitialized) {
+            synchronized (this) {
+                if (instance == null) {
                     try {
-                        instancePool.push(loadServlet());
-                        nInstances++;
+                        if (log.isDebugEnabled()) {
+                            log.debug("Allocating instance");
+                        }
+                        instance = loadServlet();
+                        newInstance = true;
+                        // Increment here to prevent a race condition
+                        // with unload. Bug 43683, test case #3
+                        countAllocated.incrementAndGet();
                     } catch (ServletException e) {
                         throw e;
                     } catch (Throwable e) {
                         ExceptionUtils.handleThrowable(e);
                         throw new ServletException(sm.getString("standardWrapper.allocate"), e);
                     }
-                } else {
-                    try {
-                        instancePool.wait();
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
+                }
+                if (!instanceInitialized) {
+                    initServlet(instance);
                 }
             }
-            if (log.isTraceEnabled()) {
-                log.trace("  Returning allocated STM instance");
-            }
-            countAllocated.incrementAndGet();
-            return instancePool.pop();
         }
+
+        if (log.isTraceEnabled()) {
+            log.trace("  Returning instance");
+        }
+        // For new instances, count will have been incremented at the
+        // time of creation
+        if (!newInstance) {
+            countAllocated.incrementAndGet();
+        }
+        return instance;
     }
 
 
     /**
-     * Return this previously allocated servlet to the pool of available
-     * instances.  If this servlet class does not implement SingleThreadModel,
-     * no action is actually required.
+     * Decrement the allocation count for this servlet.
      *
      * @param servlet The servlet to be returned
      *
@@ -843,20 +719,7 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public void deallocate(Servlet servlet) throws ServletException {
-
-        // If not SingleThreadModel, no action is required
-        if (!singleThreadModel) {
-            countAllocated.decrementAndGet();
-            return;
-        }
-
-        // Unlock and free this instance
-        synchronized (instancePool) {
-            countAllocated.decrementAndGet();
-            instancePool.push(servlet);
-            instancePool.notify();
-        }
-
+        countAllocated.decrementAndGet();
     }
 
 
@@ -1011,17 +874,19 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * Load and initialize an instance of this servlet, if there is not already
-     * at least one initialized instance.  This can be used, for example, to
-     * load servlets that are marked in the deployment descriptor to be loaded
-     * at server startup time.
+     * an initialized instance.  This can be used, for example, to load servlets
+     * that are marked in the deployment descriptor to be loaded at server
+     * startup time.
+     *
      * @return the loaded Servlet instance
      * @throws ServletException for a Servlet load error
      */
     public synchronized Servlet loadServlet() throws ServletException {
 
         // Nothing to do if we already have an instance or an instance pool
-        if (!singleThreadModel && (instance != null))
+        if (instance != null) {
             return instance;
+        }
 
         PrintStream out = System.out;
         if (swallowOutput) {
@@ -1080,13 +945,6 @@ public class StandardWrapper extends ContainerBase
 
             classLoadTime=(int) (System.currentTimeMillis() -t1);
 
-            if (servlet instanceof SingleThreadModel) {
-                if (instancePool == null) {
-                    instancePool = new Stack<>();
-                }
-                singleThreadModel = true;
-            }
-
             initServlet(servlet);
 
             fireContainerEvent("load", this);
@@ -1112,7 +970,9 @@ public class StandardWrapper extends ContainerBase
     private synchronized void initServlet(Servlet servlet)
             throws ServletException {
 
-        if (instanceInitialized && !singleThreadModel) return;
+        if (instanceInitialized) {
+            return;
+        }
 
         // Call the initialization method of this servlet
         try {
@@ -1186,8 +1046,9 @@ public class StandardWrapper extends ContainerBase
         } finally {
             mappingsLock.writeLock().unlock();
         }
-        if(parent.getState().equals(LifecycleState.STARTED))
+        if(parent.getState().equals(LifecycleState.STARTED)) {
             fireContainerEvent(REMOVE_MAPPING_EVENT, mapping);
+        }
 
     }
 
@@ -1221,14 +1082,16 @@ public class StandardWrapper extends ContainerBase
     @Override
     public void unavailable(UnavailableException unavailable) {
         getServletContext().log(sm.getString("standardWrapper.unavailable", getName()));
-        if (unavailable == null)
+        if (unavailable == null) {
             setAvailable(Long.MAX_VALUE);
-        else if (unavailable.isPermanent())
+        } else if (unavailable.isPermanent()) {
             setAvailable(Long.MAX_VALUE);
-        else {
+        } else {
             int unavailableSeconds = unavailable.getUnavailableSeconds();
             if (unavailableSeconds <= 0)
+             {
                 unavailableSeconds = 60;        // Arbitrary default
+            }
             setAvailable(System.currentTimeMillis() +
                          (unavailableSeconds * 1000L));
         }
@@ -1250,12 +1113,12 @@ public class StandardWrapper extends ContainerBase
     public synchronized void unload() throws ServletException {
 
         // Nothing to do if we have never loaded the instance
-        if (!singleThreadModel && (instance == null))
+        if (instance == null) {
             return;
+        }
         unloading = true;
 
         // Loaf a while if the current instance is allocated
-        // (possibly more than once if non-STM)
         if (countAllocated.get() > 0) {
             int nRetries = 0;
             long delay = unloadDelay / 20;
@@ -1295,9 +1158,6 @@ public class StandardWrapper extends ContainerBase
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
-                instance = null;
-                instancePool = null;
-                nInstances = 0;
                 fireContainerEvent("unload", this);
                 unloading = false;
                 throw new ServletException
@@ -1324,55 +1184,20 @@ public class StandardWrapper extends ContainerBase
                         }
                     }
                 }
+                instance = null;
+                instanceInitialized = false;
             }
         }
 
         // Deregister the destroyed instance
         instance = null;
-        instanceInitialized = false;
 
         if (isJspServlet && jspMonitorON != null ) {
             Registry.getRegistry(null, null).unregisterComponent(jspMonitorON);
         }
 
-        if (singleThreadModel && (instancePool != null)) {
-            try {
-                while (!instancePool.isEmpty()) {
-                    Servlet s = instancePool.pop();
-                    if (Globals.IS_SECURITY_ENABLED) {
-                        try {
-                            SecurityUtil.doAsPrivilege("destroy", s);
-                        } finally {
-                            SecurityUtil.remove(s);
-                        }
-                    } else {
-                        s.destroy();
-                    }
-                    // Annotation processing
-                    if (!((Context) getParent()).getIgnoreAnnotations()) {
-                       ((StandardContext)getParent()).getInstanceManager().destroyInstance(s);
-                    }
-                }
-            } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
-                instancePool = null;
-                nInstances = 0;
-                unloading = false;
-                fireContainerEvent("unload", this);
-                throw new ServletException
-                    (sm.getString("standardWrapper.destroyException",
-                                  getName()), t);
-            }
-            instancePool = null;
-            nInstances = 0;
-        }
-
-        singleThreadModel = false;
-
         unloading = false;
         fireContainerEvent("unload", this);
-
     }
 
 
@@ -1413,12 +1238,13 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public ServletContext getServletContext() {
-        if (parent == null)
+        if (parent == null) {
             return null;
-        else if (!(parent instanceof Context))
+        } else if (!(parent instanceof Context)) {
             return null;
-        else
+        } else {
             return ((Context) parent).getServletContext();
+        }
     }
 
 

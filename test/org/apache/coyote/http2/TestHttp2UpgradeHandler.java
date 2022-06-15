@@ -17,6 +17,7 @@
 package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,4 +70,120 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
                 "3-EndOfStream\n", output.getTrace());
     }
 
+
+    @Test
+    public void testUpgradeWithRequestBodyGet() throws Exception {
+        doTestUpgradeWithRequestBody(false, false, false);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyGetTooBig() throws Exception {
+        doTestUpgradeWithRequestBody(false, false, true);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyPost() throws Exception {
+        doTestUpgradeWithRequestBody(true, false, false);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyPostTooBig() throws Exception {
+        doTestUpgradeWithRequestBody(true, false, true);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyGetReader() throws Exception {
+        doTestUpgradeWithRequestBody(false, true, false);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyGetReaderTooBig() throws Exception {
+        doTestUpgradeWithRequestBody(false, true, true);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyPostReader() throws Exception {
+        doTestUpgradeWithRequestBody(true, true, false);
+    }
+
+
+    @Test
+    public void testUpgradeWithRequestBodyPostReaderTooBig() throws Exception {
+        doTestUpgradeWithRequestBody(true, true, true);
+    }
+
+
+    private void doTestUpgradeWithRequestBody(boolean usePost, boolean useReader, boolean tooBig) throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = tomcat.addContext("", null);
+        Tomcat.addServlet(ctxt, "ReadRequestBodyServlet", new ReadRequestBodyServlet());
+        ctxt.addServletMappingDecoded("/", "ReadRequestBodyServlet");
+
+        if (tooBig) {
+            // Reduce maxSavePostSize rather than use a larger request body
+            tomcat.getConnector().setProperty("maxSavePostSize", "10");
+        }
+        tomcat.start();
+
+        openClientConnection();
+
+        byte[] upgradeRequest = ((usePost ? "POST" : "GET") +
+                " /" + (useReader ? "?useReader=true " : " ") + "HTTP/1.1\r\n" +
+                "Host: localhost:" + getPort() + "\r\n" +
+                "Content-Length: 18\r\n" +
+                "Connection: Upgrade,HTTP2-Settings\r\n" +
+                "Upgrade: h2c\r\n" +
+                EMPTY_HTTP2_SETTINGS_HEADER +
+                "\r\n" +
+                "Small request body").getBytes(StandardCharsets.ISO_8859_1);
+        os.write(upgradeRequest);
+        os.flush();
+
+        if (tooBig) {
+            String[] responseHeaders = readHttpResponseHeaders();
+            Assert.assertNotNull(responseHeaders);
+            Assert.assertNotEquals(0, responseHeaders.length);
+            Assert.assertEquals("HTTP/1.1 413 ", responseHeaders[0]);
+        } else {
+            Assert.assertTrue("Failed to read HTTP Upgrade response", readHttpUpgradeResponse());
+
+            sendClientPreface();
+
+            // - 101 response acts as acknowledgement of the HTTP2-Settings header
+            // Need to read 5 frames
+            // - settings (server settings - must be first)
+            // - settings ack (for the settings frame in the client preface)
+            // - ping
+            // - headers (for response)
+            // - data (for response body)
+            parser.readFrame(true);
+            parser.readFrame(true);
+            parser.readFrame(true);
+            parser.readFrame(true);
+            parser.readFrame(true);
+
+            Assert.assertEquals("0-Settings-[3]-[200]\n" +
+                    "0-Settings-End\n" +
+                    "0-Settings-Ack\n" +
+                    "0-Ping-[0,0,0,0,0,0,0,1]\n" +
+                    "1-HeadersStart\n" +
+                    "1-Header-[:status]-[200]\n" +
+                    "1-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
+                    "1-Header-[content-length]-[39]\n" +
+                    "1-Header-[date]-[" + DEFAULT_DATE + "]\n" +
+                    "1-HeadersEnd\n" +
+                    "1-Body-39\n" +
+                    "1-EndOfStream\n"
+                    , output.getTrace());
+        }
+    }
 }

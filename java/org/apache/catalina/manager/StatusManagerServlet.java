@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.manager;
 
 
@@ -62,12 +60,6 @@ public class StatusManagerServlet
 
 
     /**
-     * Vector of protocol handlers object names.
-     */
-    protected final Vector<ObjectName> protocolHandlers = new Vector<>();
-
-
-    /**
      * Vector of thread pools object names.
      */
     protected final Vector<ObjectName> threadPools = new Vector<>();
@@ -106,21 +98,11 @@ public class StatusManagerServlet
 
         try {
 
-            // Query protocol handlers
-            String onStr = "*:type=ProtocolHandler,*";
+            // Query Thread Pools
+            String onStr = "*:type=ThreadPool,*";
             ObjectName objectName = new ObjectName(onStr);
             Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
             Iterator<ObjectInstance> iterator = set.iterator();
-            while (iterator.hasNext()) {
-                ObjectInstance oi = iterator.next();
-                protocolHandlers.addElement(oi.getObjectName());
-            }
-
-            // Query Thread Pools
-            onStr = "*:type=ThreadPool,*";
-            objectName = new ObjectName(onStr);
-            set = mBeanServer.queryMBeans(objectName, null);
-            iterator = set.iterator();
             while (iterator.hasNext()) {
                 ObjectInstance oi = iterator.next();
                 threadPools.addElement(oi.getObjectName());
@@ -286,17 +268,6 @@ public class StatusManagerServlet
 
         try {
 
-            // Display operating system statistics using APR if available
-            args = new Object[7];
-            args[0] = smClient.getString("htmlManagerServlet.osPhysicalMemory");
-            args[1] = smClient.getString("htmlManagerServlet.osAvailableMemory");
-            args[2] = smClient.getString("htmlManagerServlet.osTotalPageFile");
-            args[3] = smClient.getString("htmlManagerServlet.osFreePageFile");
-            args[4] = smClient.getString("htmlManagerServlet.osMemoryLoad");
-            args[5] = smClient.getString("htmlManagerServlet.osKernelTime");
-            args[6] = smClient.getString("htmlManagerServlet.osUserTime");
-            StatusTransformer.writeOSState(writer, mode, args);
-
             // Display virtual machine statistics
             args = new Object[9];
             args[0] = smClient.getString("htmlManagerServlet.jvmFreeMemory");
@@ -324,7 +295,7 @@ public class StatusManagerServlet
                 args[5] = smClient.getString("htmlManagerServlet.connectorStateProcessingTime");
                 args[6] = smClient.getString("htmlManagerServlet.connectorStateRequestCount");
                 args[7] = smClient.getString("htmlManagerServlet.connectorStateErrorCount");
-                args[8] = smClient.getString("htmlManagerServlet.connectorStateBytesRecieved");
+                args[8] = smClient.getString("htmlManagerServlet.connectorStateBytesReceived");
                 args[9] = smClient.getString("htmlManagerServlet.connectorStateBytesSent");
                 args[10] = smClient.getString("htmlManagerServlet.connectorStateTableTitleStage");
                 args[11] = smClient.getString("htmlManagerServlet.connectorStateTableTitleTime");
@@ -373,9 +344,7 @@ public class StatusManagerServlet
                 (MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
                 String type = objectName.getKeyProperty("type");
                 if (type != null) {
-                    if (type.equals("ProtocolHandler")) {
-                        protocolHandlers.addElement(objectName);
-                    } else if (type.equals("ThreadPool")) {
+                    if (type.equals("ThreadPool")) {
                         threadPools.addElement(objectName);
                     } else if (type.equals("GlobalRequestProcessor")) {
                         globalRequestProcessors.addElement(objectName);
@@ -387,9 +356,7 @@ public class StatusManagerServlet
                        (MBeanServerNotification.UNREGISTRATION_NOTIFICATION)) {
                 String type = objectName.getKeyProperty("type");
                 if (type != null) {
-                    if (type.equals("ProtocolHandler")) {
-                        protocolHandlers.removeElement(objectName);
-                    } else if (type.equals("ThreadPool")) {
+                    if (type.equals("ThreadPool")) {
                         threadPools.removeElement(objectName);
                     } else if (type.equals("GlobalRequestProcessor")) {
                         globalRequestProcessors.removeElement(objectName);

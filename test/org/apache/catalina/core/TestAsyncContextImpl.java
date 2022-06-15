@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +28,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.AsyncEvent;
@@ -302,9 +305,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                             result.append("false");
                         }
                         done = true;
-                    } catch (InterruptedException e) {
-                        result.append(e);
-                    } catch (IOException e) {
+                    } catch (InterruptedException | IOException e) {
                         result.append(e);
                     }
                 }
@@ -380,9 +381,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                                     result.append("false");
                                 }
                                 done = true;
-                            } catch (InterruptedException e) {
-                                result.append(e);
-                            } catch (IOException e) {
+                            } catch (InterruptedException | IOException e) {
                                 result.append(e);
                             }
                         }
@@ -870,7 +869,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
-    private static class TrackingListener implements AsyncListener {
+    public static class TrackingListener implements AsyncListener {
 
         private final boolean completeOnError;
         private final boolean completeOnTimeout;
@@ -1956,8 +1955,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 loops--;
                 req.setAttribute("loops", Integer.valueOf(loops));
                 ctx.dispatch();
-            } else
-                throw new ServletException();
+            } else {
+              throw new ServletException();
+            }
         }
     }
 
@@ -2742,29 +2742,34 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
 
     private void doTestAsyncIoEnd(boolean useThread, boolean useComplete) throws Exception {
-        Tomcat tomcat = getTomcatInstance();
+        LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.ALL);
+        try {
+            Tomcat tomcat = getTomcatInstance();
 
-        // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+            // No file system docBase required
+            Context ctx = tomcat.addContext("", null);
 
-        AsyncIoEndServlet asyncIoEndServlet = new AsyncIoEndServlet(useThread, useComplete);
-        Wrapper wrapper = Tomcat.addServlet(ctx, "asyncIoEndServlet", asyncIoEndServlet);
-        wrapper.setAsyncSupported(true);
-        ctx.addServletMappingDecoded("/asyncIoEndServlet", "asyncIoEndServlet");
+            AsyncIoEndServlet asyncIoEndServlet = new AsyncIoEndServlet(useThread, useComplete);
+            Wrapper wrapper = Tomcat.addServlet(ctx, "asyncIoEndServlet", asyncIoEndServlet);
+            wrapper.setAsyncSupported(true);
+            ctx.addServletMappingDecoded("/asyncIoEndServlet", "asyncIoEndServlet");
 
-        SimpleServlet simpleServlet = new SimpleServlet();
-        Tomcat.addServlet(ctx, "simpleServlet", simpleServlet);
-        ctx.addServletMappingDecoded("/simpleServlet", "simpleServlet");
+            SimpleServlet simpleServlet = new SimpleServlet();
+            Tomcat.addServlet(ctx, "simpleServlet", simpleServlet);
+            ctx.addServletMappingDecoded("/simpleServlet", "simpleServlet");
 
-        tomcat.start();
+            tomcat.start();
 
-        ByteChunk body = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + "/asyncIoEndServlet", body, null);
+            ByteChunk body = new ByteChunk();
+            int rc = getUrl("http://localhost:" + getPort() + "/asyncIoEndServlet", body, null);
 
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals("OK", body.toString());
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            Assert.assertEquals("OK", body.toString());
 
-        Assert.assertFalse(asyncIoEndServlet.getInvalidStateDetected());
+            Assert.assertFalse(asyncIoEndServlet.getInvalidStateDetected());
+        } finally {
+            LogManager.getLogManager().getLogger("org.apache.coyote").setLevel(Level.INFO);
+        }
     }
 
 
@@ -2837,14 +2842,14 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
 
         public void doOnWritePossible() {
-            // Hack to avoid ISE if we try gettign the request after complete/dispatch
+            // Hack to avoid ISE if we try getting the request after complete/dispatch
             ServletRequest req = ac.getRequest();
             if (useComplete) {
                 ac.complete();
             } else {
                 ac.dispatch("/simpleServlet");
             }
-            if (req.isAsyncStarted()) {
+            if (!useThread && req.isAsyncStarted()) {
                 invalidStateDetected = true;
             }
         }
@@ -3020,4 +3025,190 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+
+    @Test
+    public void testCanceledPostChunked() throws Exception {
+        doTestCanceledPost(new String[] {
+                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + SimpleHttpClient.CRLF +
+                "Transfer-Encoding: Chunked" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "10" + SimpleHttpClient.CRLF +
+                "This is 16 bytes" + SimpleHttpClient.CRLF
+                });
+    }
+
+
+    @Test
+    public void testCanceledPostNoChunking() throws Exception {
+        doTestCanceledPost(new String[] {
+                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + SimpleHttpClient.CRLF +
+                "Content-Length: 100" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "This is 16 bytes"
+                });
+    }
+
+
+    /*
+     * Tests an error on an async thread when the client closes the connection
+     * before fully writing the request body.
+     *
+     * Required sequence is:
+     * - enter Servlet's service() method
+     * - startAsync()
+     * - start async thread
+     * - read partial body
+     * - close client connection
+     * - read on async thread -> I/O error
+     * - exit Servlet's service() method
+     *
+     * This test makes extensive use of instance fields in the Servlet that
+     * would normally be considered very poor practice. It is only safe in this
+     * test as the Servlet only processes a single request.
+     */
+    private void doTestCanceledPost(String[] request) throws Exception {
+        CountDownLatch partialReadLatch = new CountDownLatch(1);
+        CountDownLatch clientCloseLatch = new CountDownLatch(1);
+        CountDownLatch threadCompleteLatch = new CountDownLatch(1);
+
+        AtomicBoolean testFailed = new AtomicBoolean(true);
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        PostServlet postServlet = new PostServlet(partialReadLatch, clientCloseLatch, threadCompleteLatch, testFailed);
+        Wrapper wrapper = Tomcat.addServlet(ctx, "postServlet", postServlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMappingDecoded("/*", "postServlet");
+
+        tomcat.start();
+
+        PostClient client = new PostClient();
+        client.setPort(getPort());
+        client.setRequest(request);
+        client.connect();
+        client.sendRequest();
+
+        // Wait server to read partial request body
+        partialReadLatch.await();
+
+        client.disconnect();
+
+        clientCloseLatch.countDown();
+
+        threadCompleteLatch.await();
+
+        Assert.assertFalse(testFailed.get());
+    }
+
+
+    private static final class PostClient extends SimpleHttpClient {
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return true;
+        }
+    }
+
+
+    private static final class PostServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final transient CountDownLatch partialReadLatch;
+        private final transient CountDownLatch clientCloseLatch;
+        private final transient CountDownLatch threadCompleteLatch;
+        private final AtomicBoolean testFailed;
+
+        public PostServlet(CountDownLatch doPostLatch, CountDownLatch clientCloseLatch,
+                CountDownLatch threadCompleteLatch, AtomicBoolean testFailed) {
+            this.partialReadLatch = doPostLatch;
+            this.clientCloseLatch = clientCloseLatch;
+            this.threadCompleteLatch = threadCompleteLatch;
+            this.testFailed = testFailed;
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            AsyncContext ac = req.startAsync();
+            Thread t = new PostServletThread(ac, partialReadLatch, clientCloseLatch, threadCompleteLatch, testFailed);
+            t.start();
+
+            try {
+                threadCompleteLatch.await();
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+    }
+
+
+    private static final class PostServletThread extends Thread {
+
+        private final AsyncContext ac;
+        private final CountDownLatch partialReadLatch;
+        private final CountDownLatch clientCloseLatch;
+        private final CountDownLatch threadCompleteLatch;
+        private final AtomicBoolean testFailed;
+
+        public PostServletThread(AsyncContext ac, CountDownLatch partialReadLatch, CountDownLatch clientCloseLatch,
+                CountDownLatch threadCompleteLatch, AtomicBoolean testFailed) {
+            this.ac = ac;
+            this.partialReadLatch = partialReadLatch;
+            this.clientCloseLatch = clientCloseLatch;
+            this.threadCompleteLatch = threadCompleteLatch;
+            this.testFailed = testFailed;
+        }
+
+        @Override
+        public void run() {
+            try {
+                int bytesRead = 0;
+                byte[] buffer = new byte[32];
+                InputStream is = null;
+
+                try {
+                    is = ac.getRequest().getInputStream();
+
+                    // Read the partial request body
+                    while (bytesRead < 16) {
+                        int read = is.read(buffer);
+                        if (read == -1) {
+                            // Error condition
+                            return;
+                        }
+                        bytesRead += read;
+                    }
+                } catch (IOException ioe) {
+                    // Error condition
+                    return;
+                } finally {
+                    partialReadLatch.countDown();
+                }
+
+                // Wait for client to close connection
+                clientCloseLatch.await();
+
+                // Read again
+                try {
+                    is.read();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    // Required. Clear the error marker.
+                    testFailed.set(false);
+                }
+            } catch (InterruptedException e) {
+                // Ignore
+            } finally {
+                threadCompleteLatch.countDown();
+            }
+        }
+    }
 }

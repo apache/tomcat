@@ -15,10 +15,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Apache Tomcat 9 Architecture"
+<project name="Apache Tomcat 10 Architecture"
         href="https://tomcat.apache.org/">
 
-    <title>Apache Tomcat 9 Architecture</title>
+    <title>Apache Tomcat 10 Architecture</title>
 
     <logo href="/images/tomcat.gif">
       The Apache Tomcat Servlet/JSP Container
@@ -30,7 +30,7 @@
     <menu name="Links">
         <item name="Docs Home"             href="../index.html" />
         <item name="Architecture Home"     href="index.html"/>
-        <item name="FAQ"                   href="https://wiki.apache.org/tomcat/FAQ" />
+        <item name="FAQ"                   href="https://cwiki.apache.org/confluence/display/TOMCAT/FAQ" />
         <item name="User Comments"         href="#comments_section"/>
     </menu>
 

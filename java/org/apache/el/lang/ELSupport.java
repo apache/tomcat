@@ -19,6 +19,9 @@ package org.apache.el.lang;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.AccessController;
@@ -29,6 +32,7 @@ import java.util.Set;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
+import jakarta.el.LambdaExpression;
 
 import org.apache.el.util.MessageFactory;
 
@@ -48,13 +52,8 @@ public class ELSupport {
         String coerceToZeroStr;
         if (System.getSecurityManager() != null) {
             coerceToZeroStr = AccessController.doPrivileged(
-                    new PrivilegedAction<String>(){
-                        @Override
-                        public String run() {
-                            return System.getProperty(
-                                    "org.apache.el.parser.COERCE_TO_ZERO", "false");
-                        }
-                    }
+                    (PrivilegedAction<String>) () -> System.getProperty(
+                            "org.apache.el.parser.COERCE_TO_ZERO", "false")
             );
         } else {
             coerceToZeroStr = System.getProperty(
@@ -493,13 +492,13 @@ public class ELSupport {
         }
     }
 
-    public static final Object coerceToType(final ELContext ctx, final Object obj,
-            final Class<?> type) throws ELException {
+    public static final <T> T coerceToType(final ELContext ctx, final Object obj,
+            final Class<T> type) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
             try {
-                Object result = ctx.getELResolver().convertToType(ctx, obj, type);
+                T result = ctx.getELResolver().convertToType(ctx, obj, type);
                 if (ctx.isPropertyResolved()) {
                     return result;
                 }
@@ -510,7 +509,9 @@ public class ELSupport {
 
         if (type == null || Object.class.equals(type) ||
                 (obj != null && type.isAssignableFrom(obj.getClass()))) {
-            return obj;
+            @SuppressWarnings("unchecked")
+            T result = (T) obj;
+            return result;
         }
 
         if (!COERCE_TO_ZERO) {
@@ -521,38 +522,52 @@ public class ELSupport {
         }
 
         if (String.class.equals(type)) {
-            return coerceToString(ctx, obj);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToString(ctx, obj);
+            return result;
         }
         if (ELArithmetic.isNumberType(type)) {
-            return coerceToNumber(ctx, obj, type);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToNumber(ctx, obj, type);
+            return result;
         }
         if (Character.class.equals(type) || Character.TYPE == type) {
-            return coerceToCharacter(ctx, obj);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToCharacter(ctx, obj);
+            return result;
         }
         if (Boolean.class.equals(type) || Boolean.TYPE == type) {
-            return coerceToBoolean(ctx, obj, Boolean.TYPE == type);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToBoolean(ctx, obj, Boolean.TYPE == type);
+            return result;
         }
         if (type.isEnum()) {
-            return coerceToEnum(ctx, obj, type);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToEnum(ctx, obj, type);
+            return result;
         }
 
         // new to spec
-        if (obj == null)
+        if (obj == null) {
             return null;
+        }
         if (obj instanceof String) {
+            String str = (String) obj;
             PropertyEditor editor = PropertyEditorManager.findEditor(type);
             if (editor == null) {
-                if ("".equals(obj)) {
+                if (str.isEmpty()) {
                     return null;
                 }
                 throw new ELException(MessageFactory.get("error.convert", obj,
                         obj.getClass(), type));
             } else {
                 try {
-                    editor.setAsText((String) obj);
-                    return editor.getValue();
+                    editor.setAsText(str);
+                    @SuppressWarnings("unchecked")
+                    T result = (T) editor.getValue();
+                    return result;
                 } catch (RuntimeException e) {
-                    if ("".equals(obj)) {
+                    if (str.isEmpty()) {
                         return null;
                     }
                     throw new ELException(MessageFactory.get("error.convert",
@@ -565,12 +580,21 @@ public class ELSupport {
         // for an empty map. The parser will always parse {} as an empty set.
         if (obj instanceof Set && type == Map.class &&
                 ((Set<?>) obj).isEmpty()) {
-            return Collections.EMPTY_MAP;
+            @SuppressWarnings("unchecked")
+            T result = (T) Collections.EMPTY_MAP;
+            return result;
         }
 
         // Handle arrays
         if (type.isArray() && obj.getClass().isArray()) {
-            return coerceToArray(ctx, obj, type);
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToArray(ctx, obj, type);
+            return result;
+        }
+
+        if (obj instanceof LambdaExpression && isFunctionalInterface(type)) {
+            T result = coerceToFunctionalInterface(ctx, (LambdaExpression) obj, type);
+            return result;
         }
 
         throw new ELException(MessageFactory.get("error.convert",
@@ -597,6 +621,23 @@ public class ELSupport {
 
         return result;
     }
+
+
+    private static <T> T coerceToFunctionalInterface(final ELContext ctx, final LambdaExpression lambdaExpression,
+            final Class<T> type) {
+        // Create a dynamic proxy for the functional interface
+        @SuppressWarnings("unchecked")
+        T result = (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[] { type },
+                (Object obj, Method method, Object[] args) -> {
+            // Functional interfaces have a single, abstract method
+            if (!Modifier.isAbstract(method.getModifiers())) {
+                throw new ELException(MessageFactory.get("elSupport.coerce.nonAbstract", type, method));
+            }
+            return lambdaExpression.invoke(ctx, args);
+        });
+        return result;
+    }
+
 
     public static final boolean isBigDecimalOp(final Object obj0,
             final Object obj1) {
@@ -645,11 +686,63 @@ public class ELSupport {
         return false;
     }
 
-    /**
-     *
-     */
-    public ELSupport() {
-        super();
+
+    static boolean isFunctionalInterface(Class<?> type) {
+
+        if (!type.isInterface()) {
+            return false;
+        }
+
+        boolean foundAbstractMethod = false;
+        Method[] methods = type.getMethods();
+        for (Method method : methods) {
+            if (Modifier.isAbstract(method.getModifiers())) {
+                // Abstract methods that override one of the public methods
+                // of Object don't count
+                if (overridesObjectMethod(method)) {
+                    continue;
+                }
+                if (foundAbstractMethod) {
+                    // Found more than one
+                    return false;
+                } else {
+                    foundAbstractMethod = true;
+                }
+            }
+        }
+        return foundAbstractMethod;
     }
 
+
+    private static boolean overridesObjectMethod(Method method) {
+        // There are three methods that can be overridden
+        if ("equals".equals(method.getName())) {
+            if (method.getReturnType().equals(boolean.class)) {
+                if (method.getParameterCount() == 1) {
+                    if (method.getParameterTypes()[0].equals(Object.class)) {
+                        return true;
+                    }
+                }
+            }
+        } else if ("hashCode".equals(method.getName())) {
+            if (method.getReturnType().equals(int.class)) {
+                if (method.getParameterCount() == 0) {
+                    return true;
+                }
+            }
+        } else if ("toString".equals(method.getName())) {
+            if (method.getReturnType().equals(String.class)) {
+                if (method.getParameterCount() == 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    private ELSupport() {
+        // Uility class - hide default constructor;
+    }
 }

@@ -118,14 +118,42 @@ public abstract class ELResolver {
     public abstract boolean isReadOnly(ELContext context, Object base,
             Object property);
 
-    public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
+    /**
+     * Obtain the feature descriptors for the resolvable properties of the given
+     * object.
+     * <p>
+     * The default implementation returns {@code null}.
+     *
+     * @param context The context in which the examination takes place
+     * @param base The object to examine
+     *
+     * @return An iterator, possibly empty, of feature descriptors of the given
+     *         object
+     *
+     * @deprecated This method will be removed, without replacement, in EL 6.0 /
+     *             Tomcat 11.
+     */
+    @Deprecated(forRemoval = true, since = "EL 5.0")
+    public Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
+        return null;
+    }
 
+    /**
+     * Obtain the most common type that is acceptable for the given base object.
+     *
+     * @param context The context in which the examination takes place
+     * @param base The object to examine
+     *
+     * @return {code null} if the most common type cannot be determine,
+     *         otherwise the most common type
+     */
     public abstract Class<?> getCommonPropertyType(ELContext context,
             Object base);
 
     /**
      * Converts the given object to the given type. This default implementation
      * always returns <code>null</code>.
+     * @param <T>     The type to which the object should be converted
      *
      * @param context The EL context for this evaluation
      * @param obj     The object to convert
@@ -135,7 +163,7 @@ public abstract class ELResolver {
      *
      * @since EL 3.0
      */
-    public Object convertToType(ELContext context, Object obj, Class<?> type) {
+    public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
         context.setPropertyResolved(false);
         return null;
     }

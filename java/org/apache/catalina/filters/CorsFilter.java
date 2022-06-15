@@ -74,8 +74,13 @@ import org.apache.tomcat.util.res.StringManager;
  * 'Access-Control-Request-Headers' header, for pre-flight request.</li>
  * </ul>
  *
- * @see <a href="http://www.w3.org/TR/cors/">CORS specification</a>
+ * If you extend this class and override one or more of the getXxx() methods,
+ * consider whether you also need to override
+ * {@link CorsFilter#doFilter(ServletRequest, ServletResponse, FilterChain)} and
+ * add appropriate locking so that the {@code doFilter()} method executes with a
+ * consistent configuration.
  *
+ * @see <a href="http://www.w3.org/TR/cors/">CORS specification</a>
  */
 public class CorsFilter extends GenericFilter {
 
@@ -151,7 +156,7 @@ public class CorsFilter extends GenericFilter {
         CorsFilter.CORSRequestType requestType = checkRequestType(request);
 
         // Adds CORS specific attributes to request.
-        if (decorateRequest) {
+        if (isDecorateRequest()) {
             CorsFilter.decorateCORSProperties(request, requestType);
         }
         switch (requestType) {
@@ -247,7 +252,7 @@ public class CorsFilter extends GenericFilter {
             return;
         }
 
-        if (!allowedHttpMethods.contains(method)) {
+        if (!getAllowedHttpMethods().contains(method)) {
             handleInvalidCORS(request, response, filterChain);
             return;
         }
@@ -309,7 +314,7 @@ public class CorsFilter extends GenericFilter {
         }
 
         // Section 6.2.5
-        if (!allowedHttpMethods.contains(accessControlRequestMethod)) {
+        if (!getAllowedHttpMethods().contains(accessControlRequestMethod)) {
             handleInvalidCORS(request, response, filterChain);
             return;
         }
@@ -317,7 +322,7 @@ public class CorsFilter extends GenericFilter {
         // Section 6.2.6
         if (!accessControlRequestHeaders.isEmpty()) {
             for (String header : accessControlRequestHeaders) {
-                if (!allowedHttpHeaders.contains(header)) {
+                if (!getAllowedHttpHeaders().contains(header)) {
                     handleInvalidCORS(request, response, filterChain);
                     return;
                 }
@@ -395,6 +400,9 @@ public class CorsFilter extends GenericFilter {
         final String method = request.getMethod();
         final String origin = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
 
+        // Local copy to avoid concurrency issues if isAnyOriginAllowed()
+        // is overridden.
+        boolean anyOriginAllowed = isAnyOriginAllowed();
         if (!anyOriginAllowed) {
             // If only specific origins are allowed, the response will vary by
             // origin
@@ -419,13 +427,16 @@ public class CorsFilter extends GenericFilter {
         // If the resource supports credentials, add a single
         // Access-Control-Allow-Credentials header with the case-sensitive
         // string "true" as value.
-        if (supportsCredentials) {
+        if (isSupportsCredentials()) {
             response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
         }
 
         // If the list of exposed headers is not empty add one or more
         // Access-Control-Expose-Headers headers, with as values the header
         // field names given in the list of exposed headers.
+        // Local copy to avoid concurrency issues if getExposedHeaders()
+        // is overridden.
+        Collection<String> exposedHeaders = getExposedHeaders();
         if ((exposedHeaders != null) && (exposedHeaders.size() > 0)) {
             String exposedHeadersString = join(exposedHeaders, ",");
             response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS,
@@ -445,19 +456,27 @@ public class CorsFilter extends GenericFilter {
             // non-CORS OPTIONS requests do not need to. The headers are always set
             // as a) they do no harm in the non-CORS case and b) it allows the same
             // response to be cached for CORS and non-CORS requests.
-
+            // Local copy to avoid concurrency issues if getPreflightMaxAge()
+            // is overridden.
+            long preflightMaxAge = getPreflightMaxAge();
             if (preflightMaxAge > 0) {
                 response.addHeader(
                         CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_MAX_AGE,
                         String.valueOf(preflightMaxAge));
             }
 
+            // Local copy to avoid concurrency issues if getAllowedHttpMethods()
+            // is overridden.
+            Collection<String> allowedHttpMethods = getAllowedHttpMethods();
             if  ((allowedHttpMethods != null) && (!allowedHttpMethods.isEmpty())) {
                 response.addHeader(
                         CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_METHODS,
                         join(allowedHttpMethods, ","));
             }
 
+            // Local copy to avoid concurrency issues if getAllowedHttpHeaders()
+            // is overridden.
+            Collection<String> allowedHttpHeaders = getAllowedHttpHeaders();
             if ((allowedHttpHeaders != null) && (!allowedHttpHeaders.isEmpty())) {
                 response.addHeader(
                         CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_HEADERS,
@@ -659,13 +678,13 @@ public class CorsFilter extends GenericFilter {
      *         otherwise.
      */
     private boolean isOriginAllowed(final String origin) {
-        if (anyOriginAllowed) {
+        if (isAnyOriginAllowed()) {
             return true;
         }
 
         // If 'Origin' header is a case-sensitive match of any of allowed
         // origins, then return true, else return false.
-        return allowedOrigins.contains(origin);
+        return getAllowedOrigins().contains(origin);
     }
 
 
@@ -687,7 +706,7 @@ public class CorsFilter extends GenericFilter {
      * @param preflightMaxAge
      *            The amount of seconds the user agent is allowed to cache the
      *            result of the pre-flight request.
-     * @throws ServletException
+     * @throws ServletException If the configuration is invalid
      */
     private void parseAndStore(final String allowedOrigins,
             final String allowedHttpMethods, final String allowedHttpHeaders,
@@ -839,6 +858,17 @@ public class CorsFilter extends GenericFilter {
      */
     public Collection<String> getAllowedHttpHeaders() {
         return allowedHttpHeaders;
+    }
+
+
+    /**
+     * Should CORS specific attributes be added to the request.
+     *
+     * @return {@code true} if the request should be decorated, otherwise
+     *         {@code false}
+     */
+    public boolean isDecorateRequest() {
+        return decorateRequest;
     }
 
 

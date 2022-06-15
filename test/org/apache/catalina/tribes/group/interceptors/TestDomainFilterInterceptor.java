@@ -73,8 +73,12 @@ public class TestDomainFilterInterceptor {
             };
             threads[i] = t;
         }
-        for (Thread thread : threads) thread.start();
-        for (Thread thread : threads) thread.join();
+        for (Thread thread : threads) {
+          thread.start();
+        }
+        for (Thread thread : threads) {
+          thread.join();
+        }
         System.out.println("All channels started.");
         for (int i=listeners.length-1; i>=0; i-- ) {
             Assert.assertEquals("Checking member arrival length",0,listeners[i].members.size());

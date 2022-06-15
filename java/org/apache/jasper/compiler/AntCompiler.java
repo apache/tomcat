@@ -65,8 +65,9 @@ public class AntCompiler extends Compiler {
     // Lazy eval - if we don't need to compile we probably don't need the project
     protected Project getProject() {
 
-        if (project != null)
+        if (project != null) {
             return project;
+        }
 
         // Initializing project
         project = new Project();
@@ -80,8 +81,9 @@ public class AntCompiler extends Compiler {
         }
 
         if( options.getCompiler() != null ) {
-            if( log.isDebugEnabled() )
+            if( log.isDebugEnabled() ) {
                 log.debug("Compiler " + options.getCompiler() );
+            }
             project.setProperty("build.compiler", options.getCompiler() );
         }
         project.init();
@@ -173,22 +175,6 @@ public class AntCompiler extends Compiler {
             extdirs.setPath(exts);
             javac.setExtdirs(extdirs);
             info.append("    extension dir=" + exts + "\n");
-        }
-
-        // Add endorsed directories if any are specified and we're forking
-        // See Bugzilla 31257
-        if(ctxt.getOptions().getFork()) {
-            String endorsed = System.getProperty("java.endorsed.dirs");
-            if(endorsed != null) {
-                Javac.ImplementationSpecificArgument endorsedArg =
-                    javac.createCompilerArg();
-                endorsedArg.setLine("-J-Djava.endorsed.dirs=" +
-                        quotePathList(endorsed));
-                info.append("    endorsed dir=" + quotePathList(endorsed) +
-                        "\n");
-            } else {
-                info.append("    no endorsed dirs specified\n");
-            }
         }
 
         // Configure the compiler object
@@ -284,25 +270,6 @@ public class AntCompiler extends Compiler {
         if (!options.isSmapSuppressed()) {
             SmapUtil.installSmap(smaps);
         }
-    }
-
-    private String quotePathList(String list) {
-        StringBuilder result = new StringBuilder(list.length() + 10);
-        StringTokenizer st = new StringTokenizer(list, File.pathSeparator);
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            if (token.indexOf(' ') == -1) {
-                result.append(token);
-            } else {
-                result.append('\"');
-                result.append(token);
-                result.append('\"');
-            }
-            if (st.hasMoreTokens()) {
-                result.append(File.pathSeparatorChar);
-            }
-        }
-        return result.toString();
     }
 
 

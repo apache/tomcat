@@ -31,7 +31,7 @@ import jakarta.servlet.ServletRequestWrapper;
  * calling through to the wrapped request object.
  *
  * @see jakarta.servlet.http.HttpServletRequest
- * @since v 2.3
+ * @since Servlet 2.3
  */
 public class HttpServletRequestWrapper extends ServletRequestWrapper implements
         HttpServletRequest {
@@ -256,6 +256,8 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     /**
      * The default behavior of this method is to call changeSessionId() on the
      * wrapped request object.
+     *
+     * @since Servlet 3.1
      */
     @Override
     public String changeSessionId() {
@@ -287,18 +289,6 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     @Override
     public boolean isRequestedSessionIdFromURL() {
         return this._getHttpServletRequest().isRequestedSessionIdFromURL();
-    }
-
-    /**
-     * The default behavior of this method is to return
-     * isRequestedSessionIdFromUrl() on the wrapped request object.
-     *
-     * @deprecated As of Version 3.0 of the Java Servlet API
-     */
-    @Override
-    @Deprecated
-    public boolean isRequestedSessionIdFromUrl() {
-        return this._getHttpServletRequest().isRequestedSessionIdFromUrl();
     }
 
     /**

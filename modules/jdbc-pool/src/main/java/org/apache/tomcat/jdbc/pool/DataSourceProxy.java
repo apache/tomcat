@@ -55,7 +55,9 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     public DataSourceProxy(PoolConfiguration poolProperties) {
-        if (poolProperties == null) throw new NullPointerException("PoolConfiguration cannot be null.");
+        if (poolProperties == null) {
+          throw new NullPointerException("PoolConfiguration cannot be null.");
+        }
         this.poolProperties = poolProperties;
     }
 
@@ -83,8 +85,9 @@ public class DataSourceProxy implements PoolConfiguration {
      */
     public Connection getConnection(String username, String password) throws SQLException {
         if (this.getPoolProperties().isAlternateUsernameAllowed()) {
-            if (pool == null)
-                return createPool().getConnection(username,password);
+            if (pool == null) {
+              return createPool().getConnection(username,password);
+            }
             return pool.getConnection(username,password);
         } else {
             return getConnection();
@@ -127,8 +130,9 @@ public class DataSourceProxy implements PoolConfiguration {
      * @throws SQLException Connection error
      */
     public Connection getConnection() throws SQLException {
-        if (pool == null)
-            return createPool().getConnection();
+        if (pool == null) {
+          return createPool().getConnection();
+        }
         return pool.getConnection();
     }
 
@@ -138,8 +142,9 @@ public class DataSourceProxy implements PoolConfiguration {
      * @throws SQLException Connection error
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
-        if (pool == null)
-            return createPool().getConnectionAsync();
+        if (pool == null) {
+          return createPool().getConnectionAsync();
+        }
         return pool.getConnectionAsync();
     }
 
@@ -238,8 +243,11 @@ public class DataSourceProxy implements PoolConfiguration {
 
     public int getPoolSize() {
         final ConnectionPool p = pool;
-        if (p == null) return 0;
-        else return p.getSize();
+        if (p == null) {
+          return 0;
+        } else {
+          return p.getSize();
+        }
     }
 
 

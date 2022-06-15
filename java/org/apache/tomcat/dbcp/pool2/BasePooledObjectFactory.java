@@ -17,7 +17,7 @@
 package org.apache.tomcat.dbcp.pool2;
 
 /**
- * A base implementation of <code>PoolableObjectFactory</code>.
+ * A base implementation of {@code PoolableObjectFactory}.
  * <p>
  * All operations defined here are essentially no-op's.
  * <p>
@@ -31,6 +31,17 @@ package org.apache.tomcat.dbcp.pool2;
  * @since 2.0
  */
 public abstract class BasePooledObjectFactory<T> extends BaseObject implements PooledObjectFactory<T> {
+
+    /**
+     *  No-op.
+     *
+     *  @param p ignored
+     */
+    @Override
+    public void activateObject(final PooledObject<T> p) throws Exception {
+        // The default implementation is a no-op.
+    }
+
     /**
      * Creates an object instance, to be wrapped in a {@link PooledObject}.
      * <p>This method <strong>must</strong> support concurrent, multi-threaded
@@ -44,21 +55,6 @@ public abstract class BasePooledObjectFactory<T> extends BaseObject implements P
     public abstract T create() throws Exception;
 
     /**
-     * Wrap the provided instance with an implementation of
-     * {@link PooledObject}.
-     *
-     * @param obj the instance to wrap
-     *
-     * @return The provided instance, wrapped by a {@link PooledObject}
-     */
-    public abstract PooledObject<T> wrap(T obj);
-
-    @Override
-    public PooledObject<T> makeObject() throws Exception {
-        return wrap(create());
-    }
-
-    /**
      *  No-op.
      *
      *  @param p ignored
@@ -69,26 +65,9 @@ public abstract class BasePooledObjectFactory<T> extends BaseObject implements P
         // The default implementation is a no-op.
     }
 
-    /**
-     * This implementation always returns {@code true}.
-     *
-     * @param p ignored
-     *
-     * @return {@code true}
-     */
     @Override
-    public boolean validateObject(final PooledObject<T> p) {
-        return true;
-    }
-
-    /**
-     *  No-op.
-     *
-     *  @param p ignored
-     */
-    @Override
-    public void activateObject(final PooledObject<T> p) throws Exception {
-        // The default implementation is a no-op.
+    public PooledObject<T> makeObject() throws Exception {
+        return wrap(create());
     }
 
     /**
@@ -101,4 +80,26 @@ public abstract class BasePooledObjectFactory<T> extends BaseObject implements P
         throws Exception {
         // The default implementation is a no-op.
     }
+
+    /**
+     * Always returns {@code true}.
+     *
+     * @param p ignored
+     *
+     * @return {@code true}
+     */
+    @Override
+    public boolean validateObject(final PooledObject<T> p) {
+        return true;
+    }
+
+    /**
+     * Wraps the provided instance with an implementation of
+     * {@link PooledObject}.
+     *
+     * @param obj the instance to wrap
+     *
+     * @return The provided instance, wrapped by a {@link PooledObject}
+     */
+    public abstract PooledObject<T> wrap(T obj);
 }

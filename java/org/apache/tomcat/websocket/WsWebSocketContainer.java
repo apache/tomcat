@@ -69,12 +69,12 @@ import jakarta.websocket.WebSocketContainer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.KeyStoreUtil;
-import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
 
@@ -106,8 +106,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     private InstanceManager instanceManager;
 
-    InstanceManager getInstanceManager() {
-        return instanceManager;
+    protected InstanceManager getInstanceManager(ClassLoader classLoader) {
+        if (instanceManager  != null) {
+            return instanceManager;
+        }
+        return InstanceManagerBindings.get(classLoader);
     }
 
     protected void setInstanceManager(InstanceManager instanceManager) {
@@ -115,18 +118,29 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
     @Override
-    public Session connectToServer(Object pojo, URI path)
-            throws DeploymentException {
+    public Session connectToServer(Object pojo, URI path) throws DeploymentException {
+        ClientEndpointConfig config = createClientEndpointConfig(pojo.getClass());
+        ClientEndpointHolder holder = new PojoHolder(pojo, config);
+        return connectToServerRecursive(holder, config, path, new HashSet<>());
+    }
 
-        ClientEndpoint annotation =
-                pojo.getClass().getAnnotation(ClientEndpoint.class);
+
+    @Override
+    public Session connectToServer(Class<?> annotatedEndpointClass, URI path) throws DeploymentException {
+        ClientEndpointConfig config = createClientEndpointConfig(annotatedEndpointClass);
+        ClientEndpointHolder holder = new PojoClassHolder(annotatedEndpointClass, config);
+        return connectToServerRecursive(holder, config, path, new HashSet<>());
+    }
+
+
+    private ClientEndpointConfig createClientEndpointConfig(Class<?> annotatedEndpointClass)
+            throws DeploymentException {
+        ClientEndpoint annotation = annotatedEndpointClass.getAnnotation(ClientEndpoint.class);
         if (annotation == null) {
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.missingAnnotation",
-                            pojo.getClass().getName()));
+                            annotatedEndpointClass.getName()));
         }
-
-        Endpoint ep = new PojoEndpointClient(pojo, Arrays.asList(annotation.decoders()));
 
         Class<? extends ClientEndpointConfig.Configurator> configuratorClazz =
                 annotation.configurator();
@@ -152,56 +166,34 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 encoders(Arrays.asList(annotation.encoders())).
                 preferredSubprotocols(Arrays.asList(annotation.subprotocols())).
                 build();
-        return connectToServer(ep, config, path);
+
+        return config;
     }
 
 
     @Override
-    public Session connectToServer(Class<?> annotatedEndpointClass, URI path)
+    public Session connectToServer(Class<? extends Endpoint> clazz, ClientEndpointConfig clientEndpointConfiguration,
+            URI path) throws DeploymentException {
+        ClientEndpointHolder holder = new EndpointClassHolder(clazz);
+        return connectToServerRecursive(holder, clientEndpointConfiguration, path, new HashSet<>());
+    }
+
+
+    @Override
+    public Session connectToServer(Endpoint endpoint, ClientEndpointConfig clientEndpointConfiguration, URI path)
+            throws DeploymentException {
+        ClientEndpointHolder holder = new EndpointHolder(endpoint);
+        return connectToServerRecursive(holder, clientEndpointConfiguration, path, new HashSet<>());
+    }
+
+
+    private Session connectToServerRecursive(ClientEndpointHolder clientEndpointHolder,
+            ClientEndpointConfig clientEndpointConfiguration, URI path, Set<URI> redirectSet)
             throws DeploymentException {
 
-        Object pojo;
-        try {
-            pojo = annotatedEndpointClass.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.endpointCreateFail",
-                    annotatedEndpointClass.getName()), e);
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("wsWebSocketContainer.connect.entry", clientEndpointHolder.getClassName(), path));
         }
-
-        return connectToServer(pojo, path);
-    }
-
-
-    @Override
-    public Session connectToServer(Class<? extends Endpoint> clazz,
-            ClientEndpointConfig clientEndpointConfiguration, URI path)
-            throws DeploymentException {
-
-        Endpoint endpoint;
-        try {
-            endpoint = clazz.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.endpointCreateFail", clazz.getName()),
-                    e);
-        }
-
-        return connectToServer(endpoint, clientEndpointConfiguration, path);
-    }
-
-
-    @Override
-    public Session connectToServer(Endpoint endpoint,
-            ClientEndpointConfig clientEndpointConfiguration, URI path)
-            throws DeploymentException {
-        return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, new HashSet<>());
-    }
-
-    private Session connectToServerRecursive(Endpoint endpoint,
-            ClientEndpointConfig clientEndpointConfiguration, URI path,
-            Set<URI> redirectSet)
-            throws DeploymentException {
 
         boolean secure = false;
         ByteBuffer proxyConnect = null;
@@ -301,13 +293,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         boolean success = false;
         List<Extension> extensionsAgreed = new ArrayList<>();
         Transformation transformation = null;
-
-        // Open the connection
-        Future<Void> fConnect = socketChannel.connect(sa);
         AsyncChannelWrapper channel = null;
 
-        if (proxyConnect != null) {
-            try {
+        try {
+            // Open the connection
+            Future<Void> fConnect = socketChannel.connect(sa);
+
+            if (proxyConnect != null) {
                 fConnect.get(timeout, TimeUnit.MILLISECONDS);
                 // Proxy CONNECT is clear text
                 channel = new AsyncChannelWrapperNonSecure(socketChannel);
@@ -318,34 +310,35 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                             "wsWebSocketContainer.proxyConnectFail", selectedProxy,
                             Integer.toString(httpResponse.getStatus())));
                 }
-            } catch (TimeoutException | InterruptedException | ExecutionException |
-                    EOFException e) {
-                if (channel != null) {
-                    channel.close();
-                }
-                throw new DeploymentException(
-                        sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
             }
-        }
 
-        if (secure) {
-            // Regardless of whether a non-secure wrapper was created for a
-            // proxy CONNECT, need to use TLS from this point on so wrap the
-            // original AsynchronousSocketChannel
-            SSLEngine sslEngine = createSSLEngine(userProperties, host, port);
-            channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
-        } else if (channel == null) {
-            // Only need to wrap as this point if it wasn't wrapped to process a
-            // proxy CONNECT
-            channel = new AsyncChannelWrapperNonSecure(socketChannel);
-        }
+            if (secure) {
+                // Regardless of whether a non-secure wrapper was created for a
+                // proxy CONNECT, need to use TLS from this point on so wrap the
+                // original AsynchronousSocketChannel
+                SSLEngine sslEngine = createSSLEngine(clientEndpointConfiguration, host, port);
+                channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
+            } else if (channel == null) {
+                // Only need to wrap as this point if it wasn't wrapped to process a
+                // proxy CONNECT
+                channel = new AsyncChannelWrapperNonSecure(socketChannel);
+            }
 
-        try {
             fConnect.get(timeout, TimeUnit.MILLISECONDS);
 
             Future<Void> fHandshake = channel.handshake();
             fHandshake.get(timeout, TimeUnit.MILLISECONDS);
 
+            if (log.isDebugEnabled()) {
+                SocketAddress localAddress = null;
+                try {
+                    localAddress = channel.getLocalAddress();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+                log.debug(sm.getString("wsWebSocketContainer.connect.write",
+                        Integer.valueOf(request.position()), Integer.valueOf(request.limit()), localAddress));
+            }
             writeRequest(channel, request, timeout);
 
             HttpResponse httpResponse = processResponse(response, channel, timeout);
@@ -393,7 +386,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                                 Integer.toString(maxRedirects)));
                     }
 
-                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, redirectLocation, redirectSet);
+                    return connectToServerRecursive(
+                            clientEndpointHolder, clientEndpointConfiguration, redirectLocation, redirectSet);
 
                 }
 
@@ -430,7 +424,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     userProperties.put(Constants.AUTHORIZATION_HEADER_NAME, auth.getAuthorization(
                             requestUri, wwwAuthenticateHeaders.get(0), userProperties));
 
-                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, redirectSet);
+                    return connectToServerRecursive(
+                            clientEndpointHolder, clientEndpointConfiguration, path, redirectSet);
 
                 } else {
                     throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
@@ -486,17 +481,23 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             throw new DeploymentException(sm.getString("wsWebSocketContainer.httpRequestFailed", path), e);
         } finally {
             if (!success) {
-                channel.close();
+                if (channel != null) {
+                    channel.close();
+                } else {
+                    try {
+                        socketChannel.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                }
             }
         }
 
         // Switch to WebSocket
         WsRemoteEndpointImplClient wsRemoteEndpointClient = new WsRemoteEndpointImplClient(channel);
 
-        WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
-                this, null, null, null, null, null, extensionsAgreed,
-                subProtocol, Collections.<String,String>emptyMap(), secure,
-                clientEndpointConfiguration);
+        WsSession wsSession = new WsSession(clientEndpointHolder, wsRemoteEndpointClient, this, extensionsAgreed,
+                subProtocol, Collections.<String,String>emptyMap(), secure, clientEndpointConfiguration);
 
         WsFrameClient wsFrameClient = new WsFrameClient(response, channel,
                 wsSession, transformation);
@@ -504,8 +505,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         // completed transformation chain to the remote end point.
         wsRemoteEndpointClient.setTransformation(wsFrameClient.getTransformation());
 
-        endpoint.onOpen(wsSession, clientEndpointConfiguration);
-        registerSession(endpoint, wsSession);
+        wsSession.getLocal().onOpen(wsSession, clientEndpointConfiguration);
+        registerSession(wsSession.getLocal(), wsSession);
 
         /* It is possible that the server sent one or more messages as soon as
          * the WebSocket connection was established. Depending on the exact
@@ -720,7 +721,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         // Request line
         result.put(GET_BYTES);
-        if (null == uri.getPath() || "".equals(uri.getPath())) {
+        final String path = uri.getPath();
+        if (null == path || path.isEmpty()) {
             result.put(ROOT_URI_BYTES);
         } else {
             result.put(uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1));
@@ -779,10 +781,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     /**
      * Process response, blocking until HTTP response has been fully received.
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws DeploymentException
-     * @throws TimeoutException
+     * @throws ExecutionException if there is an exception reading the response
+     * @throws InterruptedException if the thread is interrupted while reading
+     *         the response
+     * @throws DeploymentException if the response status line is not correctly
+     *         formatted
+     * @throws TimeoutException if the response was not read within the expected
+     *         timeout
      */
     private HttpResponse processResponse(ByteBuffer response,
             AsyncChannelWrapper channel, long timeout) throws InterruptedException,
@@ -801,9 +806,17 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             response.clear();
             // Blocking read
             Future<Integer> read = channel.read(response);
-            Integer bytesRead = read.get(timeout, TimeUnit.MILLISECONDS);
+            Integer bytesRead;
+            try {
+                bytesRead = read.get(timeout, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                TimeoutException te = new TimeoutException(
+                        sm.getString("wsWebSocketContainer.responseFail", Integer.toString(status), headers));
+                te.initCause(e);
+                throw te;
+            }
             if (bytesRead.intValue() == -1) {
-                throw new EOFException();
+                throw new EOFException(sm.getString("wsWebSocketContainer.responseFail", Integer.toString(status), headers));
             }
             response.flip();
             while (response.hasRemaining() && !readHeaders) {
@@ -887,13 +900,20 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private SSLEngine createSSLEngine(Map<String,Object> userProperties, String host, int port)
+    @SuppressWarnings("removal")
+    private SSLEngine createSSLEngine(ClientEndpointConfig clientEndpointConfig, String host, int port)
             throws DeploymentException {
 
+        Map<String,Object> userProperties = clientEndpointConfig.getUserProperties();
         try {
             // See if a custom SSLContext has been provided
-            SSLContext sslContext =
-                    (SSLContext) userProperties.get(Constants.SSL_CONTEXT_PROPERTY);
+            SSLContext sslContext = clientEndpointConfig.getSSLContext();
+
+            // If no SSLContext is found, try the pre WebSocket 2.1 Tomcat
+            // specific method
+            if (sslContext == null) {
+                sslContext = (SSLContext) userProperties.get(Constants.SSL_CONTEXT_PROPERTY);
+            }
 
             if (sslContext == null) {
                 // Create the SSL Context

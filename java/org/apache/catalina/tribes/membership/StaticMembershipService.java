@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.membership;
 
 import java.io.IOException;
@@ -213,16 +212,21 @@ public class StaticMembershipService extends MembershipServiceBase
 
     protected void setDefaults(Properties properties) {
         // default values
-        if (properties.getProperty("expirationTime") == null)
+        if (properties.getProperty("expirationTime") == null) {
             properties.setProperty("expirationTime","5000");
-        if (properties.getProperty("connectTimeout") == null)
+        }
+        if (properties.getProperty("connectTimeout") == null) {
             properties.setProperty("connectTimeout","500");
-        if (properties.getProperty("rpcTimeout") == null)
+        }
+        if (properties.getProperty("rpcTimeout") == null) {
             properties.setProperty("rpcTimeout","3000");
-        if (properties.getProperty("useThread") == null)
+        }
+        if (properties.getProperty("useThread") == null) {
             properties.setProperty("useThread","false");
-        if (properties.getProperty("pingInterval") == null)
+        }
+        if (properties.getProperty("pingInterval") == null) {
             properties.setProperty("pingInterval","1000");
+        }
     }
 
     private String getMembershipName() {
@@ -230,7 +234,9 @@ public class StaticMembershipService extends MembershipServiceBase
     }
 
     private void findLocalMember() throws IOException {
-        if (this.localMember != null) return;
+        if (this.localMember != null) {
+            return;
+        }
         String listenHost = properties.getProperty("tcpListenHost");
         String listenPort = properties.getProperty("tcpListenPort");
 
@@ -242,7 +248,9 @@ public class StaticMembershipService extends MembershipServiceBase
                 break;
             }
         }
-        if (this.localMember == null) throw new IllegalStateException(sm.getString("staticMembershipService.noLocalMember"));
+        if (this.localMember == null) {
+            throw new IllegalStateException(sm.getString("staticMembershipService.noLocalMember"));
+        }
         staticMembers.remove(this.localMember);
     }
 }

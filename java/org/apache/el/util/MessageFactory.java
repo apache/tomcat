@@ -25,8 +25,7 @@ import java.util.ResourceBundle;
  */
 public final class MessageFactory {
 
-    static final ResourceBundle bundle =
-            ResourceBundle.getBundle("org.apache.el.Messages");
+    static final ResourceBundle bundle = ResourceBundle.getBundle("org.apache.el.LocalStrings");
 
     public MessageFactory() {
         super();

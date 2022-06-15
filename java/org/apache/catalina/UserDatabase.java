@@ -156,6 +156,33 @@ public interface UserDatabase {
 
 
     /**
+     * Signal the specified {@link Group} from this user database has been
+     * modified.
+     *
+     * @param group The group that has been modified
+     */
+    public default void modifiedGroup(Group group) {}
+
+
+    /**
+     * Signal the specified {@link Role} from this user database has been
+     * modified.
+     *
+     * @param role The role that has been modified
+     */
+    public default void modifiedRole(Role role) {}
+
+
+    /**
+     * Signal the specified {@link User} from this user database has been
+     * modified.
+     *
+     * @param user The user that has been modified
+     */
+    public default void modifiedUser(User user) {}
+
+
+    /**
      * Save any updated information to the persistent storage location for this
      * user database.
      *
@@ -170,5 +197,27 @@ public interface UserDatabase {
      */
     public default void backgroundProcess() {
         // NO-OP by default
+    }
+
+
+    /**
+     * Is the database available.
+     *
+     * @return true
+     */
+    public default boolean isAvailable() {
+        return true;
+    }
+
+
+    /**
+     * Is the database data loaded on demand. This is used to avoid eager
+     * loading of the full database data, for example for JMX registration of
+     * all objects.
+     *
+     * @return false
+     */
+    public default boolean isSparse() {
+        return false;
     }
 }

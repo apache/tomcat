@@ -14,8 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
-
 package jakarta.servlet.jsp.tagext;
 
 /**
@@ -23,7 +21,7 @@ package jakarta.servlet.jsp.tagext;
  * This class is instantiated from the Tag Library Descriptor file (TLD)
  * and is available only at translation time.
  *
- * @since 2.0
+ * @since JSP 2.0
  */
 public class TagFileInfo {
 

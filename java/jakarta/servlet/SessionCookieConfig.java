@@ -16,6 +16,8 @@
  */
 package jakarta.servlet;
 
+import java.util.Map;
+
 /**
  * Configures the session cookies used by the web application associated with
  * the ServletContext from which this SessionCookieConfig was obtained.
@@ -34,6 +36,11 @@ public interface SessionCookieConfig {
      */
     public void setName(String name);
 
+    /**
+     * Obtain the name to use for the session cookies.
+     *
+     * @return the name to use for session cookies.
+     */
     public String getName();
 
     /**
@@ -46,6 +53,11 @@ public interface SessionCookieConfig {
      */
     public void setDomain(String domain);
 
+    /**
+     * Obtain the domain to use for session cookies.
+     *
+     * @return the domain to use for session cookies.
+     */
     public String getDomain();
 
     /**
@@ -58,18 +70,35 @@ public interface SessionCookieConfig {
      */
     public void setPath(String path);
 
+    /**
+     * Obtain the path to use for session cookies. This is normally the context
+     * path.
+     *
+     * @return The path to use for session cookies.
+     */
     public String getPath();
 
     /**
-     * Sets the comment for the session cookie
+     * If called, this method has no effect.
      *
-     * @param comment The session cookie comment
+     * @param comment Ignore
      *
      * @throws IllegalStateException if the associated ServletContext has
      *         already been initialised
+     *
+     * @deprecated This is no longer required with RFC 6265
      */
+    @Deprecated(since = "Servlet 6.0", forRemoval = true)
     public void setComment(String comment);
 
+    /**
+     * With the adoption of support for RFC 6265, this method should no longer be used.
+     *
+     * @return always {@code null}
+     *
+     * @deprecated This is no longer required with RFC 6265
+     */
+    @Deprecated(since = "Servlet 6.0", forRemoval = true)
     public String getComment();
 
     /**
@@ -82,6 +111,11 @@ public interface SessionCookieConfig {
      */
     public void setHttpOnly(boolean httpOnly);
 
+    /**
+     * Will session cookies be created with the httpOnly flag set?
+     *
+     * @return {@code true} if the flag should be set, otherwise {@code false}
+     */
     public boolean isHttpOnly();
 
     /**
@@ -94,6 +128,11 @@ public interface SessionCookieConfig {
      */
     public void setSecure(boolean secure);
 
+    /**
+     * Will session cookies be created with the secure flag set?
+     *
+     * @return {@code true} if the flag should be set, otherwise {@code false}
+     */
     public boolean isSecure();
 
     /**
@@ -105,6 +144,54 @@ public interface SessionCookieConfig {
      */
     public void setMaxAge(int MaxAge);
 
+    /**
+     * Obtain the maximum age to set for a session cookie.
+     *
+     * @return the maximum age in seconds
+     */
     public int getMaxAge();
 
+    /**
+     * Sets the value for the given session cookie attribute. When a value is
+     * set via this method, the value returned by the attribute specific getter
+     * (if any) must be consistent with the value set via this method.
+     *
+     * @param name  Name of attribute to set
+     * @param value Value of attribute
+     *
+     * @throws IllegalStateException if the associated ServletContext has
+     *         already been initialised
+     *
+     * @throws IllegalArgumentException If the attribute name is null or
+     *         contains any characters not permitted for use in Cookie names.
+     *
+     * @throws NumberFormatException If the attribute is known to be numerical
+     *         but the provided value cannot be parsed to a number.
+     *
+     * @since Servlet 6.0
+     */
+    public void setAttribute(String name, String value);
+
+    /**
+     * Obtain the value for a sesison cookie given attribute. Values returned
+     * from this method must be consistent with the values set and returned by
+     * the attribute specific getters and setters in this class.
+     *
+     * @param name  Name of attribute to return
+     *
+     * @return Value of specified attribute
+     *
+     * @since Servlet 6.0
+     */
+    public String getAttribute(String name);
+
+    /**
+     * Obtain the Map of attributes and values (excluding version) for this
+     * session cookie.
+     *
+     * @return A read-only Map of attributes to values, excluding version.
+     *
+     * @since Servlet 6.0
+     */
+    public Map<String,String> getAttributes();
 }

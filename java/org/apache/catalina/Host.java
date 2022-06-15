@@ -114,6 +114,30 @@ public interface Host extends Container {
 
 
     /**
+     * @return the legacy (Java EE) application root for this Host.  This can be
+     * an absolute pathname, a relative pathname, or a URL.
+     */
+    public String getLegacyAppBase();
+
+
+    /**
+     * @return an absolute {@link File} for the legacy (Java EE) appBase of this
+     * Host. The file will be canonical if possible. There is no guarantee that
+     * that the appBase exists.
+     */
+    public File getLegacyAppBaseFile();
+
+
+    /**
+     * Set the legacy (Java EE) application root for this Host.  This can be an
+     * absolute pathname, a relative pathname, or a URL.
+     *
+     * @param legacyAppBase The new legacy application root
+     */
+    public void setLegacyAppBase(String legacyAppBase);
+
+
+    /**
      * @return the value of the auto deploy flag.  If true, it indicates that
      * this host's child webapps should be discovered and automatically
      * deployed dynamically.

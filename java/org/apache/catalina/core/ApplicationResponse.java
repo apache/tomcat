@@ -78,8 +78,9 @@ class ApplicationResponse extends ServletResponseWrapper {
     public void reset() {
 
         // If already committed, the wrapped response will throw ISE
-        if (!included || getResponse().isCommitted())
+        if (!included || getResponse().isCommitted()) {
             getResponse().reset();
+        }
 
     }
 
@@ -93,8 +94,9 @@ class ApplicationResponse extends ServletResponseWrapper {
     @Override
     public void setContentLength(int len) {
 
-        if (!included)
+        if (!included) {
             getResponse().setContentLength(len);
+        }
 
     }
 
@@ -108,8 +110,9 @@ class ApplicationResponse extends ServletResponseWrapper {
     @Override
     public void setContentLengthLong(long len) {
 
-        if (!included)
+        if (!included) {
             getResponse().setContentLengthLong(len);
+        }
 
     }
 
@@ -122,8 +125,9 @@ class ApplicationResponse extends ServletResponseWrapper {
     @Override
     public void setContentType(String type) {
 
-        if (!included)
+        if (!included) {
             getResponse().setContentType(type);
+        }
 
     }
 
@@ -135,8 +139,9 @@ class ApplicationResponse extends ServletResponseWrapper {
      */
     @Override
     public void setLocale(Locale loc) {
-        if (!included)
+        if (!included) {
             getResponse().setLocale(loc);
+        }
     }
 
 
@@ -147,8 +152,9 @@ class ApplicationResponse extends ServletResponseWrapper {
      */
     @Override
     public void setBufferSize(int size) {
-        if (!included)
+        if (!included) {
             getResponse().setBufferSize(size);
+        }
     }
 
 

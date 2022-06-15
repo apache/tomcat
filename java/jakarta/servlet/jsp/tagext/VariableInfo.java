@@ -49,7 +49,7 @@ package jakarta.servlet.jsp.tagext;
  * Frequently a fully qualified class name will refer to a class that is known
  * to the tag library and thus, delivered in the same JAR file as the tag
  * handlers. In most other remaining cases it will refer to a class that is in
- * the platform on which the JSP processor is built (like J2EE). Using fully
+ * the platform on which the JSP processor is built. Using fully
  * qualified class names in this manner makes the usage relatively resistant to
  * configuration errors.
  * <p>
@@ -85,74 +85,74 @@ package jakarta.servlet.jsp.tagext;
  * <caption>Variable Synchronization Points</caption>
  * <tbody>
  * <tr>
- * <td valign="top" colspan="6" style="background-color:#999999">
+ * <td colspan="6" style="background-color:#999999">
  *   <u><b>Variable Synchronization Points</b></u><br>
  * </td>
  * </tr>
  * <tr>
- * <th valign="top" style="background-color:#c0c0c0">&nbsp;</th>
- * <th valign="top" style="background-color:#c0c0c0">doStartTag()</th>
- * <th valign="top" style="background-color:#c0c0c0">doInitBody()</th>
- * <th valign="top" style="background-color:#c0c0c0">doAfterBody()</th>
- * <th valign="top" style="background-color:#c0c0c0">doEndTag()</th>
- * <th valign="top" style="background-color:#c0c0c0">doTag()</th>
+ * <th style="background-color:#c0c0c0">&nbsp;</th>
+ * <th style="background-color:#c0c0c0">doStartTag()</th>
+ * <th style="background-color:#c0c0c0">doInitBody()</th>
+ * <th style="background-color:#c0c0c0">doAfterBody()</th>
+ * <th style="background-color:#c0c0c0">doEndTag()</th>
+ * <th style="background-color:#c0c0c0">doTag()</th>
  * </tr>
  * <tr>
- * <td valign="top" style="background-color:#c0c0c0"><b>Tag<br>
+ * <td style="background-color:#c0c0c0"><b>Tag<br>
  * </b></td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN, NESTED<br>
+ * <td style="background-color:#ffffff">AT_BEGIN, NESTED<br>
  * </td>
- * <td valign="top" style="background-color:#ffffff"><br>
+ * <td style="background-color:#ffffff"><br>
  * </td>
- * <td valign="top" style="background-color:#ffffff"><br>
+ * <td style="background-color:#ffffff"><br>
  * </td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN, AT_END<br>
+ * <td style="background-color:#ffffff">AT_BEGIN, AT_END<br>
  * </td>
- * <td valign="top" style="background-color:#ffffff"><br>
- * </td>
- * </tr>
- * <tr>
- * <td valign="top" style="background-color:#c0c0c0"><b>IterationTag<br>
- * </b></td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN, NESTED<br>
- * </td>
- * <td valign="top" style="background-color:#ffffff"><br>
- * </td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN, NESTED<br>
- * </td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN, AT_END<br>
- * </td>
- * <td valign="top" style="background-color:#ffffff"><br>
+ * <td style="background-color:#ffffff"><br>
  * </td>
  * </tr>
  * <tr>
- * <td valign="top" style="background-color:#c0c0c0"><b>BodyTag<br>
+ * <td style="background-color:#c0c0c0"><b>IterationTag<br>
  * </b></td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN,
+ * <td style="background-color:#ffffff">AT_BEGIN, NESTED<br>
+ * </td>
+ * <td style="background-color:#ffffff"><br>
+ * </td>
+ * <td style="background-color:#ffffff">AT_BEGIN, NESTED<br>
+ * </td>
+ * <td style="background-color:#ffffff">AT_BEGIN, AT_END<br>
+ * </td>
+ * <td style="background-color:#ffffff"><br>
+ * </td>
+ * </tr>
+ * <tr>
+ * <td style="background-color:#c0c0c0"><b>BodyTag<br>
+ * </b></td>
+ * <td style="background-color:#ffffff">AT_BEGIN,
  * NESTED<sup>1</sup><br>
  * </td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN,
+ * <td style="background-color:#ffffff">AT_BEGIN,
  * NESTED<sup>1</sup><br>
  * </td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN, NESTED<br>
+ * <td style="background-color:#ffffff">AT_BEGIN, NESTED<br>
  * </td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN, AT_END<br>
+ * <td style="background-color:#ffffff">AT_BEGIN, AT_END<br>
  * </td>
- * <td valign="top" style="background-color:#ffffff"><br>
+ * <td style="background-color:#ffffff"><br>
  * </td>
  * </tr>
  * <tr>
- * <td valign="top" style="background-color:#c0c0c0"><b>SimpleTag<br>
+ * <td style="background-color:#c0c0c0"><b>SimpleTag<br>
  * </b></td>
- * <td valign="top" style="background-color:#ffffff"><br>
+ * <td style="background-color:#ffffff"><br>
  * </td>
- * <td valign="top" style="background-color:#ffffff"><br>
+ * <td style="background-color:#ffffff"><br>
  * </td>
- * <td valign="top" style="background-color:#ffffff"><br>
+ * <td style="background-color:#ffffff"><br>
  * </td>
- * <td valign="top" style="background-color:#ffffff"><br>
+ * <td style="background-color:#ffffff"><br>
  * </td>
- * <td valign="top" style="background-color:#ffffff">AT_BEGIN, AT_END<br>
+ * <td style="background-color:#ffffff">AT_BEGIN, AT_END<br>
  * </td>
  * </tr>
  * </tbody>

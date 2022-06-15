@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.catalina.tribes.util;
 
 import java.text.MessageFormat;
@@ -30,7 +29,7 @@ import java.util.ResourceBundle;
 /**
  * An internationalization / localization helper class which reduces
  * the bother of handling ResourceBundles and takes care of the
- * common cases of message formating which otherwise require the
+ * common cases of message formatting which otherwise require the
  * creation of Object arrays and such.
  *
  * <p>The StringManager operates on a package basis. One StringManager
@@ -234,7 +233,7 @@ public class StringManager {
              * for removal needs to use one less than the maximum desired size
              *
              */
-            map = new LinkedHashMap<Locale,StringManager>(LOCALE_CACHE_SIZE, 1, true) {
+            map = new LinkedHashMap<>(LOCALE_CACHE_SIZE, 1, true) {
                 private static final long serialVersionUID = 1L;
                 @Override
                 protected boolean removeEldestEntry(

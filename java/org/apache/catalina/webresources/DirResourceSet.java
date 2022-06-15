@@ -157,6 +157,36 @@ public class DirResourceSet extends AbstractFileResourceSet {
                 File[] list = f.listFiles();
                 if (list != null) {
                     for (File entry : list) {
+                        // f has already been validated so the following checks
+                        // can be much simpler than those in file()
+                        if (!getRoot().getAllowLinking()) {
+                            // allow linking is disabled so need to check for
+                            // symlinks
+                            boolean symlink = true;
+                            String absPath = null;
+                            String canPath = null;
+                            try {
+                                // We know that 'f' must be valid since it will
+                                // have been checked in the call to file()
+                                // above. Therefore strip off the path of the
+                                // path that was contributed by 'f' and check
+                                // that what is left does not contain a symlink.
+                                absPath = entry.getAbsolutePath().substring(f.getAbsolutePath().length());
+                                if (entry.getCanonicalPath().length() >= f.getCanonicalPath().length()) {
+                                    canPath = entry.getCanonicalPath().substring(f.getCanonicalPath().length());
+                                    if (absPath.equals(canPath)) {
+                                        symlink = false;
+                                    }
+                                }
+                            } catch (IOException ioe) {
+                                // Ignore the exception. Assume we have a symlink.
+                                canPath = "Unknown";
+                            }
+                            if (symlink) {
+                                logIgnoredSymlink(getRoot().getContext().getName(), absPath, canPath);
+                                continue;
+                            }
+                        }
                         StringBuilder sb = new StringBuilder(path);
                         if (path.charAt(path.length() - 1) != '/') {
                             sb.append('/');

@@ -58,7 +58,6 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.file.ConfigFileLoader;
-import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.net.jsse.PEMFile;
 import org.apache.tomcat.util.res.StringManager;
@@ -113,10 +112,13 @@ public abstract class SSLUtilBase implements SSLUtil {
         this.enabledProtocols = enabledProtocols.toArray(new String[0]);
 
         if (enabledProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
-                sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL &&
+                sslHostConfig.getCertificateVerification().isOptional() &&
                 !isTls13RenegAuthAvailable() && warnTls13) {
             log.warn(sm.getString("sslUtilBase.tls13.auth"));
         }
+
+        // Make TLS 1.3 renegotiation status visible further up the stack
+        sslHostConfig.setTls13RenegotiationAvailable(isTls13RenegAuthAvailable());
 
         // Calculate the enabled ciphers
         List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
@@ -192,8 +194,8 @@ public abstract class SSLUtilBase implements SSLUtil {
                 // Some key store types (e.g. hardware) expect the InputStream
                 // to be null
                 if(!("PKCS11".equalsIgnoreCase(type) ||
-                        "".equalsIgnoreCase(path)) ||
-                        "NONE".equalsIgnoreCase(path)) {
+                        path.isEmpty() ||
+                        "NONE".equalsIgnoreCase(path))) {
                     istream = ConfigFileLoader.getSource().getResource(path).getInputStream();
                 }
 
@@ -201,8 +203,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                 // Unfortunately, some key stores behave differently with null
                 // and "".
                 // JKS key stores treat null and "" interchangeably.
-                // PKCS12 key stores (Java 7 onwards) don't return the cert if
-                // null is used.
+                // PKCS12 key stores don't return the cert if null is used.
                 // Key stores that do not use passwords expect null
                 // Therefore:
                 // - generally use null if pass is null or ""
@@ -296,6 +297,16 @@ public abstract class SSLUtilBase implements SSLUtil {
 
         char[] keyPassArray = keyPass.toCharArray();
 
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
+        if (kmf.getProvider().getInfo().indexOf("FIPS") != -1) {
+            // FIPS doesn't like ANY wrapping nor key manipulation.
+            if (keyAlias != null) {
+                log.warn(sm.getString("sslUtilBase.aliasIgnored", keyAlias));
+            }
+            kmf.init(ksUsed, keyPassArray);
+            return kmf.getKeyManagers();
+        }
+
         if (ks == null) {
             if (certificate.getCertificateFile() == null) {
                 throw new IOException(sm.getString("sslUtilBase.noCertFile"));
@@ -358,7 +369,6 @@ public abstract class SSLUtilBase implements SSLUtil {
         }
 
 
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
         kmf.init(ksUsed, keyPassArray);
 
         KeyManager[] kms = kmf.getKeyManagers();

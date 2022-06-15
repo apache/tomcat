@@ -65,6 +65,12 @@ public class MBeanUtils {
           "Role" },
         { "org.apache.catalina.users.MemoryUser",
           "User" },
+        { "org.apache.catalina.users.GenericGroup",
+          "Group" },
+        { "org.apache.catalina.users.GenericRole",
+          "Role" },
+        { "org.apache.catalina.users.GenericUser",
+          "User" }
     };
 
 
@@ -100,8 +106,9 @@ public class MBeanUtils {
 
         // Perform the standard transformation
         int period = className.lastIndexOf('.');
-        if (period >= 0)
+        if (period >= 0) {
             className = className.substring(period + 1);
+        }
         return className;
 
     }
@@ -125,8 +132,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(environment);
         ObjectName oname = createObjectName(domain, environment);
         if( mserver.isRegistered( oname ))  {
@@ -156,8 +164,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(resource);
         ObjectName oname = createObjectName(domain, resource);
         if( mserver.isRegistered( oname ))  {
@@ -187,8 +196,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(resourceLink);
         ObjectName oname = createObjectName(domain, resourceLink);
         if( mserver.isRegistered( oname ))  {
@@ -218,8 +228,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(group);
         ObjectName oname = createObjectName(domain, group);
         if( mserver.isRegistered( oname ))  {
@@ -249,8 +260,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(role);
         ObjectName oname = createObjectName(domain, role);
         if( mserver.isRegistered( oname ))  {
@@ -280,8 +292,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(user);
         ObjectName oname = createObjectName(domain, user);
         if( mserver.isRegistered( oname ))  {
@@ -304,6 +317,25 @@ public class MBeanUtils {
     static DynamicMBean createMBean(UserDatabase userDatabase)
         throws Exception {
 
+        if (userDatabase.isSparse()) {
+            // Register a sparse database bean as well
+            ManagedBean managed = registry.findManagedBean("SparseUserDatabase");
+            if (managed == null) {
+                Exception e = new Exception(sm.getString("mBeanUtils.noManagedBean", "SparseUserDatabase"));
+                throw new MBeanException(e);
+            }
+            String domain = managed.getDomain();
+            if (domain == null) {
+                domain = mserver.getDefaultDomain();
+            }
+            DynamicMBean mbean = managed.createMBean(userDatabase);
+            ObjectName oname = createObjectName(domain, userDatabase);
+            if( mserver.isRegistered( oname ))  {
+                mserver.unregisterMBean(oname);
+            }
+            mserver.registerMBean(mbean, oname);
+        }
+
         String mname = createManagedName(userDatabase);
         ManagedBean managed = registry.findManagedBean(mname);
         if (managed == null) {
@@ -311,8 +343,9 @@ public class MBeanUtils {
             throw new MBeanException(e);
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         DynamicMBean mbean = managed.createMBean(userDatabase);
         ObjectName oname = createObjectName(domain, userDatabase);
         if( mserver.isRegistered( oname ))  {
@@ -596,11 +629,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, environment);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -628,11 +663,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, resource);
-        if( mserver.isRegistered(oname ))
+        if( mserver.isRegistered(oname )) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -654,11 +691,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, resourceLink);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -679,11 +718,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, group);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -705,11 +746,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, role);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -731,11 +774,13 @@ public class MBeanUtils {
             return;
         }
         String domain = managed.getDomain();
-        if (domain == null)
+        if (domain == null) {
             domain = mserver.getDefaultDomain();
+        }
         ObjectName oname = createObjectName(domain, user);
-        if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);
+        }
 
     }
 
@@ -781,6 +826,11 @@ public class MBeanUtils {
         // The database itself
         ObjectName db = new ObjectName(
                 "Users:type=UserDatabase,database=" + userDatabase);
+        if( mserver.isRegistered(db) ) {
+            mserver.unregisterMBean(db);
+        }
+        db = new ObjectName(
+                "Catalina:type=UserDatabase,database=" + userDatabase);
         if( mserver.isRegistered(db) ) {
             mserver.unregisterMBean(db);
         }

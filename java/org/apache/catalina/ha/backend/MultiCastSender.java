@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ha.backend;
 
 import java.net.DatagramPacket;
@@ -57,8 +55,9 @@ public class MultiCastSender
                     InetAddress addr =  InetAddress.getByName(config.getHost());
                     InetSocketAddress addrs = new InetSocketAddress(addr, config.getMultiport());
                     s = new MulticastSocket(addrs);
-                } else
+                } else {
                     s = new MulticastSocket(config.getMultiport());
+                }
 
                 s.setTimeToLive(config.getTtl());
                 s.joinGroup(group);

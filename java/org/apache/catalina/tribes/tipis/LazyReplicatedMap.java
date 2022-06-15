@@ -57,7 +57,7 @@ import org.apache.juli.logging.LogFactory;
  * each time the object gets replicated the entire object gets serialized, hence a call to <code>replicate(true)</code>
  * will replicate all objects in this map that are using this node as primary.
  *
- * <br><br><b>REMEMBER TO CALL</b> <code>breakdown()</code> or <code>finalize()</code> when you are done with the map to
+ * <br><br><b>REMEMBER TO CALL</b> <code>breakdown()</code> when you are done with the map to
  * avoid memory leaks.<br><br>
  * TODO implement periodic sync/transfer thread
  *
@@ -150,14 +150,18 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     @Override
     protected Member[] publishEntryInfo(Object key, Object value) throws ChannelException {
         Log log = getLog();
-        if  (! (key instanceof Serializable && value instanceof Serializable)  ) return new Member[0];
+        if  (! (key instanceof Serializable && value instanceof Serializable)  ) {
+            return new Member[0];
+        }
         Member[] members = getMapMembers();
         int firstIdx = getNextBackupIndex();
         int nextIdx = firstIdx;
         Member[] backup = new Member[0];
 
         //there are no backups
-        if ( members.length == 0 || firstIdx == -1 ) return backup;
+        if ( members.length == 0 || firstIdx == -1 ) {
+            return backup;
+        }
 
         boolean success = false;
         do {
@@ -166,7 +170,9 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 
             //increment for the next round of back up selection
             nextIdx = nextIdx + 1;
-            if ( nextIdx >= members.length ) nextIdx = 0;
+            if ( nextIdx >= members.length ) {
+                nextIdx = 0;
+            }
 
             if (next == null) {
                 continue;
@@ -177,11 +183,13 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 //publish the backup data to one node
                 msg = new MapMessage(getMapContextName(), MapMessage.MSG_BACKUP, false,
                                      (Serializable) key, (Serializable) value, null, channel.getLocalMember(false), tmpBackup);
-                if ( log.isTraceEnabled() )
+                if ( log.isTraceEnabled() ) {
                     log.trace("Publishing backup data:"+msg+" to: "+next.getName());
+                }
                 UniqueId id = getChannel().send(tmpBackup, msg, getChannelSendOptions());
-                if ( log.isTraceEnabled() )
+                if ( log.isTraceEnabled() ) {
                     log.trace("Data published:"+msg+" msg Id:"+id);
+                }
                 //we published out to a backup, mark the test success
                 success = true;
                 backup = tmpBackup;
@@ -195,8 +203,9 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 if (success && proxies.length > 0 ) {
                     msg = new MapMessage(getMapContextName(), MapMessage.MSG_PROXY, false,
                                          (Serializable) key, null, null, channel.getLocalMember(false),backup);
-                    if ( log.isTraceEnabled() )
+                    if ( log.isTraceEnabled() ) {
                         log.trace("Publishing proxy data:"+msg+" to: "+Arrays.toNameString(proxies));
+                    }
                     getChannel().send(proxies, msg, getChannelSendOptions());
                 }
             }catch  ( ChannelException x ) {

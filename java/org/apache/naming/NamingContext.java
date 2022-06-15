@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming;
 
 import java.util.Enumeration;
@@ -74,7 +72,7 @@ public class NamingContext implements Context {
      * @param name The name of the associated Catalina Context
      */
     public NamingContext(Hashtable<String,Object> env, String name) {
-        this(env, name, new HashMap<String,NamingEntry>());
+        this(env, name, new HashMap<>());
     }
 
 
@@ -270,11 +268,13 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
-        if (name.isEmpty())
+        }
+        if (name.isEmpty()) {
             throw new NamingException
                 (sm.getString("namingContext.invalidName"));
+        }
 
         NamingEntry entry = bindings.get(name.get(0));
 
@@ -365,8 +365,9 @@ public class NamingContext implements Context {
     public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
+        }
         if (name.isEmpty()) {
             return new NamingContextEnumeration(bindings.values().iterator());
         }
@@ -419,8 +420,9 @@ public class NamingContext implements Context {
     public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
+        }
         if (name.isEmpty()) {
             return new NamingContextBindingsEnumeration(bindings.values().iterator(), this);
         }
@@ -488,11 +490,13 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
-        if (name.isEmpty())
+        }
+        if (name.isEmpty()) {
             throw new NamingException
                 (sm.getString("namingContext.invalidName"));
+        }
 
         NamingEntry entry = bindings.get(name.get(0));
 
@@ -633,10 +637,12 @@ public class NamingContext implements Context {
     public NameParser getNameParser(Name name)
         throws NamingException {
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
-        if (name.isEmpty())
+        }
+        if (name.isEmpty()) {
             return nameParser;
+        }
 
         if (name.size() > 1) {
             Object obj = bindings.get(name.get(0));
@@ -804,7 +810,7 @@ public class NamingContext implements Context {
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             // Should never happen
         }
-        GRAAL = result;
+        GRAAL = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
     }
 
     /**
@@ -819,8 +825,9 @@ public class NamingContext implements Context {
         throws NamingException {
 
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
+        }
         if (name.isEmpty()) {
             // If name is empty, a newly allocated naming context is returned
             return new NamingContext(env, this.name, bindings);
@@ -861,7 +868,7 @@ public class NamingContext implements Context {
                         // Note: This may need manual constructor reflection configuration
                         Reference reference = (Reference) entry.value;
                         Class<?> factoryClass = getClass().getClassLoader().loadClass(reference.getFactoryClassName());
-                        ObjectFactory factory = (ObjectFactory) factoryClass.newInstance();
+                        ObjectFactory factory = (ObjectFactory) factoryClass.getDeclaredConstructor().newInstance();
                         obj = factory.getObjectInstance(entry.value, name, this, env);
                     }
                     if (entry.value instanceof ResourceRef) {
@@ -872,6 +879,9 @@ public class NamingContext implements Context {
                             entry.type = NamingEntry.ENTRY;
                             entry.value = obj;
                         }
+                    }
+                    if (obj == null) {
+                        throw new NamingException(sm.getString("namingContext.failResolvingReference"));
                     }
                     return obj;
                 } catch (NamingException e) {
@@ -911,11 +921,13 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0))
+        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
             name = name.getSuffix(1);
-        if (name.isEmpty())
+        }
+        if (name.isEmpty()) {
             throw new NamingException
                 (sm.getString("namingContext.invalidName"));
+        }
 
         NamingEntry entry = bindings.get(name.get(0));
 

@@ -34,7 +34,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.Filter;
@@ -340,10 +339,12 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getRealPath(String path) {
-        if (!myResourceBaseURL.getProtocol().equals("file"))
+        if (!myResourceBaseURL.getProtocol().equals("file")) {
             return null;
-        if (!path.startsWith("/"))
+        }
+        if (!path.startsWith("/")) {
             return null;
+        }
         try {
             File f = new File(getResource(path).toURI());
             return f.getAbsolutePath();
@@ -470,7 +471,7 @@ public class JspCServletContext implements ServletContext {
                         if (entryName.startsWith(jarPath) &&
                                 entryName.length() > jarPath.length()) {
                             // Let the Set implementation handle duplicates
-                            int sep = entryName.indexOf("/", jarPath.length());
+                            int sep = entryName.indexOf('/', jarPath.length());
                             if (sep < 0) {
                                 // This is a file - strip leading "META-INF/resources"
                                 thePaths.add(entryName.substring(18));
@@ -495,21 +496,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getServerInfo() {
-        return "JspC/ApacheTomcat9";
-    }
-
-
-    /**
-     * Return a null reference for the specified servlet name.
-     *
-     * @param name Name of the requested servlet
-     *
-     * @deprecated This method has been deprecated with no replacement
-     */
-    @Override
-    @Deprecated
-    public Servlet getServlet(String name) throws ServletException {
-        return null;
+        return "JspC/ApacheTomcat10";
     }
 
 
@@ -523,30 +510,6 @@ public class JspCServletContext implements ServletContext {
 
 
     /**
-     * Return an empty enumeration of servlet names.
-     *
-     * @deprecated This method has been deprecated with no replacement
-     */
-    @Override
-    @Deprecated
-    public Enumeration<String> getServletNames() {
-        return new Vector<String>().elements();
-    }
-
-
-    /**
-     * Return an empty enumeration of servlets.
-     *
-     * @deprecated This method has been deprecated with no replacement
-     */
-    @Override
-    @Deprecated
-    public Enumeration<Servlet> getServlets() {
-        return new Vector<Servlet>().elements();
-    }
-
-
-    /**
      * Log the specified message.
      *
      * @param message The message to be logged
@@ -554,21 +517,6 @@ public class JspCServletContext implements ServletContext {
     @Override
     public void log(String message) {
         myLogWriter.println(message);
-    }
-
-
-    /**
-     * Log the specified message and exception.
-     *
-     * @param exception The exception to be logged
-     * @param message The message to be logged
-     *
-     * @deprecated Use log(String,Throwable) instead
-     */
-    @Override
-    @Deprecated
-    public void log(Exception exception, String message) {
-        log(message, exception);
     }
 
 

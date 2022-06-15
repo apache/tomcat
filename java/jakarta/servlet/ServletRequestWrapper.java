@@ -29,8 +29,9 @@ import java.util.ResourceBundle;
  * class implements the Wrapper or Decorator pattern. Methods default to calling
  * through to the wrapped request object.
  *
- * @since Servlet 2.3
  * @see jakarta.servlet.ServletRequest
+ *
+ * @since Servlet 2.3
  */
 public class ServletRequestWrapper implements ServletRequest {
     private static final String LSTRING_FILE = "jakarta.servlet.LocalStrings";
@@ -63,6 +64,7 @@ public class ServletRequestWrapper implements ServletRequest {
 
     /**
      * Sets the request object being wrapped.
+     *
      * @param request The new wrapped request.
      *
      * @throws IllegalArgumentException if the request is null.
@@ -303,18 +305,6 @@ public class ServletRequestWrapper implements ServletRequest {
     }
 
     /**
-     * The default behavior of this method is to return getRealPath(String path)
-     * on the wrapped request object.
-     *
-     * @deprecated As of Version 3.0 of the Java Servlet API
-     */
-    @Override
-    @Deprecated
-    public String getRealPath(String path) {
-        return this.request.getRealPath(path);
-    }
-
-    /**
      * The default behavior of this method is to return getRemotePort() on the
      * wrapped request object.
      *
@@ -481,5 +471,41 @@ public class ServletRequestWrapper implements ServletRequest {
     @Override
     public DispatcherType getDispatcherType() {
         return this.request.getDispatcherType();
+    }
+
+    /**
+     * Gets the request ID for the wrapped request.
+     *
+     * @return the request ID for the wrapped request
+     *
+     * @since Servlet 6.0
+     */
+    @Override
+    public String getRequestId() {
+        return request.getRequestId();
+    }
+
+    /**
+     * Gets the protocol defined request ID, if any, for the wrapped request.
+     *
+     * @return the protocol defined request ID, if any, for the wrapped request
+     *
+     * @since Servlet 6.0
+     */
+    @Override
+    public String getProtocolRequestId() {
+        return request.getProtocolRequestId();
+    }
+
+    /**
+     * Gets the connection information for the wrapped request.
+     *
+     * @return the connection information for the wrapped request
+     *
+     * @since Servlet 6.0
+     */
+    @Override
+    public ServletConnection getServletConnection() {
+        return request.getServletConnection();
     }
 }

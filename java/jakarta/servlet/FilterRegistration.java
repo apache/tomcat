@@ -20,8 +20,9 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 /**
+ * Interface through which a Filter may be further configured.
+ *
  * @since Servlet 3.0
- * TODO SERVLET3 - Add comments
  */
 public interface FilterRegistration extends Registration {
 
@@ -43,9 +44,12 @@ public interface FilterRegistration extends Registration {
     public void addMappingForServletNames(
             EnumSet<DispatcherType> dispatcherTypes,
             boolean isMatchAfter, String... servletNames);
+
     /**
+     * Gets the currently available servlet name mappings of the Filter
+     * represented by this FilterRegistration.
      *
-     * @return TODO
+     * @return a Collection of the Servlet name mappings
      */
     public Collection<String> getServletNameMappings();
 
@@ -69,13 +73,18 @@ public interface FilterRegistration extends Registration {
             boolean isMatchAfter, String... urlPatterns);
 
     /**
+     * Gets the currently available URL pattern mappings of the Filter
+     * represented by this FilterRegistration.
      *
-     * @return TODO
+     * @return a Collection of the URL pattern mappings
      */
     public Collection<String> getUrlPatternMappings();
 
-    public static interface Dynamic
-    extends FilterRegistration, Registration.Dynamic {
+    /**
+     * Interface through which a Filter registered via one of the addFilter
+     * methods on ServletContext may be further configured.
+     */
+    public static interface Dynamic extends FilterRegistration, Registration.Dynamic {
         // No additional methods
     }
 }

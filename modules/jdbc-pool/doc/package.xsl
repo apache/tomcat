@@ -25,12 +25,10 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   version="1.0">
 
-
   <!-- Output method -->
   <xsl:output method="html"
-            encoding="UTF-8"
+              encoding="UTF-8"
               indent="no"/>
-
 
   <!-- Defined parameters (overrideable) -->
   <xsl:param    name="relative-path"    select="'.'"/>
@@ -54,23 +52,19 @@
 
   <!-- Process an entire document into an HTML page -->
   <xsl:template match="document">
-  <xsl:variable name="project"
-              select="document('project.xml')/project"/>
+  <xsl:variable name="project" select="document('project.xml')/project"/>
     <html>
-    <head>
-    <title><xsl:value-of select="project/title"/> - <xsl:value-of select="properties/title"/></title>
-    </head>
+      <head>
+        <title><xsl:value-of select="project/title"/> - <xsl:value-of select="properties/title"/></title>
+      </head>
+      <body bgcolor="{$body-bg}" text="{$body-fg}" link="{$body-link}"
+            alink="{$body-link}" vlink="{$body-link}">
 
-    <body bgcolor="{$body-bg}" text="{$body-fg}" link="{$body-link}"
-          alink="{$body-link}" vlink="{$body-link}">
-
-          <h2><xsl:value-of select="properties/title"/>.</h2>
-          <xsl:apply-templates select="body/section"/>
-    </body>
+        <h2><xsl:value-of select="properties/title"/>.</h2>
+        <xsl:apply-templates select="body/section"/>
+      </body>
     </html>
-
   </xsl:template>
-
 
   <!-- Process a documentation section -->
   <xsl:template match="section">
@@ -79,18 +73,25 @@
     </xsl:variable>
     <table border="0" cellspacing="0" cellpadding="2">
       <!-- Section heading -->
-      <tr><td bgcolor="{$banner-bg}">
+      <tr>
+        <td bgcolor="{$banner-bg}">
           <font color="{$banner-fg}" face="arial,helvetica.sanserif">
-          <a name="{$name}">
-          <strong><xsl:value-of select="@name"/></strong></a></font>
-      </td></tr>
+            <a name="{$name}">
+              <strong><xsl:value-of select="@name"/></strong>
+            </a>
+          </font>
+        </td>
+      </tr>
       <!-- Section body -->
-      <tr><td><blockquote>
-        <xsl:apply-templates/>
-      </blockquote></td></tr>
+      <tr>
+        <td>
+          <blockquote>
+            <xsl:apply-templates/>
+          </blockquote>
+        </td>
+      </tr>
     </table>
   </xsl:template>
-
 
   <!-- Process a documentation subsection -->
   <xsl:template match="subsection">
@@ -99,18 +100,25 @@
     </xsl:variable>
     <table border="0" cellspacing="0" cellpadding="2">
       <!-- Subsection heading -->
-      <tr><td bgcolor="{$sub-banner-bg}">
+      <tr>
+        <td bgcolor="{$sub-banner-bg}">
           <font color="{$sub-banner-fg}" face="arial,helvetica.sanserif">
-          <a name="{$name}">
-          <strong><xsl:value-of select="@name"/></strong></a></font>
-      </td></tr>
+            <a name="{$name}">
+              <strong><xsl:value-of select="@name"/></strong>
+            </a>
+          </font>
+        </td>
+      </tr>
       <!-- Subsection body -->
-      <tr><td><blockquote>
-        <xsl:apply-templates/>
-      </blockquote></td></tr>
+      <tr>
+        <td>
+          <blockquote>
+            <xsl:apply-templates/>
+          </blockquote>
+        </td>
+      </tr>
     </table>
   </xsl:template>
-
 
   <!-- Process a source code example -->
   <xsl:template match="source">
@@ -134,9 +142,11 @@
           <td bgcolor="{$source-color}" width="1">
             <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
-          <td bgcolor="#ffffff" height="1"><pre>
-            <xsl:value-of select="."/>
-          </pre></td>
+          <td bgcolor="#ffffff" height="1">
+            <pre>
+              <xsl:value-of select="."/>
+            </pre>
+          </td>
           <td bgcolor="{$source-color}" width="1">
             <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
           </td>
@@ -155,7 +165,6 @@
       </table>
     </div>
   </xsl:template>
-
 
   <!-- Process an attributes list with nested attribute elements -->
   <xsl:template match="attributes">

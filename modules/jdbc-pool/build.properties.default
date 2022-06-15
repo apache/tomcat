@@ -29,6 +29,11 @@ version.build=0
 version.patch=1
 version.suffix=
 
+# ----- Reproducible builds -----
+# Uncomment and set to current time for reproducible builds
+#2021-03-18T06:00:00Z
+#ant.tstamp.now=1616047200
+
 # ----- Default Base Path for Dependent Packages -----
 # Please note this path must be absolute, not relative,
 # as it is referenced with different working directory
@@ -96,7 +101,7 @@ derby.home=${base.path}/db-derby-10.5.1.1-bin
 derby.loc=https://archive.apache.org/dist/db/derby/db-derby-10.5.1.1/db-derby-10.5.1.1-bin.tar.gz
 derby.jar=${derby.home}/lib/derby.jar
 
-h2.version=1.2.129
+h2.version=2.1.210
 h2.home=${base.path}/h2-${h2.version}
-h2.loc=https://repo.maven.apache.org/maven2/com/h2database/h2/1.2.129/h2-1.2.129.jar
-h2.jar=${h2.home}/h2-1.2.129.jar
+h2.loc=https://repo.maven.apache.org/maven2/com/h2database/h2/${h2.version}/h2-${h2.version}.jar
+h2.jar=${h2.home}/h2-${h2.version}.jar

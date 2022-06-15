@@ -91,29 +91,8 @@ public interface HttpServletResponse extends ServletResponse {
      * @return the encoded URL if encoding is needed; the unchanged URL
      *         otherwise.
      * @see #sendRedirect
-     * @see #encodeUrl
      */
     public String encodeRedirectURL(String url);
-
-    /**
-     * @param url
-     *            the url to be encoded.
-     * @return the encoded URL if encoding is needed; the unchanged URL
-     *         otherwise.
-     * @deprecated As of version 2.1, use encodeURL(String url) instead
-     */
-    @Deprecated
-    public String encodeUrl(String url);
-
-    /**
-     * @param url
-     *            the url to be encoded.
-     * @return the encoded URL if encoding is needed; the unchanged URL
-     *         otherwise.
-     * @deprecated As of version 2.1, use encodeRedirectURL(String url) instead
-     */
-    @Deprecated
-    public String encodeRedirectUrl(String url);
 
     /**
      * Sends an error response to the client using the specified status code and
@@ -280,21 +259,6 @@ public interface HttpServletResponse extends ServletResponse {
     public void setStatus(int sc);
 
     /**
-     * Sets the status code and message for this response.
-     *
-     * @param sc
-     *            the status code
-     * @param sm
-     *            the status message
-     * @deprecated As of version 2.1, due to ambiguous meaning of the message
-     *             parameter. To set a status code use
-     *             <code>setStatus(int)</code>, to send an error with a
-     *             description use <code>sendError(int, String)</code>.
-     */
-    @Deprecated
-    public void setStatus(int sc, String sm);
-
-    /**
      * Get the HTTP status code for this Response.
      *
      * @return The HTTP status code for this Response
@@ -377,7 +341,7 @@ public interface HttpServletResponse extends ServletResponse {
     }
 
     /*
-     * Server status codes; see RFC 2068.
+     * Server status codes; see RFC 7231.
      */
 
     /**

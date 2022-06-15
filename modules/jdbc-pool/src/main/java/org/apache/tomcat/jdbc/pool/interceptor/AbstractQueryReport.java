@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.reflect.Constructor;
@@ -194,11 +193,17 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             //was close invoked?
             boolean close = compare(JdbcInterceptor.CLOSE_VAL,name);
             //allow close to be called multiple times
-            if (close && closed) return null;
+            if (close && closed) {
+              return null;
+            }
             //are we calling isClosed?
-            if (compare(JdbcInterceptor.ISCLOSED_VAL,name)) return Boolean.valueOf(closed);
+            if (compare(JdbcInterceptor.ISCLOSED_VAL,name)) {
+              return Boolean.valueOf(closed);
+            }
             //if we are calling anything else, bail out
-            if (closed) throw new SQLException("Statement closed.");
+            if (closed) {
+              throw new SQLException("Statement closed.");
+            }
             boolean process = false;
             //check to see if we are about to execute a query
             process = isExecute( method, process);
@@ -225,7 +230,9 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                     //report the slow query
                     reportSlowQuery(query, args, name, start, delta);
                 }catch (Exception t) {
-                    if (log.isWarnEnabled()) log.warn("Unable to process slow query",t);
+                    if (log.isWarnEnabled()) {
+                      log.warn("Unable to process slow query",t);
+                    }
                 }
             } else if (process) {
                 reportQuery(query, args, name, start, delta);

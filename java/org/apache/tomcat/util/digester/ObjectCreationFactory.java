@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.util.digester;
 
 
@@ -37,7 +36,7 @@ public interface ObjectCreationFactory {
      * object based on the element's attributes.
      *
      * @param attributes the element's attributes
-     * @return the creted object
+     * @return the created object
      * @throws Exception any exception thrown will be propagated upwards
      */
     public Object createObject(Attributes attributes) throws Exception;

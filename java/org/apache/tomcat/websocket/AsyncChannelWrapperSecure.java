@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -163,6 +164,12 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         t.start();
 
         return wFuture;
+    }
+
+
+    @Override
+    public SocketAddress getLocalAddress() throws IOException {
+        return socketChannel.getLocalAddress();
     }
 
 
@@ -404,9 +411,12 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             handshaking = false;
                             break;
                         }
-                        case NOT_HANDSHAKING: {
-                            throw new SSLException(
-                                    sm.getString("asyncChannelWrapperSecure.notHandshaking"));
+                        case NOT_HANDSHAKING:
+                            // Don't expect to see this during a handshake
+                        case NEED_UNWRAP_AGAIN: {
+                            // Only applies to DLTS
+                            throw new SSLException(sm.getString(
+                                    "asyncChannelWrapperSecure.unexpectedHandshakeState", handshakeStatus));
                         }
                     }
                 }

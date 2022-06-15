@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.File;
@@ -242,6 +241,33 @@ public class TestValidator extends TomcatBaseTest {
         Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
         Assert.assertTrue(result.indexOf("<p>07-hello world</p>") > 0);
+    }
+
+    @Test
+    public void testTldVersions60() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir =
+            new File("test/webapp-6.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/tld-versions.jsp");
+
+        String result = res.toString();
+
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>07-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>08-hello world</p>") > 0);
     }
 
     public static class Echo extends TagSupport {

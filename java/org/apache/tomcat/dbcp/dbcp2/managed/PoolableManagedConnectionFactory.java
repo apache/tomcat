@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.dbcp.dbcp2.managed;
 
 import java.sql.Connection;
+import java.time.Duration;
 
 import javax.management.ObjectName;
 
@@ -82,7 +82,7 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
             final GenericKeyedObjectPoolConfig<DelegatingPreparedStatement> config = new GenericKeyedObjectPoolConfig<>();
             config.setMaxTotalPerKey(-1);
             config.setBlockWhenExhausted(false);
-            config.setMaxWaitMillis(0);
+            config.setMaxWait(Duration.ZERO);
             config.setMaxIdlePerKey(1);
             config.setMaxTotal(getMaxOpenPreparedStatements());
             final ObjectName dataSourceJmxName = getDataSourceJmxName();
@@ -90,7 +90,7 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
             if (dataSourceJmxName != null) {
                 final StringBuilder base = new StringBuilder(dataSourceJmxName.toString());
                 base.append(Constants.JMX_CONNECTION_BASE_EXT);
-                base.append(Long.toString(connIndex));
+                base.append(connIndex);
                 config.setJmxNameBase(base.toString());
                 config.setJmxNamePrefix(Constants.JMX_STATEMENT_POOL_PREFIX);
             } else {

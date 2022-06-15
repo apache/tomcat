@@ -95,7 +95,7 @@ public class PStmtKeyCPDS extends PStmtKey {
      *            An array of column indexes indicating the columns that should be returned from the inserted row or
      *            rows.
      */
-    public PStmtKeyCPDS(final String sql, final int columnIndexes[]) {
+    public PStmtKeyCPDS(final String sql, final int[] columnIndexes) {
         super(sql, null, columnIndexes);
     }
 
@@ -107,7 +107,7 @@ public class PStmtKeyCPDS extends PStmtKey {
      * @param columnNames
      *            An array of column names indicating the columns that should be returned from the inserted row or rows.
      */
-    public PStmtKeyCPDS(final String sql, final String columnNames[]) {
+    public PStmtKeyCPDS(final String sql, final String[] columnNames) {
         super(sql, null, columnNames);
     }
 }

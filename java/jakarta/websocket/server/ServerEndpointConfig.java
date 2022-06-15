@@ -74,6 +74,18 @@ public interface ServerEndpointConfig extends EndpointConfig {
 
         private Builder(Class<?> endpointClass,
                 String path) {
+            if (endpointClass == null) {
+                throw new IllegalArgumentException("Endpoint class may not be null");
+            }
+            if (path == null) {
+                throw new IllegalArgumentException("Path may not be null");
+            }
+            if (path.isEmpty()) {
+                throw new IllegalArgumentException("Path may not be empty");
+            }
+            if (path.charAt(0) != '/') {
+                throw new IllegalArgumentException("Path must start with '/'");
+            }
             this.endpointClass = endpointClass;
             this.path = path;
         }
@@ -200,6 +212,17 @@ public interface ServerEndpointConfig extends EndpointConfig {
             }
         }
 
+
+        /**
+         * Return the platform default configurator.
+         *
+         * @return the platform default configurator
+         *
+         * @since WebSocket 2.1
+         */
+        public ServerEndpointConfig.Configurator getContainerDefaultConfigurator() {
+            return fetchContainerDefaultConfigurator();
+        }
 
         public String getNegotiatedSubprotocol(List<String> supported,
                 List<String> requested) {

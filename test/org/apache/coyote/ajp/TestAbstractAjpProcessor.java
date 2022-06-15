@@ -68,8 +68,6 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             protocol = "org.apache.coyote.ajp.AjpNioProtocol";
         } else if (protocol.contains("Nio2")) {
             protocol = "org.apache.coyote.ajp.AjpNio2Protocol";
-        } else if (protocol.contains("Apr")) {
-            protocol = "org.apache.coyote.ajp.AjpAprProtocol";
         } else {
             protocol = "org.apache.coyote.ajp.AjpNioProtocol";
         }

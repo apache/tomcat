@@ -73,14 +73,16 @@ public class SSIFilter extends GenericFilter {
 
         isVirtualWebappRelative = Boolean.parseBoolean(getInitParameter("isVirtualWebappRelative"));
 
-        if (getInitParameter("expires") != null)
+        if (getInitParameter("expires") != null) {
             expires = Long.valueOf(getInitParameter("expires"));
+        }
 
         allowExec = Boolean.parseBoolean(getInitParameter("allowExec"));
 
-        if (debug > 0)
+        if (debug > 0) {
             getServletContext().log(
                     "SSIFilter.init() SSI invoker started with 'debug'=" + debug);
+        }
     }
 
     @Override
@@ -143,7 +145,7 @@ public class SSIFilter extends GenericFilter {
             Matcher shtmlMatcher =
                 shtmlRegEx.matcher(responseIncludeWrapper.getContentType());
             if (shtmlMatcher.matches()) {
-                // Convert shtml mime type to ordinary html mime type but preserve
+                // Convert SHTML mime type to ordinary HTML mime type but preserve
                 // encoding, if any.
                 String enc = shtmlMatcher.group(1);
                 res.setContentType("text/html" + ((enc != null) ? enc : ""));

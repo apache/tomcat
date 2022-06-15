@@ -18,6 +18,8 @@ package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -25,7 +27,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class HpackDecoder {
 
-    protected static final StringManager sm = StringManager.getManager(HpackDecoder.class);
+    private static final Log log = LogFactory.getLog(HpackDecoder.class);
+    private static final StringManager sm = StringManager.getManager(HpackDecoder.class);
 
     private static final int DEFAULT_RING_BUFFER_SIZE = 10;
 
@@ -71,8 +74,6 @@ public class HpackDecoder {
     private volatile int headerCount = 0;
     private volatile boolean countedCookie;
     private volatile int headerSize = 0;
-
-    private final StringBuilder stringBuilder = new StringBuilder();
 
     HpackDecoder(int maxMemorySize) {
         this.maxMemorySizeHard = maxMemorySize;
@@ -215,26 +216,24 @@ public class HpackDecoder {
         byte data = buffer.get(buffer.position());
 
         int length = Hpack.decodeInteger(buffer, 7);
-        if (buffer.remaining() < length) {
+        if (buffer.remaining() < length || length == -1) {
             return null;
         }
         boolean huffman = (data & 0b10000000) != 0;
         if (huffman) {
             return readHuffmanString(length, buffer);
         }
+        StringBuilder stringBuilder = new StringBuilder(length);
         for (int i = 0; i < length; ++i) {
             stringBuilder.append((char) buffer.get());
         }
-        String ret = stringBuilder.toString();
-        stringBuilder.setLength(0);
-        return ret;
+        return stringBuilder.toString();
     }
 
     private String readHuffmanString(int length, ByteBuffer buffer) throws HpackException {
+        StringBuilder stringBuilder = new StringBuilder(length);
         HPackHuffman.decode(buffer, length, stringBuilder);
-        String ret = stringBuilder.toString();
-        stringBuilder.setLength(0);
-        return ret;
+        return stringBuilder.toString();
     }
 
     private String handleIndexedHeaderName(int index) throws HpackException {
@@ -260,13 +259,16 @@ public class HpackDecoder {
      * Handle an indexed header representation
      *
      * @param index The index
-     * @throws HpackException
+     * @throws HpackException If an error occurs processing the given index
      */
     private void handleIndex(int index) throws HpackException {
         if (index <= Hpack.STATIC_TABLE_LENGTH) {
             addStaticTableEntry(index);
         } else {
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("hpackdecoder.useDynamic", Integer.valueOf(adjustedIndex)));
+            }
             Hpack.HeaderField headerField = headerTable[adjustedIndex];
             emitHeader(headerField.name, headerField.value);
         }
@@ -296,12 +298,18 @@ public class HpackDecoder {
 
     private void addStaticTableEntry(int index) throws HpackException {
         //adds an entry from the static table.
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("hpackdecoder.useStatic", Integer.valueOf(index)));
+        }
         Hpack.HeaderField entry = Hpack.STATIC_TABLE[index];
         emitHeader(entry.name, (entry.value == null) ? "" : entry.value);
     }
 
     private void addEntryToHeaderTable(Hpack.HeaderField entry) {
         if (entry.size > maxMemorySizeSoft) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("hpackdecoder.clearDynamic"));
+            }
             //it is to big to fit, so we just completely clear the table.
             while (filledTableSlots > 0) {
                 headerTable[firstSlotPosition] = null;
@@ -318,6 +326,9 @@ public class HpackDecoder {
         int newTableSlots = filledTableSlots + 1;
         int tableLength = headerTable.length;
         int index = (firstSlotPosition + filledTableSlots) % tableLength;
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("hpackdecoder.addDynamic", Integer.valueOf(index), entry.name, entry.value));
+        }
         headerTable[index] = entry;
         int newSize = currentMemorySize + entry.size;
         while (newSize > maxMemorySizeSoft) {
@@ -428,6 +439,9 @@ public class HpackDecoder {
         int inc = 3 + name.length() + value.length();
         headerSize += inc;
         if (!isHeaderCountExceeded() && !isHeaderSizeExceeded(0)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("hpackdecoder.emitHeader", name, value));
+            }
             headerEmitter.emitHeader(name, value);
         }
     }

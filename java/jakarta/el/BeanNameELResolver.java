@@ -106,6 +106,14 @@ public class BeanNameELResolver extends ELResolver {
             if (beanNameResolver.isNameResolved(beanName)) {
                 Class<?> result = beanNameResolver.getBean(beanName).getClass();
                 context.setPropertyResolved(base, property);
+
+                /*
+                 * No resolver level isReadOnly property for this resolver
+                 */
+                if (beanNameResolver.isReadOnly((String) property)) {
+                    return null;
+                }
+
                 return result;
             }
         } catch (Throwable t) {
@@ -142,6 +150,7 @@ public class BeanNameELResolver extends ELResolver {
         return false;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
             Object base) {

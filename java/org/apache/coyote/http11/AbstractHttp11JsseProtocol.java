@@ -38,6 +38,10 @@ public abstract class AbstractHttp11JsseProtocol<S>
         if (OpenSSLImplementation.class.getName().equals(getSslImplementationName())) {
             return "openssl";
         }
+        if (getSslImplementationName() != null
+                && getSslImplementationName().endsWith(".panama.OpenSSLImplementation")) {
+            return "opensslforeign";
+        }
         return "jsse";
     }
 

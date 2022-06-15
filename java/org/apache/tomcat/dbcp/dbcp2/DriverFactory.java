@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.sql.Driver;
@@ -31,9 +30,9 @@ class DriverFactory {
     static Driver createDriver(final BasicDataSource basicDataSource) throws SQLException {
         // Load the JDBC driver class
         Driver driverToUse = basicDataSource.getDriver();
-        String driverClassName = basicDataSource.getDriverClassName();
-        ClassLoader driverClassLoader = basicDataSource.getDriverClassLoader();
-        String url = basicDataSource.getUrl();
+        final String driverClassName = basicDataSource.getDriverClassName();
+        final ClassLoader driverClassLoader = basicDataSource.getDriverClassLoader();
+        final String url = basicDataSource.getUrl();
 
         if (driverToUse == null) {
             Class<?> driverFromCCL = null;

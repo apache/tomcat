@@ -16,8 +16,8 @@
  */
 package org.apache.coyote.http2;
 
-import java.util.EnumMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -45,8 +45,8 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
     static final long DEFAULT_MAX_HEADER_LIST_SIZE = 1 << 15;
 
-    Map<Setting, Long> current = new EnumMap<>(Setting.class);
-    Map<Setting, Long> pending = new EnumMap<>(Setting.class);
+    Map<Setting, Long> current = new ConcurrentHashMap<>();
+    Map<Setting, Long> pending = new ConcurrentHashMap<>();
 
 
     ConnectionSettingsBase(String connectionId) {
@@ -88,8 +88,6 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
             break;
         case UNKNOWN:
             // Unrecognised. Ignore it.
-            log.warn(sm.getString("connectionSettings.unknown",
-                    connectionId, setting, Long.toString(value)));
             return;
         }
 

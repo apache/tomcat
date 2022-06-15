@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.jasper.tagplugins.jstl;
 
 import java.io.ByteArrayOutputStream;
@@ -127,10 +125,14 @@ public class Util {
         int begin;
         int end;
         int index = input.toUpperCase(Locale.ENGLISH).indexOf(name.toUpperCase(Locale.ENGLISH));
-        if (index == -1) return null;
+        if (index == -1) {
+            return null;
+        }
         index = index + name.length(); // positioned after the attribute name
         index = input.indexOf('=', index); // positioned at the '='
-        if (index == -1) return null;
+        if (index == -1) {
+            return null;
+        }
         index += 1; // positioned after the '='
         input = input.substring(index).trim();
 
@@ -138,12 +140,18 @@ public class Util {
             // attribute value is a quoted string
             begin = 1;
             end = input.indexOf('"', begin);
-            if (end == -1) return null;
+            if (end == -1) {
+                return null;
+            }
         } else {
             begin = 0;
             end = input.indexOf(';');
-            if (end == -1) end = input.indexOf(' ');
-            if (end == -1) end = input.length();
+            if (end == -1) {
+                end = input.indexOf(' ');
+            }
+            if (end == -1) {
+                end = input.length();
+            }
         }
         return input.substring(begin, end).trim();
     }
@@ -221,17 +229,19 @@ public class Util {
             String url, String context, PageContext pageContext)
     throws JspException {
         // don't touch absolute URLs
-        if (isAbsoluteUrl(url))
+        if (isAbsoluteUrl(url)) {
             return url;
+        }
 
         // normalize relative URLs against a context root
         HttpServletRequest request =
             (HttpServletRequest) pageContext.getRequest();
         if (context == null) {
-            if (url.startsWith("/"))
+            if (url.startsWith("/")) {
                 return request.getContextPath() + url;
-            else
+            } else {
                 return url;
+            }
         } else {
             if (!context.startsWith("/") || !url.startsWith("/")) {
                 throw new JspTagException(Localizer.getMessage("jstl.urlMustStartWithSlash"));
@@ -286,16 +296,18 @@ public class Util {
 
         @Override
         public PrintWriter getWriter() {
-            if (isStreamUsed)
+            if (isStreamUsed) {
                 throw new IllegalStateException(Localizer.getMessage("jstl.writerAfterOS"));
+            }
             isWriterUsed = true;
             return new PrintWriter(sw);
         }
 
         @Override
         public ServletOutputStream getOutputStream() {
-            if (isWriterUsed)
+            if (isWriterUsed) {
                 throw new IllegalStateException(Localizer.getMessage("jstl.OSAfterWriter"));
+            }
             isStreamUsed = true;
             return sos;
         }
@@ -329,15 +341,18 @@ public class Util {
         }
 
         public String getString() throws UnsupportedEncodingException {
-            if (isWriterUsed)
+            if (isWriterUsed) {
                 return sw.toString();
-            else if (isStreamUsed) {
-                if (this.charEncoding != null && !this.charEncoding.equals(""))
+            } else if (isStreamUsed) {
+                if (this.charEncoding != null && !this.charEncoding.equals("")) {
                     return bos.toString(charEncoding);
-                else
+                } else {
                     return bos.toString("ISO-8859-1");
-            } else
+                }
+            }
+            else {
                 return ""; // target didn't write anything
+            }
         }
     }
 

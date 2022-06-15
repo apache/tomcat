@@ -87,7 +87,7 @@ public class AsyncChannelGroupUtil {
                     0,
                     Integer.MAX_VALUE,
                     Long.MAX_VALUE, TimeUnit.MILLISECONDS,
-                    new SynchronousQueue<Runnable>(),
+                    new SynchronousQueue<>(),
                     new AsyncIOThreadFactory());
 
             try {

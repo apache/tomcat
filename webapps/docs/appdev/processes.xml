@@ -64,7 +64,7 @@ once (no matter how many web applications you plan to develop).</p>
 <li><p><em>Define one or more Tomcat users</em>.  The <em>Manager</em> web
     application runs under a security constraint that requires a user to be
     logged in, and have the security role <code>manager-script</code> assigned
-    to him or her.  How such users are defined depends on which Realm you have
+    to then.  How such users are defined depends on which Realm you have
     configured in Tomcat's <code>conf/server.xml</code> file -- see the
     <a href="../realm-howto.html">Realm Configuration How-To</a> for more
     information.  You may define any number of users (with any username
@@ -151,7 +151,7 @@ cvs commit]]></source>
 
 Note that this is only an example web.xml file.  The full definition
 of the deployment descriptor file is in the
-<a href="https://wiki.apache.org/tomcat/Specifications">Servlet Specification.</a>
+<a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet Specification.</a>
 
 </subsection>
 

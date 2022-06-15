@@ -15,7 +15,6 @@
 
 -include: build-defaults.bnd
 
-Automatic-Module-Name: org.apache.tomcat.embed.websocket
 Bundle-Name: tomcat-embed-websocket
 Bundle-SymbolicName: org.apache.tomcat-embed-websocket
 Export-Package: \
@@ -26,7 +25,7 @@ Export-Package: \
 -includepackage: \
     org.apache.tomcat.websocket.pojo
 
--includeresource.meta-inf: /META-INF/=../META-INF/tomcat-websocket.jar/
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/tomcat-websocket.jar/
 
 Provide-Capability: \
     osgi.contract;\
@@ -34,10 +33,30 @@ Provide-Capability: \
         version:Version=${websocket.spec.version};\
         uses:='${packages;NAMED;jakarta.websocket.*}'
 
+Require-Capability: \
+    osgi.extender;\
+        filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=jakarta.websocket.ContainerProvider)";\
+        osgi.serviceloader="jakarta.websocket.ContainerProvider",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=jakarta.websocket.server.ServerEndpointConfig$Configurator)";\
+        osgi.serviceloader="jakarta.websocket.server.ServerEndpointConfig$Configurator",\
+    osgi.ee;\
+        filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+
 -namesection: jakarta/websocket*/;\
     Specification-Title=Jakarta WebSocket;\
     Specification-Version=${websocket.spec.version};\
     Specification-Vendor=Eclipse Foundation;\
     Implementation-Title=jakarta.websocket;\
-    Implementation-Version=${websocket.spec.version}.${websocket.revision};\
+    Implementation-Version=${websocket.spec.version}${websocket.revision};\
     Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=${Bundle-Name}

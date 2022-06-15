@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.servlet;
 
 import java.io.IOException;
@@ -93,8 +92,9 @@ public class JasperLoader extends URLClassLoader {
         // (0) Check our previously loaded class cache
         clazz = findLoadedClass(name);
         if (clazz != null) {
-            if (resolve)
+            if (resolve) {
                 resolveClass(clazz);
+            }
             return clazz;
         }
 
@@ -120,8 +120,9 @@ public class JasperLoader extends URLClassLoader {
             // Class is not in org.apache.jsp, therefore, have our
             // parent load it
             clazz = getParent().loadClass(name);
-            if( resolve )
+            if( resolve ) {
                 resolveClass(clazz);
+            }
             return clazz;
         }
 

@@ -33,17 +33,11 @@ import org.apache.el.util.MessageFactory;
  *
  * @author Jacob Hookom [jacob@hookom.net]
  */
+@aQute.bnd.annotation.spi.ServiceProvider(value=ExpressionFactory.class)
 public class ExpressionFactoryImpl extends ExpressionFactory {
 
-    /**
-     *
-     */
-    public ExpressionFactoryImpl() {
-        super();
-    }
-
     @Override
-    public Object coerceToType(Object obj, Class<?> type) {
+    public <T> T coerceToType(Object obj, Class<T> type) {
         return ELSupport.coerceToType(null, obj, type);
     }
 

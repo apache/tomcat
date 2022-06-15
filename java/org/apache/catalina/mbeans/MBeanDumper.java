@@ -73,11 +73,13 @@ public class MBeanDumper {
                 Object value = null;
 
                 for (MBeanAttributeInfo attr : attrs) {
-                    if (!attr.isReadable())
+                    if (!attr.isReadable()) {
                         continue;
+                    }
                     String attName = attr.getName();
-                    if ("modelerType".equals(attName))
+                    if ("modelerType".equals(attName)) {
                         continue;
+                    }
                     if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0
                             || attName.indexOf(' ') >= 0) {
                         continue;
@@ -159,7 +161,7 @@ public class MBeanDumper {
         // The only invalid char is \n
         // We also need to keep the string short and split it with \nSPACE
         // XXX TODO
-        int idx = value.indexOf("\n");
+        int idx = value.indexOf('\n');
         if (idx < 0) {
             return value;
         }
@@ -170,8 +172,9 @@ public class MBeanDumper {
             appendHead(sb, value, prev, idx);
             sb.append("\\n\n ");
             prev = idx + 1;
-            if (idx == value.length() - 1)
+            if (idx == value.length() - 1) {
                 break;
+            }
             idx = value.indexOf('\n', idx + 1);
         }
         if (prev < value.length()) {
@@ -218,10 +221,10 @@ public class MBeanDumper {
             CompositeData composite = CompositeData.class.cast(value);
             Set<String> keys = composite.getCompositeType().keySet();
             for (String key : keys) {
-                sb.append(sep).append(key).append("=").append(composite.get(key));
+                sb.append(sep).append(key).append('=').append(composite.get(key));
                 sep = ", ";
             }
-            sb.append("}");
+            sb.append('}');
             valueString = sb.toString();
         } else {
             valueString = value.toString();

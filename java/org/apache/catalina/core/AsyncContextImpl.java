@@ -54,8 +54,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     private static final Log log = LogFactory.getLog(AsyncContextImpl.class);
 
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(AsyncContextImpl.class);
 
     /* When a request uses a sequence of multiple start(); dispatch() with
      * non-container threads it is possible for a previous dispatch() to
@@ -114,7 +113,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         } finally {
             context.fireRequestDestroyEvent(request.getRequest());
             clearServletRequestResponse();
-            this.context.decrementInProgressAsyncCount();
             context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
         }
     }
@@ -207,16 +205,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                     (AsyncDispatcher) requestDispatcher;
             final ServletRequest servletRequest = getRequest();
             final ServletResponse servletResponse = getResponse();
-            // https://bz.apache.org/bugzilla/show_bug.cgi?id=63246
-            // Take a local copy as the dispatch may complete the
-            // request/response and that in turn may trigger recycling of this
-            // object before the in-progress count can be decremented
-            final Context context = this.context;
             this.dispatch = new AsyncRunnable(
                     request, applicationDispatcher, servletRequest, servletResponse);
             this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
             clearServletRequestResponse();
-            context.decrementInProgressAsyncCount();
         }
     }
 
@@ -404,7 +396,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
 
     public void setErrorState(Throwable t, boolean fireOnError) {
-        if (t!=null) request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
+        if (t!=null) {
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
+        }
         request.getCoyoteRequest().action(ActionCode.ASYNC_ERROR, null);
 
         if (fireOnError) {
@@ -455,6 +449,18 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 complete();
             }
         }
+    }
+
+
+    @Override
+    public void incrementInProgressAsyncCount() {
+        context.incrementInProgressAsyncCount();
+    }
+
+
+    @Override
+    public void decrementInProgressAsyncCount() {
+        context.decrementInProgressAsyncCount();
     }
 
 
@@ -581,7 +587,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             try {
                 applicationDispatcher.dispatch(servletRequest, servletResponse);
             } catch (Exception e) {
-                throw new RuntimeException(sm.getString("asyncContextImpl.asyncDispachError"), e);
+                throw new RuntimeException(sm.getString("asyncContextImpl.asyncDispatchError"), e);
             }
         }
 

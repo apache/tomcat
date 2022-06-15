@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 
@@ -24,10 +22,10 @@ import java.util.Iterator;
 
 
 /**
- * <p>Abstract representation of a user in a {@link UserDatabase}.  Each user
- * is optionally associated with a set of {@link Group}s through which he or
- * she inherits additional security roles, and is optionally assigned a set
- * of specific {@link Role}s.</p>
+ * Abstract representation of a user in a {@link UserDatabase}.  Each user is
+ * optionally associated with a set of {@link Group}s through which they inherit
+ * additional security roles, and is optionally assigned a set of specific
+ * {@link Role}s.
  *
  * @author Craig R. McClanahan
  * @since 4.1

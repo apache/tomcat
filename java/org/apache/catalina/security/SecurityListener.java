@@ -23,11 +23,15 @@ import java.util.Set;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Server;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * This listener must only be nested within {@link Server} elements.
+ */
 public class SecurityListener implements LifecycleListener {
 
     private static final Log log = LogFactory.getLog(SecurityListener.class);
@@ -61,6 +65,10 @@ public class SecurityListener implements LifecycleListener {
     public void lifecycleEvent(LifecycleEvent event) {
         // This is the earliest event in Lifecycle
         if (event.getType().equals(Lifecycle.BEFORE_INIT_EVENT)) {
+            if (!(event.getLifecycle() instanceof Server)) {
+                log.warn(sm.getString("listener.notServer",
+                        event.getLifecycle().getClass().getSimpleName()));
+            }
             doChecks();
         }
     }

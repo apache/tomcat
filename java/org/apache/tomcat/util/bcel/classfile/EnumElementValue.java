@@ -25,9 +25,10 @@ public class EnumElementValue extends ElementValue
 
     EnumElementValue(final int type, final int valueIdx, final ConstantPool cpool) {
         super(type, cpool);
-        if (type != ENUM_CONSTANT)
-            throw new RuntimeException(
+        if (type != ENUM_CONSTANT) {
+            throw new IllegalArgumentException(
                     "Only element values of type enum can be built with this ctor - type specified: " + type);
+        }
         this.valueIdx = valueIdx;
     }
 

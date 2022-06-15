@@ -139,6 +139,13 @@ public abstract class RequestFilterValve extends ValveBase {
      */
     private volatile boolean addConnectorPort = false;
 
+    /**
+     * Flag deciding whether we use the connection peer address
+     * or the remote address. This makes a dfifference when
+     * using AJP or the RemoteIpValve.
+     */
+    private volatile boolean usePeerAddress = false;
+
     // ------------------------------------------------------------- Properties
 
 
@@ -286,6 +293,29 @@ public abstract class RequestFilterValve extends ValveBase {
      */
     public void setAddConnectorPort(boolean addConnectorPort) {
         this.addConnectorPort = addConnectorPort;
+    }
+
+
+    /**
+     * Get the flag deciding whether we use the connection peer address
+     * or the remote address. This makes a dfifference when
+     * using AJP or the RemoteIpValve.
+     * @return <code>true</code> if we use the connection peer address
+     */
+    public boolean getUsePeerAddress() {
+        return usePeerAddress;
+    }
+
+
+    /**
+     * Set the flag deciding whether we use the connection peer address
+     * or the remote address. This makes a dfifference when
+     * using AJP or the RemoteIpValve.
+     *
+     * @param usePeerAddress The new flag
+     */
+    public void setUsePeerAddress(boolean usePeerAddress) {
+        this.usePeerAddress = usePeerAddress;
     }
 
     // --------------------------------------------------------- Public Methods

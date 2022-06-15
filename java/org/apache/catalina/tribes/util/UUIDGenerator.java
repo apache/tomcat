@@ -57,10 +57,11 @@ public class UUIDGenerator {
     }
 
     public static byte[] randomUUID(boolean secure, byte[] into, int offset) {
-        if ( (offset+UUID_LENGTH)>into.length )
+        if ( (offset+UUID_LENGTH)>into.length ) {
             throw new ArrayIndexOutOfBoundsException(sm.getString("uuidGenerator.unable.fit",
                     Integer.toString(UUID_LENGTH), Integer.toString(into.length),
                     Integer.toString(offset+UUID_LENGTH)));
+        }
         Random r = (secure&&(secrand!=null))?secrand:rand;
         nextBytes(into,offset,UUID_LENGTH,r);
         into[6+offset] &= 0x0F;
@@ -71,7 +72,7 @@ public class UUIDGenerator {
     }
 
     /**
-     * Same as java.util.Random.nextBytes except this one we dont have to allocate a new byte array
+     * Same as java.util.Random.nextBytes except this one we don't have to allocate a new byte array
      * @param into byte[]
      * @param offset int
      * @param length int
@@ -82,7 +83,9 @@ public class UUIDGenerator {
         int numGot = 0, rnd = 0;
         while (true) {
             for (int i = 0; i < BYTES_PER_INT; i++) {
-                if (numGot == numRequested) return;
+                if (numGot == numRequested) {
+                    return;
+                }
                 rnd = (i == 0 ? r.nextInt() : rnd >> BITS_PER_BYTE);
                 into[offset+numGot] = (byte) rnd;
                 numGot++;

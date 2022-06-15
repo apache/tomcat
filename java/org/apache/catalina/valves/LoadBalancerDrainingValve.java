@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.SessionCookieConfig;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -222,6 +223,9 @@ public class LoadBalancerDrainingValve extends ValveBase {
                 sessionCookie.setPath(SessionConfig.getSessionCookiePath(request.getContext()));
                 sessionCookie.setMaxAge(0); // Delete
                 sessionCookie.setValue(""); // Purge the cookie's value
+                // Replicate logic used to set secure attribute for session cookies
+                SessionCookieConfig sessionCookieConfig = request.getContext().getServletContext().getSessionCookieConfig();
+                sessionCookie.setSecure(request.isSecure() || sessionCookieConfig.isSecure());
                 response.addCookie(sessionCookie);
             }
 

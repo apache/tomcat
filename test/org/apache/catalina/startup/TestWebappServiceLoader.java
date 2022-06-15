@@ -27,6 +27,9 @@ import java.util.List;
 import jakarta.servlet.ServletContainerInitializer;
 import jakarta.servlet.ServletContext;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -162,7 +165,7 @@ public class TestWebappServiceLoader {
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
         } catch (IOException e) {
-            Assert.assertTrue(e.getCause() instanceof ClassCastException);
+            assertThat(e.getCause(), instanceOf(ClassCastException.class));
         } finally {
             control.verify();
         }
@@ -181,7 +184,7 @@ public class TestWebappServiceLoader {
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
         } catch (IOException e) {
-            Assert.assertTrue(e.getCause() instanceof ReflectiveOperationException);
+            assertThat(e.getCause(), instanceOf(ReflectiveOperationException.class));
         } finally {
             control.verify();
         }
