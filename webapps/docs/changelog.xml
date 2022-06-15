@@ -172,6 +172,13 @@
         Update the packaged version of the Tomcat Native Library to 1.2.34 to
         improve the support for building with OpenSSL 3.0.x.(markt)
       </update>
+      <fix>
+        Remove and/or update references to the removed
+        <code>org.apache.tomcat.util.threads.res</code> package. The
+        <code>LocalStrings*.properties</code> files in that package were moved
+        to <code>org.apache.tomcat.util.threads</code> package for consistency
+        with the rest of the Tomcat code base.
+      </fix>
     </changelog>
   </subsection>
 </section>
