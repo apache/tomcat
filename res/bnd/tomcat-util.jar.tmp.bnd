@@ -29,8 +29,7 @@ Export-Package: \
     org.apache.tomcat.util.threads
 
 -includepackage: \
-    org.apache.tomcat.util.json,\
-    org.apache.tomcat.util.threads.res
+    org.apache.tomcat.util.json
 
 -jpms-module-info: \
     ${module.name};\

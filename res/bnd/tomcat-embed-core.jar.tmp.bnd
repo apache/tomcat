@@ -93,8 +93,7 @@ Export-Package: \
     org.apache.tomcat.util.bcel,\
     org.apache.tomcat.util.http.fileupload.util.mime,\
     org.apache.tomcat.util.json,\
-    org.apache.tomcat.util.net.jsse,\
-    org.apache.tomcat.util.threads.res
+    org.apache.tomcat.util.net.jsse
 
 -includeresource.notice2: META-INF/NOTICE=${tomcat.output}/manifests/servlet-api.jar.notice
 -includeresource.license2: META-INF/LICENSE=${tomcat.output}/manifests/servlet-api.jar.license
