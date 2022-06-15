@@ -45,7 +45,7 @@
     {"name":"org.apache.tomcat.util.net.LocalStrings"},
     {"name":"org.apache.tomcat.util.scan.LocalStrings"},
     {"name":"org.apache.tomcat.util.security.LocalStrings"},
-    {"name":"org.apache.tomcat.util.threads.res.LocalStrings"}
+    {"name":"org.apache.tomcat.util.threads.LocalStrings"}
   ],
   "resources":[
     {"pattern":".*/mbeans-descriptors.xml$"},
