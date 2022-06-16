@@ -147,6 +147,8 @@
       <ul>
         <li><code>org.apache.tomcat.websocket.server.WsServerContainer#isEnforceNoAddAfterHandshake</code></li>
       </ul>
+      <p>This system property is deprecated and will be removed in Tomcat
+      10.1.</p>
     </property>
 
   </properties>
