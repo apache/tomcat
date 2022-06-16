@@ -112,6 +112,11 @@
         files from the logging directory before the directory has been created.
         Based on <pr>521</pr> by HanLi. (markt)
       </fix>
+      <update>
+        Update the Jakarta Common Annotations API to 2.1.1. This deprecates the
+        <code>ManagedBean</code> annotation which will be removed in a future
+        release. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

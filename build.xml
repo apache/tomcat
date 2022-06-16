@@ -68,7 +68,7 @@
   <property name="jaspic.spec.version"     value="3.0" />
   <property name="jaspic.revision"         value="" />
   <property name="annotation.spec.version" value="2.1" />
-  <property name="annotation.revision"     value="" />
+  <property name="annotation.revision"     value=".1" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
