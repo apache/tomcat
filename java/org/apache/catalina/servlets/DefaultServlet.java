@@ -198,9 +198,9 @@ public class DefaultServlet extends HttpServlet {
     protected boolean listings = false;
 
     /**
-     * Should we use a 301 for directory redirects? Default is no
+     * Status code to use for directory redirects [302]
      */
-    protected boolean dirRedirectUse301 = false;
+    protected int redirectStatusCode = 302;
 
 
     /**
@@ -318,11 +318,22 @@ public class DefaultServlet extends HttpServlet {
 
         listings = Boolean.parseBoolean(getServletConfig().getInitParameter("listings"));
 
-        if (getServletConfig().getInitParameter("dirRedirectUse301") != null)
-            dirRedirectUse301 = Boolean.parseBoolean(getServletConfig().getInitParameter("dirRedirectUse301"));
+        if (getServletConfig().getInitParameter("redirectStatusCode") != null) {
+            String statusCodeString = getServletConfig().getInitParameter("redirectStatusCode");
+            int statusCode = Integer.parseInt(statusCodeString);
+            switch (statusCode) {
+                case HttpServletResponse.SC_MOVED_PERMANENTLY:
+                case HttpServletResponse.SC_FOUND:
+                case HttpServletResponse.SC_TEMPORARY_REDIRECT:
+                case 308:
+                    redirectStatusCode = statusCode;
+                    break;
+                default:
+                    log("Invalid redirectStatusCode of " + statusCode);
+            }
         }
 
-        if (getServletConfig().getInitParameter("readonly") != null)
+        if (getServletConfig().getInitParameter("readonly") != null) {
             readOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("readonly"));
         }
 
@@ -1459,11 +1470,7 @@ public class DefaultServlet extends HttpServlet {
         while (location.length() > 1 && location.charAt(1) == '/') {
             location.deleteCharAt(0);
         }
-        if (dirRedirectUse301) {
-            response.setStatus(301);
-        } else {
-            response.setStatus(302);
-        }
+        response.setStatus(redirectStatusCode);
         response.setHeader("Location", response.encodeRedirectURL(location.toString()));
     }
 

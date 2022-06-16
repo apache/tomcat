@@ -115,8 +115,8 @@
   <!--                       that RFC 7233 clarified that Range headers are -->
   <!--                       only valid for GET requests. [true]            -->
   <!--                                                                      -->
-  <!--   dirRedirectUse301   Use a 301 (instead of 302) for redirects       -->
-  <!--                       when a pathless directory was requested.[false]-->
+  <!--   redirectStatusCode  Status code to use for directory redirects[302]-->
+  <!--                       Possible values: 301, 302, 307, 308            -->
 
     <servlet>
         <servlet-name>default</servlet-name>
