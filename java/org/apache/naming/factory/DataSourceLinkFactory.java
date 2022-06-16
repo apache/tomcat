@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming.factory;
 
 import java.lang.reflect.InvocationHandler;
@@ -86,8 +84,9 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
                     x = (Exception) cause;
                 }
             }
-            if (x instanceof NamingException) throw (NamingException)x;
-            else {
+            if (x instanceof NamingException) {
+                throw (NamingException)x;
+            } else {
                 NamingException nx = new NamingException(x.getMessage());
                 nx.initCause(x);
                 throw nx;

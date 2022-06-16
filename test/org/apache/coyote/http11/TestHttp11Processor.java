@@ -39,7 +39,9 @@ import java.util.concurrent.CountDownLatch;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,6 +52,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -251,31 +254,6 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
 
     @Test
-    public void testWithTEIdentity() throws Exception {
-        getTomcatInstanceTestWebapp(false, true);
-
-        String request =
-            "POST /test/echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
-            "Host: any" + SimpleHttpClient.CRLF +
-            "Transfer-encoding: identity" + SimpleHttpClient.CRLF +
-            "Content-Length: 9" + SimpleHttpClient.CRLF +
-            "Content-Type: application/x-www-form-urlencoded" +
-                    SimpleHttpClient.CRLF +
-            "Connection: close" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF +
-            "test=data";
-
-        Client client = new Client(getPort());
-        client.setRequest(new String[] {request});
-
-        client.connect();
-        client.processRequest();
-        Assert.assertTrue(client.isResponse200());
-        Assert.assertTrue(client.getResponseBody().contains("test - data"));
-    }
-
-
-    @Test
     public void testWithTESavedRequest() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
@@ -352,9 +330,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                 try {
                     client.sendRequest();
                     client.sendRequest();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
+                } catch (InterruptedException | IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -365,6 +341,49 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // Sleep for 1500 ms which should mean the all of request 1 has been
         // sent and half of request 2
         Thread.sleep(1500);
+
+        // Now read the first response
+        client.readResponse(true);
+        Assert.assertFalse(client.isResponse50x());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
+
+        // Read the second response. No need to sleep, read will block until
+        // there is data to process
+        client.readResponse(true);
+        Assert.assertFalse(client.isResponse50x());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
+    }
+
+
+    @Test
+    public void testPipeliningBug64974() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add protected servlet
+        Wrapper w = Tomcat.addServlet(ctx, "servlet", new Bug64974Servlet());
+        w.setAsyncSupported(true);
+        ctx.addServletMappingDecoded("/foo", "servlet");
+
+        tomcat.start();
+
+        String request =
+                "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: any" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: any" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF;
+
+        final Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+        client.setUseContentLength(true);
+        client.connect();
+        client.sendRequest();
 
         // Now read the first response
         client.readResponse(true);
@@ -573,7 +592,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         String request =
                 "POST /echo HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF;
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 10" + SimpleHttpClient.CRLF;
         if (useExpectation) {
             request += "Expect: 100-continue" + SimpleHttpClient.CRLF;
         }
@@ -582,6 +602,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] {request});
+        client.setUseContentLength(true);
 
         client.connect();
         client.processRequest();
@@ -855,15 +876,27 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk responseBody = new ByteChunk();
-        Map<String,List<String>> responseHeaders = new HashMap<>();
+        ByteChunk getBody = new ByteChunk();
+        Map<String,List<String>> getHeaders = new HashMap<>();
+        int getStatus = getUrl("http://localhost:" + getPort() + "/test", getBody,
+                getHeaders);
 
-        int rc = headUrl("http://localhost:" + getPort() + "/test", responseBody,
-                responseHeaders);
+        ByteChunk headBody = new ByteChunk();
+        Map<String,List<String>> headHeaders = new HashMap<>();
+        int headStatus = getUrl("http://localhost:" + getPort() + "/test", headBody,
+                headHeaders);
 
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals(0, responseBody.getLength());
-        Assert.assertFalse(responseHeaders.containsKey("Content-Length"));
+        Assert.assertEquals(HttpServletResponse.SC_OK, getStatus);
+        Assert.assertEquals(HttpServletResponse.SC_OK, headStatus);
+
+        Assert.assertEquals(0, getBody.getLength());
+        Assert.assertEquals(0, headBody.getLength());
+
+        if (getHeaders.containsKey("Content-Length")) {
+            Assert.assertEquals(getHeaders.get("Content-Length"), headHeaders.get("Content-Length"));
+        } else {
+            Assert.assertFalse(headHeaders.containsKey("Content-Length"));
+        }
     }
 
 
@@ -874,7 +907,6 @@ public class TestHttp11Processor extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            super.doGet(req, resp);
         }
 
         @Override
@@ -1513,36 +1545,66 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testKeepAliveHeader01() throws Exception {
-        doTestKeepAliveHeader(false, 3000, 10);
+        doTestKeepAliveHeader(false, 3000, 10, false);
     }
 
     @Test
     public void testKeepAliveHeader02() throws Exception {
-        doTestKeepAliveHeader(true, 5000, 1);
+        doTestKeepAliveHeader(true, 5000, 1, false);
     }
 
     @Test
     public void testKeepAliveHeader03() throws Exception {
-        doTestKeepAliveHeader(true, 5000, 10);
+        doTestKeepAliveHeader(true, 5000, 10, false);
     }
 
     @Test
     public void testKeepAliveHeader04() throws Exception {
-        doTestKeepAliveHeader(true, -1, 10);
+        doTestKeepAliveHeader(true, -1, 10, false);
     }
 
     @Test
     public void testKeepAliveHeader05() throws Exception {
-        doTestKeepAliveHeader(true, -1, 1);
+        doTestKeepAliveHeader(true, -1, 1, false);
     }
 
     @Test
     public void testKeepAliveHeader06() throws Exception {
-        doTestKeepAliveHeader(true, -1, -1);
+        doTestKeepAliveHeader(true, -1, -1, false);
+    }
+
+    @Test
+    public void testKeepAliveHeader07() throws Exception {
+        doTestKeepAliveHeader(false, 3000, 10, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader08() throws Exception {
+        doTestKeepAliveHeader(true, 5000, 1, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader09() throws Exception {
+        doTestKeepAliveHeader(true, 5000, 10, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader10() throws Exception {
+        doTestKeepAliveHeader(true, -1, 10, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader11() throws Exception {
+        doTestKeepAliveHeader(true, -1, 1, true);
+    }
+
+    @Test
+    public void testKeepAliveHeader12() throws Exception {
+        doTestKeepAliveHeader(true, -1, -1, true);
     }
 
     private void doTestKeepAliveHeader(boolean sendKeepAlive, int keepAliveTimeout,
-            int maxKeepAliveRequests) throws Exception {
+            int maxKeepAliveRequests, boolean explicitClose) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         tomcat.getConnector().setProperty("keepAliveTimeout", Integer.toString(keepAliveTimeout));
@@ -1552,7 +1614,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Add servlet
-        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet(explicitClose));
         ctx.addServletMappingDecoded("/foo", "TesterServlet");
 
         tomcat.start();
@@ -1586,7 +1648,10 @@ public class TestHttp11Processor extends TomcatBaseTest {
             }
         }
 
-        if (!sendKeepAlive || keepAliveTimeout < 0
+        if (explicitClose) {
+            Assert.assertEquals("close", connectionHeaderValue);
+            Assert.assertNull(keepAliveHeaderValue);
+        } else if (!sendKeepAlive || keepAliveTimeout < 0
             && (maxKeepAliveRequests < 0 || maxKeepAliveRequests > 1)) {
             Assert.assertNull(connectionHeaderValue);
             Assert.assertNull(keepAliveHeaderValue);
@@ -1641,5 +1706,251 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
             out.print(" and request.getServerPort() is " + req.getServerPort());
         }
+    }
+
+
+    @Test
+    public void testSlowUploadTimeoutWithLongerUploadTimeout() throws Exception {
+        doTestSlowUploadTimeout(true);
+    }
+
+
+    @Test
+    public void testSlowUploadTimeoutWithoutLongerUploadTimeout() throws Exception {
+        doTestSlowUploadTimeout(false);
+    }
+
+
+    private void doTestSlowUploadTimeout(boolean useLongerUploadTimeout) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+
+        int connectionTimeout = ((Integer) connector.getProperty("connectionTimeout")).intValue();
+
+        // These factors should make the differences large enough that the CI
+        // tests pass consistently. If not, may need to reduce connectionTimeout
+        // and increase delay and connectionUploadTimeout
+        int delay = connectionTimeout * 2;
+        int connectionUploadTimeout = connectionTimeout * 4;
+
+        if (useLongerUploadTimeout) {
+            connector.setProperty("connectionUploadTimeout", "" + connectionUploadTimeout);
+            connector.setProperty("disableUploadTimeout", "false");
+        }
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new SwallowBodyTesterServlet());
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request =
+                "POST /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 10" + SimpleHttpClient.CRLF +
+                 SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request, "XXXXXXXXXX"});
+        client.setRequestPause(delay);
+
+        client.connect();
+        try {
+            client.processRequest();
+        } catch (IOException ioe) {
+            // Failure is expected on some platforms (notably Windows) if the
+            // longer upload timeout is not used but record the exception in
+            // case it is useful for debugging purposes.
+            // The assertions below will check for the correct behaviour.
+            ioe.printStackTrace();
+        }
+
+        if (useLongerUploadTimeout) {
+            // Expected response is a 200 response.
+            Assert.assertTrue(client.isResponse200());
+            Assert.assertEquals("OK", client.getResponseBody());
+        } else {
+            // Different failure modes with different connectors
+            Assert.assertFalse(client.isResponse200());
+        }
+    }
+
+
+    private static class SwallowBodyTesterServlet extends TesterServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        public SwallowBodyTesterServlet() {
+            super(true);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            // Swallow the body
+            byte[] buf = new byte[1024];
+            InputStream is = req.getInputStream();
+            while (is.read(buf) > 0) {
+                // Loop
+            }
+
+            // Standard response
+            doGet(req, resp);
+        }
+    }
+
+
+    private static class Bug64974Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            // Get requests can have bodies although these requests don't.
+            // Needs to be async to trigger the problematic code path
+            AsyncContext ac = req.startAsync();
+            ServletInputStream sis = req.getInputStream();
+            // This triggers a call to Http11InputBuffer.avalable(true) which
+            // did not handle the pipelining case.
+            sis.setReadListener(new Bug64974ReadListener());
+            ac.complete();
+
+            resp.setContentType("text/plain");
+            PrintWriter out = resp.getWriter();
+            out.print("OK");
+        }
+    }
+
+
+    private static class Bug64974ReadListener implements ReadListener {
+
+        @Override
+        public void onDataAvailable() throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onAllDataRead() throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            // NO-OP
+        }
+    }
+
+
+    @Test
+    public void testTEHeaderUnknown01() throws Exception {
+        doTestTEHeaderInvalid("identity", false);
+    }
+
+
+    @Test
+    public void testTEHeaderUnknown02() throws Exception {
+        doTestTEHeaderInvalid("identity, chunked", false);
+    }
+
+
+    @Test
+    public void testTEHeaderUnknown03() throws Exception {
+        doTestTEHeaderInvalid("unknown, chunked", false);
+    }
+
+
+    @Test
+    public void testTEHeaderUnknown04() throws Exception {
+        doTestTEHeaderInvalid("void", false);
+    }
+
+
+    @Test
+    public void testTEHeaderUnknown05() throws Exception {
+        doTestTEHeaderInvalid("void, chunked", false);
+    }
+
+
+    @Test
+    public void testTEHeaderUnknown06() throws Exception {
+        doTestTEHeaderInvalid("void, identity", false);
+    }
+
+
+    @Test
+    public void testTEHeaderUnknown07() throws Exception {
+        doTestTEHeaderInvalid("identity, void", false);
+    }
+
+
+    @Test
+    public void testTEHeaderChunkedNotLast01() throws Exception {
+        doTestTEHeaderInvalid("chunked, void", true);
+    }
+
+
+    private void doTestTEHeaderInvalid(String headerValue, boolean badRequest) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet(false));
+        ctx.addServletMappingDecoded("/foo", "TesterServlet");
+
+        tomcat.start();
+
+        String request =
+                "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Transfer-Encoding: " + headerValue + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest(false);
+
+        if (badRequest) {
+            Assert.assertTrue(client.isResponse400());
+        } else {
+            Assert.assertTrue(client.isResponse501());
+        }
+    }
+
+
+    @Test
+    public void testWithTEChunkedHttp10() throws Exception {
+
+        getTomcatInstanceTestWebapp(false, true);
+
+        String request =
+            "POST /test/echo-params.jsp HTTP/1.0" + SimpleHttpClient.CRLF +
+            "Host: any" + SimpleHttpClient.CRLF +
+            "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
+            "Content-Type: application/x-www-form-urlencoded" +
+                    SimpleHttpClient.CRLF +
+            "Connection: close" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF +
+            "9" + SimpleHttpClient.CRLF +
+            "test=data" + SimpleHttpClient.CRLF +
+            "0" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF;
+
+        Client client = new Client(getPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.getResponseBody().contains("test - data"));
     }
 }

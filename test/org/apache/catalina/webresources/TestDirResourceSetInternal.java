@@ -58,7 +58,7 @@ public class TestDirResourceSetInternal extends AbstractTestResourceSet {
     }
 
     @Override
-    protected boolean isWriteable() {
+    protected boolean isWritable() {
         return true;
     }
 

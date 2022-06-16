@@ -104,6 +104,7 @@ public class JspC extends Task implements Options {
         JspFactory.setDefaultFactory(new JspFactoryImpl());
     }
 
+    @Deprecated
     public static final String DEFAULT_IE_CLASS_ID =
             "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93";
 
@@ -185,7 +186,7 @@ public class JspC extends Task implements Options {
     protected boolean mappedFile = false;
     protected boolean poolingEnabled = true;
     protected File scratchDir;
-    protected String ieClassId = DEFAULT_IE_CLASS_ID;
+
     protected String targetPackage;
     protected String targetClassName;
     protected String uriBase;
@@ -201,8 +202,8 @@ public class JspC extends Task implements Options {
 
     protected String compiler = null;
 
-    protected String compilerTargetVM = "1.8";
-    protected String compilerSourceVM = "1.8";
+    protected String compilerTargetVM = "11";
+    protected String compilerSourceVM = "11";
 
     protected boolean classDebugInfo = true;
 
@@ -702,25 +703,6 @@ public class JspC extends Task implements Options {
     }
 
     /**
-     * Sets the class-id value to be sent to Internet Explorer when using
-     * &lt;jsp:plugin&gt; tags.
-     *
-     * @param ieClassId
-     *            Class-id value
-     */
-    public void setIeClassId(String ieClassId) {
-        this.ieClassId = ieClassId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getIeClassId() {
-        return ieClassId;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -836,8 +818,9 @@ public class JspC extends Task implements Options {
      */
     @Override
     public String getClassPath() {
-        if( classPath != null )
+        if( classPath != null ) {
             return classPath;
+        }
         return System.getProperty("java.class.path");
     }
 
@@ -1124,6 +1107,19 @@ public class JspC extends Task implements Options {
         return tagPluginManager;
     }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Hard-coded to {@code false} for pre-compiled code to enable repeatable
+     * builds.
+     */
+    @Override
+    public boolean getGeneratedJavaAddTimestamp() {
+        return false;
+    }
+
+
     /**
      * Adds servlet declaration and mapping for the JSP page servlet to the
      * generated web.xml fragment.
@@ -1147,7 +1143,7 @@ public class JspC extends Task implements Options {
         String packageName = clctxt.getServletPackageName();
 
         String thisServletName;
-        if  ("".equals(packageName)) {
+        if  (packageName.isEmpty()) {
             thisServletName = className;
         } else {
             thisServletName = packageName + '.' + className;
@@ -1255,12 +1251,14 @@ public class JspC extends Task implements Options {
             }
         }
 
-        if(!webXml2.delete() && log.isDebugEnabled())
+        if(!webXml2.delete() && log.isDebugEnabled()) {
             log.debug(Localizer.getMessage("jspc.delete.fail",
                     webXml2.toString()));
+        }
 
-        if (!(new File(webxmlFile)).delete() && log.isDebugEnabled())
+        if (!(new File(webxmlFile)).delete() && log.isDebugEnabled()) {
             log.debug(Localizer.getMessage("jspc.delete.fail", webxmlFile));
+        }
 
     }
 
@@ -1573,7 +1571,9 @@ public class JspC extends Task implements Options {
     }
 
     protected String nextFile() {
-        if (fullstop) argPos++;
+        if (fullstop) {
+            argPos++;
+        }
         if (argPos >= args.length) {
             return null;
         } else {
@@ -1727,7 +1727,9 @@ public class JspC extends Task implements Options {
                 String[] libs = webinfLib.list();
                 if (libs != null) {
                     for (String lib : libs) {
-                        if (lib.length() < 5) continue;
+                        if (lib.length() < 5) {
+                            continue;
+                        }
                         String ext = lib.substring(lib.length() - 4);
                         if (!".jar".equalsIgnoreCase(ext)) {
                             if (".tld".equalsIgnoreCase(ext)) {

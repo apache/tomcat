@@ -23,9 +23,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -42,7 +45,9 @@ import javax.crypto.Cipher;
 import javax.crypto.EncryptedPrivateKeyInfo;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.buf.Asn1Writer;
@@ -59,6 +64,9 @@ public class PEMFile {
 
     private static final byte[] OID_EC_PUBLIC_KEY =
             new byte[] { 0x06, 0x07, 0x2A, (byte) 0x86, 0x48, (byte) 0xCE, 0x3D, 0x02, 0x01 };
+
+    private static final String OID_PKCS5_PBES2 = "1.2.840.113549.1.5.13";
+    private static final String PBES2 = "PBES2";
 
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
         StringBuilder result = new StringBuilder();
@@ -110,7 +118,16 @@ public class PEMFile {
                     part = null;
                 } else if (part != null && !line.contains(":") && !line.startsWith(" ")) {
                     part.content += line;
-                }
+                } else if (part != null && line.contains(":") && !line.startsWith(" ")) {
+                    /* Something like DEK-Info: DES-EDE3-CBC,B5A53CB8B7E50064 */
+                    if (line.startsWith("DEK-Info: ")) {
+                        String[] pieces = line.split(" ");
+                        pieces = pieces[1].split(",");
+                        if (pieces.length == 2) {
+                            part.algorithm = pieces[0];
+                            part.ivHex = pieces[1];
+                        }
+                    }                }
             }
         }
 
@@ -126,7 +143,13 @@ public class PEMFile {
                     privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS8);
                     break;
                 case Part.RSA_PRIVATE_KEY:
-                    privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1);
+                    if (part.algorithm == null) {
+                        // If no encryption algorithm was detected, ignore any
+                        // (probably default) key password provided.
+                        privateKey = part.toPrivateKey(null, keyAlgorithm, Format.PKCS1);
+                    } else {
+                        privateKey = part.toPrivateKey(password, keyAlgorithm, Format.PKCS1);
+                    }
                     break;
                 case Part.CERTIFICATE:
                 case Part.X509_CERTIFICATE:
@@ -150,6 +173,8 @@ public class PEMFile {
 
         public String type;
         public String content = "";
+        public String algorithm = null;
+        public String ivHex = null;
 
         private byte[] decode() {
             return Base64.decodeBase64(content);
@@ -180,14 +205,60 @@ public class PEMFile {
                     }
                 }
             } else {
-                EncryptedPrivateKeyInfo privateKeyInfo = new EncryptedPrivateKeyInfo(decode());
-                SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(privateKeyInfo.getAlgName());
-                SecretKey secretKey = secretKeyFactory.generateSecret(new PBEKeySpec(password.toCharArray()));
+                if (algorithm == null) {
+                    // PKCS 8
+                    EncryptedPrivateKeyInfo privateKeyInfo = new EncryptedPrivateKeyInfo(decode());
+                    String pbeAlgorithm = getPBEAlgorithm(privateKeyInfo);
+                    SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(pbeAlgorithm);
+                    SecretKey secretKey = secretKeyFactory.generateSecret(new PBEKeySpec(password.toCharArray()));
 
-                Cipher cipher = Cipher.getInstance(privateKeyInfo.getAlgName());
-                cipher.init(Cipher.DECRYPT_MODE, secretKey, privateKeyInfo.getAlgParameters());
+                    Cipher cipher = Cipher.getInstance(pbeAlgorithm);
+                    cipher.init(Cipher.DECRYPT_MODE, secretKey, privateKeyInfo.getAlgParameters());
 
-                keySpec = privateKeyInfo.getKeySpec(cipher);
+                    keySpec = privateKeyInfo.getKeySpec(cipher);
+                } else {
+                    // PKCS 1
+                    String secretKeyAlgorithm;
+                    String cipherTransformation;
+                    int keyLength;
+
+                    // Is there a generic way to derive these three values from
+                    // just the algorithm name?
+                    switch (algorithm) {
+                        case "DES-CBC": {
+                            secretKeyAlgorithm = "DES";
+                            cipherTransformation = "DES/CBC/PKCS5Padding";
+                            keyLength = 8;
+                            break;
+                        }
+                        case "DES-EDE3-CBC": {
+                            secretKeyAlgorithm = "DESede";
+                            cipherTransformation = "DESede/CBC/PKCS5Padding";
+                            keyLength = 24;
+                            break;
+                        }
+                        case "AES-256-CBC": {
+                            secretKeyAlgorithm = "AES";
+                            cipherTransformation = "AES/CBC/PKCS5Padding";
+                            keyLength = 32;
+                            break;
+                        }
+                        default:
+                            // This will almost certainly trigger errors
+                            secretKeyAlgorithm = algorithm;
+                            cipherTransformation = algorithm;
+                            keyLength = 8;
+                            break;
+                    }
+
+                    byte[] iv = fromHex(ivHex);
+                    byte[] key = deriveKey(keyLength, password, iv);
+                    SecretKey secretKey = new SecretKeySpec(key, secretKeyAlgorithm);
+                    Cipher cipher = Cipher.getInstance(cipherTransformation);
+                    cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+                    byte[] pkcs1 = cipher.doFinal(decode());
+                    keySpec = parsePKCS1(pkcs1);
+                }
             }
 
             InvalidKeyException exception = new InvalidKeyException(sm.getString("pemFile.parseError", filename));
@@ -208,6 +279,51 @@ public class PEMFile {
             }
 
             throw exception;
+        }
+
+
+        private String getPBEAlgorithm(EncryptedPrivateKeyInfo privateKeyInfo) {
+            AlgorithmParameters parameters = privateKeyInfo.getAlgParameters();
+            String algName = privateKeyInfo.getAlgName();
+            // Java 11 returns OID_PKCS5_PBES2
+            // Java 17 returns PBES2
+            if (parameters != null && (OID_PKCS5_PBES2.equals(algName) || PBES2.equals(algName))) {
+                /*
+                 * This should be "PBEWith<prf>And<encryption>".
+                 * Relying on the toString() implementation is potentially
+                 * fragile but acceptable in this case since the JRE depends on
+                 * the toString() implementation as well.
+                 * In the future, if necessary, we can parse the value of
+                 * paremeters.getEncoded() but the associated complexity and
+                 * unlikeliness of the JRE implementation changing means that
+                 * Tomcat will use to toString() approach for now.
+                 */
+                return parameters.toString();
+            }
+            return privateKeyInfo.getAlgName();
+        }
+
+
+        private byte[] deriveKey(int keyLength, String password, byte[] iv) throws NoSuchAlgorithmException {
+            // PBKDF1-MD5 as specified by PKCS#5
+            byte[] key = new byte[keyLength];
+
+            int insertPosition = 0;
+
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            byte[] pw = password.getBytes(StandardCharsets.UTF_8);
+
+            while (insertPosition < keyLength) {
+                digest.update(pw);
+                digest.update(iv, 0, 8);
+                byte[] round = digest.digest();
+                digest.update(round);
+
+                System.arraycopy(round, 0, key, insertPosition, Math.min(keyLength - insertPosition, round.length));
+                insertPosition += round.length;
+            }
+
+            return key;
         }
 
 
@@ -308,6 +424,18 @@ public class PEMFile {
             }
             return new RSAPrivateCrtKeySpec(p.parseInt(), p.parseInt(), p.parseInt(), p.parseInt(),
                     p.parseInt(), p.parseInt(), p.parseInt(), p.parseInt());
+        }
+
+
+
+        private byte[] fromHex(String hexString) {
+            byte[] bytes = new byte[hexString.length() / 2];
+            for (int i = 0; i < hexString.length(); i += 2)
+            {
+                bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i + 1), 16));
+            }
+            return bytes;
         }
     }
 

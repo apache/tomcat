@@ -56,8 +56,6 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Session;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.util.IOTools;
@@ -173,18 +171,12 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         Assert.assertTrue(connector.setProperty("address", InetAddress.getByName("localhost").getHostAddress()));
         // Use random free port
         connector.setPort(0);
+        // By default, a connector failure means a failed test
+        connector.setThrowOnFailure(true);
         // Mainly set to reduce timeouts during async tests
         Assert.assertTrue(connector.setProperty("connectionTimeout", "3000"));
         tomcat.getService().addConnector(connector);
         tomcat.setConnector(connector);
-
-        // Add AprLifecycleListener if we are using the Apr connector
-        if (protocol.contains("Apr")) {
-            StandardServer server = (StandardServer) tomcat.getServer();
-            AprLifecycleListener listener = new AprLifecycleListener();
-            listener.setSSLRandomSeed("/dev/urandom");
-            server.addLifecycleListener(listener);
-        }
 
         File catalinaBase = getTemporaryDirectory();
         tomcat.setBaseDir(catalinaBase.getAbsolutePath());
@@ -452,7 +444,6 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        @SuppressWarnings("deprecation")
         @Override
         public void service(HttpServletRequest request,
                             HttpServletResponse response)
@@ -559,7 +550,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             out.println("SESSION-REQUESTED-ID-COOKIE: " +
                         request.isRequestedSessionIdFromCookie());
             out.println("SESSION-REQUESTED-ID-URL: " +
-                        request.isRequestedSessionIdFromUrl());
+                        request.isRequestedSessionIdFromURL());
             out.println("SESSION-REQUESTED-ID-VALID: " +
                         request.isRequestedSessionIdValid());
 
@@ -748,8 +739,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
             @Override
             public int available() {
-                if (done) return 0;
-                else return getLength();
+                if (done) {
+                  return 0;
+                } else {
+                  return getLength();
+                }
             }
         };
         return postUrl(false,s,path,out,reqHead,resHead);

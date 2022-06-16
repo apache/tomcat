@@ -147,7 +147,7 @@ public class TestAsyncTimeout extends Http2TestBase {
                 PrintWriter pw = asyncContext.getResponse().getWriter();
                 int counter = 0;
 
-                // If the test works running will be set too false before
+                // If the test works running will be set to false before
                 // counter reaches 50.
                 while (running && counter < 50) {
                     Thread.sleep(100);
@@ -183,6 +183,16 @@ public class TestAsyncTimeout extends Http2TestBase {
         @Override
         public void onTimeout(AsyncEvent event) throws IOException {
             ticker.end();
+            // Wait for the ticker to exit to avoid concurrent access to the
+            // response and associated writer.
+            // Excessively long timeout just in case things so wrong so test
+            // does not lock up.
+            try {
+                ticker.join(10 * 1000);
+            } catch (InterruptedException e) {
+                throw new IOException(e);
+            }
+
             if (ended.compareAndSet(false, true)) {
                 PrintWriter pw = event.getAsyncContext().getResponse().getWriter();
                 pw.write("PASS");

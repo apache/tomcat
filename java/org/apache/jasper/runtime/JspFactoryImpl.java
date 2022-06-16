@@ -60,8 +60,9 @@ public class JspFactoryImpl extends JspFactory {
 
     @Override
     public void releasePageContext(PageContext pc) {
-        if( pc == null )
+        if( pc == null ) {
             return;
+        }
         if( Constants.IS_SECURITY_ENABLED ) {
             PrivilegedReleasePageContext dp = new PrivilegedReleasePageContext(
                     this,pc);
@@ -206,12 +207,7 @@ public class JspFactoryImpl extends JspFactory {
             final ServletContext context) {
         if (Constants.IS_SECURITY_ENABLED) {
             return AccessController.doPrivileged(
-                    new PrivilegedAction<JspApplicationContext>() {
-                @Override
-                public JspApplicationContext run() {
-                    return JspApplicationContextImpl.getInstance(context);
-                }
-            });
+                    (PrivilegedAction<JspApplicationContext>) () -> JspApplicationContextImpl.getInstance(context));
         } else {
             return JspApplicationContextImpl.getInstance(context);
         }

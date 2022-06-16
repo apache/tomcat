@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.servlet;
 
 import java.io.FileNotFoundException;
@@ -128,13 +127,10 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             }
             try {
                 if (SecurityUtil.isPackageProtectionEnabled()){
-                   AccessController.doPrivileged(new PrivilegedExceptionAction<Object>(){
-                        @Override
-                        public Object run() throws IOException, ServletException {
-                            serviceJspFile(null, null, jspFile, true);
-                            return null;
-                        }
-                    });
+                   AccessController.doPrivileged((PrivilegedExceptionAction<Object>) () -> {
+                       serviceJspFile(null, null, jspFile, true);
+                       return null;
+                   });
                 } else {
                     serviceJspFile(null, null, jspFile, true);
                 }
@@ -142,7 +138,9 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), e);
             } catch (PrivilegedActionException e) {
                 Throwable t = e.getCause();
-                if (t instanceof ServletException) throw (ServletException)t;
+                if (t instanceof ServletException) {
+                    throw (ServletException)t;
+                }
                 throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), e);
             }
         }
@@ -328,11 +326,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         try {
             boolean precompile = preCompile(request);
             serviceJspFile(request, response, jspUri, precompile);
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (ServletException e) {
-            throw e;
-        } catch (IOException e) {
+        } catch (RuntimeException | IOException | ServletException e) {
             throw e;
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);

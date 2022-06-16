@@ -79,9 +79,9 @@ public abstract class AbstractRef extends Reference {
             sb.append(refAddr.getType());
             sb.append(",content=");
             sb.append(refAddr.getContent());
-            sb.append("}");
+            sb.append('}');
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

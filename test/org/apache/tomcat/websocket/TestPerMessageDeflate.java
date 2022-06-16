@@ -26,6 +26,7 @@ import java.util.List;
 import jakarta.websocket.Extension;
 import jakarta.websocket.Extension.Parameter;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestPerMessageDeflate {
@@ -61,9 +62,61 @@ public class TestPerMessageDeflate {
 
 
     /*
-     * Minimal implementation to enable other transformations to be tested.
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=65317
+     */
+    @Test
+    public void testMessagePartThatFillsBufffer() throws IOException {
+
+        // Set up the extension using defaults
+        List<Parameter> parameters = Collections.emptyList();
+        List<List<Parameter>> preferences = new ArrayList<>();
+        preferences.add(parameters);
+
+        // Set up the compression and sending of the message.
+        PerMessageDeflate perMessageDeflateTx = PerMessageDeflate.negotiate(preferences, true);
+        perMessageDeflateTx.setNext(new TesterTransformation());
+
+        byte[] data = new byte[8192];
+
+        ByteBuffer bb = ByteBuffer.wrap(data);
+        MessagePart mp = new MessagePart(true, 0, Constants.OPCODE_BINARY, bb, null, null, -1);
+
+        List<MessagePart> uncompressedParts = new ArrayList<>();
+        uncompressedParts.add(mp);
+        List<MessagePart> compressedParts = perMessageDeflateTx.sendMessagePart(uncompressedParts);
+
+        MessagePart compressedPart = compressedParts.get(0);
+
+        // Set up the decompression and process the received messafe
+        PerMessageDeflate perMessageDeflateRx = PerMessageDeflate.negotiate(preferences, true);
+        perMessageDeflateRx.setNext(new TesterTransformation(compressedPart.getPayload()));
+
+        ByteBuffer received = ByteBuffer.allocate(8192);
+
+        TransformationResult tr = perMessageDeflateRx.getMoreData(
+                compressedPart.getOpCode(), compressedPart.isFin(), compressedPart.getRsv(), received);
+
+        Assert.assertEquals(8192, received.position());
+        Assert.assertEquals(TransformationResult.END_OF_FRAME , tr);
+    }
+
+
+    /*
+     * Minimal implementation to enable other transformations to be tested. It
+     * is NOT robust.
      */
     private static class TesterTransformation implements Transformation {
+
+        final ByteBuffer data;
+
+        TesterTransformation() {
+            this(null);
+        }
+
+        TesterTransformation(ByteBuffer data) {
+            this.data = data;
+        }
+
         @Override
         public boolean validateRsvBits(int i) {
             return false;
@@ -82,7 +135,11 @@ public class TestPerMessageDeflate {
         @Override
         public TransformationResult getMoreData(byte opCode, boolean fin, int rsv, ByteBuffer dest)
                 throws IOException {
-            return null;
+            if (data == null) {
+                return TransformationResult.UNDERFLOW;
+            }
+            dest.put(data);
+            return TransformationResult.END_OF_FRAME;
         }
         @Override
         public Extension getExtensionResponse() {

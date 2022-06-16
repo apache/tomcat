@@ -31,6 +31,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.websocket.DeploymentException;
 import jakarta.websocket.Endpoint;
 import jakarta.websocket.Extension;
 import jakarta.websocket.HandshakeResponse;
@@ -44,7 +45,7 @@ import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.TransformationFactory;
 import org.apache.tomcat.websocket.Util;
 import org.apache.tomcat.websocket.WsHandshakeResponse;
-import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
+import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 
 public class UpgradeUtil {
 
@@ -199,12 +200,31 @@ public class UpgradeUtil {
             resp.setHeader(Constants.WS_EXTENSIONS_HEADER_NAME, responseHeaderExtensions.toString());
         }
 
-        WsHandshakeRequest wsRequest = new WsHandshakeRequest(req, pathParams);
-        WsHandshakeResponse wsResponse = new WsHandshakeResponse();
+        // Add method mapping to user properties
+        if (!Endpoint.class.isAssignableFrom(sec.getEndpointClass()) &&
+                sec.getUserProperties().get(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY) == null) {
+            // This is a POJO endpoint and the application has called upgrade
+            // directly. Need to add the method mapping.
+            try {
+                PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(),
+                        sec.getDecoders(), sec.getPath(), sc.getInstanceManager(Thread.currentThread().getContextClassLoader()));
+                if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null
+                        || methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
+                    sec.getUserProperties().put(
+                            org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY, methodMapping);
+                }
+            } catch (DeploymentException e) {
+                throw new ServletException(
+                        sm.getString("upgradeUtil.pojoMapFail", sec.getEndpointClass().getName()),  e);
+            }
+        }
+
         WsPerSessionServerEndpointConfig perSessionServerEndpointConfig =
                 new WsPerSessionServerEndpointConfig(sec);
-        sec.getConfigurator().modifyHandshake(perSessionServerEndpointConfig,
-                wsRequest, wsResponse);
+
+        WsHandshakeRequest wsRequest = new WsHandshakeRequest(req, pathParams);
+        WsHandshakeResponse wsResponse = new WsHandshakeResponse();
+        sec.getConfigurator().modifyHandshake(perSessionServerEndpointConfig, wsRequest, wsResponse);
         wsRequest.finished();
 
         // Add any additional headers
@@ -215,25 +235,9 @@ public class UpgradeUtil {
             }
         }
 
-        Endpoint ep;
-        try {
-            Class<?> clazz = sec.getEndpointClass();
-            if (Endpoint.class.isAssignableFrom(clazz)) {
-                ep = (Endpoint) sec.getConfigurator().getEndpointInstance(
-                        clazz);
-            } else {
-                ep = new PojoEndpointServer();
-                // Need to make path params available to POJO
-                perSessionServerEndpointConfig.getUserProperties().put(
-                        org.apache.tomcat.websocket.pojo.Constants.POJO_PATH_PARAM_KEY, pathParams);
-            }
-        } catch (InstantiationException e) {
-            throw new ServletException(e);
-        }
-
         WsHttpUpgradeHandler wsHandler =
                 req.upgrade(WsHttpUpgradeHandler.class);
-        wsHandler.preInit(ep, perSessionServerEndpointConfig, sc, wsRequest,
+        wsHandler.preInit(perSessionServerEndpointConfig, sc, wsRequest,
                 negotiatedExtensionsPhase2, subProtocol, transformation, pathParams,
                 req.isSecure());
 

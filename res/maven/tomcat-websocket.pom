@@ -23,7 +23,7 @@
   <groupId>org.apache.tomcat</groupId>
   <artifactId>tomcat-websocket</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Tomcat WebSocket (JSR356) implementation</description>
+  <description>Tomcat WebSocket implementation</description>
   <url>https://tomcat.apache.org/</url>
   <licenses>
     <license>

@@ -16,13 +16,21 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -32,7 +40,31 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * generated using a test CA the files for which are in the Tomcat PMC private
  * repository since not all of them are AL2 licensed.
  */
+@RunWith(Parameterized.class)
 public class TestClientCert extends TomcatBaseTest {
+
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> parameters() {
+        List<Object[]> parameterSets = new ArrayList<>();
+        parameterSets.add(new Object[] {
+                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+
+        return parameterSets;
+    }
+
+    @Parameter(0)
+    public String connectorName;
+
+    @Parameter(1)
+    public boolean needApr;
+
+    @Parameter(2)
+    public String sslImplementationName;
+
 
     @Test
     public void testClientCertGetWithoutPreemptive() throws Exception {
@@ -45,9 +77,6 @@ public class TestClientCert extends TomcatBaseTest {
     }
 
     private void doTestClientCertGet(boolean preemptive) throws Exception {
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
-
         if (preemptive) {
             Tomcat tomcat = getTomcatInstance();
             // Only one context deployed
@@ -120,9 +149,6 @@ public class TestClientCert extends TomcatBaseTest {
 
     private void doTestClientCertPost(int bodySize, boolean expectProtectedFail)
             throws Exception {
-        Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
-
         getTomcatInstance().start();
 
         byte[] body = new byte[bodySize];
@@ -178,5 +204,14 @@ public class TestClientCert extends TomcatBaseTest {
         TesterSupport.configureClientCertContext(tomcat);
 
         TesterSupport.configureClientSsl();
+
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
+
+        if (needApr) {
+            AprLifecycleListener listener = new AprLifecycleListener();
+            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
+        }
     }
 }

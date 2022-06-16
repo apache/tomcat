@@ -25,6 +25,7 @@ import java.security.UnrecoverableKeyException;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.management.ObjectName;
@@ -48,8 +49,12 @@ public class SSLHostConfig implements Serializable {
     private static final Log log = LogFactory.getLog(SSLHostConfig.class);
     private static final StringManager sm = StringManager.getManager(SSLHostConfig.class);
 
+    // Must be lower case. SSL host names are always stored using lower case as
+    // they are case insensitive but are used by case sensitive code such as
+    // keys in Maps.
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
     protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
+    public static final String DEFAULT_TLS_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
 
     static {
         /* Default used if protocols are not configured, also used if
@@ -72,6 +77,8 @@ public class SSLHostConfig implements Serializable {
     // reference is held on the certificate.
     private transient Long openSslContext = Long.valueOf(0);
 
+    private boolean tls13RenegotiationAvailable = false;
+
     // Configuration properties
 
     // Internal
@@ -91,7 +98,7 @@ public class SSLHostConfig implements Serializable {
     private int certificateVerificationDepth = 10;
     // Used to track if certificateVerificationDepth has been explicitly set
     private boolean certificateVerificationDepthConfigured = false;
-    private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
+    private String ciphers = DEFAULT_TLS_CIPHERS;
     private LinkedHashSet<Cipher> cipherList = null;
     private List<String> jsseCipherNames = null;
     private boolean honorCipherOrder = false;
@@ -122,6 +129,16 @@ public class SSLHostConfig implements Serializable {
     public SSLHostConfig() {
         // Set defaults that can't be (easily) set when defining the fields.
         setProtocols(Constants.SSL_PROTO_ALL);
+    }
+
+
+    public boolean isTls13RenegotiationAvailable() {
+        return tls13RenegotiationAvailable;
+    }
+
+
+    public void setTls13RenegotiationAvailable(boolean tls13RenegotiationAvailable) {
+        this.tls13RenegotiationAvailable = tls13RenegotiationAvailable;
     }
 
 
@@ -409,10 +426,14 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setHostName(String hostName) {
-        this.hostName = hostName;
+        this.hostName = hostName.toLowerCase(Locale.ENGLISH);
     }
 
 
+    /**
+     * @return The host name associated with this SSL configuration - always in
+     *         lower case.
+     */
     public String getHostName() {
         return hostName;
     }
@@ -765,10 +786,20 @@ public class SSLHostConfig implements Serializable {
 
 
     public enum CertificateVerification {
-        NONE,
-        OPTIONAL_NO_CA,
-        OPTIONAL,
-        REQUIRED;
+        NONE(false),
+        OPTIONAL_NO_CA(true),
+        OPTIONAL(true),
+        REQUIRED(false);
+
+        private final boolean optional;
+
+        private CertificateVerification(boolean optional) {
+            this.optional = optional;
+        }
+
+        public boolean isOptional() {
+           return optional;
+        }
 
         public static CertificateVerification fromString(String value) {
             if ("true".equalsIgnoreCase(value) ||

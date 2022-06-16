@@ -21,6 +21,8 @@ public abstract class ValueExpression extends Expression {
     private static final long serialVersionUID = 8577809572381654673L;
 
     /**
+     * @param <T> The expected type for the result of evaluating this value
+     *            expression
      * @param context The EL context for this evaluation
      *
      * @return The result of evaluating this value expression
@@ -34,7 +36,7 @@ public abstract class ValueExpression extends Expression {
      *              Wraps any exception throw whilst resolving a property or
      *              variable
      */
-    public abstract Object getValue(ELContext context);
+    public abstract <T> T getValue(ELContext context);
 
     /**
      * @param context The EL context for this evaluation

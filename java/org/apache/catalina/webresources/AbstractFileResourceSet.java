@@ -22,10 +22,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.catalina.LifecycleException;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.RequestUtil;
 
 public abstract class AbstractFileResourceSet extends AbstractResourceSet {
+
+    private static final Log log = LogFactory.getLog(AbstractFileResourceSet.class);
 
     protected static final String[] EMPTY_STRING_ARRAY = new String[0];
 
@@ -128,12 +132,29 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
             canPath = normalize(canPath);
         }
         if (!canPath.equals(absPath)) {
+            if (!canPath.equalsIgnoreCase(absPath)) {
+                // Typically means symlinks are in use but being ignored. Given
+                // the symlink was likely created for a reason, log a warning
+                // that it was ignored.
+                logIgnoredSymlink(getRoot().getContext().getName(), absPath, canPath);
+            }
             return null;
         }
 
         return file;
     }
 
+
+    protected void logIgnoredSymlink(String contextPath, String absPath, String canPath) {
+        String msg = sm.getString("abstractFileResourceSet.canonicalfileCheckFailed",
+                contextPath, absPath, canPath);
+        // Log issues with configuration files at a higher level
+        if(absPath.startsWith("/META-INF/") || absPath.startsWith("/WEB-INF/")) {
+            log.error(msg);
+        } else {
+            log.warn(msg);
+        }
+    }
 
     private boolean isInvalidWindowsFilename(String name) {
         final int len = name.length();
@@ -144,7 +165,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // expression irrespective of input length.
         for (int i = 0; i < len; i++) {
             char c = name.charAt(i);
-            if (c == '\"' || c == '<' || c == '>') {
+            if (c == '\"' || c == '<' || c == '>' || c == ':') {
                 // These characters are disallowed in Windows file names and
                 // there are known problems for file names with these characters
                 // when using File#getCanonicalPath().
@@ -211,6 +232,14 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
             this.canonicalBase = fileBase.getCanonicalPath();
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
+        }
+
+        // Need to handle mapping of the file system root as a special case
+        if ("/".equals(this.absoluteBase)) {
+            this.absoluteBase = "";
+        }
+        if ("/".equals(this.canonicalBase)) {
+            this.canonicalBase = "";
         }
     }
 

@@ -404,19 +404,11 @@ public interface ServletRequest {
     public RequestDispatcher getRequestDispatcher(String path);
 
     /**
-     * @param path The virtual path to be converted to a real path
-     * @return {@link ServletContext#getRealPath(String)}
-     * @deprecated As of Version 2.1 of the Java Servlet API, use
-     *             {@link ServletContext#getRealPath} instead.
-     */
-    @Deprecated
-    public String getRealPath(String path);
-
-    /**
      * Returns the Internet Protocol (IP) source port of the client or last
      * proxy that sent the request.
      *
      * @return an integer specifying the port number
+     *
      * @since Servlet 2.4
      */
     public int getRemotePort();
@@ -446,6 +438,7 @@ public interface ServletRequest {
      * the request was received.
      *
      * @return an integer specifying the port number
+     *
      * @since Servlet 2.4
      */
     public int getLocalPort();
@@ -504,4 +497,53 @@ public interface ServletRequest {
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public DispatcherType getDispatcherType();
+
+    /**
+     * Obtain a unique (within the lifetime of the Servlet container) identifier
+     * string for this request.
+     * <p>
+     * There is no defined format for this string. The format is implementation
+     * dependent.
+     *
+     * @return A unique identifier for the request
+     *
+     * @since Servlet 6.0
+     */
+    String getRequestId();
+
+    /**
+     * Obtain the request identifier for this request as defined by the protocol
+     * in use. Note that some protocols do not define such an identifier.
+     * <p>
+     * Examples of protocol provided request identifiers include:
+     * <dl>
+     * <dt>HTTP 1.x</dt>
+     * <dd>None, so the empty string should be returned</dd>
+     * <dt>HTTP 2</dt>
+     * <dd>The stream identifier</dd>
+     * <dt>HTTP 3</dt>
+     * <dd>The stream identifier</dd>
+     * <dt>AJP</dt>
+     * <dd>None, so the empty string should be returned</dd>
+     * </dl>
+     *
+     * @return The request identifier if one is defined, otherwise an empty
+     *         string
+     *
+     * @since Servlet 6.0
+     */
+    String getProtocolRequestId();
+
+    /**
+     * Obtain details of the network connection to the Servlet container that is
+     * being used by this request. The information presented may differ from
+     * information presented elsewhere in the Servlet API as raw information is
+     * presented without adjustments for, example, use of reverse proxies that
+     * may be applied elsewhere in the Servlet API.
+     *
+     * @return The network connection details.
+     *
+     * @since Servlet 6.0
+     */
+    ServletConnection getServletConnection();
 }

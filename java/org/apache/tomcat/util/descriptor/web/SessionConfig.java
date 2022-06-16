@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.util.descriptor.web;
 
 import java.util.EnumSet;
+import java.util.Map;
+import java.util.TreeMap;
 
 import jakarta.servlet.SessionTrackingMode;
 
@@ -27,14 +28,10 @@ import jakarta.servlet.SessionTrackingMode;
  * deployment descriptor.
  */
 public class SessionConfig {
+
     private Integer sessionTimeout;
     private String cookieName;
-    private String cookieDomain;
-    private String cookiePath;
-    private String cookieComment;
-    private Boolean cookieHttpOnly;
-    private Boolean cookieSecure;
-    private Integer cookieMaxAge;
+    private final Map<String,String> cookieAttributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final EnumSet<SessionTrackingMode> sessionTrackingModes =
         EnumSet.noneOf(SessionTrackingMode.class);
 
@@ -53,45 +50,67 @@ public class SessionConfig {
     }
 
     public String getCookieDomain() {
-        return cookieDomain;
+        return getCookieAttribute(Constants.COOKIE_DOMAIN_ATTR);
     }
     public void setCookieDomain(String cookieDomain) {
-        this.cookieDomain = cookieDomain;
+        setCookieAttribute(Constants.COOKIE_DOMAIN_ATTR, cookieDomain);
     }
 
     public String getCookiePath() {
-        return cookiePath;
+        return getCookieAttribute(Constants.COOKIE_PATH_ATTR);
     }
     public void setCookiePath(String cookiePath) {
-        this.cookiePath = cookiePath;
+        setCookieAttribute(Constants.COOKIE_PATH_ATTR, cookiePath);
     }
 
     public String getCookieComment() {
-        return cookieComment;
+        return getCookieAttribute(Constants.COOKIE_COMMENT_ATTR);
     }
     public void setCookieComment(String cookieComment) {
-        this.cookieComment = cookieComment;
+        setCookieAttribute(Constants.COOKIE_COMMENT_ATTR, cookieComment);
     }
 
     public Boolean getCookieHttpOnly() {
-        return cookieHttpOnly;
+        String httpOnly = getCookieAttribute(Constants.COOKIE_HTTP_ONLY_ATTR);
+        if (httpOnly == null) {
+            return null;
+        }
+        return Boolean.valueOf(httpOnly);
     }
     public void setCookieHttpOnly(String cookieHttpOnly) {
-        this.cookieHttpOnly = Boolean.valueOf(cookieHttpOnly);
+        setCookieAttribute(Constants.COOKIE_HTTP_ONLY_ATTR, cookieHttpOnly);
     }
 
     public Boolean getCookieSecure() {
-        return cookieSecure;
+        String secure = getCookieAttribute(Constants.COOKIE_SECURE_ATTR);
+        if (secure == null) {
+            return null;
+        }
+        return Boolean.valueOf(secure);
     }
     public void setCookieSecure(String cookieSecure) {
-        this.cookieSecure = Boolean.valueOf(cookieSecure);
+        setCookieAttribute(Constants.COOKIE_SECURE_ATTR, cookieSecure);
     }
 
     public Integer getCookieMaxAge() {
-        return cookieMaxAge;
+        String maxAge = getCookieAttribute(Constants.COOKIE_MAX_AGE_ATTR);
+        if (maxAge == null) {
+            return null;
+        }
+        return Integer.valueOf(maxAge);
     }
     public void setCookieMaxAge(String cookieMaxAge) {
-        this.cookieMaxAge = Integer.valueOf(cookieMaxAge);
+        setCookieAttribute(Constants.COOKIE_MAX_AGE_ATTR, cookieMaxAge);
+    }
+
+    public Map<String,String> getCookieAttributes() {
+        return cookieAttributes;
+    }
+    public void setCookieAttribute(String name, String value) {
+        cookieAttributes.put(name, value);
+    }
+    public String getCookieAttribute(String name) {
+        return cookieAttributes.get(name);
     }
 
     public EnumSet<SessionTrackingMode> getSessionTrackingModes() {
@@ -101,5 +120,4 @@ public class SessionConfig {
         sessionTrackingModes.add(
                 SessionTrackingMode.valueOf(sessionTrackingMode));
     }
-
 }

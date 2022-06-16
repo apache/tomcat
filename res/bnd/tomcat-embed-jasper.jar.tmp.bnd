@@ -15,7 +15,6 @@
 
 -include: build-defaults.bnd
 
-Automatic-Module-Name: org.apache.tomcat.embed.jasper
 Bundle-Name: tomcat-embed-jasper
 Bundle-SymbolicName: org.apache.tomcat-embed-jasper
 Export-Package: \
@@ -24,17 +23,19 @@ Export-Package: \
     org.apache.jasper.compiler,\
     org.apache.jasper.compiler.tagplugin,\
     org.apache.jasper.el,\
+    org.apache.jasper.optimizations,\
     org.apache.jasper.runtime,\
     org.apache.jasper.security,\
     org.apache.jasper.servlet,\
     org.apache.jasper.tagplugins.jstl,\
     org.apache.jasper.tagplugins.jstl.core,\
-    org.apache.jasper.util
+    org.apache.jasper.util,\
+    org.apache.tomcat.util.descriptor.tld
 
 -includepackage: \
     org.apache.jasper.resources
 
--includeresource.meta-inf: /META-INF/=../META-INF/jasper.jar/
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/jasper.jar/
 
 Provide-Capability: \
     osgi.contract;\
@@ -47,5 +48,13 @@ Provide-Capability: \
     Specification-Version=${jsp.spec.version};\
     Specification-Vendor=Eclipse Foundation;\
     Implementation-Title=jakarta.servlet.jsp;\
-    Implementation-Version=${jsp.spec.version}.${jsp.revision};\
+    Implementation-Version=${jsp.spec.version}${jsp.revision};\
     Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=${Bundle-Name}

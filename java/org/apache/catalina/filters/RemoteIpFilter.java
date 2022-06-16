@@ -18,6 +18,8 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -165,6 +167,13 @@ import org.apache.tomcat.util.res.StringManager;
  * <td>N/A</td>
  * <td>integer</td>
  * <td>443</td>
+ * </tr>
+ * <tr>
+ * <td>enableLookups</td>
+ * <td>Should a DNS lookup be performed to provide a host name when calling {@link ServletRequest#getRemoteHost()}</td>
+ * <td>N/A</td>
+ * <td>boolean</td>
+ * <td>false</td>
  * </tr>
  * </table>
  * <p>
@@ -681,6 +690,8 @@ public class RemoteIpFilter extends GenericFilter {
 
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
 
+    protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
+
     /**
      * Convert a given comma delimited list of regular expressions into an array of String
      *
@@ -773,6 +784,8 @@ public class RemoteIpFilter extends GenericFilter {
      */
     private Pattern trustedProxies = null;
 
+    private boolean enableLookups;
+
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         boolean isInternal = internalProxies != null &&
@@ -781,7 +794,6 @@ public class RemoteIpFilter extends GenericFilter {
         if (isInternal || (trustedProxies != null &&
                 trustedProxies.matcher(request.getRemoteAddr()).matches())) {
             String remoteIp = null;
-            // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
 
@@ -823,7 +835,22 @@ public class RemoteIpFilter extends GenericFilter {
             if (remoteIp != null) {
 
                 xRequest.setRemoteAddr(remoteIp);
-                xRequest.setRemoteHost(remoteIp);
+                if (getEnableLookups()) {
+                    // This isn't a lazy lookup but that would be a little more
+                    // invasive - mainly in XForwardedRequest - and if
+                    // enableLookups is true is seems reasonable that the
+                    // hostname will be required so look it up here.
+                    try {
+                        InetAddress inetAddress = InetAddress.getByName(remoteIp);
+                        // We know we need a DNS look up so use getCanonicalHostName()
+                        xRequest.setRemoteHost(inetAddress.getCanonicalHostName());
+                    } catch (UnknownHostException e) {
+                        log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), e);
+                        xRequest.setRemoteHost(remoteIp);
+                    }
+                } else {
+                    xRequest.setRemoteHost(remoteIp);
+                }
 
                 if (proxiesHeaderValue.size() == 0) {
                     xRequest.removeHeader(proxiesHeader);
@@ -1013,6 +1040,10 @@ public class RemoteIpFilter extends GenericFilter {
         return trustedProxies;
     }
 
+    public boolean getEnableLookups() {
+        return enableLookups;
+    }
+
     @Override
     public void init() throws ServletException {
         if (getInitParameter(INTERNAL_PROXIES_PARAMETER) != null) {
@@ -1069,6 +1100,10 @@ public class RemoteIpFilter extends GenericFilter {
             } catch (NumberFormatException e) {
                 throw new NumberFormatException(sm.getString("remoteIpFilter.invalidNumber", HTTPS_SERVER_PORT_PARAMETER, e.getLocalizedMessage()));
             }
+        }
+
+        if (getInitParameter(ENABLE_LOOKUPS_PARAMETER) != null) {
+            setEnableLookups(Boolean.parseBoolean(getInitParameter(ENABLE_LOOKUPS_PARAMETER)));
         }
     }
 
@@ -1151,7 +1186,7 @@ public class RemoteIpFilter extends GenericFilter {
     /**
      * <p>
      * Header that holds the incoming host, usually named
-     * <code>X-Forwarded-HOst</code>.
+     * <code>X-Forwarded-Host</code>.
      * </p>
      * <p>
      * Default value : <code>null</code>
@@ -1282,6 +1317,9 @@ public class RemoteIpFilter extends GenericFilter {
         }
     }
 
+    public void setEnableLookups(boolean enableLookups) {
+        this.enableLookups = enableLookups;
+    }
 
     /*
      * Log objects are not Serializable but this Filter is because it extends

@@ -52,7 +52,9 @@ public class TestKeepAliveCount extends TomcatBaseTest {
         private boolean init;
 
         private synchronized void init() {
-            if (init) return;
+            if (init) {
+              return;
+            }
 
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.dbcp.dbcp2.datasources;
 
 import java.sql.SQLException;
@@ -29,14 +28,14 @@ import javax.sql.PooledConnection;
 interface PooledConnectionManager {
 
     /**
-     * Closes the PooledConnection and remove it from the connection pool to which it belongs, adjusting pool counters.
+     * Closes the connection pool associated with the given user.
      *
-     * @param pc
-     *            PooledConnection to be invalidated
+     * @param userName
+     *            user name
      * @throws SQLException
-     *             if an SQL error occurs closing the connection
+     *             if an error occurs closing idle connections in the pool
      */
-    void invalidate(PooledConnection pc) throws SQLException;
+    void closePool(String userName) throws SQLException;
 
     // /**
     // * Sets the database password used when creating connections.
@@ -47,21 +46,21 @@ interface PooledConnectionManager {
     // void setPassword(char[] password);
 
     /**
+     * Closes the PooledConnection and remove it from the connection pool to which it belongs, adjusting pool counters.
+     *
+     * @param pc
+     *            PooledConnection to be invalidated
+     * @throws SQLException
+     *             if an SQL error occurs closing the connection
+     */
+    void invalidate(PooledConnection pc) throws SQLException;
+
+    /**
      * Sets the database password used when creating connections.
      *
      * @param password
      *            password used when authenticating to the database
      */
     void setPassword(String password);
-
-    /**
-     * Closes the connection pool associated with the given user.
-     *
-     * @param userName
-     *            user name
-     * @throws SQLException
-     *             if an error occurs closing idle connections in the pool
-     */
-    void closePool(String userName) throws SQLException;
 
 }

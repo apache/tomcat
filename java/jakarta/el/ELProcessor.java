@@ -50,12 +50,14 @@ public class ELProcessor {
     }
 
 
-    public Object eval(String expression) {
-        return getValue(expression, Object.class);
+    public <T> T eval(String expression) {
+        @SuppressWarnings("unchecked")
+        T result = (T) getValue(expression, Object.class);
+        return result;
     }
 
 
-    public Object getValue(String expression, Class<?> expectedType) {
+    public <T> T getValue(String expression, Class<T> expectedType) {
         ValueExpression ve = factory.createValueExpression(
                 context, bracket(expression), expectedType);
         return ve.getValue(context);
@@ -109,15 +111,14 @@ public class ELProcessor {
             function = sig.getName();
         }
 
-        // Only returns public methods. Java 9+ access is checked below.
+        // Only returns public methods. Module access is checked below.
         Method methods[] = clazz.getMethods();
-        JreCompat jreCompat = JreCompat.getInstance();
 
         for (Method method : methods) {
             if (!Modifier.isStatic(method.getModifiers())) {
                 continue;
             }
-            if (!jreCompat.canAcccess(null, method)) {
+            if (!Util.canAccess(null, method)) {
                 continue;
             }
             if (method.getName().equals(sig.getName())) {
@@ -190,9 +191,8 @@ public class ELProcessor {
 
         int modifiers = method.getModifiers();
 
-        // Check for static, public method and module access for Java 9+
-        JreCompat jreCompat = JreCompat.getInstance();
-        if (!Modifier.isStatic(modifiers) || !jreCompat.canAcccess(null, method)) {
+        // Check for static, public method and module access
+        if (!Modifier.isStatic(modifiers) || !Util.canAccess(null, method)) {
             throw new NoSuchMethodException(Util.message(context,
                     "elProcessor.defineFunctionInvalidMethod", method.getName(),
                     method.getDeclaringClass().getName()));

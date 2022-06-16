@@ -217,15 +217,10 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 credentialLifetime = GSSCredential.DEFAULT_LIFETIME;
             }
             final PrivilegedExceptionAction<GSSCredential> action =
-                new PrivilegedExceptionAction<GSSCredential>() {
-                    @Override
-                    public GSSCredential run() throws GSSException {
-                        return manager.createCredential(null,
-                                credentialLifetime,
-                                new Oid("1.3.6.1.5.5.2"),
-                                GSSCredential.ACCEPT_ONLY);
-                    }
-                };
+                    () -> manager.createCredential(null,
+                            credentialLifetime,
+                            new Oid("1.3.6.1.5.5.2"),
+                            GSSCredential.ACCEPT_ONLY);
             gssContext = manager.createContext(Subject.doAs(subject, action));
 
             outToken = Subject.doAs(lc.getSubject(), new AcceptAction(gssContext, decoded));
@@ -302,6 +297,13 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         return false;
+    }
+
+
+    @Override
+    protected boolean isPreemptiveAuthPossible(Request request) {
+        MessageBytes authorizationHeader = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
+        return authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("negotiate ", 0);
     }
 
 
@@ -388,16 +390,34 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
             // Scan until we find the mech types list. If we find anything
             // unexpected, abort the fix process.
-            if (!tag(0x60)) return;
-            if (!length()) return;
-            if (!oid("1.3.6.1.5.5.2")) return;
-            if (!tag(0xa0)) return;
-            if (!length()) return;
-            if (!tag(0x30)) return;
-            if (!length()) return;
-            if (!tag(0xa0)) return;
+            if (!tag(0x60)) {
+                return;
+            }
+            if (!length()) {
+                return;
+            }
+            if (!oid("1.3.6.1.5.5.2")) {
+                return;
+            }
+            if (!tag(0xa0)) {
+                return;
+            }
+            if (!length()) {
+                return;
+            }
+            if (!tag(0x30)) {
+                return;
+            }
+            if (!length()) {
+                return;
+            }
+            if (!tag(0xa0)) {
+                return;
+            }
             lengthAsInt();
-            if (!tag(0x30)) return;
+            if (!tag(0x30)) {
+                return;
+            }
             // Now at the start of the mechType list.
             // Read the mechTypes into an ordered set
             int mechTypesLen = lengthAsInt();
@@ -463,7 +483,9 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
 
         private String oidAsString() {
-            if (!tag(0x06)) return null;
+            if (!tag(0x06)) {
+                return null;
+            }
             StringBuilder result = new StringBuilder();
             int len = lengthAsInt();
             // First byte is special case

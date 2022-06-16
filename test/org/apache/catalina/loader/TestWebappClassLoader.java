@@ -48,8 +48,6 @@ public class TestWebappClassLoader extends TomcatBaseTest {
 
         ClassLoader cl = ctx.getLoader().getClassLoader();
 
-        Assert.assertTrue(cl instanceof URLClassLoader);
-
         try (URLClassLoader ucl = (URLClassLoader) cl) {
             URL[] urls = ucl.getURLs();
             Assert.assertEquals(expected.length, urls.length);
@@ -101,6 +99,7 @@ public class TestWebappClassLoader extends TomcatBaseTest {
             "org.apache.juli",
             "org.apache.naming",
             "org.apache.tomcat",
+            "jakarta.annotation",
             "jakarta.el",
             "jakarta.servlet",
             "jakarta.websocket",

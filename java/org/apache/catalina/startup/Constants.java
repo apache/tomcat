@@ -38,7 +38,8 @@ public final class Constants {
     public static final String WarTracker = "/META-INF/war-tracker";
 
     /**
-     * A dummy value used to suppress loading the default web.xml file.
+     * A value that points to a non-existent file used to suppress loading the
+     * default web.xml file.
      *
      * <p>
      * It is useful when embedding Tomcat, when the default configuration is

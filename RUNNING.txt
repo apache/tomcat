@@ -132,8 +132,8 @@ belong to CATALINA_OPTS.
 
 Another frequently used variable is CATALINA_PID (on *nix only). It
 specifies the location of the file where process id of the forked Tomcat
-java process will be written. This setting is optional. It will enable the
-following features:
+java process will be written. This setting is optional. It will activate
+the following features:
 
  *  better protection against duplicate start attempts and
  *  allows forceful termination of Tomcat process when it does not react to
@@ -163,7 +163,7 @@ On Windows, %CATALINA_BASE%\bin\setenv.bat:
 On *nix, $CATALINA_BASE/bin/setenv.sh:
 
   JRE_HOME=/usr/java/latest
-  CATALINA_PID="$CATALINA_BASE/tomcat.pid"
+  CATALINA_PID="/run/tomcat.pid"
 
 
 The CATALINA_HOME and CATALINA_BASE variables cannot be configured in the
@@ -272,12 +272,6 @@ In CATALINA_HOME:
 
  * lib  - Libraries and classes, as explained below
 
- * endorsed - Libraries that override standard "Endorsed Standards"
-              libraries provided by JRE. See Classloading documentation
-              in the User Guide for details.
-              This is only supported for Java <= 8.
-              By default this "endorsed" directory is absent.
-
 In the default configuration the JAR libraries and classes both in
 CATALINA_BASE/lib and in CATALINA_HOME/lib will be added to the common
 classpath, but the ones in CATALINA_BASE will be added first and thus will
@@ -297,8 +291,8 @@ CATALINA_BASE can be referenced in the XML configuration files processed
 by Tomcat as ${catalina.home} and ${catalina.base} respectively.
 
 For example, the standard manager web application can be kept in
-CATALINA_HOME/webapps/manager and loaded into CATALINA_BASE by using
-the following trick:
+CATALINA_HOME/webapps/manager and loaded into CATALINA_BASE by copying
+its deployment descriptor into the desired virtual host:
 
  * Copy the CATALINA_HOME/webapps/manager/META-INF/context.xml
    file as CATALINA_BASE/conf/Catalina/localhost/manager.xml
@@ -312,6 +306,7 @@ The file will look like the following:
     antiResourceLocking="false" privileged="true" >
     <Valve className="org.apache.catalina.valves.RemoteAddrValve"
          allow="127\.0\.0\.1" />
+    <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
   </Context>
 
 See Deployer chapter in User Guide and Context and Host chapters in the
@@ -378,10 +373,9 @@ If you do use them, do not forget to read their documentation.
 Apache Tomcat Native library
 -----------------------------
 
-It is a library that allows to use the "Apr" variant of HTTP and AJP
-protocol connectors in Apache Tomcat. It is built around OpenSSL and Apache
-Portable Runtime (APR) libraries. Those are the same libraries as used by
-Apache HTTPD Server project.
+It is a library that allows to use the OpenSSL variant of the TLS implementation
+for the HTTP connector in Apache Tomcat. It is built around OpenSSL and Apache
+Portable Runtime (APR) libraries.
 
 This feature was especially important in the old days when Java performance
 was poor. It is less important nowadays, but it is still used and respected
@@ -395,12 +389,9 @@ For further reading:
 
       https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/apr.html
 
-    * Documentation for the HTTP and AJP protocol connectors in the Tomcat
-      Configuration Reference
+    * Documentation for the HTTP connector in the Tomcat Configuration Reference
 
       https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/http.html
-
-      https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/ajp.html
 
  - Apache Tomcat Native project home
 
@@ -420,9 +411,9 @@ For further reading:
 
       https://httpd.apache.org/
 
-To disable Apache Tomcat Native library:
+To deactivate Apache Tomcat Native library:
 
- - To disable Apache Tomcat Native library when it is installed, or
+ - To deactivate Apache Tomcat Native library when it is installed, or
  - To remove the warning that is logged during Tomcat startup when the
    library is not installed:
 

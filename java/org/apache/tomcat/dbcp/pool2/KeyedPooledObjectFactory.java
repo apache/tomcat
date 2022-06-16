@@ -36,7 +36,7 @@ package org.apache.tomcat.dbcp.pool2;
  *   {@link #validateObject} may be invoked on {@link #activateObject activated}
  *   instances to make sure they can be
  *   {@link KeyedObjectPool#borrowObject borrowed} from the pool.
- *   <code>validateObject</code> may also be used to test an
+ *   {@code validateObject} may also be used to test an
  *   instance being {@link KeyedObjectPool#returnObject returned} to the pool
  *   before it is {@link #passivateObject passivated}. It will only be invoked
  *   on an activated instance.
@@ -48,7 +48,7 @@ package org.apache.tomcat.dbcp.pool2;
  *  <li>
  *   {@link #destroyObject destroyObject}
  *   is invoked on every instance when it is being "dropped" from the
- *   pool (whether due to the response from <code>validateObject</code>,
+ *   pool (whether due to the response from {@code validateObject},
  *   or for reasons specific to the pool implementation.) There is no
  *   guarantee that the instance being destroyed will
  *   be considered active, passive or in a generally consistent state.
@@ -57,7 +57,7 @@ package org.apache.tomcat.dbcp.pool2;
  * {@link KeyedPooledObjectFactory} must be thread-safe. The only promise
  * an {@link KeyedObjectPool} makes is that the same instance of an object will
  * not be passed to more than one method of a
- * <code>KeyedPoolableObjectFactory</code> at a time.
+ * {@code KeyedPoolableObjectFactory} at a time.
  * <p>
  * While clients of a {@link KeyedObjectPool} borrow and return instances of
  * the underlying value type V, the factory methods act on instances of
@@ -77,24 +77,23 @@ package org.apache.tomcat.dbcp.pool2;
 public interface KeyedPooledObjectFactory<K, V> {
 
     /**
-     * Create an instance that can be served by the pool and
-     * wrap it in a {@link PooledObject} to be managed by the pool.
+     * Reinitializes an instance to be returned by the pool.
      *
-     * @param key the key used when constructing the object
+     * @param key the key used when selecting the object
+     * @param p a {@code PooledObject} wrapping the instance to be activated
      *
-     * @return a {@code PooledObject} wrapping an instance that can
-     * be served by the pool.
+     * @throws Exception if there is a problem activating {@code obj},
+     *    this exception may be swallowed by the pool.
      *
-     * @throws Exception if there is a problem creating a new instance,
-     *    this will be propagated to the code requesting an object.
+     * @see #destroyObject
      */
-    PooledObject<V> makeObject(K key) throws Exception;
+    void activateObject(K key, PooledObject<V> p) throws Exception;
 
     /**
-     * Destroy an instance no longer needed by the pool.
+     * Destroys an instance no longer needed by the pool.
      * <p>
      * It is important for implementations of this method to be aware that there
-     * is no guarantee about what state <code>obj</code> will be in and the
+     * is no guarantee about what state {@code obj} will be in and the
      * implementation should be prepared to handle unexpected errors.
      * </p>
      * <p>
@@ -114,40 +113,61 @@ public interface KeyedPooledObjectFactory<K, V> {
     void destroyObject(K key, PooledObject<V> p) throws Exception;
 
     /**
-     * Ensures that the instance is safe to be returned by the pool.
+     * Destroys an instance no longer needed by the pool, using the provided {@link DestroyMode}.
      *
-     * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the instance to be validated
+     * @param key the key used when selecting the instance
+     * @param p a {@code PooledObject} wrapping the instance to be destroyed
+     * @param destroyMode DestroyMode providing context to the factory
      *
-     * @return <code>false</code> if <code>obj</code> is not valid and should
-     *         be dropped from the pool, <code>true</code> otherwise.
+     * @throws Exception should be avoided as it may be swallowed by
+     *    the pool implementation.
+     *
+     * @see #validateObject
+     * @see KeyedObjectPool#invalidateObject
+     * @see #destroyObject(Object, PooledObject)
+     * @see DestroyMode
+     * @since 2.9.0
      */
-    boolean validateObject(K key, PooledObject<V> p);
+    default void destroyObject(final K key, final PooledObject<V> p, final DestroyMode destroyMode) throws Exception {
+        destroyObject(key, p);
+    }
 
     /**
-     * Reinitialize an instance to be returned by the pool.
+     * Creates an instance that can be served by the pool and
+     * wrap it in a {@link PooledObject} to be managed by the pool.
      *
-     * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the instance to be activated
+     * @param key the key used when constructing the object
      *
-     * @throws Exception if there is a problem activating <code>obj</code>,
-     *    this exception may be swallowed by the pool.
+     * @return a {@code PooledObject} wrapping an instance that can
+     * be served by the pool.
      *
-     * @see #destroyObject
+     * @throws Exception if there is a problem creating a new instance,
+     *    this will be propagated to the code requesting an object.
      */
-    void activateObject(K key, PooledObject<V> p) throws Exception;
+    PooledObject<V> makeObject(K key) throws Exception;
 
     /**
-     * Uninitialize an instance to be returned to the idle object pool.
+     * Uninitializes an instance to be returned to the idle object pool.
      *
      * @param key the key used when selecting the object
      * @param p a {@code PooledObject} wrapping the instance to be passivated
      *
-     * @throws Exception if there is a problem passivating <code>obj</code>,
+     * @throws Exception if there is a problem passivating {@code obj},
      *    this exception may be swallowed by the pool.
      *
      * @see #destroyObject
      */
     void passivateObject(K key, PooledObject<V> p) throws Exception;
+
+    /**
+     * Ensures that the instance is safe to be returned by the pool.
+     *
+     * @param key the key used when selecting the object
+     * @param p a {@code PooledObject} wrapping the instance to be validated
+     *
+     * @return {@code false} if {@code obj} is not valid and should
+     *         be dropped from the pool, {@code true} otherwise.
+     */
+    boolean validateObject(K key, PooledObject<V> p);
 }
 

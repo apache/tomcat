@@ -20,11 +20,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+
 public interface ClientEndpointConfig extends EndpointConfig {
 
     List<String> getPreferredSubprotocols();
 
     List<Extension> getExtensions();
+
+    SSLContext getSSLContext();
 
     public Configurator getConfigurator();
 
@@ -46,15 +50,13 @@ public interface ClientEndpointConfig extends EndpointConfig {
         private Configurator configurator = DEFAULT_CONFIGURATOR;
         private List<String> preferredSubprotocols = Collections.emptyList();
         private List<Extension> extensions = Collections.emptyList();
-        private List<Class<? extends Encoder>> encoders =
-                Collections.emptyList();
-        private List<Class<? extends Decoder>> decoders =
-                Collections.emptyList();
-
+        private List<Class<? extends Encoder>> encoders = Collections.emptyList();
+        private List<Class<? extends Decoder>> decoders = Collections.emptyList();
+        private SSLContext sslContext = null;
 
         public ClientEndpointConfig build() {
             return new DefaultClientEndpointConfig(preferredSubprotocols,
-                    extensions, encoders, decoders, configurator);
+                    extensions, encoders, decoders, sslContext, configurator);
         }
 
 
@@ -108,6 +110,12 @@ public interface ClientEndpointConfig extends EndpointConfig {
             } else {
                 this.decoders = Collections.unmodifiableList(decoders);
             }
+            return this;
+        }
+
+
+        public Builder sslContext(SSLContext sslContext) {
+            this.sslContext = sslContext;
             return this;
         }
     }

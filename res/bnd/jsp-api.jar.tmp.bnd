@@ -31,5 +31,13 @@ Provide-Capability: \
     Specification-Version=${jsp.spec.version};\
     Specification-Vendor=Eclipse Foundation;\
     Implementation-Title=jakarta.servlet.jsp;\
-    Implementation-Version=${jsp.spec.version}.${jsp.revision};\
+    Implementation-Version=${jsp.spec.version}${jsp.revision};\
     Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.servlet.jsp;\
+        access=32;\
+        version=${jsp.spec.version}
+-jpms-module-info-options: \
+    jakarta.servlet.jsp;\
+        substitute=jsp-api

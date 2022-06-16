@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -1090,6 +1093,8 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File war = null;
         File dir = null;
 
+        long testStartTime = System.currentTimeMillis();
+
         if (startXml && !startExternalWar && !startExternalDir) {
             xml = createXmlInConfigBaseForAppbase();
         }
@@ -1117,14 +1122,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         host.backgroundProcess();
 
         // Update the last modified time. Make sure that the OS reports a change
-        // in modification time that HostConfig can detect.
+        // in modification time that HostConfig can detect. Change is made
+        // relative to test start time to ensure new modification times are
+        // sufficiently different.
         switch (toModify) {
             case XML:
                 if (xml == null) {
                     Assert.fail();
                 } else {
                     Assert.assertTrue("Failed to set last modified for [" + xml + "]", xml.setLastModified(
-                            System.currentTimeMillis() - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
+                            testStartTime - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
                 }
                 break;
             case EXT:
@@ -1132,7 +1139,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                     Assert.fail();
                 } else {
                     Assert.assertTrue("Failed to set last modified for [" + ext + "]", ext.setLastModified(
-                            System.currentTimeMillis() - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
+                            testStartTime - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
                 }
                 break;
             case WAR:
@@ -1140,7 +1147,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                     Assert.fail();
                 } else {
                     Assert.assertTrue("Failed to set last modified for [" + war + "]", war.setLastModified(
-                            System.currentTimeMillis() - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
+                            testStartTime - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
                 }
                 break;
             case DIR:
@@ -1148,7 +1155,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                     Assert.fail();
                 } else {
                     Assert.assertTrue("Failed to set last modified for [" + dir + "]", dir.setLastModified(
-                            System.currentTimeMillis() - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
+                            testStartTime - 10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
                 }
                 break;
             default:
@@ -1880,7 +1887,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         // Check the Context class
         Context ctxt = (Context) host.findChild(APP_NAME.getName());
 
-        Assert.assertTrue(ctxt instanceof TesterContext);
+        assertThat(ctxt, instanceOf(TesterContext.class));
     }
 
 

@@ -21,7 +21,7 @@ import java.io.IOException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
 
-import org.apache.coyote.ContainerThreadMarker;
+import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -37,6 +37,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
     private final UpgradeProcessorBase processor;
     private final SocketWrapperBase<?> socketWrapper;
+    private final UpgradeInfo upgradeInfo;
 
     // Used to ensure that isReady() and onWritePossible() have a consistent
     // view of buffer and registered.
@@ -61,10 +62,11 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
 
 
-    public UpgradeServletOutputStream(UpgradeProcessorBase processor,
-            SocketWrapperBase<?> socketWrapper) {
+    public UpgradeServletOutputStream(UpgradeProcessorBase processor, SocketWrapperBase<?> socketWrapper,
+            UpgradeInfo upgradeInfo) {
         this.processor = processor;
         this.socketWrapper = socketWrapper;
+        this.upgradeInfo = upgradeInfo;
     }
 
 
@@ -117,7 +119,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         synchronized (registeredLock) {
             registered = true;
             // Container is responsible for first call to onDataAvailable().
-            if (ContainerThreadMarker.isContainerThread()) {
+            Request request = processor.getRequest();
+            if (request != null && request.isRequestThread()) {
                 processor.addDispatch(DispatchType.NON_BLOCKING_WRITE);
             } else {
                 socketWrapper.registerWriteInterest();
@@ -210,6 +213,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         } else {
             socketWrapper.write(false, b, off, len);
         }
+        upgradeInfo.addBytesSent(len);
     }
 
 

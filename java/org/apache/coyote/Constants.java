@@ -96,4 +96,11 @@ public final class Constants {
      * the X-Forwarded-For HTTP header.
      */
     public static final String REMOTE_ADDR_ATTRIBUTE = "org.apache.tomcat.remoteAddr";
+
+    /**
+     * The request attribute set by the RemoteIpFilter, RemoteIpValve (and may
+     * be set by other similar components) that identifies for the connector the
+     * connection peer IP address.
+     */
+    public static final String PEER_ADDR_ATTRIBUTE = "org.apache.tomcat.peerAddr";
 }

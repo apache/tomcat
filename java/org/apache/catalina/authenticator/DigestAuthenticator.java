@@ -31,6 +31,7 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.util.security.MD5Encoder;
@@ -367,6 +368,13 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
 
+    @Override
+    protected boolean isPreemptiveAuthPossible(Request request) {
+        MessageBytes authorizationHeader = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
+        return authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("digest ", 0);
+    }
+
+
     // ------------------------------------------------------- Lifecycle Methods
 
     @Override
@@ -383,7 +391,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             setOpaque(sessionIdGenerator.generateSessionId());
         }
 
-        nonces = new LinkedHashMap<String, DigestAuthenticator.NonceInfo>() {
+        nonces = new LinkedHashMap<>() {
 
             private static final long serialVersionUID = 1L;
             private static final long LOG_SUPPRESS_TIME = 5 * 60 * 1000;

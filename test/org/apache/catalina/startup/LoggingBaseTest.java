@@ -121,6 +121,8 @@ public abstract class LoggingBaseTest {
                 new File(System.getProperty("tomcat.test.basedir"),
                         "conf/logging.properties").toString());
 
+        // tempDir contains log files which will be open until JULI shuts down
+        deleteOnClassTearDown.add(tempDir);
     }
 
     @Before
@@ -131,13 +133,13 @@ public abstract class LoggingBaseTest {
 
     @After
     public void tearDown() throws Exception {
+        boolean deleted = true;
         for (File file : deleteOnTearDown) {
-            ExpandWar.delete(file);
+            deleted = deleted & ExpandWar.delete(file);
         }
         deleteOnTearDown.clear();
 
-        // tempDir contains log files which will be open until JULI shuts down
-        deleteOnClassTearDown.add(tempDir);
+        Assert.assertTrue("Failed to delete at least one file", deleted);
     }
 
     @AfterClass

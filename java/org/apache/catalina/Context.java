@@ -86,7 +86,6 @@ public interface Context extends Container, ContextBind {
 
     // ------------------------------------------------------------- Properties
 
-
     /**
      * Returns <code>true</code> if requests mapped to servlets without
      * "multipart config" to parse multipart/form-data requests anyway.
@@ -760,6 +759,30 @@ public interface Context extends Container, ContextBind {
      *         name of each container provided SCI will be checked
      */
     public String getContainerSciFilter();
+
+
+    /**
+     * @return the value of the parallel annotation scanning flag.  If true,
+     * it will dispatch scanning to the utility executor.
+     * @deprecated This method will be removed in Tomcat 11 onwards
+     */
+    @Deprecated
+    public default boolean isParallelAnnotationScanning() {
+        return getParallelAnnotationScanning();
+    }
+
+    /**
+     * @return the value of the parallel annotation scanning flag.  If true,
+     * it will dispatch scanning to the utility executor.
+     */
+    public boolean getParallelAnnotationScanning();
+
+    /**
+     * Set the parallel annotation scanning value.
+     *
+     * @param parallelAnnotationScanning new parallel annotation scanning flag
+     */
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning);
 
 
     // --------------------------------------------------------- Public Methods
@@ -1931,5 +1954,18 @@ public interface Context extends Container, ContextBind {
      */
     public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject);
 
+
+    /**
+     * @return <code>true</code> if the resources archive lookup will
+     * use a bloom filter.
+     */
+    public boolean getUseBloomFilterForArchives();
+
+    /**
+     * Set bloom filter flag value.
+     *
+     * @param useBloomFilterForArchives The new fast class path scan flag
+     */
+    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives);
 
 }

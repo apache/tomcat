@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.el;
 
 import java.beans.FeatureDescriptor;
@@ -22,14 +21,26 @@ import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Objects;
 
+/**
+ * Standard ELResolver for working with arrays.
+ */
 public class ArrayELResolver extends ELResolver {
 
     private final boolean readOnly;
 
+    /**
+     * Creates a writable instance of the standard array resolver.
+     */
     public ArrayELResolver() {
         this.readOnly = false;
     }
 
+    /**
+     * Creates an instance of the standard array resolver.
+     *
+     * @param readOnly  {@code true} if the created instance should be read-only
+     *                  otherwise false.
+     */
     public ArrayELResolver(boolean readOnly) {
         this.readOnly = readOnly;
     }
@@ -45,6 +56,13 @@ public class ArrayELResolver extends ELResolver {
                 checkBounds(base, idx);
             } catch (IllegalArgumentException e) {
                 // ignore
+            }
+            /*
+             * The resolver may have been created in read-only mode but the
+             * array and its elements will always be read-write.
+             */
+            if (readOnly) {
+                return null;
             }
             return base.getClass().getComponentType();
         }
@@ -78,7 +96,7 @@ public class ArrayELResolver extends ELResolver {
 
             if (this.readOnly) {
                 throw new PropertyNotWritableException(Util.message(context,
-                        "resolverNotWriteable", base.getClass().getName()));
+                        "resolverNotWritable", base.getClass().getName()));
             }
 
             int idx = coerce(property);
@@ -110,6 +128,7 @@ public class ArrayELResolver extends ELResolver {
         return this.readOnly;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         return null;

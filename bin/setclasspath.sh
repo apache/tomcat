@@ -17,8 +17,7 @@
 
 # -----------------------------------------------------------------------------
 #  Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
-#  are valid and consistent with the selected start-up options and set up the
-#  endorsed directory.
+#  are valid and consistent with the selected start-up options.
 # -----------------------------------------------------------------------------
 
 # Make sure prerequisite environment variables are set
@@ -74,16 +73,6 @@ if [ "$1" = "debug" ] ; then
       echo "NB: JAVA_HOME should point to a JDK not a JRE"
       exit 1
     fi
-  fi
-fi
-
-# Don't override the endorsed dir if the user has set it previously
-if [ -z "$JAVA_ENDORSED_DIRS" ]; then
-  # Java 9 no longer supports the java.endorsed.dirs
-  # system property. Only try to use it if
-  # CATALINA_HOME/endorsed exists.
-  if [ -d "$CATALINA_HOME"/endorsed ]; then
-    JAVA_ENDORSED_DIRS="$CATALINA_HOME"/endorsed
   fi
 fi
 

@@ -24,18 +24,20 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.TLSClientHelloExtractor.ExtractorResult;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
@@ -67,6 +69,8 @@ public class SecureNioChannel extends NioChannel {
 
     protected boolean closed = false;
     protected boolean closing = false;
+
+    private final Map<String,List<String>> additionalTlsAttributes = new HashMap<>();
 
     public SecureNioChannel(SocketBufferHandler bufHandler, NioEndpoint endpoint) {
         super(bufHandler);
@@ -170,9 +174,8 @@ public class SecureNioChannel extends NioChannel {
                         if (sslEngine instanceof SSLUtil.ProtocolInfo) {
                             socketWrapper.setNegotiatedProtocol(
                                     ((SSLUtil.ProtocolInfo) sslEngine).getNegotiatedProtocol());
-                        } else if (JreCompat.isAlpnSupported()) {
-                            socketWrapper.setNegotiatedProtocol(
-                                    JreCompat.getInstance().getApplicationProtocol(sslEngine));
+                        } else {
+                            socketWrapper.setNegotiatedProtocol(sslEngine.getApplicationProtocol());
                         }
                     }
                     //we are complete if we have delivered the last package
@@ -184,10 +187,8 @@ public class SecureNioChannel extends NioChannel {
                     try {
                         handshake = handshakeWrap(write);
                     } catch (SSLException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("channel.nio.ssl.wrapException"), e);
-                        }
                         handshake = handshakeWrap(write);
+                        throw e;
                     }
                     if (handshake.getStatus() == Status.OK) {
                         if (handshakeStatus == HandshakeStatus.NEED_TASK) {
@@ -303,6 +304,13 @@ public class SecureNioChannel extends NioChannel {
         sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers,
                 clientRequestedApplicationProtocols);
 
+        // Populate additional TLS attributes obtained from the handshake that
+        // aren't available from the session
+        additionalTlsAttributes.put(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY,
+                extractor.getClientRequestedProtocols());
+        additionalTlsAttributes.put(SSLSupport.REQUESTED_CIPHERS_KEY,
+                extractor.getClientRequestedCipherNames());
+
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.
         getBufHandler().expand(sslEngine.getSession().getApplicationBufferSize());
@@ -351,7 +359,7 @@ public class SecureNioChannel extends NioChannel {
         }
         handshakeComplete = false;
         boolean isReadable = false;
-        boolean isWriteable = false;
+        boolean isWritable = false;
         boolean handshaking = true;
         Selector selector = null;
         SelectionKey key = null;
@@ -359,7 +367,7 @@ public class SecureNioChannel extends NioChannel {
             sslEngine.beginHandshake();
             handshakeStatus = sslEngine.getHandshakeStatus();
             while (handshaking) {
-                int hsStatus = this.handshake(isReadable, isWriteable);
+                int hsStatus = this.handshake(isReadable, isWritable);
                 switch (hsStatus) {
                     case -1 :
                         throw new EOFException(sm.getString("channel.nio.ssl.eofDuringHandshake"));
@@ -379,7 +387,7 @@ public class SecureNioChannel extends NioChannel {
                             throw new SocketTimeoutException(sm.getString("channel.nio.ssl.timeoutDuringHandshake"));
                         }
                         isReadable = key.isReadable();
-                        isWriteable = key.isWritable();
+                        isWritable = key.isWritable();
                 }
             }
         } catch (IOException x) {
@@ -487,6 +495,14 @@ public class SecureNioChannel extends NioChannel {
         return result;
     }
 
+    public SSLSupport getSSLSupport() {
+        if (sslEngine != null) {
+            SSLSession session = sslEngine.getSession();
+            return endpoint.getSslImplementation().getSSLSupport(session, additionalTlsAttributes);
+        }
+        return null;
+    }
+
     /**
      * Sends an SSL close message, will not physically close the connection here.
      * <br>To close the connection, you could do something like
@@ -505,6 +521,11 @@ public class SecureNioChannel extends NioChannel {
             return;
         }
         closing = true;
+        if (sslEngine == null) {
+            netOutBuffer.clear();
+            closed = true;
+            return;
+        }
         sslEngine.closeOutbound();
 
         if (!flush(netOutBuffer)) {
@@ -626,6 +647,14 @@ public class SecureNioChannel extends NioChannel {
                                 sm.getString("channel.nio.ssl.unwrapFailResize", unwrap.getStatus()));
                     }
                 }
+            } else if (unwrap.getStatus() == Status.CLOSED && netInBuffer.position() == 0 && read > 0) {
+                // Clean TLS close on input side but there is application data
+                // to process. Can't tell if the client closed the connection
+                // mid-request or if the client is performing a half-close after
+                // a complete request. Assume it is a half-close and allow
+                // processing to continue. If the connection has been closed
+                // mid-request then the next attempt to read will trigger an
+                // EOF.
             } else {
                 // Something else went wrong
                 throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
@@ -755,8 +784,6 @@ public class SecureNioChannel extends NioChannel {
     public int write(ByteBuffer src) throws IOException {
         checkInterruptStatus();
         if (src == this.netOutBuffer) {
-            //we can get here through a recursive call
-            //by using the NioBlockingSelector
             int written = sc.write(src);
             return written;
         } else {
@@ -767,6 +794,11 @@ public class SecureNioChannel extends NioChannel {
 
             if (!flush(netOutBuffer)) {
                 // We haven't emptied out the buffer yet
+                return 0;
+            }
+
+            if (!src.hasRemaining()) {
+                // Nothing left to write
                 return 0;
             }
 
@@ -816,7 +848,9 @@ public class SecureNioChannel extends NioChannel {
         netOutBuffer.flip();
 
         if (result.getStatus() == Status.OK) {
-            if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
+            if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
+                tasks();
+            }
         } else {
             throw new IOException(sm.getString("channel.nio.ssl.wrapFail", result.getStatus()));
         }

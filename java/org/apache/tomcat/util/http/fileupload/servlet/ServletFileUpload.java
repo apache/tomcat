@@ -34,7 +34,7 @@ import org.apache.tomcat.util.http.fileupload.FileUploadException;
  * <p>High level API for processing file uploads.</p>
  *
  * <p>This class handles multiple files per single HTML widget, sent using
- * <code>multipart/mixed</code> encoding type, as specified by
+ * {@code multipart/mixed} encoding type, as specified by
  * <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>.  Use {@link
  * #parseRequest(org.apache.tomcat.util.http.fileupload.RequestContext)} to
  * acquire a list of {@link org.apache.tomcat.util.http.fileupload.FileItem}s
@@ -59,11 +59,11 @@ public class ServletFileUpload extends FileUpload {
      *
      * @param request The servlet request to be evaluated. Must be non-null.
      *
-     * @return <code>true</code> if the request is multipart;
-     *         <code>false</code> otherwise.
+     * @return {@code true} if the request is multipart;
+     *         {@code false} otherwise.
      */
     public static final boolean isMultipartContent(
-            HttpServletRequest request) {
+            final HttpServletRequest request) {
         if (!POST_METHOD.equalsIgnoreCase(request.getMethod())) {
             return false;
         }
@@ -73,24 +73,23 @@ public class ServletFileUpload extends FileUpload {
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Constructs an uninitialised instance of this class. A factory must be
-     * configured, using <code>setFileItemFactory()</code>, before attempting
+     * Constructs an uninitialized instance of this class. A factory must be
+     * configured, using {@code setFileItemFactory()}, before attempting
      * to parse requests.
      *
      * @see FileUpload#FileUpload(FileItemFactory)
      */
     public ServletFileUpload() {
-        super();
     }
 
     /**
      * Constructs an instance of this class which uses the supplied factory to
-     * create <code>FileItem</code> instances.
+     * create {@code FileItem} instances.
      *
      * @see FileUpload#FileUpload()
      * @param fileItemFactory The factory to use for creating file items.
      */
-    public ServletFileUpload(FileItemFactory fileItemFactory) {
+    public ServletFileUpload(final FileItemFactory fileItemFactory) {
         super(fileItemFactory);
     }
 
@@ -98,29 +97,29 @@ public class ServletFileUpload extends FileUpload {
 
     /**
      * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
-     * compliant <code>multipart/form-data</code> stream.
+     * compliant {@code multipart/form-data} stream.
      *
      * @param request The servlet request to be parsed.
      *
-     * @return A map of <code>FileItem</code> instances parsed from the request.
+     * @return A map of {@code FileItem} instances parsed from the request.
      *
      * @throws FileUploadException if there are problems reading/parsing
      *                             the request or storing files.
      *
      * @since 1.3
      */
-    public Map<String, List<FileItem>> parseParameterMap(HttpServletRequest request)
+    public Map<String, List<FileItem>> parseParameterMap(final HttpServletRequest request)
             throws FileUploadException {
         return parseParameterMap(new ServletRequestContext(request));
     }
 
     /**
      * Processes an <a href="http://www.ietf.org/rfc/rfc1867.txt">RFC 1867</a>
-     * compliant <code>multipart/form-data</code> stream.
+     * compliant {@code multipart/form-data} stream.
      *
      * @param request The servlet request to be parsed.
      *
-     * @return An iterator to instances of <code>FileItemStream</code>
+     * @return An iterator to instances of {@code FileItemStream}
      *         parsed from the request, in the order that they were
      *         transmitted.
      *
@@ -130,7 +129,7 @@ public class ServletFileUpload extends FileUpload {
      *   error while communicating with the client or a problem while
      *   storing the uploaded content.
      */
-    public FileItemIterator getItemIterator(HttpServletRequest request)
+    public FileItemIterator getItemIterator(final HttpServletRequest request)
     throws FileUploadException, IOException {
         return super.getItemIterator(new ServletRequestContext(request));
     }

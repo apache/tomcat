@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.modeler;
 
 
@@ -307,8 +305,9 @@ public class ManagedBean implements java.io.Serializable {
             if( clazz==null ) {
                 try {
                     ClassLoader cl= Thread.currentThread().getContextClassLoader();
-                    if ( cl != null)
+                    if ( cl != null) {
                         clazz= cl.loadClass(getClassName());
+                    }
                 } catch (Exception e) {
                     ex=e;
                 }
@@ -333,8 +332,9 @@ public class ManagedBean implements java.io.Serializable {
 
         // Set the managed resource (if any)
         try {
-            if (instance != null)
+            if (instance != null) {
                 mbean.setManagedResource(instance, "ObjectReference");
+            }
         } catch (InstanceNotFoundException e) {
             throw e;
         }
@@ -367,21 +367,24 @@ public class ManagedBean implements java.io.Serializable {
                 AttributeInfo attrs[] = getAttributes();
                 MBeanAttributeInfo attributes[] =
                     new MBeanAttributeInfo[attrs.length];
-                for (int i = 0; i < attrs.length; i++)
+                for (int i = 0; i < attrs.length; i++) {
                     attributes[i] = attrs[i].createAttributeInfo();
+                }
 
                 OperationInfo opers[] = getOperations();
                 MBeanOperationInfo operations[] =
                     new MBeanOperationInfo[opers.length];
-                for (int i = 0; i < opers.length; i++)
+                for (int i = 0; i < opers.length; i++) {
                     operations[i] = opers[i].createOperationInfo();
+                }
 
 
                 NotificationInfo notifs[] = getNotifications();
                 MBeanNotificationInfo notifications[] =
                     new MBeanNotificationInfo[notifs.length];
-                for (int i = 0; i < notifs.length; i++)
+                for (int i = 0; i < notifs.length; i++) {
                     notifications[i] = notifs[i].createNotificationInfo();
+                }
 
 
                 // Construct and return a new ModelMBeanInfo object
@@ -419,7 +422,7 @@ public class ManagedBean implements java.io.Serializable {
         }
         sb.append(", type=");
         sb.append(type);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
 
     }
@@ -431,8 +434,9 @@ public class ManagedBean implements java.io.Serializable {
 
         AttributeInfo attrInfo = attributes.get(aname);
         // Look up the actual operation to be used
-        if (attrInfo == null)
+        if (attrInfo == null) {
             throw new AttributeNotFoundException(sm.getString("managedMBean.noAttribute", aname, resource));
+        }
 
         String getMethod = attrInfo.getGetMethod();
 
@@ -505,22 +509,26 @@ public class ManagedBean implements java.io.Serializable {
 
         Method method = null;
 
-        if (params == null)
+        if (params == null) {
             params = new Object[0];
-        if (signature == null)
+        }
+        if (signature == null) {
             signature = new String[0];
-        if (params.length != signature.length)
+        }
+        if (params.length != signature.length) {
             throw new RuntimeOperationsException(
                     new IllegalArgumentException(sm.getString("managedMBean.inconsistentArguments")),
                     sm.getString("managedMBean.inconsistentArguments"));
+        }
 
         // Acquire the ModelMBeanOperationInfo information for
         // the requested operation
         OperationInfo opInfo =
                 operations.get(createOperationKey(aname, signature));
-        if (opInfo == null)
+        if (opInfo == null) {
             throw new MBeanException(new ServiceNotFoundException(sm.getString("managedMBean.noOperation", aname)),
                     sm.getString("managedMBean.noOperation", aname));
+        }
 
         // Prepare the signature required by Java reflection APIs
         // FIXME - should we use the signature from opInfo?
@@ -559,7 +567,7 @@ public class ManagedBean implements java.io.Serializable {
     private String createOperationKey(OperationInfo operation) {
         StringBuilder key = new StringBuilder(operation.getName());
         key.append('(');
-        StringUtils.join(operation.getSignature(), ',', (x) -> x.getType(), key);
+        StringUtils.join(operation.getSignature(), ',', FeatureInfo::getType, key);
         key.append(')');
 
         return key.toString().intern();

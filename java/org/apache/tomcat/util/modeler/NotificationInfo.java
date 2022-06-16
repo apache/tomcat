@@ -30,7 +30,7 @@ import javax.management.MBeanNotificationInfo;
  */
 public class NotificationInfo extends FeatureInfo {
 
-    static final long serialVersionUID = -6319885418912650856L;
+    private static final long serialVersionUID = -6319885418912650856L;
 
     // ----------------------------------------------------- Instance Variables
 
@@ -117,8 +117,9 @@ public class NotificationInfo extends FeatureInfo {
     public MBeanNotificationInfo createNotificationInfo() {
 
         // Return our cached information (if any)
-        if (info != null)
+        if (info != null) {
             return info;
+        }
 
         // Create and return a new information object
         info = new MBeanNotificationInfo
@@ -150,7 +151,7 @@ public class NotificationInfo extends FeatureInfo {
         } finally {
             readLock.unlock();
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.reflect.Constructor;
@@ -56,6 +54,13 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         // nothing to do
     }
 
+    /*
+     * Neither the class nor the constructor are exposed outside of jdbc-pool.
+     * Given the comments in the jdbc-pool code regarding caching for
+     * performance, continue to use Proxy.getProxyClass(). This will need to be
+     * revisited if that method is marked for removal.
+     */
+    @SuppressWarnings("deprecation")
     protected Constructor<?> getResultSetConstructor() throws NoSuchMethodException {
         if (resultSetConstructor == null) {
             Class<?> proxyClass = Proxy.getProxyClass(StatementDecoratorInterceptor.class.getClassLoader(),
@@ -212,14 +217,17 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             // was close invoked?
             boolean close = compare(CLOSE_VAL, method);
             // allow close to be called multiple times
-            if (close && closed)
-                return null;
+            if (close && closed) {
+              return null;
+            }
             // are we calling isClosed?
-            if (compare(ISCLOSED_VAL, method))
-                return Boolean.valueOf(closed);
+            if (compare(ISCLOSED_VAL, method)) {
+              return Boolean.valueOf(closed);
+            }
             // if we are calling anything else, bail out
-            if (closed)
-                throw new SQLException("Statement closed.");
+            if (closed) {
+              throw new SQLException("Statement closed.");
+            }
             if (compare(GETCONNECTION_VAL,method)){
                 return connection;
             }

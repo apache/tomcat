@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.servlet.http;
 
 /**
@@ -36,10 +35,14 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
 
     private static final long serialVersionUID = 1L;
 
-    /* The name to which the object is being bound or unbound */
+    /**
+     *  The name to which the object is being bound or unbound.
+     */
     private final String name;
 
-    /* The object is being bound or unbound */
+    /**
+     *  The object is being bound or unbound.
+     */
     private final Object value;
 
     /**
@@ -111,7 +114,7 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
      *         value of the removed attribute. If the attribute was replaced,
      *         this is the old value of the attribute.
      *
-     * @since 2.3
+     * @since Servlet 2.3
      */
     public Object getValue() {
         return this.value;

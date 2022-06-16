@@ -294,10 +294,10 @@
       default to reduce exposure to a DOS attack.</p>
 
       <p>The <strong>maxSavePostSize</strong> attribute controls the saving of
-      POST requests during FORM and CLIENT-CERT authentication. The parameters
-      are cached for the duration of the authentication (which may be many
-      minutes) so this is limited to 4KB by default to reduce exposure to a DOS
-      attack.</p>
+      the request body during FORM and CLIENT-CERT authentication and HTTP/1.1
+      upgrade. For FORM authentication, the request body is cached for the
+      duration of the authentication (which may be many minutes) so this is
+      limited to 4KB by default to reduce exposure to a DOS attack.</p>
 
       <p>The <strong>maxParameterCount</strong> attribute controls the
       maximum number of parameter and value pairs (GET plus POST) that can
@@ -440,10 +440,6 @@
       <p>The MemoryRealm is not intended for production use as any changes to
       tomcat-users.xml require a restart of Tomcat to take effect.</p>
 
-      <p>The JDBCRealm is not recommended for production use as it is single
-      threaded for all authentication and authorization options. Use the
-      DataSourceRealm instead.</p>
-
       <p>The UserDatabaseRealm is not intended for large-scale installations. It
       is intended for small-scale, relatively static environments.</p>
 
@@ -468,6 +464,12 @@
       <p>The <strong>persistAuthentication</strong> controls whether the
       authenticated Principal associated with the session (if any) is included
       when the session is persisted during a restart or to a Store.</p>
+
+      <p>When using the <strong>JDBCStore</strong>, the session store should be
+      secured (dedicated credentials, appropriate permissions) such that only
+      the <strong>JDBCStore</strong> is able to access the persisted session
+      data. In particular, the <strong>JDBCStore</strong> should not be
+      accessible via any credentials available to a web application.</p>
     </subsection>
 
     <subsection name="Cluster">
@@ -475,10 +477,12 @@
       trusted network is used for all of the cluster related network traffic. It
       is not safe to run a cluster on a insecure, untrusted network.</p>
 
-      <p>If you are operating on an untrusted network or would prefer to
-      exercise an over-abundance of caution, you can use the
+      <p>If you require confidentiality and/or integrity protection then you can
+      use the
       <a href="config/cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
-      to encrypt traffic between nodes.</p>
+      to encrypt traffic between nodes. This interceptor does not protect
+      against all the risks of running on an untrusted network, particularly
+      DoS attacks.</p>
     </subsection>
   </section>
 

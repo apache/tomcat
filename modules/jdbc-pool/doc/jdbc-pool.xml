@@ -917,7 +917,7 @@
         a string value comparison when the <code>useEquals=true</code> flag is set.
     </p>
     <p>Pool start/stop<br/>
-       When the connection pool is started or closed, you can be notifed. You will only be notified once per interceptor class
+       When the connection pool is started or closed, you can be notified. You will only be notified once per interceptor class
        even though it is an instance method. and you will be notified using an interceptor currently not attached to a pool.
     </p>
 <source><![CDATA[  public void poolStarted(ConnectionPool pool) {

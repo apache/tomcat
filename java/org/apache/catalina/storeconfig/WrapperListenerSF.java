@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
@@ -41,9 +40,10 @@ public class WrapperListenerSF extends StoreFactoryBase {
             String[] listeners = ((StandardContext) aElement)
                     .findWrapperListeners();
             if (elementDesc != null) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("store " + elementDesc.getTag() + "( " + aElement
                             + " )");
+                }
                 getStoreAppender().printTagArray(aWriter, "WrapperListener",
                         indent, listeners);
             }

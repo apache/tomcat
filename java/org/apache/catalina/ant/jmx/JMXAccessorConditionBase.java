@@ -170,8 +170,9 @@ public abstract class JMXAccessorConditionBase extends ProjectComponent implemen
         try {
             Object result = getJMXConnection().getAttribute(
                     new ObjectName(name), attribute);
-            if(result != null)
+            if (result != null) {
                 return result.toString();
+            }
         } catch (Exception e) {
             // ignore access or connection open errors
         }

@@ -34,7 +34,6 @@
     <tei-class>org.apache.jasper.compiler.TestScriptingVariabler$Bug48616bTei</tei-class>
     <body-content>JSP</body-content>
   </tag>
-
   <tag>
     <name>Bug48701a</name>
     <tag-class>org.apache.jasper.compiler.TestGenerator$Bug48701</tag-class>
@@ -54,16 +53,17 @@
   <tag>
     <name>Bug48701c</name>
     <tag-class>org.apache.jasper.compiler.TestGenerator$Bug48701</tag-class>
-    <body-content>empty</body-content>
-    <attribute>
-      <name>beanName</name>
-      <type>java.lang.String</type>
-    </attribute>
+    <body-content>JSP</body-content>
     <variable>
       <name-from-attribute>beanName</name-from-attribute>
       <variable-class>org.apache.jasper.compiler.TestGenerator.Bean</variable-class>
       <scope>AT_END</scope>
     </variable>
+    <attribute>
+      <name>beanName</name>
+      <rtexprvalue>true</rtexprvalue>
+      <type>java.lang.String</type>
+    </attribute>
   </tag>
   <tag>
     <name>Bug56529</name>
@@ -77,6 +77,110 @@
     <attribute>
       <name>attribute2</name>
       <required>true</required>
+    </attribute>
+  </tag>
+  <tag>
+    <name>JspIdTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$JspIdTag</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
+  <tag>
+    <name>TryCatchFinallyTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TryCatchFinallyTag</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
+  <tag>
+    <name>TryCatchFinallyBodyTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TryCatchFinallyBodyTag</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
+  <tag>
+    <name>TesterBodyTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TesterBodyTag</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
+  <tag>
+    <name>TesterTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TesterTag</tag-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>foo</name>
+      <required>false</required>
+    </attribute>
+  </tag>
+  <tag>
+    <name>TesterTagA</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TesterTagA</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
+  <tag>
+    <name>TesterScriptingTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TesterScriptingTag</tag-class>
+    <body-content>JSP</body-content>
+    <variable>
+      <name-given>variable01</name-given>
+    </variable>
+    <variable>
+      <name-from-attribute>attribute02</name-from-attribute>
+    </variable>
+    <variable>
+      <name-from-attribute>attribute03</name-from-attribute>
+      <declare>false</declare>
+    </variable>
+    <attribute>
+      <name>attribute02</name>
+    </attribute>
+    <attribute>
+      <name>attribute03</name>
+    </attribute>
+  </tag>
+  <tag>
+    <name>TesterScriptingTagB</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TesterScriptingTagB</tag-class>
+    <tei-class>org.apache.jasper.compiler.TestGenerator$TesterScriptingTagBTEI</tei-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>attribute02</name>
+    </attribute>
+  </tag>
+  <tag>
+    <name>TesterDynamicTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TesterDynamicTag</tag-class>
+    <body-content>JSP</body-content>
+    <dynamic-attributes>true</dynamic-attributes>
+  </tag>
+  <tag>
+    <name>TesterAttributeTag</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TesterAttributeTag</tag-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <name>attribute01</name>
+      <deferred-value/>
+    </attribute>
+    <attribute>
+      <name>attribute02</name>
+      <rtexprvalue>true</rtexprvalue>
+      <deferred-value/>
+    </attribute>
+    <attribute>
+      <name>attribute03</name>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>attribute04</name>
+      <rtexprvalue>true</rtexprvalue>
+      <type>jakarta.el.ValueExpression</type>
+    </attribute>
+    <attribute>
+      <name>attribute05</name>
+      <deferred-method>
+        <method-signature>java.lang.String sayHello(java.lang.String)</method-signature>
+      </deferred-method>
+    </attribute>
+    <attribute>
+      <name>attribute06</name>
+      <rtexprvalue>true</rtexprvalue>
+      <type>jakarta.el.MethodExpression</type>
     </attribute>
   </tag>
   <function>

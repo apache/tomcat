@@ -97,8 +97,9 @@ public class ContextAccessController {
      * @param token Security token
      */
     public static void setWritable(Object name, Object token) {
-        if (checkSecurityToken(name, token))
+        if (checkSecurityToken(name, token)) {
             readOnlyContexts.remove(name);
+        }
     }
 
 

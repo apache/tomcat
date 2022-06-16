@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.persistence;
 
 import java.lang.annotation.Retention;
@@ -25,6 +24,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 
 public @interface PersistenceProperty {
-   String name();
-   String value();
+    String name();
+    String value();
 }

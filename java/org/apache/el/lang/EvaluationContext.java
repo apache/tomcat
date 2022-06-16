@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el.lang;
 
 import java.util.List;
@@ -148,7 +147,7 @@ public final class EvaluationContext extends ELContext {
     }
 
     @Override
-    public Object convertToType(Object obj, Class<?> type) {
+    public <T> T convertToType(Object obj, Class<T> type) {
         return elContext.convertToType(obj, type);
     }
 }

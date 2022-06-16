@@ -23,7 +23,7 @@
     &project;
 
   <properties>
-    <title>GraalVM support</title>
+    <title>Ahead of Time compilation support</title>
   </properties>
 
 <body>
@@ -64,14 +64,14 @@
 cd $JAVA_HOME/bin
 ./gu install native-image</source>
    Mandrel already includes the Native Image tool ready to use, so this
-   step can be skipped. Only JAVA_HOME must be set to the mandrelJDK folder,
-   such as:
-   <source>export JAVA_HOME=/absolute...path...to/mandrel-javaXX-platform-x.x.x.x</source>
+   step can be skipped. Only JAVA_HOME must be set to the folder which
+   contains the bin folder with the JVM binaries, such as:
+   <source>export JAVA_HOME=/absolute...path...to/mandrel-javaXX-platform-x.x.x.x/mandrelJDK</source>
   </p>
 
   <p>
     Download the Tomcat Stuffed module from
-    https://github.com/apache/tomcat/tree/master/modules/stuffed and place
+    https://github.com/apache/tomcat/tree/main/modules/stuffed and place
     all the files in a folder <code>stuffed</code> in this documentation.
     <source>export TOMCAT_STUFFED=/absolute...path...to/stuffed</source>
     The build process now requires both Ant and Maven.
@@ -128,6 +128,7 @@ mvn package</source>
     Run the GraalVM substrate VM using the trace agent:
     <source>$JAVA_HOME/bin/java\
         -agentlib:native-image-agent=config-output-dir=$TOMCAT_STUFFED/target/\
+        -Dorg.graalvm.nativeimage.imagecode=agent\
         -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties\
         -jar target/tomcat-stuffed-1.0.jar --catalina -useGeneratedCode</source>
   </p>
@@ -146,6 +147,14 @@ mvn package</source>
     not traced, including: base interfaces, resource bundles, BeanInfo based
     reflection, etc. Please refer to the Graal documentation for more
     information on this process.
+  </p>
+
+  <p>
+    Even though all classes that are used have to be complied AOT into the
+    native image, webapps must still be left unchanged, and continue including
+    all needed classes and JARs in the <code>WEB-INF</code> folder. Although
+    these classes will not actually be run or loaded, access to them is
+    required.
   </p>
 
   </section>
@@ -200,9 +209,6 @@ mvn package</source>
   <p>
     Missing items for better Tomcat functionality:
     <ul>
-      <li><a href="https://github.com/oracle/graal/issues/460">Java
-        serialization</a>: Clustering and session persistence are not
-        functional</li>
       <li><a href="https://github.com/oracle/graal/issues/2103">JMX</a>:
         The usual monitoring and management is not usable</li>
       <li>java.util.logging LogManager: Configuration through a system property

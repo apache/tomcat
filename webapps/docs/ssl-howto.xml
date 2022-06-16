@@ -115,9 +115,7 @@ for your version of Java for details on protocol and algorithm support.</p>
 the <a href="https://www.openssl.org/">OpenSSL</a> cryptographic provider
 through JCA/JCE/JSSE which may provide a different selection of cryptographic
 algorithms and/or performance benefits relative to the SunJCE provider.
-You can also use <code>tcnative</code> to enable the <a href="apr.html">APR</a>
-connector which uses OpenSSL for its cryptographic operations. Check the
-documentation for your version of OpenSSL for details on protocol and
+Check the documentation for your version of OpenSSL for details on protocol and
 algorithm support.</p>
 
 </section>
@@ -155,7 +153,7 @@ scenarios, they are not suitable for any form of production use.</p>
 
 <p>When securing a website with SSL it's important to make sure that all assets
 that the site uses are served over SSL, so that an attacker can&apos;t bypass
-the security by injecting malicious content in a javascript file or similar. To
+the security by injecting malicious content in a JavaScript file or similar. To
 further enhance the security of your website, you should evaluate to use the
 HSTS header. It allows you to communicate to the browser that your site should
 always be accessed over https.</p>
@@ -254,12 +252,11 @@ Certificate that can be used by your server.</p>
 
 <subsection name="Edit the Tomcat Configuration File">
 <p>
-Tomcat can use three different implementations of SSL:
+Tomcat can use two different implementations of SSL:
 </p>
 <ul>
 <li>JSSE implementation provided as part of the Java runtime</li>
 <li>JSSE implementation that uses OpenSSL</li>
-<li>APR implementation, which uses the OpenSSL engine by default</li>
 </ul>
 <p>
 The exact configuration details depend on which implementation is being used.
@@ -287,32 +284,23 @@ loaded or not, use one of the following:</p>
            sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
            port="8443" .../>]]></source>
 
-<p>The OpenSSL JSSE implementation can also be configured explicitly if needed. If the APR library
-is installed (as for using the APR connector), using the sslImplementationName attribute
-allows enabling it. When using the OpenSSL JSSE implementation, the configuration can use
-either the JSSE attributes or
-the OpenSSL attributes (as used for the APR connector), but must not mix attributes from
-both types in the same SSLHostConfig or Connector element.</p>
+<p>The OpenSSL JSSE implementation can also be configured explicitly if needed.
+If the APR library is installed, using the sslImplementationName attribute
+allows enabling it. When using the OpenSSL JSSE implementation, the
+configuration can use either the JSSE attributes or the OpenSSL attributes, but
+must not mix attributes from both types in the same SSLHostConfig or Connector
+element.</p>
 <source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO implementation and OpenSSL -->
 <Connector protocol="org.apache.coyote.http11.Http11NioProtocol" port="8443"
            sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"
            .../>]]></source>
 
-<p>Alternatively, to specify an APR connector (the APR library must be available) use:</p>
-<source><![CDATA[<!-- Define an HTTP/1.1 Connector on port 8443, APR implementation -->
-<Connector protocol="org.apache.coyote.http11.Http11AprProtocol"
-           port="8443" .../>]]></source>
-
-<p>If you are using APR or JSSE OpenSSL, you have the option of configuring an alternative engine to OpenSSL.</p>
+<p>If you are using JSSE OpenSSL, you have the option of configuring an alternative engine to OpenSSL.</p>
 <source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
           SSLEngine="someengine" SSLRandomSeed="somedevice" />]]></source>
 <p>The default value is</p>
 <source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
           SSLEngine="on" SSLRandomSeed="builtin" />]]></source>
-<p>Also the <code>useAprConnector</code> attribute may be used to have Tomcat default to
-using the APR connector rather than the NIO connector:</p>
-<source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
-          useAprConnector="true" SSLEngine="on" SSLRandomSeed="builtin" />]]></source>
 <p>
 So to enable OpenSSL, make sure the SSLEngine attribute is set to something other than <code>off</code>.
 The default value is <code>on</code> and if you specify another value,
@@ -356,7 +344,7 @@ so it looks something like this:</p>
   is:</p>
 <source><![CDATA[<!-- Define an SSL Coyote HTTP/1.1 Connector on port 8443 -->
 <Connector
-    protocol="org.apache.coyote.http11.Http11AprProtocol"
+    protocol="org.apache.coyote.http11.Http11NioProtocol"
     port="8443"
     maxThreads="150"
     SSLEnabled="true" >
@@ -452,6 +440,16 @@ After that you can proceed with importing your Certificate.</p>
     -file &lt;your_certificate_filename&gt;</source>
 </li>
 </ul>
+
+<p>Each Certificate Authority tends to differ slightly from the others. They may
+require slightly different information and/or provide the certificate and
+associated certificate chain in different formats. Additionally, the rules that
+the Certificate Authorities use for issuing certifcates change over time. As a
+result you may find that the commands given above may need to be modified. If
+you require assitance then help is available via the
+<a href="http://tomcat.apache.org/lists.html#tomcat-users">Apache Tomcat users
+mailing list</a>.</p>
+
 </subsection>
 </section>
 
@@ -520,52 +518,18 @@ nsComment="Testing OCSP Certificate"
 </ul>
 </subsection>
 
-<subsection name="Configuring OCSP Connector">
-
-<p>To configure the OCSP connector, first verify that you are loading the Tomcat
-   APR library. Check the <a href="apr.html#Installation">
-   Apache Portable Runtime (APR) based Native library for Tomcat</a>
-for more information about installation of APR. A basic OCSP-enabled connector
- definition in the <code>server.xml</code> file looks as follows:</p>
-<source>
-<![CDATA[<Connector
-    port="8443"
-    protocol="org.apache.coyote.http11.Http11AprProtocol"
-    secure="true"
-    scheme="https"
-    SSLEnabled="true"
-  <SSLHostConfig
-      caCertificateFile="/path/to/ca.pem"
-      certificateVerification="require"
-      certificateVerificationDepth="10" >
-    <Certificate
-        certificateFile="/path/to/ocsp-cert.crt"
-        certificateKeyFile="/path/to/ocsp-cert.key" />
-  </SSLHostConfig>]]>
-</source>
-</subsection>
-
-<subsection name="Starting OCSP Responder">
-  <p>Apache Tomcat will query an OCSP responder server to get the certificate
-  status. When testing, an easy way to create an OCSP responder is by executing
-   the following:
-  <source>openssl ocsp -port 127.0.0.1:8088 \
-    -text -sha256 -index index.txt \
-    -CA ca-chain.cert.pem -rkey ocsp-cert.key \
-    -rsigner ocsp-cert.crt</source> </p>
-
- <p>Do note that when using OCSP, the responder encoded in the connector
-   certificate must be running. For further information, see
-   <a href="https://www.openssl.org/docs/man1.1.0/apps/ocsp.html">
-     OCSP documentation
-   </a>.
- </p>
-
-</subsection>
-
 </section>
 
 <section name="Troubleshooting">
+
+<p>Additional information may be obtained about TLS handshake failures by
+configuring the dedicated TLS handshake logger to log debug level messages by
+adding the following to <code>$CATALINA_BASE/conf/logging.properties</code>:
+<source>org.apache.tomcat.util.net.NioEndpoint.handshake.level=FINE</source>
+or
+<source>org.apache.tomcat.util.net.Nio2Endpoint.handshake.level=FINE</source>
+depending on the <strong>Connector</strong> being used.
+</p>
 
 <p>Here is a list of common problems that you may encounter when setting up
 SSL communications, and what to do about them.</p>
@@ -613,24 +577,6 @@ SSL communications, and what to do about them.</p>
     <a href="#Edit_the_Tomcat_Configuration_File">Tomcat configuration file</a>.
     <strong>REMINDER</strong> - <code>keyAlias</code> values may be case
     sensitive!</p>
-    </li>
-
-<li>My Java-based client aborts handshakes with exceptions such as
-    "java.lang.RuntimeException: Could not generate DH keypair" and
-    "java.security.InvalidAlgorithmParameterException: Prime size must be multiple
-    of 64, and can only range from 512 to 1024 (inclusive)"
-
-    <p>If you are using the APR/native connector or the JSSE OpenSSL implementation,
-    it will determine the strength of ephemeral DH keys from the key size of
-    your RSA certificate. For example a 2048 bit RSA key will result in
-    using a 2048 bit prime for the DH keys. Unfortunately Java 6 only supports
-    768 bit and Java 7 only supports 1024 bit. So if your certificate has a
-    stronger key, old Java clients might produce such handshake failures.
-    As a mitigation you can either try to force them to use another cipher by
-    configuring an appropriate <code>SSLCipherSuite</code> and activate
-    <code>SSLHonorCipherOrder</code>, or embed weak DH params in your
-    certificate file. The latter approach is not recommended because it weakens
-    the SSL security (logjam attack).</p>
     </li>
 
 </ul>
@@ -690,9 +636,6 @@ public class SessionTrackingModeListener implements ServletContextListener {
 
 }]]></source>
 
-  <p>Note: SSL session tracking is implemented for the NIO and NIO2 connectors.
-     It is not yet implemented for the APR connector.</p>
-
 </section>
 
 <section name="Miscellaneous Tips and Bits">
@@ -718,11 +661,6 @@ mgr.invalidateSession();
 // Close the connection since the SSL session will be active until the connection
 // is closed
 response.setHeader("Connection", "close");]]></source>
-  <p>
-    Note that this code is Tomcat specific due to the use of the
-    SSLSessionManager class. This is currently only available for the NIO and
-    NIO2 connectors, not the APR/native connector.
-  </p>
 </section>
 
 </body>

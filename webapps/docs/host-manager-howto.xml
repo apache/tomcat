@@ -68,7 +68,7 @@
   </ul>
   <p>
     Both ways enable you to add, remove, start, and stop virtual hosts. Changes
-    may be presisted by using the <code>persist</code> command. This document
+    may be persisted by using the <code>persist</code> command. This document
     focuses on the text interface. For further information about the graphical
     interface, see
     <a href="html-host-manager-howto.html">Host Manager App -- HTML Interface</a>.
@@ -111,10 +111,9 @@ OK - Listed hosts
 localhost:</source>
   </p>
   <p>
-    Note that in case you retrieve your users using the
-    <code>DataSourceRealm</code>, <code>JDBCRealm</code>, or
-    <code>JNDIRealm</code> mechanism, add the appropriate role in the database
-    or the directory server respectively.
+    If you are using a different realm you will need to add the necessary role
+    to the appropriate user(s) using the standard user management tools for that
+    realm.
   </p>
 </section>
 <section name="List of Commands">

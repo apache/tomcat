@@ -19,8 +19,9 @@ package org.apache.tomcat.websocket.pojo;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.naming.NamingException;
 
 import jakarta.websocket.DecodeException;
 import jakarta.websocket.Decoder;
@@ -42,7 +43,6 @@ public class PojoMessageHandlerWholeText
     private static final StringManager sm =
             StringManager.getManager(PojoMessageHandlerWholeText.class);
 
-    private final List<Decoder> decoders = new ArrayList<>();
     private final Class<?> primitiveType;
 
     public PojoMessageHandlerWholeText(Object pojo, Method method,
@@ -75,13 +75,11 @@ public class PojoMessageHandlerWholeText
             if (decoderClazzes != null) {
                 for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
                     if (Text.class.isAssignableFrom(decoderClazz)) {
-                        Text<?> decoder = (Text<?>) decoderClazz.getConstructor().newInstance();
+                        Text<?> decoder = (Text<?>) createDecoderInstance(decoderClazz);
                         decoder.init(config);
                         decoders.add(decoder);
-                    } else if (TextStream.class.isAssignableFrom(
-                            decoderClazz)) {
-                        TextStream<?> decoder =
-                                (TextStream<?>) decoderClazz.getConstructor().newInstance();
+                    } else if (TextStream.class.isAssignableFrom(decoderClazz)) {
+                        TextStream<?> decoder = (TextStream<?>) createDecoderInstance(decoderClazz);
                         decoder.init(config);
                         decoders.add(decoder);
                     } else {
@@ -89,7 +87,7 @@ public class PojoMessageHandlerWholeText
                     }
                 }
             }
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | NamingException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -124,13 +122,5 @@ public class PojoMessageHandlerWholeText
     @Override
     protected Object convert(String message) {
         return new StringReader(message);
-    }
-
-
-    @Override
-    protected void onClose() {
-        for (Decoder decoder : decoders) {
-            decoder.destroy();
-        }
     }
 }

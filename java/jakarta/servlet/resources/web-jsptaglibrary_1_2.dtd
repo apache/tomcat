@@ -62,7 +62,7 @@ small-icon      optional small-icon that can be used by tools
 large-icon      optional large-icon that can be used by tools
 
 description     a simple string describing the "use" of this taglib,
-                should be user discernable
+                should be user discernible
 
 validator       optional TagLibraryValidator information
 

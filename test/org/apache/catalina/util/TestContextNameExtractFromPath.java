@@ -62,7 +62,7 @@ public class TestContextNameExtractFromPath {
 
 
     @Test
-    public void testConextNameExtractFromPath() throws Exception {
+    public void testContextNameExtractFromPath() throws Exception {
         ContextName cn = ContextName.extractFromPath(path);
         Assert.assertEquals(expectedPath,  cn.getPath());
         Assert.assertEquals(expectedVersion, cn.getVersion());

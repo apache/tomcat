@@ -237,6 +237,35 @@ public class HttpParser {
     }
 
 
+    /**
+     * Is the provided String a token as per RFC 7230?
+     * <br>
+     * Note: token = 1 * tchar (RFC 7230)
+     * <br>
+     * Since a token requires at least 1 tchar, {@code null} and the empty
+     * string ({@code ""}) are not considered to be valid tokens.
+     *
+     * @param s The string to test
+     *
+     * @return {@code true} if the string is a valid token, otherwise
+     *         {@code false}
+     */
+    public static boolean isToken(String s) {
+        if (s == null) {
+            return false;
+        }
+        if (s.isEmpty()) {
+            return false;
+        }
+        for (char c : s.toCharArray()) {
+            if (!isToken(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     public static boolean isHex(int c) {
         // Fast for correct values, slower for some incorrect ones
         try {

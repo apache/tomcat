@@ -21,12 +21,23 @@ import java.util.Set;
 
 /**
  * Common interface for the registration of Filters and Servlets.
+ *
  * @since Servlet 3.0
  */
 public interface Registration {
 
+    /**
+     * Obtain the name of the Servlet.
+     *
+     * @return the name of the Servlet.
+     */
     public String getName();
 
+    /**
+     * Obtain the name of the implementation class for the Servlet.
+     *
+     * @return the name of the implementation class for the Servlet.
+     */
     public String getClassName();
 
     /**
@@ -78,6 +89,11 @@ public interface Registration {
      */
     public Map<String, String> getInitParameters();
 
+    /**
+     * Interface through which a Servlet or Filter registered via one of the
+     * addServlet or addFilter methods, respectively, on ServletContext may be
+     * further configured.
+     */
     public interface Dynamic extends Registration {
 
         /**

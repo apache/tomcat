@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.storeconfig;
 
 import java.io.File;
@@ -77,11 +76,12 @@ public class StandardContextSF extends StoreFactoryBase {
                         .getConfigFile();
                 if (configFile != null) {
                     if (desc.isExternalAllowed()) {
-                        if (desc.isBackup())
+                        if (desc.isBackup()) {
                             storeWithBackup((StandardContext) aContext);
-                        else
+                        } else {
                             storeContextSeparate(aWriter, indent,
                                     (StandardContext) aContext);
+                        }
                         return;
                     }
                 } else if (desc.isExternalOnly()) {
@@ -93,11 +93,12 @@ public class StandardContextSF extends StoreFactoryBase {
                     String baseName = cn.getBaseName();
                     File xml = new File(configBase, baseName + ".xml");
                     context.setConfigFile(xml.toURI().toURL());
-                    if (desc.isBackup())
+                    if (desc.isBackup()) {
                         storeWithBackup((StandardContext) aContext);
-                    else
+                    } else {
                         storeContextSeparate(aWriter, indent,
                                 (StandardContext) aContext);
+                    }
                     return;
                 }
             }
@@ -339,18 +340,24 @@ public class StandardContextSF extends StoreFactoryBase {
 
         List<String> resource = new ArrayList<>();
         for (String wresource : wresources) {
-            if (wresource.equals(confContext))
+            if (wresource.equals(confContext)) {
                 continue;
-            if (wresource.equals(confWeb))
+            }
+            if (wresource.equals(confWeb)) {
                 continue;
-            if (wresource.equals(confHostDefault))
+            }
+            if (wresource.equals(confHostDefault)) {
                 continue;
-            if (wresource.equals(configFile))
+            }
+            if (wresource.equals(configFile)) {
                 continue;
-            if (wresource.equals(webxml))
+            }
+            if (wresource.equals(webxml)) {
                 continue;
-            if (wresource.equals(tomcatwebxml))
+            }
+            if (wresource.equals(tomcatwebxml)) {
                 continue;
+            }
             resource.add(wresource);
         }
         return resource.toArray(new String[0]);

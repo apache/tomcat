@@ -22,6 +22,7 @@ Export-Package: \
     org.apache.jasper.compiler,\
     org.apache.jasper.compiler.tagplugin,\
     org.apache.jasper.el,\
+    org.apache.jasper.optimizations,\
     org.apache.jasper.runtime,\
     org.apache.jasper.security,\
     org.apache.jasper.servlet,\
@@ -32,4 +33,13 @@ Export-Package: \
 -includepackage: \
     org.apache.jasper.resources
 
--includeresource.meta-inf: /META-INF/=../META-INF/jasper.jar/
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/jasper.jar/
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version};\
+        modules='ecj'
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=jasper

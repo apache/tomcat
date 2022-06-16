@@ -38,9 +38,14 @@ public class StaticMember extends MemberImpl {
      * or as a regular hostname, 127.0.0.1 or tomcat01.mydomain.com
      */
     public void setHost(String host) {
-        if ( host == null ) return;
-        if ( host.startsWith("{") ) setHost(Arrays.fromString(host));
-        else try { setHostname(host); }catch (IOException x) { throw new RuntimeException(x);}
+        if ( host == null ) {
+            return;
+        }
+        if ( host.startsWith("{") ) {
+            setHost(Arrays.fromString(host));
+        } else {
+            try { setHostname(host); }catch (IOException x) { throw new RuntimeException(x);}
+        }
 
     }
 
@@ -49,9 +54,14 @@ public class StaticMember extends MemberImpl {
      * or as a regular string value like 'mydomain'. The latter will be converted using ISO-8859-1 encoding
      */
     public void setDomain(String domain) {
-        if ( domain == null ) return;
-        if ( domain.startsWith("{") ) setDomain(Arrays.fromString(domain));
-        else setDomain(Arrays.convert(domain));
+        if ( domain == null ) {
+            return;
+        }
+        if ( domain.startsWith("{") ) {
+            setDomain(Arrays.fromString(domain));
+        } else {
+            setDomain(Arrays.convert(domain));
+        }
     }
 
     /**
@@ -59,7 +69,9 @@ public class StaticMember extends MemberImpl {
      */
     public void setUniqueId(String id) {
         byte[] uuid = Arrays.fromString(id);
-        if ( uuid==null || uuid.length != 16 ) throw new RuntimeException(sm.getString("staticMember.invalid.uuidLength", id));
+        if ( uuid==null || uuid.length != 16 ) {
+            throw new RuntimeException(sm.getString("staticMember.invalid.uuidLength", id));
+        }
         setUniqueId(uuid);
     }
 

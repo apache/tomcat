@@ -52,7 +52,6 @@ public class TestResourceBundleELResolver {
 
         // Check that the method expression does return the keys
         Object result2 = me.invoke(context, null);
-        Assert.assertTrue(result2 instanceof Enumeration);
         @SuppressWarnings("unchecked")
         Enumeration<String> e = (Enumeration<String>) result2;
 
@@ -230,6 +229,7 @@ public class TestResourceBundleELResolver {
      * Tests that a valid FeatureDescriptors are not returned if base is not
      * ResourceBundle.
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     @Test
     public void testGetFeatureDescriptors01() {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();
@@ -245,6 +245,7 @@ public class TestResourceBundleELResolver {
     /**
      * Tests that a valid FeatureDescriptors are returned.
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
     @Test
     public void testGetFeatureDescriptors02() {
         ResourceBundleELResolver resolver = new ResourceBundleELResolver();

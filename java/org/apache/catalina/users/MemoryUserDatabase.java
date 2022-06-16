@@ -528,7 +528,7 @@ public class MemoryUserDatabase implements UserDatabase {
      *
      * @return <code>true</code> if the database is writable
      */
-    public boolean isWriteable() {
+    public boolean isWritable() {
 
         File file = new File(pathname);
         if (!file.isAbsolute()) {
@@ -553,7 +553,7 @@ public class MemoryUserDatabase implements UserDatabase {
             return;
         }
 
-        if (!isWriteable()) {
+        if (!isWritable()) {
             log.warn(sm.getString("memoryUserDatabase.notPersistable"));
             return;
         }
@@ -712,7 +712,7 @@ public class MemoryUserDatabase implements UserDatabase {
         sb.append(this.roles.size());
         sb.append(",userCount=");
         sb.append(this.users.size());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 }

@@ -82,7 +82,7 @@
  * <strong>java:comp/env</strong> namespace.  So the JNDI path given for
  * the dataSourceName parameter is valid for a
  * <code>ConnectionPoolDataSource</code> that is deployed as given in the
- * <a href="../cpdsadapter/package.html">cpdsadapter example</a>
+ * <a href="../cpdsadapter/package-summary.html">cpdsadapter example</a>
  * </p>
  *
  * <p>
@@ -127,7 +127,7 @@
  * Connection pooling is useful in applications regardless of whether they run
  * in a J2EE environment and a <code>DataSource</code> can be used within a
  * simpler environment.  The example below shows SharedPoolDataSource using
- * DriverAdapterCPDS as the backend source, though any CPDS is applicable.
+ * DriverAdapterCPDS as the back end source, though any CPDS is applicable.
  * </p>
  *
  * <code>

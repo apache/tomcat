@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.manager.host;
 
 
@@ -81,7 +79,7 @@ public class Constants {
     public static final String HTML_TAIL_SECTION =
         "<hr size=\"1\" noshade=\"noshade\">\n" +
         "<center><font size=\"-1\" color=\"#525D76\">\n" +
-        " <em>Copyright &copy; 1999-2020, Apache Software Foundation</em>" +
+        " <em>Copyright &copy; 1999-2022, Apache Software Foundation</em>" +
         "</font></center>\n" +
         "\n" +
         "</body>\n" +

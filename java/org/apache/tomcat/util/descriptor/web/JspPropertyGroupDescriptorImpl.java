@@ -72,6 +72,18 @@ public class JspPropertyGroupDescriptorImpl
 
 
     @Override
+    public String getErrorOnELNotFound() {
+        String result = null;
+
+        if (jspPropertyGroup.getErrorOnELNotFound() != null) {
+            result = jspPropertyGroup.getErrorOnELNotFound().toString();
+        }
+
+        return result;
+    }
+
+
+    @Override
     public String getErrorOnUndeclaredNamespace() {
         String result = null;
 

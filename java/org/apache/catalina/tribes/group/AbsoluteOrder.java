@@ -52,13 +52,17 @@ public class AbsoluteOrder {
 
 
     public static void absoluteOrder(Member[] members) {
-        if ( members == null || members.length <= 1 ) return;
+        if ( members == null || members.length <= 1 ) {
+            return;
+        }
         Arrays.sort(members,comp);
     }
 
     public static void absoluteOrder(List<Member> members) {
-        if ( members == null || members.size() <= 1 ) return;
-        java.util.Collections.sort(members, comp);
+        if ( members == null || members.size() <= 1 ) {
+            return;
+        }
+        members.sort(comp);
     }
 
     public static class AbsoluteComparator implements Comparator<Member>,
@@ -69,8 +73,12 @@ public class AbsoluteOrder {
         @Override
         public int compare(Member m1, Member m2) {
             int result = compareIps(m1,m2);
-            if ( result == 0 ) result = comparePorts(m1,m2);
-            if ( result == 0 ) result = compareIds(m1,m2);
+            if ( result == 0 ) {
+                result = comparePorts(m1,m2);
+            }
+            if ( result == 0 ) {
+                result = compareIds(m1,m2);
+            }
             return result;
         }
 

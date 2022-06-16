@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.util;
 
 
@@ -68,12 +66,15 @@ public class ServerInfo {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
-        if (info == null || info.equals("Apache Tomcat/@VERSION@"))
-            info = "Apache Tomcat/10.0.x-dev";
-        if (built == null || built.equals("@VERSION_BUILT@"))
+        if (info == null || info.equals("Apache Tomcat/@VERSION@")) {
+            info = "Apache Tomcat/10.1.x-dev";
+        }
+        if (built == null || built.equals("@VERSION_BUILT@")) {
             built = "unknown";
-        if (number == null || number.equals("@VERSION_NUMBER@"))
-            number = "10.0.x";
+        }
+        if (number == null || number.equals("@VERSION_NUMBER@")) {
+            number = "10.1.x";
+        }
 
         serverInfo = info;
         serverBuilt = built;

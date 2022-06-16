@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serializable;
@@ -79,7 +77,7 @@ public class SecurityRoleRef implements Serializable {
             sb.append(", link=");
             sb.append(link);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

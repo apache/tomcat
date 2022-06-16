@@ -87,13 +87,13 @@ that is included with Apache Tomcat solves this by triggering the driver scan
 during Tomcat startup. This is enabled by default. It means that only
 libraries visible to the common class loader and its parents will be scanned for
 database drivers. This include drivers in <code>$CATALINA_HOME/lib</code>,
-<code>$CATALINA_BASE/lib</code>, the class path and (where the JRE supports it)
-the endorsed directory. Drivers packaged in web applications (in
-<code>WEB-INF/lib</code>) and in the shared class loader (where configured) will
-not be visible and will not be loaded automatically. If you are considering
-disabling this feature, note that the scan would be triggered by the first web
-application that is using JDBC, leading to failures when this web application is
-reloaded and for other web applications that rely on this feature.
+<code>$CATALINA_BASE/lib</code>, the class path and the modeul path. Drivers
+packaged in web applications (in <code>WEB-INF/lib</code>) and in the shared
+class loader (where configured) will not be visible and will not be loaded
+automatically. If you are considering disabling this feature, note that the scan
+would be triggered by the first web application that is using JDBC, leading to
+failures when this web application is reloaded and for other web applications
+that rely on this feature.
 </p>
 
 <p>Thus, the web applications that have database drivers in their
@@ -294,11 +294,12 @@ resource to your <a href="config/context.html">Context</a>.</p>
 <h5>3. web.xml configuration</h5>
 
 <p>Now create a <code>WEB-INF/web.xml</code> for this test application.</p>
-<source><![CDATA[<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
-http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-    version="2.4">
+<source><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+  version="6.0">
   <description>MySQL Test App</description>
   <resource-ref>
       <description>DB Connection</description>

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.storeconfig;
 
 import java.util.HashMap;
@@ -182,7 +181,7 @@ public class StoreRegistry {
      */
     public void registerDescription(StoreDescription desc) {
         String key = desc.getId();
-        if (key == null || "".equals(key)) {
+        if (key == null || key.isEmpty()) {
             key = desc.getTagClass();
         }
         descriptors.put(key, desc);

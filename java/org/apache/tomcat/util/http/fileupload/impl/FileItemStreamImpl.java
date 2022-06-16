@@ -33,6 +33,11 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * Default implementation of {@link FileItemStream}.
  */
 public class FileItemStreamImpl implements FileItemStream {
+    /**
+     * The File Item iterator implementation.
+     *
+     * @see FileItemIteratorImpl
+     */
     private final FileItemIteratorImpl fileItemIteratorImpl;
 
     /**
@@ -48,7 +53,7 @@ public class FileItemStreamImpl implements FileItemStream {
     /**
      * The file items file name.
      */
-    final String name;
+    private final String name;
 
     /**
      * Whether the file item is a form field.
@@ -67,36 +72,36 @@ public class FileItemStreamImpl implements FileItemStream {
 
     /**
      * Creates a new instance.
-     * @param pFileItemIterator Iterator for all files in this upload
+     *
+     * @param pFileItemIterator The {@link FileItemIteratorImpl iterator}, which returned this file
+     * item.
      * @param pName The items file name, or null.
      * @param pFieldName The items field name.
      * @param pContentType The items content type, or null.
      * @param pFormField Whether the item is a form field.
      * @param pContentLength The items content length, if known, or -1
-     * @throws FileUploadException If an error is encountered processing the request
      * @throws IOException Creating the file item failed.
+     * @throws FileUploadException Parsing the incoming data stream failed.
      */
-    public FileItemStreamImpl(FileItemIteratorImpl pFileItemIterator, String pName, String pFieldName,
-            String pContentType, boolean pFormField,
-            long pContentLength) throws FileUploadException, IOException {
+    public FileItemStreamImpl(final FileItemIteratorImpl pFileItemIterator, final String pName, final String pFieldName,
+            final String pContentType, final boolean pFormField,
+            final long pContentLength) throws FileUploadException, IOException {
         fileItemIteratorImpl = pFileItemIterator;
         name = pName;
         fieldName = pFieldName;
         contentType = pContentType;
         formField = pFormField;
         final long fileSizeMax = fileItemIteratorImpl.getFileSizeMax();
-        if (fileSizeMax != -1) { // Check if limit is already exceeded
-            if (pContentLength != -1
-                    && pContentLength > fileSizeMax) {
-                FileSizeLimitExceededException e =
-                        new FileSizeLimitExceededException(
-                                String.format("The field %s exceeds its maximum permitted size of %s bytes.",
-                                        fieldName, Long.valueOf(fileSizeMax)),
-                                pContentLength, fileSizeMax);
-                e.setFileName(pName);
-                e.setFieldName(pFieldName);
-                throw new FileUploadIOException(e);
-            }
+        if (fileSizeMax != -1 && pContentLength != -1
+                && pContentLength > fileSizeMax) {
+            final FileSizeLimitExceededException e =
+                    new FileSizeLimitExceededException(
+                            String.format("The field %s exceeds its maximum permitted size of %s bytes.",
+                                    fieldName, Long.valueOf(fileSizeMax)),
+                            pContentLength, fileSizeMax);
+            e.setFileName(pName);
+            e.setFieldName(pFieldName);
+            throw new FileUploadIOException(e);
         }
         // OK to construct stream now
         final ItemInputStream itemStream = fileItemIteratorImpl.getMultiPartStream().newInputStream();
@@ -104,10 +109,10 @@ public class FileItemStreamImpl implements FileItemStream {
         if (fileSizeMax != -1) {
             istream = new LimitedInputStream(istream, fileSizeMax) {
                 @Override
-                protected void raiseError(long pSizeMax, long pCount)
+                protected void raiseError(final long pSizeMax, final long pCount)
                         throws IOException {
                     itemStream.close(true);
-                    FileSizeLimitExceededException e =
+                    final FileSizeLimitExceededException e =
                         new FileSizeLimitExceededException(
                             String.format("The field %s exceeds its maximum permitted size of %s bytes.",
                                    fieldName, Long.valueOf(pSizeMax)),
@@ -206,7 +211,7 @@ public class FileItemStreamImpl implements FileItemStream {
      * @param pHeaders The items header object
      */
     @Override
-    public void setHeaders(FileItemHeaders pHeaders) {
+    public void setHeaders(final FileItemHeaders pHeaders) {
         headers = pHeaders;
     }
 

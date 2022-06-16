@@ -93,14 +93,18 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
         return true;
     }
 
+
     /**
      * Generate a once time token (nonce) for authenticating subsequent
      * requests. The nonce generation is a simplified version of
      * ManagerBase.generateSessionId().
      *
+     * @param request   The request. Unused in this method but present for the
+     *                  the benefit of sub-classes.
+     *
      * @return the generated nonce
      */
-    protected String generateNonce() {
+    protected String generateNonce(HttpServletRequest request) {
         byte random[] = new byte[16];
 
         // Render the result as a String of hexadecimal digits

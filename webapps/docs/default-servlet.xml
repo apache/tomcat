@@ -85,14 +85,14 @@ Tomcat.</p>
 
 <section anchor="change" name="What can I change?">
 <p>
-  The DefaultServlet allows the following initParamters:
+  The DefaultServlet allows the following initParameters:
 </p>
 
 <properties>
   <property name="debug">
         Debugging level. It is not very useful unless you are a tomcat
         developer. As
-        of this writing, useful values are 0, 1, 11, 1000. [0]
+        of this writing, useful values are 0, 1, 11. [0]
   </property>
   <property name="listings">
         If no welcome file is present, can a directory listing be
@@ -180,7 +180,11 @@ Tomcat.</p>
   </property>
   <property name="useBomIfPresent">
         If a static file contains a byte order mark (BOM), should this be used
-        to determine the file encoding in preference to fileEncoding. [true]
+        to determine the file encoding in preference to fileEncoding. This
+        setting must be one of <code>true</code> (remove the BOM and use it in
+        preference to fileEncoding), <code>false</code> (remove the BOM but do
+        not use it) or <code>pass-through</code> (do not use the BOM and do not
+        remove it). [true]
   </property>
   <property name="sendfileSize">
         If the connector used supports sendfile, this represents the minimal
@@ -221,13 +225,13 @@ to DefaultServlet servlet and make the appropriate adjustments. (If not,
 then that method isn't for you)
 </p>
 <p>
-You can use either  <code>localXsltFile</code> or
-<code>globalXsltFile</code> and DefaultServlet will create
+You can use either  <code>localXsltFile</code>, <code>contextXsltFile</code>
+or <code>globalXsltFile</code> and DefaultServlet will create
 an xml document and run it through an xsl transformation based
-on the values provided in <code>localXsltFile</code> and
-<code>globalXsltFile</code>. <code>localXsltFile</code> is first
-checked, followed by <code>globalXsltFile</code>, then default
-behaviors takes place.
+on the values provided in the XSLT file. <code>localXsltFile</code> is first
+checked, then <code>contextXsltFile</code>, followed by
+<code>globalXsltFile</code>. If no XSLT files are configured, default behavior
+is used.
 </p>
 
 <p>

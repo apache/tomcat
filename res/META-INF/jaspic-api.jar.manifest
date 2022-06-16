@@ -7,5 +7,5 @@ Specification-Title: Jakarta Authentication SPI for Containers
 Specification-Version: @jaspic.spec.version@
 Specification-Vendor: Eclipse Foundation
 Implementation-Title: jakarta.security.auth.message
-Implementation-Version: @jaspic.spec.version@.@jaspic.revision@
+Implementation-Version: @jaspic.spec.version@@jaspic.revision@
 Implementation-Vendor: Apache Software Foundation

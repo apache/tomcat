@@ -24,11 +24,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipFile;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.tomcat.util.buf.UriUtil;
-import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Base class for a {@link org.apache.catalina.WebResourceSet} based on a
@@ -115,8 +115,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
                     JarFile jarFile = null;
                     try {
                         jarFile = openJarFile();
-                        multiRelease = Boolean.valueOf(
-                                JreCompat.getInstance().jarFileIsMultiRelease(jarFile));
+                        multiRelease = Boolean.valueOf(jarFile.isMultiRelease());
                     } catch (IOException ioe) {
                         // Should never happen
                         throw new IllegalStateException(ioe);
@@ -137,7 +136,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
     @Override
     protected void initInternal() throws LifecycleException {
 
-        try (JarFile jarFile = JreCompat.getInstance().jarFileNewInstance(getBase())) {
+        try (JarFile jarFile = new JarFile(new File(getBase()), true, ZipFile.OPEN_READ, Runtime.version())) {
             setManifest(jarFile.getManifest());
         } catch (IOException ioe) {
             throw new IllegalArgumentException(ioe);

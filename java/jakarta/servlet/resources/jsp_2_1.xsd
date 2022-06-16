@@ -20,7 +20,7 @@
 <!--
   **  The actual Sun XSD for this stripped down XSD can be found at
   **  http://java.sun.com/xml/ns/javaee/jsp_2_1.xsd
-  **  This XSD contains only the functional elements for programatic use.
+  **  This XSD contains only the functional elements for programmatic use.
 -->
 
 <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"

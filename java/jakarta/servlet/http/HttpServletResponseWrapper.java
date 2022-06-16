@@ -29,7 +29,7 @@ import jakarta.servlet.ServletResponseWrapper;
  * Servlet. This class implements the Wrapper or Decorator pattern. Methods
  * default to calling through to the wrapped response object.
  *
- * @since v 2.3
+ * @since Servlet 2.3
  * @see jakarta.servlet.http.HttpServletResponse
  */
 public class HttpServletResponseWrapper extends ServletResponseWrapper
@@ -85,30 +85,6 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     @Override
     public String encodeRedirectURL(String url) {
         return this._getHttpServletResponse().encodeRedirectURL(url);
-    }
-
-    /**
-     * The default behavior of this method is to call encodeUrl(String url) on
-     * the wrapped response object.
-     *
-     * @deprecated As of Version 3.0 of the Java Servlet API
-     */
-    @Override
-    @Deprecated
-    public String encodeUrl(String url) {
-        return this._getHttpServletResponse().encodeUrl(url);
-    }
-
-    /**
-     * The default behavior of this method is to return encodeRedirectUrl(String
-     * url) on the wrapped response object.
-     *
-     * @deprecated As of Version 3.0 of the Java Servlet API
-     */
-    @Override
-    @Deprecated
-    public String encodeRedirectUrl(String url) {
-        return this._getHttpServletResponse().encodeRedirectUrl(url);
     }
 
     /**
@@ -199,18 +175,6 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     @Override
     public void setStatus(int sc) {
         this._getHttpServletResponse().setStatus(sc);
-    }
-
-    /**
-     * The default behavior of this method is to call setStatus(int sc, String
-     * sm) on the wrapped response object.
-     *
-     * @deprecated As of Version 3.0 of the Java Servlet API
-     */
-    @Override
-    @Deprecated
-    public void setStatus(int sc, String sm) {
-        this._getHttpServletResponse().setStatus(sc, sm);
     }
 
     /**

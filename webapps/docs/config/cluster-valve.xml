@@ -61,7 +61,9 @@
         been no session change. An example filter would look like <code>
         filter=&quot;.*\.gif|.*\.js|.*\.jpeg|.*\.jpg|.*\.png|.*\.htm|.*\.html|.*\.css|.*\.txt&quot;
         </code>. The filter is a regular expression using
-        <code>java.util.regex</code>.
+        <code>java.util.regex</code>. If no filter pattern specified or if the
+        filter pattern is configured to be the empty string, no filtering will
+        take place.
       </attribute>
       <attribute name="primaryIndicator" required="false">
         Boolean value, so to true, and the replication valve will insert a request attribute with the name
@@ -98,7 +100,7 @@
       </attribute>
       <attribute name="sessionIdAttribute" required="false">
         Old sessionid before failover is registered in request attributes with  this attribute.
-        Default attribute name is <code>org.apache.catalina.ha.session.JvmRouteOrignalSessionID</code>.
+        Default attribute name is <code>org.apache.catalina.ha.session.JvmRouteOriginalSessionID</code>.
       </attribute>
     </attributes>
   </subsection>

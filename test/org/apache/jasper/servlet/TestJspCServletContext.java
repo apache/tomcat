@@ -34,14 +34,14 @@ public class TestJspCServletContext {
         File appDir = new File("test/webapp");
         JspCServletContext context = new JspCServletContext(
                 null, appDir.toURI().toURL(), null, false, false);
-        Assert.assertEquals(5, context.getEffectiveMajorVersion());
+        Assert.assertEquals(6, context.getEffectiveMajorVersion());
         Assert.assertEquals(0, context.getEffectiveMinorVersion());
         JspConfigDescriptor jspConfigDescriptor =
                 context.getJspConfigDescriptor();
         Assert.assertTrue(jspConfigDescriptor.getTaglibs().isEmpty());
         Collection<JspPropertyGroupDescriptor> propertyGroups =
                 jspConfigDescriptor.getJspPropertyGroups();
-        Assert.assertEquals(4, propertyGroups.size());
+        Assert.assertEquals(6, propertyGroups.size());
         Iterator<JspPropertyGroupDescriptor> groupIterator =
                 propertyGroups.iterator();
         JspPropertyGroupDescriptor groupDescriptor;
@@ -134,11 +134,21 @@ public class TestJspCServletContext {
 
 
     @Test
+    public void testWebapp_6_0() throws Exception {
+        File appDir = new File("test/webapp-6.0");
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
+        Assert.assertEquals(6, context.getEffectiveMajorVersion());
+        Assert.assertEquals(0, context.getEffectiveMinorVersion());
+    }
+
+
+    @Test
     public void testWebresources() throws Exception {
         File appDir = new File("test/webresources/dir1");
         JspCServletContext context = new JspCServletContext(
                 null, appDir.toURI().toURL(), null, false, false);
-        Assert.assertEquals(5, context.getEffectiveMajorVersion());
+        Assert.assertEquals(6, context.getEffectiveMajorVersion());
         Assert.assertEquals(0, context.getEffectiveMinorVersion());
     }
 

@@ -48,7 +48,7 @@ public class ContextEjb extends ResourceBase {
 
 
     /**
-     * The link to a J2EE EJB definition.
+     * The link to a Jakarta EE EJB definition.
      */
     private String link = null;
 
@@ -106,7 +106,7 @@ public class ContextEjb extends ResourceBase {
             sb.append(", link=");
             sb.append(link);
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
 
     }

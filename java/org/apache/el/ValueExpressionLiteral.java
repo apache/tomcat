@@ -48,8 +48,9 @@ public final class ValueExpressionLiteral extends ValueExpression implements
         this.expectedType = expectedType;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Object getValue(ELContext context) {
+    public <T> T getValue(ELContext context) {
         context.notifyBeforeEvaluation(getExpressionString());
         Object result;
         if (this.expectedType != null) {
@@ -58,7 +59,7 @@ public final class ValueExpressionLiteral extends ValueExpression implements
             result = this.value;
         }
         context.notifyAfterEvaluation(getExpressionString());
-        return result;
+        return (T) result;
     }
 
     @Override
@@ -129,7 +130,7 @@ public final class ValueExpressionLiteral extends ValueExpression implements
             ClassNotFoundException {
         this.value = in.readObject();
         String type = in.readUTF();
-        if (!"".equals(type)) {
+        if (!type.isEmpty()) {
             this.expectedType = ReflectionUtil.forName(type);
         }
     }

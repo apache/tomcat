@@ -20,36 +20,36 @@ package org.apache.tomcat.util.bcel.classfile;
 public class ArrayElementValue extends ElementValue
 {
     // For array types, this is the array
-    private final ElementValue[] evalues;
+    private final ElementValue[] elementValues;
 
     ArrayElementValue(final int type, final ElementValue[] datums, final ConstantPool cpool)
     {
         super(type, cpool);
         if (type != ARRAY) {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                     "Only element values of type array can be built with this ctor - type specified: " + type);
         }
-        this.evalues = datums;
+        this.elementValues = datums;
     }
 
     @Override
     public String stringifyValue()
     {
         final StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int i = 0; i < evalues.length; i++)
+        sb.append('[');
+        for (int i = 0; i < elementValues.length; i++)
         {
-            sb.append(evalues[i].stringifyValue());
-            if ((i + 1) < evalues.length) {
-                sb.append(",");
+            sb.append(elementValues[i].stringifyValue());
+            if (i + 1 < elementValues.length) {
+                sb.append(',');
             }
         }
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
     public ElementValue[] getElementValuesArray()
     {
-        return evalues;
+        return elementValues;
     }
 }

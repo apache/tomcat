@@ -56,10 +56,10 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private int port  = 4000;
     private int udpPort = -1;
     private int securePort = -1;
-    private int rxBufSize = 43800;
-    private int txBufSize = 25188;
-    private int udpRxBufSize = 43800;
-    private int udpTxBufSize = 25188;
+    private int rxBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
+    private int txBufSize = Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE;
+    private int udpRxBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
+    private int udpTxBufSize = Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE;
 
     private volatile boolean listen = false;
     private RxTaskPool pool;
@@ -99,22 +99,31 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         if ( executor == null ) {
             //executor = new ThreadPoolExecutor(minThreads,maxThreads,60,TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
             String channelName = "";
-            if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
+            if (channel.getName() != null) {
+                channelName = "[" + channel.getName() + "]";
+            }
             TaskThreadFactory tf = new TaskThreadFactory("Tribes-Task-Receiver" + channelName + "-");
             executor = ExecutorFactory.newThreadPool(minThreads, maxThreads, maxIdleTime, TimeUnit.MILLISECONDS, tf);
         }
         // register jmx
         JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
-        if (jmxRegistry != null) this.oname = jmxRegistry.registerJmx(",component=Receiver", this);
+        if (jmxRegistry != null) {
+            this.oname = jmxRegistry.registerJmx(",component=Receiver", this);
+        }
     }
 
     @Override
     public void stop() {
-        if ( executor != null ) executor.shutdownNow();//ignore left overs
+        if ( executor != null )
+         {
+            executor.shutdownNow();//ignore left overs
+        }
         executor = null;
         if (oname != null) {
             JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
-            if (jmxRegistry != null) jmxRegistry.unregisterJmx(oname);
+            if (jmxRegistry != null) {
+                jmxRegistry.unregisterJmx(oname);
+            }
             oname = null;
         }
         channel = null;
@@ -174,8 +183,9 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                 if ("auto".equals(host)) {
                     host = java.net.InetAddress.getLocalHost().getHostAddress();
                 }
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("Starting replication listener on address:"+ host);
+                }
                 bind = java.net.InetAddress.getByName(host);
             } catch (IOException ioe) {
                 log.error(sm.getString("receiverBase.bind.failed", host), ioe);
@@ -258,13 +268,17 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public void messageDataReceived(ChannelMessage data) {
         if ( this.listener != null ) {
-            if ( listener.accept(data) ) listener.messageReceived(data);
+            if ( listener.accept(data) ) {
+                listener.messageReceived(data);
+            }
         }
     }
 
     public int getWorkerThreadOptions() {
         int options = 0;
-        if ( getDirect() ) options = options | OPTION_DIRECT_BUFFER;
+        if ( getDirect() ) {
+            options = options | OPTION_DIRECT_BUFFER;
+        }
         return options;
     }
 
@@ -413,7 +427,9 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public void setAutoBind(int autoBind) {
         this.autoBind = autoBind;
-        if ( this.autoBind <= 0 ) this.autoBind = 1;
+        if ( this.autoBind <= 0 ) {
+            this.autoBind = 1;
+        }
     }
 
     public void setMaxThreads(int maxThreads) {

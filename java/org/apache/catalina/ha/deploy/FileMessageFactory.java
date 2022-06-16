@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ha.deploy;
 
 import java.io.File;
@@ -150,13 +149,15 @@ public class FileMessageFactory {
             throws FileNotFoundException, IOException {
         this.file = f;
         this.openForWrite = openForWrite;
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("open file " + f + " write " + openForWrite);
+        }
         if (openForWrite) {
-            if (!file.exists())
+            if (!file.exists()) {
                 if (!file.createNewFile()) {
                     throw new IOException(sm.getString("fileNewFail", file));
                 }
+            }
             out = new FileOutputStream(f);
         } else {
             size = file.length();
@@ -193,8 +194,8 @@ public class FileMessageFactory {
      * If EOF is reached, the factory returns null, and closes itself, otherwise
      * the same message is returned as was passed in. This makes sure that not
      * more memory is ever used. To remember, neither the file message or the
-     * factory are thread safe. dont hand off the message to one thread and read
-     * the same with another.
+     * factory are thread safe. Don't hand off the message to one thread and
+     * read the same with another.
      *
      * @param f
      *            FileMessage - the message to be populated with file data
@@ -238,9 +239,10 @@ public class FileMessageFactory {
         if (!openForWrite) {
             throw new IllegalArgumentException(sm.getString("fileMessageFactory.cannotWrite"));
         }
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Message " + msg + " data " + HexUtils.toHexString(msg.getData())
                     + " data length " + msg.getDataLength() + " out " + out);
+        }
 
         if (msg.getMessageNumber() <= lastMessageProcessed.get()) {
             // Duplicate of message already processed
@@ -297,16 +299,18 @@ public class FileMessageFactory {
      * Closes the factory, its streams and sets all its references to null
      */
     public void cleanup() {
-        if (in != null)
+        if (in != null) {
             try {
                 in.close();
             } catch (IOException ignore) {
             }
-        if (out != null)
+        }
+        if (out != null) {
             try {
                 out.close();
             } catch (IOException ignore) {
             }
+        }
         in = null;
         out = null;
         size = 0;

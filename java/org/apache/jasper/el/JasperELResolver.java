@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.el;
 
 import java.beans.FeatureDescriptor;
@@ -35,6 +34,8 @@ import jakarta.el.PropertyNotFoundException;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import jakarta.servlet.jsp.el.ImplicitObjectELResolver;
+import jakarta.servlet.jsp.el.ImportELResolver;
+import jakarta.servlet.jsp.el.NotFoundELResolver;
 import jakarta.servlet.jsp.el.ScopedAttributeELResolver;
 
 import org.apache.jasper.runtime.ExceptionUtils;
@@ -46,7 +47,8 @@ import org.apache.jasper.runtime.JspRuntimeLibrary;
  */
 public class JasperELResolver extends CompositeELResolver {
 
-    private static final int STANDARD_RESOLVERS_COUNT = 9;
+    // Keep aligned with class under test
+    private static final int STANDARD_RESOLVERS_COUNT = 11;
 
     private AtomicInteger resolversSize = new AtomicInteger(0);
     private volatile ELResolver[] resolvers;
@@ -72,6 +74,8 @@ public class JasperELResolver extends CompositeELResolver {
         }
         add(new BeanELResolver());
         add(new ScopedAttributeELResolver());
+        add(new ImportELResolver());
+        add(new NotFoundELResolver());
     }
 
     @Override
@@ -199,6 +203,7 @@ public class JasperELResolver extends CompositeELResolver {
             if (method != null) {
                 context.setPropertyResolved(base, property);
                 try {
+                    method.setAccessible(true);
                     value = method.invoke(base, (Object[]) null);
                 } catch (Exception ex) {
                     Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
@@ -211,6 +216,9 @@ public class JasperELResolver extends CompositeELResolver {
         @Override
         public void setValue(ELContext context, Object base, Object property,
                 Object value) {
+            if (base == null) {
+                return;
+            }
             Method method = getWriteMethod(base.getClass(), property.toString());
             if (method != null) {
                 context.setPropertyResolved(base, property);

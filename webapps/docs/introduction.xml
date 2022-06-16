@@ -48,7 +48,7 @@ help.</p>
 
 <p>In the course of reading these documents, you will run across a number of
 terms; some specific to Tomcat, and others defined by the
-<a href="https://wiki.apache.org/tomcat/Specifications">Servlet and
+<a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet and
 JSP specifications</a>.</p>
 
 <ul>
@@ -273,8 +273,8 @@ only to earlier versions.</p>
     to fully read the relevant documentation as it will save you much time
     and effort. There's nothing like scouring the web only to find out that
     the answer was right in front of you all along!</li>
-<li><a href="https://wiki.apache.org/tomcat/FAQ">Tomcat FAQ</a></li>
-<li><a href="https://wiki.apache.org/tomcat/">Tomcat WIKI</a></li>
+<li><a href="https://cwiki.apache.org/confluence/display/TOMCAT/FAQ">Tomcat FAQ</a></li>
+<li><a href="https://cwiki.apache.org/confluence/display/TOMCAT/">Tomcat WIKI</a></li>
 <li>Tomcat FAQ at <a href="http://www.jguru.com/faq/home.jsp?topic=Tomcat">jGuru</a></li>
 <li>Tomcat mailing list archives - numerous sites archive the Tomcat mailing
     lists. Since the links change over time, clicking here will search

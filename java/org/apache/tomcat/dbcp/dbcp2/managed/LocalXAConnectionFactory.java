@@ -1,5 +1,4 @@
-/**
- *
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -7,13 +6,13 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.tomcat.dbcp.dbcp2.managed;
 
@@ -26,6 +25,7 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
 import jakarta.transaction.TransactionManager;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 
 import org.apache.tomcat.dbcp.dbcp2.ConnectionFactory;
 
@@ -37,6 +37,7 @@ import org.apache.tomcat.dbcp.dbcp2.ConnectionFactory;
  * @since 2.0
  */
 public class LocalXAConnectionFactory implements XAConnectionFactory {
+
     /**
      * LocalXAResource is a fake XAResource for non-XA connections. When a transaction is started the connection
      * auto-commit is turned off. When the connection is committed or rolled back, the commit or rollback method is
@@ -45,16 +46,24 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
      * The LocalXAResource also respects the connection read-only setting. If the connection is read-only the commit
      * method will not be called, and the prepare method returns the XA_RDONLY.
      * </p>
+     * <p>
      * It is assumed that the wrapper around a managed connection disables the setAutoCommit(), commit(), rollback() and
      * setReadOnly() methods while a transaction is in progress.
+     * </p>
      *
      * @since 2.0
      */
     protected static class LocalXAResource implements XAResource {
+        private static final Xid[] EMPTY_XID_ARRAY = {};
         private final Connection connection;
         private Xid currentXid; // @GuardedBy("this")
         private boolean originalAutoCommit; // @GuardedBy("this")
 
+        /**
+         * Construct a new instance for a given connection.
+         *
+         * @param localTransaction A connection.
+         */
         public LocalXAResource(final Connection localTransaction) {
             this.connection = localTransaction;
         }
@@ -208,7 +217,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
          */
         @Override
         public Xid[] recover(final int flag) {
-            return new Xid[0];
+            return EMPTY_XID_ARRAY;
         }
 
         /**
@@ -317,9 +326,27 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
      */
     public LocalXAConnectionFactory(final TransactionManager transactionManager,
             final ConnectionFactory connectionFactory) {
+        this(transactionManager, null, connectionFactory);
+    }
+
+    /**
+     * Creates an LocalXAConnectionFactory which uses the specified connection factory to create database connections.
+     * The connections are enlisted into transactions using the specified transaction manager.
+     *
+     * @param transactionManager
+     *            the transaction manager in which connections will be enlisted
+     * @param transactionSynchronizationRegistry
+     *            the optional TSR to register synchronizations with
+     * @param connectionFactory
+     *            the connection factory from which connections will be retrieved
+     * @since 2.8.0
+     */
+    public LocalXAConnectionFactory(final TransactionManager transactionManager,
+            final TransactionSynchronizationRegistry transactionSynchronizationRegistry,
+            final ConnectionFactory connectionFactory) {
         Objects.requireNonNull(transactionManager, "transactionManager is null");
         Objects.requireNonNull(connectionFactory, "connectionFactory is null");
-        this.transactionRegistry = new TransactionRegistry(transactionManager);
+        this.transactionRegistry = new TransactionRegistry(transactionManager, transactionSynchronizationRegistry);
         this.connectionFactory = connectionFactory;
     }
 

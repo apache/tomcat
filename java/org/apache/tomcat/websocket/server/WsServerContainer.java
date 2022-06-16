@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import javax.naming.NamingException;
+
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.FilterRegistration;
 import jakarta.servlet.ServletContext;
@@ -151,7 +153,7 @@ public class WsServerContainer extends WsWebSocketContainer
 
             // Add method mapping to user properties
             PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(),
-                    sec.getDecoders(), path);
+                    sec.getDecoders(), path, getInstanceManager(Thread.currentThread().getContextClassLoader()));
             if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null
                     || methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
                 sec.getUserProperties().put(org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
@@ -248,7 +250,7 @@ public class WsServerContainer extends WsWebSocketContainer
             String path = annotation.value();
 
             // Validate encoders
-            validateEncoders(annotation.encoders());
+            validateEncoders(annotation.encoders(), getInstanceManager(Thread.currentThread().getContextClassLoader()));
 
             // ServerEndpointConfig
             Class<? extends Configurator> configuratorClazz =
@@ -294,29 +296,16 @@ public class WsServerContainer extends WsWebSocketContainer
     }
 
 
-    /**
-     * Until the WebSocket specification provides such a mechanism, this Tomcat
-     * proprietary method is provided to enable applications to programmatically
-     * determine whether or not to upgrade an individual request to WebSocket.
-     * <p>
-     * Note: This method is not used by Tomcat but is used directly by
-     *       third-party code and must not be removed.
-     *
-     * @param request The request object to be upgraded
-     * @param response The response object to be populated with the result of
-     *                 the upgrade
-     * @param sec The server endpoint to use to process the upgrade request
-     * @param pathParams The path parameters associated with the upgrade request
-     *
-     * @throws ServletException If a configuration error prevents the upgrade
-     *         from taking place
-     * @throws IOException If an I/O error occurs during the upgrade process
-     */
-    public void doUpgrade(HttpServletRequest request,
-            HttpServletResponse response, ServerEndpointConfig sec,
-            Map<String,String> pathParams)
-            throws ServletException, IOException {
-        UpgradeUtil.doUpgrade(this, request, response, sec, pathParams);
+    @Override
+    public void upgradeHttpToWebSocket(Object httpServletRequest, Object httpServletResponse,
+            ServerEndpointConfig sec, Map<String, String> pathParameters)
+            throws IOException, DeploymentException {
+        try {
+            UpgradeUtil.doUpgrade(this, (HttpServletRequest) httpServletRequest, (HttpServletResponse) httpServletResponse,
+                    sec, pathParameters);
+        } catch (ServletException e) {
+            throw new DeploymentException(e.getMessage(), e);
+        }
     }
 
 
@@ -397,6 +386,17 @@ public class WsServerContainer extends WsWebSocketContainer
      * Overridden to make it visible to other classes in this package.
      */
     @Override
+    protected InstanceManager getInstanceManager(ClassLoader classLoader) {
+        return super.getInstanceManager(classLoader);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * Overridden to make it visible to other classes in this package.
+     */
+    @Override
     protected void registerSession(Object key, WsSession wsSession) {
         super.registerSession(key, wsSession);
         if (wsSession.isOpen() &&
@@ -429,7 +429,7 @@ public class WsServerContainer extends WsWebSocketContainer
         Set<WsSession> wsSessions = authenticatedSessions.get(httpSessionId);
         if (wsSessions == null) {
             wsSessions = Collections.newSetFromMap(
-                     new ConcurrentHashMap<WsSession,Boolean>());
+                     new ConcurrentHashMap<>());
              authenticatedSessions.putIfAbsent(httpSessionId, wsSessions);
              wsSessions = authenticatedSessions.get(httpSessionId);
         }
@@ -463,17 +463,22 @@ public class WsServerContainer extends WsWebSocketContainer
     }
 
 
-    private static void validateEncoders(Class<? extends Encoder>[] encoders)
+    private static void validateEncoders(Class<? extends Encoder>[] encoders, InstanceManager instanceManager)
             throws DeploymentException {
 
         for (Class<? extends Encoder> encoder : encoders) {
-            // Need to instantiate decoder to ensure it is valid and that
-            // deployment can be failed if it is not
-            @SuppressWarnings("unused")
+            // Need to instantiate encoder to ensure it is valid and that
+            // deployment can be failed if it is not. The encoder is then
+            // discarded immediately.
             Encoder instance;
             try {
-                encoder.getConstructor().newInstance();
-            } catch(ReflectiveOperationException e) {
+                if (instanceManager == null) {
+                    instance = encoder.getConstructor().newInstance();
+                } else {
+                    instance = (Encoder) instanceManager.newInstance(encoder);
+                    instanceManager.destroyInstance(instance);
+                }
+            } catch(ReflectiveOperationException | NamingException e) {
                 throw new DeploymentException(sm.getString(
                         "serverContainer.encoderFail", encoder.getName()), e);
             }

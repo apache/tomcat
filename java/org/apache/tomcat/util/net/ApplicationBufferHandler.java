@@ -24,6 +24,21 @@ import java.nio.ByteBuffer;
  */
 public interface ApplicationBufferHandler {
 
+    static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
+
+    static ApplicationBufferHandler EMPTY = new ApplicationBufferHandler() {
+        @Override
+        public void expand(int newSize) {
+        }
+        @Override
+        public void setByteBuffer(ByteBuffer buffer) {
+        }
+        @Override
+        public ByteBuffer getByteBuffer() {
+            return EMPTY_BUFFER;
+        }
+    };
+
     public void setByteBuffer(ByteBuffer buffer);
 
     public ByteBuffer getByteBuffer();

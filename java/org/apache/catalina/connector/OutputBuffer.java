@@ -35,6 +35,7 @@ import org.apache.catalina.Globals;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.CloseNowException;
 import org.apache.coyote.Response;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -233,13 +234,9 @@ public class OutputBuffer extends Writer {
             flushCharBuffer();
         }
 
-        if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)
-                && !coyoteResponse.getRequest().method().equals("HEAD")) {
+        if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)) {
             // If this didn't cause a commit of the response, the final content
-            // length can be calculated. Only do this if this is not a HEAD
-            // request since in that case no body should have been written and
-            // setting a value of zero here will result in an explicit content
-            // length of zero being set on the response.
+            // length can be calculated.
             if (!coyoteResponse.isCommitted()) {
                 coyoteResponse.setContentLength(bb.remaining());
             }
@@ -348,6 +345,7 @@ public class OutputBuffer extends Writer {
                 // An IOException on a write is almost always due to
                 // the remote client aborting the request. Wrap this
                 // so that it can be handled better by the error dispatcher.
+                coyoteResponse.setErrorException(e);
                 throw new ClientAbortException(e);
             }
         }
@@ -401,8 +399,9 @@ public class OutputBuffer extends Writer {
             return;
         }
 
+        int remaining = from.remaining();
         append(from);
-        bytesWritten += from.remaining();
+        bytesWritten += remaining;
 
         // if called from within flush(), then immediately flush
         // remaining bytes
@@ -525,7 +524,7 @@ public class OutputBuffer extends Writer {
         while (sOff < sEnd) {
             int n = transfer(s, sOff, sEnd - sOff, cb);
             sOff += n;
-            if (isFull(cb)) {
+            if (sOff < sEnd && isFull(cb)) {
                 flushCharBuffer();
             }
         }
@@ -560,6 +559,11 @@ public class OutputBuffer extends Writer {
         }
 
         if (charset == null) {
+            if (coyoteResponse.getCharacterEncoding() != null) {
+                // setCharacterEncoding() was called with an invalid character set
+                // Trigger an UnsupportedEncodingException
+                charset = B2CConverter.getCharset(coyoteResponse.getCharacterEncoding());
+            }
             charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
         }
 
@@ -677,7 +681,7 @@ public class OutputBuffer extends Writer {
             int n = transfer(src, off, len, bb);
             len = len - n;
             off = off + n;
-            if (isFull(bb)) {
+            if (len > 0 && isFull(bb)) {
                 flushByteBuffer();
                 appendByteArray(src, off, len);
             }
@@ -729,7 +733,7 @@ public class OutputBuffer extends Writer {
             appendByteBuffer(from);
         } else {
             transfer(from, bb);
-            if (isFull(bb)) {
+            if (from.hasRemaining() && isFull(bb)) {
                 flushByteBuffer();
                 appendByteBuffer(from);
             }
@@ -742,7 +746,7 @@ public class OutputBuffer extends Writer {
         }
 
         int limit = bb.capacity();
-        while (len >= limit) {
+        while (len > limit) {
             realWriteBytes(ByteBuffer.wrap(src, off, limit));
             len = len - limit;
             off = off + limit;
@@ -760,7 +764,7 @@ public class OutputBuffer extends Writer {
 
         int limit = bb.capacity();
         int fromLimit = from.limit();
-        while (from.remaining() >= limit) {
+        while (from.remaining() > limit) {
             from.limit(from.position() + limit);
             realWriteBytes(from.slice());
             from.position(from.limit());

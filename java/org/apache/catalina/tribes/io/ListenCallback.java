@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.io;
 
 import org.apache.catalina.tribes.ChannelMessage;

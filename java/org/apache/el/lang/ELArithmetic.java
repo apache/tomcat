@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el.lang;
 
 import java.math.BigDecimal;
@@ -39,10 +38,12 @@ public abstract class ELArithmetic {
 
         @Override
         protected Number coerce(Number num) {
-            if (num instanceof BigDecimal)
+            if (num instanceof BigDecimal) {
                 return num;
-            if (num instanceof BigInteger)
+            }
+            if (num instanceof BigInteger) {
                 return new BigDecimal((BigInteger) num);
+            }
             return new BigDecimal(num.doubleValue());
         }
 
@@ -87,8 +88,9 @@ public abstract class ELArithmetic {
 
         @Override
         protected Number coerce(Number num) {
-            if (num instanceof BigInteger)
+            if (num instanceof BigInteger) {
                 return num;
+            }
             return new BigInteger(num.toString());
         }
 
@@ -138,10 +140,12 @@ public abstract class ELArithmetic {
 
         @Override
         protected Number coerce(Number num) {
-            if (num instanceof Double)
+            if (num instanceof Double) {
                 return num;
-            if (num instanceof BigInteger)
+            }
+            if (num instanceof BigInteger) {
                 return new BigDecimal((BigInteger) num);
+            }
             return Double.valueOf(num.doubleValue());
         }
 
@@ -203,8 +207,9 @@ public abstract class ELArithmetic {
 
         @Override
         protected Number coerce(Number num) {
-            if (num instanceof Long)
+            if (num instanceof Long) {
                 return num;
+            }
             return Long.valueOf(num.longValue());
         }
 
@@ -267,14 +272,15 @@ public abstract class ELArithmetic {
         }
 
         final ELArithmetic delegate;
-        if (BIGDECIMAL.matches(obj0, obj1))
+        if (BIGDECIMAL.matches(obj0, obj1)) {
             delegate = DOUBLE;
-        else if (DOUBLE.matches(obj0, obj1))
+        } else if (DOUBLE.matches(obj0, obj1)) {
             delegate = DOUBLE;
-        else if (BIGINTEGER.matches(obj0, obj1))
+        } else if (BIGINTEGER.matches(obj0, obj1)) {
             delegate = BIGINTEGER;
-        else
+        } else {
             delegate = LONG;
+        }
 
         Number num0 = delegate.coerce(obj0);
         Number num1 = delegate.coerce(obj1);
@@ -300,12 +306,13 @@ public abstract class ELArithmetic {
         }
 
         final ELArithmetic delegate;
-        if (BIGDECIMAL.matches(obj0, obj1))
+        if (BIGDECIMAL.matches(obj0, obj1)) {
             delegate = BIGDECIMAL;
-        else if (BIGINTEGER.matches(obj0, obj1))
+        } else if (BIGINTEGER.matches(obj0, obj1)) {
             delegate = BIGDECIMAL;
-        else
+        } else {
             delegate = DOUBLE;
+        }
 
         Number num0 = delegate.coerce(obj0);
         Number num1 = delegate.coerce(obj1);

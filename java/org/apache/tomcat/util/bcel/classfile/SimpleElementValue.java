@@ -85,7 +85,7 @@ public class SimpleElementValue extends ElementValue
                     Const.CONSTANT_Utf8);
             return cu8.getBytes();
         default:
-            throw new RuntimeException("SimpleElementValue class does not know how to stringify type " + _type);
+            throw new IllegalStateException("SimpleElementValue class does not know how to stringify type " + _type);
         }
     }
 }

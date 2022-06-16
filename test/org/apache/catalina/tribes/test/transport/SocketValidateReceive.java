@@ -22,6 +22,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DecimalFormat;
 
+import org.apache.catalina.tribes.transport.Constants;
+
 public class SocketValidateReceive {
     static long start = 0;
     static double mb = 0;
@@ -34,8 +36,10 @@ public class SocketValidateReceive {
 
 
     public static void main(String[] args) throws Exception {
-        int size = 43800;
-        if (args.length > 0 ) try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
+        int size = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
+        if (args.length > 0 ) {
+          try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
+        }
 
         try(ServerSocket srvSocket = new ServerSocket(9999)) {
             System.out.println("Listening on 9999");
@@ -105,7 +109,9 @@ public class SocketValidateReceive {
                     seq++;
                     packages++;
                 }
-                if ( b[i] != seq ) throw new Exception("mismatch on seq:"+seq+" and byte nr:"+cur+" count:"+count+" packages:"+packages);
+                if ( b[i] != seq ) {
+                  throw new Exception("mismatch on seq:"+seq+" and byte nr:"+cur+" count:"+count+" packages:"+packages);
+                }
                 cur++;
             }
             return packages;

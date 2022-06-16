@@ -33,6 +33,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -572,7 +575,7 @@ public class TestTomcat extends TomcatBaseTest {
             tomcat.start();
             Assert.fail();
         } catch (Throwable t) {
-            Assert.assertTrue(getRootCause(t) instanceof LifecycleException);
+            assertThat(getRootCause(t), instanceOf(LifecycleException.class));
         }
     }
 
@@ -590,7 +593,7 @@ public class TestTomcat extends TomcatBaseTest {
             tomcat.start();
             Assert.fail();
         } catch (Throwable t) {
-            Assert.assertTrue(getRootCause(t) instanceof MultiThrowable);
+            assertThat(getRootCause(t), instanceOf(MultiThrowable.class));
         }
     }
 

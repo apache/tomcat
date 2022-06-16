@@ -291,6 +291,21 @@ public class TesterHost implements Host {
     }
 
     @Override
+    public String getLegacyAppBase() {
+        return null;
+    }
+
+    @Override
+    public File getLegacyAppBaseFile() {
+        return null;
+    }
+
+    @Override
+    public void setLegacyAppBase(String legacyAppBase) {
+        // NO-OP
+    }
+
+    @Override
     public boolean getAutoDeploy() {
         return false;
     }

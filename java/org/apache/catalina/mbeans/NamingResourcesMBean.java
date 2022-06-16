@@ -70,10 +70,8 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), env);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
-                IllegalArgumentException iae = new IllegalArgumentException(
-                        sm.getString("namingResourcesMBean.createObjectNameError.environment", env));
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(
+                        sm.getString("namingResourcesMBean.createObjectNameError.environment", env), e);
             }
         }
         return results.toArray(new String[0]);
@@ -93,10 +91,8 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), contextResource);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
-                IllegalArgumentException iae = new IllegalArgumentException(
-                        sm.getString("namingResourcesMBean.createObjectNameError.resource", contextResource));
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(
+                        sm.getString("namingResourcesMBean.createObjectNameError.resource", contextResource), e);
             }
         }
         return results.toArray(new String[0]);
@@ -118,10 +114,8 @@ public class NamingResourcesMBean extends BaseModelMBean {
                         MBeanUtils.createObjectName(managed.getDomain(), resourceLink);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
-                IllegalArgumentException iae = new IllegalArgumentException(
-                        sm.getString("namingResourcesMBean.createObjectNameError.resourceLink", resourceLink));
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(
+                        sm.getString("namingResourcesMBean.createObjectNameError.resourceLink", resourceLink), e);
             }
         }
         return results.toArray(new String[0]);

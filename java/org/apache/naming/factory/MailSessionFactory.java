@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.naming.factory;
 
 import java.security.AccessController;
@@ -94,63 +93,61 @@ public class MailSessionFactory implements ObjectFactory {
 
         // Return null if we cannot create an object of the requested type
         final Reference ref = (Reference) refObj;
-        if (!ref.getClassName().equals(factoryType))
+        if (!ref.getClassName().equals(factoryType)) {
             return null;
+        }
 
         // Create a new Session inside a doPrivileged block, so that JavaMail
         // can read its default properties without throwing Security
         // exceptions.
         //
         // Bugzilla 31288, 33077: add support for authentication.
-        return AccessController.doPrivileged(new PrivilegedAction<Session>() {
-                @Override
-                public Session run() {
+        return AccessController.doPrivileged((PrivilegedAction<Session>) () -> {
 
-                    // Create the JavaMail properties we will use
-                    Properties props = new Properties();
-                    props.put("mail.transport.protocol", "smtp");
-                    props.put("mail.smtp.host", "localhost");
+            // Create the JavaMail properties we will use
+            Properties props = new Properties();
+            props.put("mail.transport.protocol", "smtp");
+            props.put("mail.smtp.host", "localhost");
 
-                    String password = null;
+            String password = null;
 
-                    Enumeration<RefAddr> attrs = ref.getAll();
-                    while (attrs.hasMoreElements()) {
-                        RefAddr attr = attrs.nextElement();
-                        if ("factory".equals(attr.getType())) {
-                            continue;
-                        }
-
-                        if ("password".equals(attr.getType())) {
-                            password = (String) attr.getContent();
-                            continue;
-                        }
-
-                        props.put(attr.getType(), attr.getContent());
-                    }
-
-                    Authenticator auth = null;
-                    if (password != null) {
-                        String user = props.getProperty("mail.smtp.user");
-                        if(user == null) {
-                            user = props.getProperty("mail.user");
-                        }
-
-                        if(user != null) {
-                            final PasswordAuthentication pa = new PasswordAuthentication(user, password);
-                            auth = new Authenticator() {
-                                    @Override
-                                    protected PasswordAuthentication getPasswordAuthentication() {
-                                        return pa;
-                                    }
-                                };
-                        }
-                    }
-
-                    // Create and return the new Session object
-                    Session session = Session.getInstance(props, auth);
-                    return session;
-
+            Enumeration<RefAddr> attrs = ref.getAll();
+            while (attrs.hasMoreElements()) {
+                RefAddr attr = attrs.nextElement();
+                if ("factory".equals(attr.getType())) {
+                    continue;
                 }
-        } );
+
+                if ("password".equals(attr.getType())) {
+                    password = (String) attr.getContent();
+                    continue;
+                }
+
+                props.put(attr.getType(), attr.getContent());
+            }
+
+            Authenticator auth = null;
+            if (password != null) {
+                String user = props.getProperty("mail.smtp.user");
+                if(user == null) {
+                    user = props.getProperty("mail.user");
+                }
+
+                if(user != null) {
+                    final PasswordAuthentication pa = new PasswordAuthentication(user, password);
+                    auth = new Authenticator() {
+                            @Override
+                            protected PasswordAuthentication getPasswordAuthentication() {
+                                return pa;
+                            }
+                        };
+                }
+            }
+
+            // Create and return the new Session object
+            Session session = Session.getInstance(props, auth);
+            return session;
+
+        });
     }
 }

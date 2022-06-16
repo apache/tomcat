@@ -14,7 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 package filters;
 
 
@@ -70,8 +69,9 @@ public final class ExampleFilter extends GenericFilter {
             throws IOException, ServletException {
 
         // Store ourselves as a request attribute (if requested)
-        if (attribute != null)
+        if (attribute != null) {
             request.setAttribute(attribute, this);
+        }
 
         // Time and log the subsequent processing
         long startTime = System.currentTimeMillis();
@@ -93,10 +93,7 @@ public final class ExampleFilter extends GenericFilter {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("TimingFilter(");
-        sb.append(getFilterConfig());
-        sb.append(")");
-        return sb.toString();
+        return "ExampleFilter(" + getFilterConfig() + ")";
     }
 }
 

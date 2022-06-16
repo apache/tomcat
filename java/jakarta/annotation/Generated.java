@@ -31,7 +31,17 @@ import java.lang.annotation.Target;
     ElementType.PACKAGE, ElementType.PARAMETER, ElementType.TYPE})
 @Retention(RetentionPolicy.SOURCE)
 public @interface Generated {
+    /**
+     * @return The name of the code generator. It is recommended that the fully
+     *         qualified name of the code generator is used.
+     */
     public String[] value();
+    /**
+     * @return The date the code was generated
+     */
     public String date() default "";
+    /**
+     * @return Additional comments (if any) related to the code generation
+     */
     public String comments() default "";
 }

@@ -14,7 +14,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 package jakarta.servlet.jsp;
 
 import java.io.IOException;
@@ -202,7 +201,7 @@ public abstract class PageContext
      * the "out" name in page scope with this newly created object.
      *
      * <p>
-     * This method should not be used by page  or tag library authors.
+     * This method should not be used by page or tag library authors.
      *
      * @param servlet The Servlet that is associated with this PageContext
      * @param request The currently pending request for this Servlet
@@ -406,7 +405,7 @@ public abstract class PageContext
      * @throws ServletException if the page that was forwarded to throws
      *     a ServletException
      * @throws IOException if an I/O error occurred while forwarding
-     * @since 2.0
+     * @since JSP 2.0
      */
     public abstract void include(String relativeUrlPath, boolean flush)
         throws ServletException, IOException;
@@ -509,7 +508,7 @@ public abstract class PageContext
      * if the isErrorPage attribute of the page directive is not set
      * to "true"), the information is meaningless.
      *
-     * @since 2.0
+     * @since JSP 2.0
      */
     public ErrorData getErrorData() {
         int status = 0;

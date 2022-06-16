@@ -14,12 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el;
 
+import java.util.function.Function;
+
 import jakarta.el.ELContext;
+import jakarta.el.ELProcessor;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.MethodExpression;
+import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
 import jakarta.el.ValueExpression;
 
@@ -535,5 +538,254 @@ public class TestMethodExpressionImpl {
         MethodExpression me2 = factory.createMethodExpression(context,
                 "${beanC.sayHello}", null , new Class[]{ TesterBeanA.class, TesterBeanB.class});
         me2.invoke(context, new Object[] { new Object() });
+    }
+
+
+    @Test
+    public void testVarArgsBeanFEnum() {
+        doTestVarArgsBeanF("beanF.doTest(apple)", (a) -> a.doTest(TesterEnum.APPLE));
+    }
+
+
+    @Test
+    public void testVarArgsBeanFEnumEnum() {
+        doTestVarArgsBeanF("beanF.doTest(apple,apple)", (a) -> a.doTest(TesterEnum.APPLE, TesterEnum.APPLE));
+    }
+
+
+    @Test
+    public void testVarArgsBeanFEnumString() {
+        doTestVarArgsBeanF("beanF.doTest(apple,'apple')", (a) -> a.doTest(TesterEnum.APPLE, "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanFEnumVEnum() {
+        doTestVarArgsBeanF("beanF.doTest(apple,apple,apple)",
+                (a) -> a.doTest(TesterEnum.APPLE, TesterEnum.APPLE, TesterEnum.APPLE));
+    }
+
+
+    @Test
+    public void testVarArgsBeanFEnumVString() {
+        doTestVarArgsBeanF("beanF.doTest(apple,'apple','apple')", (a) -> a.doTest(TesterEnum.APPLE, "apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanFString() {
+        doTestVarArgsBeanF("beanF.doTest('apple')", (a) -> a.doTest("apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanFStringEnum() {
+        doTestVarArgsBeanF("beanF.doTest('apple',apple)", (a) -> a.doTest("apple", TesterEnum.APPLE));
+    }
+
+
+    @Test
+    public void testVarArgsBeanFStringString() {
+        doTestVarArgsBeanF("beanF.doTest('apple','apple')", (a) -> a.doTest("apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanFStringVEnum() {
+        doTestVarArgsBeanF("beanF.doTest('apple',apple,apple)",
+                (a) -> a.doTest("apple", TesterEnum.APPLE, TesterEnum.APPLE));
+    }
+
+
+    @Test
+    public void testVarArgsBeanFStringVString() {
+        doTestVarArgsBeanF("beanF.doTest('apple','apple','apple')", (a) -> a.doTest("apple", "apple", "apple"));
+    }
+
+
+    private void doTestVarArgsBeanF(String expression, Function<TesterBeanF,String> func) {
+        ELProcessor elp = new ELProcessor();
+        elp.defineBean("apple", TesterEnum.APPLE);
+        elp.defineBean("beanF", new TesterBeanF());
+        String elResult = elp.eval(expression);
+        String javaResult = func.apply(new TesterBeanF());
+        Assert.assertEquals(javaResult, elResult);
+    }
+
+
+    @Test
+    public void testVarArgsBeanGEnum() {
+        doTestVarArgsBeanG("beanG.doTest(apple)", (a) -> a.doTest("apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanGEnumEnum() {
+        doTestVarArgsBeanG("beanG.doTest(apple,apple)", (a) -> a.doTest("apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanGEnumString() {
+        doTestVarArgsBeanG("beanG.doTest(apple,'apple')", (a) -> a.doTest("apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanGEnumVEnum() {
+        doTestVarArgsBeanG("beanG.doTest(apple,apple,apple)", (a) -> a.doTest("apple", "apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanGEnumVString() {
+        doTestVarArgsBeanG("beanG.doTest(apple,'apple','apple')", (a) -> a.doTest("apple", "apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanGString() {
+        doTestVarArgsBeanG("beanG.doTest('apple')", (a) -> a.doTest("apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanGStringEnum() {
+        doTestVarArgsBeanG("beanG.doTest('apple',apple)", (a) -> a.doTest("apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanGStringString() {
+        doTestVarArgsBeanG("beanG.doTest('apple','apple')", (a) -> a.doTest("apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanGStringVEnum() {
+        doTestVarArgsBeanG("beanG.doTest('apple',apple,apple)", (a) -> a.doTest("apple", "apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanGStringVString() {
+        doTestVarArgsBeanG("beanG.doTest('apple','apple','apple')", (a) -> a.doTest("apple", "apple", "apple"));
+    }
+
+
+    private void doTestVarArgsBeanG(String expression, Function<TesterBeanG,String> func) {
+        ELProcessor elp = new ELProcessor();
+        elp.defineBean("apple", TesterEnum.APPLE);
+        elp.defineBean("beanG", new TesterBeanG());
+        String elResult = elp.eval(expression);
+        String javaResult = func.apply(new TesterBeanG());
+        Assert.assertEquals(javaResult, elResult);
+    }
+
+    @Test
+    public void testVarArgsBeanHEnum() {
+        doTestVarArgsBeanH("beanH.doTest(apple)", (a) -> a.doTest("apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanHEnumEnum() {
+        doTestVarArgsBeanH("beanH.doTest(apple,apple)", (a) -> a.doTest("apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanHEnumString() {
+        doTestVarArgsBeanH("beanH.doTest(apple,'apple')", (a) -> a.doTest("apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanHEnumVEnum() {
+        doTestVarArgsBeanH("beanH.doTest(apple,apple,apple)", (a) -> a.doTest("apple", "apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanHEnumVString() {
+        doTestVarArgsBeanH("beanH.doTest(apple,'apple','apple')", (a) -> a.doTest("apple", "apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanHString() {
+        doTestVarArgsBeanH("beanH.doTest('apple')", (a) -> a.doTest("apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanHStringEnum() {
+        doTestVarArgsBeanH("beanH.doTest('apple',apple)", (a) -> a.doTest("apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanHStringString() {
+        doTestVarArgsBeanH("beanH.doTest('apple','apple')", (a) -> a.doTest("apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanHStringVEnum() {
+        doTestVarArgsBeanH("beanH.doTest('apple',apple,apple)", (a) -> a.doTest("apple", "apple", "apple"));
+    }
+
+
+    @Test
+    public void testVarArgsBeanHStringVString() {
+        doTestVarArgsBeanH("beanH.doTest('apple','apple','apple')", (a) -> a.doTest("apple", "apple", "apple"));
+    }
+
+
+    private void doTestVarArgsBeanH(String expression, Function<TesterBeanH,String> func) {
+        ELProcessor elp = new ELProcessor();
+        elp.defineBean("apple", TesterEnum.APPLE);
+        elp.defineBean("beanH", new TesterBeanH());
+        String elResult = elp.eval(expression);
+        String javaResult = func.apply(new TesterBeanH());
+        Assert.assertEquals(javaResult, elResult);
+    }
+
+
+    @Test
+    public void testPreferNoVarArgs() {
+        ELProcessor elp = new ELProcessor();
+        TesterBeanAAA bean = new TesterBeanAAA();
+        bean.setName("xyz");
+        elp.defineBean("bean2", bean);
+        elp.defineBean("bean1", new TesterBeanI());
+        String elResult = elp.eval("bean1.echo(bean2)");
+        Assert.assertEquals("No varargs: xyz", elResult);
+    }
+
+
+    @Test
+    public void testGetMethodInfo01() throws Exception {
+        MethodExpression me = factory.createMethodExpression(context,
+                "#{beanA.setName('New value')}", null, null);
+        // This is the call that failed
+        MethodInfo mi = me.getMethodInfo(context);
+        // The rest is to check it worked correctly
+        Assert.assertEquals(void.class, mi.getReturnType());
+        Assert.assertEquals(1, mi.getParamTypes().length);
+        Assert.assertEquals(String.class, mi.getParamTypes()[0]);
+    }
+
+
+    @Test
+    public void testGetMethodInfo02() throws Exception {
+        MethodExpression me = factory.createMethodExpression(context,
+                "#{beanA.setName}", null, new Class[] { String.class } );
+        // This is the call that failed
+        MethodInfo mi = me.getMethodInfo(context);
+        // The rest is to check it worked correctly
+        Assert.assertEquals(void.class, mi.getReturnType());
+        Assert.assertEquals(1, mi.getParamTypes().length);
+        Assert.assertEquals(String.class, mi.getParamTypes()[0]);
     }
 }

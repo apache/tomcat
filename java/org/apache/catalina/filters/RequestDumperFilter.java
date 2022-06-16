@@ -57,13 +57,7 @@ public class RequestDumperFilter extends GenericFilter {
     private static final String NON_HTTP_RES_MSG =
         "Not available. Non-http response.";
 
-    private static final ThreadLocal<Timestamp> timestamp =
-            new ThreadLocal<Timestamp>() {
-        @Override
-        protected Timestamp initialValue() {
-            return new Timestamp();
-        }
-    };
+    private static final ThreadLocal<Timestamp> timestamp = ThreadLocal.withInitial(Timestamp::new);
 
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders

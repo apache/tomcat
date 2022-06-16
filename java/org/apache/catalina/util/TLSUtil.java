@@ -33,11 +33,18 @@ public class TLSUtil {
      *         information, otherwise {@code false}
      */
     public static boolean isTLSRequestAttribute(String name) {
-        return Globals.CERTIFICATES_ATTR.equals(name) ||
-                Globals.CIPHER_SUITE_ATTR.equals(name) ||
-                Globals.KEY_SIZE_ATTR.equals(name)  ||
-                Globals.SSL_SESSION_ID_ATTR.equals(name) ||
-                Globals.SSL_SESSION_MGR_ATTR.equals(name) ||
-                SSLSupport.PROTOCOL_VERSION_KEY.equals(name);
+        switch (name) {
+            case Globals.CERTIFICATES_ATTR:
+            case Globals.CIPHER_SUITE_ATTR:
+            case Globals.KEY_SIZE_ATTR:
+            case Globals.SSL_SESSION_ID_ATTR:
+            case Globals.SSL_SESSION_MGR_ATTR:
+            case SSLSupport.PROTOCOL_VERSION_KEY:
+            case SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY:
+            case SSLSupport.REQUESTED_CIPHERS_KEY:
+                return true;
+            default:
+                return false;
+        }
     }
 }

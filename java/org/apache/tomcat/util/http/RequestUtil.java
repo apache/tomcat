@@ -66,12 +66,14 @@ public class RequestUtil {
         // Create a place for the normalized path
         String normalized = path;
 
-        if (replaceBackSlash && normalized.indexOf('\\') >= 0)
+        if (replaceBackSlash && normalized.indexOf('\\') >= 0) {
             normalized = normalized.replace('\\', '/');
+        }
 
         // Add a leading "/" if necessary
-        if (!normalized.startsWith("/"))
+        if (!normalized.startsWith("/")) {
             normalized = "/" + normalized;
+        }
 
         boolean addedTrailingSlash = false;
         if (normalized.endsWith("/.") || normalized.endsWith("/..")) {

@@ -369,7 +369,7 @@ public interface PoolConfiguration {
 
 
     /**
-     * boolean flag to remove abandoned connections if they exceed the removeAbandonedTimout.
+     * boolean flag to remove abandoned connections if they exceed the removeAbandonedTimeout.
      * If set to true a connection is considered abandoned and eligible for removal if it has
      * been in use longer than the {@link #getRemoveAbandonedTimeout()} and the condition for
      * {@link #getAbandonWhenPercentageFull()} is met.
@@ -380,7 +380,7 @@ public interface PoolConfiguration {
     public boolean isRemoveAbandoned();
 
     /**
-     * boolean flag to remove abandoned connections if they exceed the removeAbandonedTimout.
+     * boolean flag to remove abandoned connections if they exceed the removeAbandonedTimeout.
      * If set to true a connection is considered abandoned and eligible for removal if it has
      * been in use longer than the {@link #getRemoveAbandonedTimeout()} and the condition for
      * {@link #getAbandonWhenPercentageFull()} is met.

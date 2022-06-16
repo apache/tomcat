@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.servlet.http;
 
 import java.io.IOException;
@@ -172,6 +171,11 @@ public interface HttpServletRequest extends ServletRequest {
      */
     public int getIntHeader(String name);
 
+    /**
+     * Obtain the mapping information for this request.
+     *
+     * @return the mapping information for this request
+     */
     public default HttpServletMapping getHttpServletMapping() {
         return new HttpServletMapping() {
 
@@ -216,12 +220,13 @@ public interface HttpServletRequest extends ServletRequest {
      * This method returns <code>null</code> if there was no extra path
      * information.
      * <p>
-     * Same as the value of the CGI variable PATH_INFO.
+     * The URL will be canonicalized as per section 3.5 of the specification
+     * before the path information, if any, is extracted.
      *
-     * @return a <code>String</code>, decoded by the web container, specifying
-     *         extra path information that comes after the servlet path but
-     *         before the query string in the request URL; or <code>null</code>
-     *         if the URL does not have any extra path information
+     * @return a <code>String</code>, canonicalized by the web container,
+     *         specifying extra path information that comes after the servlet
+     *         path but before the query string in the request URL; or
+     *         {@code null} if the URL does not have any extra path information
      */
     public String getPathInfo();
 
@@ -384,13 +389,16 @@ public interface HttpServletRequest extends ServletRequest {
      * path to the servlet, but does not include any extra path information or a
      * query string. Same as the value of the CGI variable SCRIPT_NAME.
      * <p>
+     * The URL will be canonicalized as per section 3.5 of the specification
+     * before the path information, if any, is extracted.
+     * <p>
      * This method will return an empty string ("") if the servlet used to
      * process this request was matched using the "/*" pattern.
      *
-     * @return a <code>String</code> containing the name or path of the servlet
-     *         being called, as specified in the request URL, decoded, or an
-     *         empty string if the servlet used to process the request is
-     *         matched using the "/*" pattern.
+     * @return a <code>String</code>, canonicalized by the web container,
+     *         containing the name or path of the servlet being called, as
+     *         specified in the request URL, or an empty string if the servlet
+     *         used to process the request is matched using the "/*" pattern.
      */
     public String getServletPath();
 
@@ -467,14 +475,6 @@ public interface HttpServletRequest extends ServletRequest {
      * @see #getSession
      */
     public boolean isRequestedSessionIdFromURL();
-
-    /**
-     * @return {@link #isRequestedSessionIdFromURL()}
-     * @deprecated As of Version 2.1 of the Java Servlet API, use
-     *             {@link #isRequestedSessionIdFromURL} instead.
-     */
-    @Deprecated
-    public boolean isRequestedSessionIdFromUrl();
 
     /**
      * Triggers the same authentication process as would be triggered if the
@@ -557,12 +557,11 @@ public interface HttpServletRequest extends ServletRequest {
             ServletException;
 
     /**
-     * Start the HTTP upgrade process and pass the connection to the provided
-     * protocol handler once the current request/response pair has completed
-     * processing. Calling this method sets the response status to {@link
-     * HttpServletResponse#SC_SWITCHING_PROTOCOLS} and flushes the response.
-     * Protocol specific headers must have already been set before this method
-     * is called.
+     * Start the HTTP upgrade process and create and instance of the provided
+     * protocol handler class. The connection will be passed this instance once
+     * the current request/response pair has completed processing. Calling this
+     * method sets the response status to
+     * {@link HttpServletResponse#SC_SWITCHING_PROTOCOLS}.
      *
      * @param <T>                     The type of the upgrade handler
      * @param httpUpgradeHandlerClass The class that implements the upgrade

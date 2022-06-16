@@ -44,9 +44,7 @@ public class MessageInfoImpl implements MessageInfo {
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    // JASPIC uses raw types
-    public Map getMap() {
+    public Map<String,Object> getMap() {
         return map;
     }
 

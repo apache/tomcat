@@ -20,30 +20,19 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testDEFAULT() throws Exception {
-        if (TesterOpenSSL.VERSION < 10100) {
-            // Account for classes of ciphers removed from DEFAULT in 1.1.0
-            testSpecification("DEFAULT:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES");
-        } else {
-            testSpecification("DEFAULT");
-        }
+        testSpecification("DEFAULT");
     }
 
 
     @Test
     public void testCOMPLEMENTOFDEFAULT() throws Exception {
-        if (TesterOpenSSL.VERSION < 10100) {
-            // Account for classes of ciphers removed from DEFAULT in 1.1.0
-            testSpecification("COMPLEMENTOFDEFAULT:RC4:DSS:SEED:IDEA:CAMELLIA:AESCCM:aNULL:3DES");
-        } else {
-            testSpecification("COMPLEMENTOFDEFAULT");
-        }
+        testSpecification("COMPLEMENTOFDEFAULT");
     }
 
 
@@ -73,13 +62,23 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testHIGH() throws Exception {
-        testSpecification("HIGH");
+        if (TesterOpenSSL.VERSION < 30100) {
+            // OpenSSL 3.1.x moved the CCM8 ciphers from high to medium
+            testSpecification("HIGH:!AESCCM8");
+        } else {
+            testSpecification("HIGH");
+        }
     }
 
 
     @Test
     public void testMEDIUM() throws Exception {
-        testSpecification("MEDIUM");
+        if (TesterOpenSSL.VERSION < 30100) {
+            // OpenSSL 3.1.x moved the CCM8 ciphers from high to medium
+            testSpecification("MEDIUM:AESCCM8");
+        } else {
+            testSpecification("MEDIUM");
+        }
     }
 
 
@@ -127,10 +126,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testkDHE() throws Exception {
-        // This alias was introduced in 1.0.2
-        if (TesterOpenSSL.VERSION >= 10002) {
-            testSpecification("kDHE");
-        }
+        testSpecification("kDHE");
     }
 
 
@@ -142,10 +138,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testDHE() throws Exception {
-        // This alias was introduced in 1.0.2
-        if (TesterOpenSSL.VERSION >= 10002) {
-            testSpecification("DHE");
-        }
+        testSpecification("DHE");
     }
 
 
@@ -206,13 +199,6 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testECDHE() throws Exception {
         testSpecification("ECDHE");
-    }
-
-
-    @Test
-    @Ignore("Contrary to the docs, OpenSSL does not recognise EECDHE")
-    public void testEECDHE() throws Exception {
-        testSpecification("EECDHE");
     }
 
 
@@ -290,27 +276,19 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testTLSv1() throws Exception {
-        // In OpenSSL 1.1.0-dev, TLSv1 refers to those ciphers that require
-        // TLSv1 rather than being an alias for SSLv3
-        if (TesterOpenSSL.VERSION >= 10100) {
-            testSpecification("TLSv1");
-        }
+        testSpecification("TLSv1");
+    }
+
+
+    @Test
+    public void testSSLv3() throws Exception {
+        testSpecification("SSLv3");
     }
 
 
     @Test
     public void testSSLv2() throws Exception {
         testSpecification("SSLv2");
-    }
-
-
-    @Test
-    public void testSSLv3() throws Exception {
-        // In OpenSSL 1.1.0-dev, TLSv1 refers to those ciphers that require
-        // TLSv1 rather than being an alias for SSLv3
-        if (TesterOpenSSL.VERSION < 10100) {
-            testSpecification("SSLv3:TLSv1");
-        }
     }
 
 
@@ -555,7 +533,12 @@ public class TestOpenSSLCipherConfigurationParser {
         // Tomcat 8 default as of 2014-08-04
         // This gets an A- from https://www.ssllabs.com/ssltest with no FS for
         // a number of the reference browsers
-        testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+        if (TesterOpenSSL.VERSION < 30100) {
+            // OpenSSL 3.1.x moved the CCM8 ciphers from high to medium
+            testSpecification("HIGH:!AESCCM8:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+        } else {
+            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+        }
     }
 
 

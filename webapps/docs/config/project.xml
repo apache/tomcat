@@ -15,10 +15,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Apache Tomcat 9 Configuration Reference"
+<project name="Apache Tomcat 10 Configuration Reference"
         href="https://tomcat.apache.org/">
 
-  <title>Apache Tomcat 9 Configuration Reference</title>
+  <title>Apache Tomcat 10 Configuration Reference</title>
 
   <logo href="/images/tomcat.gif">
     The Apache Tomcat Servlet/JSP Container
@@ -30,7 +30,7 @@
     <menu name="Links">
         <item name="Docs Home"             href="../index.html"/>
         <item name="Config Ref. Home"      href="index.html"/>
-        <item name="FAQ"                   href="https://wiki.apache.org/tomcat/FAQ" />
+        <item name="FAQ"                   href="https://cwiki.apache.org/confluence/display/TOMCAT/FAQ" />
         <item name="User Comments"         href="#comments_section"/>
     </menu>
 
@@ -90,7 +90,8 @@
 
     <menu name="Other">
         <item name="System properties"     href="systemprops.html"/>
-        <item name="JASPIC"                href="jaspic.html"/>
+        <item name="Jakarta Authentication"
+              href="jaspic.html"/>
     </menu>
   </body>
 

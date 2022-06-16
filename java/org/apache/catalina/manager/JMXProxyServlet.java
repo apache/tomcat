@@ -38,8 +38,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.mbeans.MBeanDumper;
-import org.apache.catalina.tribes.util.StringManager;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This servlet will dump JMX attributes in a simple format and implement proxy
@@ -136,8 +136,9 @@ public class JMXProxyServlet extends HttpServlet {
             ObjectName oname = new ObjectName(onameStr);
             Object value = mBeanServer.getAttribute(oname, att);
 
-            if (null != key && value instanceof CompositeData)
+            if (null != key && value instanceof CompositeData) {
                 value = ((CompositeData) value).get(key);
+            }
 
             String valueStr;
             if (value != null) {
@@ -234,10 +235,11 @@ public class JMXProxyServlet extends HttpServlet {
      *         <code>paramString</code> was <code>null</code>).
      */
     private String[] getInvokeParameters(String paramString) {
-        if (paramString == null)
+        if (paramString == null) {
             return NO_PARAMETERS;
-        else
+        } else {
             return paramString.split(",");
+        }
     }
 
 

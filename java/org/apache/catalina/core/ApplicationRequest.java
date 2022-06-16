@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
 
 
@@ -135,8 +133,9 @@ class ApplicationRequest extends ServletRequestWrapper {
 
         synchronized (attributes) {
             attributes.remove(name);
-            if (!isSpecial(name))
+            if (!isSpecial(name)) {
                 getRequest().removeAttribute(name);
+            }
         }
 
     }
@@ -154,8 +153,9 @@ class ApplicationRequest extends ServletRequestWrapper {
 
         synchronized (attributes) {
             attributes.put(name, value);
-            if (!isSpecial(name))
+            if (!isSpecial(name)) {
                 getRequest().setAttribute(name, value);
+            }
         }
 
     }
@@ -200,8 +200,9 @@ class ApplicationRequest extends ServletRequestWrapper {
     protected boolean isSpecial(String name) {
 
         for (String special : specials) {
-            if (special.equals(name))
+            if (special.equals(name)) {
                 return true;
+            }
         }
         return false;
 

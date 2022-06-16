@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serializable;
@@ -84,8 +82,6 @@ public class ContextTransaction implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("Transaction[");
-        sb.append("]");
-        return sb.toString();
+        return "Transaction[]";
     }
 }

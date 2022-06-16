@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.users;
 
 
@@ -106,8 +104,9 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
         // Return the configured database instance
         database.open();
         // Don't try something we know won't work
-        if (!database.getReadonly())
+        if (!database.getReadonly()) {
             database.save();
+        }
         return database;
 
     }

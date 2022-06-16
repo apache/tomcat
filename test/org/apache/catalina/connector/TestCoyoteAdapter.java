@@ -212,19 +212,19 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
     @Test
     public void testBug54602c() throws Exception {
         // Partial UTF-8
-        doTestUriDecoding("/foo%c4", "UTF-8", "/foo\uFFFD");
+        doTestUriDecoding("/foo%c4", "UTF-8", null);
     }
 
     @Test
     public void testBug54602d() throws Exception {
         // Invalid UTF-8
-        doTestUriDecoding("/foo%ff", "UTF-8", "/foo\uFFFD");
+        doTestUriDecoding("/foo%ff", "UTF-8", null);
     }
 
     @Test
     public void testBug54602e() throws Exception {
         // Invalid UTF-8
-        doTestUriDecoding("/foo%ed%a0%80", "UTF-8", "/foo\uFFFD\uFFFD\uFFFD");
+        doTestUriDecoding("/foo%ed%a0%80", "UTF-8", null);
     }
 
     private void doTestUriDecoding(String path, String encoding,
@@ -246,9 +246,15 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         int rc = getUrl("http://localhost:" + getPort() + path,
                 new ByteChunk(), null);
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
-        Assert.assertEquals(expectedPathInfo, servlet.getPathInfo());
+        if (expectedPathInfo == null) {
+            // Invalid URI
+            Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
+        } else {
+            // Valid URI
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            Assert.assertEquals(expectedPathInfo, servlet.getPathInfo());
+        }
     }
 
     private static class PathInfoServlet extends HttpServlet {
@@ -328,10 +334,18 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         doTestNormalize("/foo/../bar", "/bar");
     }
 
+    @Test
+    public void testNormalize02() {
+        doTestNormalize("/foo/.", "/foo");
+    }
+
     private void doTestNormalize(String input, String expected) {
         MessageBytes mb = MessageBytes.newInstance();
         byte[] b = input.getBytes(StandardCharsets.UTF_8);
-        mb.setBytes(b, 0, b.length);
+        // Need to allow an extra byte in case '/' is appended during processing
+        byte[] b2 = new byte[b.length + 1];
+        System.arraycopy(b, 0, b2, 0, b.length);
+        mb.setBytes(b2, 0, b.length);
 
         boolean result = CoyoteAdapter.normalize(mb, false);
         mb.toString();

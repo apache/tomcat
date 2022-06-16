@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
 
 
@@ -132,16 +130,17 @@ public final class Tool {
                 usage();
                 System.exit(1);
             }
-            if ("-ant".equals(args[index]))
+            if ("-ant".equals(args[index])) {
                 ant = true;
-            else if ("-common".equals(args[index]))
+            } else if ("-common".equals(args[index])) {
                 common = true;
-            else if ("-server".equals(args[index]))
+            } else if ("-server".equals(args[index])) {
                 server = true;
-            else if ("-shared".equals(args[index]))
+            } else if ("-shared".equals(args[index])) {
                 shared = true;
-            else
+            } else {
                 break;
+            }
             index++;
         }
         if (index > args.length) {
@@ -150,8 +149,9 @@ public final class Tool {
         }
 
         // Set "ant.home" if requested
-        if (ant)
+        if (ant) {
             System.setProperty("ant.home", catalinaHome);
+        }
 
         // Construct the class loader we will be using
         ClassLoader classLoader = null;
@@ -194,8 +194,9 @@ public final class Tool {
         Class<?> clazz = null;
         String className = args[index++];
         try {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Loading application class " + className);
+            }
             clazz = classLoader.loadClass(className);
         } catch (Throwable t) {
             Bootstrap.handleThrowable(t);
@@ -207,8 +208,9 @@ public final class Tool {
         String params[] = new String[args.length - index];
         System.arraycopy(args, index, params, 0, params.length);
         try {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Identifying main() method");
+            }
             String methodName = "main";
             Class<?> paramTypes[] = new Class[1];
             paramTypes[0] = params.getClass();
@@ -221,8 +223,9 @@ public final class Tool {
 
         // Invoke the main method of the application class
         try {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Calling main() method");
+            }
             Object paramValues[] = new Object[1];
             paramValues[0] = params;
             method.invoke(null, paramValues);

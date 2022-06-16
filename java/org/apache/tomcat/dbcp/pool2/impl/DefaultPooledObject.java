@@ -17,6 +17,9 @@
 package org.apache.tomcat.dbcp.pool2.impl;
 
 import java.io.PrintWriter;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Deque;
 
 import org.apache.tomcat.dbcp.pool2.PooledObject;
@@ -38,14 +41,16 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
     private final T object;
     private PooledObjectState state = PooledObjectState.IDLE; // @GuardedBy("this") to ensure transitions are valid
-    private final long createTime = System.currentTimeMillis();
-    private volatile long lastBorrowTime = createTime;
-    private volatile long lastUseTime = createTime;
-    private volatile long lastReturnTime = createTime;
-    private volatile boolean logAbandoned = false;
+    private final Clock systemClock = Clock.systemUTC();
+    private final Instant createInstant = now();
+
+    private volatile Instant lastBorrowInstant = createInstant;
+    private volatile Instant lastUseInstant = createInstant;
+    private volatile Instant lastReturnInstant = createInstant;
+    private volatile boolean logAbandoned;
     private volatile CallStack borrowedBy = NoOpCallStack.INSTANCE;
     private volatile CallStack usedBy = NoOpCallStack.INSTANCE;
-    private volatile long borrowedCount = 0;
+    private volatile long borrowedCount;
 
     /**
      * Creates a new instance that wraps the provided object so that the pool can
@@ -57,105 +62,59 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         this.object = object;
     }
 
-    @Override
-    public T getObject() {
-        return object;
-    }
-
-    @Override
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    @Override
-    public long getActiveTimeMillis() {
-        // Take copies to avoid threading issues
-        final long rTime = lastReturnTime;
-        final long bTime = lastBorrowTime;
-
-        if (rTime > bTime) {
-            return rTime - bTime;
-        }
-        return System.currentTimeMillis() - bTime;
-    }
-
-    @Override
-    public long getIdleTimeMillis() {
-        final long elapsed = System.currentTimeMillis() - lastReturnTime;
-        // elapsed may be negative if:
-        // - another thread updates lastReturnTime during the calculation window
-        // - System.currentTimeMillis() is not monotonic (e.g. system time is set back)
-        return elapsed >= 0 ? elapsed : 0;
-    }
-
-    @Override
-    public long getLastBorrowTime() {
-        return lastBorrowTime;
-    }
-
-    @Override
-    public long getLastReturnTime() {
-        return lastReturnTime;
-    }
-
     /**
-     * Gets the number of times this object has been borrowed.
-     * @return The number of times this object has been borrowed.
-     * @since 2.1
-     */
-    @Override
-    public long getBorrowedCount() {
-        return borrowedCount;
-    }
-
-    /**
-     * Returns an estimate of the last time this object was used.  If the class
-     * of the pooled object implements {@link TrackedUse}, what is returned is
-     * the maximum of {@link TrackedUse#getLastUsed()} and
-     * {@link #getLastBorrowTime()}; otherwise this method gives the same
-     * value as {@link #getLastBorrowTime()}.
+     * Allocates the object.
      *
-     * @return the last time this object was used
+     * @return {@code true} if the original state was {@link PooledObjectState#IDLE IDLE}
      */
     @Override
-    public long getLastUsedTime() {
-        if (object instanceof TrackedUse) {
-            return Math.max(((TrackedUse) object).getLastUsed(), lastUseTime);
+    public synchronized boolean allocate() {
+        if (state == PooledObjectState.IDLE) {
+            state = PooledObjectState.ALLOCATED;
+            lastBorrowInstant = now();
+            lastUseInstant = lastBorrowInstant;
+            borrowedCount++;
+            if (logAbandoned) {
+                borrowedBy.fillInStackTrace();
+            }
+            return true;
         }
-        return lastUseTime;
+        if (state == PooledObjectState.EVICTION) {
+            // TODO Allocate anyway and ignore eviction test
+            state = PooledObjectState.EVICTION_RETURN_TO_HEAD;
+        }
+        // TODO if validating and testOnBorrow == true then pre-allocate for
+        // performance
+        return false;
     }
 
     @Override
     public int compareTo(final PooledObject<T> other) {
-        final long lastActiveDiff = this.getLastReturnTime() - other.getLastReturnTime();
-        if (lastActiveDiff == 0) {
+        final int compareTo = getLastReturnInstant().compareTo(other.getLastReturnInstant());
+        if (compareTo == 0) {
             // Make sure the natural ordering is broadly consistent with equals
             // although this will break down if distinct objects have the same
             // identity hash code.
             // see java.lang.Comparable Javadocs
             return System.identityHashCode(this) - System.identityHashCode(other);
         }
-        // handle int overflow
-        return (int)Math.min(Math.max(lastActiveDiff, Integer.MIN_VALUE), Integer.MAX_VALUE);
+        return compareTo;
     }
 
+    /**
+     * Deallocates the object and sets it {@link PooledObjectState#IDLE IDLE}
+     * if it is currently {@link PooledObjectState#ALLOCATED ALLOCATED}
+     * or {@link PooledObjectState#RETURNING RETURNING}.
+     *
+     * @return {@code true} if the state was {@link PooledObjectState#ALLOCATED ALLOCATED}
+     *         or {@link PooledObjectState#RETURNING RETURNING}.
+     */
     @Override
-    public String toString() {
-        final StringBuilder result = new StringBuilder();
-        result.append("Object: ");
-        result.append(object.toString());
-        result.append(", State: ");
-        synchronized (this) {
-            result.append(state.toString());
-        }
-        return result.toString();
-        // TODO add other attributes
-    }
-
-    @Override
-    public synchronized boolean startEvictionTest() {
-        if (state == PooledObjectState.IDLE) {
-            state = PooledObjectState.EVICTION;
+    public synchronized boolean deallocate() {
+        if (state == PooledObjectState.ALLOCATED || state == PooledObjectState.RETURNING) {
+            state = PooledObjectState.IDLE;
+            lastReturnInstant = now();
+            borrowedBy.clear();
             return true;
         }
 
@@ -168,7 +127,8 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         if (state == PooledObjectState.EVICTION) {
             state = PooledObjectState.IDLE;
             return true;
-        } else if (state == PooledObjectState.EVICTION_RETURN_TO_HEAD) {
+        }
+        if (state == PooledObjectState.EVICTION_RETURN_TO_HEAD) {
             state = PooledObjectState.IDLE;
             if (!idleQueue.offerFirst(this)) {
                 // TODO - Should never happen
@@ -178,63 +138,146 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         return false;
     }
 
-    /**
-     * Allocates the object.
-     *
-     * @return {@code true} if the original state was {@link PooledObjectState#IDLE IDLE}
-     */
     @Override
-    public synchronized boolean allocate() {
-        if (state == PooledObjectState.IDLE) {
-            state = PooledObjectState.ALLOCATED;
-            lastBorrowTime = System.currentTimeMillis();
-            lastUseTime = lastBorrowTime;
-            borrowedCount++;
-            if (logAbandoned) {
-                borrowedBy.fillInStackTrace();
-            }
-            return true;
-        } else if (state == PooledObjectState.EVICTION) {
-            // TODO Allocate anyway and ignore eviction test
-            state = PooledObjectState.EVICTION_RETURN_TO_HEAD;
-            return false;
-        }
-        // TODO if validating and testOnBorrow == true then pre-allocate for
-        // performance
-        return false;
+    public long getActiveTimeMillis() {
+        return getActiveDuration().toMillis();
     }
 
     /**
-     * Deallocates the object and sets it {@link PooledObjectState#IDLE IDLE}
-     * if it is currently {@link PooledObjectState#ALLOCATED ALLOCATED}.
-     *
-     * @return {@code true} if the state was {@link PooledObjectState#ALLOCATED ALLOCATED}
+     * Gets the number of times this object has been borrowed.
+     * @return The number of times this object has been borrowed.
+     * @since 2.1
      */
     @Override
-    public synchronized boolean deallocate() {
-        if (state == PooledObjectState.ALLOCATED ||
-                state == PooledObjectState.RETURNING) {
-            state = PooledObjectState.IDLE;
-            lastReturnTime = System.currentTimeMillis();
-            borrowedBy.clear();
-            return true;
-        }
+    public long getBorrowedCount() {
+        return borrowedCount;
+    }
 
-        return false;
+    @Override
+    public Instant getCreateInstant() {
+        return createInstant;
+    }
+
+    @Override
+    public long getCreateTime() {
+        return createInstant.toEpochMilli();
+    }
+
+    @Override
+    public Duration getIdleDuration() {
+        // elapsed may be negative if:
+        // - another thread updates lastReturnInstant during the calculation window
+        // - System.currentTimeMillis() is not monotonic (e.g. system time is set back)
+        final Duration elapsed = Duration.between(lastReturnInstant, now());
+        return elapsed.isNegative() ? Duration.ZERO : elapsed;
+    }
+
+    @Override
+    public Duration getIdleTime() {
+        return getIdleDuration();
+    }
+
+    @Override
+    public long getIdleTimeMillis() {
+        return getIdleDuration().toMillis();
+    }
+
+    @Override
+    public Instant getLastBorrowInstant() {
+        return lastBorrowInstant;
+    }
+
+    @Override
+    public long getLastBorrowTime() {
+        return lastBorrowInstant.toEpochMilli();
+    }
+
+    @Override
+    public Instant getLastReturnInstant() {
+        return lastReturnInstant;
+    }
+
+    @Override
+    public long getLastReturnTime() {
+        return lastReturnInstant.toEpochMilli();
     }
 
     /**
-     * Sets the state to {@link PooledObjectState#INVALID INVALID}
+     * Gets an estimate of the last time this object was used.  If the class
+     * of the pooled object implements {@link TrackedUse}, what is returned is
+     * the maximum of {@link TrackedUse#getLastUsedInstant()} and
+     * {@link #getLastBorrowTime()}; otherwise this method gives the same
+     * value as {@link #getLastBorrowTime()}.
+     *
+     * @return the last Instant this object was used.
+     */
+    @Override
+    public Instant getLastUsedInstant() {
+        if (object instanceof TrackedUse) {
+            return PoolImplUtils.max(((TrackedUse) object).getLastUsedInstant(), lastUseInstant);
+        }
+        return lastUseInstant;
+    }
+
+    /**
+     * Gets an estimate of the last time this object was used.  If the class
+     * of the pooled object implements {@link TrackedUse}, what is returned is
+     * the maximum of {@link TrackedUse#getLastUsedInstant()} and
+     * {@link #getLastBorrowTime()}; otherwise this method gives the same
+     * value as {@link #getLastBorrowTime()}.
+     *
+     * @return the last time this object was used
+     */
+    @Override
+    public long getLastUsedTime() {
+        return getLastUsedInstant().toEpochMilli();
+    }
+
+    @Override
+    public T getObject() {
+        return object;
+    }
+
+    /**
+     * Gets the state of this object.
+     * @return state
+     */
+    @Override
+    public synchronized PooledObjectState getState() {
+        return state;
+    }
+
+    /**
+     * Sets the state to {@link PooledObjectState#INVALID INVALID}.
      */
     @Override
     public synchronized void invalidate() {
         state = PooledObjectState.INVALID;
     }
 
+    /**
+     * Marks the pooled object as {@link PooledObjectState#ABANDONED ABANDONED}.
+     */
     @Override
-    public void use() {
-        lastUseTime = System.currentTimeMillis();
-        usedBy.fillInStackTrace();
+    public synchronized void markAbandoned() {
+        state = PooledObjectState.ABANDONED;
+    }
+
+    /**
+     * Marks the pooled object as {@link PooledObjectState#RETURNING RETURNING}.
+     */
+    @Override
+    public synchronized void markReturning() {
+        state = PooledObjectState.RETURNING;
+    }
+
+    /**
+     * Gets the current instant of the clock.
+     *
+     * @return the current instant of the clock.
+     */
+    private Instant now() {
+        return systemClock.instant();
     }
 
     @Override
@@ -244,31 +287,6 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         if (written) {
             writer.flush();
         }
-    }
-
-    /**
-     * Returns the state of this object.
-     * @return state
-     */
-    @Override
-    public synchronized PooledObjectState getState() {
-        return state;
-    }
-
-    /**
-     * Marks the pooled object as abandoned.
-     */
-    @Override
-    public synchronized void markAbandoned() {
-        state = PooledObjectState.ABANDONED;
-    }
-
-    /**
-     * Marks the object as returning to the pool.
-     */
-    @Override
-    public synchronized void markReturning() {
-        state = PooledObjectState.RETURNING;
     }
 
     @Override
@@ -294,5 +312,34 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         usedBy = CallStackUtils.newCallStack("The last code to use this object was:",
             false, requireFullStackTrace);
     }
+
+    @Override
+    public synchronized boolean startEvictionTest() {
+        if (state == PooledObjectState.IDLE) {
+            state = PooledObjectState.EVICTION;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder result = new StringBuilder();
+        result.append("Object: ");
+        result.append(object.toString());
+        result.append(", State: ");
+        synchronized (this) {
+            result.append(state.toString());
+        }
+        return result.toString();
+        // TODO add other attributes
+    }
+
+    @Override
+    public void use() {
+        lastUseInstant = now();
+        usedBy.fillInStackTrace();
+    }
+
 
 }

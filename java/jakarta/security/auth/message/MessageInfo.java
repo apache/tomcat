@@ -28,6 +28,5 @@ public interface MessageInfo {
 
     void setResponseMessage(Object response);
 
-    @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    Map getMap();
+    Map<String,Object> getMap();
 }

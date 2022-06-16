@@ -47,7 +47,7 @@ to authenticate themselves.  If you are not utilizing these features, you can
 safely skip this document.</p>
 
 <p>For fundamental background information about container managed security,
-see the <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
+see the <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
 Specification (Version 2.4)</a>, Section 12.</p>
 
 <p>For information about utilizing the <em>Single Sign On</em> feature of
@@ -84,8 +84,6 @@ can be implemented by "plug in" components to establish this connection.
 Six standard plug-ins are provided, supporting connections to various
 sources of authentication information:</p>
 <ul>
-<li><a href="#JDBCRealm">JDBCRealm</a> - Accesses authentication information
-    stored in a relational database, accessed via a JDBC driver.</li>
 <li><a href="#DataSourceRealm">DataSourceRealm</a> - Accesses authentication
     information stored in a relational database, accessed via a named JNDI
     JDBC DataSource.</li>
@@ -300,115 +298,6 @@ users.</p>
 
 <section name="Standard Realm Implementations">
 
-<subsection name="JDBCRealm">
-
-<h5>Introduction</h5>
-
-<p><strong>JDBCRealm</strong> is an implementation of the Tomcat
-<code>Realm</code> interface that looks up users in a relational database
-accessed via a JDBC driver.  There is substantial configuration flexibility
-that lets you adapt to existing table and column names, as long as your
-database structure conforms to the following requirements:</p>
-<ul>
-<li>There must be a table, referenced below as the <em>users</em> table,
-    that contains one row for every valid user that this <code>Realm</code>
-    should recognize.</li>
-<li>The <em>users</em> table must contain at least two columns (it may
-    contain more if your existing applications required it):
-    <ul>
-    <li>Username to be recognized by Tomcat when the user logs in.</li>
-    <li>Password to be recognized by Tomcat when the user logs in.
-        This value may in cleartext or digested - see below for more
-        information.</li>
-    </ul></li>
-<li>There must be a table, referenced below as the <em>user roles</em> table,
-    that contains one row for every valid role that is assigned to a
-    particular user.  It is legal for a user to have zero, one, or more than
-    one valid role.</li>
-<li>The <em>user roles</em> table must contain at least two columns (it may
-    contain more if your existing applications required it):
-    <ul>
-    <li>Username to be recognized by Tomcat (same value as is specified
-        in the <em>users</em> table).</li>
-    <li>Role name of a valid role associated with this user.</li>
-    </ul></li>
-</ul>
-
-<h5>Quick Start</h5>
-
-<p>To set up Tomcat to use JDBCRealm, you will need to follow these steps:</p>
-<ol>
-<li>If you have not yet done so, create tables and columns in your database
-    that conform to the requirements described above.</li>
-<li>Configure a database username and password for use by Tomcat, that has
-    at least read only access to the tables described above.  (Tomcat will
-    never attempt to write to these tables.)</li>
-<li>Place a copy of the JDBC driver you will be using inside the
-    <code>$CATALINA_HOME/lib</code> directory.
-    Note that <strong>only</strong> JAR files are recognized!</li>
-<li>Set up a <code>&lt;Realm&gt;</code> element, as described below, in your
-    <code>$CATALINA_BASE/conf/server.xml</code> file.</li>
-<li>Restart Tomcat if it is already running.</li>
-</ol>
-
-<h5>Realm Element Attributes</h5>
-
-<p>To configure JDBCRealm, you will create a <code>&lt;Realm&gt;</code>
-element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring_a_Realm">above</a>. The attributes for the
-JDBCRealm are defined in the <a href="config/realm.html">Realm</a> configuration
-documentation.</p>
-
-<h5>Example</h5>
-
-<p>An example SQL script to create the needed tables might look something
-like this (adapt the syntax as required for your particular database):</p>
-<source>create table users (
-  user_name         varchar(15) not null primary key,
-  user_pass         varchar(15) not null
-);
-
-create table user_roles (
-  user_name         varchar(15) not null,
-  role_name         varchar(15) not null,
-  primary key (user_name, role_name)
-);</source>
-
-<p>Example <code>Realm</code> elements are included (commented out) in the
-default <code>$CATALINA_BASE/conf/server.xml</code> file.  Here's an example
-for using a MySQL database called "authority", configured with the tables
-described above, and accessed with username "dbuser" and password "dbpass":</p>
-<source><![CDATA[<Realm className="org.apache.catalina.realm.JDBCRealm"
-      driverName="org.gjt.mm.mysql.Driver"
-   connectionURL="jdbc:mysql://localhost/authority?user=dbuser&amp;password=dbpass"
-       userTable="users" userNameCol="user_name" userCredCol="user_pass"
-   userRoleTable="user_roles" roleNameCol="role_name"/>]]></source>
-
-<h5>Additional Notes</h5>
-
-<p>JDBCRealm operates according to the following rules:</p>
-<ul>
-<li>When a user attempts to access a protected resource for the first time,
-    Tomcat will call the <code>authenticate()</code> method of this
-    <code>Realm</code>.  Thus, any changes you have made to the database
-    directly (new users, changed passwords or roles, etc.) will be immediately
-    reflected.</li>
-<li>Once a user has been authenticated, the user (and his or her associated
-    roles) are cached within Tomcat for the duration of the user's login.
-    (For FORM-based authentication, that means until the session times out or
-    is invalidated; for BASIC authentication, that means until the user
-    closes their browser).  The cached user is <strong>not</strong> saved and
-    restored across sessions serialisations. Any changes to the database
-    information for an already authenticated user will <strong>not</strong> be
-    reflected until the next time that user logs on again.</li>
-<li>Administering the information in the <em>users</em> and <em>user roles</em>
-    table is the responsibility of your own applications.  Tomcat does not
-    provide any built-in capabilities to maintain users and roles.</li>
-</ul>
-
-</subsection>
-
-
 <subsection name="DataSourceRealm">
 
 <h5>Introduction</h5>
@@ -503,7 +392,7 @@ name "java:/comp/env/jdbc/authority".</p>
     <code>Realm</code>.  Thus, any changes you have made to the database
     directly (new users, changed passwords or roles, etc.) will be immediately
     reflected.</li>
-<li>Once a user has been authenticated, the user (and his or her associated
+<li>Once a user has been authenticated, the user (and their associated
     roles) are cached within Tomcat for the duration of the user's login.
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
@@ -848,10 +737,10 @@ userPassword: janet</source>
 searches the directory for a unique entry with that value as its mail
 attribute and attempts to bind to the directory as
 <code>uid=jjones,ou=people,dc=mycompany,dc=com</code> with the given
-password. If authentication succeeds, she is assigned three roles:
-"role2" and "role3", the values of the "memberOf" attribute in her
+password. If authentication succeeds, they are assigned three roles:
+"role2" and "role3", the values of the "memberOf" attribute in their
 directory entry, and "tomcat", the value of the "cn" attribute in the
-only group entry of which she is a member.</p>
+only group entry of which they are a member.</p>
 
 <p>Finally, to authenticate the user by retrieving
 the password from the directory and making a local comparison in the
@@ -880,7 +769,7 @@ authentication is usually to be preferred.</p>
     <code>Realm</code>.  Thus, any changes you have made to the directory
     (new users, changed passwords or roles, etc.) will be immediately
     reflected.</li>
-<li>Once a user has been authenticated, the user (and his or her associated
+<li>Once a user has been authenticated, the user (and their associated
     roles) are cached within Tomcat for the duration of the user's login.
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
@@ -920,8 +809,8 @@ configuration documentation.</p>
 
 <h5>User File Format</h5>
 
-<p>The users file uses the same format as the
-<a href="#MemoryRealm">MemoryRealm</a>.</p>
+<p>For the XML file based <code>UserDatabase</code>, the users file uses the
+same format as the <a href="#MemoryRealm">MemoryRealm</a>.</p>
 
 <h5>Example</h5>
 
@@ -947,12 +836,20 @@ to all virtual hosts and web applications.  The default contents of the
 <li>When a user attempts to access a protected resource for the first time,
     Tomcat will call the <code>authenticate()</code> method of this
     <code>Realm</code>.</li>
-<li>Once a user has been authenticated, the user (and his or her associated
-    roles) are cached within Tomcat for the duration of the user's login.
+<li>Once a user has been authenticated, the user becomes associated within
+    Tomcat for the duration of the user's login.
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
-    closes their browser).  The cached user is <strong>not</strong> saved and
-    restored across sessions serialisations.</li>
+    closes their browser). However, the user roles will still reflect the
+    <code>UserDatabase</code> contents, unlike for the other realms. If a user
+    is removed from the database, it will be considered to have no roles.
+    The <code>useStaticPrincipal</code> attribute of the
+    <code>UserDatabaseRealm</code> can be used to instead cache the user along
+    with all its roles. The cached user is <strong>not</strong> saved and
+    restored across sessions serialisations. When the user's principal object
+    is serialized for any reason, it will also be replaced by a static
+    equivalent object with roles that will no longer reflect the databse
+    contents.</li>
 </ul>
 
 
@@ -1005,7 +902,7 @@ valid user, consisting of the following attributes:</p>
 <li>When a user attempts to access a protected resource for the first time,
     Tomcat will call the <code>authenticate()</code> method of this
     <code>Realm</code>.</li>
-<li>Once a user has been authenticated, the user (and his or her associated
+<li>Once a user has been authenticated, the user (and their associated
     roles) are cached within Tomcat for the duration of the user's login.
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
@@ -1116,8 +1013,8 @@ and restarting the server, without any code changes to your application.</li>
               method of this <code>Realm</code>.  Thus, any changes you have made in
               the security mechanism directly (new users, changed passwords or
               roles, etc.) will be immediately reflected.</li>
-          <li>Once a user has been authenticated, the user (and his or
-              her associated roles) are cached within Tomcat for the duration of
+          <li>Once a user has been authenticated, the user (and their
+              associated roles) are cached within Tomcat for the duration of
               the user's login.  For FORM-based authentication, that means until
               the session times out or is invalidated; for BASIC authentication,
               that means until the user closes their browser.  Any changes to the

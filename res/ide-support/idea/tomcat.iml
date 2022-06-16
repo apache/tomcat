@@ -41,7 +41,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-            <root url="jar://$TOMCAT_BUILD_LIBS$/junit-4.13/junit-4.13.jar!/" />
+            <root url="jar://$TOMCAT_BUILD_LIBS$/junit-4.13.2/junit-4.13.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -68,7 +68,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/ecj-4.15/ecj-4.15.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/ecj-4.23/ecj-4.23.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -104,7 +104,34 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/objenesis-3.1/objenesis-3.1.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/objenesis-3.2/objenesis-3.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$TOMCAT_BUILD_LIBS$/bnd-6.3.1/biz.aQute.bnd-6.3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$TOMCAT_BUILD_LIBS$/migration-1.0.0/jakartaee-migration-1.0.0-shaded.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$TOMCAT_BUILD_LIBS$/unboundid-6.0.3/unboundid-ldapsdk-6.0.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

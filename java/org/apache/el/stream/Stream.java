@@ -175,7 +175,7 @@ public class Stream {
                 while (iterator.hasNext()) {
                     list.add(iterator.next());
                 }
-                Collections.sort(list, c);
+                list.sort(c);
                 sorted = list.iterator();
             }
         };

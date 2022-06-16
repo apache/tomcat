@@ -25,11 +25,11 @@ import org.apache.catalina.util.URLEncoder;
 
 public class Substitution {
 
-    public abstract class SubstitutionElement {
+    public abstract static class SubstitutionElement {
         public abstract String evaluate(Matcher rule, Matcher cond, Resolver resolver);
     }
 
-    public class StaticElement extends SubstitutionElement {
+    public static class StaticElement extends SubstitutionElement {
         public String value;
 
         @Override
@@ -59,7 +59,7 @@ public class Substitution {
         }
     }
 
-    public class RewriteCondBackReferenceElement extends SubstitutionElement {
+    public static class RewriteCondBackReferenceElement extends SubstitutionElement {
         public int n;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -67,7 +67,7 @@ public class Substitution {
         }
     }
 
-    public class ServerVariableElement extends SubstitutionElement {
+    public static class ServerVariableElement extends SubstitutionElement {
         public String key;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -75,7 +75,7 @@ public class Substitution {
         }
     }
 
-    public class ServerVariableEnvElement extends SubstitutionElement {
+    public static class ServerVariableEnvElement extends SubstitutionElement {
         public String key;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -83,7 +83,7 @@ public class Substitution {
         }
     }
 
-    public class ServerVariableSslElement extends SubstitutionElement {
+    public static class ServerVariableSslElement extends SubstitutionElement {
         public String key;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -91,7 +91,7 @@ public class Substitution {
         }
     }
 
-    public class ServerVariableHttpElement extends SubstitutionElement {
+    public static class ServerVariableHttpElement extends SubstitutionElement {
         public String key;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
@@ -125,10 +125,10 @@ public class Substitution {
     }
 
     public void parse(Map<String, RewriteMap> maps) {
-        this.elements = parseSubtitution(sub, maps);
+        this.elements = parseSubstitution(sub, maps);
     }
 
-    private SubstitutionElement[] parseSubtitution(String sub, Map<String, RewriteMap> maps) {
+    private SubstitutionElement[] parseSubstitution(String sub, Map<String, RewriteMap> maps) {
 
         List<SubstitutionElement> elements = new ArrayList<>();
         int pos = 0;
@@ -143,7 +143,7 @@ public class Substitution {
             if (percentPos == -1 && dollarPos == -1 && backslashPos == -1) {
                 // Static text
                 StaticElement newElement = new StaticElement();
-                newElement.value = sub.substring(pos, sub.length());
+                newElement.value = sub.substring(pos);
                 pos = sub.length();
                 elements.add(newElement);
             } else if (isFirstPos(backslashPos, dollarPos, percentPos)) {
@@ -197,9 +197,9 @@ public class Substitution {
                     } else {
                         key = sub.substring(colon + 1, close);
                     }
-                    newElement.key = parseSubtitution(key, maps);
+                    newElement.key = parseSubstitution(key, maps);
                     if (defaultValue != null) {
-                        newElement.defaultValue = parseSubtitution(defaultValue, maps);
+                        newElement.defaultValue = parseSubstitution(defaultValue, maps);
                     }
                     pos = close + 1;
                     elements.add(newElement);
@@ -314,7 +314,7 @@ public class Substitution {
     }
 
     private String evaluateSubstitution(SubstitutionElement[] elements, Matcher rule, Matcher cond, Resolver resolver) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (SubstitutionElement element : elements) {
             buf.append(element.evaluate(rule, cond, resolver));
         }

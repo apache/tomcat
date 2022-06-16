@@ -25,7 +25,7 @@ public class TesterMessageInfo implements MessageInfo {
 
     private Object requestMessage;
     private Object responseMessage;
-    private final Map<String,String> map = new HashMap<>();
+    private final Map<String,Object> map = new HashMap<>();
 
     @Override
     public Object getRequestMessage() {
@@ -47,9 +47,8 @@ public class TesterMessageInfo implements MessageInfo {
         responseMessage = response;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
-    public Map getMap() {
+    public Map<String,Object> getMap() {
         return map;
     }
 }

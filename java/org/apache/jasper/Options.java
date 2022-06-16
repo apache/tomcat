@@ -101,17 +101,13 @@ public interface Options {
      * @return {@link TrimSpacesOption#TRUE} to remove template text that
      *         consists only of whitespace from the output completely,
      *         {@link TrimSpacesOption#SINGLE} to replace such template text
-     *         with a single space or {@link TrimSpacesOption#FALSE} to leave
-     *         such template text unchanged
+     *         with a single space, {@link TrimSpacesOption#FALSE} to leave
+     *         such template text unchanged or {@link TrimSpacesOption#EXTENDED}
+     *         to remove template text that consists only of whitespace and to
+     *         replace any sequence of whitespace and new lines within template
+     *         text with a single new line.
      */
     public TrimSpacesOption getTrimSpaces();
-
-    /**
-     * Gets the class-id value that is sent to Internet Explorer when using
-     * &lt;jsp:plugin&gt; tags.
-     * @return Class-id value
-     */
-    public String getIeClassId();
 
     /**
      * @return the work folder
@@ -359,5 +355,17 @@ public interface Options {
      */
     public default boolean getUseInstanceManagerForTags() {
         return false;
+    }
+
+
+    /**
+     * Should the container include the time the file was generated in the
+     * comments at the start of a Java file generated from a JSP or tag.
+     * Defaults to {@code true}.
+     *
+     * @return {@code true} to include the timestamp, otherwise don't include it
+     */
+    public default boolean getGeneratedJavaAddTimestamp() {
+        return true;
     }
 }

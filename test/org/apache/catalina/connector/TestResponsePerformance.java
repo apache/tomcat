@@ -26,7 +26,7 @@ import org.apache.tomcat.unittest.TesterRequest;
 
 public class TestResponsePerformance extends LoggingBaseTest {
 
-    private static final int ITERATIONS = 100000;
+    private static final int ITERATIONS = 1000000;
 
     @Test
     public void testToAbsolutePerformance() throws Exception {
@@ -38,9 +38,8 @@ public class TestResponsePerformance extends LoggingBaseTest {
         doHomebrew(resp);
         doUri();
 
-        // Note: Java 9 on my OSX laptop consistently shows doUri() is faster
-        //       than doHomebrew(). Worth a closer look for Tomcat 10 on the
-        //       assumption it will require java 9
+        // Note: With Java 11 the 'homebrew' approach is consistently 3 to 4
+        //       times faster on both MacOS and Linux
 
         // To allow for timing differences between runs, a "best of n" approach
         // is taken for this test

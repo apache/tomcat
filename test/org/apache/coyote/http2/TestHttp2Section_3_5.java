@@ -18,22 +18,52 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestHttp2Section_3_5 extends Http2TestBase {
 
-    @Test(expected=IOException.class)
+    @Test
     public void testNoConnectionPreface() throws Exception {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
         doHttpUpgrade();
-        // Should send client preface here
+
+        // Server settings
+        parser.readFrame(true);
+        Assert.assertEquals("0-Settings-[3]-[200]\n" +
+                "0-Settings-End\n"
+                , output.getTrace());
+        output.clearTrace();
+
+        // Should send client preface here. This will trigger an error.
+        // Send two pings (2*(9+8)=34 bytes) as server looks for entire preface
+        // of 24 bytes.
         sendPing();
-        // Send several pings else server will block waiting for the client
-        // preface which is longer than a single ping.
-        sendPing();
-        sendPing();
-        validateHttp2InitialResponse();
+        // Depending on timing, this ping may fail after the header has been
+        // sent but before the ping body since:
+        // 9 (ping 1 header) + 8 (ping 1 body) + 9 (ping 2 header) = 26 which
+        // which is enough data for the server to determine that the preface is
+        // invalid and close the connection. A subsequent attempt to send ping 2
+        // body will fail.
+        try {
+            sendPing();
+        } catch (IOException e) {
+            // Ignore
+        }
+
+        // If the client preface had been valid, this would be an
+        // acknowledgement. Of the settings. As the preface was invalid, it
+        // should be a GOAWAY frame.
+        try {
+            parser.readFrame(true);
+            Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("0-Goaway-[1]-[1]-["));
+        } catch (IOException ioe) {
+            // Ignore
+            // This is expected on some platforms and depends on timing. Once
+            // the server closes the connection the client may see an exception
+            // when trying to read the GOAWAY frame.
+        }
     }
 }

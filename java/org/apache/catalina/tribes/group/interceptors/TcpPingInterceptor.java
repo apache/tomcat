@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.group.interceptors;
 
 import java.lang.ref.WeakReference;
@@ -70,7 +69,9 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
             thread = new PingThread();
             thread.setDaemon(true);
             String channelName = "";
-            if (getChannel().getName() != null) channelName = "[" + getChannel().getName() + "]";
+            if (getChannel().getName() != null) {
+                channelName = "[" + getChannel().getName() + "]";
+            }
             thread.setName("TcpPingInterceptor.PingThread" + channelName +"-"+cnt.addAndGet(1));
             thread.start();
         }
@@ -78,10 +79,12 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         //acquire the interceptors to invoke on send ping events
         ChannelInterceptor next = getNext();
         while ( next != null ) {
-            if ( next instanceof TcpFailureDetector )
+            if ( next instanceof TcpFailureDetector ) {
                 failureDetector = new WeakReference<>((TcpFailureDetector)next);
-            if ( next instanceof StaticMembershipInterceptor )
+            }
+            if ( next instanceof StaticMembershipInterceptor ) {
                 staticMembers = new WeakReference<>((StaticMembershipInterceptor)next);
+            }
             next = next.getNext();
         }
 
@@ -100,7 +103,9 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
     @Override
     public void heartbeat() {
         super.heartbeat();
-        if (!getUseThread()) sendPing();
+        if (!getUseThread()) {
+            sendPing();
+        }
     }
 
     @Override
@@ -148,7 +153,9 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
     }
 
     protected void sendPingMessage(Member[] members) {
-        if ( members == null || members.length == 0 ) return;
+        if ( members == null || members.length == 0 ) {
+            return;
+        }
         ChannelData data = new ChannelData(true);//generates a unique Id
         data.setAddress(getLocalMember(false));
         data.setTimestamp(System.currentTimeMillis());
@@ -172,8 +179,11 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         }//end if
 
         //ignore the message, it doesnt have the flag set
-        if ( process ) super.messageReceived(msg);
-        else if ( log.isDebugEnabled() ) log.debug("Received a TCP ping packet:"+msg);
+        if ( process ) {
+            super.messageReceived(msg);
+        } else if ( log.isDebugEnabled() ) {
+            log.debug("Received a TCP ping packet:"+msg);
+        }
     }//messageReceived
 
     protected class PingThread extends Thread {

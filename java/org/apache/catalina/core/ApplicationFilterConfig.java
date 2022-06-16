@@ -57,8 +57,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
     private static final long serialVersionUID = 1L;
 
-    static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    static final StringManager sm = StringManager.getManager(ApplicationFilterConfig.class);
 
     private transient Log log = LogFactory.getLog(ApplicationFilterConfig.class); // must not be static
 
@@ -86,9 +85,10 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      * @exception InstantiationException if an exception occurs while
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
-     * @throws NamingException
-     * @throws SecurityException
-     * @throws IllegalArgumentException
+     * @throws NamingException If a JNDI lookup fails
+     * @throws SecurityException If a security manager prevents the creation
+     * @throws IllegalArgumentException If the provided configuration is not
+     *         valid
      */
     ApplicationFilterConfig(Context context, FilterDef filterDef)
             throws ClassCastException, ReflectiveOperationException, ServletException,
@@ -209,7 +209,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         sb.append(filterDef.getFilterName());
         sb.append(", filterClass=");
         sb.append(filterDef.getFilterClass());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -233,17 +233,19 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      * @exception InstantiationException if an exception occurs while
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
-     * @throws NamingException
-     * @throws ReflectiveOperationException
-     * @throws SecurityException
-     * @throws IllegalArgumentException
+     * @throws NamingException If a JNDI lookup fails
+     * @throws ReflectiveOperationException If the creation of the filter fails
+     * @throws SecurityException If a security manager prevents the creation
+     * @throws IllegalArgumentException If the provided configuration is not
+     *         valid
      */
     Filter getFilter() throws ClassCastException, ReflectiveOperationException, ServletException,
             NamingException, IllegalArgumentException, SecurityException {
 
         // Return the existing filter instance, if any
-        if (this.filter != null)
+        if (this.filter != null) {
             return this.filter;
+        }
 
         // Identify the class loader we will be using
         String filterClass = filterDef.getFilterClass();
@@ -371,9 +373,10 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         if (oname != null) {
             try {
                 Registry.getRegistry(null, null).unregisterComponent(oname);
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug(sm.getString("applicationFilterConfig.jmxUnregister",
                             getFilterClass(), getFilterName()));
+                }
             } catch(Exception ex) {
                 log.warn(sm.getString("applicationFilterConfig.jmxUnregisterFail",
                         getFilterClass(), getFilterName()), ex);

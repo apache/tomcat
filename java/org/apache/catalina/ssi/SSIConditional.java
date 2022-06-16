@@ -57,7 +57,9 @@ public class SSIConditional implements SSICommand {
         } else if ("elif".equalsIgnoreCase(commandName)) {
             // No need to even execute if we are nested in
             // a false branch
-            if (state.nestingCount > 0) return lastModified;
+            if (state.nestingCount > 0) {
+                return lastModified;
+            }
             // If a branch was already taken in this if block
             // then disable output and return
             if (state.branchTaken) {
@@ -77,7 +79,9 @@ public class SSIConditional implements SSICommand {
         } else if ("else".equalsIgnoreCase(commandName)) {
             // No need to even execute if we are nested in
             // a false branch
-            if (state.nestingCount > 0) return lastModified;
+            if (state.nestingCount > 0) {
+                return lastModified;
+            }
             // If we've already taken another branch then
             // disable output otherwise enable it.
             state.processConditionalCommandsOnly = state.branchTaken;
@@ -107,7 +111,7 @@ public class SSIConditional implements SSICommand {
 
 
     /**
-     * Retrieves the expression from the specified arguments and peforms the
+     * Retrieves the expression from the specified arguments and performs the
      * necessary evaluation steps.
      */
     private boolean evaluateArguments(String[] names, String[] values,
@@ -133,7 +137,9 @@ public class SSIConditional implements SSICommand {
      * null.
      */
     private String getExpression(String[] paramNames, String[] paramValues) {
-        if ("expr".equalsIgnoreCase(paramNames[0])) return paramValues[0];
+        if ("expr".equalsIgnoreCase(paramNames[0])) {
+            return paramValues[0];
+        }
         return null;
     }
 }

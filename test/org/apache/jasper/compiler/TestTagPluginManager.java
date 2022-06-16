@@ -56,7 +56,6 @@ public class TestTagPluginManager extends TomcatBaseTest {
 
         Node n = nodes.getNode(0);
         Assert.assertNotNull(n);
-        Assert.assertTrue(n instanceof Node.CustomTag);
 
         Node.CustomTag t = (Node.CustomTag)n;
         Assert.assertNotNull(t.getAtSTag());
@@ -64,7 +63,6 @@ public class TestTagPluginManager extends TomcatBaseTest {
         Node.Nodes sTag = c.getAtSTag();
         Node scriptlet = sTag.getNode(0);
         Assert.assertNotNull(scriptlet);
-        Assert.assertTrue(scriptlet instanceof Node.Scriptlet);
         Node.Scriptlet s = (Node.Scriptlet)scriptlet;
         Assert.assertEquals("//Just a comment", s.getText());
     }

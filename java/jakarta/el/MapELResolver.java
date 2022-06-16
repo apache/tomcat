@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.el;
 
 import java.beans.FeatureDescriptor;
@@ -47,6 +46,12 @@ public class MapELResolver extends ELResolver {
 
         if (base instanceof Map<?,?>) {
             context.setPropertyResolved(base, property);
+
+            Map<?, ?> map = (Map<?, ?>) base;
+            if (readOnly || map.getClass() == UNMODIFIABLE) {
+                return null;
+            }
+
             return Object.class;
         }
 
@@ -75,7 +80,7 @@ public class MapELResolver extends ELResolver {
 
             if (this.readOnly) {
                 throw new PropertyNotWritableException(Util.message(context,
-                        "resolverNotWriteable", base.getClass().getName()));
+                        "resolverNotWritable", base.getClass().getName()));
             }
 
             try {
@@ -100,6 +105,7 @@ public class MapELResolver extends ELResolver {
         return this.readOnly;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         if (base instanceof Map<?, ?>) {

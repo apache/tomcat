@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina;
 
 import java.util.Set;
@@ -25,7 +24,7 @@ import java.util.Set;
  * BackupManager is an example of such a Manager as are implementations of the
  * StoreManager interface.
  * <p>
- * With the BackupManager, sessions can be primary (master copy on this node),
+ * With the BackupManager, sessions can be primary (primary copy on this node),
  * backup (backup copy on this node) or proxy (only the session ID on this
  * node). The identity of the primary and backup nodes are known for all
  * sessions, including proxy sessions.

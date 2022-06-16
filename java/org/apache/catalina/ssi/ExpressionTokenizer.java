@@ -82,16 +82,22 @@ public class ExpressionTokenizer {
      */
     public int nextToken() {
         // Skip any leading white space
-        while (index < length && Character.isWhitespace(expr[index]))
+        while (index < length && Character.isWhitespace(expr[index])) {
             index++;
+        }
         // Clear the current token val
         tokenVal = null;
-        if (index == length) return TOKEN_END; // End of string
+        if (index == length)
+         {
+            return TOKEN_END; // End of string
+        }
         int start = index;
         char currentChar = expr[index];
         char nextChar = (char)0;
         index++;
-        if (index < length) nextChar = expr[index];
+        if (index < length) {
+            nextChar = expr[index];
+        }
         // Check for a known token start
         switch (currentChar) {
             case '(' :
@@ -145,7 +151,9 @@ public class ExpressionTokenizer {
                     escaped = true;
                     continue;
                 }
-                if (expr[index] == endChar && !escaped) break;
+                if (expr[index] == endChar && !escaped) {
+                    break;
+                }
                 escaped = false;
             }
             end = index;
@@ -159,14 +167,18 @@ public class ExpressionTokenizer {
                     escaped = true;
                     continue;
                 }
-                if (expr[index] == endChar && !escaped) break;
+                if (expr[index] == endChar && !escaped) {
+                    break;
+                }
                 escaped = false;
             }
             end = ++index;
         } else {
             // End is the next whitespace character
             for (; index < length; index++) {
-                if (isMetaChar(expr[index])) break;
+                if (isMetaChar(expr[index])) {
+                    break;
+                }
             }
             end = index;
         }

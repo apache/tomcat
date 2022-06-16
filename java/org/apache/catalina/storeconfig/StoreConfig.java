@@ -275,8 +275,9 @@ public class StoreConfig implements IStoreConfig {
             desc.setStoreSeparate(false);
             desc.getStoreFactory().store(aWriter, indent, aContext);
         } finally {
-            if (desc != null)
+            if (desc != null) {
                 desc.setStoreSeparate(oldSeparate);
+            }
         }
     }
 

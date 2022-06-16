@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.sql.PreparedStatement;
@@ -50,7 +49,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
      */
     private final K key;
 
-    private volatile boolean batchAdded = false;
+    private volatile boolean batchAdded;
 
     /**
      * Constructor.
@@ -73,6 +72,15 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         // Remove from trace now because this statement will be
         // added by the activate method.
         removeThisTrace(getConnectionInternal());
+    }
+
+    @Override
+    public void activate() throws SQLException {
+        setClosedInternal(false);
+        if (getConnectionInternal() != null) {
+            getConnectionInternal().addTrace(this);
+        }
+        super.activate();
     }
 
     /**
@@ -102,23 +110,12 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         if (!isClosed()) {
             try {
                 pool.returnObject(key, this);
-            } catch (final SQLException e) {
-                throw e;
-            } catch (final RuntimeException e) {
+            } catch (final SQLException | RuntimeException e) {
                 throw e;
             } catch (final Exception e) {
                 throw new SQLException("Cannot close preparedstatement (return to pool failed)", e);
             }
         }
-    }
-
-    @Override
-    public void activate() throws SQLException {
-        setClosedInternal(false);
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().addTrace(this);
-        }
-        super.activate();
     }
 
     @Override
@@ -138,12 +135,12 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         final List<AbandonedTrace> resultSetList = getTrace();
         if (resultSetList != null) {
             final List<Exception> thrownList = new ArrayList<>();
-            final ResultSet[] resultSets = resultSetList.toArray(new ResultSet[0]);
+            final ResultSet[] resultSets = resultSetList.toArray(Utils.EMPTY_RESULT_SET_ARRAY);
             for (final ResultSet resultSet : resultSets) {
                 if (resultSet != null) {
                     try {
                         resultSet.close();
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         thrownList.add(e);
                     }
                 }

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el;
 
 import java.io.Externalizable;
@@ -28,6 +27,7 @@ import jakarta.el.FunctionMapper;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
+import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.el.VariableMapper;
 
@@ -279,7 +279,7 @@ public final class MethodExpressionImpl extends MethodExpression implements
             ClassNotFoundException {
         this.expr = in.readUTF();
         String type = in.readUTF();
-        if (!"".equals(type)) {
+        if (!type.isEmpty()) {
             this.expectedType = ReflectionUtil.forName(type);
         }
         this.paramTypes = ReflectionUtil.toTypeArray(((String[]) in
@@ -317,15 +317,13 @@ public final class MethodExpressionImpl extends MethodExpression implements
         return this.getNode().isParametersProvided();
     }
 
-    /**
-     * @since EL 2.2
-     * Note: The spelling mistake is deliberate.
-     * isParmetersProvided()  - Specification definition
-     * isParametersProvided() - Corrected spelling
-     */
-    @Override
-    public boolean isParmetersProvided() {
-        return this.getNode().isParametersProvided();
-    }
 
+    @Override
+    public MethodReference getMethodReference(ELContext context) {
+        EvaluationContext ctx = new EvaluationContext(context, this.fnMapper, this.varMapper);
+        ctx.notifyBeforeEvaluation(getExpressionString());
+        MethodReference methodReference = this.getNode().getMethodReference(ctx);
+        ctx.notifyAfterEvaluation(getExpressionString());
+        return methodReference;
+    }
 }

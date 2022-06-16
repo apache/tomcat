@@ -88,19 +88,20 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     /**
      * The name of the algorithm to use to create instances of
-     * {@link java.security.SecureRandom} which are used to generate session IDs.
-     * If no algorithm is specified, SHA1PRNG is used. To use the platform
-     * default (which may be SHA1PRNG), specify the empty string. If an invalid
+     * {@link java.security.SecureRandom} which are used to generate session
+     * IDs. If no algorithm is specified, SHA1PRNG is used. If SHA1PRNG is not
+     * available, the platform default will be used. To use the platform default
+     * (which may be SHA1PRNG), specify the empty string. If an invalid
      * algorithm and/or provider is specified the SecureRandom instances will be
      * created using the defaults. If that fails, the SecureRandom instances
      * will be created using platform defaults.
      */
-    protected String secureRandomAlgorithm = "SHA1PRNG";
+    protected String secureRandomAlgorithm = SessionIdGeneratorBase.DEFAULT_SECURE_RANDOM_ALGORITHM;
 
     /**
      * The name of the provider to use to create instances of
-     * {@link java.security.SecureRandom} which are used to generate session IDs.
-     * If no algorithm is specified the of SHA1PRNG default is used. If an
+     * {@link java.security.SecureRandom} which are used to generate session
+     * IDs. If no provider is specified the platform default is used. If an
      * invalid algorithm and/or provider is specified the SecureRandom instances
      * will be created using the defaults. If that fails, the SecureRandom
      * instances will be created using platform defaults.
@@ -614,8 +615,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     @Override
     public void backgroundProcess() {
         count = (count + 1) % processExpiresFrequency;
-        if (count == 0)
+        if (count == 0) {
             processExpires();
+        }
     }
 
     /**
@@ -627,16 +629,18 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         Session sessions[] = findSessions();
         int expireHere = 0 ;
 
-        if(log.isDebugEnabled())
+        if(log.isDebugEnabled()) {
             log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
+        }
         for (Session session : sessions) {
             if (session != null && !session.isValid()) {
                 expireHere++;
             }
         }
         long timeEnd = System.currentTimeMillis();
-        if(log.isDebugEnabled())
-             log.debug("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) + " expired sessions: " + expireHere);
+        if(log.isDebugEnabled()) {
+            log.debug("End expire sessions " + getName() + " processingTime " + (timeEnd - timeNow) + " expired sessions: " + expireHere);
+        }
         processingTime += ( timeEnd - timeNow );
 
     }
@@ -683,11 +687,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             ((Lifecycle) sessionIdGenerator).start();
         } else {
             // Force initialization of the random number generator
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Force random number initialization starting");
+            }
             sessionIdGenerator.generateSessionId();
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("Force random number initialization completed");
+            }
         }
     }
 
@@ -1159,7 +1165,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     public String listSessionIds() {
         StringBuilder sb = new StringBuilder();
         for (String s : sessions.keySet()) {
-            sb.append(s).append(" ");
+            sb.append(s).append(' ');
         }
         return sb.toString();
     }
@@ -1183,7 +1189,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             return null;
         }
         Object o=s.getSession().getAttribute(key);
-        if( o==null ) return null;
+        if( o==null ) {
+            return null;
+        }
         return o.toString();
     }
 

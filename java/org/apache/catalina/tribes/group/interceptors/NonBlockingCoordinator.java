@@ -46,7 +46,7 @@ import org.apache.juli.logging.LogFactory;
  * <p>Title: Auto merging leader election algorithm</p>
  *
  * <p>Description: Implementation of a simple coordinator algorithm that not only selects a coordinator,
- *    it also merges groups automatically when members are discovered that werent part of the
+ *    it also merges groups automatically when members are discovered that weren't part of the
  *    </p>
  * <p>This algorithm is non blocking meaning it allows for transactions while the coordination phase is going on
  * </p>
@@ -276,7 +276,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             }catch ( ChannelException x  ) {
                 log.warn(sm.getString("nonBlockingCoordinator.electionMessage.sendfailed", msg.getMembers()[current]));
                 current = Arrays.nextIndex(msg.getMembers()[current],msg.getMembers());
-                if ( current == next ) throw x;
+                if ( current == next ) {
+                    throw x;
+                }
             }
         }
     }
@@ -297,16 +299,16 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
     protected boolean memberAlive(Member mbr, long conTimeout) {
         //could be a shutdown notification
-        if ( Arrays.equals(mbr.getCommand(),Member.SHUTDOWN_PAYLOAD) ) return false;
+        if ( Arrays.equals(mbr.getCommand(),Member.SHUTDOWN_PAYLOAD) ) {
+            return false;
+        }
 
         try (Socket socket = new Socket()) {
             InetAddress ia = InetAddress.getByAddress(mbr.getHost());
             InetSocketAddress addr = new InetSocketAddress(ia, mbr.getPort());
             socket.connect(addr, (int) conTimeout);
             return true;
-        } catch (SocketTimeoutException sx) {
-            //do nothing, we couldn't connect
-        } catch (ConnectException cx) {
+        } catch (SocketTimeoutException | ConnectException x) {
             //do nothing, we couldn't connect
         } catch (Exception x) {
             log.error(sm.getString("nonBlockingCoordinator.memberAlive.failed"),x);
@@ -322,8 +324,11 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         Arrays.fill(merged,getMembers());
         Member[] diff = Arrays.diff(merged,membership,local);
         for (Member member : diff) {
-            if (!alive(member)) merged.removeMember(member);
-            else memberAdded(member, false);
+            if (!alive(member)) {
+                merged.removeMember(member);
+            } else {
+                memberAdded(member, false);
+            }
         }
         fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_POST_MERGE,this,"Post merge"));
         return merged;
@@ -335,8 +340,11 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             synchronized (electionMutex) { electionMutex.notifyAll();}
         }
         Membership merged = mergeOnArrive(msg);
-        if (isViewConf(msg)) handleViewConf(msg, merged);
-        else handleToken(msg, merged);
+        if (isViewConf(msg)) {
+            handleViewConf(msg, merged);
+        } else {
+            handleToken(msg, merged);
+        }
     }
 
     protected void handleToken(CoordinationMessage msg, Membership merged) throws ChannelException {
@@ -384,7 +392,10 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     protected void handleViewConf(CoordinationMessage msg, Membership merged) throws ChannelException {
-        if ( viewId != null && msg.getId().equals(viewId) ) return;//we already have this view
+        if ( viewId != null && msg.getId().equals(viewId) )
+         {
+            return;//we already have this view
+        }
         view = new Membership(getLocalMember(false),AbsoluteOrder.comp,true);
         Arrays.fill(view,msg.getMembers());
         viewId = msg.getId();
@@ -411,8 +422,12 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     protected boolean hasHigherPriority(Member[] complete, Member[] local) {
-        if ( local == null || local.length == 0 ) return false;
-        if ( complete == null || complete.length == 0 ) return true;
+        if ( local == null || local.length == 0 ) {
+            return false;
+        }
+        if ( complete == null || complete.length == 0 ) {
+            return true;
+        }
         AbsoluteOrder.absoluteOrder(complete);
         AbsoluteOrder.absoluteOrder(local);
         return (AbsoluteOrder.comp.compare(complete[0],local[0]) > 0);
@@ -463,12 +478,18 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 //============================================================================================================
     @Override
     public void start(int svc) throws ChannelException {
-            if (membership == null) setupMembership();
-            if (started)return;
+            if (membership == null) {
+                setupMembership();
+            }
+            if (started) {
+                return;
+            }
             fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_START, this, "Before start"));
             super.start(startsvc);
             started = true;
-            if (view == null) view = new Membership(super.getLocalMember(true), AbsoluteOrder.comp, true);
+            if (view == null) {
+                view = new Membership(super.getLocalMember(true), AbsoluteOrder.comp, true);
+            }
             fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_START, this, "After start"));
             startElection(false);
     }
@@ -478,7 +499,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         try {
             halt();
             synchronized (electionMutex) {
-                if (!started)return;
+                if (!started) {
+                    return;
+                }
                 started = false;
                 fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_STOP, this, "Before stop"));
                 super.stop(startsvc);
@@ -527,11 +550,17 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     public void memberAdded(Member member,boolean elect) {
-        if (membership == null) setupMembership();
-        if (membership.memberAlive(member)) super.memberAdded(member);
+        if (membership == null) {
+            setupMembership();
+        }
+        if (membership.memberAlive(member)) {
+            super.memberAdded(member);
+        }
         try {
             fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MBR_ADD,this,"Member add("+member.getName()+")"));
-            if (started && elect) startElection(false);
+            if (started && elect) {
+                startElection(false);
+            }
         } catch (ChannelException x) {
             log.error(sm.getString("nonBlockingCoordinator.memberAdded.failed"),x);
         }
@@ -544,7 +573,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         try {
             fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MBR_DEL,this,"Member remove("+member.getName()+")"));
             if (started && (isCoordinator() || isHighest()))
+             {
                 startElection(true); //to do, if a member disappears, only the coordinator can start
+            }
         } catch (ChannelException x) {
             log.error(sm.getString("nonBlockingCoordinator.memberDisappeared.failed"),x);
         }
@@ -552,8 +583,11 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
     public boolean isHighest() {
         Member local = getLocalMember(false);
-        if ( membership.getMembers().length == 0 ) return true;
-        else return AbsoluteOrder.comp.compare(local,membership.getMembers()[0])<=0;
+        if ( membership.getMembers().length == 0 ) {
+            return true;
+        } else {
+            return AbsoluteOrder.comp.compare(local,membership.getMembers()[0])<=0;
+        }
     }
 
     public boolean isCoordinator() {
@@ -617,7 +651,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     @Override
     public Member getLocalMember(boolean incAlive) {
         Member local = super.getLocalMember(incAlive);
-        if ( view == null && (local != null)) setupMembership();
+        if ( view == null && (local != null)) {
+            setupMembership();
+        }
         return local;
     }
 
@@ -667,27 +703,37 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         }
 
         public Member getLeader() {
-            if ( leader == null ) parse();
+            if ( leader == null ) {
+                parse();
+            }
             return leader;
         }
 
         public Member getSource() {
-            if ( source == null ) parse();
+            if ( source == null ) {
+                parse();
+            }
             return source;
         }
 
         public UniqueId getId() {
-            if ( id == null ) parse();
+            if ( id == null ) {
+                parse();
+            }
             return id;
         }
 
         public Member[] getMembers() {
-            if ( view == null ) parse();
+            if ( view == null ) {
+                parse();
+            }
             return view;
         }
 
         public byte[] getType() {
-            if (type == null ) parse();
+            if (type == null ) {
+                parse();
+            }
             return type;
         }
 
@@ -762,9 +808,14 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
     @Override
     public void fireInterceptorEvent(InterceptorEvent event) {
-        if (event instanceof CoordinationEvent &&
-            ((CoordinationEvent)event).type == CoordinationEvent.EVT_CONF_RX) {
-            log.info(event);
+        if (event instanceof CoordinationEvent) {
+            if (((CoordinationEvent) event).type == CoordinationEvent.EVT_CONF_RX) {
+                log.info(event);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(event);
+                }
+            }
         }
     }
 

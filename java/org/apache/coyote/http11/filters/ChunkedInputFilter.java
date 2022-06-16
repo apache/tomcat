@@ -243,7 +243,16 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
      */
     @Override
     public int available() {
-        return readChunk != null ? readChunk.remaining() : 0;
+        int available = 0;
+        if (readChunk != null) {
+            available = readChunk.remaining();
+        }
+        if (available == 0) {
+            // No data buffered here. Try the next filter in the chain.
+            return buffer.available();
+        } else {
+            return available;
+        }
     }
 
 
@@ -326,8 +335,9 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         while (!eol) {
 
             if (readChunk == null || readChunk.position() >= readChunk.limit()) {
-                if (readBytes() <= 0)
+                if (readBytes() <= 0) {
                     return false;
+                }
             }
 
             byte chr = readChunk.get(readChunk.position());

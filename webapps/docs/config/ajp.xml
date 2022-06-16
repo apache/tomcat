@@ -81,16 +81,10 @@
 
   <attributes>
 
-    <attribute name="ajpFlush" required="false">
-      <p>A boolean value which can be used to enable or disable sending
-      AJP flush messages to the fronting proxy whenever an explicit
-      flush happens. The default value is <code>true</code>.<br/>
-      An AJP flush message is a SEND_BODY_CHUNK packet with no body content.
-      Proxy implementations like mod_jk or mod_proxy_ajp will flush the
-      data buffered in the web server to the client when they receive
-      such a packet. Setting this to <code>false</code> can reduce
-      AJP packet traffic but might delay sending packets to the client.
-      At the end of the response, AJP does always flush to the client.</p>
+    <attribute name="allowBackslash" required="false">
+      <p>If this is <code>true</code> the '\' character will be permitted as a
+      path delimiter.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
     </attribute>
 
     <attribute name="allowTrace" required="false">
@@ -102,6 +96,15 @@
       <p>The default timeout for asynchronous requests in milliseconds. If not
       specified, this attribute is set to the Servlet specification default of
       30000 (30 seconds).</p>
+    </attribute>
+
+    <attribute name="discardFacades" required="false">
+      <p>A boolean value which can be used to enable or disable the recycling
+      of the facade objects that isolate the container internal request
+      processing objects. If set to <code>true</code> the facades will be
+      set for garbage collection after every request, otherwise they will be
+      reused. This setting has no effect when the security manager is enabled.
+      If not specified, this attribute is set to <code>true</code>.</p>
     </attribute>
 
     <attribute name="enableLookups" required="false">
@@ -124,11 +127,21 @@
       If not specified the default value is <code>reject</code>.</p>
     </attribute>
 
-    <attribute name="maxHeaderCount" required="false">
-      <p>The maximum number of headers in a request that are allowed by the
-      container. A request that contains more headers than the specified limit
-      will be rejected. A value of less than 0 means no limit.
-      If not specified, a default of 100 is used.</p>
+    <attribute name="enforceEncodingInGetWriter" required="false">
+      <p>If this is <code>true</code> then
+      a call to <code>Response.getWriter()</code> if no character encoding
+      has been specified will result in subsequent calls to
+      <code>Response.getCharacterEncoding()</code> returning
+      <code>ISO-8859-1</code> and the <code>Content-Type</code> response header
+      will include a <code>charset=ISO-8859-1</code> component. (SRV.15.2.22.1)</p>
+      <p>If not specified, the default specification compliant value of
+      <code>true</code> will be used.</p>
+    </attribute>
+
+    <attribute name="maxCookieCount" required="false">
+      <p>The maximum number of cookies that are permitted for a request. A value
+      of less than zero means no limit. If not specified, a default value of 200
+      will be used.</p>
     </attribute>
 
     <attribute name="maxParameterCount" required="false">
@@ -199,8 +212,6 @@
         - non blocking Java NIO connector.<br/>
         <code>org.apache.coyote.ajp.AjpNio2Protocol</code>
         - non blocking Java NIO2 connector.<br/>
-        <code>org.apache.coyote.ajp.AjpAprProtocol</code>
-        - the APR/native connector.<br/>
         Custom implementations may also be used.<br/>
         Take a look at our <a href="#Connector_Comparison">Connector
         Comparison</a> chart.
@@ -229,6 +240,12 @@
       <code>&lt;security-constraint&gt;</code> requires SSL transport,
       Catalina will automatically redirect the request to the port
       number specified here.</p>
+    </attribute>
+
+    <attribute name="rejectSuspiciousURIs" required="false">
+      <p>Should this <strong>Connector</strong> reject a requests if the URI
+      matches one of the suspicious URIs patterns identified by the Servlet 6.0
+      specification? The default value is <code>false</code>.</p>
     </attribute>
 
     <attribute name="scheme" required="false">
@@ -285,16 +302,17 @@
 
   <p>To use AJP, you must specify the protocol attribute (see above).</p>
 
-  <p>The standard AJP connectors (NIO, NIO2 and APR/native) all support the
-  following attributes in addition to the common Connector attributes listed
-  above.</p>
+  <p>The standard AJP connectors (NIO and NIO2) both support the following
+  attributes in addition to the common Connector attributes listed above.</p>
 
   <attributes>
 
     <attribute name="acceptCount" required="false">
-      <p>The maximum queue length for incoming connection requests when
-      all possible request processing threads are in use.  Any requests
-      received when the queue is full will be refused.  The default
+      <p>The maximum length of the operating system provided queue for incoming
+      connection requests when <code>maxConnections</code> has been reached. The
+      operating system may ignore this setting and use a different size for the
+      queue. When this queue is full, the operating system may actively refuse
+      additional connections or those connections may time out. The default
       value is 100.</p>
     </attribute>
 
@@ -320,11 +338,19 @@
       default, the connector will listen on the loopback address. Unless the JVM
       is configured otherwise using system properties, the Java based connectors
       (NIO, NIO2) will listen on both IPv4 and IPv6 addresses when configured
-      with either <code>0.0.0.0</code> or <code>::</code>. The APR/native
-      connector will only listen on IPv4 addresses if configured with
-      <code>0.0.0.0</code> and will listen on IPv6 addresses (and optionally
-      IPv4 addresses depending on the setting of <strong>ipv6v6only</strong>) if
-      configured with <code>::</code>.</p>
+      with either <code>0.0.0.0</code> or <code>::</code>.</p>
+    </attribute>
+
+    <attribute name="ajpFlush" required="false">
+      <p>A boolean value which can be used to enable or disable sending
+      AJP flush messages to the fronting proxy whenever an explicit
+      flush happens. The default value is <code>true</code>.<br/>
+      An AJP flush message is a SEND_BODY_CHUNK packet with no body content.
+      Proxy implementations like mod_jk or mod_proxy_ajp will flush the
+      data buffered in the web server to the client when they receive
+      such a packet. Setting this to <code>false</code> can reduce
+      AJP packet traffic but might delay sending packets to the client.
+      At the end of the response, AJP does always flush to the client.</p>
     </attribute>
 
     <attribute name="allowedRequestAttributesPattern" required="false">
@@ -366,10 +392,7 @@
       <p>When client certificate information is presented in a form other than
       instances of <code>java.security.cert.X509Certificate</code> it needs to
       be converted before it can be used and this property controls which JSSE
-      provider is used to perform the conversion. For example it is used with
-      the AJP connectors, the <a href="http.html">HTTP APR connector</a> and
-      with the <a href="valve.html#SSL_Authenticator_Valve">
-      org.apache.catalina.valves.SSLValve</a>.If not specified, the default
+      provider is used to perform the conversion. If not specified, the default
       provider will be used.</p>
     </attribute>
 
@@ -423,10 +446,11 @@
       maxConnections feature and connections will not be counted.</p>
     </attribute>
 
-    <attribute name="maxCookieCount" required="false">
-      <p>The maximum number of cookies that are permitted for a request. A value
-      of less than zero means no limit. If not specified, a default value of 200
-      will be used.</p>
+    <attribute name="maxHeaderCount" required="false">
+      <p>The maximum number of headers in a request that are allowed by the
+      container. A request that contains more headers than the specified limit
+      will be rejected. A value of less than 0 means no limit.
+      If not specified, a default of 100 is used.</p>
     </attribute>
 
     <attribute name="maxThreads" required="false">
@@ -703,31 +727,6 @@
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
-      <attribute name="selectorPool.maxSelectors" required="false">
-        <p>(int)The max selectors to be used in the pool, to reduce selector
-        contention. Use this option when the command line
-        <code>org.apache.tomcat.util.net.NioSelectorShared</code> value is set
-        to false. Default value is <code>200</code>.</p>
-      </attribute>
-
-      <attribute name="selectorPool.maxSpareSelectors" required="false">
-        <p>(int)The max spare selectors to be used in the pool, to reduce
-        selector contention. When a selector is returned to the pool, the system
-        can decide to keep it or let it be GC'd. Use this option when the
-        command line <code>org.apache.tomcat.util.net.NioSelectorShared</code>
-        value is set to false. Default value is <code>-1</code> (unlimited).</p>
-      </attribute>
-
-      <attribute name="command-line-options" required="false">
-        <p>The following command line options are available for the NIO
-        connector:<br/>
-        <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true|false</code>
-        - default is <code>true</code>. Set this value to <code>false</code> if you wish to
-        use a selector for each thread. When you set it to <code>false</code>, you can
-        control the size of the pool of selectors by using the
-        <strong>selectorPool.maxSelectors</strong> attribute.</p>
-      </attribute>
-
     </attributes>
   </subsection>
 
@@ -791,31 +790,6 @@
     </attributes>
   </subsection>
 
-  <subsection name="APR/native specific configuration">
-
-    <p>The APR/native implementation supports the following attributes in
-    addition to the common Connector and AJP attributes listed above.</p>
-
-    <attributes>
-      <attribute name="ipv6v6only" required="false">
-        <p>If listening on an IPv6 address on a dual stack system, should the
-        connector only listen on the IPv6 address? If not specified the default
-        is <code>false</code> and the connector will listen on the IPv6 address
-        and the equivalent IPv4 address if present.</p>
-      </attribute>
-
-      <attribute name="pollTime" required="false">
-        <p>Duration of a poll call in microseconds. Lowering this value will
-        slightly decrease latency of connections being kept alive in some cases
-        , but will use more CPU as more poll calls are being made. The default
-        value is 2000 (2ms).
-        </p>
-    </attribute>
-
-    </attributes>
-
-  </subsection>
-
 </section>
 
 
@@ -853,23 +827,19 @@
         <th />
         <th style="text-align: center;">Java Nio Connector<br />NIO</th>
         <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
-        <th style="text-align: center;">APR/native Connector<br />APR</th>
       </tr>
       <tr>
         <th>Classname</th>
         <td><code class="noHighlight">AjpNioProtocol</code></td>
         <td><code class="noHighlight">AjpNio2Protocol</code></td>
-        <td><code class="noHighlight">AjpAprProtocol</code></td>
       </tr>
       <tr>
         <th>Tomcat Version</th>
         <td>7.x onwards</td>
         <td>8.x onwards</td>
-        <td>5.5.x onwards</td>
       </tr>
       <tr>
         <th>Support Polling</th>
-        <td>YES</td>
         <td>YES</td>
         <td>YES</td>
       </tr>
@@ -877,11 +847,9 @@
         <th>Polling Size</th>
         <td><code class="noHighlight">maxConnections</code></td>
         <td><code class="noHighlight">maxConnections</code></td>
-        <td><code class="noHighlight">maxConnections</code></td>
       </tr>
       <tr>
         <th>Read Request Headers</th>
-        <td>Blocking</td>
         <td>Blocking</td>
         <td>Blocking</td>
       </tr>
@@ -889,11 +857,9 @@
         <th>Read Request Body</th>
         <td>Blocking</td>
         <td>Blocking</td>
-        <td>Blocking</td>
       </tr>
       <tr>
         <th>Write Response Headers and Body</th>
-        <td>Blocking</td>
         <td>Blocking</td>
         <td>Blocking</td>
       </tr>
@@ -901,11 +867,9 @@
         <th>Wait for next Request</th>
         <td>Non Blocking</td>
         <td>Non Blocking</td>
-        <td>Non Blocking</td>
       </tr>
       <tr>
         <th>Max Connections</th>
-        <td><code class="noHighlight">maxConnections</code></td>
         <td><code class="noHighlight">maxConnections</code></td>
         <td><code class="noHighlight">maxConnections</code></td>
       </tr>

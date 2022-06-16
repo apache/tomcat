@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
@@ -41,8 +43,9 @@ import org.xml.sax.SAXException;
  * Utility class for the loading and saving of JASPIC persistent provider
  * registrations.
  */
-final class PersistentProviderRegistrations {
+public final class PersistentProviderRegistrations {
 
+    private static final Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
     private static final StringManager sm =
             StringManager.getManager(PersistentProviderRegistrations.class);
 
@@ -59,11 +62,12 @@ final class PersistentProviderRegistrations {
 
             try {
                 digester.setFeature("http://apache.org/xml/features/allow-java-encodings", true);
-                digester.setValidating(true);
-                digester.setNamespaceAware(true);
-            } catch (Exception e) {
-                throw new SecurityException(e);
+            } catch (SAXException se) {
+                log.warn(sm.getString("persistentProviderRegistrations.xmlFeatureEncoding"), se);
             }
+
+            digester.setValidating(true);
+            digester.setNamespaceAware(true);
 
             // Create an object to hold the parse results and put it on the top
             // of the digester's stack
@@ -83,7 +87,7 @@ final class PersistentProviderRegistrations {
             digester.parse(is);
 
             return result;
-        } catch (IOException | SAXException e) {
+        } catch (IOException | ParserConfigurationException | SAXException e) {
             throw new SecurityException(e);
         }
     }
@@ -232,6 +236,16 @@ final class PersistentProviderRegistrations {
 
         public void addProperty(Property property) {
             properties.put(property.getName(), property.getValue());
+        }
+
+        /**
+         * Used by IntrospectionUtils via reflection.
+         * @param name - the name of of the property to set on this object
+         * @param value - the value to set
+         * @see #addProperty(String, String)
+         */
+        public void setProperty(String name, String value) {
+            addProperty(name, value);
         }
         void addProperty(String name, String value) {
             properties.put(name, value);

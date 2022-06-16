@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ha.backend;
 
 import org.apache.catalina.Lifecycle;
@@ -128,7 +126,7 @@ public class HeartbeatListener implements LifecycleListener {
     public String getProxyList() { return proxyList; }
 
     /**
-     * Set the list of Proxies that send is requests, when not empty it toogles
+     * Set the list of Proxies that send is requests, when not empty it toggles
      * the multi to off. A SetHandler heartbeat must be existing in httpd.conf.
      *
      * @param proxyList the list of proxy, format "address:port,address:port".
@@ -167,10 +165,11 @@ public class HeartbeatListener implements LifecycleListener {
 
         if (Lifecycle.PERIODIC_EVENT.equals(event.getType())) {
             if (sender == null) {
-                if (proxyList == null)
+                if (proxyList == null) {
                     sender = new MultiCastSender();
-                else
+                } else {
                     sender = new TcpSender();
+                }
             }
 
             /* Read busy and ready */

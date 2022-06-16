@@ -86,7 +86,9 @@ public class MembersWithProperties implements MembershipListener{
 
     @SuppressWarnings("unused")
     public static void main(String[] args) throws Exception {
-        if (args.length==0) usage();
+        if (args.length==0) {
+          usage();
+        }
         main = Thread.currentThread();
         ManagedChannel channel = (ManagedChannel) ChannelCreator.createChannel(args);
         Properties props = new Properties();

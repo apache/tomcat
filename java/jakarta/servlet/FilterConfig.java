@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.servlet;
 
 import java.util.Enumeration;
 
 /**
- *
  * A filter configuration object used by a servlet container to pass information
  * to a filter during initialization.
  *

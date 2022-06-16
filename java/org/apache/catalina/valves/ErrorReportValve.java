@@ -94,17 +94,25 @@ public class ErrorReportValve extends ValveBase {
         if (response.isCommitted()) {
             if (response.setErrorReported()) {
                 // Error wasn't previously reported but we can't write an error
-                // page because the response has already been committed. Attempt
-                // to flush any data that is still to be written to the client.
-                try {
-                    response.flushBuffer();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
+                // page because the response has already been committed.
+
+                // See if IO is allowed
+                AtomicBoolean ioAllowed = new AtomicBoolean(true);
+                response.getCoyoteResponse().action(ActionCode.IS_IO_ALLOWED, ioAllowed);
+
+                if (ioAllowed.get()) {
+                    // I/O is currently still allowed. Flush any data that is
+                    // still to be written to the client.
+                    try {
+                        response.flushBuffer();
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                    }
+                    // Now close immediately to signal to the client that
+                    // something went wrong
+                    response.getCoyoteResponse().action(ActionCode.CLOSE_NOW,
+                            request.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
                 }
-                // Close immediately to signal to the client that something went
-                // wrong
-                response.getCoyoteResponse().action(ActionCode.CLOSE_NOW,
-                        request.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
             }
             return;
         }
@@ -320,9 +328,7 @@ public class ErrorReportValve extends ValveBase {
                 writer.write(sb.toString());
                 response.finishResponse();
             }
-        } catch (IOException e) {
-            // Ignore
-        } catch (IllegalStateException e) {
+        } catch (IOException | IllegalStateException e) {
             // Ignore
         }
 

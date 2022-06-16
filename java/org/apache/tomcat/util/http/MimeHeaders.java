@@ -392,15 +392,27 @@ public class MimeHeaders {
     }
 
     /**
-     * reset and swap with last header
+     * Reset, move to the end and then reduce count by 1.
      * @param idx the index of the header to remove.
      */
     public void removeHeader(int idx) {
-        MimeHeaderField mh = headers[idx];
+        // Implementation note. This method must not change the order of the
+        // remaining headers because, if there are multiple header values for
+        // the same name, the order of those headers is significant. It is
+        // simpler to retain order for all values than try to determine if there
+        // are multiple header values for the same name.
 
+        // Clear the header to remove
+        MimeHeaderField mh = headers[idx];
         mh.recycle();
-        headers[idx] = headers[count - 1];
+
+        // Move the remaining headers
+        System.arraycopy(headers, idx + 1, headers, idx, count - idx -1);
+
+        // Place the removed header at the end
         headers[count - 1] = mh;
+
+        // Reduce the count
         count--;
     }
 
@@ -526,5 +538,10 @@ class MimeHeaderField {
 
     public MessageBytes getValue() {
         return valueB;
+    }
+
+    @Override
+    public String toString() {
+        return nameB + ": " + valueB;
     }
 }

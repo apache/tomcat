@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.manager.util;
 
 import java.lang.reflect.Method;
@@ -175,8 +174,9 @@ public class SessionUtils {
             return in_session.getPrincipal().getName();
         }
         HttpSession httpSession = in_session.getSession();
-        if (httpSession == null)
+        if (httpSession == null) {
             return null;
+        }
 
         try {
             Object user = null;

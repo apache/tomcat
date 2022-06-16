@@ -20,12 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.net.ssl.SSLContext;
+
 final class DefaultClientEndpointConfig implements ClientEndpointConfig {
 
     private final List<String> preferredSubprotocols;
     private final List<Extension> extensions;
     private final List<Class<? extends Encoder>> encoders;
     private final List<Class<? extends Decoder>> decoders;
+    private final SSLContext sslContext;
     private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
     private final Configurator configurator;
 
@@ -34,11 +37,13 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
             List<Extension> extensions,
             List<Class<? extends Encoder>> encoders,
             List<Class<? extends Decoder>> decoders,
+            SSLContext sslContext,
             Configurator configurator) {
         this.preferredSubprotocols = preferredSubprotocols;
         this.extensions = extensions;
-        this.decoders = decoders;
         this.encoders = encoders;
+        this.decoders = decoders;
+        this.sslContext = sslContext;
         this.configurator = configurator;
     }
 
@@ -64,6 +69,12 @@ final class DefaultClientEndpointConfig implements ClientEndpointConfig {
     @Override
     public List<Class<? extends Decoder>> getDecoders() {
         return decoders;
+    }
+
+
+    @Override
+    public SSLContext getSSLContext() {
+        return sslContext;
     }
 
 

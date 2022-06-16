@@ -16,7 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.util.json;
 
 /**
@@ -84,7 +83,9 @@ public class JSONParser implements JSONParserConstants {
 
   final public boolean ensureEOF() throws ParseException {
     jj_consume_token(0);
-{if ("" != null) return true;}
+{if ("" != null) {
+  return true;
+}}
     throw new Error("Missing return statement in function");
 }
 
@@ -115,7 +116,9 @@ public class JSONParser implements JSONParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return x;}
+{if ("" != null) {
+  return x;
+}}
     throw new Error("Missing return statement in function");
 }
 
@@ -166,7 +169,9 @@ key = o.toString();
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return key;}
+{if ("" != null) {
+  return key;
+}}
     throw new Error("Missing return statement in function");
 }
 
@@ -215,7 +220,9 @@ key = null; value = null;
       ;
     }
     jj_consume_token(BRACE_CLOSE);
-{if ("" != null) return map;}
+{if ("" != null) {
+  return map;
+}}
     throw new Error("Missing return statement in function");
 }
 
@@ -261,7 +268,9 @@ value = null;
     }
     jj_consume_token(BRACKET_CLOSE);
 list.trimToSize();
-        {if ("" != null) return list;}
+        {if ("" != null) {
+          return list;
+        }}
     throw new Error("Missing return statement in function");
 }
 
@@ -293,13 +302,17 @@ list.trimToSize();
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return x;}
+{if ("" != null) {
+  return x;
+}}
     throw new Error("Missing return statement in function");
 }
 
   final public Object nullValue() throws ParseException {
     jj_consume_token(NULL);
-{if ("" != null) return null;}
+{if ("" != null) {
+  return null;
+}}
     throw new Error("Missing return statement in function");
 }
 
@@ -320,7 +333,9 @@ b = Boolean.FALSE;
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return b;}
+{if ("" != null) {
+  return b;
+}}
     throw new Error("Missing return statement in function");
 }
 
@@ -329,18 +344,26 @@ b = Boolean.FALSE;
     case NUMBER_DECIMAL:{
       t = jj_consume_token(NUMBER_DECIMAL);
 if (nativeNumbers) {
-                {if ("" != null) return new Long(t.image);}
+                {if ("" != null) {
+                  return Long.valueOf(t.image);
+                }}
             } else {
-                {if ("" != null) return new java.math.BigDecimal(t.image);}
+                {if ("" != null) {
+                  return new java.math.BigDecimal(t.image);
+                }}
             }
       break;
       }
     case NUMBER_INTEGER:{
       t = jj_consume_token(NUMBER_INTEGER);
 if (nativeNumbers) {
-                {if ("" != null) return new Double(t.image);}
+                {if ("" != null) {
+                  return Double.valueOf(t.image);
+                }}
             } else {
-                {if ("" != null) return new java.math.BigInteger(substringBefore(t.image, '.'));}
+                {if ("" != null) {
+                  return new java.math.BigInteger(substringBefore(t.image, '.'));
+                }}
             }
       break;
       }
@@ -369,7 +392,9 @@ if (nativeNumbers) {
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return s;}
+{if ("" != null) {
+  return s;
+}}
     throw new Error("Missing return statement in function");
 }
 
@@ -377,13 +402,17 @@ if (nativeNumbers) {
     switch (jj_nt.kind) {
     case STRING_DOUBLE_EMPTY:{
       jj_consume_token(STRING_DOUBLE_EMPTY);
-{if ("" != null) return "";}
+{if ("" != null) {
+  return "";
+}}
       break;
       }
     case STRING_DOUBLE_NONEMPTY:{
       jj_consume_token(STRING_DOUBLE_NONEMPTY);
 String image = token.image;
-            {if ("" != null) return image.substring(1, image.length() - 1);}
+            {if ("" != null) {
+              return image.substring(1, image.length() - 1);
+            }}
       break;
       }
     default:
@@ -398,13 +427,17 @@ String image = token.image;
     switch (jj_nt.kind) {
     case STRING_SINGLE_EMPTY:{
       jj_consume_token(STRING_SINGLE_EMPTY);
-{if ("" != null) return "";}
+{if ("" != null) {
+  return "";
+}}
       break;
       }
     case STRING_SINGLE_NONEMPTY:{
       jj_consume_token(STRING_SINGLE_NONEMPTY);
 String image = token.image;
-            {if ("" != null) return image.substring(1, image.length() - 1);}
+            {if ("" != null) {
+              return image.substring(1, image.length() - 1);
+            }}
       break;
       }
     default:
@@ -417,7 +450,9 @@ String image = token.image;
 
   final public String symbol() throws ParseException {
     jj_consume_token(SYMBOL);
-{if ("" != null) return token.image;}
+{if ("" != null) {
+  return token.image;
+}}
     throw new Error("Missing return statement in function");
 }
 
@@ -449,7 +484,9 @@ String image = token.image;
 	 token = new Token();
 	 token.next = jj_nt = token_source.getNextToken();
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) {
+    jj_la1[i] = -1;
+  }
   }
 
   /** Reinitialise. */
@@ -463,7 +500,9 @@ String image = token.image;
 	 token = new Token();
 	 token.next = jj_nt = token_source.getNextToken();
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) {
+    jj_la1[i] = -1;
+  }
   }
 
   /** Constructor. */
@@ -473,7 +512,9 @@ String image = token.image;
 	 token = new Token();
 	 token.next = jj_nt = token_source.getNextToken();
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) {
+    jj_la1[i] = -1;
+  }
   }
 
   /** Reinitialise. */
@@ -491,7 +532,9 @@ String image = token.image;
 	 token = new Token();
 	 token.next = jj_nt = token_source.getNextToken();
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) {
+    jj_la1[i] = -1;
+  }
   }
 
   /** Constructor with generated Token Manager. */
@@ -500,7 +543,9 @@ String image = token.image;
 	 token = new Token();
 	 token.next = jj_nt = token_source.getNextToken();
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) {
+    jj_la1[i] = -1;
+  }
   }
 
   /** Reinitialise. */
@@ -509,13 +554,18 @@ String image = token.image;
 	 token = new Token();
 	 token.next = jj_nt = token_source.getNextToken();
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) {
+    jj_la1[i] = -1;
+  }
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
 	 Token oldToken = token;
-	 if ((token = jj_nt).next != null) jj_nt = jj_nt.next;
-	 else jj_nt = jj_nt.next = token_source.getNextToken();
+	 if ((token = jj_nt).next != null) {
+    jj_nt = jj_nt.next;
+  } else {
+    jj_nt = jj_nt.next = token_source.getNextToken();
+  }
 	 if (token.kind == kind) {
 	   jj_gen++;
 	   return token;
@@ -529,8 +579,11 @@ String image = token.image;
 
 /** Get the next Token. */
   final public Token getNextToken() {
-	 if ((token = jj_nt).next != null) jj_nt = jj_nt.next;
-	 else jj_nt = jj_nt.next = token_source.getNextToken();
+	 if ((token = jj_nt).next != null) {
+    jj_nt = jj_nt.next;
+  } else {
+    jj_nt = jj_nt.next = token_source.getNextToken();
+  }
 	 jj_gen++;
 	 return token;
   }
@@ -539,8 +592,11 @@ String image = token.image;
   final public Token getToken(int index) {
 	 Token t = token;
 	 for (int i = 0; i < index; i++) {
-	   if (t.next != null) t = t.next;
-	   else t = t.next = token_source.getNextToken();
+	   if (t.next != null) {
+      t = t.next;
+    } else {
+      t = t.next = token_source.getNextToken();
+    }
 	 }
 	 return t;
   }

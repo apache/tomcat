@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 public class ByteBufferUtils {
@@ -42,34 +41,19 @@ public class ByteBufferUtils {
         Method cleanMethodLocal = null;
         Object unsafeLocal = null;
         Method invokeCleanerMethodLocal = null;
-        if (JreCompat.isJre9Available()) {
-            try {
-                Class<?> clazz = Class.forName("sun.misc.Unsafe");
-                Field theUnsafe = clazz.getDeclaredField("theUnsafe");
-                theUnsafe.setAccessible(true);
-                unsafeLocal = theUnsafe.get(null);
-                invokeCleanerMethodLocal = clazz.getMethod("invokeCleaner", ByteBuffer.class);
-                invokeCleanerMethodLocal.invoke(unsafeLocal, tempBuffer);
-            } catch (IllegalAccessException | IllegalArgumentException
-                    | InvocationTargetException | NoSuchMethodException | SecurityException
-                    | ClassNotFoundException | NoSuchFieldException e) {
-                log.warn(sm.getString("byteBufferUtils.cleaner"), e);
-                unsafeLocal = null;
-                invokeCleanerMethodLocal = null;
-            }
-        } else {
-            try {
-                cleanerMethodLocal = tempBuffer.getClass().getMethod("cleaner");
-                cleanerMethodLocal.setAccessible(true);
-                Object cleanerObject = cleanerMethodLocal.invoke(tempBuffer);
-                cleanMethodLocal = cleanerObject.getClass().getMethod("clean");
-                cleanMethodLocal.invoke(cleanerObject);
-            } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
-                    IllegalArgumentException | InvocationTargetException e) {
-                log.warn(sm.getString("byteBufferUtils.cleaner"), e);
-                cleanerMethodLocal = null;
-                cleanMethodLocal = null;
-            }
+        try {
+            Class<?> clazz = Class.forName("sun.misc.Unsafe");
+            Field theUnsafe = clazz.getDeclaredField("theUnsafe");
+            theUnsafe.setAccessible(true);
+            unsafeLocal = theUnsafe.get(null);
+            invokeCleanerMethodLocal = clazz.getMethod("invokeCleaner", ByteBuffer.class);
+            invokeCleanerMethodLocal.invoke(unsafeLocal, tempBuffer);
+        } catch (IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | NoSuchMethodException | SecurityException
+                | ClassNotFoundException | NoSuchFieldException e) {
+            log.warn(sm.getString("byteBufferUtils.cleaner"), e);
+            unsafeLocal = null;
+            invokeCleanerMethodLocal = null;
         }
         cleanerMethod = cleanerMethodLocal;
         cleanMethod = cleanMethodLocal;

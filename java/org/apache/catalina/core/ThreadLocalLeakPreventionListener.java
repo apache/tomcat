@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.core;
 
 import java.util.concurrent.Executor;
@@ -35,19 +34,15 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
- * <p>
  * A {@link LifecycleListener} that triggers the renewal of threads in Executor
  * pools when a {@link Context} is being stopped to avoid thread-local related
  * memory leaks.
- * </p>
  * <p>
  * Note : active threads will be renewed one by one when they come back to the
  * pool after executing their task, see
  * {@link org.apache.tomcat.util.threads.ThreadPoolExecutor}.afterExecute().
- * </p>
- *
- * This listener must be declared in server.xml to be active.
- *
+ * <p>
+ * This listener must only be nested within {@link Server} elements.
  */
 public class ThreadLocalLeakPreventionListener extends FrameworkListener {
 
@@ -59,8 +54,7 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(ThreadLocalLeakPreventionListener.class);
 
     /**
      * Listens for {@link LifecycleEvent} for the start of the {@link Server} to
@@ -115,7 +109,9 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
      *            of its parent Service.
      */
     private void stopIdleThreads(Context context) {
-        if (serverStopping) return;
+        if (serverStopping) {
+            return;
+        }
 
         if (!(context instanceof StandardContext) ||
             !((StandardContext) context).getRenewThreadsWhenStoppingContext()) {

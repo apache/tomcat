@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.membership;
 
 
@@ -196,7 +195,9 @@ public class McastServiceImpl extends MembershipProviderBase {
         receivePacket.setAddress(address);
         receivePacket.setPort(port);
         member.setCommand(new byte[0]);
-        if ( membership == null ) membership = new Membership(member);
+        if ( membership == null ) {
+            membership = new Membership(member);
+        }
     }
 
     protected void setupSocket() throws IOException {
@@ -218,12 +219,15 @@ public class McastServiceImpl extends MembershipProviderBase {
         }
         socket.setLoopbackMode(localLoopbackDisabled); //hint if we want disable loop back(local machine) messages
         if (mcastBindAddress != null) {
-            if(log.isInfoEnabled())
+            if(log.isInfoEnabled()) {
                 log.info(sm.getString("mcastServiceImpl.setInterface", mcastBindAddress));
+            }
             socket.setInterface(mcastBindAddress);
         } //end if
         //force a so timeout so that we don't block forever
-        if (mcastSoTimeout <= 0) mcastSoTimeout = (int)sendFrequency;
+        if (mcastSoTimeout <= 0) {
+            mcastSoTimeout = (int)sendFrequency;
+        }
         if (log.isInfoEnabled()) {
             log.info(sm.getString("mcastServiceImpl.setSoTimeout",
                     Integer.toString(mcastSoTimeout)));
@@ -231,8 +235,9 @@ public class McastServiceImpl extends MembershipProviderBase {
         socket.setSoTimeout(mcastSoTimeout);
 
         if ( mcastTTL >= 0 ) {
-            if(log.isInfoEnabled())
+            if(log.isInfoEnabled()) {
                 log.info(sm.getString("mcastServiceImpl.setTTL", Integer.toString(mcastTTL)));
+            }
             socket.setTimeToLive(mcastTTL);
         }
     }
@@ -248,9 +253,13 @@ public class McastServiceImpl extends MembershipProviderBase {
     public synchronized void start(int level) throws IOException {
         boolean valid = false;
         if ( (level & Channel.MBR_RX_SEQ)==Channel.MBR_RX_SEQ ) {
-            if ( receiver != null ) throw new IllegalStateException(sm.getString("mcastServiceImpl.receive.running"));
+            if ( receiver != null ) {
+                throw new IllegalStateException(sm.getString("mcastServiceImpl.receive.running"));
+            }
             try {
-                if ( sender == null ) socket.joinGroup(address);
+                if ( sender == null ) {
+                    socket.joinGroup(address);
+                }
             }catch (IOException iox) {
                 log.error(sm.getString("mcastServiceImpl.unable.join"));
                 throw iox;
@@ -262,8 +271,12 @@ public class McastServiceImpl extends MembershipProviderBase {
             valid = true;
         }
         if ( (level & Channel.MBR_TX_SEQ)==Channel.MBR_TX_SEQ ) {
-            if ( sender != null ) throw new IllegalStateException(sm.getString("mcastServiceImpl.send.running"));
-            if ( receiver == null ) socket.joinGroup(address);
+            if ( sender != null ) {
+                throw new IllegalStateException(sm.getString("mcastServiceImpl.send.running"));
+            }
+            if ( receiver == null ) {
+                socket.joinGroup(address);
+            }
             //make sure at least one packet gets out there
             send(false);
             doRunSender = true;
@@ -283,12 +296,14 @@ public class McastServiceImpl extends MembershipProviderBase {
 
     private void waitForMembers(int level) {
         long memberwait = sendFrequency*2;
-        if(log.isInfoEnabled())
+        if(log.isInfoEnabled()) {
             log.info(sm.getString("mcastServiceImpl.waitForMembers.start",
                     Long.toString(memberwait), Integer.toString(level)));
+        }
         try {Thread.sleep(memberwait);}catch (InterruptedException ignore){}
-        if(log.isInfoEnabled())
+        if(log.isInfoEnabled()) {
             log.info(sm.getString("mcastServiceImpl.waitForMembers.done", Integer.toString(level)));
+        }
     }
 
     /**
@@ -304,13 +319,17 @@ public class McastServiceImpl extends MembershipProviderBase {
         if ( (level & Channel.MBR_RX_SEQ)==Channel.MBR_RX_SEQ ) {
             valid = true;
             doRunReceiver = false;
-            if ( receiver !=null ) receiver.interrupt();
+            if ( receiver !=null ) {
+                receiver.interrupt();
+            }
             receiver = null;
         }
         if ( (level & Channel.MBR_TX_SEQ)==Channel.MBR_TX_SEQ ) {
             valid = true;
             doRunSender = false;
-            if ( sender != null )sender.interrupt();
+            if ( sender != null ) {
+                sender.interrupt();
+            }
             sender = null;
         }
 
@@ -358,40 +377,42 @@ public class McastServiceImpl extends MembershipProviderBase {
             //since the receive thread is the same thread
             //that does membership expiration
         }
-        if (checkexpired) checkExpired();
+        if (checkexpired) {
+            checkExpired();
+        }
     }
 
     private void memberDataReceived(byte[] data) {
         final Member m = MemberImpl.getMember(data);
-        if (log.isTraceEnabled()) log.trace("Mcast receive ping from member " + m);
+        if (log.isTraceEnabled()) {
+            log.trace("Mcast receive ping from member " + m);
+        }
         Runnable t = null;
         if (Arrays.equals(m.getCommand(), Member.SHUTDOWN_PAYLOAD)) {
-            if (log.isDebugEnabled()) log.debug("Member has shutdown:" + m);
+            if (log.isDebugEnabled()) {
+                log.debug("Member has shutdown:" + m);
+            }
             membership.removeMember(m);
-            t = new Runnable() {
-                @Override
-                public void run() {
-                    String name = Thread.currentThread().getName();
-                    try {
-                        Thread.currentThread().setName("Membership-MemberDisappeared.");
-                        service.memberDisappeared(m);
-                    }finally {
-                        Thread.currentThread().setName(name);
-                    }
+            t = () -> {
+                String name = Thread.currentThread().getName();
+                try {
+                    Thread.currentThread().setName("Membership-MemberDisappeared");
+                    service.memberDisappeared(m);
+                }finally {
+                    Thread.currentThread().setName(name);
                 }
             };
         } else if (membership.memberAlive(m)) {
-            if (log.isDebugEnabled()) log.debug("Mcast add member " + m);
-            t = new Runnable() {
-                @Override
-                public void run() {
-                    String name = Thread.currentThread().getName();
-                    try {
-                        Thread.currentThread().setName("Membership-MemberAdded.");
-                        service.memberAdded(m);
-                    }finally {
-                        Thread.currentThread().setName(name);
-                    }
+            if (log.isDebugEnabled()) {
+                log.debug("Mcast add member " + m);
+            }
+            t = () -> {
+                String name = Thread.currentThread().getName();
+                try {
+                    Thread.currentThread().setName("Membership-MemberAdded");
+                    service.memberAdded(m);
+                }finally {
+                    Thread.currentThread().setName(name);
                 }
             };
         } //end if
@@ -401,7 +422,9 @@ public class McastServiceImpl extends MembershipProviderBase {
     }
 
     private void memberBroadcastsReceived(final byte[] b) {
-        if (log.isTraceEnabled()) log.trace("Mcast received broadcasts.");
+        if (log.isTraceEnabled()) {
+            log.trace("Mcast received broadcasts.");
+        }
         XByteBuffer buffer = new XByteBuffer(b,true);
         if (buffer.countPackages(true)>0) {
             int count = buffer.countPackages();
@@ -413,30 +436,27 @@ public class McastServiceImpl extends MembershipProviderBase {
                     log.debug("Unable to decode message.",ise);
                 }
             }
-            Runnable t = new Runnable() {
-                @Override
-                public void run() {
-                    String name = Thread.currentThread().getName();
-                    try {
-                        Thread.currentThread().setName("Membership-MemberAdded.");
-                        for (ChannelData datum : data) {
-                            try {
-                                if (datum != null && !member.equals(datum.getAddress())) {
-                                    msgservice.messageReceived(datum);
-                                }
-                            } catch (Throwable t) {
-                                if (t instanceof ThreadDeath) {
-                                    throw (ThreadDeath) t;
-                                }
-                                if (t instanceof VirtualMachineError) {
-                                    throw (VirtualMachineError) t;
-                                }
-                                log.error(sm.getString("mcastServiceImpl.unableReceive.broadcastMessage"), t);
+            Runnable t = () -> {
+                String name = Thread.currentThread().getName();
+                try {
+                    Thread.currentThread().setName("Membership-MemberAdded");
+                    for (ChannelData datum : data) {
+                        try {
+                            if (datum != null && !member.equals(datum.getAddress())) {
+                                msgservice.messageReceived(datum);
                             }
+                        } catch (Throwable t1) {
+                            if (t1 instanceof ThreadDeath) {
+                                throw (ThreadDeath) t1;
+                            }
+                            if (t1 instanceof VirtualMachineError) {
+                                throw (VirtualMachineError) t1;
+                            }
+                            log.error(sm.getString("mcastServiceImpl.unableReceive.broadcastMessage"), t1);
                         }
-                    }finally {
-                        Thread.currentThread().setName(name);
                     }
+                }finally {
+                    Thread.currentThread().setName(name);
                 }
             };
             executor.execute(t);
@@ -448,20 +468,17 @@ public class McastServiceImpl extends MembershipProviderBase {
         synchronized (expiredMutex) {
             Member[] expired = membership.expire(timeToExpiration);
             for (final Member member : expired) {
-                if (log.isDebugEnabled())
+                if (log.isDebugEnabled()) {
                     log.debug("Mcast expire  member " + member);
+                }
                 try {
-                    Runnable t = new Runnable() {
-                        @Override
-                        public void run() {
-                            String name = Thread.currentThread().getName();
-                            try {
-                                Thread.currentThread().setName("Membership-MemberExpired.");
-                                service.memberDisappeared(member);
-                            } finally {
-                                Thread.currentThread().setName(name);
-                            }
-
+                    Runnable t = () -> {
+                        String name = Thread.currentThread().getName();
+                        try {
+                            Thread.currentThread().setName("Membership-MemberExpired");
+                            service.memberDisappeared(member);
+                        } finally {
+                            Thread.currentThread().setName(name);
                         }
                     };
                     executor.execute(t);
@@ -503,7 +520,9 @@ public class McastServiceImpl extends MembershipProviderBase {
         synchronized (sendLock) {
             socket.send(packet);
         }
-        if ( checkexpired ) checkExpired();
+        if ( checkexpired ) {
+            checkExpired();
+        }
     }
 
     public long getServiceStartTime() {
@@ -535,7 +554,9 @@ public class McastServiceImpl extends MembershipProviderBase {
         public ReceiverThread() {
             super();
             String channelName = "";
-            if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
+            if (channel.getName() != null) {
+                channelName = "[" + channel.getName() + "]";
+            }
             setName("Tribes-MembershipReceiver" + channelName);
         }
         @Override
@@ -547,11 +568,15 @@ public class McastServiceImpl extends MembershipProviderBase {
                 } catch ( ArrayIndexOutOfBoundsException ax ) {
                     //we can ignore this, as it means we have an invalid package
                     //but we will log it to debug
-                    if ( log.isDebugEnabled() )
+                    if ( log.isDebugEnabled() ) {
                         log.debug("Invalid member mcast package.",ax);
+                    }
                 } catch ( Exception x ) {
-                    if (errorCounter==0 && doRunReceiver) log.warn(sm.getString("mcastServiceImpl.error.receiving"),x);
-                    else if (log.isDebugEnabled()) log.debug("Error receiving mcast package"+(doRunReceiver?". Sleeping 500ms":"."),x);
+                    if (errorCounter==0 && doRunReceiver) {
+                        log.warn(sm.getString("mcastServiceImpl.error.receiving"),x);
+                    } else if (log.isDebugEnabled()) {
+                        log.debug("Error receiving mcast package"+(doRunReceiver?". Sleeping 500ms":"."),x);
+                    }
                     if (doRunReceiver) {
                         try { Thread.sleep(500); } catch ( Exception ignore ){}
                         if ( (++errorCounter)>=recoveryCounter ) {
@@ -570,7 +595,9 @@ public class McastServiceImpl extends MembershipProviderBase {
         public SenderThread(long time) {
             this.time = time;
             String channelName = "";
-            if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
+            if (channel.getName() != null) {
+                channelName = "[" + channel.getName() + "]";
+            }
             setName("Tribes-MembershipSender" + channelName);
 
         }
@@ -581,8 +608,11 @@ public class McastServiceImpl extends MembershipProviderBase {
                     send(true);
                     errorCounter = 0;
                 } catch ( Exception x ) {
-                    if (errorCounter==0) log.warn(sm.getString("mcastServiceImpl.send.failed"),x);
-                    else log.debug("Unable to send mcast message.",x);
+                    if (errorCounter==0) {
+                        log.warn(sm.getString("mcastServiceImpl.send.failed"),x);
+                    } else {
+                        log.debug("Unable to send mcast message.",x);
+                    }
                     if ( (++errorCounter)>=recoveryCounter ) {
                         errorCounter=0;
                         RecoveryThread.recover(McastServiceImpl.this);
@@ -609,7 +639,9 @@ public class McastServiceImpl extends MembershipProviderBase {
 
             Thread t = new RecoveryThread(parent);
             String channelName = "";
-            if (parent.channel.getName() != null) channelName = "[" + parent.channel.getName() + "]";
+            if (parent.channel.getName() != null) {
+                channelName = "[" + parent.channel.getName() + "]";
+            }
             t.setName("Tribes-MembershipRecovery" + channelName);
             t.setDaemon(true);
             t.start();
@@ -646,19 +678,22 @@ public class McastServiceImpl extends MembershipProviderBase {
             int attempt = 0;
             try {
                 while (!success) {
-                    if(log.isInfoEnabled())
+                    if(log.isInfoEnabled()) {
                         log.info(sm.getString("mcastServiceImpl.recovery"));
+                    }
                     if (stopService() & startService()) {
                         success = true;
-                        if(log.isInfoEnabled())
+                        if(log.isInfoEnabled()) {
                             log.info(sm.getString("mcastServiceImpl.recovery.successful"));
+                        }
                     }
                     try {
                         if (!success) {
-                            if(log.isInfoEnabled())
+                            if(log.isInfoEnabled()) {
                                 log.info(sm.getString("mcastServiceImpl.recovery.failed",
                                         Integer.toString(++attempt),
                                         Long.toString(parent.recoverySleepTime)));
+                            }
                             Thread.sleep(parent.recoverySleepTime);
                         }
                     }catch (InterruptedException ignore) {

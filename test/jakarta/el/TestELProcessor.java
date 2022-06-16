@@ -47,7 +47,7 @@ public class TestELProcessor {
     public void testEval03() {
         ELProcessor elp = new ELProcessor();
         // Note \ is escaped as \\ in Java source code
-        String result = (String) elp.eval("'\\\\'");
+        String result = elp.eval("'\\\\'");
         Assert.assertEquals("\\", result);
     }
 
@@ -200,12 +200,11 @@ public class TestELProcessor {
         elp.defineBean("bean01", bean01);
         elp.defineBean("bean02", new TesterBean("bean02"));
 
-        Object result = elp.eval("bean02.setValueC(bean01.valueB);bean02.valueC");
+        Integer[] result = elp.eval("bean02.setValueC(bean01.valueB);bean02.valueC");
 
-        Integer[] resultArray = (Integer[]) result;
-        Assert.assertEquals(bean01.getValueB().length, resultArray.length);
-        for (int i = 0; i < resultArray.length; i++) {
-            Assert.assertEquals(bean01.getValueB()[i], resultArray[i].intValue());
+        Assert.assertEquals(bean01.getValueB().length, result.length);
+        for (int i = 0; i < result.length; i++) {
+            Assert.assertEquals(bean01.getValueB()[i], result[i].intValue());
         }
     }
 }

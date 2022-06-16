@@ -67,7 +67,7 @@ if "x%1x" == "xx" goto displayUsage
 set SERVICE_USER=%1
 shift
 runas /env /savecred /user:%SERVICE_USER% "%COMSPEC% /K \"%SELF%\" %SERVICE_CMD% %SERVICE_NAME%"
-goto end
+exit /b 0
 
 rem Check the environment
 :checkEnv
@@ -75,8 +75,8 @@ rem Check the environment
 rem Guess CATALINA_HOME if not defined
 if not "%CATALINA_HOME%" == "" goto gotHome
 set "CATALINA_HOME=%cd%"
-if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" goto okHome
-if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" goto okHome
+if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" goto gotHome
+if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" goto gotHome
 rem CD to the upper dir
 cd ..
 set "CATALINA_HOME=%cd%"
@@ -98,7 +98,7 @@ echo Either the CATALINA_HOME environment variable is not defined correctly or
 echo the incorrect service name has been used.
 echo Both the CATALINA_HOME environment variable and the correct service name
 echo are required to run this program.
-goto end
+exit /b 1
 :okHome
 cd "%CURRENT_DIR%"
 
@@ -113,38 +113,19 @@ if not exist "%JRE_HOME%\bin\java.exe" goto noJavaHome
 goto okJavaHome
 :gotJdkHome
 if not exist "%JAVA_HOME%\bin\javac.exe" goto noJavaHome
-rem Java 9 has a different directory structure
-if exist "%JAVA_HOME%\jre\bin\java.exe" goto preJava9Layout
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
 if not "%JRE_HOME%" == "" goto okJavaHome
 set "JRE_HOME=%JAVA_HOME%"
-goto okJavaHome
-:preJava9Layout
-if not "%JRE_HOME%" == "" goto okJavaHome
-set "JRE_HOME=%JAVA_HOME%\jre"
 goto okJavaHome
 :noJavaHome
 echo The JAVA_HOME environment variable is not defined correctly
 echo This environment variable is needed to run this program
 echo NB: JAVA_HOME should point to a JDK not a JRE
-goto end
+exit /b 1
 :okJavaHome
 if not "%CATALINA_BASE%" == "" goto gotBase
 set "CATALINA_BASE=%CATALINA_HOME%"
 :gotBase
-
-rem Java 9 no longer supports the java.endorsed.dirs
-rem system property. Only try to use it if
-rem JAVA_ENDORSED_DIRS was explicitly set
-rem or CATALINA_HOME/endorsed exists.
-set ENDORSED_PROP=ignore.endorsed.dirs
-if "%JAVA_ENDORSED_DIRS%" == "" goto noEndorsedVar
-set ENDORSED_PROP=java.endorsed.dirs
-goto doneEndorsed
-:noEndorsedVar
-if not exist "%CATALINA_HOME%\endorsed" goto doneEndorsed
-set ENDORSED_PROP=java.endorsed.dirs
-:doneEndorsed
 
 rem Process the requested command
 if /i %SERVICE_CMD% == install goto doInstall
@@ -154,7 +135,7 @@ echo Unknown parameter "%SERVICE_CMD%"
 :displayUsage
 echo.
 echo Usage: service.bat install/remove [service_name [--rename]] [--user username]
-goto end
+exit /b 1
 
 :doRemove
 rem Remove the service
@@ -165,14 +146,14 @@ echo Using CATALINA_BASE:    "%CATALINA_BASE%"
     --LogPath "%CATALINA_BASE%\logs"
 if not errorlevel 1 goto removed
 echo Failed removing '%SERVICE_NAME%' service
-goto end
+exit /b 1
 :removed
 echo The service '%SERVICE_NAME%' has been removed
 if exist "%CATALINA_HOME%\bin\%SERVICE_NAME%.exe" (
     rename "%SERVICE_NAME%.exe" "%DEFAULT_SERVICE_NAME%.exe"
     rename "%SERVICE_NAME%w.exe" "%DEFAULT_SERVICE_NAME%w.exe"
 )
-goto end
+exit /b 0
 
 :doInstall
 rem Install the service
@@ -225,15 +206,14 @@ if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
     --StopClass org.apache.catalina.startup.Bootstrap ^
     --StartParams start ^
     --StopParams stop ^
-    --JvmOptions "-Dcatalina.home=%CATALINA_HOME%;-Dcatalina.base=%CATALINA_BASE%;-D%ENDORSED_PROP%=%CATALINA_HOME%\endorsed;-Djava.io.tmpdir=%CATALINA_BASE%\temp;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager;-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties;%JvmArgs%" ^
-    --JvmOptions9 "--add-opens=java.base/java.lang=ALL-UNNAMED#--add-opens=java.base/java.io=ALL-UNNAMED#--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED" ^
+    --JvmOptions "-Dcatalina.home=%CATALINA_HOME%;-Dcatalina.base=%CATALINA_BASE%;-Djava.io.tmpdir=%CATALINA_BASE%\temp;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager;-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties;%JvmArgs%" ^
+    --JvmOptions9 "--add-opens=java.base/java.lang=ALL-UNNAMED#--add-opens=java.base/java.io=ALL-UNNAMED#--add-opens=java.base/java.util=ALL-UNNAMED#--add-opens=java.base/java.util.concurrent=ALL-UNNAMED#--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED" ^
     --Startup "%SERVICE_STARTUP_MODE%" ^
     --JvmMs "%JvmMs%" ^
     --JvmMx "%JvmMx%"
 if not errorlevel 1 goto installed
 echo Failed installing '%SERVICE_NAME%' service
-goto end
+exit /b 1
 :installed
 echo The service '%SERVICE_NAME%' has been installed.
-
-:end
+exit /b 0

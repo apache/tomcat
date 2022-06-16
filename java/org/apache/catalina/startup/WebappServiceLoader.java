@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -124,12 +123,7 @@ public class WebappServiceLoader<T> {
 
         // Filter the discovered container SCIs if required
         if (containerSciFilterPattern != null) {
-            Iterator<String> iter = containerServiceClassNames.iterator();
-            while (iter.hasNext()) {
-                if (containerSciFilterPattern.matcher(iter.next()).find()) {
-                    iter.remove();
-                }
-            }
+            containerServiceClassNames.removeIf(s -> containerSciFilterPattern.matcher(s).find());
         }
 
         // Obtaining the application provided configuration files is a little

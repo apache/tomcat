@@ -29,7 +29,7 @@
 
     <menu name="Links">
         <item name="Docs Home"             href="index.html"/>
-        <item name="FAQ"                   href="https://wiki.apache.org/tomcat/FAQ" />
+        <item name="FAQ"                   href="https://cwiki.apache.org/confluence/display/TOMCAT/FAQ" />
         <item name="User Comments"         href="#comments_section"/>
     </menu>
 
@@ -75,19 +75,21 @@
         <item name="32) WebSocket"          href="web-socket-howto.html"/>
         <item name="33) Rewrite"            href="rewrite.html"/>
         <item name="34) CDI 2 and JAX-RS"   href="cdi.html"/>
-        <item name="35) GraalVM Support"    href="graal.html"/>
+        <item name="35) AOT/GraalVM Support"
+              href="graal.html"/>
     </menu>
 
     <menu name="Reference">
         <item name="Release Notes"         href="RELEASE-NOTES.txt"/>
         <item name="Configuration"         href="config/index.html"/>
         <item name="Tomcat Javadocs"       href="api/index.html"/>
-        <item name="Servlet 5.0 Javadocs"  href="servletapi/index.html"/>
-        <item name="JSP 3.0 Javadocs"      href="jspapi/index.html"/>
-        <item name="EL 4.0 Javadocs"       href="elapi/index.html"/>
-        <item name="WebSocket 2.0 Javadocs"
+        <item name="Servlet 6.0 Javadocs"  href="servletapi/index.html"/>
+        <item name="JSP 3.1 Javadocs"      href="jspapi/index.html"/>
+        <item name="EL 5.0 Javadocs"       href="elapi/index.html"/>
+        <item name="WebSocket 2.1 Javadocs"
               href="websocketapi/index.html"/>
-        <item name="JASPIC 2.0 Javadocs"   href="jaspicapi/index.html"/>
+        <item name="Authentication 3.0 Javadocs"
+              href="jaspicapi/index.html"/>
         <item name="Annotations 2.0 Javadocs"
               href="annotationapi/index.html"/>
         <item name="JK 1.2 Documentation"
@@ -97,10 +99,9 @@
     <menu name="Apache Tomcat Development">
         <item name="Building"              href="building.html"/>
         <item name="Changelog"             href="changelog.html"/>
-        <item name="Status"                href="https://wiki.apache.org/tomcat/TomcatVersions"/>
+        <item name="Status"                href="https://cwiki.apache.org/confluence/display/TOMCAT/Tomcat+Versions"/>
         <item name="Developers"            href="developers.html"/>
         <item name="Architecture"          href="architecture/index.html" />
-        <item name="Functional Specs."     href="funcspecs/index.html"/>
         <item name="Tribes"                href="tribes/introduction.html"/>
     </menu>
 

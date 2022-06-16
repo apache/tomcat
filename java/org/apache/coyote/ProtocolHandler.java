@@ -136,12 +136,16 @@ public interface ProtocolHandler {
 
 
     /**
-     * Requires APR/native library
+     * Wait for the client connections to the server to close gracefully. The
+     * method will return when all of the client connections have closed or the
+     * method has been waiting for {@code waitTimeMillis}.
      *
-     * @return <code>true</code> if this Protocol Handler requires the
-     *         APR/native library, otherwise <code>false</code>
+     * @param waitMillis    The maximum time to wait in milliseconds for the
+     *                      client connections to close.
+     *
+     * @return The wait time, if any remaining when the method returned
      */
-    public boolean isAprRequired();
+    public long awaitConnectionsClose(long waitMillis);
 
 
     /**
@@ -190,6 +194,17 @@ public interface ProtocolHandler {
      */
     public default int getDesiredBufferSize() {
         return -1;
+    }
+
+
+    /**
+     * The default behavior is to identify connectors uniquely with address
+     * and port. However, certain connectors are not using that and need
+     * some other identifier, which then can be used as a replacement.
+     * @return the id
+     */
+    public default String getId() {
+        return null;
     }
 
 

@@ -62,27 +62,23 @@ the details of your particular environment.</p>
 information, documentation, and software that is useful in developing
 web applications with Tomcat.</p>
 <ul>
-<li><p><a href="https://jcp.org/aboutJava/communityprocess/mrel/jsr245/index2.html">https://jcp.org/aboutJava/communityprocess/mrel/jsr245/index2.html</a> -
-    <i>JavaServer Pages (JSP) Specification, Version 2.3</i>.  Describes
+<li><p><a href="https://jakarta.ee/specifications/pages/3.1/">https://jakarta.ee/specifications/pages/3.1/</a> -
+    <i>Jakarta Server Pages (JSP), Version 3.1</i>.  Describes
     the programming environment provided by standard implementations
-    of the JavaServer Pages (JSP) technology.  In conjunction with
+    of the Jakarta Server Pages technology.  In conjunction with
     the Servlet API Specification (see below), this document describes
-    what a portable API page is allowed to contain.  Specific
+    what a portable JSP page is allowed to contain.  Specific
     information on scripting (Chapter 9), tag extensions (Chapter 7),
-    and packaging JSP pages (Appendix A) is useful.  The Javadoc
-    API Documentation is included in the specification, and with the
-    Tomcat download.</p></li>
-<li><p><a href="https://jcp.org/aboutJava/communityprocess/final/jsr369/index.html">https://jcp.org/aboutJava/communityprocess/final/jsr369/index.html</a> -
-    <i>Servlet API Specification, Version 4.0</i>.  Describes the
+    and packaging JSP pages (Appendix A) is useful..</p></li>
+<li><p><a href="https://jakarta.ee/specifications/servlet/6.0/">https://jakarta.ee/specifications/servlet/6.0/</a> -
+    <i>Jakarta Servlet API Specification, Version 6.0</i>.  Describes the
     programming environment that must be provided by all servlet
     containers conforming to this specification.  In particular, you
     will need this document to understand the web application
     directory structure and deployment file (Chapter 10), methods of
     mapping request URIs to servlets (Chapter 12), container managed
     security (Chapter 13), and the syntax of the <code>web.xml</code>
-    Web Application Deployment Descriptor (Chapter 14).  The Javadoc
-    API Documentation is included in the specification, and with the
-    Tomcat download.</p></li>
+    Web Application Deployment Descriptor (Chapter 14).</p></li>
 </ul>
 
 </section>

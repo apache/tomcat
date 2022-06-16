@@ -47,11 +47,11 @@
     to monitor it locally, using the same user that Tomcat runs with.</p>
 
     <p>The Oracle website includes the list of options and how to configure
-    JMX Remote on Java 8:
-        <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html">
+    JMX Remote on Java 11:
+        <a href="https://docs.oracle.com/en/java/javase/11/management/monitoring-and-management-using-jmx-technology.html">
         http://docs.oracle.com/javase/6/docs/technotes/guides/management/agent.html</a>.
     </p>
-    <p>The following is a quick configuration guide for Java 8:</p>
+    <p>The following is a quick configuration guide for Java 11:</p>
     <p>Add the following parameters to <code>setenv.bat</code> script of your
     Tomcat (see <a href="RUNNING.txt">RUNNING.txt</a> for details).<br/>
     <em>Note:</em> This syntax is for Microsoft Windows. The command has
@@ -100,7 +100,7 @@ controlRole tomcat]]></source>
     <b>Tip</b>: The password file should be read-only and only accessible by the
     operating system user Tomcat is running as.
     </li>
-    <li>Alterantively, you can configure a JAAS login module with:
+    <li>Alternatively, you can configure a JAAS login module with:
 <source><![CDATA[  -Dcom.sun.management.jmxremote.login.config=%login.module.name%]]></source></li>
     </ol>
 
@@ -555,8 +555,7 @@ List of Attributes
 
   <tr>
     <td>operation</td>
-    <td>Existing MBean operation (see Tomcat
-        <a href="funcspecs/fs-admin-opers.html">funcspecs/fs-admin-opers.html</a>).
+    <td>Existing MBean operation
     </td>
     <td></td>
   </tr>

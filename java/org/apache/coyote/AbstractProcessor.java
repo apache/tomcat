@@ -23,8 +23,10 @@ import java.util.Iterator;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
 
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -99,6 +101,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * @param t The error which occurred
      */
     protected void setErrorState(ErrorState errorState, Throwable t) {
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("abstractProcessor.setErrorState", errorState), t);
+        }
         // Use the return value to avoid processing more than one async error
         // in a single async cycle.
         boolean setError = response.setError();
@@ -213,7 +218,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             dispatchNonBlockingRead();
         } else if (status == SocketEvent.ERROR) {
             // An I/O error occurred on a non-container thread. This includes:
-            // - read/write timeouts fired by the Poller (NIO & APR)
+            // - read/write timeouts fired by the Poller in NIO
             // - completion handler failures in NIO2
 
             if (request.getAttribute(RequestDispatcher.ERROR_EXCEPTION) == null) {
@@ -390,7 +395,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
         case ACK: {
-            ack();
+            ack((ContinueResponseTiming) param);
             break;
         }
         case CLIENT_FLUSH: {
@@ -433,7 +438,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // Aborted upload or similar.
+            // Cancelled upload or similar.
             // No point reading the remainder of the request.
             disableSwallowRequest();
             // This is an error state. Make sure it is marked as such.
@@ -445,6 +450,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         case REQ_HOST_ADDR_ATTRIBUTE: {
             if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+            }
+            break;
+        }
+        case REQ_PEER_ADDR_ATTRIBUTE: {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.peerAddr().setString(socketWrapper.getRemoteAddr());
             }
             break;
         }
@@ -621,17 +632,17 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
 
-        // Identifiers associated with multiplexing protocols like HTTP/2
-        case CONNECTION_ID: {
+        // Identifiers
+        case PROTOCOL_REQUEST_ID: {
             @SuppressWarnings("unchecked")
             AtomicReference<Object> result = (AtomicReference<Object>) param;
-            result.set(getConnectionID());
+            result.set(getProtocolRequestId());
             break;
         }
-        case STREAM_ID: {
+        case SERVLET_CONNECTION: {
             @SuppressWarnings("unchecked")
             AtomicReference<Object> result = (AtomicReference<Object>) param;
-            result.set(getStreamID());
+            result.set(getServletConnection());
             break;
         }
         }
@@ -722,7 +733,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void finishResponse() throws IOException;
 
 
-    protected abstract void ack();
+    protected abstract void ack(ContinueResponseTiming continueResponseTiming);
 
 
     protected abstract void flush() throws IOException;
@@ -792,6 +803,14 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 if (sslO != null) {
                     request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
                 }
+                sslO = sslSupport.getRequestedProtocols();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY, sslO);
+                }
+                sslO = sslSupport.getRequestedCiphers();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.REQUESTED_CIPHERS_KEY, sslO);
+                }
                 request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
             }
         } catch (Exception e) {
@@ -847,7 +866,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         SocketWrapperBase<?> socketWrapper = getSocketWrapper();
         Iterator<DispatchType> dispatches = getIteratorAndClearDispatches();
         if (socketWrapper != null) {
-            synchronized (socketWrapper) {
+            Lock lock = socketWrapper.getLock();
+            lock.lock();
+            try {
                 /*
                  * This method is called when non-blocking IO is initiated by defining
                  * a read and/or write listener in a non-container thread. It is called
@@ -855,7 +876,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                  * onWritePossible() and/or onDataAvailable() as appropriate are made by
                  * the container.
                  *
-                 * Processing the dispatches requires (for APR/native at least)
+                 * Processing the dispatches requires (TODO confirm applies without APR)
                  * that the socket has been added to the waitingRequests queue. This may
                  * not have occurred by the time that the non-container thread completes
                  * triggering the call to this method. Therefore, the coded syncs on the
@@ -870,6 +891,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                     DispatchType dispatchType = dispatches.next();
                     socketWrapper.processSocket(dispatchType.getSocketStatus(), false);
                 }
+            } finally {
+                lock.unlock();
             }
         }
     }
@@ -970,27 +993,25 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Protocols that support multiplexing (e.g. HTTP/2) should override this
-     * method and return the appropriate ID.
+     * Protocols that provide per HTTP request IDs (e.g. Stream ID for HTTP/2)
+     * should override this method and return the appropriate ID.
      *
-     * @return The stream ID associated with this request or {@code null} if a
-     *         multiplexing protocol is not being used
-      */
-    protected Object getConnectionID() {
+     * @return The ID associated with this request or the empty string if no
+     *         such ID is defined
+     */
+    protected Object getProtocolRequestId() {
         return null;
     }
 
 
     /**
-     * Protocols that support multiplexing (e.g. HTTP/2) should override this
-     * method and return the appropriate ID.
+     * Protocols must override this method and return an appropriate
+     * ServletConnection instance
      *
-     * @return The stream ID associated with this request or {@code null} if a
-     *         multiplexing protocol is not being used
-     */
-    protected Object getStreamID() {
-        return null;
-    }
+     * @return the ServletConnection instance associated with the current
+     *         request.
+      */
+    protected abstract ServletConnection getServletConnection();
 
 
     /**

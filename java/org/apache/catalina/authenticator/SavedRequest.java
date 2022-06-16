@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
 
 
@@ -82,10 +80,11 @@ public final class SavedRequest {
 
     public Iterator<String> getHeaderValues(String name) {
         List<String> values = headers.get(name);
-        if (values == null)
+        if (values == null) {
             return Collections.emptyIterator();
-        else
+        } else {
             return values.iterator();
+        }
     }
 
 

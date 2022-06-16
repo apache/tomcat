@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
 
 
@@ -60,7 +58,7 @@ public class ListenerCreateRule extends ObjectCreateRule {
                 digester.push(instance);
                 StringBuilder code = digester.getGeneratedCode();
                 if (code != null) {
-                    code.append(OptionalListener.class.getName().replace('$', '.')).append(" ");
+                    code.append(OptionalListener.class.getName().replace('$', '.')).append(' ');
                     code.append(digester.toVariableName(instance)).append(" = new ");
                     code.append(OptionalListener.class.getName().replace('$', '.')).append("(\"").append(className).append("\");");
                     code.append(System.lineSeparator());

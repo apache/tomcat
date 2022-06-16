@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ssi;
 
 import java.io.ByteArrayOutputStream;
@@ -24,7 +23,7 @@ import jakarta.servlet.WriteListener;
 
 
 /**
- * Class that extends ServletOuputStream, used as a wrapper from within
+ * Class that extends ServletOutputStream, used as a wrapper from within
  * <code>SsiInclude</code>
  *
  * @author Bip Thelin

@@ -18,8 +18,8 @@
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
-  version="5.0">
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+  version="6.0">
 
   <!-- ======================== Introduction ============================== -->
   <!-- This document defines default values for *all* web applications      -->
@@ -156,9 +156,9 @@
   <!--                       pages.  See the jasper documentation for more  -->
   <!--                       information.                                   -->
   <!--                                                                      -->
-  <!--   compilerSourceVM    Compiler source VM. [1.8]                      -->
+  <!--   compilerSourceVM    Compiler source VM. [11]                      -->
   <!--                                                                      -->
-  <!--   compilerTargetVM    Compiler target VM. [1.8]                      -->
+  <!--   compilerTargetVM    Compiler target VM. [11]                      -->
   <!--                                                                      -->
   <!--   development         Is Jasper used in development mode? If true,   -->
   <!--                       the frequency at which JSPs are checked for    -->
@@ -197,10 +197,6 @@
   <!--                       Should text strings be generated as char       -->
   <!--                       arrays, to improve performance in some cases?  -->
   <!--                       [false]                                        -->
-  <!--                                                                      -->
-  <!--   ieClassId           The class-id value to be sent to Internet      -->
-  <!--                       Explorer when using <jsp:plugin> tags.         -->
-  <!--                       [clsid:8AD9C840-044E-11D1-B3E9-00805F499D93]   -->
   <!--                                                                      -->
   <!--   javaEncoding        Java file encoding to use for generating java  -->
   <!--                       source files. [UTF8]                           -->
@@ -551,7 +547,7 @@
   <!-- this to work you will need to uncomment the .shtml mime type         -->
   <!-- definition towards the bottom of this file.                          -->
   <!-- The contentType init param allows you to apply SSI processing to JSP -->
-  <!-- pages, javascript, or any other content you wish.  This filter       -->
+  <!-- pages, JavaScript, or any other content you wish.  This filter       -->
   <!-- supports the following initialization parameters (default values are -->
   <!-- in square brackets):                                                 -->
   <!--                                                                      -->

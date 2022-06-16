@@ -43,9 +43,7 @@ import org.apache.juli.logging.Log;
  *     of Contexts.
  * <li><b>Context</b> - Representation of a single ServletContext, which will
  *     typically contain one or more Wrappers for the supported servlets.
- * <li><b>Wrapper</b> - Representation of an individual servlet definition
- *     (which may support multiple servlet instances if the servlet itself
- *     implements SingleThreadModel).
+ * <li><b>Wrapper</b> - Representation of an individual servlet definition.
  * </ul>
  * A given deployment of Catalina need not include Containers at all of the
  * levels described above.  For example, an administration application
@@ -305,7 +303,7 @@ public interface Container extends Lifecycle {
      * @return the configuration path
      */
     public static String getConfigPath(Container container, String resourceName) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         Container host = null;
         Container engine = null;
         while (container != null) {

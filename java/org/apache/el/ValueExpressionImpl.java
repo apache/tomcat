@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el;
 
 import java.io.Externalizable;
@@ -181,8 +180,9 @@ public final class ValueExpressionImpl extends ValueExpression implements
      *
      * @see jakarta.el.ValueExpression#getValue(jakarta.el.ELContext)
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public Object getValue(ELContext context) throws PropertyNotFoundException,
+    public <T> T getValue(ELContext context) throws PropertyNotFoundException,
             ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);
@@ -192,7 +192,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
             value = context.convertToType(value, this.expectedType);
         }
         context.notifyAfterEvaluation(getExpressionString());
-        return value;
+        return (T) value;
     }
 
     /*
@@ -240,7 +240,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
             ClassNotFoundException {
         this.expr = in.readUTF();
         String type = in.readUTF();
-        if (!"".equals(type)) {
+        if (!type.isEmpty()) {
             this.expectedType = ReflectionUtil.forName(type);
         }
         this.fnMapper = (FunctionMapper) in.readObject();

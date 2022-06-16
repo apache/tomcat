@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.storeconfig;
 
 import org.apache.tomcat.util.digester.Rule;
@@ -114,8 +113,9 @@ public class StoreFactoryRule extends Rule {
         String className = defaultName;
         if (attr != null) {
             String value = attributes.getValue(attr);
-            if (value != null)
+            if (value != null) {
                 className = value;
+            }
         }
         Class<?> clazz = Class.forName(className);
         return clazz.getConstructor().newInstance();

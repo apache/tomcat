@@ -73,10 +73,10 @@
     <p>
       The logging frameworks used by different web applications are independent.
       See <a href="class-loader-howto.html">class loading</a> for more details.
-      The exception to this rule is <code>java.util.logging</code>. If it used
-      directly or indirectly by your logging library then elements of it will be
-      shared across web applications because it is loaded by the system class
-      loader.
+      The exception to this rule is <code>java.util.logging</code>. If it is
+      used directly or indirectly by your logging library then elements of it
+      will be shared across web applications because it is loaded by the system
+      class loader.
     </p>
 
     <subsection name="Java logging API &#8212; java.util.logging">
@@ -398,8 +398,8 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]
           <a href="api/org/apache/juli/package-summary.html"><code>org.apache.juli</code></a>
           package.
         </li>
-        <li>Oracle Java 8 Javadoc for the
-          <a href="https://docs.oracle.com/javase/8/docs/api/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
+        <li>Oracle Java 11 Javadoc for the
+          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
           package.
         </li>
       </ul>

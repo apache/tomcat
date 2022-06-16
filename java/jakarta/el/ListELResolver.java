@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.el;
 
 import java.beans.FeatureDescriptor;
@@ -28,8 +27,9 @@ public class ListELResolver extends ELResolver {
 
     private final boolean readOnly;
 
-    private static final Class<?> UNMODIFIABLE =
-        Collections.unmodifiableList(new ArrayList<>()).getClass();
+    // TODO - Handle the Lists created by List.of(). Multiple package private
+    //        classes. Java 9 + so a back-port would require JreCompat.
+    private static final Class<?> UNMODIFIABLE = Collections.unmodifiableList(new ArrayList<>()).getClass();
 
     public ListELResolver() {
         this.readOnly = false;
@@ -51,6 +51,15 @@ public class ListELResolver extends ELResolver {
                 throw new PropertyNotFoundException(
                         new ArrayIndexOutOfBoundsException(idx).getMessage());
             }
+
+            /*
+             * Not perfect as a custom list implementation may be read-only but
+             * consistent with isReadOnly().
+             */
+            if (list.getClass() == UNMODIFIABLE || readOnly) {
+                return null;
+            }
+
             return Object.class;
         }
 
@@ -86,7 +95,7 @@ public class ListELResolver extends ELResolver {
 
             if (this.readOnly) {
                 throw new PropertyNotWritableException(Util.message(context,
-                        "resolverNotWriteable", base.getClass().getName()));
+                        "resolverNotWritable", base.getClass().getName()));
             }
 
             int idx = coerce(property);
@@ -123,6 +132,7 @@ public class ListELResolver extends ELResolver {
         return this.readOnly;
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         return null;

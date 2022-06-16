@@ -87,4 +87,19 @@ public class TestAstMapData {
         Assert.assertEquals(Map.class, ve.getType(context));
         Assert.assertEquals(simpleMap, ve.getValue(context));
     }
+
+
+    @Test
+    public void testLiteralWithVariable() {
+        ELProcessor elp = new ELProcessor();
+
+        String key = "myKey";
+        String value = "myValue";
+        elp.setVariable("aaa", "'" + key + "'");
+        elp.setVariable("bbb", "'" + value + "'");
+
+        Object result = elp.eval("{ aaa : bbb }.get(aaa)");
+
+        Assert.assertEquals(value, result);
+    }
 }

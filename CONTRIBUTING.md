@@ -29,6 +29,11 @@ Please review our [guide](https://tomcat.apache.org/bugreport.html) on how to
 submit a bug report. This page also has links to other resources to assist
 you.
 
+### Reporting Translation improvements
+
+Apache Tomcat project uses POEditor for managing the localization files.
+Please see more at https://cwiki.apache.org/confluence/x/vIPzBQ
+
 ### Your First Code Contribution
 
 ### Trouble Deciding How to Contribute?
@@ -76,6 +81,7 @@ manually generate the patch file by using diff. If this is what you want, you
 can download the sources from the "Source Code Distributions" section of the
 Download Page. There is one such page for every major Tomcat version:
 
+- [Tomcat 10](https://tomcat.apache.org/download-10.cgi)
 - [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
 - [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
 - [Tomcat 7](https://tomcat.apache.org/download-70.cgi)
@@ -117,6 +123,29 @@ time as all committers are volunteers on the project. If a significant amount
 of time has lapsed since your submission, such as a couple of months, feel free
 to either update your BZ, PR, or email the dev list with a message to bump your
 issue. Sometimes things get lost in all the work and we need a reminder :smile:
+
+## IDE Support
+
+Special IDE support for
+[Eclipse](https://www.eclipse.org/ide/),
+[IntelliJ IDEA](https://www.jetbrains.com/idea/) and
+[NetBeans](https://netbeans.org/)
+is provided through special ant targets:
+
+```bash
+ant ide-eclipse
+```
+```bash
+ant ide-intellij
+```
+```bash
+ant ide-netbeans
+```
+
+Just execute the ant target for your IDE after checking out the sources
+to set up the appropriate configuration files.
+Also make sure to re-execute the target after switching branches or
+after pulling upstream changes in order to keep your IDE configurations in sync.
 
 ## Style Guide
 

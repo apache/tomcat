@@ -25,11 +25,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
@@ -45,6 +47,7 @@ import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
+import org.apache.coyote.http11.upgrade.UpgradeApplicationBufferHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -56,6 +59,7 @@ import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.http.parser.TokenList;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SendfileDataBase;
 import org.apache.tomcat.util.net.SendfileKeepAliveState;
@@ -108,13 +112,13 @@ public class Http11Processor extends AbstractProcessor {
      * Flag used to indicate that the socket should be kept open (e.g. for keep
      * alive or send file.
      */
-    private boolean openSocket = false;
+    private volatile boolean openSocket = false;
 
 
     /**
      * Flag that indicates if the request headers have been completely read.
      */
-    private boolean readComplete = true;
+    private volatile boolean readComplete = true;
 
     /**
      * HTTP/1.1 flag.
@@ -155,11 +159,11 @@ public class Http11Processor extends AbstractProcessor {
         httpParser = new HttpParser(protocol.getRelaxedPathChars(),
                 protocol.getRelaxedQueryChars());
 
-        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpHeaderSize(),
+        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpRequestHeaderSize(),
                 protocol.getRejectIllegalHeader(), httpParser);
         request.setInputBuffer(inputBuffer);
 
-        outputBuffer = new Http11OutputBuffer(response, protocol.getMaxHttpHeaderSize());
+        outputBuffer = new Http11OutputBuffer(response, protocol.getMaxHttpResponseHeaderSize());
         response.setOutputBuffer(outputBuffer);
 
         // Create and add the identity filters.
@@ -208,14 +212,22 @@ public class Http11Processor extends AbstractProcessor {
      * supported, a 501 response will be returned to the client.
      */
     private void addInputFilter(InputFilter[] inputFilters, String encodingName) {
+        if (contentDelimitation) {
+            // Chunked has already been specified and it must be the final
+            // encoding.
+            // 400 - Bad request
+            response.setStatus(400);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.prepare") +
+                          " Tranfer encoding lists chunked before [" + encodingName + "]");
+            }
+            return;
+        }
 
         // Parsing trims and converts to lower case.
-
-        if (encodingName.equals("identity")) {
-            // Skip
-        } else if (encodingName.equals("chunked")) {
-            inputBuffer.addActiveFilter
-                (inputFilters[Constants.CHUNKED_FILTER]);
+        if (encodingName.equals("chunked")) {
+            inputBuffer.addActiveFilter(inputFilters[Constants.CHUNKED_FILTER]);
             contentDelimitation = true;
         } else {
             for (int i = pluggableFilterIndex; i < inputFilters.length; i++) {
@@ -326,18 +338,33 @@ public class Http11Processor extends AbstractProcessor {
                 UpgradeProtocol upgradeProtocol = protocol.getUpgradeProtocol(requestedProtocol);
                 if (upgradeProtocol != null) {
                     if (upgradeProtocol.accept(request)) {
-                        response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
-                        response.setHeader("Connection", "Upgrade");
-                        response.setHeader("Upgrade", requestedProtocol);
-                        action(ActionCode.CLOSE,  null);
-                        getAdapter().log(request, response, 0);
+                        // Create clone of request for upgraded protocol
+                        Request upgradeRequest = null;
+                        try {
+                            upgradeRequest = cloneRequest(request);
+                        } catch (ByteChunk.BufferOverflowException ioe) {
+                            response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                            setErrorState(ErrorState.CLOSE_CLEAN, null);
+                        } catch (IOException ioe) {
+                            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                            setErrorState(ErrorState.CLOSE_CLEAN, ioe);
+                        }
 
-                        InternalHttpUpgradeHandler upgradeHandler =
-                                upgradeProtocol.getInternalUpgradeHandler(
-                                        socketWrapper, getAdapter(), cloneRequest(request));
-                        UpgradeToken upgradeToken = new UpgradeToken(upgradeHandler, null, null);
-                        action(ActionCode.UPGRADE, upgradeToken);
-                        return SocketState.UPGRADING;
+                        if (upgradeRequest != null) {
+                            // Complete the HTTP/1.1 upgrade process
+                            response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
+                            response.setHeader("Connection", "Upgrade");
+                            response.setHeader("Upgrade", requestedProtocol);
+                            action(ActionCode.CLOSE,  null);
+                            getAdapter().log(request, response, 0);
+
+                            // Continue processing using new protocol
+                            InternalHttpUpgradeHandler upgradeHandler =
+                                    upgradeProtocol.getInternalUpgradeHandler(socketWrapper, getAdapter(), upgradeRequest);
+                            UpgradeToken upgradeToken = new UpgradeToken(upgradeHandler, null, null, requestedProtocol);
+                            action(ActionCode.UPGRADE, upgradeToken);
+                            return SocketState.UPGRADING;
+                        }
                     }
                 }
             }
@@ -481,16 +508,39 @@ public class Http11Processor extends AbstractProcessor {
 
         // Transfer the minimal information required for the copy of the Request
         // that is passed to the HTTP upgrade process
-
         dest.decodedURI().duplicate(source.decodedURI());
         dest.method().duplicate(source.method());
         dest.getMimeHeaders().duplicate(source.getMimeHeaders());
         dest.requestURI().duplicate(source.requestURI());
         dest.queryString().duplicate(source.queryString());
 
-        return dest;
+        // Preparation for reading the request body
+        MimeHeaders headers = source.getMimeHeaders();
+        prepareExpectation(headers);
+        prepareInputFilters(headers);
+        ack(ContinueResponseTiming.ALWAYS);
 
+        // Need to read and buffer the request body, if any. RFC 7230 requires
+        // that the request is fully read before the upgrade takes place.
+        ByteChunk body = new ByteChunk();
+        int maxSavePostSize = protocol.getMaxSavePostSize();
+        if (maxSavePostSize != 0) {
+            body.setLimit(maxSavePostSize);
+            ApplicationBufferHandler buffer = new UpgradeApplicationBufferHandler();
+
+            while (source.getInputBuffer().doRead(buffer) >= 0) {
+                body.append(buffer.getByteBuffer());
+            }
+        }
+
+        // Make the buffered request body available to the upgraded protocol.
+        SavedRequestInputFilter srif = new SavedRequestInputFilter(body);
+        dest.setInputBuffer(srif);
+
+        return dest;
     }
+
+
     private boolean handleIncompleteRequestLineRead() {
         // Haven't finished reading the request so keep the socket
         // open
@@ -536,7 +586,7 @@ public class Http11Processor extends AbstractProcessor {
             // Ignore, an error here is already processed in prepareRequest
             // but is done again since the content length is still -1
         }
-        if (contentLength > 0 &&
+        if (contentLength > 0 && protocol.getMaxSwallowSize() > -1 &&
                 (contentLength - request.getBytesRead() > protocol.getMaxSwallowSize())) {
             // There is more data to swallow than Tomcat will accept so the
             // connection is going to be closed. Disable keep-alive which will
@@ -584,8 +634,6 @@ public class Http11Processor extends AbstractProcessor {
      */
     private void prepareRequest() throws IOException {
 
-        contentDelimitation = false;
-
         if (protocol.isSSLEnabled()) {
             request.scheme().setString("https");
         }
@@ -605,16 +653,7 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         if (http11) {
-            MessageBytes expectMB = headers.getValue("expect");
-            if (expectMB != null && !expectMB.isNull()) {
-                if (expectMB.toString().trim().equalsIgnoreCase("100-continue")) {
-                    inputBuffer.setSwallowInput(false);
-                    request.setExpectation(true);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
-                    setErrorState(ErrorState.CLOSE_CLEAN, null);
-                }
-            }
+            prepareExpectation(headers);
         }
 
         // Check user-agent header
@@ -749,16 +788,45 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Input filter setup
+        prepareInputFilters(headers);
+
+        // Validate host name and extract port if present
+        parseHost(hostValueMB);
+
+        if (!getErrorState().isIoAllowed()) {
+            getAdapter().log(request, response, 0);
+        }
+    }
+
+
+    private void prepareExpectation(MimeHeaders headers) {
+        MessageBytes expectMB = headers.getValue("expect");
+        if (expectMB != null && !expectMB.isNull()) {
+            if (expectMB.toString().trim().equalsIgnoreCase("100-continue")) {
+                inputBuffer.setSwallowInput(false);
+                request.setExpectation(true);
+            } else {
+                response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+                setErrorState(ErrorState.CLOSE_CLEAN, null);
+            }
+        }
+    }
+
+    private void prepareInputFilters(MimeHeaders headers) throws IOException {
+
+        contentDelimitation = false;
+
         InputFilter[] inputFilters = inputBuffer.getFilters();
 
         // Parse transfer-encoding header
-        if (http11) {
+        // HTTP specs say an HTTP 1.1 server should accept any recognised
+        // HTTP 1.x header from a 1.x client unless the specs says otherwise.
+        if (!http09) {
             MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
             if (transferEncodingValueMB != null) {
                 List<String> encodingNames = new ArrayList<>();
                 if (TokenList.parseTokenList(headers.values("transfer-encoding"), encodingNames)) {
                     for (String encodingName : encodingNames) {
-                        // "identity" codings are ignored
                         addInputFilter(inputFilters, encodingName);
                     }
                 } else {
@@ -786,14 +854,12 @@ public class Http11Processor extends AbstractProcessor {
                 // so remove it.
                 headers.removeHeader("content-length");
                 request.setContentLength(-1);
+                keepAlive = false;
             } else {
                 inputBuffer.addActiveFilter(inputFilters[Constants.IDENTITY_FILTER]);
                 contentDelimitation = true;
             }
         }
-
-        // Validate host name and extract port if present
-        parseHost(hostValueMB);
 
         if (!contentDelimitation) {
             // If there's no content length
@@ -801,10 +867,6 @@ public class Http11Processor extends AbstractProcessor {
             // the client is not broken and didn't send a body
             inputBuffer.addActiveFilter(inputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
-        }
-
-        if (!getErrorState().isIoAllowed()) {
-            getAdapter().log(request, response, 0);
         }
     }
 
@@ -923,9 +985,13 @@ public class Http11Processor extends AbstractProcessor {
 
         // FIXME: Add transfer encoding header
 
-        if ((entityBody) && (!contentDelimitation)) {
-            // Mark as close the connection after the request, and add the
-            // connection: close header
+        if ((entityBody) && (!contentDelimitation) || connectionClosePresent) {
+            // Disable keep-alive if:
+            // - there is a response body but way for the client to determine
+            //   the content length information; or
+            // - there is a "connection: close" header present
+            // This will cause the "connection: close" header to be added if it
+            // is not already present.
             keepAlive = false;
         }
 
@@ -1103,6 +1169,12 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    @Override
+    protected ServletConnection getServletConnection() {
+        return socketWrapper.getServletConnection("http/1.1", "");
+    }
+
+
     /*
      * No more input will be passed to the application. Remaining input will be
      * swallowed or the connection dropped depending on the error and
@@ -1159,16 +1231,21 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    protected final void ack() {
-        // Acknowledge request
-        // Send a 100 status back if it makes sense (response not committed
-        // yet, and client specified an expectation for 100-continue)
-        if (!response.isCommitted() && request.hasExpectation()) {
-            inputBuffer.setSwallowInput(true);
-            try {
-                outputBuffer.sendAck();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+    protected final void ack(ContinueResponseTiming continueResponseTiming) {
+        // Only try and send the ACK for ALWAYS or if the timing of the request
+        // to send the ACK matches the current configuration.
+        if (continueResponseTiming == ContinueResponseTiming.ALWAYS ||
+                continueResponseTiming == protocol.getContinueResponseTimingInternal()) {
+            // Acknowledge request
+            // Send a 100 status back if it makes sense (response not committed
+            // yet, and client specified an expectation for 100-continue)
+            if (!response.isCommitted() && request.hasExpectation()) {
+                inputBuffer.setSwallowInput(true);
+                try {
+                    outputBuffer.sendAck();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                }
             }
         }
     }

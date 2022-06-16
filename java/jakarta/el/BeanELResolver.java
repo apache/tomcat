@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package jakarta.el;
 
 import java.beans.BeanInfo;
@@ -37,8 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BeanELResolver extends ELResolver {
 
     private static final int CACHE_SIZE;
-    private static final String CACHE_SIZE_PROP =
-        "org.apache.el.BeanELResolver.CACHE_SIZE";
+    private static final String CACHE_SIZE_PROP = "org.apache.el.BeanELResolver.CACHE_SIZE";
 
     static {
         String cacheSizeStr;
@@ -46,21 +44,14 @@ public class BeanELResolver extends ELResolver {
             cacheSizeStr = System.getProperty(CACHE_SIZE_PROP, "1000");
         } else {
             cacheSizeStr = AccessController.doPrivileged(
-                    new PrivilegedAction<String>() {
-
-                    @Override
-                    public String run() {
-                        return System.getProperty(CACHE_SIZE_PROP, "1000");
-                    }
-                });
+                    (PrivilegedAction<String>) () -> System.getProperty(CACHE_SIZE_PROP, "1000"));
         }
         CACHE_SIZE = Integer.parseInt(cacheSizeStr);
     }
 
     private final boolean readOnly;
 
-    private final ConcurrentCache<String, BeanProperties> cache =
-        new ConcurrentCache<>(CACHE_SIZE);
+    private final ConcurrentCache<String, BeanProperties> cache = new ConcurrentCache<>(CACHE_SIZE);
 
     public BeanELResolver() {
         this.readOnly = false;
@@ -78,7 +69,13 @@ public class BeanELResolver extends ELResolver {
         }
 
         context.setPropertyResolved(base, property);
-        return this.property(context, base, property).getPropertyType();
+        BeanProperty beanProperty = property(context, base, property);
+
+        if (readOnly || beanProperty.isReadOnly(base)) {
+            return null;
+        }
+
+        return beanProperty.getPropertyType();
     }
 
     @Override
@@ -114,7 +111,7 @@ public class BeanELResolver extends ELResolver {
 
         if (this.readOnly) {
             throw new PropertyNotWritableException(Util.message(context,
-                    "resolverNotWriteable", base.getClass().getName()));
+                    "resolverNotWritable", base.getClass().getName()));
         }
 
         Method m = this.property(context, base, property).write(context, base);
@@ -143,15 +140,13 @@ public class BeanELResolver extends ELResolver {
 
         ExpressionFactory factory = ELManager.getExpressionFactory();
 
-        String methodName = (String) factory.coerceToType(method, String.class);
+        String methodName = factory.coerceToType(method, String.class);
 
         // Find the matching method
-        Method matchingMethod =
-                Util.findMethod(base.getClass(), base, methodName, paramTypes, params);
+        Method matchingMethod = Util.findMethod(context, base.getClass(), base, methodName, paramTypes, params);
 
         Object[] parameters = Util.buildParameters(
-                matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(),
-                params);
+                context, matchingMethod.getParameterTypes(), matchingMethod.isVarArgs(), params);
 
         Object result = null;
         try {
@@ -179,6 +174,7 @@ public class BeanELResolver extends ELResolver {
         return this.readOnly || this.property(context, base, property).isReadOnly(base);
     }
 
+    @Deprecated(forRemoval = true, since = "EL 5.0")
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         if (base == null) {
@@ -223,11 +219,13 @@ public class BeanELResolver extends ELResolver {
                 for (PropertyDescriptor pd: pds) {
                     this.properties.put(pd.getName(), new BeanProperty(type, pd));
                 }
-                if (System.getSecurityManager() != null) {
-                    // When running with SecurityManager, some classes may be
-                    // not accessible, but have accessible interfaces.
-                    populateFromInterfaces(type);
-                }
+                /**
+                 * Populating from any interfaces solves two distinct problems:
+                 * 1. When running under a security manager, classes may be
+                 *    unaccessible but have accessible interfaces.
+                 * 2. It causes default methods to be included.
+                 */
+                populateFromInterfaces(type);
             } catch (IntrospectionException ie) {
                 throw new ELException(ie);
             }

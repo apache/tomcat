@@ -51,14 +51,12 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         List<Object[]> parameterSets = new ArrayList<>();
 
         for (StoreType storeType : new StoreType[] { StoreType.KEYSTORE, StoreType.PEM } ) {
-            parameterSets.add(new Object[] {"NIO-JSSE", "org.apache.coyote.http11.Http11NioProtocol",
-                    "org.apache.tomcat.util.net.jsse.JSSEImplementation", storeType});
-
-            parameterSets.add(new Object[] {"NIO-OpenSSL", "org.apache.coyote.http11.Http11NioProtocol",
-                    "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
-
-            parameterSets.add(new Object[] { "APR/Native", "org.apache.coyote.http11.Http11AprProtocol",
-                    "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
+            parameterSets.add(new Object[] {
+                    "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation", storeType});
+            parameterSets.add(new Object[] {
+                    "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", storeType});
+            parameterSets.add(new Object[] {
+                    "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation", storeType});
         }
 
         return parameterSets;
@@ -68,7 +66,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public String protocolName;
+    public boolean needApr;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -304,17 +302,8 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
 
     @Override
-    protected String getProtocol() {
-        return protocolName;
-    }
-
-
-    @Override
     public void setUp() throws Exception {
         super.setUp();
-
-        AprLifecycleListener listener = new AprLifecycleListener();
-        Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
 
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
@@ -323,15 +312,17 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         connector.setScheme("https");
         connector.setSecure(true);
         Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
-        if (!connector.getProtocolHandlerClassName().contains("Apr")) {
-            // Skip this for APR. It is not supported.
-            Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
-        }
         sslHostConfig.setProtocols("TLSv1.2");
         connector.addSslHostConfig(sslHostConfig);
 
-        StandardServer server = (StandardServer) tomcat.getServer();
-        server.addLifecycleListener(listener);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
+
+        if (needApr) {
+            AprLifecycleListener listener = new AprLifecycleListener();
+            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
+        }
 
         // Simple webapp
         Context ctxt = tomcat.addContext("", null);

@@ -284,20 +284,18 @@ public class TestContextConfigAnnotation {
 
         // Add an SCI that has no interest in any type
         SCI sciNone = new SCI();
-        config.initializerClassMap.put(sciNone, new HashSet<Class<?>>());
+        config.initializerClassMap.put(sciNone, new HashSet<>());
 
         // Add an SCI with an interest in Servlets
         SCI sciServlet = new SCI();
-        config.initializerClassMap.put(sciServlet, new HashSet<Class<?>>());
-        config.typeInitializerMap.put(Servlet.class,
-                new HashSet<ServletContainerInitializer>());
+        config.initializerClassMap.put(sciServlet, new HashSet<>());
+        config.typeInitializerMap.put(Servlet.class, new HashSet<>());
         config.typeInitializerMap.get(Servlet.class).add(sciServlet);
 
         // Add an SCI with an interest in Objects - i.e. everything
         SCI sciObject = new SCI();
-        config.initializerClassMap.put(sciObject, new HashSet<Class<?>>());
-        config.typeInitializerMap.put(Object.class,
-                new HashSet<ServletContainerInitializer>());
+        config.initializerClassMap.put(sciObject, new HashSet<>());
+        config.typeInitializerMap.put(Object.class, new HashSet<>());
         config.typeInitializerMap.get(Object.class).add(sciObject);
 
         // Scan Servlet, Filter, Servlet, Listener
@@ -351,12 +349,8 @@ public class TestContextConfigAnnotation {
         public void removePropertyChangeListener(PropertyChangeListener l) {}
     }
 
-    /**
+    /*
      * Find compiled test class
-     *
-     * @param className
-     * @return File Resource
-     * @throws URISyntaxException
      */
     private File paramClassResource(String className) throws URISyntaxException {
         URL url = getClass().getClassLoader().getResource(className + ".class");

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
@@ -73,8 +72,9 @@ public class StandardEngineSF extends StoreFactoryBase {
             if(valves != null && valves.length > 0 ) {
                 List<Valve> engineValves = new ArrayList<>() ;
                 for (Valve valve : valves) {
-                    if (!(valve instanceof ClusterValve))
+                    if (!(valve instanceof ClusterValve)) {
                         engineValves.add(valve);
+                    }
                 }
                 storeElementArray(aWriter, indent, engineValves.toArray());
             }

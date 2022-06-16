@@ -15,14 +15,16 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 10.0 Maven Deployment" default="" basedir="."
+<project name="Tomcat 10.1 Maven Deployment" default="" basedir="."
          xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:if="ant:if"
          xmlns:unless="ant:unless">
 
   <property file="${basedir}/mvn.properties"/>
+  <property file="${basedir}/mvn.properties.release"/>
   <property file="${basedir}/mvn.properties.default"/>
   <property name="local.repo" value="${user.home}/.m2/repository"/>
+  <property name="aether.checksums.algorithms" value="MD5,SHA-1,SHA-256,SHA-512"/>
 
   <target name="init-maven">
     <antcall target="downloadfile">
@@ -52,6 +54,7 @@
 
     <resolver:install>
       <artifact file="${file}" />
+      <artifact file="${src}" classifier="sources"/>
       <pom file="${pom}.tmp"/>
       <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
       <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
@@ -329,6 +332,10 @@
                    jarFileName="websocket-api.jar"
                 srcJarFileName="websocket-api-src.jar"/>
 
+     <doMavenInstall artifactId="tomcat-websocket-client-api"
+                   jarFileName="websocket-client-api.jar"
+                srcJarFileName="websocket-client-api-src.jar"/>
+
      <doMavenInstall artifactId="tomcat-jaspic-api"
                    jarFileName="jaspic-api.jar"
                 srcJarFileName="jaspic-api-src.jar"/>
@@ -347,6 +354,11 @@
          file="${tomcat.embed.path}/tomcat-embed-core.jar"
          pom="tomcat-embed-core.pom"
          src="${tomcat.embed.src.path}/tomcat-embed-core-src.jar"/>
+     <doMavenInstall artifactId="tomcat-embed-programmatic"
+         groupId="org.apache.tomcat.experimental"
+         file="${tomcat.embed.path}/tomcat-embed-programmatic.jar"
+         pom="tomcat-embed-programmatic.pom"
+         src="${tomcat.embed.src.path}/tomcat-embed-programmatic-src.jar"/>
      <doMavenInstall artifactId="tomcat-embed-jasper"
          groupId="org.apache.tomcat.embed"
          file="${tomcat.embed.path}/tomcat-embed-jasper.jar"
@@ -427,6 +439,10 @@
                   jarFileName="websocket-api.jar"
                srcJarFileName="websocket-api-src.jar"/>
 
+    <doMavenDeploy artifactId="tomcat-websocket-client-api"
+                  jarFileName="websocket-client-api.jar"
+               srcJarFileName="websocket-client-api-src.jar"/>
+
     <doMavenDeploy artifactId="tomcat-jaspic-api"
                   jarFileName="jaspic-api.jar"
                srcJarFileName="jaspic-api-src.jar"/>
@@ -455,6 +471,11 @@
         file="${tomcat.embed.path}/tomcat-embed-core.jar"
         pom="tomcat-embed-core.pom"
         src="${tomcat.embed.src.path}/tomcat-embed-core-src.jar"/>
+    <doMavenDeploy artifactId="tomcat-embed-programmatic"
+                   groupId="org.apache.tomcat.experimental"
+                   file="${tomcat.embed.path}/tomcat-embed-programmatic.jar"
+                   pom="tomcat-embed-programmatic.pom"
+                   src="${tomcat.embed.src.path}/tomcat-embed-programmatic-src.jar"/>
     <doMavenDeploy artifactId="tomcat-embed-jasper"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-jasper.jar"
@@ -483,13 +504,14 @@
       <param name="maven.repo.repositoryId"
              value="${maven.snapshot.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
-      <param name="maven.deploy.version" value="10.0-SNAPSHOT"/>
+      <param name="maven.deploy.version" value="10.1.0-SNAPSHOT"/>
       <param name="maven.deploy.binary.version"
              value="${maven.asf.release.deploy.version}-dev"/>
     </antcall>
   </target>
 
-  <target name="deploy-release">
+  <target name="deploy-release" depends="init-gpg-1,init-gpg-2">
+    <fail unless="gpg.exec.available">GPG is required, but was not found at ${gpg.exec}</fail>
     <antcall target="generic-deploy">
       <param name="maven.repo.repositoryId"
              value="${maven.asf.release.repo.repositoryId}"/>

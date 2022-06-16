@@ -23,7 +23,6 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -35,6 +34,8 @@ import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
+import org.apache.coyote.http11.filters.SavedRequestInputFilter;
+import org.apache.coyote.http11.filters.VoidOutputFilter;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -46,7 +47,7 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.WriteBuffer;
 import org.apache.tomcat.util.res.StringManager;
 
-class Stream extends AbstractStream implements HeaderEmitter {
+class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private static final Log log = LogFactory.getLog(Stream.class);
     private static final StringManager sm = StringManager.getManager(Stream.class);
@@ -67,26 +68,24 @@ class Stream extends AbstractStream implements HeaderEmitter {
         ACK_HEADERS = response.getMimeHeaders();
     }
 
-    private volatile int weight = Constants.DEFAULT_WEIGHT;
     private volatile long contentLengthReceived = 0;
 
     private final Http2UpgradeHandler handler;
-    private final StreamStateMachine state;
     private final WindowAllocationManager allocationManager = new WindowAllocationManager(this);
+    private final Request coyoteRequest;
+    private final Response coyoteResponse = new Response();
+    private final StreamInputBuffer inputBuffer;
+    private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
+    private final Http2OutputBuffer http2OutputBuffer = new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
 
     // State machine would be too much overhead
     private int headerState = HEADER_STATE_START;
     private StreamException headerException = null;
 
-    // These will be set to null once the Stream closes to reduce the memory
-    // footprint.
-    private volatile Request coyoteRequest;
     private volatile StringBuilder cookieHeader = null;
-    private volatile Response coyoteResponse = new Response();
-    private volatile StreamInputBuffer inputBuffer;
-    private volatile StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
-    private volatile Http2OutputBuffer http2OutputBuffer =
-            new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
+
+    private Object pendingWindowUpdateForStreamLock = new Object();
+    private int pendingWindowUpdateForStream = 0;
 
 
     Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -95,20 +94,20 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     Stream(Integer identifier, Http2UpgradeHandler handler, Request coyoteRequest) {
-        super(identifier);
+        super(handler.getConnectionId(), identifier);
         this.handler = handler;
         handler.addChild(this);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
-        state = new StreamStateMachine(this);
         if (coyoteRequest == null) {
             // HTTP/2 new request
             this.coyoteRequest = new Request();
-            this.inputBuffer = new StreamInputBuffer();
+            this.inputBuffer = new StandardStreamInputBuffer();
             this.coyoteRequest.setInputBuffer(inputBuffer);
         } else {
             // HTTP/2 Push or HTTP/1.1 upgrade
             this.coyoteRequest = coyoteRequest;
-            this.inputBuffer = null;
+            this.inputBuffer = new SavedRequestStreamInputBuffer(
+                    (SavedRequestInputFilter) coyoteRequest.getInputBuffer());
             // Headers have been read by this point
             state.receivedStartOfHeaders();
             if (HTTP_UPGRADE_STREAM.equals(identifier)) {
@@ -124,7 +123,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                     coyoteResponse.setError();
                 }
             }
-            // TODO Assuming the body has been read at this point is not valid
+            // Request body, if any, has been read and buffered
             state.receivedEndOfStream();
         }
         this.coyoteRequest.setSendfile(handler.hasAsyncIO() && handler.getProtocol().getUseSendfile());
@@ -175,56 +174,9 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdentifier(), Boolean.toString(exclusive),
-                    parent.getIdentifier(), Integer.toString(weight)));
-        }
-
-        // Check if new parent is a descendant of this stream
-        if (isDescendant(parent)) {
-            parent.detachFromParent();
-            // Cast is always safe since any descendant of this stream must be
-            // an instance of Stream
-            getParentStream().addChild((Stream) parent);
-        }
-
-        if (exclusive) {
-            // Need to move children of the new parent to be children of this
-            // stream. Slightly convoluted to avoid concurrent modification.
-            Iterator<Stream> parentsChildren = parent.getChildStreams().iterator();
-            while (parentsChildren.hasNext()) {
-                Stream parentsChild = parentsChildren.next();
-                parentsChildren.remove();
-                this.addChild(parentsChild);
-            }
-        }
-        detachFromParent();
-        parent.addChild(this);
-        this.weight = weight;
-    }
-
-
-    /*
-     * Used when removing closed streams from the tree and we know there is no
-     * need to check for circular references.
-     */
-    final void rePrioritise(AbstractStream parent, int weight) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdentifier(), Boolean.FALSE,
-                    parent.getIdentifier(), Integer.toString(weight)));
-        }
-
-        parent.addChild(this);
-        this.weight = weight;
-    }
-
-
     final void receiveReset(long errorCode) {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reset.receive", getConnectionId(), getIdentifier(),
+            log.debug(sm.getString("stream.reset.receive", getConnectionId(), getIdAsString(),
                     Long.toString(errorCode)));
         }
         // Set the new state first since read and write both check this
@@ -239,11 +191,6 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     final void cancelAllocationRequests() {
         allocationManager.notifyAny();
-    }
-
-
-    final void checkState(FrameType frameType) throws Http2Exception {
-        state.checkFrameType(frameType);
     }
 
 
@@ -267,7 +214,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         while (windowSize < 1) {
             if (!canWrite()) {
                 throw new CloseNowException(sm.getString("stream.notWritable",
-                        getConnectionId(), getIdentifier()));
+                        getConnectionId(), getIdAsString()));
             }
             if (block) {
                 try {
@@ -275,7 +222,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                     allocationManager.waitForStream(writeTimeout);
                     windowSize = getWindowSize();
                     if (windowSize == 0) {
-                        doWriteTimeout();
+                        doStreamCancel(sm.getString("stream.writeTimeout"), Http2Error.ENHANCE_YOUR_CALM);
                     }
                 } catch (InterruptedException e) {
                     // Possible shutdown / rst or similar. Use an IOException to
@@ -299,10 +246,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void doWriteTimeout() throws CloseNowException {
-        String msg = sm.getString("stream.writeTimeout");
-        StreamException se = new StreamException(
-                msg, Http2Error.ENHANCE_YOUR_CALM, getIdAsInt());
+    void doStreamCancel(String msg, Http2Error error) throws CloseNowException {
+        StreamException se = new StreamException(msg, error, getIdAsInt());
         // Prevent the application making further writes
         streamOutputBuffer.closed = true;
         // Prevent Tomcat's error handling trying to write
@@ -332,25 +277,25 @@ class Stream extends AbstractStream implements HeaderEmitter {
     @Override
     public final void emitHeader(String name, String value) throws HpackException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.header.debug", getConnectionId(), getIdentifier(),
+            log.debug(sm.getString("stream.header.debug", getConnectionId(), getIdAsString(),
                     name, value));
         }
 
         // Header names must be lower case
         if (!name.toLowerCase(Locale.US).equals(name)) {
             throw new HpackException(sm.getString("stream.header.case",
-                    getConnectionId(), getIdentifier(), name));
+                    getConnectionId(), getIdAsString(), name));
         }
 
         if ("connection".equals(name)) {
             throw new HpackException(sm.getString("stream.header.connection",
-                    getConnectionId(), getIdentifier()));
+                    getConnectionId(), getIdAsString()));
         }
 
         if ("te".equals(name)) {
             if (!"trailers".equals(value)) {
                 throw new HpackException(sm.getString("stream.header.te",
-                        getConnectionId(), getIdentifier(), value));
+                        getConnectionId(), getIdAsString(), value));
             }
         }
 
@@ -362,14 +307,14 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
         if (name.length() == 0) {
             throw new HpackException(sm.getString("stream.header.empty",
-                    getConnectionId(), getIdentifier()));
+                    getConnectionId(), getIdAsString()));
         }
 
         boolean pseudoHeader = name.charAt(0) == ':';
 
         if (pseudoHeader && headerState != HEADER_STATE_PSEUDO) {
             headerException = new StreamException(sm.getString(
-                    "stream.header.unexpectedPseudoHeader", getConnectionId(), getIdentifier(),
+                    "stream.header.unexpectedPseudoHeader", getConnectionId(), getIdAsString(),
                     name), Http2Error.PROTOCOL_ERROR, getIdAsInt());
             // No need for further processing. The stream will be reset.
             return;
@@ -383,9 +328,13 @@ class Stream extends AbstractStream implements HeaderEmitter {
         case ":method": {
             if (coyoteRequest.method().isNull()) {
                 coyoteRequest.method().setString(value);
+                if ("HEAD".equals(value)) {
+                    addOutputFilter(new VoidOutputFilter());
+                    streamOutputBuffer.closed = true;
+                }
             } else {
                 throw new HpackException(sm.getString("stream.header.duplicate",
-                        getConnectionId(), getIdentifier(), ":method" ));
+                        getConnectionId(), getIdAsString(), ":method" ));
             }
             break;
         }
@@ -394,18 +343,18 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 coyoteRequest.scheme().setString(value);
             } else {
                 throw new HpackException(sm.getString("stream.header.duplicate",
-                        getConnectionId(), getIdentifier(), ":scheme" ));
+                        getConnectionId(), getIdAsString(), ":scheme" ));
             }
             break;
         }
         case ":path": {
             if (!coyoteRequest.requestURI().isNull()) {
                 throw new HpackException(sm.getString("stream.header.duplicate",
-                        getConnectionId(), getIdentifier(), ":path" ));
+                        getConnectionId(), getIdAsString(), ":path" ));
             }
             if (value.length() == 0) {
                 throw new HpackException(sm.getString("stream.header.noPath",
-                        getConnectionId(), getIdentifier()));
+                        getConnectionId(), getIdAsString()));
             }
             int queryStart = value.indexOf('?');
             String uri;
@@ -432,7 +381,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 } catch (IllegalArgumentException iae) {
                     // Host value invalid
                     throw new HpackException(sm.getString("stream.header.invalid",
-                            getConnectionId(), getIdentifier(), ":authority", value));
+                            getConnectionId(), getIdAsString(), ":authority", value));
                 }
                 if (i > -1) {
                     coyoteRequest.serverName().setString(value.substring(0, i));
@@ -442,7 +391,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 }
             } else {
                 throw new HpackException(sm.getString("stream.header.duplicate",
-                        getConnectionId(), getIdentifier(), ":authority" ));
+                        getConnectionId(), getIdAsString(), ":authority" ));
             }
             break;
         }
@@ -467,7 +416,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
             }
             if (pseudoHeader) {
                 headerException = new StreamException(sm.getString(
-                        "stream.header.unknownPseudoHeader", getConnectionId(), getIdentifier(),
+                        "stream.header.unknownPseudoHeader", getConnectionId(), getIdAsString(),
                         name), Http2Error.PROTOCOL_ERROR, getIdAsInt());
             }
 
@@ -504,7 +453,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         if (coyoteRequest.method().isNull() || coyoteRequest.scheme().isNull() ||
                 coyoteRequest.requestURI().isNull()) {
             throw new ConnectionException(sm.getString("stream.header.required",
-                    getConnectionId(), getIdentifier()), Http2Error.PROTOCOL_ERROR);
+                    getConnectionId(), getIdAsString()), Http2Error.PROTOCOL_ERROR);
         }
         // Cookie headers need to be concatenated into a single header
         // See RFC 7540 8.1.2.5
@@ -568,12 +517,6 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    @Override
-    final int getWeight() {
-        return weight;
-    }
-
-
     final Request getCoyoteRequest() {
         return coyoteRequest;
     }
@@ -584,7 +527,14 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    @Override
     final ByteBuffer getInputByteBuffer() {
+        if (inputBuffer == null) {
+            // This must either be a push or an HTTP upgrade. Either way there
+            // should not be a request body so return a zero length ByteBuffer
+            // to trigger a flow control error.
+            return ZERO_LENGTH_BYTEBUFFER;
+        }
         return inputBuffer.getInBuffer();
     }
 
@@ -604,7 +554,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                         handler.getProtocol().getMaxTrailerSize());
             } else {
                 throw new ConnectionException(sm.getString("stream.trailerHeader.noEndOfStream",
-                        getConnectionId(), getIdentifier()), Http2Error.PROTOCOL_ERROR);
+                        getConnectionId(), getIdAsString()), Http2Error.PROTOCOL_ERROR);
             }
         }
         // Parser will catch attempt to send a headers frame after the stream
@@ -613,12 +563,13 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final void receivedData(int payloadSize) throws ConnectionException {
+    @Override
+    final void receivedData(int payloadSize) throws Http2Exception {
         contentLengthReceived += payloadSize;
         long contentLengthHeader = coyoteRequest.getContentLengthLong();
         if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
             throw new ConnectionException(sm.getString("stream.header.contentLength",
-                    getConnectionId(), getIdentifier(), Long.valueOf(contentLengthHeader),
+                    getConnectionId(), getIdAsString(), Long.valueOf(contentLengthHeader),
                     Long.valueOf(contentLengthReceived)), Http2Error.PROTOCOL_ERROR);
         }
     }
@@ -627,7 +578,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
     final void receivedEndOfStream() throws ConnectionException {
         if (isContentLengthInconsistent()) {
             throw new ConnectionException(sm.getString("stream.header.contentLength",
-                    getConnectionId(), getIdentifier(),
+                    getConnectionId(), getIdAsString(),
                     Long.valueOf(coyoteRequest.getContentLengthLong()),
                     Long.valueOf(contentLengthReceived)), Http2Error.PROTOCOL_ERROR);
         }
@@ -693,11 +644,6 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final boolean isClosedFinal() {
-        return state.isClosedFinal();
-    }
-
-
     final void closeIfIdle() {
         state.closeIfIdle();
     }
@@ -713,15 +659,26 @@ class Stream extends AbstractStream implements HeaderEmitter {
             try {
                 StreamException se = (StreamException) http2Exception;
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("stream.reset.send", getConnectionId(), getIdentifier(),
+                    log.debug(sm.getString("stream.reset.send", getConnectionId(), getIdAsString(),
                             se.getError()));
                 }
-                state.sendReset();
-                handler.sendStreamReset(se);
+
+                // Need to update state atomically with the sending of the RST
+                // frame else other threads currently working with this stream
+                // may see the state change and send a RST frame before the RST
+                // frame triggered by this thread. If that happens the client
+                // may see out of order RST frames which may hard to follow if
+                // the client is unaware the RST frames may be received out of
+                // order.
+                handler.sendStreamReset(state, se);
+
+                cancelAllocationRequests();
+                if (inputBuffer != null) {
+                    inputBuffer.swallowUnread();
+                }
             } catch (IOException ioe) {
-                ConnectionException ce = new ConnectionException(
-                        sm.getString("stream.reset.fail"), Http2Error.PROTOCOL_ERROR);
-                ce.initCause(ioe);
+                ConnectionException ce = new ConnectionException(sm.getString(
+                        "stream.reset.fail", getConnectionId(), getIdAsString()), Http2Error.PROTOCOL_ERROR, ioe);
                 handler.closeConnection(ce);
             }
         } else {
@@ -733,18 +690,25 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     /*
      * This method is called recycle for consistency with the rest of the Tomcat
-     * code base. Currently, it only sets references to null for the purposes of
-     * reducing memory footprint. It does not fully recycle the Stream ready for
-     * re-use since Stream objects are not re-used. This is useful because
-     * Stream instances are retained for a period after the Stream closes.
+     * code base. Currently, it calls the handler to replace this stream with an
+     * implementation that uses less memory. It does not fully recycle the
+     * Stream ready for re-use since Stream objects are not re-used. This is
+     * useful because Stream instances are retained for a period after the
+     * Stream closes.
      */
     final void recycle() {
-        coyoteRequest = null;
-        cookieHeader = null;
-        coyoteResponse = null;
-        inputBuffer = null;
-        streamOutputBuffer = null;
-        http2OutputBuffer = null;
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("stream.recycle", getConnectionId(), getIdAsString()));
+        }
+        int remaining;
+        // May be null if stream was closed before any DATA frames were processed.
+        ByteBuffer inputByteBuffer = getInputByteBuffer();
+        if (inputByteBuffer == null) {
+            remaining = 0;
+        } else {
+            remaining = inputByteBuffer.remaining();
+        }
+        handler.replaceStream(this, new RecycledStream(getConnectionId(), getIdentifier(), state, remaining));
     }
 
 
@@ -795,6 +759,27 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     StreamException getResetException() {
         return streamOutputBuffer.reset;
+    }
+
+
+    int getWindowUpdateSizeToWrite(int increment) {
+        int result;
+        int threshold = handler.getProtocol().getOverheadWindowUpdateThreshold();
+        synchronized (pendingWindowUpdateForStreamLock) {
+            if (increment > threshold) {
+                result = increment + pendingWindowUpdateForStream;
+                pendingWindowUpdateForStream = 0;
+            } else {
+                pendingWindowUpdateForStream += increment;
+                if (pendingWindowUpdateForStream > threshold) {
+                    result = pendingWindowUpdateForStream;
+                    pendingWindowUpdateForStream = 0;
+                } else {
+                    result = 0;
+                }
+            }
+        }
+        return result;
     }
 
 
@@ -861,8 +846,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
         @Override
         public final synchronized int doWrite(ByteBuffer chunk) throws IOException {
             if (closed) {
-                throw new IllegalStateException(
-                        sm.getString("stream.closed", getConnectionId(), getIdentifier()));
+                throw new IOException (
+                        sm.getString("stream.closed", getConnectionId(), getIdAsString()));
             }
             // chunk is always fully written
             int result = chunk.remaining();
@@ -929,7 +914,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 throws IOException {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("stream.outputBuffer.flush.debug", getConnectionId(),
-                        getIdentifier(), Integer.toString(buffer.position()),
+                        getIdAsString(), Integer.toString(buffer.position()),
                         Boolean.toString(writeInProgress), Boolean.toString(closed)));
             }
             if (buffer.position() == 0) {
@@ -1046,7 +1031,27 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    class StreamInputBuffer implements InputBuffer {
+    abstract class StreamInputBuffer implements InputBuffer {
+
+        abstract void receiveReset();
+
+        abstract void swallowUnread() throws IOException;
+
+        abstract void notifyEof();
+
+        abstract ByteBuffer getInBuffer();
+
+        abstract void onDataAvailable() throws IOException;
+
+        abstract boolean isReadyForRead();
+
+        abstract boolean isRequestBodyFullyRead();
+
+        abstract void insertReplayedBody(ByteChunk body);
+    }
+
+
+    class StandardStreamInputBuffer extends StreamInputBuffer {
 
         /* Two buffers are required to avoid various multi-threading issues.
          * These issues arise from the fact that the Stream (or the
@@ -1073,7 +1078,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
         // 'write mode'.
         private volatile ByteBuffer inBuffer;
         private volatile boolean readInterest;
-        private boolean resetReceived = false;
+        private volatile boolean closed;
+        private boolean resetReceived;
 
         @Override
         public final int doRead(ApplicationBufferHandler applicationBufferHandler)
@@ -1083,8 +1089,19 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
             int written = -1;
 
+            // It is still possible that the stream has been closed and inBuffer
+            // set to null between the call to ensureBuffersExist() above and
+            // the sync below. The checks just before and just inside the sync
+            // ensure we don't get any NPEs reported.
+            ByteBuffer tmpInBuffer = inBuffer;
+            if (tmpInBuffer == null) {
+                return -1;
+            }
             // Ensure that only one thread accesses inBuffer at a time
-            synchronized (inBuffer) {
+            synchronized (tmpInBuffer) {
+                if (inBuffer == null) {
+                    return -1;
+                }
                 boolean canRead = false;
                 while (inBuffer.position() == 0 && (canRead = isActive() && !isInputFinished())) {
                     // Need to block until some data is written
@@ -1150,6 +1167,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         }
 
 
+        @Override
         final boolean isReadyForRead() {
             ensureBuffersExist();
 
@@ -1166,12 +1184,14 @@ class Stream extends AbstractStream implements HeaderEmitter {
             }
         }
 
+        @Override
         final synchronized boolean isRequestBodyFullyRead() {
             return (inBuffer == null || inBuffer.position() == 0) && isInputFinished();
         }
 
 
-        final synchronized int available() {
+        @Override
+        public final synchronized int available() {
             if (inBuffer == null) {
                 return 0;
             }
@@ -1182,8 +1202,11 @@ class Stream extends AbstractStream implements HeaderEmitter {
         /*
          * Called after placing some data in the inBuffer.
          */
-        final synchronized boolean onDataAvailable() {
-            if (readInterest) {
+        @Override
+        final synchronized void onDataAvailable() throws IOException {
+            if (closed) {
+                swallowUnread();
+            } else if (readInterest) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("stream.inputBuffer.dispatch"));
                 }
@@ -1193,7 +1216,6 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 // the incoming connection and streams are processed on their
                 // own.
                 coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
-                return true;
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("stream.inputBuffer.signal"));
@@ -1201,30 +1223,31 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 synchronized (inBuffer) {
                     inBuffer.notifyAll();
                 }
-                return false;
             }
         }
 
 
-        private final ByteBuffer getInBuffer() {
+        @Override
+        final ByteBuffer getInBuffer() {
             ensureBuffersExist();
             return inBuffer;
         }
 
 
+        @Override
         final synchronized void insertReplayedBody(ByteChunk body) {
             inBuffer = ByteBuffer.wrap(body.getBytes(),  body.getOffset(),  body.getLength());
         }
 
 
         private final void ensureBuffersExist() {
-            if (inBuffer == null) {
+            if (inBuffer == null && !closed) {
                 // The client must obey Tomcat's window size when sending so
                 // this is the initial window size set by Tomcat that the client
                 // uses (i.e. the local setting is required here).
                 int size = handler.getLocalSettings().getInitialWindowSize();
                 synchronized (this) {
-                    if (inBuffer == null) {
+                    if (inBuffer == null && !closed) {
                         inBuffer = ByteBuffer.allocate(size);
                         outBuffer = new byte[size];
                     }
@@ -1233,7 +1256,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
         }
 
 
-        private final void receiveReset() {
+        @Override
+        final void receiveReset() {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
                     resetReceived = true;
@@ -1242,12 +1266,101 @@ class Stream extends AbstractStream implements HeaderEmitter {
             }
         }
 
-        private final void notifyEof() {
+        @Override
+        final void notifyEof() {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
                     inBuffer.notifyAll();
                 }
             }
+        }
+
+        @Override
+        final void swallowUnread() throws IOException {
+            synchronized (this) {
+                closed = true;
+            }
+            if (inBuffer != null) {
+                int unreadByteCount = 0;
+                synchronized (inBuffer) {
+                    unreadByteCount = inBuffer.position();
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("stream.inputBuffer.swallowUnread", Integer.valueOf(unreadByteCount)));
+                    }
+                    if (unreadByteCount > 0) {
+                        inBuffer.position(0);
+                        inBuffer.limit(inBuffer.limit() - unreadByteCount);
+                    }
+                }
+                // Do this outside of the sync because:
+                // - it doesn't need to be inside the sync
+                // - if inside the sync it can trigger a deadlock
+                //   https://markmail.org/message/vbglzkvj6wxlhh3p
+                if (unreadByteCount > 0) {
+                    handler.onSwallowedDataFramePayload(getIdAsInt(), unreadByteCount);
+                }
+            }
+        }
+    }
+
+
+    class SavedRequestStreamInputBuffer extends StreamInputBuffer {
+
+        private final SavedRequestInputFilter inputFilter;
+
+        SavedRequestStreamInputBuffer(SavedRequestInputFilter inputFilter) {
+            this.inputFilter = inputFilter;
+        }
+
+
+        @Override
+        public int doRead(ApplicationBufferHandler handler) throws IOException {
+            return inputFilter.doRead(handler);
+        }
+
+        @Override
+        public int available() {
+            return inputFilter.available();
+        }
+
+        @Override
+        void receiveReset() {
+            // NO-OP
+        }
+
+        @Override
+        void swallowUnread() throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        void notifyEof() {
+            // NO-OP
+        }
+
+        @Override
+        ByteBuffer getInBuffer() {
+            return null;
+        }
+
+        @Override
+        void onDataAvailable() throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        boolean isReadyForRead() {
+            return true;
+        }
+
+        @Override
+        boolean isRequestBodyFullyRead() {
+            return inputFilter.isFinished();
+        }
+
+        @Override
+        void insertReplayedBody(ByteChunk body) {
+            // NO-OP
         }
     }
 }

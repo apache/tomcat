@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class Constants {
 
-    public static final String SPEC_VERSION = "3.0";
+    public static final String SPEC_VERSION = "3.1";
 
     /**
      * These classes/packages are automatically imported by the
@@ -58,15 +58,6 @@ public class Constants {
      * Default tag handler pool size.
      */
     public static final int MAX_POOL_SIZE = 5;
-
-    /**
-     * Default URLs to download the plugin for Netscape and IE.
-     */
-    public static final String NS_PLUGIN_URL =
-        "http://java.sun.com/products/plugin/";
-
-    public static final String IE_PLUGIN_URL =
-        "http://java.sun.com/products/plugin/1.2.2/jinstall-1_2_2-win.cab#Version=1,2,2,0";
 
     /**
      * Has security been turned on?

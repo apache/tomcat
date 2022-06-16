@@ -191,7 +191,7 @@
         you can use <code>closeMethod="close"</code>. Note that Apache Commons
         DBCP 2 requires this to be set for a clean shutdown. When using the
         default Tomcat connection pool (based on DBCP 2) Tomcat will set this
-        attribute automatically unless it is explictly set to the empty
+        attribute automatically unless it is explicitly set to the empty
         string.</p>
       </attribute>
 

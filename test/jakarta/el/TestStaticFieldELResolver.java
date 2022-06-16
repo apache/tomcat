@@ -240,8 +240,8 @@ public class TestStaticFieldELResolver {
         Class<?> result = resolver.getType(context, new ELClass(
                 TesterClass.class), PROPERTY01_NAME);
 
-        Assert.assertEquals(PROPERTY01_NAME.getClass(), result);
-        Assert.assertTrue(context.isPropertyResolved());
+        // Resolver is read-only so this should return null
+        Assert.assertNull(result);
     }
 
     /**
@@ -305,8 +305,8 @@ public class TestStaticFieldELResolver {
         Class<?> result = resolver.getType(context, new ELClass(
                 MethodUnderTest.class), MethodUnderTest.GET_TYPE.toString());
 
-        Assert.assertEquals(MethodUnderTest.GET_TYPE.getClass(), result);
-        Assert.assertTrue(context.isPropertyResolved());
+        // Resolver is read-only so this should return null
+        Assert.assertNull(result);
     }
 
     /**

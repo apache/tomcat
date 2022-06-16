@@ -16,6 +16,7 @@
  */
 package org.apache.coyote;
 
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -104,7 +105,7 @@ public interface UpgradeProtocol {
      *                 handle any connections passed to this UpgradeProtocol via
      *                 the HTTP upgrade mechanism
      */
-    public default void setHttp11Protocol(AbstractProtocol<?> protocol) {
+    public default void setHttp11Protocol(AbstractHttp11Protocol<?> protocol) {
         // NO-OP
     }
 }

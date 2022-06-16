@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.sql.CallableStatement;
@@ -72,25 +71,6 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
     }
 
     /**
-     * Returns the CallableStatement to the pool. If {{@link #isClosed()}, this is a No-op.
-     */
-    @Override
-    public void close() throws SQLException {
-        // calling close twice should have no effect
-        if (!isClosed()) {
-            try {
-                pool.returnObject(key, this);
-            } catch (final SQLException e) {
-                throw e;
-            } catch (final RuntimeException e) {
-                throw e;
-            } catch (final Exception e) {
-                throw new SQLException("Cannot close CallableStatement (return to pool failed)", e);
-            }
-        }
-    }
-
-    /**
      * Activates after retrieval from the pool. Adds a trace for this CallableStatement to the Connection that created
      * it.
      *
@@ -103,6 +83,23 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
             getConnectionInternal().addTrace(this);
         }
         super.activate();
+    }
+
+    /**
+     * Returns the CallableStatement to the pool. If {{@link #isClosed()}, this is a No-op.
+     */
+    @Override
+    public void close() throws SQLException {
+        // calling close twice should have no effect
+        if (!isClosed()) {
+            try {
+                pool.returnObject(key, this);
+            } catch (final SQLException | RuntimeException e) {
+                throw e;
+            } catch (final Exception e) {
+                throw new SQLException("Cannot close CallableStatement (return to pool failed)", e);
+            }
+        }
     }
 
     /**
@@ -123,12 +120,12 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
         final List<AbandonedTrace> resultSetList = getTrace();
         if (resultSetList != null) {
             final List<Exception> thrownList = new ArrayList<>();
-            final ResultSet[] resultSets = resultSetList.toArray(new ResultSet[0]);
+            final ResultSet[] resultSets = resultSetList.toArray(Utils.EMPTY_RESULT_SET_ARRAY);
             for (final ResultSet resultSet : resultSets) {
                 if (resultSet != null) {
                     try {
                         resultSet.close();
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         thrownList.add(e);
                     }
                 }

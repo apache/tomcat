@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.IOException;
@@ -184,7 +183,17 @@ public class TestJspDocumentParser extends TomcatBaseTest {
 
     @Test
     public void testDocument_3_1() throws Exception {
-        doTestDocument(false, "3.1");
+        doTestDocument(true, "3.1");
+    }
+
+    @Test
+    public void testDocument_3_2() throws Exception {
+        doTestDocument(false, "3.2");
+    }
+
+    @Test
+    public void testDocument_4_0() throws Exception {
+        doTestDocument(false, "4.0");
     }
 
     @Test

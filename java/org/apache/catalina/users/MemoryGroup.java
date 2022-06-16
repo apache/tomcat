@@ -14,17 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.users;
 
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.catalina.Role;
-import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.buf.StringUtils;
 
@@ -36,10 +29,7 @@ import org.apache.tomcat.util.buf.StringUtils;
  * @author Craig R. McClanahan
  * @since 4.1
  */
-public class MemoryGroup extends AbstractGroup {
-
-
-    // ----------------------------------------------------------- Constructors
+public class MemoryGroup extends GenericGroup<MemoryUserDatabase> {
 
 
     /**
@@ -52,122 +42,7 @@ public class MemoryGroup extends AbstractGroup {
      */
     MemoryGroup(MemoryUserDatabase database,
                 String groupname, String description) {
-
-        super();
-        this.database = database;
-        setGroupname(groupname);
-        setDescription(description);
-
-    }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The {@link MemoryUserDatabase} that owns this group.
-     */
-    protected final MemoryUserDatabase database;
-
-
-    /**
-     * The set of {@link Role}s associated with this group.
-     */
-    protected final ArrayList<Role> roles = new ArrayList<>();
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return the set of {@link Role}s assigned specifically to this group.
-     */
-    @Override
-    public Iterator<Role> getRoles() {
-        synchronized (roles) {
-            return roles.iterator();
-        }
-    }
-
-
-    /**
-     * Return the {@link UserDatabase} within which this Group is defined.
-     */
-    @Override
-    public UserDatabase getUserDatabase() {
-        return this.database;
-    }
-
-
-    /**
-     * Return the set of {@link org.apache.catalina.User}s that are members of this group.
-     */
-    @Override
-    public Iterator<User> getUsers() {
-        List<User> results = new ArrayList<>();
-        Iterator<User> users = database.getUsers();
-        while (users.hasNext()) {
-            User user = users.next();
-            if (user.isInGroup(this)) {
-                results.add(user);
-            }
-        }
-        return results.iterator();
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-
-    /**
-     * Add a new {@link Role} to those assigned specifically to this group.
-     *
-     * @param role The new role
-     */
-    @Override
-    public void addRole(Role role) {
-        synchronized (roles) {
-            if (!roles.contains(role)) {
-                roles.add(role);
-            }
-        }
-    }
-
-
-    /**
-     * Is this group specifically assigned the specified {@link Role}?
-     *
-     * @param role The role to check
-     */
-    @Override
-    public boolean isInRole(Role role) {
-        synchronized (roles) {
-            return roles.contains(role);
-        }
-    }
-
-
-    /**
-     * Remove a {@link Role} from those assigned to this group.
-     *
-     * @param role The old role
-     */
-    @Override
-    public void removeRole(Role role) {
-        synchronized (roles) {
-            roles.remove(role);
-        }
-    }
-
-
-    /**
-     * Remove all {@link Role}s from those assigned to this group.
-     */
-    @Override
-    public void removeRoles() {
-        synchronized (roles) {
-            roles.clear();
-        }
+        super(database, groupname, description, null);
     }
 
 
@@ -184,13 +59,9 @@ public class MemoryGroup extends AbstractGroup {
             sb.append(description);
             sb.append("\"");
         }
-        synchronized (roles) {
-            if (roles.size() > 0) {
-                sb.append(" roles=\"");
-                StringUtils.join(roles, ',', (x) -> x.getRolename(), sb);
-                sb.append("\"");
-            }
-        }
+        sb.append(" roles=\"");
+        StringUtils.join(roles, ',', Role::getRolename, sb);
+        sb.append("\"");
         sb.append("/>");
         return sb.toString();
     }

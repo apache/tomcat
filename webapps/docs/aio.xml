@@ -45,9 +45,8 @@
   <section name="Asynchronous writes">
 
   <p>
-    When using HTTP connectors (based on APR or NIO/NIO2),
-    Tomcat supports using sendfile to send large static files.
-    These writes, as soon as the system load increases, will be performed
+    When using HTTP connectors Tomcat supports using sendfile to send large
+    static files. These writes, as soon as the system load increases, will be performed
     asynchronously in the most efficient way. Instead of sending a large response using
     blocking writes, it is possible to write content to a static file, and write it
     using a sendfile code. A caching valve could take advantage of this to cache the

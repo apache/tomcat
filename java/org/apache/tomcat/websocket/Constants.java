@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.Extension;
 
 /**
@@ -50,19 +51,30 @@ public class Constants {
      * Property name to set to configure the value that is passed to
      * {@link javax.net.ssl.SSLEngine#setEnabledProtocols(String[])}. The value
      * should be a comma separated string.
+     *
+     * @deprecated This will be removed in Tomcat 11.
+     *             Use {@link ClientEndpointConfig#getSSLContext()}
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
     public static final String SSL_PROTOCOLS_PROPERTY =
             "org.apache.tomcat.websocket.SSL_PROTOCOLS";
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
     public static final String SSL_TRUSTSTORE_PROPERTY =
             "org.apache.tomcat.websocket.SSL_TRUSTSTORE";
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
     public static final String SSL_TRUSTSTORE_PWD_PROPERTY =
             "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
     public static final String SSL_TRUSTSTORE_PWD_DEFAULT = "changeit";
     /**
      * Property name to set to configure used SSLContext. The value should be an
      * instance of SSLContext. If this property is present, the SSL_TRUSTSTORE*
      * properties are ignored.
+     *
+     * @deprecated This will be removed in Tomcat 11.
+     *             Use {@link ClientEndpointConfig#getSSLContext()}
      */
+    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
     public static final String SSL_CONTEXT_PROPERTY =
             "org.apache.tomcat.websocket.SSL_CONTEXT";
     /**
@@ -114,6 +126,12 @@ public class Constants {
     // Milliseconds so this is 20 seconds
     public static final long DEFAULT_BLOCKING_SEND_TIMEOUT = 20 * 1000;
 
+    // Configuration for read idle timeout on WebSocket session
+    public static final String READ_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.READ_IDLE_TIMEOUT_MS";
+
+    // Configuration for write idle timeout on WebSocket session
+    public static final String WRITE_IDLE_TIMEOUT_MS = "org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS";
+
     // Configuration for background processing checks intervals
     static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
             "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
@@ -122,30 +140,15 @@ public class Constants {
     public static final String WS_AUTHENTICATION_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME";
     public static final String WS_AUTHENTICATION_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD";
 
-    /* Configuration for extensions
-     * Note: These options are primarily present to enable this implementation
-     *       to pass compliance tests. They are expected to be removed once
-     *       the WebSocket API includes a mechanism for adding custom extensions
-     *       and disabling built-in extensions.
-     */
-    static final boolean DISABLE_BUILTIN_EXTENSIONS =
-            Boolean.getBoolean("org.apache.tomcat.websocket.DISABLE_BUILTIN_EXTENSIONS");
-    static final boolean ALLOW_UNSUPPORTED_EXTENSIONS =
-            Boolean.getBoolean("org.apache.tomcat.websocket.ALLOW_UNSUPPORTED_EXTENSIONS");
-
     public static final boolean STRICT_SPEC_COMPLIANCE =
             Boolean.getBoolean("org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
 
     public static final List<Extension> INSTALLED_EXTENSIONS;
 
     static {
-        if (DISABLE_BUILTIN_EXTENSIONS) {
-            INSTALLED_EXTENSIONS = Collections.unmodifiableList(new ArrayList<Extension>());
-        } else {
-            List<Extension> installed = new ArrayList<>(1);
-            installed.add(new WsExtension("permessage-deflate"));
-            INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
-        }
+        List<Extension> installed = new ArrayList<>(1);
+        installed.add(new WsExtension("permessage-deflate"));
+        INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
     }
 
     private Constants() {

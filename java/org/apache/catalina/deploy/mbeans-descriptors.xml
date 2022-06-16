@@ -23,7 +23,7 @@
   <mbean         name="NamingResourcesImpl"
             className="org.apache.catalina.mbeans.NamingResourcesMBean"
           description="Holds and manages the naming resources defined in the
-                       J2EE Enterprise Naming Context and their associated
+                       Jakarta EE Naming Context and their associated
                        JNDI context"
                domain="Catalina"
                 group="Resources"

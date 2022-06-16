@@ -150,7 +150,7 @@ public abstract class JspFactory {
      *
      * @param context the current web application's <code>ServletContext</code>
      * @return <code>JspApplicationContext</code> instance
-     * @since 2.1
+     * @since JSP 2.1
      */
     public abstract JspApplicationContext getJspApplicationContext(
             ServletContext context);

@@ -17,20 +17,17 @@
 package jakarta.el;
 
 import java.io.File;
+import java.lang.module.ModuleFinder;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestImportHandlerStandardPackages {
 
@@ -41,8 +38,6 @@ public class TestImportHandlerStandardPackages {
         Field f = clazz.getDeclaredField("standardPackages");
         f.setAccessible(true);
         Object obj = f.get(null);
-
-        Assert.assertTrue("Not Map", obj instanceof Map);
 
         @SuppressWarnings("unchecked")
         Map<String,Set<String>> standardPackageName = (Map<String, Set<String>>) obj;
@@ -56,27 +51,24 @@ public class TestImportHandlerStandardPackages {
     private void checkPackageClassList(String packageName, Set<String> classNames) throws Exception {
 
         if ("java.lang".equals(packageName)) {
-            // The code below is designed to run on Java 9 so skip this check
-            // if running on Java 8. The test has previously been run with Java
-            // 9 (and later) so it is not necessary that this is executed on
-            // every test run. The intention is that it will catch new classes
-            // when the tests are run on a newer JRE.
+            // The intention is that this test will catch new classes when the
+            // tests are run on a newer JRE.
             // The latest version of the JRE where this test is known to pass is
-            // - OpenJDK 14 EA 27
-            if (!JreCompat.isJre9Available()) {
-                return;
-            }
-            getJavaBaseClasses().filter(c -> (c.startsWith("java/lang/")))
+            // - OpenJDK 19 EA 22
+            ModuleFinder.ofSystem().find("java.base").get().open().list()
+                    .filter(c -> (c.startsWith("java/lang/")))
                     .filter(c -> c.lastIndexOf('/') == 9)             // Exclude sub-packages
                     .filter(c -> c.endsWith(".class"))                // Exclude non-class resources
                     .map(c -> c.substring(10, c.length() - 6))        // Extract class name
                     .map(c-> {
                         try {
-                            return Class.forName("java.lang." + c);   // Get the class object
+                            return Class.forName("java.lang." + c, false,
+                                    TesterImportHandlerPerformance.class.getClassLoader());   // Get the class object
                         } catch (ClassNotFoundException e) {
-                            throw new RuntimeException();
+                            throw new RuntimeException(c);
                         }
                     })
+                    .filter(c -> null != c)
                     .filter(c -> Modifier.isPublic(c.getModifiers())) // Exclude non-public classes
                     .map(c -> c.getName().substring(10))              // Back to the class name
                     .map(c -> c.replace('$',  '.'))
@@ -105,10 +97,10 @@ public class TestImportHandlerStandardPackages {
                 Assert.assertNotNull(files);
                 for (String file : files) {
                     if (!file.endsWith(".class")) {
-                        // Skip non-class resoucres
+                        // Skip non-class resources
                         continue;
                     }
-                    if (file.startsWith("Test")) {
+                    if (file.startsWith("Test") || file.endsWith("BaseTest.class")) {
                         // Skip test resources
                         continue;
                     }
@@ -138,26 +130,5 @@ public class TestImportHandlerStandardPackages {
                 }
             }
         }
-    }
-
-
-    private static Stream<String> getJavaBaseClasses() throws Exception {
-        // While this code is only used on Java 9 and later, it needs to compile
-        // with Java 8 so use reflection for now.
-        Class<?> clazzModuleFinder = Class.forName("java.lang.module.ModuleFinder");
-        Class<?> clazzModuleReference = Class.forName("java.lang.module.ModuleReference");
-        Class<?> clazzModuleReader = Class.forName("java.lang.module.ModuleReader");
-
-        // Returns ModuleFinder
-        Object mf = clazzModuleFinder.getMethod("ofSystem").invoke(null);
-        // Returns ModuleReference
-        Object mRef = ((Optional<?>) clazzModuleFinder.getMethod(
-                "find", String.class).invoke(mf, "java.base")).get();
-        // Returns ModuleReader
-        Object mr = clazzModuleReference.getMethod("open").invoke(mRef);
-        // Returns the contents of the module
-        @SuppressWarnings("unchecked")
-        Stream<String> result = (Stream<String>) clazzModuleReader.getMethod("list").invoke(mr);
-        return result;
     }
 }

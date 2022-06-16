@@ -51,16 +51,19 @@
   <code>mod_jk 1.2.x</code> connector for Apache 1.3), please refer to the
   <a href="ajp.html">AJP Connector</a> documentation.</p>
 
-  <p>Each incoming request requires
-  a thread for the duration of that request.  If more simultaneous requests
-  are received than can be handled by the currently available request
-  processing threads, additional threads will be created up to the
-  configured maximum (the value of the <code>maxThreads</code> attribute).
-  If still more simultaneous requests are received, they are stacked up
-  inside the server socket created by the <strong>Connector</strong>, up to
-  the configured maximum (the value of the <code>acceptCount</code>
-  attribute).  Any further simultaneous requests will receive "connection
-  refused" errors, until resources are available to process them.</p>
+  <p>Each incoming, non-asynchronous request requires a thread for the duration
+  of that request.  If more simultaneous requests are received than can be
+  handled by the currently available request processing threads, additional
+  threads will be created up to the configured maximum (the value of the
+  <code>maxThreads</code> attribute). If still more simultaneous requests are
+  received, Tomcat will accept new connections until the current number of
+  connections reaches <code>maxConnections</code>. Connections are queued inside
+  the server socket created by the <strong>Connector</strong> until a thread
+  becomes avaialble to process the connection. Once <code>maxConnections</code>
+  has been reached the operating system will queue further connections. The size
+  of the  operating system provided connection queue may be controlled by the
+  <code>acceptCount</code> attribute. If the operating system queue fills,
+  further connection requests may be refused or may time out.</p>
 
 </section>
 
@@ -89,15 +92,6 @@
       <p>The default timeout for asynchronous requests in milliseconds. If not
       specified, this attribute is set to the Servlet specification default of
       30000 (30 seconds).</p>
-    </attribute>
-
-    <attribute name="defaultSSLHostConfigName" required="false">
-      <p>The name of the default <strong>SSLHostConfig</strong> that will be
-      used for secure connections (if this connector is configured for secure
-      connections) if the client connection does not provide SNI or if the SNI
-      is provided but does not match any configured
-      <strong>SSLHostConfig</strong>. If not specified the default value of
-      <code>_default_</code> will be used.</p>
     </attribute>
 
     <attribute name="discardFacades" required="false">
@@ -140,11 +134,10 @@
       <code>true</code> will be used.</p>
     </attribute>
 
-    <attribute name="maxHeaderCount" required="false">
-      <p>The maximum number of headers in a request that are allowed by the
-      container. A request that contains more headers than the specified limit
-      will be rejected. A value of less than 0 means no limit.
-      If not specified, a default of 100 is used.</p>
+    <attribute name="maxCookieCount" required="false">
+      <p>The maximum number of cookies that are permitted for a request. A value
+      of less than zero means no limit. If not specified, a default value of 200
+      will be used.</p>
     </attribute>
 
     <attribute name="maxParameterCount" required="false">
@@ -166,18 +159,20 @@
     </attribute>
 
     <attribute name="maxSavePostSize" required="false">
-      <p>The maximum size in bytes of the POST which will be saved/buffered by
-      the container during FORM or CLIENT-CERT authentication. For both types
-      of authentication, the POST will be saved/buffered before the user is
-      authenticated. For CLIENT-CERT authentication, the POST is buffered for
-      the duration of the SSL handshake and the buffer emptied when the request
-      is processed. For FORM authentication the POST is saved whilst the user
-      is re-directed to the login form and is retained until the user
-      successfully authenticates or the session associated with the
-      authentication request expires. The limit can be disabled by setting this
+      <p>The maximum size in bytes of the request body which will be
+      saved/buffered by the container during FORM or CLIENT-CERT authentication
+      or during HTTP/1.1 upgrade. For both types of authentication, the request
+      body will be saved/buffered before the user is authenticated. For
+      CLIENT-CERT authentication, the request body is buffered for the duration
+      of the SSL handshake and the buffer emptied when the request is processed.
+      For FORM authentication the POST is saved whilst the user is re-directed
+      to the login form and is retained until the user successfully
+      authenticates or the session associated with the authentication request
+      expires. For HTTP/1.1 upgrade, the request body is buffered for the
+      duration of the upgrade process. The limit can be disabled by setting this
       attribute to -1. Setting the attribute to zero will disable the saving of
-      POST data during authentication. If not specified, this attribute is set
-      to 4096 (4 kilobytes).</p>
+      the requets body data during authentication and HTTP/1.1 upgrade. If not
+      specified, this attribute is set to 4096 (4 kilobytes).</p>
     </attribute>
 
     <attribute name="parseBodyMethods" required="false">
@@ -211,14 +206,10 @@
               non blocking Java NIO connector<br/>
         <code>org.apache.coyote.http11.Http11Nio2Protocol</code> -
               non blocking Java NIO2 connector<br/>
-        <code>org.apache.coyote.http11.Http11AprProtocol</code> -
-              the APR/native connector.<br/>
         Custom implementations may also be used.<br/>
         Take a look at our <a href="#Connector_Comparison">Connector
-        Comparison</a> chart. The configuration for both Java connectors is
-        identical, for http and https.<br/>
-        For more information on the APR connector and APR specific SSL settings
-        please  visit the <a href="../apr.html">APR documentation</a>
+        Comparison</a> chart. The configuration for Java connectors is
+        identical, for http and https.
       </p>
     </attribute>
 
@@ -244,6 +235,12 @@
       <code>&lt;security-constraint&gt;</code> requires SSL transport,
       Catalina will automatically redirect the request to the port
       number specified here.</p>
+    </attribute>
+
+    <attribute name="rejectSuspiciousURIs" required="false">
+      <p>Should this <strong>Connector</strong> reject a requests if the URI
+      matches one of the suspicious URIs patterns identified by the Servlet 6.0
+      specification? The default value is <code>false</code>.</p>
     </attribute>
 
     <attribute name="scheme" required="false">
@@ -305,21 +302,22 @@
 
   <subsection name="Standard Implementation">
 
-  <p>The standard HTTP connectors (NIO, NIO2 and APR/native) all support the
-  following attributes in addition to the common Connector attributes listed
-  above.</p>
+  <p>The standard HTTP connectors (NIO and NIO2) all support the following
+  attributes in addition to the common Connector attributes listed above.</p>
 
   <attributes>
 
     <attribute name="acceptCount" required="false">
-      <p>The maximum queue length for incoming connection requests when
-      all possible request processing threads are in use.  Any requests
-      received when the queue is full will be refused.  The default
+      <p>The maximum length of the operating system provided queue for incoming
+      connection requests when <code>maxConnections</code> has been reached. The
+      operating system may ignore this setting and use a different size for the
+      queue. When this queue is full, the operating system may actively refuse
+      additional connections or those connections may time out. The default
       value is 100.</p>
     </attribute>
 
     <attribute name="acceptorThreadPriority" required="false">
-      <p>The priority of the acceptor threads. The threads used to accept
+      <p>The priority of the acceptor thread. The thread used to accept
       new connections. The default value is <code>5</code> (the value of the
       <code>java.lang.Thread.NORM_PRIORITY</code> constant). See the JavaDoc
       for the <code>java.lang.Thread</code> class for more details on what
@@ -332,11 +330,7 @@
       default, the connector will listen all local addresses. Unless the JVM is
       configured otherwise using system properties, the Java based connectors
       (NIO, NIO2) will listen on both IPv4 and IPv6 addresses when configured
-      with either <code>0.0.0.0</code> or <code>::</code>. The APR/native
-      connector will only listen on IPv4 addresses if configured with
-      <code>0.0.0.0</code> and will listen on IPv6 addresses (and optionally
-      IPv4 addresses depending on the setting of <strong>ipv6v6only</strong>) if
-      configured with <code>::</code>.</p>
+      with either <code>0.0.0.0</code> or <code>::</code>.</p>
     </attribute>
 
     <attribute name="allowHostHeaderMismatch" required="false">
@@ -363,11 +357,7 @@
       <p>When client certificate information is presented in a form other than
       instances of <code>java.security.cert.X509Certificate</code> it needs to
       be converted before it can be used and this property controls which JSSE
-      provider is used to perform the conversion. For example it is used with
-      the <a href="ajp.html">AJP connectors</a>, the HTTP APR connector and
-      with the <a href="valve.html#SSL_Authenticator_Valve">
-      org.apache.catalina.valves.SSLValve</a>. If not specified, the default
-      provider will be used.</p>
+      provider is used to perform the conversion.</p>
     </attribute>
 
     <attribute name="compressibleMimeType" required="false">
@@ -377,7 +367,7 @@
       <code>
       text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
       </code>.
-      </p>
+      If you specify a type explicitly, the default is over-ridden.</p>
     </attribute>
 
     <attribute name="compression" required="false">
@@ -407,7 +397,8 @@
     <attribute name="compressionMinSize" required="false">
       <p>If <strong>compression</strong> is set to "on" then this attribute
       may be used to specify the minimum amount of data before the output is
-      compressed. If not specified, this attribute is defaults to "2048".</p>
+      compressed. If not specified, this attribute is defaults to "2048".
+      Units are in bytes.</p>
     </attribute>
 
     <attribute name="connectionLinger" required="false">
@@ -431,6 +422,31 @@
       in progress. This only takes effect if
       <strong>disableUploadTimeout</strong> is set to <code>false</code>.
       </p>
+    </attribute>
+
+    <attribute name="continueResponseTiming" required="false">
+      <p>When to respond with a <code>100</code> intermediate response code to a
+      request containing an <code>Expect: 100-continue</code> header.
+      The following values may used:
+      <ul>
+      <li><code>immediately</code> - an intermediate 100 status response
+      will be returned as soon as practical</li>
+      <li><code>onRead</code> - an intermediate 100 status
+      response will be returned only when the Servlet reads the request body,
+      allowing the servlet to inspect the headers and possibly respond
+      before the user agent sends a possibly large request body.</li>
+      </ul>
+      </p>
+    </attribute>
+
+    <attribute name="defaultSSLHostConfigName" required="false">
+      <p>The name of the default <strong>SSLHostConfig</strong> that will be
+      used for secure connections (if this connector is configured for secure
+      connections) if the client connection does not provide SNI or if the SNI
+      is provided but does not match any configured
+      <strong>SSLHostConfig</strong>. If not specified the default value of
+      <code>_default_</code> will be used. Provided values are always converted
+      to lower case.</p>
     </attribute>
 
     <attribute name="disableUploadTimeout" required="false">
@@ -478,21 +494,42 @@
       maxConnections feature and connections will not be counted.</p>
     </attribute>
 
-    <attribute name="maxCookieCount" required="false">
-      <p>The maximum number of cookies that are permitted for a request. A value
-      of less than zero means no limit. If not specified, a default value of 200
-      will be used.</p>
-    </attribute>
-
     <attribute name="maxExtensionSize" required="false">
       <p>Limits the total length of chunk extensions in chunked HTTP requests.
       If the value is <code>-1</code>, no limit will be imposed. If not
       specified, the default value of <code>8192</code> will be used.</p>
     </attribute>
 
+    <attribute name="maxHeaderCount" required="false">
+      <p>The maximum number of headers in a request that are allowed by the
+      container. A request that contains more headers than the specified limit
+      will be rejected. A value of less than 0 means no limit.
+      If not specified, a default of 100 is used.</p>
+    </attribute>
+
     <attribute name="maxHttpHeaderSize" required="false">
-      <p>The maximum size of the request and response HTTP header, specified
-      in bytes. If not specified, this attribute is set to 8192 (8 KB).</p>
+      <p>Provides the default value for
+      <strong>maxHttpRequestHeaderSize</strong> and
+      <strong>maxHttpResponseHeaderSize</strong>. If not specified, this
+      attribute is set to 8192 (8 KB).</p>
+    </attribute>
+
+    <attribute name="maxHttpRequestHeaderSize" required="false">
+      <p>The maximum permitted size of the request line and headers associated
+      with an HTTP request, specified in bytes. This is compared to the number
+      of bytes received so includes line terminators and whitespace as well as
+      the request line, header names and header values. If not specified, this
+      attribute is set to the value of the <code>maxHttpHeaderSize</code>
+      attribute.</p>
+    </attribute>
+
+    <attribute name="maxHttpResponseHeaderSize" required="false">
+      <p>The maximum permitted size of the response line and headers associated
+      with an HTTP response, specified in bytes. This is compared to the number
+      of bytes written so includes line terminators and whitespace as well as
+      the status line, header names and header values. If not specified, this
+      attribute is set to the value of the <code>maxHttpHeaderSize</code>
+      attribute.</p>
     </attribute>
 
     <attribute name="maxKeepAliveRequests" required="false">
@@ -542,14 +579,6 @@
       value set for this attribute will be recorded correctly but it will be
       reported (e.g. via JMX) as <code>-1</code> to make clear that it is not
       used.</p>
-    </attribute>
-
-    <attribute name="noCompressionStrongETag" required="false">
-      <p>This flag configures whether resources with a stong ETag will be
-      considered for compression. If <code>true</code>, resources with a strong
-      ETag will not be compressed. The default value is <code>true</code>.</p>
-      <p>This attribute is deprecated. It will be removed in Tomcat 10 onwards
-      where it will be hard-coded to <code>true</code>.</p>
     </attribute>
 
     <attribute name="noCompressionUserAgents" required="false">
@@ -669,8 +698,7 @@
 
     <attribute name="useAsyncIO" required="false">
       <p>(bool) Use this attribute to enable or disable usage of the
-      asynchronous IO API. The default value is <code>true</code> except when
-      using the APR connector due to low performance.</p>
+      asynchronous IO API. The default value is <code>true</code>.</p>
     </attribute>
 
     <attribute name="useKeepAliveResponseHeader" required="false">
@@ -876,10 +904,29 @@
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
+      <attribute name="unixDomainSocketPath" required="false">
+        <p>Where supported, the path to a Unix Domain Socket that this
+        <strong>Connector</strong> will create and await incoming connections.
+        When this is specified, the otherwise mandatory <code>port</code>
+        attribute may be omitted.
+        See <a href="#Unix_Domain_Socket_Support">Unix Domain Socket Support</a>
+        for more information.</p>
+      </attribute>
+
+      <attribute name="unixDomainSocketPathPermissions" required="false">
+        <p>Where supported, the posix permissions that will be applied to the
+        to the Unix Domain Socket specified with
+        <code>unixDomainSocketPath</code> above. The
+        permissions are specified as a string of nine characters, in three sets
+        of three: (r)ead, (w)rite and e(x)ecute for owner, group and others
+        respectively. If a permission is not granted, a hyphen is used. If
+        unspecified, the permissions default to <code>rw-rw-rw-</code>.</p>
+      </attribute>
+
       <attribute name="useInheritedChannel" required="false">
         <p>(bool)Defines if this connector should inherit an inetd/systemd network socket.
         Only one connector can inherit a network socket. This can option can be
-        used to automatcially start Tomcat once a connection request is made to
+        used to automatically start Tomcat once a connection request is made to
         the systemd super daemon's port.
         The default value is <code>false</code>. See the JavaDoc
         for the <code>java.nio.channels.spi.SelectorProvider</code> class for
@@ -967,87 +1014,30 @@
     </attributes>
   </subsection>
 
-  <subsection name="APR/native specific configuration">
-
-    <p>The following attributes are specific to the APR/native connector.</p>
-
-    <attributes>
-
-      <attribute name="deferAccept" required="false">
-        <p>Sets the <code>TCP_DEFER_ACCEPT</code> flag on the listening socket
-        for this connector. The default value is <code>true</code> where
-        <code>TCP_DEFER_ACCEPT</code> is supported by the operating system,
-        otherwise it is <code>false</code>.</p>
-      </attribute>
-
-      <attribute name="ipv6v6only" required="false">
-        <p>If listening on an IPv6 address on a dual stack system, should the
-        connector only listen on the IPv6 address? If not specified the default
-        is <code>false</code> and the connector will listen on the IPv6 address
-        and the equivalent IPv4 address if present.</p>
-      </attribute>
-
-      <attribute name="pollerThreadCount" required="false">
-        <p>Number of threads used to poll kept alive connections. On Windows the
-        default is chosen so that the sockets managed by each thread is
-        less than 1024. For Linux the default is 1. Changing the default on
-        Windows is likely to have a negative performance impact.</p>
-      </attribute>
-
-      <attribute name="pollTime" required="false">
-        <p>Duration of a poll call in microseconds. Lowering this value will
-        slightly decrease latency of connections being kept alive in some cases,
-        but will use more CPU as more poll calls are being made. The default
-        value is 2000 (2ms).</p>
-      </attribute>
-
-      <attribute name="sendfileSize" required="false">
-        <p>Amount of sockets that the poller responsible for sending static
-        files asynchronously can hold at a given time. Extra connections will be
-        closed right away without any data being sent (resulting in a zero
-        length file on the client side). Note that in most cases, sendfile is a
-        call that will return right away (being taken care of "synchronously" by
-        the kernel), and the sendfile poller will not be used, so the amount of
-        static files which can be sent concurrently is much larger than the
-        specified amount. The default value is 1024.</p>
-      </attribute>
-
-      <attribute name="threadPriority" required="false">
-        <p>(int)The priority of the acceptor and poller threads.
-        The default value is <code>5</code> (the value of the
-        <code>java.lang.Thread.NORM_PRIORITY</code> constant). See the JavaDoc
-        for the <code>java.lang.Thread</code> class for more details on what
-        this priority means.</p>
-      </attribute>
-
-      <attribute name="useSendfile" required="false">
-        <p>(bool)Use this attribute to enable or disable sendfile capability.
-        The default value is <code>true</code>. Note that the use of sendfile
-        will disable any compression that Tomcat may otherwise have performed on
-        the response.</p>
-      </attribute>
-
-    </attributes>
-
-  </subsection>
-
 </section>
 
 
 <section name="Nested Components">
 
-  <p>First implemented in Tomcat 9 and back-ported to 8.5, Tomcat now supports
-  Server Name Indication (SNI). This allows multiple SSL configurations to be
-  associated with a single secure connector with the configuration used for any
-  given connection determined by the host name requested by the client. To
-  facilitate this, the <strong>SSLHostConfig</strong> element was added which
-  can be used to define one of these configurations. Any number of
-  <strong>SSLHostConfig</strong> may be nested in a <strong>Connector</strong>.
-  At the same time, support was added for multiple certificates to be associated
-  with a single <strong>SSLHostConfig</strong>. Each SSL certificate is
-  therefore configured in a <strong>Certificate</strong> element with in an
+  <p>Tomcat supports Server Name Indication (SNI). This allows multiple SSL
+  configurations to be associated with a single secure connector with the
+  configuration used for any given connection determined by the host name
+  requested by the client. To facilitate this, the
+  <strong>SSLHostConfig</strong> element was added which can be used to define
+  one of these configurations. Any number of <strong>SSLHostConfig</strong> may
+  be nested in a <strong>Connector</strong>. At the same time, support was added
+  for multiple certificates to be associated with a single
+  <strong>SSLHostConfig</strong>. Each SSL certificate is therefore configured
+  in a <strong>Certificate</strong> element within an
   <strong>SSLHostConfig</strong>. For further information, see the SSL Support
   section below.</p>
+
+  <p>When OpenSSL is providing the TLS implementation, one or more
+  <strong>OpenSSLConfCmd</strong> elements may be nested inside a
+  <strong>OpenSSLConf</strong> element to configure OpenSSL via OpenSSL's
+  <code>SSL_CONF</code> API. A single <strong>OpenSSLConf</strong> element may
+  be nested in a <strong>SSLHostConfig</strong> element. For further
+  information, see the SSL Support section below</p>
 
 </section>
 
@@ -1086,12 +1076,6 @@
   <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
 </Connector>]]></source>
 
-  <p>Because Java 8's TLS implementation does not support ALPN (which is
-     required for HTTP/2 over TLS), you must be using an OpenSSL based TLS
-     implementation to enable HTTP/2 support. See the
-     <code>sslImplementationName</code> attribute of the
-     <strong>Connector</strong>.</p>
-
   <p>Additional configuration attributes are available. See the
   <a href="http2.html">HTTP/2 Upgrade Protocol</a> documentation for details.</p>
 
@@ -1115,6 +1099,38 @@
   </subsection>
 
 
+  <subsection name="Unix Domain Socket Support">
+
+  <p>When the <code>unixDomainSocketPath</code> attribute is used, connectors
+  that support Unix Domain Sockets will bind to the socket at the given path.
+  </p>
+
+  <p>For users of Java 16 and higher, support is provided within the NIO
+  connectors.
+  </p>
+
+  <p>The socket path is created with read and write permissions for all
+  users. To protect this socket, place it in a directory with suitable
+  permissions appropriately configured to restrict access as required.
+  Alternatively, on platforms that support posix permissions, the
+  permissions on the socket can be set directly with the
+  <code>unixDomainSocketPathPermissions</code> option.
+  </p>
+
+  <p>Tomcat will automatically remove the socket on server shutdown. If the
+  socket already exists startup will fail. Care must be taken by the
+  administrator to remove the socket after verifying that the socket isn't
+  already being used by an existing Tomcat process.</p>
+
+  <p>The Unix Domain Socket can be accessed using the
+  <code>--unix-socket</code> option of the <code>curl</code> command line
+  client, and the Unix Domain Socket support in Apache HTTP server's
+  <code>mod_proxy</code> module.
+  </p>
+
+  </subsection>
+
+
   <subsection name="SSL Support">
 
   <p>You can enable SSL support for a particular instance of this
@@ -1126,14 +1142,8 @@
   respectively, to pass correct information to the servlets.</p>
 
   <p>The NIO and NIO2 connectors use either the JSSE Java SSL implementation or
-  an OpenSSL implementation, whereas the APR/native connector uses OpenSSL only.
-  Prior to Tomcat 8.5, different configuration attributes were used for JSSE and
-  OpenSSL. From Tomcat 8.5 onwards, and as far as possible, common configuration
-  attributes are used for both JSSE and OpenSSL. Also if using the JSSE OpenSSL
-  implementation, configuration can be set using either the JSSE or APR
-  attributes (note: but not both types within the same configuration). This is
-  to aid simpler switching between connector implementations for SSL
-  connectors.</p>
+  an OpenSSL implementation. As far as possible, common configuration attributes
+  are used for both JSSE and OpenSSL.</p>
 
   <p>Each secure connector must define at least one
   <strong>SSLHostConfig</strong>. The names of the
@@ -1145,14 +1155,11 @@
   <strong>Certificate</strong>. The types of the <strong>Certificate</strong>s
   must be unique.</p>
 
-  <p>As of Tomcat 8.5, the majority of the SSL configuration attributes in the
-  <strong>Connector</strong> are deprecated. If specified, they will be used to
-  configure a <strong>SSLHostConfig</strong> and <strong>Certificate</strong>
-  for the <code>defaultSSLHostConfigName</code>. Note that if an explicit
-  <strong>SSLHostConfig</strong> element also exists for the
-  <code>defaultSSLHostConfigName</code> then that will be treated as a configuration
-  error. It is expected that Tomcat 10 will drop support for the SSL
-  configuration attributes in the <strong>Connector</strong>.</p>
+  <p>In addition to the standard TLS related request attributes defined in
+  section 3.10 of the Servlet specification, Tomcat supports a number of
+  additional TLS related attributes. The full list may be found in the <a
+  href="http://tomcat.apache.org/tomcat-10.1-doc/api/index.html">SSLSupport
+  Javadoc</a>.</p>
 
   <p>For more information, see the
   <a href="../ssl-howto.html">SSL Configuration How-To</a>.</p>
@@ -1258,7 +1265,8 @@
       <p>The name of the SSL Host. This should either be the fully qualified
       domain name (e.g. <code>tomcat.apache.org</code>) or a wild card domain
       name (e.g. <code>*.apache.org</code>). If not specified, the default value
-      of <code>_default_</code> will be used.</p>
+      of <code>_default_</code> will be used. Provided values are always
+      converted to lower case.</p>
     </attribute>
 
     <attribute name="insecureRenegotiation" required="false">
@@ -1336,8 +1344,8 @@
       default is <code>TLS</code>. The permitted values may be obtained from the
       JVM documentation for the allowed values for algorithm when creating an
       <code>SSLContext</code> instance e.g.
-      <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#SSLContext">
-      Oracle Java 7</a>. Note: There is overlap between this attribute and
+      <a href="https://docs.oracle.com/en/java/javase/11/docs/specs/security/standard-names.html#sslcontext-algorithms">
+      Oracle Java 11</a>. Note: There is overlap between this attribute and
       <code>protocols</code>.</p>
     </attribute>
 
@@ -1506,7 +1514,7 @@
     <attribute name="type" required="false">
       <p>The type of certificate. This is used to identify the ciphers that are
       compatible with the certificate. It must be one of <code>UNDEFINED</code>,
-      <code>RSA</code>, <code>DSS</code> or <code>EC</code>. If only one
+      <code>RSA</code>, <code>DSA</code> or <code>EC</code>. If only one
       <strong>Certificate</strong> is nested within a <code>SSLHostConfig</code>
       then this attribute is not required and will default to
       <code>UNDEFINED</code>. If multiple <strong>Certificate</strong>s are
@@ -1550,9 +1558,9 @@
       will be used which wraps JVM&apos;s default JSSE provider. Note that the
       JVM can be configured to use a different JSSE provider as the default.
       Tomcat also bundles a special SSL implementation for JSSE that is backed
-      by OpenSSL. To enable it, the native library should be enabled as if
-      intending to use the APR connector, and Tomcat will automatically enable it
-      and the default value of this attribute becomes
+      by OpenSSL. To enable it, the native library should be enabled and Tomcat
+      will automatically enable it and the default value of this attribute
+      becomes
       <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>.
       In that case, the attributes from either JSSE and OpenSSL
       configuration styles can be used, as long as the two types are not mixed
@@ -1564,12 +1572,50 @@
 
   </subsection>
 
+  <subsection name="SSL Support - OpenSSL's SSL_CONF API">
+
+  <p>When OpenSSL is providing the TLS implementation, one or more
+  <strong>OpenSSLConfCmd</strong> elements may be nested inside a
+  <strong>OpenSSLConf</strong> element to configure OpenSSL via OpenSSL's
+  <code>SSL_CONF</code> API. A single <strong>OpenSSLConf</strong> element may
+  be nested in a <strong>SSLHostConfig</strong> element.</p>
+
+  <p>The set of configuration file commands available depends on the OpenSSL
+  version being used. For a list of supported command names and values, see the
+  section Supported configuration file commands in the <a
+  href="https://www.openssl.org/docs/manmaster/man3/SSL_CONF_cmd.html#SUPPORTED-CONFIGURATION-FILE-COMMANDS"
+  >SSL_CONF_cmd(3)</a> manual page for OpenSSL. Some of the configuration file
+  commands can be used as alternatives to <strong>SSLHostConfig</strong>
+  attributes. It is recommended that configuration file commands are only used
+  where the feature cannot be configured using <strong>SSLHostConfig</strong>
+  attributes.</p>
+
+  <p>The <strong>OpenSSLConf</strong> element does not support any
+  attributes.</p>
+
+  <p>The <strong>OpenSSLConfCmd</strong> element supports the following
+  attributes.</p>
+
+  <attributes>
+
+    <attribute name="name" required="true">
+      <p>The name of the configuration file command.</p>
+    </attribute>
+
+    <attribute name="value" required="false">
+      <p>The value to use for the configuration file command.</p>
+    </attribute>
+
+  </attributes>
+
+  </subsection>
+
   <subsection name="Key store types">
 
     <p>In addition to the standard key store types (JKS and PKCS12), most Java
     runtimes support additional key store types such as Windows-ROOT,
     Windows-My, DKS as well as hardware security modules. Generally, to use
-    these additional keystore types with a TLS Conector in Tomcat:</p>
+    these additional keystore types with a TLS Connector in Tomcat:</p>
 
     <ul>
       <li>Set the certificateKeystoreType and/or truststoreType Connector
@@ -1593,7 +1639,7 @@
     <p>Variations in key store implementations, combined with the key store
     manipulation Tomcat does in the background to allow interoperability between
     JSSE and OpenSSL configuration styles, means that some keystores may need
-    slightly different configuration. Assitance is always available from the
+    slightly different configuration. Assistance is always available from the
     <a href="http://tomcat.apache.org/lists.html#tomcat-users">Apache Tomcat
     users mailing list</a>. We aim to document any key stores that vary from the
     above advice here. Currently there are none we are aware of.</p>
@@ -1609,23 +1655,19 @@
         <th />
         <th style="text-align: center;">Java Nio Connector<br />NIO</th>
         <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
-        <th style="text-align: center;">APR/native Connector<br />APR</th>
       </tr>
       <tr>
         <th>Classname</th>
         <td><code class="noHighlight">Http11NioProtocol</code></td>
         <td><code class="noHighlight">Http11Nio2Protocol</code></td>
-        <td><code class="noHighlight">Http11AprProtocol</code></td>
       </tr>
       <tr>
         <th>Tomcat Version</th>
         <td>since 6.0.x</td>
         <td>since 8.0.x</td>
-        <td>since 5.5.x</td>
       </tr>
       <tr>
         <th>Support Polling</th>
-        <td>YES</td>
         <td>YES</td>
         <td>YES</td>
       </tr>
@@ -1633,11 +1675,9 @@
         <th>Polling Size</th>
         <td><code class="noHighlight">maxConnections</code></td>
         <td><code class="noHighlight">maxConnections</code></td>
-        <td><code class="noHighlight">maxConnections</code></td>
       </tr>
       <tr>
         <th>Read Request Headers</th>
-        <td>Non Blocking</td>
         <td>Non Blocking</td>
         <td>Non Blocking</td>
       </tr>
@@ -1645,11 +1685,9 @@
         <th>Read Request Body</th>
         <td>Blocking</td>
         <td>Blocking</td>
-        <td>Blocking</td>
       </tr>
       <tr>
         <th>Write Response Headers and Body</th>
-        <td>Blocking</td>
         <td>Blocking</td>
         <td>Blocking</td>
       </tr>
@@ -1657,23 +1695,19 @@
         <th>Wait for next Request</th>
         <td>Non Blocking</td>
         <td>Non Blocking</td>
-        <td>Non Blocking</td>
       </tr>
       <tr>
         <th>SSL Support</th>
         <td>Java SSL or OpenSSL</td>
         <td>Java SSL or OpenSSL</td>
-        <td>OpenSSL</td>
       </tr>
       <tr>
         <th>SSL Handshake</th>
         <td>Non blocking</td>
         <td>Non blocking</td>
-        <td>Blocking</td>
       </tr>
       <tr>
         <th>Max Connections</th>
-        <td><code class="noHighlight">maxConnections</code></td>
         <td><code class="noHighlight">maxConnections</code></td>
         <td><code class="noHighlight">maxConnections</code></td>
       </tr>

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.membership;
 
 import java.io.IOException;
@@ -125,7 +124,9 @@ public class McastService
      */
     @Override
     public Member getLocalMember(boolean alive) {
-        if ( alive && localMember != null && impl != null) localMember.setMemberAliveTime(System.currentTimeMillis()-impl.getServiceStartTime());
+        if ( alive && localMember != null && impl != null) {
+            localMember.setMemberAliveTime(System.currentTimeMillis()-impl.getServiceStartTime());
+        }
         return localMember;
     }
 
@@ -270,7 +271,9 @@ public class McastService
      * @param name The property to check for
      */
     protected void hasProperty(Properties properties, String name){
-        if ( properties.getProperty(name)==null) throw new IllegalArgumentException(sm.getString("mcastService.missing.property", name));
+        if ( properties.getProperty(name)==null) {
+            throw new IllegalArgumentException(sm.getString("mcastService.missing.property", name));
+        }
     }
 
     @Override
@@ -305,8 +308,12 @@ public class McastService
         }
         localMember.setSecurePort(securePort);
         localMember.setUdpPort(udpPort);
-        if ( this.payload != null ) localMember.setPayload(payload);
-        if ( this.domain != null ) localMember.setDomain(domain);
+        if ( this.payload != null ) {
+            localMember.setPayload(payload);
+        }
+        if ( this.domain != null ) {
+            localMember.setDomain(domain);
+        }
         localMember.setServiceStartTime(System.currentTimeMillis());
         java.net.InetAddress bind = null;
         if ( properties.getProperty("mcastBindAddress")!= null ) {
@@ -392,7 +399,9 @@ public class McastService
 
     @Override
     public void messageReceived(ChannelMessage msg) {
-        if (msglistener!=null && msglistener.accept(msg)) msglistener.messageReceived(msg);
+        if (msglistener!=null && msglistener.accept(msg)) {
+            msglistener.messageReceived(msg);
+        }
     }
 
     @Override
@@ -401,8 +410,9 @@ public class McastService
     }
     @Override
     public void broadcast(ChannelMessage message) throws ChannelException {
-        if (impl==null || (impl.startLevel & Channel.MBR_TX_SEQ)!=Channel.MBR_TX_SEQ )
+        if (impl==null || (impl.startLevel & Channel.MBR_TX_SEQ)!=Channel.MBR_TX_SEQ ) {
             throw new ChannelException(sm.getString("mcastService.noStart"));
+        }
 
         byte[] data = XByteBuffer.createDataPackage((ChannelData)message);
         if (data.length>McastServiceImpl.MAX_PACKET_SIZE) {
@@ -453,7 +463,9 @@ public class McastService
         if ( localMember != null ) {
             localMember.setPayload(payload);
             try {
-                if (impl != null) impl.send(false);
+                if (impl != null) {
+                    impl.send(false);
+                }
             }catch ( Exception x ) {
                 log.error(sm.getString("McastService.payload"), x);
             }
@@ -466,7 +478,9 @@ public class McastService
         if ( localMember != null ) {
             localMember.setDomain(domain);
             try {
-                if (impl != null) impl.send(false);
+                if (impl != null) {
+                    impl.send(false);
+                }
             }catch ( Exception x ) {
                 log.error(sm.getString("McastService.domain"), x);
             }
@@ -474,9 +488,14 @@ public class McastService
     }
 
     public void setDomain(String domain) {
-        if ( domain == null ) return;
-        if ( domain.startsWith("{") ) setDomain(Arrays.fromString(domain));
-        else setDomain(Arrays.convert(domain));
+        if ( domain == null ) {
+            return;
+        }
+        if ( domain.startsWith("{") ) {
+            setDomain(Arrays.fromString(domain));
+        } else {
+            setDomain(Arrays.convert(domain));
+        }
     }
 
     @Override
@@ -486,22 +505,30 @@ public class McastService
 
     protected void setDefaults(Properties properties) {
         // default values
-        if (properties.getProperty("mcastPort") == null)
+        if (properties.getProperty("mcastPort") == null) {
             properties.setProperty("mcastPort","45564");
-        if (properties.getProperty("mcastAddress") == null)
+        }
+        if (properties.getProperty("mcastAddress") == null) {
             properties.setProperty("mcastAddress","228.0.0.4");
-        if (properties.getProperty("memberDropTime") == null)
+        }
+        if (properties.getProperty("memberDropTime") == null) {
             properties.setProperty("memberDropTime","3000");
-        if (properties.getProperty("mcastFrequency") == null)
+        }
+        if (properties.getProperty("mcastFrequency") == null) {
             properties.setProperty("mcastFrequency","500");
-        if (properties.getProperty("recoveryCounter") == null)
+        }
+        if (properties.getProperty("recoveryCounter") == null) {
             properties.setProperty("recoveryCounter", "10");
-        if (properties.getProperty("recoveryEnabled") == null)
+        }
+        if (properties.getProperty("recoveryEnabled") == null) {
             properties.setProperty("recoveryEnabled", "true");
-        if (properties.getProperty("recoverySleepTime") == null)
+        }
+        if (properties.getProperty("recoverySleepTime") == null) {
             properties.setProperty("recoverySleepTime", "5000");
-        if (properties.getProperty("localLoopbackDisabled") == null)
+        }
+        if (properties.getProperty("localLoopbackDisabled") == null) {
             properties.setProperty("localLoopbackDisabled", "false");
+        }
     }
 
     /**

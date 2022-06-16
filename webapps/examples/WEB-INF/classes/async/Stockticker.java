@@ -66,14 +66,18 @@ public class Stockticker implements Runnable {
 
         public void addTickListener(TickListener listener) {
             if (listeners.add(listener)) {
-                if (counter.incrementAndGet()==1) start();
+                if (counter.incrementAndGet()==1) {
+                    start();
+                }
             }
 
         }
 
         public void removeTickListener(TickListener listener) {
             if (listeners.remove(listener)) {
-                if (counter.decrementAndGet()==0) stop();
+                if (counter.decrementAndGet()==0) {
+                    stop();
+                }
             }
         }
 
@@ -87,8 +91,9 @@ public class Stockticker implements Runnable {
                 while (run) {
                     for (int j = 0; j < 1; j++) {
                         int i = r.nextInt() % 3;
-                        if (i < 0)
+                        if (i < 0) {
                             i = i * (-1);
+                        }
                         Stock stock = stocks[i];
                         double change = r.nextDouble();
                         boolean plus = r.nextBoolean();
@@ -186,11 +191,11 @@ public class Stockticker implements Runnable {
         public String toString() {
             StringBuilder buf = new StringBuilder("STOCK#");
             buf.append(getSymbol());
-            buf.append("#");
+            buf.append('#');
             buf.append(getValueAsString());
-            buf.append("#");
+            buf.append('#');
             buf.append(getLastChangeAsString());
-            buf.append("#");
+            buf.append('#');
             buf.append(String.valueOf(getCnt()));
             return buf.toString();
 

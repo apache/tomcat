@@ -14,12 +14,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.catalina.users;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,6 +34,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.User;
+import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.realm.UserDatabaseRealm;
 
 public class MemoryUserDatabaseTests {
     private static File TEST_FILE = new File(System.getProperty("java.io.tmpdir"), "tomcat-users.xml");
@@ -125,15 +130,17 @@ public class MemoryUserDatabaseTests {
         Runnable job = new Runnable() {
             @Override
             public void run() {
-                for(int i=0; i<10; ++i)
-                    db.createUser("newUser-" + Thread.currentThread().getName() + "-" + i, "x", null);
+                for(int i=0; i<10; ++i) {
+                  db.createUser("newUser-" + Thread.currentThread().getName() + "-" + i, "x", null);
+                }
             }
         };
 
         int numThreads = 100;
         Thread[] threads = new Thread[numThreads + 1];
-        for(int i=0; i<numThreads; ++i)
-            threads[i] = new Thread(job);
+        for(int i=0; i<numThreads; ++i) {
+          threads[i] = new Thread(job);
+        }
 
         // Let's
         threads[numThreads] = new Thread(new Runnable() {
@@ -148,18 +155,21 @@ public class MemoryUserDatabaseTests {
 
         ++numThreads;
 
-        for(int i=0; i<numThreads; ++i)
-            threads[i].start();
+        for(int i=0; i<numThreads; ++i) {
+          threads[i].start();
+        }
 
-        for(int i=0; i<numThreads; ++i)
-            threads[i].join();
+        for(int i=0; i<numThreads; ++i) {
+          threads[i].join();
+        }
 
         // Remove all those extra users
         Iterator<User> users = db.getUsers();
         for(; users.hasNext();) {
             User user = users.next();
-            if(user.getUsername().startsWith("newUser"))
-                db.removeUser(user);
+            if(user.getUsername().startsWith("newUser")) {
+              db.removeUser(user);
+            }
         }
 
         users = db.getUsers();
@@ -174,6 +184,25 @@ public class MemoryUserDatabaseTests {
 
         assertPrincipalNames(new String[] { "testrole", "otherrole"}, user.getRoles());
         assertPrincipalNames(new String[] { "testgroup", "othergroup"}, user.getGroups());
+    }
+
+    @Test
+    public void testSerializePrincipal()
+        throws Exception {
+        User user = db.findUser("admin");
+        GenericPrincipal gpIn = new UserDatabaseRealm.UserDatabasePrincipal(user, db);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(gpIn);
+
+        byte[] data = bos.toByteArray();
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        GenericPrincipal gpOut =  (GenericPrincipal) ois.readObject();
+
+        Assert.assertEquals("admin", gpOut.getName());
+        assertPrincipalNames(gpOut.getRoles(), user.getRoles());
     }
 
     private void assertPrincipalNames(String[] expectedNames, Iterator<? extends Principal> i) {

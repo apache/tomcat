@@ -17,7 +17,7 @@
 package org.apache.tomcat.dbcp.pool2;
 
 /**
- * A base implementation of <code>KeyedPooledObjectFactory</code>.
+ * A base implementation of {@code KeyedPooledObjectFactory}.
  * <p>
  * All operations defined here are essentially no-op's.
  * </p>
@@ -36,6 +36,21 @@ public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
         implements KeyedPooledObjectFactory<K, V> {
 
     /**
+     * Reinitialize an instance to be returned by the pool.
+     * <p>
+     * The default implementation is a no-op.
+     * </p>
+     *
+     * @param key the key used when selecting the object
+     * @param p a {@code PooledObject} wrapping the instance to be activated
+     */
+    @Override
+    public void activateObject(final K key, final PooledObject<V> p)
+        throws Exception {
+        // The default implementation is a no-op.
+    }
+
+    /**
      * Create an instance that can be served by the pool.
      *
      * @param key the key used when constructing the object
@@ -46,21 +61,6 @@ public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
      */
     public abstract V create(K key)
         throws Exception;
-
-    /**
-     * Wrap the provided instance with an implementation of
-     * {@link PooledObject}.
-     *
-     * @param value the instance to wrap
-     *
-     * @return The provided instance, wrapped by a {@link PooledObject}
-     */
-    public abstract PooledObject<V> wrap(V value);
-
-    @Override
-    public PooledObject<V> makeObject(final K key) throws Exception {
-        return wrap(create(key));
-    }
 
     /**
      * Destroy an instance no longer needed by the pool.
@@ -77,34 +77,9 @@ public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
         // The default implementation is a no-op.
     }
 
-    /**
-     * Ensures that the instance is safe to be returned by the pool.
-     * <p>
-     * The default implementation always returns {@code true}.
-     * </p>
-     *
-     * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the instance to be validated
-     * @return always <code>true</code> in the default implementation
-     */
     @Override
-    public boolean validateObject(final K key, final PooledObject<V> p) {
-        return true;
-    }
-
-    /**
-     * Reinitialize an instance to be returned by the pool.
-     * <p>
-     * The default implementation is a no-op.
-     * </p>
-     *
-     * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the instance to be activated
-     */
-    @Override
-    public void activateObject(final K key, final PooledObject<V> p)
-        throws Exception {
-        // The default implementation is a no-op.
+    public PooledObject<V> makeObject(final K key) throws Exception {
+        return wrap(create(key));
     }
 
     /**
@@ -121,4 +96,29 @@ public abstract class BaseKeyedPooledObjectFactory<K, V> extends BaseObject
         throws Exception {
         // The default implementation is a no-op.
     }
+
+    /**
+     * Ensures that the instance is safe to be returned by the pool.
+     * <p>
+     * The default implementation always returns {@code true}.
+     * </p>
+     *
+     * @param key the key used when selecting the object
+     * @param p a {@code PooledObject} wrapping the instance to be validated
+     * @return always {@code true} in the default implementation
+     */
+    @Override
+    public boolean validateObject(final K key, final PooledObject<V> p) {
+        return true;
+    }
+
+    /**
+     * Wrap the provided instance with an implementation of
+     * {@link PooledObject}.
+     *
+     * @param value the instance to wrap
+     *
+     * @return The provided instance, wrapped by a {@link PooledObject}
+     */
+    public abstract PooledObject<V> wrap(V value);
 }

@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11;
 
 import java.io.IOException;
@@ -196,6 +195,10 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         for (int i = 0; i < 31; i++) {
             if (i == '\t') {
                 // TAB is allowed
+                continue;
+            }
+            if (i == '\n') {
+                // LF is the optional line terminator
                 continue;
             }
             doTestBug51557InvalidCharInValue((char) i);
@@ -675,24 +678,6 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         String[] request = new String[1];
         request[0] =
                 "GET /test HTTP/1.1" + CR +
-                "Host: localhost:8080" + CRLF +
-                "Connection: close" + CRLF +
-                CRLF;
-
-        InvalidClient client = new InvalidClient(request);
-
-        client.doRequest();
-        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
-        Assert.assertTrue(client.isResponseBodyOK());
-    }
-
-
-    @Test
-    public void testInvalidEndOfRequestLine02() {
-
-        String[] request = new String[1];
-        request[0] =
-                "GET /test HTTP/1.1" + LF +
                 "Host: localhost:8080" + CRLF +
                 "Connection: close" + CRLF +
                 CRLF;

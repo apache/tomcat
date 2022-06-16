@@ -27,4 +27,28 @@ public class AuthException extends LoginException {
     public AuthException(String msg) {
         super(msg);
     }
+
+    /**
+     * Construct an instance of AuthException.
+     *
+     * @param msg   Exception message
+     * @param cause The cause of the exception
+     *
+     * @since Authentication 3.0
+     */
+    public AuthException(String msg, Throwable cause) {
+        super(msg);
+        initCause(cause);
+    }
+
+    /**
+     * Construct an instance of AuthException.
+     *
+     * @param cause The cause of the exception
+     *
+     * @since Authentication 3.0
+     */
+    public AuthException(Throwable cause) {
+        initCause(cause);
+    }
 }

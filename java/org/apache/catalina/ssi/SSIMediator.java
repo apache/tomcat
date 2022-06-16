@@ -21,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -127,13 +126,7 @@ public class SSIMediator {
         variableNames.add("LAST_MODIFIED");
         ssiExternalResolver.addVariableNames(variableNames);
         //Remove any variables that are reserved by this class
-        Iterator<String> iter = variableNames.iterator();
-        while (iter.hasNext()) {
-            String name = iter.next();
-            if (isNameReserved(name)) {
-                iter.remove();
-            }
-        }
+        variableNames.removeIf(this::isNameReserved);
         return variableNames;
     }
 
@@ -201,7 +194,9 @@ public class SSIMediator {
     public String substituteVariables(String val) {
         // If it has no references or HTML entities then no work
         // need to be done
-        if (val.indexOf('$') < 0 && val.indexOf('&') < 0) return val;
+        if (val.indexOf('$') < 0 && val.indexOf('&') < 0) {
+            return val;
+        }
 
         // HTML decoding
         val = val.replace("&lt;", "<");
@@ -232,7 +227,9 @@ public class SSIMediator {
                     break;
                 }
             }
-            if (i == sb.length()) break;
+            if (i == sb.length()) {
+                break;
+            }
             // Check to see if the $ is escaped
             if (i > 1 && sb.charAt(i - 2) == '\\') {
                 sb.deleteCharAt(i - 2);
@@ -251,15 +248,21 @@ public class SSIMediator {
             }
             // Find the end of the var reference
             for (; i < sb.length(); i++) {
-                if (sb.charAt(i) == endChar) break;
+                if (sb.charAt(i) == endChar) {
+                    break;
+                }
             }
             end = i;
             nameEnd = end;
-            if (endChar == '}') end++;
+            if (endChar == '}') {
+                end++;
+            }
             // We should now have enough to extract the var name
             String varName = sb.substring(nameStart, nameEnd);
             String value = getVariableValue(varName);
-            if (value == null) value = "";
+            if (value == null) {
+                value = "";
+            }
             // Replace the var name with its value
             sb.replace(start, end, value);
             // Start searching for the next $ after the value
