@@ -146,6 +146,10 @@
         Documentation. <bug>62245</bug>: Include <code>contextXsltFile</code>
         when discussing options for configuring directory listings. (markt)
       </fix>
+      <add>
+        Allow alternate redirect status codes via init param <code>redirectStatusCode</code>
+        on directory redirect. (funkman)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
