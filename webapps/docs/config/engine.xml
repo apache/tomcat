@@ -95,9 +95,9 @@
         instance.</p>
         <p>
             Note that the <code>jvmRoute</code> can also be set using the
-            <code>jvmRoute</code> system property. The <code>jvmRoute</code>
-            set in an <code>&lt;Engine&gt;</code> attribute will override
-            any <code>jvmRoute</code> system property.
+            deprecated <code>jvmRoute</code> system property. The
+            <code>jvmRoute</code> set in an <code>&lt;Engine&gt;</code>
+            attribute will override any <code>jvmRoute</code> system property.
         </p>
       </attribute>
 
