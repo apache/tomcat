@@ -140,16 +140,6 @@ public class Constants {
     public static final String WS_AUTHENTICATION_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME";
     public static final String WS_AUTHENTICATION_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD";
 
-    /**
-     * WebSocket specification compliance flag.
-     *
-     * @deprecated  This is no longer required in Jakarta EE 10 onwards and will
-     *              be removed in Tomcat 10.1.
-     */
-    @Deprecated
-    public static final boolean STRICT_SPEC_COMPLIANCE =
-            Boolean.getBoolean("org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
-
     public static final List<Extension> INSTALLED_EXTENSIONS;
 
     static {

@@ -150,6 +150,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <update>
+        Remove configuration settings related to the restriction on WebSocket
+        endpoint deployment that was removed in version 2.1 of the
+        specification. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

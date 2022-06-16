@@ -140,17 +140,6 @@
       </ul>
     </property>
 
-    <property name="org.apache.tomcat.websocket. STRICT_SPEC_COMPLIANCE">
-      <p>The default value of this system property is <code>false</code>.</p>
-      <p>If this is <code>true</code> the default values will be changed
-      to <code>true</code> instead of <code>false</code> for:</p>
-      <ul>
-        <li><code>org.apache.tomcat.websocket.server.WsServerContainer#isEnforceNoAddAfterHandshake</code></li>
-      </ul>
-      <p>This system property is deprecated and will be removed in Tomcat
-      10.1.</p>
-    </property>
-
   </properties>
 
 </section>

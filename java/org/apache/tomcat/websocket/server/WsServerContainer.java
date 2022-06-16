@@ -74,10 +74,6 @@ public class WsServerContainer extends WsWebSocketContainer
     private final Map<String,ExactPathMatch> configExactMatchMap = new ConcurrentHashMap<>();
     private final Map<Integer,ConcurrentSkipListMap<String,TemplatePathMatch>> configTemplateMatchMap =
             new ConcurrentHashMap<>();
-    @SuppressWarnings("deprecation")
-    private volatile boolean enforceNoAddAfterHandshake =
-            org.apache.tomcat.websocket.Constants.STRICT_SPEC_COMPLIANCE;
-    private volatile boolean addAllowed = true;
     private final Map<String,Set<WsSession>> authenticatedSessions = new ConcurrentHashMap<>();
     private volatile boolean endpointsRegistered = false;
     private volatile boolean deploymentFailed = false;
@@ -98,12 +94,6 @@ public class WsServerContainer extends WsWebSocketContainer
                 Constants.TEXT_BUFFER_SIZE_SERVLET_CONTEXT_INIT_PARAM);
         if (value != null) {
             setDefaultMaxTextMessageBufferSize(Integer.parseInt(value));
-        }
-
-        value = servletContext.getInitParameter(
-                Constants.ENFORCE_NO_ADD_AFTER_HANDSHAKE_CONTEXT_INIT_PARAM);
-        if (value != null) {
-            setEnforceNoAddAfterHandshake(Boolean.parseBoolean(value));
         }
 
         FilterRegistration.Dynamic fr = servletContext.addFilter(
@@ -133,11 +123,6 @@ public class WsServerContainer extends WsWebSocketContainer
 
 
     void addEndpoint(ServerEndpointConfig sec, boolean fromAnnotatedPojo) throws DeploymentException {
-
-        if (enforceNoAddAfterHandshake && !addAllowed) {
-            throw new DeploymentException(
-                    sm.getString("serverContainer.addNotAllowed"));
-        }
 
         if (servletContext == null) {
             throw new DeploymentException(
@@ -312,12 +297,6 @@ public class WsServerContainer extends WsWebSocketContainer
 
     public WsMappingResult findMapping(String path) {
 
-        // Prevent registering additional endpoints once the first attempt has
-        // been made to use one
-        if (addAllowed) {
-            addAllowed = false;
-        }
-
         // Check an exact match. Simple case as there are no templates.
         ExactPathMatch match = configExactMatchMap.get(path);
         if (match != null) {
@@ -361,19 +340,6 @@ public class WsServerContainer extends WsWebSocketContainer
         }
 
         return new WsMappingResult(sec, pathParams);
-    }
-
-
-    @Deprecated
-    public boolean isEnforceNoAddAfterHandshake() {
-        return enforceNoAddAfterHandshake;
-    }
-
-
-    @Deprecated
-    public void setEnforceNoAddAfterHandshake(
-            boolean enforceNoAddAfterHandshake) {
-        this.enforceNoAddAfterHandshake = enforceNoAddAfterHandshake;
     }
 
 
