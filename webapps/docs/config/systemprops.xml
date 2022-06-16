@@ -332,6 +332,9 @@
     </property>
 
     <property name="jvmRoute">
+      <p>Deprecated. Use the <code>jvmRoute</code> attribute of the
+      <a href="engine.html">Engine</a> element. This will be removed in Tomcat
+      10.1.</p>
       <p>Provides a default value for the <code>jvmRoute</code> attribute of the
       <a href="engine.html">Engine</a> element. It does not override the value
       configured on the <a href="engine.html">Engine</a> element.</p>
