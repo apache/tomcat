@@ -156,7 +156,7 @@
                type="org.apache.tomcat.InstanceManager" />
 
     <attribute name="javaVMs"
-               description="The Java virtual machines on which this module is running"
+               description="Deprecated. Will be removed in Tomact 10.1. The Java virtual machines on which this module is running"
                type="[Ljava.lang.String;"/>
 
     <attribute name="loader"
