@@ -26,26 +26,6 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$2 {
 
-    static final FunctionDescriptor BIO_read$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER,
-        C_INT
-    );
-    static final MethodHandle BIO_read$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "BIO_read",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
-        constants$2.BIO_read$FUNC, false
-    );
-    static final FunctionDescriptor BIO_write$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_POINTER,
-        C_INT
-    );
-    static final MethodHandle BIO_write$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "BIO_write",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
-        constants$2.BIO_write$FUNC, false
-    );
     static final FunctionDescriptor BIO_ctrl$FUNC = FunctionDescriptor.of(C_LONG,
         C_POINTER,
         C_INT,
@@ -79,6 +59,21 @@ class constants$2 {
         openssl_h.LIBRARIES, "BIO_new_bio_pair",
         "(Ljdk/incubator/foreign/MemoryAddress;JLjdk/incubator/foreign/MemoryAddress;J)I",
         constants$2.BIO_new_bio_pair$FUNC, false
+    );
+    static final FunctionDescriptor BN_new$FUNC = FunctionDescriptor.of(C_POINTER);
+    static final MethodHandle BN_new$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "BN_new",
+        "()Ljdk/incubator/foreign/MemoryAddress;",
+        constants$2.BN_new$FUNC, false
+    );
+    static final FunctionDescriptor BN_set_word$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_LONG
+    );
+    static final MethodHandle BN_set_word$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "BN_set_word",
+        "(Ljdk/incubator/foreign/MemoryAddress;J)I",
+        constants$2.BN_set_word$FUNC, false
     );
 }
 

@@ -13,7 +13,7 @@ It can be built and run with Apache Tomcat 9.0 or newer.
 
 ## Running
 
-The module uses the OpenSSL 1.1 API. It requires an API compatible version of
+The module uses the OpenSSL 3.0 API. It requires an API compatible version of
 OpenSSL or a compatible alternative library, that can be loaded from the JVM
 library path.
 
@@ -67,7 +67,7 @@ export JAVA_HOME=<pathto_jdk17_with_jextract>
 $JAVA_HOME/bin/jextract @openssl-tomcat.conf openssl.h
 ```
 
-The code included was generated using OpenSSL 1.1.1. As long as things remain
+The code included was generated using OpenSSL 3.0. As long as things remain
 API compatible, the generated code will still work.
 
 The `openssl-tomcat.conf` will generate a trimmed down OpenSSL API. When

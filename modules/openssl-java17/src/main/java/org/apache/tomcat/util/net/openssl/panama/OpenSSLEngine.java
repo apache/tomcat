@@ -966,7 +966,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private byte[] getPeerCertificate() {
         var allocator = SegmentAllocator.ofScope(engineScope);
-        MemoryAddress/*(X509*)*/ x509 = SSL_get_peer_certificate(state.ssl);
+        MemoryAddress/*(X509*)*/ x509 = SSL_get1_peer_certificate(state.ssl);
         MemorySegment bufPointer = allocator.allocate(CLinker.C_POINTER, MemoryAddress.NULL);
         int length = i2d_X509(x509, bufPointer);
         if (length <= 0) {

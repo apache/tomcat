@@ -26,6 +26,15 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$11 {
 
+    static final FunctionDescriptor SSL_CTX_set_options$FUNC = FunctionDescriptor.of(C_LONG,
+        C_POINTER,
+        C_LONG
+    );
+    static final MethodHandle SSL_CTX_set_options$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_CTX_set_options",
+        "(Ljdk/incubator/foreign/MemoryAddress;J)J",
+        constants$11.SSL_CTX_set_options$FUNC, false
+    );
     static final FunctionDescriptor SSL_set_options$FUNC = FunctionDescriptor.of(C_LONG,
         C_POINTER,
         C_LONG

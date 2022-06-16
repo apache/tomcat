@@ -26,6 +26,15 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$7 {
 
+    static final FunctionDescriptor X509_STORE_add_lookup$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle X509_STORE_add_lookup$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "X509_STORE_add_lookup",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$7.X509_STORE_add_lookup$FUNC, false
+    );
     static final FunctionDescriptor X509_LOOKUP_hash_dir$FUNC = FunctionDescriptor.of(C_POINTER);
     static final MethodHandle X509_LOOKUP_hash_dir$MH = RuntimeHelper.downcallHandle(
         openssl_h.LIBRARIES, "X509_LOOKUP_hash_dir",
@@ -66,15 +75,6 @@ class constants$7 {
         openssl_h.LIBRARIES, "X509_STORE_CTX_get_error",
         "(Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$7.X509_STORE_CTX_get_error$FUNC, false
-    );
-    static final FunctionDescriptor X509_STORE_CTX_set_error$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER,
-        C_INT
-    );
-    static final MethodHandle X509_STORE_CTX_set_error$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "X509_STORE_CTX_set_error",
-        "(Ljdk/incubator/foreign/MemoryAddress;I)V",
-        constants$7.X509_STORE_CTX_set_error$FUNC, false
     );
 }
 

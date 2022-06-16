@@ -26,6 +26,14 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$6 {
 
+    static final FunctionDescriptor EC_KEY_free$FUNC = FunctionDescriptor.ofVoid(
+        C_POINTER
+    );
+    static final MethodHandle EC_KEY_free$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "EC_KEY_free",
+        "(Ljdk/incubator/foreign/MemoryAddress;)V",
+        constants$6.EC_KEY_free$FUNC, false
+    );
     static final FunctionDescriptor DH_new$FUNC = FunctionDescriptor.of(C_POINTER);
     static final MethodHandle DH_new$MH = RuntimeHelper.downcallHandle(
         openssl_h.LIBRARIES, "DH_new",
@@ -67,15 +75,6 @@ class constants$6 {
         openssl_h.LIBRARIES, "X509_STORE_CTX_get0_untrusted",
         "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$6.X509_STORE_CTX_get0_untrusted$FUNC, false
-    );
-    static final FunctionDescriptor X509_STORE_add_lookup$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle X509_STORE_add_lookup$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "X509_STORE_add_lookup",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$6.X509_STORE_add_lookup$FUNC, false
     );
 }
 

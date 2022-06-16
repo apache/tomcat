@@ -26,21 +26,29 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$5 {
 
-    static final FunctionDescriptor EVP_PKEY_base_id$FUNC = FunctionDescriptor.of(C_INT,
+    static final FunctionDescriptor EVP_MD_free$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER
     );
-    static final MethodHandle EVP_PKEY_base_id$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "EVP_PKEY_base_id",
-        "(Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$5.EVP_PKEY_base_id$FUNC, false
+    static final MethodHandle EVP_MD_free$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "EVP_MD_free",
+        "(Ljdk/incubator/foreign/MemoryAddress;)V",
+        constants$5.EVP_MD_free$FUNC, false
     );
-    static final FunctionDescriptor EVP_PKEY_bits$FUNC = FunctionDescriptor.of(C_INT,
+    static final FunctionDescriptor EVP_PKEY_get_base_id$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER
     );
-    static final MethodHandle EVP_PKEY_bits$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "EVP_PKEY_bits",
+    static final MethodHandle EVP_PKEY_get_base_id$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "EVP_PKEY_get_base_id",
         "(Ljdk/incubator/foreign/MemoryAddress;)I",
-        constants$5.EVP_PKEY_bits$FUNC, false
+        constants$5.EVP_PKEY_get_base_id$FUNC, false
+    );
+    static final FunctionDescriptor EVP_PKEY_get_bits$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER
+    );
+    static final MethodHandle EVP_PKEY_get_bits$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "EVP_PKEY_get_bits",
+        "(Ljdk/incubator/foreign/MemoryAddress;)I",
+        constants$5.EVP_PKEY_get_bits$FUNC, false
     );
     static final FunctionDescriptor EC_GROUP_free$FUNC = FunctionDescriptor.ofVoid(
         C_POINTER
@@ -65,14 +73,6 @@ class constants$5 {
         openssl_h.LIBRARIES, "EC_KEY_new_by_curve_name",
         "(I)Ljdk/incubator/foreign/MemoryAddress;",
         constants$5.EC_KEY_new_by_curve_name$FUNC, false
-    );
-    static final FunctionDescriptor EC_KEY_free$FUNC = FunctionDescriptor.ofVoid(
-        C_POINTER
-    );
-    static final MethodHandle EC_KEY_free$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "EC_KEY_free",
-        "(Ljdk/incubator/foreign/MemoryAddress;)V",
-        constants$5.EC_KEY_free$FUNC, false
     );
 }
 

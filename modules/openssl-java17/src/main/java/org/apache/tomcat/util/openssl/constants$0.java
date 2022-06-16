@@ -67,11 +67,13 @@ class constants$0 {
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)V",
         constants$0.CRYPTO_free$FUNC, false
     );
-    static final FunctionDescriptor FIPS_mode$FUNC = FunctionDescriptor.of(C_INT);
-    static final MethodHandle FIPS_mode$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "FIPS_mode",
-        "()I",
-        constants$0.FIPS_mode$FUNC, false
+    static final FunctionDescriptor BIO_ctrl_pending$FUNC = FunctionDescriptor.of(C_LONG,
+        C_POINTER
+    );
+    static final MethodHandle BIO_ctrl_pending$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "BIO_ctrl_pending",
+        "(Ljdk/incubator/foreign/MemoryAddress;)J",
+        constants$0.BIO_ctrl_pending$FUNC, false
     );
 }
 

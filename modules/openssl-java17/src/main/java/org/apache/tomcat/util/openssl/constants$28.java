@@ -67,7 +67,14 @@ class constants$28 {
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$28.i2d_OCSP_REQUEST$FUNC, false
     );
-    static final MemorySegment OPENSSL_FILE$SEGMENT = CLinker.toCString("/tmp/jextract$18358922675719620067.h", ResourceScope.newImplicitScope());
+    static final FunctionDescriptor OSSL_PROVIDER_get0_name$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle OSSL_PROVIDER_get0_name$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "OSSL_PROVIDER_get0_name",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$28.OSSL_PROVIDER_get0_name$FUNC, false
+    );
 }
 
 

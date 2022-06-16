@@ -26,22 +26,6 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$1 {
 
-    static final FunctionDescriptor FIPS_mode_set$FUNC = FunctionDescriptor.of(C_INT,
-        C_INT
-    );
-    static final MethodHandle FIPS_mode_set$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "FIPS_mode_set",
-        "(I)I",
-        constants$1.FIPS_mode_set$FUNC, false
-    );
-    static final FunctionDescriptor BIO_ctrl_pending$FUNC = FunctionDescriptor.of(C_LONG,
-        C_POINTER
-    );
-    static final MethodHandle BIO_ctrl_pending$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "BIO_ctrl_pending",
-        "(Ljdk/incubator/foreign/MemoryAddress;)J",
-        constants$1.BIO_ctrl_pending$FUNC, false
-    );
     static final FunctionDescriptor BIO_s_file$FUNC = FunctionDescriptor.of(C_POINTER);
     static final MethodHandle BIO_s_file$MH = RuntimeHelper.downcallHandle(
         openssl_h.LIBRARIES, "BIO_s_file",
@@ -72,6 +56,26 @@ class constants$1 {
         openssl_h.LIBRARIES, "BIO_free",
         "(Ljdk/incubator/foreign/MemoryAddress;)I",
         constants$1.BIO_free$FUNC, false
+    );
+    static final FunctionDescriptor BIO_read$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER,
+        C_INT
+    );
+    static final MethodHandle BIO_read$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "BIO_read",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
+        constants$1.BIO_read$FUNC, false
+    );
+    static final FunctionDescriptor BIO_write$FUNC = FunctionDescriptor.of(C_INT,
+        C_POINTER,
+        C_POINTER,
+        C_INT
+    );
+    static final MethodHandle BIO_write$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "BIO_write",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;I)I",
+        constants$1.BIO_write$FUNC, false
     );
 }
 

@@ -26,6 +26,17 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$10 {
 
+    static final FunctionDescriptor PEM_read_bio_ECPKParameters$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER,
+        C_POINTER,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle PEM_read_bio_ECPKParameters$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "PEM_read_bio_ECPKParameters",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$10.PEM_read_bio_ECPKParameters$FUNC, false
+    );
     static final FunctionDescriptor PEM_read_bio_DHparams$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER,
         C_POINTER,
@@ -72,15 +83,6 @@ class constants$10 {
         openssl_h.LIBRARIES, "SSL_CTX_clear_options",
         "(Ljdk/incubator/foreign/MemoryAddress;J)J",
         constants$10.SSL_CTX_clear_options$FUNC, false
-    );
-    static final FunctionDescriptor SSL_CTX_set_options$FUNC = FunctionDescriptor.of(C_LONG,
-        C_POINTER,
-        C_LONG
-    );
-    static final MethodHandle SSL_CTX_set_options$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_CTX_set_options",
-        "(Ljdk/incubator/foreign/MemoryAddress;J)J",
-        constants$10.SSL_CTX_set_options$FUNC, false
     );
 }
 

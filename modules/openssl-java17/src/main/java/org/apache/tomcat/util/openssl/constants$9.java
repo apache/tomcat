@@ -26,6 +26,16 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$9 {
 
+    static final FunctionDescriptor d2i_X509$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER,
+        C_POINTER,
+        C_LONG
+    );
+    static final MethodHandle d2i_X509$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "d2i_X509",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;J)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$9.d2i_X509$FUNC, false
+    );
     static final FunctionDescriptor i2d_X509$FUNC = FunctionDescriptor.of(C_INT,
         C_POINTER,
         C_POINTER
@@ -72,17 +82,6 @@ class constants$9 {
         openssl_h.LIBRARIES, "PEM_read_bio_X509_AUX",
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$9.PEM_read_bio_X509_AUX$FUNC, false
-    );
-    static final FunctionDescriptor PEM_read_bio_ECPKParameters$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER,
-        C_POINTER,
-        C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle PEM_read_bio_ECPKParameters$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "PEM_read_bio_ECPKParameters",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$9.PEM_read_bio_ECPKParameters$FUNC, false
     );
 }
 

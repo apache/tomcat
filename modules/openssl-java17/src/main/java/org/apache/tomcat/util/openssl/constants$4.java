@@ -26,22 +26,6 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$4 {
 
-    static final FunctionDescriptor BN_get_rfc3526_prime_3072$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle BN_get_rfc3526_prime_3072$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "BN_get_rfc3526_prime_3072",
-        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$4.BN_get_rfc3526_prime_3072$FUNC, false
-    );
-    static final FunctionDescriptor BN_get_rfc3526_prime_4096$FUNC = FunctionDescriptor.of(C_POINTER,
-        C_POINTER
-    );
-    static final MethodHandle BN_get_rfc3526_prime_4096$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "BN_get_rfc3526_prime_4096",
-        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$4.BN_get_rfc3526_prime_4096$FUNC, false
-    );
     static final FunctionDescriptor BN_get_rfc3526_prime_6144$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
     );
@@ -73,6 +57,24 @@ class constants$4 {
         openssl_h.LIBRARIES, "ASN1_STRING_get0_data",
         "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$4.ASN1_STRING_get0_data$FUNC, false
+    );
+    static final FunctionDescriptor EVP_MD_get0_provider$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle EVP_MD_get0_provider$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "EVP_MD_get0_provider",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$4.EVP_MD_get0_provider$FUNC, false
+    );
+    static final FunctionDescriptor EVP_MD_fetch$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER,
+        C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle EVP_MD_fetch$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "EVP_MD_fetch",
+        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$4.EVP_MD_fetch$FUNC, false
     );
 }
 

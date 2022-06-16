@@ -26,21 +26,6 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 class constants$3 {
 
-    static final FunctionDescriptor BN_new$FUNC = FunctionDescriptor.of(C_POINTER);
-    static final MethodHandle BN_new$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "BN_new",
-        "()Ljdk/incubator/foreign/MemoryAddress;",
-        constants$3.BN_new$FUNC, false
-    );
-    static final FunctionDescriptor BN_set_word$FUNC = FunctionDescriptor.of(C_INT,
-        C_POINTER,
-        C_LONG
-    );
-    static final MethodHandle BN_set_word$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "BN_set_word",
-        "(Ljdk/incubator/foreign/MemoryAddress;J)I",
-        constants$3.BN_set_word$FUNC, false
-    );
     static final FunctionDescriptor BN_get_rfc2409_prime_768$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
     );
@@ -72,6 +57,22 @@ class constants$3 {
         openssl_h.LIBRARIES, "BN_get_rfc3526_prime_2048",
         "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$3.BN_get_rfc3526_prime_2048$FUNC, false
+    );
+    static final FunctionDescriptor BN_get_rfc3526_prime_3072$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle BN_get_rfc3526_prime_3072$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "BN_get_rfc3526_prime_3072",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$3.BN_get_rfc3526_prime_3072$FUNC, false
+    );
+    static final FunctionDescriptor BN_get_rfc3526_prime_4096$FUNC = FunctionDescriptor.of(C_POINTER,
+        C_POINTER
+    );
+    static final MethodHandle BN_get_rfc3526_prime_4096$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "BN_get_rfc3526_prime_4096",
+        "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        constants$3.BN_get_rfc3526_prime_4096$FUNC, false
     );
 }
 

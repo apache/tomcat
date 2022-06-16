@@ -35,13 +35,13 @@ class constants$15 {
         "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
         constants$15.SSL_SESSION_get_id$FUNC, false
     );
-    static final FunctionDescriptor SSL_get_peer_certificate$FUNC = FunctionDescriptor.of(C_POINTER,
+    static final FunctionDescriptor SSL_get1_peer_certificate$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
     );
-    static final MethodHandle SSL_get_peer_certificate$MH = RuntimeHelper.downcallHandle(
-        openssl_h.LIBRARIES, "SSL_get_peer_certificate",
+    static final MethodHandle SSL_get1_peer_certificate$MH = RuntimeHelper.downcallHandle(
+        openssl_h.LIBRARIES, "SSL_get1_peer_certificate",
         "(Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
-        constants$15.SSL_get_peer_certificate$FUNC, false
+        constants$15.SSL_get1_peer_certificate$FUNC, false
     );
     static final FunctionDescriptor SSL_get_peer_cert_chain$FUNC = FunctionDescriptor.of(C_POINTER,
         C_POINTER
