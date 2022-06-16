@@ -366,6 +366,8 @@
         <li><code>org.apache.tomcat.websocket.server#isEnforceNoAddAfterHandshake</code>
         (default changes from <code>false</code> to <code>true</code>)</li>
       </ul>
+      <p>This system property is deprecated and will be removed in Tomcat
+      10.1.</p>
     </property>
 
     <property name="org.apache.tomcat.util.http. ServerCookie.STRICT_NAMING">

@@ -139,6 +139,13 @@ public class Constants {
     static final boolean ALLOW_UNSUPPORTED_EXTENSIONS =
             Boolean.getBoolean("org.apache.tomcat.websocket.ALLOW_UNSUPPORTED_EXTENSIONS");
 
+    /**
+     * WebSocket specification compliance flag.
+     *
+     * @deprecated  This is no longer required in Jakarta EE 10 onwards and will
+     *              be removed in Tomcat 10.1.
+     */
+    @Deprecated
     public static final boolean STRICT_SPEC_COMPLIANCE =
             Boolean.getBoolean("org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
 

@@ -73,6 +73,7 @@ public class WsServerContainer extends WsWebSocketContainer
     private final Map<String,ExactPathMatch> configExactMatchMap = new ConcurrentHashMap<>();
     private final Map<Integer,ConcurrentSkipListMap<String,TemplatePathMatch>> configTemplateMatchMap =
             new ConcurrentHashMap<>();
+    @SuppressWarnings("deprecation")
     private volatile boolean enforceNoAddAfterHandshake =
             org.apache.tomcat.websocket.Constants.STRICT_SPEC_COMPLIANCE;
     private volatile boolean addAllowed = true;
@@ -80,6 +81,7 @@ public class WsServerContainer extends WsWebSocketContainer
     private volatile boolean endpointsRegistered = false;
     private volatile boolean deploymentFailed = false;
 
+    @SuppressWarnings("deprecation")
     WsServerContainer(ServletContext servletContext) {
 
         this.servletContext = servletContext;
@@ -419,12 +421,13 @@ public class WsServerContainer extends WsWebSocketContainer
     }
 
 
-
+    @Deprecated
     public boolean isEnforceNoAddAfterHandshake() {
         return enforceNoAddAfterHandshake;
     }
 
 
+    @Deprecated
     public void setEnforceNoAddAfterHandshake(
             boolean enforceNoAddAfterHandshake) {
         this.enforceNoAddAfterHandshake = enforceNoAddAfterHandshake;
