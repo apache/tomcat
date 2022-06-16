@@ -132,6 +132,11 @@
         using Tomcat Native 1.2.34 onwards built with OpenSSL 3.0.x onwards.
         (markt)
       </add>
+      <scode>
+        Deprecated the <code>jmvRoute</code> system property used to configure a
+        default value for the <code>jmvRoute</code> attribute of an Engine.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
