@@ -46,10 +46,7 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Standard implementation of the <b>Engine</b> interface.  Each
  * child container must be a Host implementation to process the specific
- * fully qualified host name of that virtual host. <br>
- * The jvmRoute should be set directly like any other property. Using the
- * System property <b>jvmRoute</b> is deprecated and will be removed in Tomcat
- * 10.1 onwards.
+ * fully qualified host name of that virtual host.
  *
  * @author Craig R. McClanahan
  */
@@ -57,30 +54,20 @@ public class StandardEngine extends ContainerBase implements Engine {
 
     private static final Log log = LogFactory.getLog(StandardEngine.class);
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Create a new StandardEngine component with the default basic Valve.
      */
     public StandardEngine() {
-
-        super();
         pipeline.setBasic(new StandardEngineValve());
-        /* Set the jmvRoute using the system property jvmRoute */
-        try {
-            setJvmRoute(System.getProperty("jvmRoute"));
-        } catch(Exception ex) {
-            log.warn(sm.getString("standardEngine.jvmRouteFail"));
-        }
         // By default, the engine will hold the reloading thread
         backgroundProcessorDelay = 10;
-
     }
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Host name to use when no server host, or an unknown host,

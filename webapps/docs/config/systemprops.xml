@@ -308,15 +308,6 @@
       <code>org.apache.naming.factory.MailSessionFactory</code> is used.</p>
     </property>
 
-    <property name="jvmRoute">
-      <p>Deprecated. Use the <code>jvmRoute</code> attribute of the
-      <a href="engine.html">Engine</a> element. This will be removed in Tomcat
-      10.1.</p>
-      <p>Provides a default value for the <code>jvmRoute</code> attribute of the
-      <a href="engine.html">Engine</a> element. It does not override the value
-      configured on the <a href="engine.html">Engine</a> element.</p>
-    </property>
-
     <property name="catalina.config">
       <p>The location from which to load the catalina.properties configuration
       file. This may be an absolute URL, a relative (to the current working
