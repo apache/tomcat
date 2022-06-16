@@ -6378,43 +6378,12 @@ public class StandardContext extends ContainerBase
      */
     private String server = null;
 
-    /**
-     * The Java virtual machines on which this module is running.
-     */
-    private String[] javaVMs = null;
-
     public String getServer() {
         return server;
     }
 
     public String setServer(String server) {
         return this.server=server;
-    }
-
-    /**
-     * Unused.
-     *
-     * @return The current array.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.1.
-     */
-    @Deprecated
-    public String[] getJavaVMs() {
-        return javaVMs;
-    }
-
-    /**
-     * Unused.
-     *
-     * @param javaVMs The new value for the array.
-     *
-     * @return The new value for the array.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.1.
-     */
-    @Deprecated
-    public String[] setJavaVMs(String[] javaVMs) {
-        return this.javaVMs = javaVMs;
     }
 
     /**
