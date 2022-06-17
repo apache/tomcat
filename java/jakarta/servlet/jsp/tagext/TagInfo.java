@@ -20,29 +20,24 @@ package jakarta.servlet.jsp.tagext;
  * Tag information for a tag in a Tag Library;
  * This class is instantiated from the Tag Library Descriptor file (TLD)
  * and is available only at translation time.
- *
- *
-*/
+ */
 
 public class TagInfo {
 
     /**
      * Static constant for getBodyContent() when it is JSP.
      */
-
     public static final String BODY_CONTENT_JSP = "JSP";
 
     /**
      * Static constant for getBodyContent() when it is Tag dependent.
      */
-
     public static final String BODY_CONTENT_TAG_DEPENDENT = "tagdependent";
 
 
     /**
      * Static constant for getBodyContent() when it is empty.
      */
-
     public static final String BODY_CONTENT_EMPTY = "empty";
 
     /**
@@ -217,7 +212,6 @@ public class TagInfo {
      *
      * @return The (short) name of the tag.
      */
-
     public String getTagName() {
         return tagName;
     }
@@ -230,10 +224,9 @@ public class TagInfo {
      * @return The array of TagAttributeInfo for this tag, or a
      *         zero-length array if the tag has no attributes.
      */
-
-   public TagAttributeInfo[] getAttributes() {
-       return attributeInfo;
-   }
+    public TagAttributeInfo[] getAttributes() {
+        return attributeInfo;
+    }
 
     /**
      * Information on the scripting objects created by this tag at runtime.
@@ -244,14 +237,14 @@ public class TagInfo {
      *     result of getTagExtraInfo().getVariableInfo( data ), otherwise
      *     null.
      */
-   public VariableInfo[] getVariableInfo(TagData data) {
-       VariableInfo[] result = null;
-       TagExtraInfo tei = getTagExtraInfo();
-       if (tei != null) {
-           result = tei.getVariableInfo( data );
-       }
-       return result;
-   }
+    public VariableInfo[] getVariableInfo(TagData data) {
+        VariableInfo[] result = null;
+        TagExtraInfo tei = getTagExtraInfo();
+        if (tei != null) {
+            result = tei.getVariableInfo( data );
+        }
+        return result;
+    }
 
     /**
      * Translation-time validation of the attributes.

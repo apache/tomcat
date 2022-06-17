@@ -91,28 +91,28 @@ public class ImplicitObjectELResolver extends ELResolver {
                         .getContext(JspContext.class);
                 context.setPropertyResolved(base, property);
                 switch (idx) {
-                case APPLICATIONSCOPE:
-                    return ScopeManager.get(page).getApplicationScope();
-                case COOKIE:
-                    return ScopeManager.get(page).getCookie();
-                case HEADER:
-                    return ScopeManager.get(page).getHeader();
-                case HEADERVALUES:
-                    return ScopeManager.get(page).getHeaderValues();
-                case INITPARAM:
-                    return ScopeManager.get(page).getInitParam();
-                case PAGECONTEXT:
-                    return ScopeManager.get(page).getPageContext();
-                case PAGESCOPE:
-                    return ScopeManager.get(page).getPageScope();
-                case PARAM:
-                    return ScopeManager.get(page).getParam();
-                case PARAM_VALUES:
-                    return ScopeManager.get(page).getParamValues();
-                case REQUEST_SCOPE:
-                    return ScopeManager.get(page).getRequestScope();
-                case SESSION_SCOPE:
-                    return ScopeManager.get(page).getSessionScope();
+                    case APPLICATIONSCOPE:
+                        return ScopeManager.get(page).getApplicationScope();
+                    case COOKIE:
+                        return ScopeManager.get(page).getCookie();
+                    case HEADER:
+                        return ScopeManager.get(page).getHeader();
+                    case HEADERVALUES:
+                        return ScopeManager.get(page).getHeaderValues();
+                    case INITPARAM:
+                        return ScopeManager.get(page).getInitParam();
+                    case PAGECONTEXT:
+                        return ScopeManager.get(page).getPageContext();
+                    case PAGESCOPE:
+                        return ScopeManager.get(page).getPageScope();
+                    case PARAM:
+                        return ScopeManager.get(page).getParam();
+                    case PARAM_VALUES:
+                        return ScopeManager.get(page).getParamValues();
+                    case REQUEST_SCOPE:
+                        return ScopeManager.get(page).getRequestScope();
+                    case SESSION_SCOPE:
+                        return ScopeManager.get(page).getSessionScope();
                 }
             }
         }
