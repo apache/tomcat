@@ -79,8 +79,7 @@ public class JMXQueryTask extends AbstractCatalinaTask {
             try {
                 queryString = "?qry=" + URLEncoder.encode(query, getCharset());
             } catch (UnsupportedEncodingException e) {
-                throw new BuildException
-                    ("Invalid 'charset' attribute: " + getCharset());
+                throw new BuildException("Invalid 'charset' attribute: " + getCharset());
             }
         }
         log("Query string is " + queryString);

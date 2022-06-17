@@ -138,7 +138,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
                     "Must specify a 'attribute' and 'value' for set");
         }
         return  jmxSet(jmxServerConnection, getName());
-     }
+    }
 
     /**
      * Set property value.
@@ -192,4 +192,4 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
         }
         return mattrType;
     }
- }
+}
