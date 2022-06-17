@@ -33,6 +33,7 @@ the patch file has been applied and committed
 
 BCEL
 ----
+Unused code is removed
 Sub-tree:
 src/main/java/org/apache/bcel
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
@@ -40,6 +41,7 @@ rel/commons-bcel-6.8.2 (2024-02-25)
 
 Codec
 -----
+Unused code is removed
 Sub-tree:
 src/main/java/org/apache/commons/codec
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
@@ -48,6 +50,7 @@ Note: Only classes required for Base64 encoding/decoding. The rest are removed.
 
 FileUpload
 ----------
+Unused code is removed
 Sub-tree:
 src/main/java/org/apache/commons/fileupload2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
