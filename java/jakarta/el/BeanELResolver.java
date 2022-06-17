@@ -219,7 +219,7 @@ public class BeanELResolver extends ELResolver {
                 for (PropertyDescriptor pd: pds) {
                     this.properties.put(pd.getName(), new BeanProperty(type, pd));
                 }
-                /**
+                /*
                  * Populating from any interfaces solves two distinct problems:
                  * 1. When running under a security manager, classes may be
                  *    unaccessible but have accessible interfaces.
