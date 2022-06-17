@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.http.fileupload.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -115,41 +114,6 @@ public final class Streams {
             in.close();
             return total;
         }
-    }
-
-    /**
-     * This convenience method allows to read a
-     * {@link org.apache.tomcat.util.http.fileupload.FileItemStream}'s
-     * content into a string. The platform's default character encoding
-     * is used for converting bytes into characters.
-     *
-     * @param inputStream The input stream to read.
-     * @see #asString(InputStream, String)
-     * @return The streams contents, as a string.
-     * @throws IOException An I/O error occurred.
-     */
-    public static String asString(final InputStream inputStream) throws IOException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        copy(inputStream, baos, true);
-        return baos.toString();
-    }
-
-    /**
-     * This convenience method allows to read a
-     * {@link org.apache.tomcat.util.http.fileupload.FileItemStream}'s
-     * content into a string, using the given character encoding.
-     *
-     * @param inputStream The input stream to read.
-     * @param encoding The character encoding, typically "UTF-8".
-     * @see #asString(InputStream)
-     * @return The streams contents, as a string.
-     * @throws IOException An I/O error occurred.
-     */
-    public static String asString(final InputStream inputStream, final String encoding)
-            throws IOException {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        copy(inputStream, baos, true);
-        return baos.toString(encoding);
     }
 
     /**

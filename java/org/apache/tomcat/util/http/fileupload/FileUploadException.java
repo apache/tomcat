@@ -52,14 +52,4 @@ public class FileUploadException extends IOException {
     public FileUploadException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
-
-    /**
-     * Creates a new {@code FileUploadException} with the given
-     * cause.
-     *
-     * @param cause The exceptions cause.
-     */
-    public FileUploadException(final Throwable cause) {
-        super(cause);
-    }
 }
