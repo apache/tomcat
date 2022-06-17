@@ -62,12 +62,14 @@ Note: Tomcat's copy of fileupload also includes classes copied manually from
 DBCP
 ----
 Pool2
+Unused classes removed
 Sub-tree
 src/main/java/org/apache/commons/pool2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
 rel/commons-pool-2.12.0 (2023-09-30)
 
 DBCP2
+No unused code removed
 Sub-tree
 src/main/java/org/apache/commons/dbcp2
 src/main/resources/org/apache/commons/dbcp2

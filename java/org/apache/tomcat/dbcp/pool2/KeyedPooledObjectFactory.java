@@ -67,7 +67,6 @@ package org.apache.tomcat.dbcp.pool2;
  * </p>
  *
  * @see KeyedObjectPool
- * @see BaseKeyedPooledObjectFactory
  *
  * @param <K> The type of keys managed by this factory.
  * @param <V> Type of element managed by this factory.
