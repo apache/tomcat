@@ -61,13 +61,4 @@ final class Utility {
             throw new EOFException();
         }
     }
-
-    static void swallowAttribute(final DataInput file)
-            throws IOException {
-        //file.readUnsignedShort();   // Unused name index
-        skipFully(file, 2);
-        // Length of data in bytes
-        int length = file.readInt();
-        skipFully(file, length);
-    }
 }
