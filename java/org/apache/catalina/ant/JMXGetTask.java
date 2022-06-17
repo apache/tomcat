@@ -86,8 +86,7 @@ public class JMXGetTask extends AbstractCatalinaTask {
     public void execute() throws BuildException {
         super.execute();
         if (bean == null || attribute == null) {
-            throw new BuildException
-                ("Must specify 'bean' and 'attribute' attributes");
+            throw new BuildException("Must specify 'bean' and 'attribute' attributes");
         }
         log("Getting attribute " + attribute +
                 " in bean " + bean );
@@ -95,8 +94,7 @@ public class JMXGetTask extends AbstractCatalinaTask {
             execute("/jmxproxy/?get=" + URLEncoder.encode(bean, getCharset())
                     + "&att=" + URLEncoder.encode(attribute, getCharset()));
         } catch (UnsupportedEncodingException e) {
-            throw new BuildException
-                ("Invalid 'charset' attribute: " + getCharset());
+            throw new BuildException("Invalid 'charset' attribute: " + getCharset());
         }
     }
 }

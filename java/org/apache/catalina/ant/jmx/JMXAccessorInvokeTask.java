@@ -141,7 +141,7 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
                     "Must specify a 'operation' for call");
         }
         return  jmxInvoke(jmxServerConnection, getName());
-     }
+    }
 
     /**
      * Invoke specified operation.
@@ -154,8 +154,7 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
     protected String jmxInvoke(MBeanServerConnection jmxServerConnection, String name) throws Exception {
         Object result ;
         if (args == null) {
-             result = jmxServerConnection.invoke(new ObjectName(name),
-                    operation, null, null);
+            result = jmxServerConnection.invoke(new ObjectName(name), operation, null, null);
         } else {
             Object argsA[]=new Object[ args.size()];
             String sigA[]=new String[args.size()];

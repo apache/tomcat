@@ -225,5 +225,5 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
         }
         return true;
     }
- }
+}
 
