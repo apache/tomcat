@@ -17,11 +17,6 @@
 
 Notes of things to consider for the next major Tomcat release (10.1.x)
 
-Items carried over from the 9.0.x list:
-
- 1. Reduce instances of setters and getters for the same property existing on an
-    object and its parent. This may require new objects to be exposed via JMX.
-
 Deferred until 10.1.x:
 
  1. Review code forked from Commons projects and consider removing unused code.
