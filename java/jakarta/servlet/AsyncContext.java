@@ -150,8 +150,7 @@ public interface AsyncContext {
      * @return the newly created AsyncListener object
      * @throws ServletException if the listener cannot be created
      */
-    <T extends AsyncListener> T createListener(Class<T> clazz)
-    throws ServletException;
+    <T extends AsyncListener> T createListener(Class<T> clazz) throws ServletException;
 
     /**
      * Set the timeout.
