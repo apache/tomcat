@@ -26,44 +26,48 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$2 {
 
-    static final FunctionDescriptor FIPS_mode$FUNC = FunctionDescriptor.of(JAVA_INT);
-    static final MethodHandle FIPS_mode$MH = RuntimeHelper.downcallHandle(
-        "FIPS_mode",
-        constants$2.FIPS_mode$FUNC, false
+    static final FunctionDescriptor BIO_ctrl$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor FIPS_mode_set$FUNC = FunctionDescriptor.of(JAVA_INT,
-        JAVA_INT
+    static final MethodHandle BIO_ctrl$MH = RuntimeHelper.downcallHandle(
+        "BIO_ctrl",
+        constants$2.BIO_ctrl$FUNC
     );
-    static final MethodHandle FIPS_mode_set$MH = RuntimeHelper.downcallHandle(
-        "FIPS_mode_set",
-        constants$2.FIPS_mode_set$FUNC, false
+    static final FunctionDescriptor BIO_s_mem$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
+    static final MethodHandle BIO_s_mem$MH = RuntimeHelper.downcallHandle(
+        "BIO_s_mem",
+        constants$2.BIO_s_mem$FUNC
     );
-    static final FunctionDescriptor BIO_ctrl_pending$FUNC = FunctionDescriptor.of(JAVA_LONG,
-        ADDRESS
+    static final FunctionDescriptor BIO_s_bio$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
+    static final MethodHandle BIO_s_bio$MH = RuntimeHelper.downcallHandle(
+        "BIO_s_bio",
+        constants$2.BIO_s_bio$FUNC
     );
-    static final MethodHandle BIO_ctrl_pending$MH = RuntimeHelper.downcallHandle(
-        "BIO_ctrl_pending",
-        constants$2.BIO_ctrl_pending$FUNC, false
+    static final FunctionDescriptor BIO_new_bio_pair$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT
     );
-    static final FunctionDescriptor BIO_s_file$FUNC = FunctionDescriptor.of(ADDRESS);
-    static final MethodHandle BIO_s_file$MH = RuntimeHelper.downcallHandle(
-        "BIO_s_file",
-        constants$2.BIO_s_file$FUNC, false
+    static final MethodHandle BIO_new_bio_pair$MH = RuntimeHelper.downcallHandle(
+        "BIO_new_bio_pair",
+        constants$2.BIO_new_bio_pair$FUNC
     );
-    static final FunctionDescriptor BIO_new_file$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor BN_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
+    static final MethodHandle BN_new$MH = RuntimeHelper.downcallHandle(
+        "BN_new",
+        constants$2.BN_new$FUNC
     );
-    static final MethodHandle BIO_new_file$MH = RuntimeHelper.downcallHandle(
-        "BIO_new_file",
-        constants$2.BIO_new_file$FUNC, false
+    static final FunctionDescriptor BN_set_word$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT
     );
-    static final FunctionDescriptor BIO_new$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
-    );
-    static final MethodHandle BIO_new$MH = RuntimeHelper.downcallHandle(
-        "BIO_new",
-        constants$2.BIO_new$FUNC, false
+    static final MethodHandle BN_set_word$MH = RuntimeHelper.downcallHandle(
+        "BN_set_word",
+        constants$2.BN_set_word$FUNC
     );
 }
 

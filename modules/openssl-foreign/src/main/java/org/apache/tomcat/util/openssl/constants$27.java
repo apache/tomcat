@@ -26,54 +26,54 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$27 {
 
-    static final FunctionDescriptor ENGINE_free$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final FunctionDescriptor OCSP_response_get1_basic$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle ENGINE_free$MH = RuntimeHelper.downcallHandle(
-        "ENGINE_free",
-        constants$27.ENGINE_free$FUNC, false
+    static final MethodHandle OCSP_response_get1_basic$MH = RuntimeHelper.downcallHandle(
+        "OCSP_response_get1_basic",
+        constants$27.OCSP_response_get1_basic$FUNC
     );
-    static final FunctionDescriptor ENGINE_load_private_key$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor OCSP_resp_get0$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
     );
-    static final MethodHandle ENGINE_load_private_key$MH = RuntimeHelper.downcallHandle(
-        "ENGINE_load_private_key",
-        constants$27.ENGINE_load_private_key$FUNC, false
+    static final MethodHandle OCSP_resp_get0$MH = RuntimeHelper.downcallHandle(
+        "OCSP_resp_get0",
+        constants$27.OCSP_resp_get0$FUNC
     );
-    static final FunctionDescriptor ENGINE_set_default$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        JAVA_INT
+    static final FunctionDescriptor OCSP_resp_find$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
     );
-    static final MethodHandle ENGINE_set_default$MH = RuntimeHelper.downcallHandle(
-        "ENGINE_set_default",
-        constants$27.ENGINE_set_default$FUNC, false
+    static final MethodHandle OCSP_resp_find$MH = RuntimeHelper.downcallHandle(
+        "OCSP_resp_find",
+        constants$27.OCSP_resp_find$FUNC
     );
-    static final FunctionDescriptor OCSP_cert_to_id$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor OCSP_single_get0_status$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle OCSP_cert_to_id$MH = RuntimeHelper.downcallHandle(
-        "OCSP_cert_to_id",
-        constants$27.OCSP_cert_to_id$FUNC, false
+    static final MethodHandle OCSP_single_get0_status$MH = RuntimeHelper.downcallHandle(
+        "OCSP_single_get0_status",
+        constants$27.OCSP_single_get0_status$FUNC
     );
-    static final FunctionDescriptor OCSP_request_add0_id$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor OCSP_BASICRESP_free$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle OCSP_request_add0_id$MH = RuntimeHelper.downcallHandle(
-        "OCSP_request_add0_id",
-        constants$27.OCSP_request_add0_id$FUNC, false
+    static final MethodHandle OCSP_BASICRESP_free$MH = RuntimeHelper.downcallHandle(
+        "OCSP_BASICRESP_free",
+        constants$27.OCSP_BASICRESP_free$FUNC
     );
-    static final FunctionDescriptor OCSP_response_status$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final FunctionDescriptor OCSP_RESPONSE_free$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle OCSP_response_status$MH = RuntimeHelper.downcallHandle(
-        "OCSP_response_status",
-        constants$27.OCSP_response_status$FUNC, false
+    static final MethodHandle OCSP_RESPONSE_free$MH = RuntimeHelper.downcallHandle(
+        "OCSP_RESPONSE_free",
+        constants$27.OCSP_RESPONSE_free$FUNC
     );
 }
 

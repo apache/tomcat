@@ -26,57 +26,54 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$11 {
 
-    static final FunctionDescriptor PEM_read_bio_ECPKParameters$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_CTX_set_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT
     );
-    static final MethodHandle PEM_read_bio_ECPKParameters$MH = RuntimeHelper.downcallHandle(
-        "PEM_read_bio_ECPKParameters",
-        constants$11.PEM_read_bio_ECPKParameters$FUNC, false
+    static final MethodHandle SSL_CTX_set_options$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_options",
+        constants$11.SSL_CTX_set_options$FUNC
     );
-    static final FunctionDescriptor PEM_read_bio_DHparams$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_set_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT
     );
-    static final MethodHandle PEM_read_bio_DHparams$MH = RuntimeHelper.downcallHandle(
-        "PEM_read_bio_DHparams",
-        constants$11.PEM_read_bio_DHparams$FUNC, false
+    static final MethodHandle SSL_set_options$MH = RuntimeHelper.downcallHandle(
+        "SSL_set_options",
+        constants$11.SSL_set_options$FUNC
     );
-    static final FunctionDescriptor PEM_read_bio_PrivateKey$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_CTX_set_alpn_select_cb$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle PEM_read_bio_PrivateKey$MH = RuntimeHelper.downcallHandle(
-        "PEM_read_bio_PrivateKey",
-        constants$11.PEM_read_bio_PrivateKey$FUNC, false
+    static final MethodHandle SSL_CTX_set_alpn_select_cb$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_alpn_select_cb",
+        constants$11.SSL_CTX_set_alpn_select_cb$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_get_options$FUNC = FunctionDescriptor.of(JAVA_LONG,
-        ADDRESS
+    static final FunctionDescriptor SSL_get0_alpn_selected$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_get_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_options",
-        constants$11.SSL_CTX_get_options$FUNC, false
+    static final MethodHandle SSL_get0_alpn_selected$MH = RuntimeHelper.downcallHandle(
+        "SSL_get0_alpn_selected",
+        constants$11.SSL_get0_alpn_selected$FUNC
     );
-    static final FunctionDescriptor SSL_get_options$FUNC = FunctionDescriptor.of(JAVA_LONG,
-        ADDRESS
+    static final FunctionDescriptor SSL_in_init$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_get_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_get_options",
-        constants$11.SSL_get_options$FUNC, false
+    static final MethodHandle SSL_in_init$MH = RuntimeHelper.downcallHandle(
+        "SSL_in_init",
+        constants$11.SSL_in_init$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_clear_options$FUNC = FunctionDescriptor.of(JAVA_LONG,
-        ADDRESS,
-        JAVA_LONG
+    static final FunctionDescriptor SSL_CTX_set_cipher_list$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_clear_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_clear_options",
-        constants$11.SSL_CTX_clear_options$FUNC, false
+    static final MethodHandle SSL_CTX_set_cipher_list$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_cipher_list",
+        constants$11.SSL_CTX_set_cipher_list$FUNC
     );
 }
 

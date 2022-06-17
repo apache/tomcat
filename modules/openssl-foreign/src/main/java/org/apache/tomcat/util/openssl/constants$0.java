@@ -26,40 +26,48 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$0 {
 
-    static final FunctionDescriptor OPENSSL_sk_num$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final FunctionDescriptor OPENSSL_sk_num$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
     static final MethodHandle OPENSSL_sk_num$MH = RuntimeHelper.downcallHandle(
         "OPENSSL_sk_num",
-        constants$0.OPENSSL_sk_num$FUNC, false
+        constants$0.OPENSSL_sk_num$FUNC
     );
-    static final FunctionDescriptor OPENSSL_sk_value$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        JAVA_INT
+    static final FunctionDescriptor OPENSSL_sk_value$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
     );
     static final MethodHandle OPENSSL_sk_value$MH = RuntimeHelper.downcallHandle(
         "OPENSSL_sk_value",
-        constants$0.OPENSSL_sk_value$FUNC, false
+        constants$0.OPENSSL_sk_value$FUNC
     );
-    static final FunctionDescriptor OpenSSL_version_num$FUNC = FunctionDescriptor.of(JAVA_LONG);
+    static final FunctionDescriptor OpenSSL_version_num$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT);
     static final MethodHandle OpenSSL_version_num$MH = RuntimeHelper.downcallHandle(
         "OpenSSL_version_num",
-        constants$0.OpenSSL_version_num$FUNC, false
+        constants$0.OpenSSL_version_num$FUNC
     );
-    static final FunctionDescriptor OpenSSL_version$FUNC = FunctionDescriptor.of(ADDRESS,
-        JAVA_INT
+    static final FunctionDescriptor OpenSSL_version$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
     );
     static final MethodHandle OpenSSL_version$MH = RuntimeHelper.downcallHandle(
         "OpenSSL_version",
-        constants$0.OpenSSL_version$FUNC, false
+        constants$0.OpenSSL_version$FUNC
     );
-    static final FunctionDescriptor CRYPTO_set_mem_functions$m$FUNC = FunctionDescriptor.of(ADDRESS,
-        JAVA_LONG,
-        ADDRESS,
-        JAVA_INT
+    static final FunctionDescriptor CRYPTO_free$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
     );
-    static final MethodHandle CRYPTO_set_mem_functions$m$MH = RuntimeHelper.downcallHandle(
-        constants$0.CRYPTO_set_mem_functions$m$FUNC, false
+    static final MethodHandle CRYPTO_free$MH = RuntimeHelper.downcallHandle(
+        "CRYPTO_free",
+        constants$0.CRYPTO_free$FUNC
+    );
+    static final FunctionDescriptor BIO_ctrl_pending$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
+    );
+    static final MethodHandle BIO_ctrl_pending$MH = RuntimeHelper.downcallHandle(
+        "BIO_ctrl_pending",
+        constants$0.BIO_ctrl_pending$FUNC
     );
 }
 

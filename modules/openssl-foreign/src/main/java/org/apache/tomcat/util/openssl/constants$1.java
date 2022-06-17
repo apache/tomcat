@@ -26,40 +26,50 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$1 {
 
-    static final FunctionDescriptor CRYPTO_set_mem_functions$r$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        JAVA_LONG,
-        ADDRESS,
-        JAVA_INT
+    static final FunctionDescriptor BIO_s_file$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
+    static final MethodHandle BIO_s_file$MH = RuntimeHelper.downcallHandle(
+        "BIO_s_file",
+        constants$1.BIO_s_file$FUNC
     );
-    static final MethodHandle CRYPTO_set_mem_functions$r$MH = RuntimeHelper.downcallHandle(
-        constants$1.CRYPTO_set_mem_functions$r$FUNC, false
+    static final FunctionDescriptor BIO_new_file$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor CRYPTO_set_mem_functions$f$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS,
-        ADDRESS,
-        JAVA_INT
+    static final MethodHandle BIO_new_file$MH = RuntimeHelper.downcallHandle(
+        "BIO_new_file",
+        constants$1.BIO_new_file$FUNC
     );
-    static final MethodHandle CRYPTO_set_mem_functions$f$MH = RuntimeHelper.downcallHandle(
-        constants$1.CRYPTO_set_mem_functions$f$FUNC, false
+    static final FunctionDescriptor BIO_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor CRYPTO_set_mem_functions$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final MethodHandle BIO_new$MH = RuntimeHelper.downcallHandle(
+        "BIO_new",
+        constants$1.BIO_new$FUNC
     );
-    static final MethodHandle CRYPTO_set_mem_functions$MH = RuntimeHelper.downcallHandle(
-        "CRYPTO_set_mem_functions",
-        constants$1.CRYPTO_set_mem_functions$FUNC, false
+    static final FunctionDescriptor BIO_free$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor CRYPTO_free$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS,
-        ADDRESS,
-        JAVA_INT
+    static final MethodHandle BIO_free$MH = RuntimeHelper.downcallHandle(
+        "BIO_free",
+        constants$1.BIO_free$FUNC
     );
-    static final MethodHandle CRYPTO_free$MH = RuntimeHelper.downcallHandle(
-        "CRYPTO_free",
-        constants$1.CRYPTO_free$FUNC, false
+    static final FunctionDescriptor BIO_read$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
+    );
+    static final MethodHandle BIO_read$MH = RuntimeHelper.downcallHandle(
+        "BIO_read",
+        constants$1.BIO_read$FUNC
+    );
+    static final FunctionDescriptor BIO_write$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
+    );
+    static final MethodHandle BIO_write$MH = RuntimeHelper.downcallHandle(
+        "BIO_write",
+        constants$1.BIO_write$FUNC
     );
 }
 

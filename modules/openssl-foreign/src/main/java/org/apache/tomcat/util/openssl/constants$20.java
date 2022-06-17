@@ -26,49 +26,49 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$20 {
 
-    static final FunctionDescriptor SSL_shutdown$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final FunctionDescriptor SSL_set_accept_state$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_shutdown$MH = RuntimeHelper.downcallHandle(
-        "SSL_shutdown",
-        constants$20.SSL_shutdown$FUNC, false
+    static final MethodHandle SSL_set_accept_state$MH = RuntimeHelper.downcallHandle(
+        "SSL_set_accept_state",
+        constants$20.SSL_set_accept_state$FUNC
     );
-    static final FunctionDescriptor SSL_verify_client_post_handshake$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final FunctionDescriptor SSL_get_privatekey$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_verify_client_post_handshake$MH = RuntimeHelper.downcallHandle(
-        "SSL_verify_client_post_handshake",
-        constants$20.SSL_verify_client_post_handshake$FUNC, false
+    static final MethodHandle SSL_get_privatekey$MH = RuntimeHelper.downcallHandle(
+        "SSL_get_privatekey",
+        constants$20.SSL_get_privatekey$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_set_client_CA_list$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_get_shutdown$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_set_client_CA_list$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_client_CA_list",
-        constants$20.SSL_CTX_set_client_CA_list$FUNC, false
+    static final MethodHandle SSL_get_shutdown$MH = RuntimeHelper.downcallHandle(
+        "SSL_get_shutdown",
+        constants$20.SSL_get_shutdown$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_get_client_CA_list$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_CTX_set_default_verify_paths$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_get_client_CA_list$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_client_CA_list",
-        constants$20.SSL_CTX_get_client_CA_list$FUNC, false
+    static final MethodHandle SSL_CTX_set_default_verify_paths$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_default_verify_paths",
+        constants$20.SSL_CTX_set_default_verify_paths$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_add_client_CA$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_CTX_load_verify_locations$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_add_client_CA$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_add_client_CA",
-        constants$20.SSL_CTX_add_client_CA$FUNC, false
+    static final MethodHandle SSL_CTX_load_verify_locations$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_load_verify_locations",
+        constants$20.SSL_CTX_load_verify_locations$FUNC
     );
-    static final FunctionDescriptor SSL_set_connect_state$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS
+    static final FunctionDescriptor SSL_get_session$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_set_connect_state$MH = RuntimeHelper.downcallHandle(
-        "SSL_set_connect_state",
-        constants$20.SSL_set_connect_state$FUNC, false
+    static final MethodHandle SSL_get_session$MH = RuntimeHelper.downcallHandle(
+        "SSL_get_session",
+        constants$20.SSL_get_session$FUNC
     );
 }
 

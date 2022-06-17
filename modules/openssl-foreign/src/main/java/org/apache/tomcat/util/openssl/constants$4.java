@@ -26,49 +26,49 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$4 {
 
-    static final FunctionDescriptor BIO_new_bio_pair$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        JAVA_LONG,
-        ADDRESS,
-        JAVA_LONG
+    static final FunctionDescriptor BN_get_rfc3526_prime_6144$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle BIO_new_bio_pair$MH = RuntimeHelper.downcallHandle(
-        "BIO_new_bio_pair",
-        constants$4.BIO_new_bio_pair$FUNC, false
+    static final MethodHandle BN_get_rfc3526_prime_6144$MH = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_6144",
+        constants$4.BN_get_rfc3526_prime_6144$FUNC
     );
-    static final FunctionDescriptor BN_new$FUNC = FunctionDescriptor.of(ADDRESS);
-    static final MethodHandle BN_new$MH = RuntimeHelper.downcallHandle(
-        "BN_new",
-        constants$4.BN_new$FUNC, false
+    static final FunctionDescriptor BN_get_rfc3526_prime_8192$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor BN_set_word$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        JAVA_LONG
+    static final MethodHandle BN_get_rfc3526_prime_8192$MH = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_8192",
+        constants$4.BN_get_rfc3526_prime_8192$FUNC
     );
-    static final MethodHandle BN_set_word$MH = RuntimeHelper.downcallHandle(
-        "BN_set_word",
-        constants$4.BN_set_word$FUNC, false
+    static final FunctionDescriptor ASN1_STRING_length$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor BN_get_rfc2409_prime_768$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
+    static final MethodHandle ASN1_STRING_length$MH = RuntimeHelper.downcallHandle(
+        "ASN1_STRING_length",
+        constants$4.ASN1_STRING_length$FUNC
     );
-    static final MethodHandle BN_get_rfc2409_prime_768$MH = RuntimeHelper.downcallHandle(
-        "BN_get_rfc2409_prime_768",
-        constants$4.BN_get_rfc2409_prime_768$FUNC, false
+    static final FunctionDescriptor ASN1_STRING_get0_data$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor BN_get_rfc2409_prime_1024$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
+    static final MethodHandle ASN1_STRING_get0_data$MH = RuntimeHelper.downcallHandle(
+        "ASN1_STRING_get0_data",
+        constants$4.ASN1_STRING_get0_data$FUNC
     );
-    static final MethodHandle BN_get_rfc2409_prime_1024$MH = RuntimeHelper.downcallHandle(
-        "BN_get_rfc2409_prime_1024",
-        constants$4.BN_get_rfc2409_prime_1024$FUNC, false
+    static final FunctionDescriptor EVP_MD_get0_provider$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor BN_get_rfc3526_prime_1536$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
+    static final MethodHandle EVP_MD_get0_provider$MH = RuntimeHelper.downcallHandle(
+        "EVP_MD_get0_provider",
+        constants$4.EVP_MD_get0_provider$FUNC
     );
-    static final MethodHandle BN_get_rfc3526_prime_1536$MH = RuntimeHelper.downcallHandle(
-        "BN_get_rfc3526_prime_1536",
-        constants$4.BN_get_rfc3526_prime_1536$FUNC, false
+    static final FunctionDescriptor EVP_MD_fetch$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
+    );
+    static final MethodHandle EVP_MD_fetch$MH = RuntimeHelper.downcallHandle(
+        "EVP_MD_fetch",
+        constants$4.EVP_MD_fetch$FUNC
     );
 }
 

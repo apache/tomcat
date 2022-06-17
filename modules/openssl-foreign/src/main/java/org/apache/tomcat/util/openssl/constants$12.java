@@ -26,46 +26,48 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$12 {
 
-    static final FunctionDescriptor SSL_CTX_set_options$FUNC = FunctionDescriptor.of(JAVA_LONG,
-        ADDRESS,
-        JAVA_LONG
+    static final FunctionDescriptor SSL_CTX_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_set_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_options",
-        constants$12.SSL_CTX_set_options$FUNC, false
+    static final MethodHandle SSL_CTX_new$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_new",
+        constants$12.SSL_CTX_new$FUNC
     );
-    static final FunctionDescriptor SSL_set_options$FUNC = FunctionDescriptor.of(JAVA_LONG,
-        ADDRESS,
-        JAVA_LONG
+    static final FunctionDescriptor SSL_CTX_free$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_set_options$MH = RuntimeHelper.downcallHandle(
-        "SSL_set_options",
-        constants$12.SSL_set_options$FUNC, false
+    static final MethodHandle SSL_CTX_free$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_free",
+        constants$12.SSL_CTX_free$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_set_alpn_select_cb$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_CTX_set_timeout$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT
     );
-    static final MethodHandle SSL_CTX_set_alpn_select_cb$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_alpn_select_cb",
-        constants$12.SSL_CTX_set_alpn_select_cb$FUNC, false
+    static final MethodHandle SSL_CTX_set_timeout$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_set_timeout",
+        constants$12.SSL_CTX_set_timeout$FUNC
     );
-    static final FunctionDescriptor SSL_get0_alpn_selected$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_CTX_get_timeout$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_get0_alpn_selected$MH = RuntimeHelper.downcallHandle(
-        "SSL_get0_alpn_selected",
-        constants$12.SSL_get0_alpn_selected$FUNC, false
+    static final MethodHandle SSL_CTX_get_timeout$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_get_timeout",
+        constants$12.SSL_CTX_get_timeout$FUNC
     );
-    static final FunctionDescriptor SSL_in_init$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final FunctionDescriptor SSL_CTX_get_cert_store$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_in_init$MH = RuntimeHelper.downcallHandle(
-        "SSL_in_init",
-        constants$12.SSL_in_init$FUNC, false
+    static final MethodHandle SSL_CTX_get_cert_store$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_get_cert_store",
+        constants$12.SSL_CTX_get_cert_store$FUNC
+    );
+    static final FunctionDescriptor SSL_get_current_cipher$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
+    );
+    static final MethodHandle SSL_get_current_cipher$MH = RuntimeHelper.downcallHandle(
+        "SSL_get_current_cipher",
+        constants$12.SSL_get_current_cipher$FUNC
     );
 }
 

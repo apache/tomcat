@@ -26,49 +26,49 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$7 {
 
-    static final FunctionDescriptor EC_KEY_free$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS
+    static final FunctionDescriptor X509_STORE_add_lookup$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle EC_KEY_free$MH = RuntimeHelper.downcallHandle(
-        "EC_KEY_free",
-        constants$7.EC_KEY_free$FUNC, false
+    static final MethodHandle X509_STORE_add_lookup$MH = RuntimeHelper.downcallHandle(
+        "X509_STORE_add_lookup",
+        constants$7.X509_STORE_add_lookup$FUNC
     );
-    static final FunctionDescriptor DH_new$FUNC = FunctionDescriptor.of(ADDRESS);
-    static final MethodHandle DH_new$MH = RuntimeHelper.downcallHandle(
-        "DH_new",
-        constants$7.DH_new$FUNC, false
+    static final FunctionDescriptor X509_LOOKUP_hash_dir$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
+    static final MethodHandle X509_LOOKUP_hash_dir$MH = RuntimeHelper.downcallHandle(
+        "X509_LOOKUP_hash_dir",
+        constants$7.X509_LOOKUP_hash_dir$FUNC
     );
-    static final FunctionDescriptor DH_free$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS
+    static final FunctionDescriptor X509_LOOKUP_file$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
+    static final MethodHandle X509_LOOKUP_file$MH = RuntimeHelper.downcallHandle(
+        "X509_LOOKUP_file",
+        constants$7.X509_LOOKUP_file$FUNC
     );
-    static final MethodHandle DH_free$MH = RuntimeHelper.downcallHandle(
-        "DH_free",
-        constants$7.DH_free$FUNC, false
+    static final FunctionDescriptor X509_LOOKUP_ctrl$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor DH_set0_pqg$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final MethodHandle X509_LOOKUP_ctrl$MH = RuntimeHelper.downcallHandle(
+        "X509_LOOKUP_ctrl",
+        constants$7.X509_LOOKUP_ctrl$FUNC
     );
-    static final MethodHandle DH_set0_pqg$MH = RuntimeHelper.downcallHandle(
-        "DH_set0_pqg",
-        constants$7.DH_set0_pqg$FUNC, false
+    static final FunctionDescriptor X509_STORE_CTX_get_ex_data$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
     );
-    static final FunctionDescriptor X509_STORE_set_flags$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        JAVA_LONG
+    static final MethodHandle X509_STORE_CTX_get_ex_data$MH = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_get_ex_data",
+        constants$7.X509_STORE_CTX_get_ex_data$FUNC
     );
-    static final MethodHandle X509_STORE_set_flags$MH = RuntimeHelper.downcallHandle(
-        "X509_STORE_set_flags",
-        constants$7.X509_STORE_set_flags$FUNC, false
+    static final FunctionDescriptor X509_STORE_CTX_get_error$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor X509_STORE_CTX_get0_untrusted$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
-    );
-    static final MethodHandle X509_STORE_CTX_get0_untrusted$MH = RuntimeHelper.downcallHandle(
-        "X509_STORE_CTX_get0_untrusted",
-        constants$7.X509_STORE_CTX_get0_untrusted$FUNC, false
+    static final MethodHandle X509_STORE_CTX_get_error$MH = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_get_error",
+        constants$7.X509_STORE_CTX_get_error$FUNC
     );
 }
 

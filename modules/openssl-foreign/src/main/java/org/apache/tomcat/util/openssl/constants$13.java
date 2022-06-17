@@ -26,57 +26,50 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$13 {
 
-    static final FunctionDescriptor SSL_CTX_set_cipher_list$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_CIPHER_get_name$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_set_cipher_list$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_cipher_list",
-        constants$13.SSL_CTX_set_cipher_list$FUNC, false
+    static final MethodHandle SSL_CIPHER_get_name$MH = RuntimeHelper.downcallHandle(
+        "SSL_CIPHER_get_name",
+        constants$13.SSL_CIPHER_get_name$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_set_ciphersuites$FUNC = FunctionDescriptor.of(JAVA_INT,
-            ADDRESS,
-            ADDRESS
-        );
-    static final MethodHandle SSL_CTX_set_ciphersuites$MH = RuntimeHelper.downcallHandle(
-            "SSL_CTX_set_ciphersuites",
-            constants$13.SSL_CTX_set_ciphersuites$FUNC, false
-        );
-    static final FunctionDescriptor SSL_CTX_new$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_CIPHER_get_kx_nid$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_new$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_new",
-        constants$13.SSL_CTX_new$FUNC, false
+    static final MethodHandle SSL_CIPHER_get_kx_nid$MH = RuntimeHelper.downcallHandle(
+        "SSL_CIPHER_get_kx_nid",
+        constants$13.SSL_CIPHER_get_kx_nid$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_free$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS
+    static final FunctionDescriptor SSL_CIPHER_get_auth_nid$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_free$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_free",
-        constants$13.SSL_CTX_free$FUNC, false
+    static final MethodHandle SSL_CIPHER_get_auth_nid$MH = RuntimeHelper.downcallHandle(
+        "SSL_CIPHER_get_auth_nid",
+        constants$13.SSL_CIPHER_get_auth_nid$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_set_timeout$FUNC = FunctionDescriptor.of(JAVA_LONG,
-        ADDRESS,
-        JAVA_LONG
+    static final FunctionDescriptor SSL_pending$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_set_timeout$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_timeout",
-        constants$13.SSL_CTX_set_timeout$FUNC, false
+    static final MethodHandle SSL_pending$MH = RuntimeHelper.downcallHandle(
+        "SSL_pending",
+        constants$13.SSL_pending$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_get_timeout$FUNC = FunctionDescriptor.of(JAVA_LONG,
-        ADDRESS
+    static final FunctionDescriptor SSL_set_bio$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_get_timeout$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_timeout",
-        constants$13.SSL_CTX_get_timeout$FUNC, false
+    static final MethodHandle SSL_set_bio$MH = RuntimeHelper.downcallHandle(
+        "SSL_set_bio",
+        constants$13.SSL_set_bio$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_get_cert_store$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_set_cipher_list$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_get_cert_store$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_get_cert_store",
-        constants$13.SSL_CTX_get_cert_store$FUNC, false
+    static final MethodHandle SSL_set_cipher_list$MH = RuntimeHelper.downcallHandle(
+        "SSL_set_cipher_list",
+        constants$13.SSL_set_cipher_list$FUNC
     );
 }
 

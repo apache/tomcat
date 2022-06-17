@@ -26,56 +26,57 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$10 {
 
-    static final FunctionDescriptor d2i_X509$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        JAVA_LONG
+    static final FunctionDescriptor PEM_read_bio_ECPKParameters$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle d2i_X509$MH = RuntimeHelper.downcallHandle(
-        "d2i_X509",
-        constants$10.d2i_X509$FUNC, false
+    static final MethodHandle PEM_read_bio_ECPKParameters$MH = RuntimeHelper.downcallHandle(
+        "PEM_read_bio_ECPKParameters",
+        constants$10.PEM_read_bio_ECPKParameters$FUNC
     );
-    static final FunctionDescriptor i2d_X509$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor PEM_read_bio_DHparams$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle i2d_X509$MH = RuntimeHelper.downcallHandle(
-        "i2d_X509",
-        constants$10.i2d_X509$FUNC, false
+    static final MethodHandle PEM_read_bio_DHparams$MH = RuntimeHelper.downcallHandle(
+        "PEM_read_bio_DHparams",
+        constants$10.PEM_read_bio_DHparams$FUNC
     );
-    static final FunctionDescriptor X509_get_ext_by_NID$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        JAVA_INT,
-        JAVA_INT
+    static final FunctionDescriptor PEM_read_bio_PrivateKey$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle X509_get_ext_by_NID$MH = RuntimeHelper.downcallHandle(
-        "X509_get_ext_by_NID",
-        constants$10.X509_get_ext_by_NID$FUNC, false
+    static final MethodHandle PEM_read_bio_PrivateKey$MH = RuntimeHelper.downcallHandle(
+        "PEM_read_bio_PrivateKey",
+        constants$10.PEM_read_bio_PrivateKey$FUNC
     );
-    static final FunctionDescriptor X509_get_ext$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        JAVA_INT
+    static final FunctionDescriptor SSL_CTX_get_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle X509_get_ext$MH = RuntimeHelper.downcallHandle(
-        "X509_get_ext",
-        constants$10.X509_get_ext$FUNC, false
+    static final MethodHandle SSL_CTX_get_options$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_get_options",
+        constants$10.SSL_CTX_get_options$FUNC
     );
-    static final FunctionDescriptor X509_EXTENSION_get_data$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_get_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle X509_EXTENSION_get_data$MH = RuntimeHelper.downcallHandle(
-        "X509_EXTENSION_get_data",
-        constants$10.X509_EXTENSION_get_data$FUNC, false
+    static final MethodHandle SSL_get_options$MH = RuntimeHelper.downcallHandle(
+        "SSL_get_options",
+        constants$10.SSL_get_options$FUNC
     );
-    static final FunctionDescriptor PEM_read_bio_X509_AUX$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_CTX_clear_options$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT
     );
-    static final MethodHandle PEM_read_bio_X509_AUX$MH = RuntimeHelper.downcallHandle(
-        "PEM_read_bio_X509_AUX",
-        constants$10.PEM_read_bio_X509_AUX$FUNC, false
+    static final MethodHandle SSL_CTX_clear_options$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_clear_options",
+        constants$10.SSL_CTX_clear_options$FUNC
     );
 }
 

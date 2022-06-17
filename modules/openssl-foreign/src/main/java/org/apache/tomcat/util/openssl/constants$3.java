@@ -26,50 +26,47 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$3 {
 
-    static final FunctionDescriptor BIO_free$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final FunctionDescriptor BN_get_rfc2409_prime_768$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle BIO_free$MH = RuntimeHelper.downcallHandle(
-        "BIO_free",
-        constants$3.BIO_free$FUNC, false
+    static final MethodHandle BN_get_rfc2409_prime_768$MH = RuntimeHelper.downcallHandle(
+        "BN_get_rfc2409_prime_768",
+        constants$3.BN_get_rfc2409_prime_768$FUNC
     );
-    static final FunctionDescriptor BIO_read$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS,
-        JAVA_INT
+    static final FunctionDescriptor BN_get_rfc2409_prime_1024$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle BIO_read$MH = RuntimeHelper.downcallHandle(
-        "BIO_read",
-        constants$3.BIO_read$FUNC, false
+    static final MethodHandle BN_get_rfc2409_prime_1024$MH = RuntimeHelper.downcallHandle(
+        "BN_get_rfc2409_prime_1024",
+        constants$3.BN_get_rfc2409_prime_1024$FUNC
     );
-    static final FunctionDescriptor BIO_write$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS,
-        JAVA_INT
+    static final FunctionDescriptor BN_get_rfc3526_prime_1536$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle BIO_write$MH = RuntimeHelper.downcallHandle(
-        "BIO_write",
-        constants$3.BIO_write$FUNC, false
+    static final MethodHandle BN_get_rfc3526_prime_1536$MH = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_1536",
+        constants$3.BN_get_rfc3526_prime_1536$FUNC
     );
-    static final FunctionDescriptor BIO_ctrl$FUNC = FunctionDescriptor.of(JAVA_LONG,
-        ADDRESS,
-        JAVA_INT,
-        JAVA_LONG,
-        ADDRESS
+    static final FunctionDescriptor BN_get_rfc3526_prime_2048$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle BIO_ctrl$MH = RuntimeHelper.downcallHandle(
-        "BIO_ctrl",
-        constants$3.BIO_ctrl$FUNC, false
+    static final MethodHandle BN_get_rfc3526_prime_2048$MH = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_2048",
+        constants$3.BN_get_rfc3526_prime_2048$FUNC
     );
-    static final FunctionDescriptor BIO_s_mem$FUNC = FunctionDescriptor.of(ADDRESS);
-    static final MethodHandle BIO_s_mem$MH = RuntimeHelper.downcallHandle(
-        "BIO_s_mem",
-        constants$3.BIO_s_mem$FUNC, false
+    static final FunctionDescriptor BN_get_rfc3526_prime_3072$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor BIO_s_bio$FUNC = FunctionDescriptor.of(ADDRESS);
-    static final MethodHandle BIO_s_bio$MH = RuntimeHelper.downcallHandle(
-        "BIO_s_bio",
-        constants$3.BIO_s_bio$FUNC, false
+    static final MethodHandle BN_get_rfc3526_prime_3072$MH = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_3072",
+        constants$3.BN_get_rfc3526_prime_3072$FUNC
+    );
+    static final FunctionDescriptor BN_get_rfc3526_prime_4096$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
+    );
+    static final MethodHandle BN_get_rfc3526_prime_4096$MH = RuntimeHelper.downcallHandle(
+        "BN_get_rfc3526_prime_4096",
+        constants$3.BN_get_rfc3526_prime_4096$FUNC
     );
 }
 

@@ -26,54 +26,54 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$17 {
 
-    static final FunctionDescriptor SSL_CTX_set_cert_verify_callback$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_set_cert_verify_callback$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_cert_verify_callback",
-        constants$17.SSL_CTX_set_cert_verify_callback$FUNC, false
+    static final MethodHandle SSL_new$MH = RuntimeHelper.downcallHandle(
+        "SSL_new",
+        constants$17.SSL_new$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_use_PrivateKey$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_free$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_use_PrivateKey$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_use_PrivateKey",
-        constants$17.SSL_CTX_use_PrivateKey$FUNC, false
+    static final MethodHandle SSL_free$MH = RuntimeHelper.downcallHandle(
+        "SSL_free",
+        constants$17.SSL_free$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_use_certificate$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_read$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
     );
-    static final MethodHandle SSL_CTX_use_certificate$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_use_certificate",
-        constants$17.SSL_CTX_use_certificate$FUNC, false
+    static final MethodHandle SSL_read$MH = RuntimeHelper.downcallHandle(
+        "SSL_read",
+        constants$17.SSL_read$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_set_default_passwd_cb$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor SSL_write$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
     );
-    static final MethodHandle SSL_CTX_set_default_passwd_cb$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_default_passwd_cb",
-        constants$17.SSL_CTX_set_default_passwd_cb$FUNC, false
+    static final MethodHandle SSL_write$MH = RuntimeHelper.downcallHandle(
+        "SSL_write",
+        constants$17.SSL_write$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_check_private_key$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final FunctionDescriptor SSL_CTX_ctrl$FUNC = FunctionDescriptor.of(Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_check_private_key$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_check_private_key",
-        constants$17.SSL_CTX_check_private_key$FUNC, false
+    static final MethodHandle SSL_CTX_ctrl$MH = RuntimeHelper.downcallHandle(
+        "SSL_CTX_ctrl",
+        constants$17.SSL_CTX_ctrl$FUNC
     );
-    static final FunctionDescriptor SSL_CTX_set_session_id_context$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS,
-        JAVA_INT
+    static final FunctionDescriptor SSL_get_version$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle SSL_CTX_set_session_id_context$MH = RuntimeHelper.downcallHandle(
-        "SSL_CTX_set_session_id_context",
-        constants$17.SSL_CTX_set_session_id_context$FUNC, false
+    static final MethodHandle SSL_get_version$MH = RuntimeHelper.downcallHandle(
+        "SSL_get_version",
+        constants$17.SSL_get_version$FUNC
     );
 }
 

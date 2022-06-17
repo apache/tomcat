@@ -24,9 +24,22 @@ import java.lang.invoke.VarHandle;
 import java.nio.ByteOrder;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
-class constants$29 {
+public interface SSL_CTX_set_tmp_dh_callback$dh {
 
-    static final MemorySegment OPENSSL_FILE$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("/tmp/jextract$17092896582695808251.h");
+    java.lang.foreign.Addressable apply(java.lang.foreign.MemoryAddress _x0, int _x1, int _x2);
+    static MemorySegment allocate(SSL_CTX_set_tmp_dh_callback$dh fi, MemorySession session) {
+        return RuntimeHelper.upcallStub(SSL_CTX_set_tmp_dh_callback$dh.class, fi, constants$21.SSL_CTX_set_tmp_dh_callback$dh$FUNC, session);
+    }
+    static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemoryAddress addr, MemorySession session) {
+        MemorySegment symbol = MemorySegment.ofAddress(addr, 0, session);
+        return (java.lang.foreign.MemoryAddress __x0, int __x1, int __x2) -> {
+            try {
+                return (java.lang.foreign.Addressable)(java.lang.foreign.MemoryAddress)constants$22.SSL_CTX_set_tmp_dh_callback$dh$MH.invokeExact((Addressable)symbol, (java.lang.foreign.Addressable)__x0, __x1, __x2);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        };
+    }
 }
 
 

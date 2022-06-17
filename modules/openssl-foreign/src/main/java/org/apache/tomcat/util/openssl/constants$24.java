@@ -26,48 +26,53 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$24 {
 
-    static final FunctionDescriptor SSL_CONF_CTX_set_ssl_ctx$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor ERR_clear_error$FUNC = FunctionDescriptor.ofVoid();
+    static final MethodHandle ERR_clear_error$MH = RuntimeHelper.downcallHandle(
+        "ERR_clear_error",
+        constants$24.ERR_clear_error$FUNC
     );
-    static final MethodHandle SSL_CONF_CTX_set_ssl_ctx$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_CTX_set_ssl_ctx",
-        constants$24.SSL_CONF_CTX_set_ssl_ctx$FUNC, false
+    static final FunctionDescriptor ERR_error_string$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor SSL_CONF_cmd$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS,
-        ADDRESS
+    static final MethodHandle ERR_error_string$MH = RuntimeHelper.downcallHandle(
+        "ERR_error_string",
+        constants$24.ERR_error_string$FUNC
     );
-    static final MethodHandle SSL_CONF_cmd$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_cmd",
-        constants$24.SSL_CONF_cmd$FUNC, false
+    static final FunctionDescriptor PKCS12_verify_mac$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_INT$LAYOUT
     );
-    static final FunctionDescriptor SSL_CONF_cmd_value_type$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS,
-        ADDRESS
+    static final MethodHandle PKCS12_verify_mac$MH = RuntimeHelper.downcallHandle(
+        "PKCS12_verify_mac",
+        constants$24.PKCS12_verify_mac$FUNC
     );
-    static final MethodHandle SSL_CONF_cmd_value_type$MH = RuntimeHelper.downcallHandle(
-        "SSL_CONF_cmd_value_type",
-        constants$24.SSL_CONF_cmd_value_type$FUNC, false
+    static final FunctionDescriptor PKCS12_free$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor OPENSSL_init_ssl$FUNC = FunctionDescriptor.of(JAVA_INT,
-        JAVA_LONG,
-        ADDRESS
+    static final MethodHandle PKCS12_free$MH = RuntimeHelper.downcallHandle(
+        "PKCS12_free",
+        constants$24.PKCS12_free$FUNC
     );
-    static final MethodHandle OPENSSL_init_ssl$MH = RuntimeHelper.downcallHandle(
-        "OPENSSL_init_ssl",
-        constants$24.OPENSSL_init_ssl$FUNC, false
+    static final FunctionDescriptor PKCS12_parse$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor ERR_get_error$FUNC = FunctionDescriptor.of(JAVA_LONG);
-    static final MethodHandle ERR_get_error$MH = RuntimeHelper.downcallHandle(
-        "ERR_get_error",
-        constants$24.ERR_get_error$FUNC, false
+    static final MethodHandle PKCS12_parse$MH = RuntimeHelper.downcallHandle(
+        "PKCS12_parse",
+        constants$24.PKCS12_parse$FUNC
     );
-    static final FunctionDescriptor ERR_peek_last_error$FUNC = FunctionDescriptor.of(JAVA_LONG);
-    static final MethodHandle ERR_peek_last_error$MH = RuntimeHelper.downcallHandle(
-        "ERR_peek_last_error",
-        constants$24.ERR_peek_last_error$FUNC, false
+    static final FunctionDescriptor d2i_PKCS12_bio$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
+    );
+    static final MethodHandle d2i_PKCS12_bio$MH = RuntimeHelper.downcallHandle(
+        "d2i_PKCS12_bio",
+        constants$24.d2i_PKCS12_bio$FUNC
     );
 }
 

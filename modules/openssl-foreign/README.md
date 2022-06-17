@@ -28,7 +28,7 @@ Note: The build path for the JDK will be different on other platforms.
 
 ## Running
 
-The module uses the OpenSSL 1.1 API. It requires an API compatible version of
+The module uses the OpenSSL 3.0 API. It requires an API compatible version of
 OpenSSL or a compatible alternative library, that can be loaded from the JVM
 library path.
 
@@ -77,22 +77,22 @@ This step is only useful to be able to use additional native APIs from OpenSSL
 or stdlib.
 
 Find include paths using `gcc -xc -E -v -`, on Fedora it is
-`/usr/lib/gcc/x86_64-redhat-linux/11/include`. Edit `openssl-tomcat.conf`
+`/usr/lib/gcc/x86_64-redhat-linux/12/include`. Edit `openssl-tomcat.conf`
 accordingly to set the appropriate path.
 
 ```
-export JAVA_HOME=<pathto>/panama-foreign/build/linux-x86_64-server-release/images/jdk
-$JAVA_HOME/bin/jextract @openssl-tomcat.conf openssl.h
+export JEXTRACT_HOME=<pathto>/jextract/build/jextract
+$JEXTRACT_HOME/bin/jextract @openssl-tomcat.conf openssl.h
 ```
 Note: The build path for the JDK will be different on other platforms.
 
-The code included was generated using OpenSSL 1.1.1. As long as things remain
+The code included was generated using OpenSSL 3.0. As long as things remain
 API compatible, the generated code will still work.
 
 The `openssl-tomcat.conf` will generate a trimmed down OpenSSL API. When
 developing new features, the full API can be generated instead using:
 ```
-$JAVA_HOME/bin/jextract --source -t org.apache.tomcat.util.openssl -lssl -I /usr/lib/gcc/x86_64-redhat-linux/11/include openssl.h -d src/main/java
+$JEXTRACT_HOME/bin/jextract --source -t org.apache.tomcat.util.openssl -lssl -I /usr/lib/gcc/x86_64-redhat-linux/12/include openssl.h --output src/main/java
 ```
 
 The `openssl.conf` file lists all the API calls and constants that can be

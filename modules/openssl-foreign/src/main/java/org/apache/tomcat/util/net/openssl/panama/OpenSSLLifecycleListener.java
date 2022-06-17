@@ -17,6 +17,8 @@
 package org.apache.tomcat.util.net.openssl.panama;
 
 
+import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode;
+import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode_set;
 import static org.apache.tomcat.util.openssl.openssl_h.*;
 
 import java.lang.foreign.MemoryAddress;
@@ -282,41 +284,74 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
             initDHParameters();
 
-            if (!(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
+            // OpenSSL 3 onwards uses providers
+            boolean usingProviders = (OpenSSL_version_num() & 0xF0000000L) > 2;
 
+            if (usingProviders || !(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
                 fipsModeActive = false;
-
                 final boolean enterFipsMode;
-                int fipsModeState = FIPS_mode();
-
-                if(log.isDebugEnabled()) {
-                    log.debug(sm.getString("listener.currentFIPSMode",
-                            Integer.valueOf(fipsModeState)));
+                int fipsModeState = FIPS_OFF;
+                if (usingProviders) {
+                    var md = EVP_MD_fetch(MemoryAddress.NULL, allocator.allocateUtf8String("SHA-512"), MemoryAddress.NULL);
+                    var provider = EVP_MD_get0_provider(md);
+                    String name = OSSL_PROVIDER_get0_name(provider).getUtf8String(0);
+                    EVP_MD_free(md);
+                    if ("fips".equals(name)) {
+                        fipsModeState = FIPS_ON;
+                    }
+                } else {
+                    fipsModeState = FIPS_mode();
                 }
 
-                if ("on".equalsIgnoreCase(FIPSMode)) {
+                if(log.isDebugEnabled()) {
+                    log.debug(sm.getString("listener.currentFIPSMode", Integer.valueOf(fipsModeState)));
+                }
+
+                if (null == FIPSMode || "off".equalsIgnoreCase(FIPSMode)) {
                     if (fipsModeState == FIPS_ON) {
-                        log.info(sm.getString("listener.skipFIPSInitialization"));
+                        fipsModeActive = true;
+                    }
+                    enterFipsMode = false;
+                } else if ("on".equalsIgnoreCase(FIPSMode)) {
+                    if (fipsModeState == FIPS_ON) {
+                        if (!usingProviders) {
+                            log.info(sm.getString("listener.skipFIPSInitialization"));
+                        }
                         fipsModeActive = true;
                         enterFipsMode = false;
                     } else {
-                        enterFipsMode = true;
+                        if (usingProviders) {
+                            throw new IllegalStateException(sm.getString("listener.FIPSProviderNotDefault", FIPSMode));
+                        } else {
+                            enterFipsMode = true;
+                        }
                     }
                 } else if ("require".equalsIgnoreCase(FIPSMode)) {
                     if (fipsModeState == FIPS_ON) {
                         fipsModeActive = true;
                         enterFipsMode = false;
                     } else {
-                        throw new IllegalStateException(
-                                sm.getString("listener.requireNotInFIPSMode"));
+                        if (usingProviders) {
+                            throw new IllegalStateException(sm.getString("listener.FIPSProviderNotDefault", FIPSMode));
+                        } else {
+                            throw new IllegalStateException(sm.getString("listener.requireNotInFIPSMode"));
+                        }
                     }
                 } else if ("enter".equalsIgnoreCase(FIPSMode)) {
                     if (fipsModeState == FIPS_OFF) {
-                        enterFipsMode = true;
+                        if (usingProviders) {
+                            throw new IllegalStateException(sm.getString("listener.FIPSProviderNotDefault", FIPSMode));
+                        } else {
+                            enterFipsMode = true;
+                        }
                     } else {
-                        throw new IllegalStateException(sm.getString(
-                                "listener.enterAlreadyInFIPSMode",
-                                Integer.valueOf(fipsModeState)));
+                        if (usingProviders) {
+                            fipsModeActive = true;
+                            enterFipsMode = false;
+                        } else {
+                            throw new IllegalStateException(sm.getString(
+                                    "listener.enterAlreadyInFIPSMode", Integer.valueOf(fipsModeState)));
+                        }
                     }
                 } else {
                     throw new IllegalArgumentException(sm.getString(
@@ -337,6 +372,10 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
                     fipsModeActive = true;
                     log.info(sm.getString("listener.initializeFIPSSuccess"));
+                }
+
+                if (usingProviders && fipsModeActive) {
+                    log.info(sm.getString("aprListener.usingFIPSProvider"));
                 }
             }
 

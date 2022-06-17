@@ -26,47 +26,49 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 class constants$6 {
 
-    static final FunctionDescriptor ASN1_STRING_get0_data$FUNC = FunctionDescriptor.of(ADDRESS,
-        ADDRESS
+    static final FunctionDescriptor EC_KEY_free$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final MethodHandle ASN1_STRING_get0_data$MH = RuntimeHelper.downcallHandle(
-        "ASN1_STRING_get0_data",
-        constants$6.ASN1_STRING_get0_data$FUNC, false
+    static final MethodHandle EC_KEY_free$MH = RuntimeHelper.downcallHandle(
+        "EC_KEY_free",
+        constants$6.EC_KEY_free$FUNC
     );
-    static final FunctionDescriptor EVP_PKEY_base_id$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final FunctionDescriptor DH_new$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT);
+    static final MethodHandle DH_new$MH = RuntimeHelper.downcallHandle(
+        "DH_new",
+        constants$6.DH_new$FUNC
     );
-    static final MethodHandle EVP_PKEY_base_id$MH = RuntimeHelper.downcallHandle(
-        "EVP_PKEY_base_id",
-        constants$6.EVP_PKEY_base_id$FUNC, false
+    static final FunctionDescriptor DH_free$FUNC = FunctionDescriptor.ofVoid(
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor EVP_PKEY_bits$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final MethodHandle DH_free$MH = RuntimeHelper.downcallHandle(
+        "DH_free",
+        constants$6.DH_free$FUNC
     );
-    static final MethodHandle EVP_PKEY_bits$MH = RuntimeHelper.downcallHandle(
-        "EVP_PKEY_bits",
-        constants$6.EVP_PKEY_bits$FUNC, false
+    static final FunctionDescriptor DH_set0_pqg$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor EC_GROUP_free$FUNC = FunctionDescriptor.ofVoid(
-        ADDRESS
+    static final MethodHandle DH_set0_pqg$MH = RuntimeHelper.downcallHandle(
+        "DH_set0_pqg",
+        constants$6.DH_set0_pqg$FUNC
     );
-    static final MethodHandle EC_GROUP_free$MH = RuntimeHelper.downcallHandle(
-        "EC_GROUP_free",
-        constants$6.EC_GROUP_free$FUNC, false
+    static final FunctionDescriptor X509_STORE_set_flags$FUNC = FunctionDescriptor.of(Constants$root.C_INT$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_LONG_LONG$LAYOUT
     );
-    static final FunctionDescriptor EC_GROUP_get_curve_name$FUNC = FunctionDescriptor.of(JAVA_INT,
-        ADDRESS
+    static final MethodHandle X509_STORE_set_flags$MH = RuntimeHelper.downcallHandle(
+        "X509_STORE_set_flags",
+        constants$6.X509_STORE_set_flags$FUNC
     );
-    static final MethodHandle EC_GROUP_get_curve_name$MH = RuntimeHelper.downcallHandle(
-        "EC_GROUP_get_curve_name",
-        constants$6.EC_GROUP_get_curve_name$FUNC, false
+    static final FunctionDescriptor X509_STORE_CTX_get0_untrusted$FUNC = FunctionDescriptor.of(Constants$root.C_POINTER$LAYOUT,
+        Constants$root.C_POINTER$LAYOUT
     );
-    static final FunctionDescriptor EC_KEY_new_by_curve_name$FUNC = FunctionDescriptor.of(ADDRESS,
-        JAVA_INT
-    );
-    static final MethodHandle EC_KEY_new_by_curve_name$MH = RuntimeHelper.downcallHandle(
-        "EC_KEY_new_by_curve_name",
-        constants$6.EC_KEY_new_by_curve_name$FUNC, false
+    static final MethodHandle X509_STORE_CTX_get0_untrusted$MH = RuntimeHelper.downcallHandle(
+        "X509_STORE_CTX_get0_untrusted",
+        constants$6.X509_STORE_CTX_get0_untrusted$FUNC
     );
 }
 
