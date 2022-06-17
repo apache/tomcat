@@ -355,11 +355,11 @@ public class DigestAuthenticator extends AuthenticatorBase {
         String authenticateHeader;
         if (isNonceStale) {
             authenticateHeader = "Digest realm=\"" + realmName + "\", " +
-            "qop=\"" + QOP + "\", nonce=\"" + nonce + "\", " + "opaque=\"" +
+                    "qop=\"" + QOP + "\", nonce=\"" + nonce + "\", " + "opaque=\"" +
             getOpaque() + "\", stale=true";
         } else {
             authenticateHeader = "Digest realm=\"" + realmName + "\", " +
-            "qop=\"" + QOP + "\", nonce=\"" + nonce + "\", " + "opaque=\"" +
+                    "qop=\"" + QOP + "\", nonce=\"" + nonce + "\", " + "opaque=\"" +
             getOpaque() + "\"";
         }
 
