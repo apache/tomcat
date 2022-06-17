@@ -114,18 +114,6 @@ public abstract class BaseNCodec {
      */
     public static final int MIME_CHUNK_SIZE = 76;
 
-    /**
-     * PEM chunk size per RFC 1421 section 4.3.2.4.
-     *
-     * <p>
-     * The {@value} character limit does not count the trailing CRLF, but counts all other characters, including any
-     * equal signs.
-     * </p>
-     *
-     * @see <a href="http://tools.ietf.org/html/rfc1421">RFC 1421 section 4.3.2.4</a>
-     */
-    public static final int PEM_CHUNK_SIZE = 64;
-
     private static final int DEFAULT_BUFFER_RESIZE_FACTOR = 2;
 
     /**
@@ -203,36 +191,6 @@ public abstract class BaseNCodec {
         return (minCapacity > MAX_BUFFER_SIZE) ?
             minCapacity :
             MAX_BUFFER_SIZE;
-    }
-
-    /**
-     * Gets a copy of the chunk separator per RFC 2045 section 2.1.
-     *
-     * @return the chunk separator
-     * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045 section 2.1</a>
-     * @since 1.15
-     */
-    public static byte[] getChunkSeparator() {
-        return CHUNK_SEPARATOR.clone();
-    }
-
-    /**
-     * Checks if a byte value is whitespace or not.
-     * Whitespace is taken to mean: space, tab, CR, LF
-     * @param byteToCheck
-     *            the byte to check
-     * @return true if byte is whitespace, false otherwise
-     */
-    protected static boolean isWhiteSpace(final byte byteToCheck) {
-        switch (byteToCheck) {
-            case ' ' :
-            case '\n' :
-            case '\r' :
-            case '\t' :
-                return true;
-            default :
-                return false;
-        }
     }
 
     /**
@@ -428,21 +386,8 @@ public abstract class BaseNCodec {
      * @param pArray a byte array containing binary data
      * @return String containing only character data in the appropriate alphabet.
      * @since 1.5
-     * This is a duplicate of {@link #encodeToString(byte[])}; it was merged during refactoring.
     */
     public String encodeAsString(final byte[] pArray){
-        return StringUtils.newStringUtf8(encode(pArray));
-    }
-
-    /**
-     * Encodes a byte[] containing binary data, into a String containing characters in the Base-N alphabet.
-     * Uses UTF8 encoding.
-     *
-     * @param pArray
-     *            a byte array containing binary data
-     * @return A String containing only Base-N character data
-     */
-    public String encodeToString(final byte[] pArray) {
         return StringUtils.newStringUtf8(encode(pArray));
     }
 
@@ -514,39 +459,6 @@ public abstract class BaseNCodec {
      * @return {@code true} if the value is defined in the current alphabet, {@code false} otherwise.
      */
     protected abstract boolean isInAlphabet(byte value);
-
-    /**
-     * Tests a given byte array to see if it contains only valid characters within the alphabet.
-     * The method optionally treats whitespace and pad as valid.
-     *
-     * @param arrayOctet byte array to test
-     * @param allowWSPad if {@code true}, then whitespace and PAD are also allowed
-     *
-     * @return {@code true} if all bytes are valid characters in the alphabet or if the byte array is empty;
-     *         {@code false}, otherwise
-     */
-    public boolean isInAlphabet(final byte[] arrayOctet, final boolean allowWSPad) {
-        for (final byte octet : arrayOctet) {
-            if (!isInAlphabet(octet) &&
-                    (!allowWSPad || (octet != pad) && !isWhiteSpace(octet))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Tests a given String to see if it contains only valid characters within the alphabet.
-     * The method treats whitespace and PAD as valid.
-     *
-     * @param basen String to test
-     * @return {@code true} if all characters in the String are valid characters in the alphabet or if
-     *         the String is empty; {@code false}, otherwise
-     * @see #isInAlphabet(byte[], boolean)
-     */
-    public boolean isInAlphabet(final String basen) {
-        return isInAlphabet(StringUtils.getBytesUtf8(basen), true);
-    }
 
     /**
      * Extracts buffered data into the provided byte[] array, starting at position bPos, up to a maximum of bAvail
