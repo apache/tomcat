@@ -44,5 +44,5 @@ public abstract class PageData {
      *
      * @return An input stream on the document.
      */
-   public abstract InputStream getInputStream();
+    public abstract InputStream getInputStream();
 }
