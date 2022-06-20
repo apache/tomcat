@@ -30,7 +30,7 @@ Note: The build path for the JDK will be different on other platforms.
 
 The module uses the OpenSSL 3.0 API. It requires an API compatible version of
 OpenSSL or a compatible alternative library, that can be loaded from the JVM
-library path.
+library path. OpenSSL 1.1 is also supported.
 
 Copy `tomcat-coyote-openssl-1.0.jar` to the Apache Tomcat `lib` folder.
 

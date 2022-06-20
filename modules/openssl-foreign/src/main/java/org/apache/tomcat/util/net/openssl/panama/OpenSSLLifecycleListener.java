@@ -285,7 +285,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
             initDHParameters();
 
             // OpenSSL 3 onwards uses providers
-            boolean usingProviders = (OpenSSL_version_num() & 0xF0000000L) > 2;
+            boolean usingProviders = (OpenSSL_version_num() >= 0x3000000fL);
 
             if (usingProviders || !(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
                 fipsModeActive = false;

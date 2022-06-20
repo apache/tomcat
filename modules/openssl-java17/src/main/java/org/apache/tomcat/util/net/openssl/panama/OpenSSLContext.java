@@ -25,6 +25,7 @@ import jdk.incubator.foreign.ResourceScope;
 import jdk.incubator.foreign.SegmentAllocator;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
+import static org.apache.tomcat.util.openssl.openssl_compat_h.*;
 
 import java.io.File;
 import java.lang.invoke.MethodHandle;
@@ -150,6 +151,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             throw new IllegalStateException(e);
         }
     }
+
+    static final boolean OPENSSL_3 = (OpenSSL_version_num() >= 0x3000000fL);
 
     private final int minTlsVersion;
     private final int maxTlsVersion;
@@ -757,7 +760,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     // DH *(*tmp_dh_callback)(SSL *ssl, int is_export, int keylength)
     public static MemoryAddress openSSLCallbackTmpDH(MemoryAddress ssl, int isExport, int keylength) {
         var pkey = SSL_get_privatekey(ssl);
-        int type = (MemoryAddress.NULL.equals(pkey)) ? EVP_PKEY_NONE() : EVP_PKEY_get_base_id(pkey);
+        int type = (MemoryAddress.NULL.equals(pkey)) ? EVP_PKEY_NONE()
+                : (OPENSSL_3 ? EVP_PKEY_get_base_id(pkey) : EVP_PKEY_base_id(pkey));
         /*
          * OpenSSL will call us with either keylen == 512 or keylen == 1024
          * (see the definition of SSL_EXPORT_PKEYLENGTH in ssl_locl.h).
@@ -772,7 +776,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
          */
         int keylen = 0;
         if ((type == EVP_PKEY_RSA()) || (type == EVP_PKEY_DSA())) {
-            keylen = EVP_PKEY_get_bits(pkey);
+            keylen = (OPENSSL_3 ? EVP_PKEY_get_bits(pkey) : EVP_PKEY_bits(pkey));
         }
         for (int i = 0; i < OpenSSLLifecycleListener.dhParameters.length; i++) {
             if (keylen >= OpenSSLLifecycleListener.dhParameters[i].min) {

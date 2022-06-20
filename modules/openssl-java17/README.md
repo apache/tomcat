@@ -15,7 +15,7 @@ It can be built and run with Apache Tomcat 9.0 or newer.
 
 The module uses the OpenSSL 3.0 API. It requires an API compatible version of
 OpenSSL or a compatible alternative library, that can be loaded from the JVM
-library path.
+library path. OpenSSL 1.1 is also supported.
 
 Copy `tomcat-coyote-openssl-java17-1.0.jar` to the Apache Tomcat `lib` folder.
 
