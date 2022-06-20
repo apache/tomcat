@@ -137,6 +137,10 @@
         default value for the <code>jmvRoute</code> attribute of an Engine.
         (markt)
       </scode>
+      <update>
+        Update experimental Panama modules with support for OpenSSL 3.0+.
+        OpenSSL 1.1 remains supported. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
