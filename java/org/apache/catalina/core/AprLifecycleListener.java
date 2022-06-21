@@ -181,10 +181,8 @@ public class AprLifecycleListener implements LifecycleListener {
 
     }
 
-    private static void terminateAPR()
-        throws ClassNotFoundException, NoSuchMethodException,
-               IllegalAccessException, InvocationTargetException
-    {
+    private static void terminateAPR() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException {
         String methodName = "terminate";
         Method method = Class.forName("org.apache.tomcat.jni.Library")
             .getMethod(methodName, (Class [])null);
@@ -287,7 +285,7 @@ public class AprLifecycleListener implements LifecycleListener {
             return;
         }
         if (sslInitialized) {
-             //only once per VM
+            // Only once per VM
             return;
         }
 
@@ -309,7 +307,7 @@ public class AprLifecycleListener implements LifecycleListener {
         method.invoke(null, paramValues);
 
         // OpenSSL 3 onwards uses providers
-        boolean usingProviders = tcnMajor > 1 || (tcnVersion > 1233 && (SSL.version() & 0xF0000000L) > 2);
+        boolean usingProviders = tcnMajor > 1 || (tcnVersion > 1233 && (SSL.version() & 0xF0000000L) > 0x20000000);
 
         // Tomcat Native 1.x built with OpenSSL 1.x without explicitly enabling
         // FIPS and Tomcat Native < 1.2.34 built with OpenSSL 3.x will fail if
