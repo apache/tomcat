@@ -34,8 +34,8 @@ addons:
 install:
     - ARCH=`uname -p`
     - echo $ARCH
-    - JDK_X64="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9/OpenJDK11U-jdk_x64_linux_hotspot_11.0.11_9.tar.gz"
-    - JDK_ARM64="https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9/OpenJDK11U-jdk_aarch64_linux_hotspot_11.0.11_9.tar.gz"
+    - JDK_X64="https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.15%2B10/OpenJDK11U-jdk_x64_linux_hotspot_11.0.15_10.tar.gz"
+    - JDK_ARM64="https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.15%2B10/OpenJDK11U-jdk_aarch64_linux_hotspot_11.0.15_10.tar.gz"
     - if test "X$ARCH" = "Xaarch64"; then JDK_URL=$JDK_ARM64; else JDK_URL=$JDK_X64; fi
     - wget -q $JDK_URL && tar xzf OpenJDK*.tar.gz
     - mv jdk-11* jdk
