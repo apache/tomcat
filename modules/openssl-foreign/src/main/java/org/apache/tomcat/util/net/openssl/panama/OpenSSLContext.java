@@ -568,13 +568,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // List the ciphers that the client is permitted to negotiate
             if (minTlsVersion <= TLS1_2_VERSION()) {
                 if (SSL_CTX_set_cipher_list(state.sslCtx,
-                        SegmentAllocator.newNativeArena(state.contextMemorySession).allocateUtf8String(sslHostConfig.getCiphers())) <= 0) {
+                        SegmentAllocator.implicitAllocator().allocateUtf8String(sslHostConfig.getCiphers())) <= 0) {
                     log.warn(sm.getString("engine.failedCipherList", sslHostConfig.getCiphers()));
                 }
             }
             if (maxTlsVersion >= TLS1_3_VERSION() && (sslHostConfig.getCiphers() != SSLHostConfig.DEFAULT_TLS_CIPHERS)) {
                 if (SSL_CTX_set_ciphersuites(state.sslCtx,
-                        SegmentAllocator.newNativeArena(state.contextMemorySession).allocateUtf8String(sslHostConfig.getCiphers())) <= 0) {
+                        SegmentAllocator.implicitAllocator().allocateUtf8String(sslHostConfig.getCiphers())) <= 0) {
                     log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
                 }
             }
