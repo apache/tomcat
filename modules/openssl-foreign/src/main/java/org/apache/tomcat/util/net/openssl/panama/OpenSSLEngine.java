@@ -60,7 +60,6 @@ import static org.apache.tomcat.util.openssl.openssl_compat_h.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Asn1Parser;
-import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
@@ -337,6 +336,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         clearLastError();
         final int pos = src.position();
         final int len = src.remaining();
+
         if (src.isDirect()) {
             final int netWrote = BIO_write(networkBIO, MemorySegment.ofBuffer(src), len);
             if (netWrote > 0) {
@@ -346,12 +346,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 checkLastError();
             }
         } else {
-            // This uses unsafe and does not need to be used: the connector should be configured with direct buffers
-            ByteBuffer buf = ByteBuffer.allocateDirect(len);
-            try {
-                buf.put(src);
-                buf.flip();
-                final int netWrote = BIO_write(networkBIO, MemorySegment.ofBuffer(buf), len);
+            try (var memorySession = MemorySession.openConfined()) {
+                MemorySegment bufSegment = memorySession.allocateArray(ValueLayout.JAVA_BYTE, len);
+                MemorySegment.copy(src.array(), pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
+                final int netWrote = BIO_write(networkBIO, bufSegment, len);
                 if (netWrote > 0) {
                     src.position(pos + netWrote);
                     return netWrote;
@@ -359,9 +357,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     src.position(pos);
                     checkLastError();
                 }
-            } finally {
-                buf.clear();
-                ByteBufferUtils.cleanDirectBuffer(buf);
             }
         }
 
@@ -411,6 +406,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private int readEncryptedData(final MemoryAddress networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
         clearLastError();
         final int pos = dst.position();
+
         if (dst.isDirect()) {
             final int bioRead = BIO_read(networkBIO, MemorySegment.ofBuffer(dst), pending);
             if (bioRead > 0) {
@@ -420,23 +416,18 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 checkLastError();
             }
         } else {
-            // This uses unsafe and does not need to be used: the connector should be configured with direct buffers
-            final ByteBuffer buf = ByteBuffer.allocateDirect(pending);
-            try {
-                final int bioRead = BIO_read(networkBIO, MemorySegment.ofBuffer(buf), pending);
+            try (var memorySession = MemorySession.openConfined()) {
+                MemorySegment bufSegment = memorySession.allocateArray(ValueLayout.JAVA_BYTE, pending);
+                final int bioRead = BIO_read(networkBIO, bufSegment, pending);
                 if (bioRead > 0) {
-                    buf.limit(bioRead);
                     int oldLimit = dst.limit();
                     dst.limit(pos + bioRead);
-                    dst.put(buf);
+                    dst.put(bufSegment.asSlice(0, bioRead).toArray(ValueLayout.JAVA_BYTE));
                     dst.limit(oldLimit);
                     return bioRead;
                 } else {
                     checkLastError();
                 }
-            } finally {
-                buf.clear();
-                ByteBufferUtils.cleanDirectBuffer(buf);
             }
         }
 
