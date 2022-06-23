@@ -229,11 +229,11 @@ public class TestHttp2Limits extends Http2TestBase {
         }
 
         enableHttp2();
-        configureAndStartWebApplication();
 
         http2Protocol.setMaxHeaderCount(maxHeaderCount);
         ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setMaxHttpHeaderSize(maxHeaderSize);
 
+        configureAndStartWebApplication();
         openClientConnection();
         doHttpUpgrade();
         sendClientPreface();
@@ -471,7 +471,6 @@ public class TestHttp2Limits extends Http2TestBase {
     private void doTestPostWithTrailerHeaders(int maxTrailerCount, int maxTrailerSize,
             FailureMode failMode) throws Exception {
         enableHttp2();
-        configureAndStartWebApplication();
 
         ((AbstractHttp11Protocol<?>) http2Protocol.getHttp11Protocol()).setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
         http2Protocol.setMaxTrailerCount(maxTrailerCount);
@@ -479,6 +478,7 @@ public class TestHttp2Limits extends Http2TestBase {
         // Disable overhead protection for window update as it breaks some tests
         http2Protocol.setOverheadWindowUpdateThreshold(0);
 
+        configureAndStartWebApplication();
         openClientConnection();
         doHttpUpgrade();
         sendClientPreface();
