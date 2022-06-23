@@ -20,7 +20,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.StringJoiner;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
@@ -709,7 +715,7 @@ public class RemoteIpFilter extends GenericFilter {
         }
         StringJoiner result = new StringJoiner(", ");
         stringList.stream()
-            .filter(Objects::nonNull)
+            .filter(str -> str != null)
             .forEach(result::add);
         return result.toString();
     }
