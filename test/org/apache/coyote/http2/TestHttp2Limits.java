@@ -41,7 +41,7 @@ public class TestHttp2Limits extends Http2TestBase {
 
     @Test
     public void testSettingsOverheadLimits() throws Exception {
-        http2Connect(false);
+        http2Connect();
 
         for (int i = 0; i < 100; i++) {
             try {
