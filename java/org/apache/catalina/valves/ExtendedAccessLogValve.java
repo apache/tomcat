@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.StringJoiner;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpSession;
@@ -323,16 +324,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             if (null != response) {
                 Iterator<String> iter = response.getHeaders(header).iterator();
                 if (iter.hasNext()) {
-                    StringBuilder buffer = new StringBuilder();
-                    boolean first = true;
-                    while (iter.hasNext()) {
-                        if (first) {
-                            first = false;
-                        } else {
-                            buffer.append(',');
-                        }
-                        buffer.append(iter.next());
-                    }
+                    StringJoiner buffer = new StringJoiner(",");
+                    iter.forEachRemaining(buffer::add);
                     buf.append(wrap(buffer.toString()));
                 }
                 return ;

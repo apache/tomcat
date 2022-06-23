@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+import java.util.StringJoiner;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -1114,13 +1115,9 @@ public class ExpiresFilter extends FilterBase {
             return "";
         }
 
-        StringBuilder result = new StringBuilder();
-
-        for (int i = 0; i < ints.length; i++) {
-            result.append(ints[i]);
-            if (i < (ints.length - 1)) {
-                result.append(", ");
-            }
+        StringJoiner result = new StringJoiner(", ");
+        for (int anInt : ints) {
+            result.add(String.valueOf(anInt));
         }
         return result.toString();
     }

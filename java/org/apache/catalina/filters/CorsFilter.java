@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;
@@ -572,21 +573,11 @@ public class CorsFilter extends GenericFilter {
         if (joinSeparator != null) {
             separator = joinSeparator;
         }
-        StringBuilder buffer = new StringBuilder();
-        boolean isFirst = true;
-        for (String element : elements) {
-            if (!isFirst) {
-                buffer.append(separator);
-            } else {
-                isFirst = false;
-            }
-
-            if (element != null) {
-                buffer.append(element);
-            }
-        }
-
-        return buffer.toString();
+        StringJoiner sj = new StringJoiner(separator);
+        elements.stream()
+            .map(r -> r == null ? "": r)
+            .forEach(sj::add);
+        return sj.toString();
     }
 
 
