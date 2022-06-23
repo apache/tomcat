@@ -177,6 +177,11 @@
         Examples. Fix CVE-2022-34305, a low severity XSS vulnerability in the
         Form authentication example. (markt)
       </fix>
+      <fix>
+        Documentation. Expand the description of the <code>useSendfile</code>
+        attribute for HTTP/2 and reference the possibility of file locking when
+        using this feature on Windows operating systems. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
