@@ -141,6 +141,10 @@
         Update experimental Panama modules with support for OpenSSL 3.0+.
         OpenSSL 1.1 remains supported. (remm)
       </update>
+      <fix>
+        Correct a regression in the refactoring to support experimentation with
+        project Loom that broke HTTP/2 support if async IO was disabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
