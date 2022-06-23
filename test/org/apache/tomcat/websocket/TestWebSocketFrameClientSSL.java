@@ -140,11 +140,11 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
             Assert.fail("No error reported by Endpoint when timeout was expected");
         }
 
-        // Wait up to another 10 seconds for the connection to be closed -
+        // Wait again for the connection to be closed -
         // should be a lot faster.
         System.out.println("Waiting for connection to be closed");
         count = 0;
-        limit = (TesterFirehoseServer.SEND_TIME_OUT_MILLIS * 2) / 100;
+        limit = TesterFirehoseServer.WAIT_TIME_MILLIS / 100;
         while (TesterFirehoseServer.Endpoint.getOpenConnectionCount() != 0 && count < limit) {
             Thread.sleep(100);
             count ++;
