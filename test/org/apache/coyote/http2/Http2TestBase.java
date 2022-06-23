@@ -54,7 +54,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.IOTools;
-import org.apache.coyote.http11.Http11NioProtocol;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
@@ -609,7 +609,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         http2Protocol.setStreamReadTimeout(5000);
         http2Protocol.setStreamWriteTimeout(5000);
         http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
-        http2Protocol.setHttp11Protocol(new Http11NioProtocol());
+        http2Protocol.setHttp11Protocol((AbstractHttp11Protocol<?>) connector.getProtocolHandler());
         connector.addUpgradeProtocol(http2Protocol);
         if (tls) {
             // Enable TLS
