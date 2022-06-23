@@ -28,6 +28,7 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,6 +43,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -63,13 +68,28 @@ import org.apache.tomcat.util.net.TesterSupport;
  * Tests for compliance with the <a href="https://tools.ietf.org/html/rfc7540">
  * HTTP/2 specification</a>.
  */
-@org.junit.runner.RunWith(org.junit.runners.Parameterized.class)
+@RunWith(Parameterized.class)
 public abstract class Http2TestBase extends TomcatBaseTest {
 
-    @org.junit.runners.Parameterized.Parameters
-    public static Object[][] data() {
-        return new Object[Integer.getInteger("tomcat.test.http2.loopCount", 1).intValue()][0];
+    @Parameters(name = "{index}: loop [{0}], useAsyncIO[{1}]")
+    public static Collection<Object[]> data() {
+        int loopCount = Integer.getInteger("tomcat.test.http2.loopCount", 1).intValue();
+        List<Object[]> parameterSets = new ArrayList<>();
+
+        for (int loop = 0; loop < loopCount; loop++) {
+            for (Boolean useAsyncIO : TomcatBaseTest.booleans) {
+                parameterSets.add(new Object[] { Integer.valueOf(loop), useAsyncIO });
+            }
+        }
+
+        return parameterSets;
     }
+
+    @Parameter(0)
+    public int loop;
+
+    @Parameter(1)
+    public boolean useAsyncIO;
 
     // Nothing special about this date apart from it being the date I ran the
     // test that demonstrated that most HTTP/2 tests were failing because the
@@ -580,6 +600,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void enableHttp2(long maxConcurrentStreams, boolean tls) {
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
+        Assert.assertTrue(connector.setProperty("useAsyncIO", Boolean.toString(useAsyncIO)));
         http2Protocol = new UpgradableHttp2Protocol();
         // Short timeouts for now. May need to increase these for CI systems.
         http2Protocol.setReadTimeout(10000);

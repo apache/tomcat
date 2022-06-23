@@ -20,6 +20,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import jakarta.servlet.ServletException;
@@ -27,14 +30,50 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.tomcat.util.net.TesterSupport;
 
+@RunWith(Parameterized.class)
 public class TestLargeUpload extends Http2TestBase {
+
+    @Parameters(name = "{0}: {1}]")
+    public static Collection<Object[]> parameters() {
+        Collection<Object[]> baseData = Http2TestBase.data();
+
+        List<Object[]> parameterSets = new ArrayList<>();
+        for (Object[] base : baseData) {
+            parameterSets.add(new Object[] {
+                    base[0], base[1],
+                    "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+            parameterSets.add(new Object[] {
+                    base[0], base[1],
+                    "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        }
+
+        return parameterSets;
+    }
+
+    @Parameter(2)
+    public String connectorName;
+
+    @Parameter(3)
+    public boolean needApr;
+
+    @Parameter(4)
+    public String sslImplementationName;
+
 
     int bodySize = 13107;
     int bodyCount = 5;
@@ -113,6 +152,23 @@ public class TestLargeUpload extends Http2TestBase {
             } else {
                 resp.setStatus(HttpServletResponse.SC_OK);
             }
+        }
+    }
+
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
+
+        if (needApr) {
+            AprLifecycleListener listener = new AprLifecycleListener();
+            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
+            StandardServer server = (StandardServer) tomcat.getServer();
+            server.addLifecycleListener(listener);
         }
     }
 }
