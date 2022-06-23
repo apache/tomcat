@@ -62,19 +62,19 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             Integer.valueOf(511), Integer.valueOf(512), Integer.valueOf(513),
             Integer.valueOf(1023), Integer.valueOf(1024), Integer.valueOf(1025) };
 
-    @Parameter(0)
-    public boolean useLegacy;
-    @Parameter(1)
-    public int bufferSize;
     @Parameter(2)
-    public boolean useWriter;
+    public boolean useLegacy;
     @Parameter(3)
-    public int invalidWriteCount;
+    public int bufferSize;
     @Parameter(4)
-    public ResetType resetType;
+    public boolean useWriter;
     @Parameter(5)
-    public int validWriteCount;
+    public int invalidWriteCount;
     @Parameter(6)
+    public ResetType resetType;
+    @Parameter(7)
+    public int validWriteCount;
+    @Parameter(8)
     public boolean explicitFlush;
 
     @Test

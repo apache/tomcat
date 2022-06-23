@@ -23,6 +23,8 @@ import java.util.List;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import org.apache.coyote.http2.Http2TestBase;
+
 /*
  * Split into multiple tests as a single test takes so long it impacts the time
  * of an entire test run.
@@ -30,17 +32,22 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class TestHttpServletDoHeadValidWrite512 extends HttpServletDoHeadBaseTest {
 
-    @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4} {5} {6}")
+    @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4} {5} {6} {7} {8}")
     public static Collection<Object[]> parameters() {
+        Collection<Object[]> baseData = Http2TestBase.data();
 
         List<Object[]> parameterSets = new ArrayList<>();
-        for (Boolean l : booleans) {
-            for (Integer buf : BUFFERS) {
-                for (Boolean w : booleans) {
-                    for (Integer c1 : COUNTS) {
-                        for (ResetType rt : ResetType.values()) {
-                            for (Boolean f : booleans) {
-                                parameterSets.add(new Object[] { l, buf, w, c1, rt, Integer.valueOf(512), f });
+        for (Object[] base : baseData) {
+            for (Boolean l : booleans) {
+                for (Integer buf : BUFFERS) {
+                    for (Boolean w : booleans) {
+                        for (Integer c1 : COUNTS) {
+                            for (ResetType rt : ResetType.values()) {
+                                for (Boolean f : booleans) {
+                                    parameterSets.add(new Object[] {
+                                            base[0], base[1],
+                                            l, buf, w, c1, rt, Integer.valueOf(512), f });
+                                }
                             }
                         }
                     }
