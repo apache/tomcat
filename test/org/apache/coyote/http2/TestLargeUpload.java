@@ -47,26 +47,33 @@ import org.apache.tomcat.util.net.TesterSupport;
 @RunWith(Parameterized.class)
 public class TestLargeUpload extends Http2TestBase {
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameterized.Parameters(name = "{0}: {1}]")
     public static Collection<Object[]> parameters() {
+        Collection<Object[]> baseData = Http2TestBase.data();
+
         List<Object[]> parameterSets = new ArrayList<>();
-        parameterSets.add(new Object[] {
-                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
-        parameterSets.add(new Object[] {
-                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
-        parameterSets.add(new Object[] {
-                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+        for (Object[] base : baseData) {
+            parameterSets.add(new Object[] {
+                    base[0], base[1],
+                    "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+            parameterSets.add(new Object[] {
+                    base[0], base[1],
+                    "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+            parameterSets.add(new Object[] {
+                    base[0], base[1],
+                    "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+        }
 
         return parameterSets;
     }
 
-    @Parameter(0)
+    @Parameter(2)
     public String connectorName;
 
-    @Parameter(1)
+    @Parameter(3)
     public boolean needApr;
 
-    @Parameter(2)
+    @Parameter(4)
     public String sslImplementationName;
 
 
