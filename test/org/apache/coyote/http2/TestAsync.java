@@ -38,6 +38,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -54,21 +55,25 @@ public class TestAsync extends Http2TestBase {
 
     private static final int BLOCK_SIZE = 0x8000;
 
-    @Parameterized.Parameters(name = "{index}: expandConnectionFirst[{0}], " +
-            "connectionUnlimited[{1}], streamUnlimited[{2}], useNonContainerThreadForWrite[{3}]," +
-            "largeInitialWindow[{4}]")
+    @Parameterized.Parameters(name = "{index}: loop[{0}], useAsyncIO[{1}], expandConnectionFirst[{1}], " +
+            "connectionUnlimited[{2}], streamUnlimited[{3}], useNonContainerThreadForWrite[{4}]," +
+            "largeInitialWindow[{5}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
+        Collection<Object[]> baseData = Http2TestBase.data();
 
-        for (Boolean expandConnectionFirst : booleans) {
-            for (Boolean connectionUnlimited : booleans) {
-                for (Boolean streamUnlimited : booleans) {
-                    for (Boolean useNonContainerThreadForWrite : booleans) {
-                        for (Boolean largeInitialWindow : booleans) {
-                            parameterSets.add(new Object[] {
-                                    expandConnectionFirst, connectionUnlimited, streamUnlimited,
-                                    useNonContainerThreadForWrite, largeInitialWindow
-                            });
+        for (Object[] base : baseData) {
+            for (Boolean expandConnectionFirst : booleans) {
+                for (Boolean connectionUnlimited : booleans) {
+                    for (Boolean streamUnlimited : booleans) {
+                        for (Boolean useNonContainerThreadForWrite : booleans) {
+                            for (Boolean largeInitialWindow : booleans) {
+                                parameterSets.add(new Object[] {
+                                        base[0], base[1],
+                                        expandConnectionFirst, connectionUnlimited, streamUnlimited,
+                                        useNonContainerThreadForWrite, largeInitialWindow
+                                });
+                            }
                         }
                     }
                 }
@@ -78,22 +83,20 @@ public class TestAsync extends Http2TestBase {
     }
 
 
-    private final boolean expandConnectionFirst;
-    private final boolean connectionUnlimited;
-    private final boolean streamUnlimited;
-    private final boolean useNonContainerThreadForWrite;
-    private final boolean largeInitialWindow;
+    @Parameter(2)
+    public boolean expandConnectionFirst;
 
+    @Parameter(3)
+    public boolean connectionUnlimited;
 
-    public TestAsync(boolean expandConnectionFirst, boolean connectionUnlimited,
-            boolean streamUnlimited, boolean useNonContainerThreadForWrite,
-            boolean largeInitialWindow) {
-        this.expandConnectionFirst = expandConnectionFirst;
-        this.connectionUnlimited = connectionUnlimited;
-        this.streamUnlimited = streamUnlimited;
-        this.useNonContainerThreadForWrite = useNonContainerThreadForWrite;
-        this.largeInitialWindow = largeInitialWindow;
-    }
+    @Parameter(4)
+    public boolean streamUnlimited;
+
+    @Parameter(5)
+    public boolean useNonContainerThreadForWrite;
+
+    @Parameter(6)
+    public boolean largeInitialWindow;
 
 
     @Test

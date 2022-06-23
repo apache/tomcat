@@ -34,6 +34,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
@@ -49,20 +50,22 @@ public class TestStreamQueryString extends Http2TestBase {
     @Parameters
     public static Collection<Object[]> inputs() {
         List<Object[]> result = new ArrayList<>();
-        // Test ASCII characters from 32 to 126 inclusive
-        for (int i = 32; i < 128; i++) {
-            result.add(new String[] { "%" + HexUtils.toHexString(new byte[] { (byte) i})});
+        Collection<Object[]> baseData = Http2TestBase.data();
+
+        for (Object[] base : baseData) {
+            // Test ASCII characters from 32 to 126 inclusive
+            for (int i = 32; i < 128; i++) {
+                result.add(new Object[] {
+                        base[0], base[1],
+                       "%" + HexUtils.toHexString(new byte[] { (byte) i})});
+            }
         }
+
         return result;
     }
 
-
-    private final String queryValueToTest;
-
-
-    public TestStreamQueryString(String queryValueToTest) {
-        this.queryValueToTest = queryValueToTest;
-    }
+    @Parameter(2)
+    public String queryValueToTest;
 
 
     @Test
