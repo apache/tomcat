@@ -20,13 +20,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
@@ -532,7 +526,7 @@ public class RemoteIpFilter extends GenericFilter {
         public Enumeration<String> getHeaders(String name) {
             Map.Entry<String, List<String>> header = getHeaderEntry(name);
             if (header == null || header.getValue() == null) {
-                return Collections.enumeration(Collections.<String>emptyList());
+                return Collections.enumeration(Collections.emptyList());
             }
             return Collections.enumeration(header.getValue());
         }
@@ -713,16 +707,10 @@ public class RemoteIpFilter extends GenericFilter {
         if (stringList == null) {
             return "";
         }
-        StringBuilder result = new StringBuilder();
-        for (Iterator<String> it = stringList.iterator(); it.hasNext();) {
-            Object element = it.next();
-            if (element != null) {
-                result.append(element);
-                if (it.hasNext()) {
-                    result.append(", ");
-                }
-            }
-        }
+        StringJoiner result = new StringJoiner(", ");
+        stringList.stream()
+            .filter(Objects::nonNull)
+            .forEach(result::add);
         return result.toString();
     }
 
