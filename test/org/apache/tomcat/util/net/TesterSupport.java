@@ -262,7 +262,11 @@ public final class TesterSupport {
         } catch (Exception e) {
             Assume.assumeNoException(e);
         }
-        Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+        Connector connector = tomcat.getConnector();
+        if (!connector.getProtocolHandlerClassName().contains("Apr")) {
+            // Skip this for APR. It is not supported.
+            Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
+        }
     }
 
     public static void configureClientCertContext(Tomcat tomcat) {
