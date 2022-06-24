@@ -323,10 +323,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         connector.setScheme("https");
         connector.setSecure(true);
         Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
-        if (!connector.getProtocolHandlerClassName().contains("Apr")) {
-            // Skip this for APR. It is not supported.
-            Assert.assertTrue(connector.setProperty("sslImplementationName", sslImplementationName));
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
         sslHostConfig.setProtocols("TLSv1.2");
         connector.addSslHostConfig(sslHostConfig);
 
