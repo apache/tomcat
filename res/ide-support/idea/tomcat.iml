@@ -77,7 +77,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/easymock-3.6/easymock-3.6.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/easymock-4.3/easymock-4.3.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
