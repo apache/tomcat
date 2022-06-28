@@ -59,11 +59,11 @@ class Http2AsyncParser extends Http2Parser {
 
     private class PrefaceCompletionHandler extends FrameCompletionHandler {
 
-        private boolean prefaceValidated = false;
-
         private final WebConnection webConnection;
         private final Stream stream;
         private final byte[] prefaceData;
+
+        private volatile boolean prefaceValidated = false;
 
         private PrefaceCompletionHandler(WebConnection webConnection, Stream stream, byte[] prefaceData, ByteBuffer... buffers) {
             super(FrameType.SETTINGS, buffers);
@@ -166,15 +166,15 @@ class Http2AsyncParser extends Http2Parser {
         private final FrameType expected;
         protected final ByteBuffer[] buffers;
 
-        private boolean parsedFrameHeader = false;
-        private boolean validated = false;
-        private CompletionState state = null;
-        protected int payloadSize;
-        protected int frameTypeId;
-        protected FrameType frameType;
-        protected int flags;
-        protected int streamId;
-        protected boolean streamException = false;
+        private volatile boolean parsedFrameHeader = false;
+        private volatile boolean validated = false;
+        private volatile CompletionState state = null;
+        protected volatile int payloadSize;
+        protected volatile int frameTypeId;
+        protected volatile FrameType frameType;
+        protected volatile int flags;
+        protected volatile int streamId;
+        protected volatile boolean streamException = false;
 
         private FrameCompletionHandler(FrameType expected, ByteBuffer... buffers) {
             this.expected = expected;
