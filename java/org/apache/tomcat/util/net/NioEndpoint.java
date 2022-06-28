@@ -1688,7 +1688,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                 }
                             }
                             if (nBytes != 0 || (!buffersArrayHasRemaining(buffers, offset, length) &&
-                                    !socketOrNetworkBufferHasDataLeft())) {
+                                    (read || !socketOrNetworkBufferHasDataLeft()))) {
                                 completionDone = false;
                             }
                         }
@@ -1697,7 +1697,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     }
                 }
                 if (nBytes > 0 || (nBytes == 0 && !buffersArrayHasRemaining(buffers, offset, length) &&
-                        !socketOrNetworkBufferHasDataLeft())) {
+                        (read || !socketOrNetworkBufferHasDataLeft()))) {
                     // The bytes processed are only updated in the completion handler
                     completion.completed(Long.valueOf(nBytes), this);
                 } else if (nBytes < 0 || getError() != null) {
