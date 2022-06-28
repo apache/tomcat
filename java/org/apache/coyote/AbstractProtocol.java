@@ -942,7 +942,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
                                 if (((InternalHttpUpgradeHandler) httpUpgradeHandler).hasAsyncIO()) {
                                     // The handler will initiate all further I/O
-                                    state = SocketState.UPGRADED;
+                                    state = SocketState.ASYNC_IO;
                                 }
                             }
                         }
@@ -978,6 +978,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         longPoll(wrapper, processor);
                         getProtocol().addWaitingProcessor(processor);
                     }
+                } else if (state == SocketState.ASYNC_IO) {
+                    // Don't add sockets back to the poller.
+                    // The handler will initiate all further I/O
                 } else if (state == SocketState.SUSPENDED) {
                     // Don't add sockets back to the poller.
                     // The resumeProcessing() method will add this socket
