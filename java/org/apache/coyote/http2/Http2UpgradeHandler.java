@@ -393,14 +393,21 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 }
 
                 if (connectionState.get() != ConnectionState.CLOSED) {
-                    result = SocketState.UPGRADED;
+                    if (socketWrapper.hasAsyncIO()) {
+                        result = SocketState.ASYNC_IO;
+                    } else {
+                        result = SocketState.UPGRADED;
+                    }
                 }
                 break;
 
             case OPEN_WRITE:
                 processWrites();
-
-                result = SocketState.UPGRADED;
+                if (socketWrapper.hasAsyncIO()) {
+                    result = SocketState.ASYNC_IO;
+                } else {
+                    result = SocketState.UPGRADED;
+                }
                 break;
 
             case TIMEOUT:
