@@ -329,7 +329,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Might not be necessary. init() will handle that.
         init(null);
 
-
         SocketState result = SocketState.CLOSED;
 
         try {
@@ -337,7 +336,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             case OPEN_READ:
                 socketWrapper.getLock().lock();
                 try {
-                    if (!socketWrapper.canWrite()) {
+                    if (socketWrapper.canWrite()) {
                         // Only send a ping if there is no other data waiting to be sent.
                         // Ping manager will ensure they aren't sent too frequently.
                         pingManager.sendPing(false);
