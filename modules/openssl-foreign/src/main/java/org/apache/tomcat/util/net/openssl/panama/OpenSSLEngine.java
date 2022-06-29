@@ -299,12 +299,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private int writePlaintextData(final MemoryAddress ssl, final ByteBuffer src) throws SSLException {
         clearLastError();
         final int pos = src.position();
-        final int limit = src.limit();
-        final int len = Math.min(limit - pos, MAX_PLAINTEXT_LENGTH);
-        final int sslWrote;
+        final int len = Math.min(src.limit() - pos, MAX_PLAINTEXT_LENGTH);
 
         if (src.isDirect()) {
-            sslWrote = SSL_write(ssl, MemorySegment.ofBuffer(src), len);
+            final int sslWrote = SSL_write(ssl, MemorySegment.ofBuffer(src), len);
             if (sslWrote > 0) {
                 src.position(pos + sslWrote);
                 return sslWrote;
@@ -315,7 +313,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             try (var memorySession = MemorySession.openConfined()) {
                 MemorySegment bufSegment = memorySession.allocateArray(ValueLayout.JAVA_BYTE, len);
                 MemorySegment.copy(src.array(), pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
-                sslWrote = SSL_write(ssl, bufSegment, len);
+                final int sslWrote = SSL_write(ssl, bufSegment, len);
                 if (sslWrote > 0) {
                     src.position(pos + sslWrote);
                     return sslWrote;
@@ -375,20 +373,19 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             final int len = dst.remaining();
             final int sslRead = SSL_read(ssl, MemorySegment.ofBuffer(dst), len);
             if (sslRead > 0) {
-                dst.position(dst.position() + sslRead);
+                dst.position(pos + sslRead);
                 return sslRead;
             } else {
                 checkLastError();
             }
         } else {
-            final int limit = dst.limit();
-            final int len = Math.min(MAX_ENCRYPTED_PACKET_LENGTH, limit - pos);
+            final int len = Math.min(MAX_ENCRYPTED_PACKET_LENGTH, dst.limit() - pos);
             try (var memorySession = MemorySession.openConfined()) {
                 MemorySegment bufSegment = memorySession.allocateArray(ValueLayout.JAVA_BYTE, len);
                 final int sslRead = SSL_read(ssl, bufSegment, len);
                 if (sslRead > 0) {
                     MemorySegment.copy(bufSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), pos, sslRead);
-                    dst.position(dst.position() + sslRead);
+                    dst.position(pos + sslRead);
                     return sslRead;
                 } else {
                     checkLastError();
@@ -420,10 +417,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 MemorySegment bufSegment = memorySession.allocateArray(ValueLayout.JAVA_BYTE, pending);
                 final int bioRead = BIO_read(networkBIO, bufSegment, pending);
                 if (bioRead > 0) {
-                    int oldLimit = dst.limit();
-                    dst.limit(pos + bioRead);
-                    dst.put(bufSegment.asSlice(0, bioRead).toArray(ValueLayout.JAVA_BYTE));
-                    dst.limit(oldLimit);
+                    MemorySegment.copy(bufSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), pos, bioRead);
+                    dst.position(pos + bioRead);
                     return bioRead;
                 } else {
                     checkLastError();
