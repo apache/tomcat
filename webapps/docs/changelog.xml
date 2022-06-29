@@ -164,6 +164,12 @@
         unexpectedly modified some TLS configurations when running on a Java 8
         JDK. (markt)
       </fix>
+      <fix>
+        <bug>66134</bug>: The NSIS based Tomcat installer for Windows now
+        correctly handles the combination of <code>TomcatAdminRoles</code>
+        defined in a configuration file and selecting the Manager and/or
+        Host Manager web applications in the installer's GUI. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
