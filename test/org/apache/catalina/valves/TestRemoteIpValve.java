@@ -17,9 +17,9 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.ServletException;
 
@@ -1127,7 +1127,7 @@ public class TestRemoteIpValve {
         // client ip
         request.setRemoteAddr("192.168.0.10");
         request.setRemoteHost("192.168.0.10");
-        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130:1234");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("2001:db8:cafe::17:1234");
         // protocol
         request.setServerPort(8080);
         request.getCoyoteRequest().scheme().setString("http");
@@ -1137,7 +1137,7 @@ public class TestRemoteIpValve {
 
         // VERIFY
 
-        Assert.assertEquals("140.211.11.130:1234", remoteAddrAndHostTrackerValve.getRemoteAddr());
+        Assert.assertEquals("2001:db8:cafe::17:1234", remoteAddrAndHostTrackerValve.getRemoteAddr());
    }
 
     @Test
@@ -1169,6 +1169,32 @@ public class TestRemoteIpValve {
 
         Assert.assertEquals("140.211.11.130:1234", remoteAddrAndHostTrackerValve.getRemoteAddr());
    }
+
+    @Test
+    public void testForwardedHeaderSplit() {
+        String[] strings = RemoteIpValve.commaDelimitedListToStringArray("for=192.0.2.60, for=203.0.113.43");
+        assertArrayEquals(new String[]{
+            "for=192.0.2.60",
+            "for=203.0.113.43",
+        }, strings);
+    }
+
+    @Test
+    public void testParseRFC7239() {
+        Map<String, StringJoiner> map = RemoteIpValve.parseRFC7239("for=192.0.2.60\", For=\"[2001:db8:cafe::17]:4711\",for=\"_mdn\",for=unknown;proto=http;by=203.0.113.43, By=192.168.1.1");
+        Assert.assertEquals("[2001:db8:cafe::17]:4711", map.get("for").toString());
+        Assert.assertEquals("203.0.113.43, 192.168.1.1",map.get("by").toString());
+        Assert.assertEquals("http", map.get("proto").toString());
+    }
+
+    @Test
+    public void testKv(){
+        String str = "for=192.1.1.1";
+        int i = str.indexOf("=");
+        System.out.println(i);
+        System.out.println(str.substring(1,str.length()-1));
+        System.out.println(str.substring(i+1, str.length()));
+    }
 
     private void assertArrayEquals(String[] expected, String[] actual) {
         if (expected == null) {

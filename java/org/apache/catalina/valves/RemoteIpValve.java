@@ -19,9 +19,7 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Deque;
-import java.util.Enumeration;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletException;
@@ -427,6 +425,21 @@ public class RemoteIpValve extends ValveBase {
     private String remoteIpHeader = "X-Forwarded-For";
 
     /**
+     * Some properties related to RFC7239
+     */
+    private static final String FORWARDED_HEADER = "Forwarded";
+    private static final String BY = "by";
+    private static final String FOR = "for";
+    private static final String HOST = "host";
+    private static final String PROTO = "proto";
+
+
+    /**
+     * legacy、rfc7239、both
+     */
+    private Strategy strategy;
+
+    /**
      * @see #setRequestAttributesEnabled(boolean)
      */
     private boolean requestAttributesEnabled = true;
@@ -592,6 +605,8 @@ public class RemoteIpValve extends ValveBase {
         final int originalLocalPort = request.getLocalPort();
         final String originalProxiesHeader = request.getHeader(proxiesHeader);
         final String originalRemoteIpHeader = request.getHeader(remoteIpHeader);
+        final String originalForwardedHeader = request.getHeader(FORWARDED_HEADER);
+
         boolean isInternal = internalProxies != null &&
                 internalProxies.matcher(originalRemoteAddr).matches();
 
@@ -766,6 +781,62 @@ public class RemoteIpValve extends ValveBase {
                 }
             }
         }
+    }
+
+    public static String parseHeaderValue(String value,String flag) {
+        return null;
+    }
+
+    public static Map<String,StringJoiner> parseRFC7239(String rfc7239Value) {
+        String[] forwardedPairs = rfc7239Value.split(";");
+        Map<String, StringJoiner> result = new HashMap<>();
+        for (String forwardedPair : forwardedPairs) {
+            String[] forwardedPairItems = commaDelimitedListToStringArray(forwardedPair);
+            for (String fpi : forwardedPairItems) {
+                int equalsIndex = fpi.indexOf("=");
+                // invalid forwarded pair
+                if (equalsIndex == -1 || equalsIndex == 0 || equalsIndex == fpi.length() - 1) {
+                    continue;
+                }
+                String key = fpi.substring(0, equalsIndex).toLowerCase(Locale.ROOT);
+                String value = fpi.substring(equalsIndex + 1);
+                switch (key) {
+                    case FOR:
+                        String v;
+                        boolean hasFirstQuote = value.startsWith("\"");
+                        boolean hasLastQuote = value.endsWith("\"");
+                        if (value.length() > 2 && hasFirstQuote && hasLastQuote) {
+                            v = value.substring(1, value.length() - 1);
+                        } else if (hasFirstQuote || hasLastQuote) {
+                            // invalid identifier,maybe throw exception ?
+                            continue;
+                        } else {
+                            v = value;
+                        }
+                        if (!v.startsWith("_") && !"unknown".equals(v)) {
+                            result.computeIfAbsent(key, k -> new StringJoiner(", ")).add(v);
+                        }
+                        break;
+                    case HOST:
+                    case PROTO:
+                        if (!result.containsKey(key)) {
+                            StringJoiner sj = new StringJoiner(", ").add(value);
+                            result.put(key, sj);
+                        }
+                        break;
+                    case BY:
+                        if (!value.startsWith("_") && !"unknown".equals(value)) {
+                            result.computeIfAbsent(key, k -> new StringJoiner(", ")).add(value);
+                        }
+                        break;
+                    default:
+                        // maybe throw exception ?
+                        break;
+                }
+            }
+        }
+
+        return result;
     }
 
     /*
@@ -957,5 +1028,10 @@ public class RemoteIpValve extends ValveBase {
         } else {
             this.trustedProxies = Pattern.compile(trustedProxies);
         }
+    }
+    enum Strategy {
+        LEGACY,
+        RFC7239,
+        BOTH
     }
 }
