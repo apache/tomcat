@@ -47,6 +47,7 @@ Unicode true
 !include "FileFunc.nsh"
 !include "TextFunc.nsh"
 ${StrRep}
+${Using:StrFunc} StrLoc
 
 Var JavaHome
 Var JavaExe
@@ -66,6 +67,10 @@ Var TomcatAdminEnable
 Var TomcatAdminUsername
 Var TomcatAdminPassword
 Var TomcatAdminRoles
+
+Var TomcatAdminEnableConfigured
+Var TomcatAdminRolesConfigured
+Var TomcatMenuEntriesEnableConfigured
 
 ; Variables that store handles of dialog controls
 Var CtlJavaHome
@@ -488,6 +493,11 @@ Function .onInit
   ${EndIf}
   ClearErrors
 
+  ;take a copy of the default / configured values
+  StrCpy $TomcatAdminEnableConfigured $TomcatAdminEnable
+  StrCpy $TomcatAdminRolesConfigured $TomcatAdminRoles
+  StrCpy $TomcatMenuEntriesEnableConfigured $TomcatMenuEntriesEnable
+
 FunctionEnd
 
 Function pageChooseJVM
@@ -539,15 +549,22 @@ FunctionEnd
 ; It updates options based on what components were selected.
 ;
 Function pageComponentsLeave
-  StrCpy $TomcatAdminEnable "0"
-  StrCpy $TomcatAdminRoles ""
-  StrCpy $TomcatMenuEntriesEnable "0"
+  StrCpy $TomcatAdminEnable $TomcatAdminEnableConfigured
+  StrCpy $TomcatAdminRoles $TomcatAdminRolesConfigured
+  StrCpy $TomcatMenuEntriesEnable $TomcatMenuEntriesEnableConfigured
 
   SectionGetFlags ${SecManager} $0
   IntOp $0 $0 & ${SF_SELECTED}
   ${If} $0 <> 0
     StrCpy $TomcatAdminEnable "1"
-    StrCpy $TomcatAdminRoles "manager-gui"
+    ${If} $TomcatAdminRoles != ""
+      ${StrLoc} $0 $TomcatAdminRoles "manager-gui" 0
+      ${If} $0 == ""
+        StrCpy $TomcatAdminRoles "$TomcatAdminRoles,manager-gui"
+      ${EndIf}
+    ${Else}
+      StrCpy $TomcatAdminRoles "manager-gui"
+    ${EndIf}
   ${EndIf}
 
   SectionGetFlags ${SecHostManager} $0
@@ -555,7 +572,10 @@ Function pageComponentsLeave
   ${If} $0 <> 0
     StrCpy $TomcatAdminEnable "1"
     ${If} $TomcatAdminRoles != ""
-      StrCpy $TomcatAdminRoles "admin-gui,$TomcatAdminRoles"
+      ${StrLoc} $0 $TomcatAdminRoles "admin-gui" 0
+      ${If} $0 == ""
+        StrCpy $TomcatAdminRoles "$TomcatAdminRoles,admin-gui"
+      ${EndIf}
     ${Else}
       StrCpy $TomcatAdminRoles "admin-gui"
     ${EndIf}
