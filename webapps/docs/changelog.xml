@@ -222,7 +222,7 @@
         <code>org.apache.tomcat.util.threads.res</code> package. The
         <code>LocalStrings*.properties</code> files in that package were moved
         to <code>org.apache.tomcat.util.threads</code> package for consistency
-        with the rest of the Tomcat code base.
+        with the rest of the Tomcat code base. (markt)
       </fix>
     </changelog>
   </subsection>
