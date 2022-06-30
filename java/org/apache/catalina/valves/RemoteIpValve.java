@@ -862,26 +862,51 @@ public class RemoteIpValve extends ValveBase {
     }
 
     public static String spliceRFC7239Element(Map<String, List<String>> elements) {
-        StringJoiner result = new StringJoiner(";");
+        StringBuilder result = new StringBuilder();
+        String ipv6Format = "%s=\"%s\"";
+        String otherFormat = "%s=%s";
+        boolean semicolonFirst = true;
         for (Map.Entry<String, List<String>> entry : elements.entrySet()) {
-            StringJoiner forIdentifier = new StringJoiner(", ");
+            if (semicolonFirst) {
+                semicolonFirst = false;
+            } else {
+                result.append(";");
+            }
             switch (entry.getKey().toLowerCase(Locale.ROOT)) {
                 case FOR:
                 case HOST:
-                    entry.getValue().stream()
-                        // ipv6 need quoted string
-                        .map(v -> v.startsWith("[") ? "\"" + v + "\"" : v)
-                        .map(v -> entry.getKey() + "=" + v)
-                        .forEach(forIdentifier::add);
-                    result.merge(forIdentifier);
+                    StringBuilder item = new StringBuilder();
+                    boolean first = true;
+                    for (String value : entry.getValue()) {
+                        if (value.startsWith("[")) {
+                            value = String.format(ipv6Format, entry.getKey(), value);
+                        } else {
+                            value = String.format(otherFormat, entry.getKey(), value);
+                        }
+                        if (first) {
+                            first = false;
+                        } else {
+                            item.append(", ");
+                        }
+                        item.append(value);
+                    }
+                    result.append(item);
                     break;
                 case BY:
                 case PROTO:
-                    entry.getValue().stream().map(v -> entry.getKey() + "=" + v).forEach(forIdentifier::add);
-                    result.merge(forIdentifier);
-                    break;
                 default:
-
+                    item = new StringBuilder();
+                    first = true;
+                    for (String value : entry.getValue()) {
+                        value = String.format(otherFormat, entry.getKey(), value);
+                        if (first) {
+                            first = false;
+                        } else {
+                            item.append(", ");
+                        }
+                        item.append(value);
+                    }
+                    result.append(item);
             }
         }
         return result.toString();
@@ -913,21 +938,34 @@ public class RemoteIpValve extends ValveBase {
                             v = value;
                         }
                         if (!v.startsWith("_") && !"unknown".equals(v)) {
-                            result.computeIfAbsent(key, k -> new LinkedList<>()).add(v);
+                            value = v;
+                        } else {
+                            value = null;
                         }
-                        break;
-                    case PROTO:
-                        result.computeIfAbsent(key, k -> new LinkedList<>()).add(value);
                         break;
                     case BY:
                     case HOST:
                         if (!value.startsWith("_") && !"unknown".equals(value)) {
-                            result.computeIfAbsent(key, k -> new LinkedList<>()).add(value);
+                            // do nothing
+                        } else {
+                            value = null;
+                        }
+                        break;
+                    case PROTO:
+                        if (!"http".equalsIgnoreCase(value) && !"https".equalsIgnoreCase(value)) {
+                            value = null;
                         }
                         break;
                     default:
-                        // maybe throw exception ?
                         break;
+                }
+                if (value != null) {
+                    List<String> item = result.get(key);
+                    if (item == null) {
+                        item = new LinkedList<>();
+                        result.put(key, item);
+                    }
+                    item.add(value);
                 }
             }
         }
