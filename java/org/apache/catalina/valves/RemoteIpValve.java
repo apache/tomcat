@@ -424,6 +424,8 @@ public class RemoteIpValve extends ValveBase {
      */
     private String remoteIpHeader = "X-Forwarded-For";
 
+    private boolean isRFC7239Only = false;
+
     /**
      * Some properties related to RFC7239
      */
@@ -433,11 +435,6 @@ public class RemoteIpValve extends ValveBase {
     private static final String HOST = "host";
     private static final String PROTO = "proto";
 
-
-    /**
-     * legacy、rfc7239、both
-     */
-    private Strategy strategy;
 
     /**
      * @see #setRequestAttributesEnabled(boolean)
@@ -588,6 +585,16 @@ public class RemoteIpValve extends ValveBase {
             return null;
         }
         return trustedProxies.toString();
+    }
+
+    public boolean isInternalProxy(String originalRemoteAddr) {
+        return internalProxies != null &&
+            internalProxies.matcher(originalRemoteAddr).matches();
+    }
+
+    public boolean isTrustedProxy(String originalRemoteAddr) {
+        return (trustedProxies != null &&
+            trustedProxies.matcher(originalRemoteAddr).matches());
     }
 
     /**
@@ -783,13 +790,105 @@ public class RemoteIpValve extends ValveBase {
         }
     }
 
-    public static String parseHeaderValue(String value,String flag) {
-        return null;
+    public void handleRemoteIpHeaderValue(Request request, String[] remoteIpHeaderValue) {
+        String remoteIp = null;
+        // https://juejin.cn/post/6872627908582572039
+        Deque<String> proxiesHeaderValue = new LinkedList<>();
+        int idx;
+        if (!isInternalProxy(request.getRemoteAddr())) {
+            proxiesHeaderValue.addFirst(request.getRemoteAddr());
+        }
+        // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
+        for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
+            String currentRemoteIp = remoteIpHeaderValue[idx];
+            remoteIp = currentRemoteIp;
+            if (isInternalProxy(currentRemoteIp)) {
+                // do nothing, internalProxies IPs are not appended to the
+            } else if (isTrustedProxy(currentRemoteIp)) {
+                proxiesHeaderValue.addFirst(currentRemoteIp);
+            } else {
+                idx--; // decrement idx because break statement doesn't do it
+                break;
+            }
+        }
+        // continue to loop on remoteIpHeaderValue to build the new value of the remoteIpHeader
+        LinkedList<String> newRemoteIpHeaderValue = new LinkedList<>();
+        for (; idx >= 0; idx--) {
+            String currentRemoteIp = remoteIpHeaderValue[idx];
+            newRemoteIpHeaderValue.addFirst(currentRemoteIp);
+        }
+        if (remoteIp != null) {
+
+            request.setRemoteAddr(remoteIp);
+            if (request.getConnector().getEnableLookups()) {
+                // This isn't a lazy lookup but that would be a little more
+                // invasive - mainly in Request.getRemoteHost() - and if
+                // enableLookups is true it seems reasonable that the
+                // hotsname will be required so look it up here.
+                try {
+                    InetAddress inetAddress = InetAddress.getByName(remoteIp);
+                    // We know we need a DNS look up so use getCanonicalHostName()
+                    request.setRemoteHost(inetAddress.getCanonicalHostName());
+                } catch (UnknownHostException e) {
+                    log.debug(sm.getString("remoteIpValve.invalidRemoteAddress", remoteIp), e);
+                    request.setRemoteHost(remoteIp);
+                }
+            } else {
+                request.setRemoteHost(remoteIp);
+            }
+
+            if (proxiesHeaderValue.size() == 0) {
+                request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
+            } else {
+                String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
+                request.getCoyoteRequest().getMimeHeaders().setValue(proxiesHeader).setString(commaDelimitedListOfProxies);
+            }
+            if (newRemoteIpHeaderValue.size() == 0) {
+                request.getCoyoteRequest().getMimeHeaders().removeHeader(remoteIpHeader);
+            } else {
+                String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
+                request.getCoyoteRequest().getMimeHeaders().setValue(remoteIpHeader).setString(commaDelimitedRemoteIpHeaderValue);
+            }
+        }
     }
 
-    public static Map<String,StringJoiner> parseRFC7239(String rfc7239Value) {
-        String[] forwardedPairs = rfc7239Value.split(";");
-        Map<String, StringJoiner> result = new HashMap<>();
+    public static void parseRFC7239(Request request, Response response) {
+
+        HashMap<String, List<String>> result = new HashMap<>();
+        for (Enumeration<String> e = request.getHeaders(FORWARDED_HEADER); e.hasMoreElements(); ) {
+            parseRFC7239Value(e.nextElement(), result);
+        }
+
+    }
+
+    public static String spliceRFC7239Element(Map<String, List<String>> elements) {
+        StringJoiner result = new StringJoiner(";");
+        for (Map.Entry<String, List<String>> entry : elements.entrySet()) {
+            StringJoiner forIdentifier = new StringJoiner(", ");
+            switch (entry.getKey().toLowerCase(Locale.ROOT)) {
+                case FOR:
+                case HOST:
+                    entry.getValue().stream()
+                        // ipv6 need quoted string
+                        .map(v -> v.startsWith("[") ? "\"" + v + "\"" : v)
+                        .map(v -> entry.getKey() + "=" + v)
+                        .forEach(forIdentifier::add);
+                    result.merge(forIdentifier);
+                    break;
+                case BY:
+                case PROTO:
+                    entry.getValue().stream().map(v -> entry.getKey() + "=" + v).forEach(forIdentifier::add);
+                    result.merge(forIdentifier);
+                    break;
+                default:
+
+            }
+        }
+        return result.toString();
+    }
+
+    public static void parseRFC7239Value(String forwardedElement, Map<String, List<String>> result) {
+        String[] forwardedPairs = forwardedElement.split(";");
         for (String forwardedPair : forwardedPairs) {
             String[] forwardedPairItems = commaDelimitedListToStringArray(forwardedPair);
             for (String fpi : forwardedPairItems) {
@@ -814,19 +913,16 @@ public class RemoteIpValve extends ValveBase {
                             v = value;
                         }
                         if (!v.startsWith("_") && !"unknown".equals(v)) {
-                            result.computeIfAbsent(key, k -> new StringJoiner(", ")).add(v);
+                            result.computeIfAbsent(key, k -> new LinkedList<>()).add(v);
                         }
                         break;
-                    case HOST:
                     case PROTO:
-                        if (!result.containsKey(key)) {
-                            StringJoiner sj = new StringJoiner(", ").add(value);
-                            result.put(key, sj);
-                        }
+                        result.computeIfAbsent(key, k -> new LinkedList<>()).add(value);
                         break;
                     case BY:
+                    case HOST:
                         if (!value.startsWith("_") && !"unknown".equals(value)) {
-                            result.computeIfAbsent(key, k -> new StringJoiner(", ")).add(value);
+                            result.computeIfAbsent(key, k -> new LinkedList<>()).add(value);
                         }
                         break;
                     default:
@@ -835,8 +931,6 @@ public class RemoteIpValve extends ValveBase {
                 }
             }
         }
-
-        return result;
     }
 
     /*
@@ -1028,10 +1122,5 @@ public class RemoteIpValve extends ValveBase {
         } else {
             this.trustedProxies = Pattern.compile(trustedProxies);
         }
-    }
-    enum Strategy {
-        LEGACY,
-        RFC7239,
-        BOTH
     }
 }

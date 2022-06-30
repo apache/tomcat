@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
 import jakarta.servlet.ServletException;
 
 import org.junit.Assert;
@@ -1181,10 +1182,33 @@ public class TestRemoteIpValve {
 
     @Test
     public void testParseRFC7239() {
-        Map<String, StringJoiner> map = RemoteIpValve.parseRFC7239("for=192.0.2.60\", For=\"[2001:db8:cafe::17]:4711\",for=\"_mdn\",for=unknown;proto=http;by=203.0.113.43, By=192.168.1.1");
-        Assert.assertEquals("[2001:db8:cafe::17]:4711", map.get("for").toString());
-        Assert.assertEquals("203.0.113.43, 192.168.1.1",map.get("by").toString());
-        Assert.assertEquals("http", map.get("proto").toString());
+        Map<String, List<String>> result = new HashMap<>();
+        RemoteIpValve.parseRFC7239Value(
+            "proto=http;for=203.0.113.43, for=\"[2001:db8:cafe::17]:4711\", for=192.0.2.60;host=proxy1, host=\"[2001:db8:cafe::17]:4711\", host=192.0.2.60",
+            result);
+        System.out.println(result);
+    }
+
+    @Test
+    public void testSpliceRFC7239() {
+        Map<String, List<String>> list = new HashMap<>();
+        list.put("for", Lists.newArrayList("203.0.113.43","[2001:db8:cafe::17]:4711","192.0.2.60"));
+        list.put("host",Lists.newArrayList("proxy1","[2001:db8:cafe::17]:4711","192.0.2.60"));
+        list.put("proto",Lists.newArrayList("http"));
+        System.out.println(RemoteIpValve.spliceRFC7239Element(list));
+
+    }
+
+    @Test
+    public void testRFC7239ParseAndSplice() {
+        Map<String, List<String>> result = new HashMap<>();
+        String testStr = "proto=http;for=203.0.113.43, for=\"[2001:db8:cafe::17]\", for=192.0.2.60;host=proxy1, host=\"[2001:db8:cafe::17]:4711\", host=192.0.2.60";
+        RemoteIpValve.parseRFC7239Value(
+            testStr,
+            result);
+        System.out.println(result);
+        String resultStr = RemoteIpValve.spliceRFC7239Element(result);
+        System.out.println(resultStr);
     }
 
     @Test
