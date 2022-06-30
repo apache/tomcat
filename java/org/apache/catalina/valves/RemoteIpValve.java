@@ -424,7 +424,7 @@ public class RemoteIpValve extends ValveBase {
      */
     private String remoteIpHeader = "X-Forwarded-For";
 
-    private boolean isRFC7239Only = false;
+    private boolean supportRFC7239Only = false;
 
     /**
      * Some properties related to RFC7239
@@ -454,6 +454,10 @@ public class RemoteIpValve extends ValveBase {
     public RemoteIpValve() {
         // Async requests are supported with this valve
         super(true);
+    }
+
+    public void setSupportRFC7239Only(boolean rfc7239Only) {
+        this.supportRFC7239Only = rfc7239Only;
     }
 
     /**
@@ -612,26 +616,36 @@ public class RemoteIpValve extends ValveBase {
         final int originalLocalPort = request.getLocalPort();
         final String originalProxiesHeader = request.getHeader(proxiesHeader);
         final String originalRemoteIpHeader = request.getHeader(remoteIpHeader);
-        final String originalForwardedHeader = request.getHeader(FORWARDED_HEADER);
+        Map<String,List<String>> originalForwardedValue = null;
 
-        boolean isInternal = internalProxies != null &&
-                internalProxies.matcher(originalRemoteAddr).matches();
+        boolean isInternal = isInternalProxy(originalRemoteAddr);
 
-        if (isInternal || (trustedProxies != null &&
-                trustedProxies.matcher(originalRemoteAddr).matches())) {
+        if (isInternal || isTrustedProxy(originalRemoteAddr)) {
+            Map<String, List<String>> forwardedValue = new HashMap<>();
             String remoteIp = null;
-            Deque<String> proxiesHeaderValue = new LinkedList<>();
-            StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
-
-            for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
-                if (concatRemoteIpHeaderValue.length() > 0) {
-                    concatRemoteIpHeaderValue.append(", ");
+            LinkedList<String> proxiesHeaderValue = new LinkedList<>();
+            String[] remoteIpHeaderValue;
+            if (supportRFC7239Only) {
+                for (Enumeration<String> e = request.getHeaders(FORWARDED_HEADER); e.hasMoreElements();) {
+                    parseRFC7239Value(e.nextElement(), forwardedValue);
                 }
-
-                concatRemoteIpHeaderValue.append(e.nextElement());
+                if (forwardedValue.containsKey(FOR)) {
+                    remoteIpHeaderValue = forwardedValue.get(FOR).toArray(new String[0]);
+                } else {
+                    remoteIpHeaderValue = new String[0];
+                }
+                originalForwardedValue = new HashMap<>(forwardedValue);
+            } else {
+                StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
+                for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
+                    if (concatRemoteIpHeaderValue.length() > 0) {
+                        concatRemoteIpHeaderValue.append(", ");
+                    }
+                    concatRemoteIpHeaderValue.append(e.nextElement());
+                }
+                remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
             }
 
-            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
             int idx;
             if (!isInternal) {
                 proxiesHeaderValue.addFirst(originalRemoteAddr);
@@ -640,10 +654,9 @@ public class RemoteIpValve extends ValveBase {
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
-                if (internalProxies !=null && internalProxies.matcher(currentRemoteIp).matches()) {
+                if (isInternalProxy(currentRemoteIp)) {
                     // do nothing, internalProxies IPs are not appended to the
-                } else if (trustedProxies != null &&
-                        trustedProxies.matcher(currentRemoteIp).matches()) {
+                } else if (isTrustedProxy(currentRemoteIp)) {
                     proxiesHeaderValue.addFirst(currentRemoteIp);
                 } else {
                     idx--; // decrement idx because break statement doesn't do it
@@ -676,56 +689,94 @@ public class RemoteIpValve extends ValveBase {
                     request.setRemoteHost(remoteIp);
                 }
 
-                if (proxiesHeaderValue.size() == 0) {
-                    request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
+                if (supportRFC7239Only) {
+                    if (proxiesHeaderValue.size() == 0) {
+                        forwardedValue.remove(BY);
+                    } else {
+                        forwardedValue.put(BY, proxiesHeaderValue);
+                    }
+
+                    if (newRemoteIpHeaderValue.size() == 0) {
+                        forwardedValue.remove(FOR);
+                    } else {
+                        forwardedValue.put(FOR, newRemoteIpHeaderValue);
+                    }
+                    request.getCoyoteRequest().getMimeHeaders().setValue(FORWARDED_HEADER).setString(spliceRFC7239Element(forwardedValue));
                 } else {
-                    String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
-                    request.getCoyoteRequest().getMimeHeaders().setValue(proxiesHeader).setString(commaDelimitedListOfProxies);
-                }
-                if (newRemoteIpHeaderValue.size() == 0) {
-                    request.getCoyoteRequest().getMimeHeaders().removeHeader(remoteIpHeader);
-                } else {
-                    String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
-                    request.getCoyoteRequest().getMimeHeaders().setValue(remoteIpHeader).setString(commaDelimitedRemoteIpHeaderValue);
-                }
-            }
-
-            if (protocolHeader != null) {
-                String protocolHeaderValue = request.getHeader(protocolHeader);
-                if (protocolHeaderValue == null) {
-                    // Don't modify the secure, scheme and serverPort attributes
-                    // of the request
-                } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
-                    request.setSecure(true);
-                    request.getCoyoteRequest().scheme().setString("https");
-                    setPorts(request, httpsServerPort);
-                } else {
-                    request.setSecure(false);
-                    request.getCoyoteRequest().scheme().setString("http");
-                    setPorts(request, httpServerPort);
-                }
-            }
-
-            if (hostHeader != null) {
-                String hostHeaderValue = request.getHeader(hostHeader);
-                if (hostHeaderValue != null) {
-                    try {
-                        int portIndex = Host.parse(hostHeaderValue);
-                        if (portIndex > -1) {
-                            log.debug(sm.getString("remoteIpValve.invalidHostWithPort", hostHeaderValue, hostHeader));
-                            hostHeaderValue = hostHeaderValue.substring(0, portIndex);
-                        }
-
-                        request.getCoyoteRequest().serverName().setString(hostHeaderValue);
-                        if (isChangeLocalName()) {
-                            request.getCoyoteRequest().localName().setString(hostHeaderValue);
-                        }
-
-                    } catch (IllegalArgumentException iae) {
-                        log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader));
+                    if (proxiesHeaderValue.size() == 0) {
+                        request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
+                    } else {
+                        String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
+                        request.getCoyoteRequest().getMimeHeaders().setValue(proxiesHeader).setString(commaDelimitedListOfProxies);
+                    }
+                    if (newRemoteIpHeaderValue.size() == 0) {
+                        request.getCoyoteRequest().getMimeHeaders().removeHeader(remoteIpHeader);
+                    } else {
+                        String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
+                        request.getCoyoteRequest().getMimeHeaders().setValue(remoteIpHeader).setString(commaDelimitedRemoteIpHeaderValue);
                     }
                 }
+
             }
+
+            if (supportRFC7239Only) {
+                if (forwardedValue.containsKey(PROTO)) {
+                    List<String> protos = forwardedValue.get(PROTO);
+                    String host = null;
+                    if (forwardedValue.containsKey(HOST)) {
+                        host = forwardedValue.get(HOST).get(0);
+                    }
+                    if (isForwardedProtoHeaderValueSecure(protos.toArray(new String[0]))) {
+                        request.setSecure(true);
+                        request.getCoyoteRequest().scheme().setString("https");
+                        setPortAndServerNameRFC7239(request, httpsServerPort, host);
+                    } else {
+                        request.setSecure(false);
+                        request.getCoyoteRequest().scheme().setString("http");
+                        setPortAndServerNameRFC7239(request, httpServerPort, host);
+                    }
+                }
+            } else {
+
+                if (protocolHeader != null) {
+                    String protocolHeaderValue = request.getHeader(protocolHeader);
+                    if (protocolHeaderValue == null) {
+                        // Don't modify the secure, scheme and serverPort attributes
+                        // of the request
+                    } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
+                        request.setSecure(true);
+                        request.getCoyoteRequest().scheme().setString("https");
+                        setPorts(request, httpsServerPort);
+                    } else {
+                        request.setSecure(false);
+                        request.getCoyoteRequest().scheme().setString("http");
+                        setPorts(request, httpServerPort);
+                    }
+                }
+
+                if (hostHeader != null) {
+                    String hostHeaderValue = request.getHeader(hostHeader);
+                    if (hostHeaderValue != null) {
+                        try {
+                            int portIndex = Host.parse(hostHeaderValue);
+                            if (portIndex > -1) {
+                                log.debug(sm.getString("remoteIpValve.invalidHostWithPort", hostHeaderValue, hostHeader));
+                                hostHeaderValue = hostHeaderValue.substring(0, portIndex);
+                            }
+
+                            request.getCoyoteRequest().serverName().setString(hostHeaderValue);
+                            if (isChangeLocalName()) {
+                                request.getCoyoteRequest().localName().setString(hostHeaderValue);
+                            }
+
+                        } catch (IllegalArgumentException iae) {
+                            log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader));
+                        }
+                    }
+
+                }
+
+           }
 
             request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
 
@@ -775,90 +826,23 @@ public class RemoteIpValve extends ValveBase {
                 request.setLocalPort(originalLocalPort);
 
                 MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
-                if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
-                    headers.removeHeader(proxiesHeader);
+                if (supportRFC7239Only) {
+                    headers.setValue(FORWARDED_HEADER).setString(spliceRFC7239Element(originalForwardedValue));
                 } else {
-                    headers.setValue(proxiesHeader).setString(originalProxiesHeader);
+                    if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
+                        headers.removeHeader(proxiesHeader);
+                    } else {
+                        headers.setValue(proxiesHeader).setString(originalProxiesHeader);
+                    }
+
+                    if (originalRemoteIpHeader == null || originalRemoteIpHeader.length() == 0) {
+                        headers.removeHeader(remoteIpHeader);
+                    } else {
+                        headers.setValue(remoteIpHeader).setString(originalRemoteIpHeader);
+                    }
                 }
-
-                if (originalRemoteIpHeader == null || originalRemoteIpHeader.length() == 0) {
-                    headers.removeHeader(remoteIpHeader);
-                } else {
-                    headers.setValue(remoteIpHeader).setString(originalRemoteIpHeader);
-                }
             }
         }
-    }
-
-    public void handleRemoteIpHeaderValue(Request request, String[] remoteIpHeaderValue) {
-        String remoteIp = null;
-        // https://juejin.cn/post/6872627908582572039
-        Deque<String> proxiesHeaderValue = new LinkedList<>();
-        int idx;
-        if (!isInternalProxy(request.getRemoteAddr())) {
-            proxiesHeaderValue.addFirst(request.getRemoteAddr());
-        }
-        // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
-        for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
-            String currentRemoteIp = remoteIpHeaderValue[idx];
-            remoteIp = currentRemoteIp;
-            if (isInternalProxy(currentRemoteIp)) {
-                // do nothing, internalProxies IPs are not appended to the
-            } else if (isTrustedProxy(currentRemoteIp)) {
-                proxiesHeaderValue.addFirst(currentRemoteIp);
-            } else {
-                idx--; // decrement idx because break statement doesn't do it
-                break;
-            }
-        }
-        // continue to loop on remoteIpHeaderValue to build the new value of the remoteIpHeader
-        LinkedList<String> newRemoteIpHeaderValue = new LinkedList<>();
-        for (; idx >= 0; idx--) {
-            String currentRemoteIp = remoteIpHeaderValue[idx];
-            newRemoteIpHeaderValue.addFirst(currentRemoteIp);
-        }
-        if (remoteIp != null) {
-
-            request.setRemoteAddr(remoteIp);
-            if (request.getConnector().getEnableLookups()) {
-                // This isn't a lazy lookup but that would be a little more
-                // invasive - mainly in Request.getRemoteHost() - and if
-                // enableLookups is true it seems reasonable that the
-                // hotsname will be required so look it up here.
-                try {
-                    InetAddress inetAddress = InetAddress.getByName(remoteIp);
-                    // We know we need a DNS look up so use getCanonicalHostName()
-                    request.setRemoteHost(inetAddress.getCanonicalHostName());
-                } catch (UnknownHostException e) {
-                    log.debug(sm.getString("remoteIpValve.invalidRemoteAddress", remoteIp), e);
-                    request.setRemoteHost(remoteIp);
-                }
-            } else {
-                request.setRemoteHost(remoteIp);
-            }
-
-            if (proxiesHeaderValue.size() == 0) {
-                request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
-            } else {
-                String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
-                request.getCoyoteRequest().getMimeHeaders().setValue(proxiesHeader).setString(commaDelimitedListOfProxies);
-            }
-            if (newRemoteIpHeaderValue.size() == 0) {
-                request.getCoyoteRequest().getMimeHeaders().removeHeader(remoteIpHeader);
-            } else {
-                String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
-                request.getCoyoteRequest().getMimeHeaders().setValue(remoteIpHeader).setString(commaDelimitedRemoteIpHeaderValue);
-            }
-        }
-    }
-
-    public static void parseRFC7239(Request request, Response response) {
-
-        HashMap<String, List<String>> result = new HashMap<>();
-        for (Enumeration<String> e = request.getHeaders(FORWARDED_HEADER); e.hasMoreElements(); ) {
-            parseRFC7239Value(e.nextElement(), result);
-        }
-
     }
 
     public static String spliceRFC7239Element(Map<String, List<String>> elements) {
@@ -875,14 +859,29 @@ public class RemoteIpValve extends ValveBase {
             switch (entry.getKey().toLowerCase(Locale.ROOT)) {
                 case FOR:
                 case HOST:
+                case BY:
                     StringBuilder item = new StringBuilder();
                     boolean first = true;
+                    // ipv6 need to be wrapped in quotes
                     for (String value : entry.getValue()) {
+                        // ipv6 handle
+                        String format = null;
+
                         if (value.startsWith("[")) {
-                            value = String.format(ipv6Format, entry.getKey(), value);
+                            format = ipv6Format;
                         } else {
-                            value = String.format(otherFormat, entry.getKey(), value);
+                            format = otherFormat;
+                            int lastColonIndex = value.lastIndexOf(":");
+                            if (lastColonIndex > 0) {
+                                int colonIndex = value.indexOf(":");
+                                // ipv6
+                                if (colonIndex != lastColonIndex) {
+                                    value = "[" + value.substring(0, lastColonIndex) + "]" + value.substring(lastColonIndex);
+                                    format = ipv6Format;
+                                }
+                            }
                         }
+                        value = String.format(format, entry.getKey(), value);
                         if (first) {
                             first = false;
                         } else {
@@ -892,7 +891,6 @@ public class RemoteIpValve extends ValveBase {
                     }
                     result.append(item);
                     break;
-                case BY:
                 case PROTO:
                 default:
                     item = new StringBuilder();
@@ -925,12 +923,28 @@ public class RemoteIpValve extends ValveBase {
                 String key = fpi.substring(0, equalsIndex).toLowerCase(Locale.ROOT);
                 String value = fpi.substring(equalsIndex + 1);
                 switch (key) {
+                    case BY:
                     case FOR:
+                    case HOST:
                         String v;
                         boolean hasFirstQuote = value.startsWith("\"");
                         boolean hasLastQuote = value.endsWith("\"");
                         if (value.length() > 2 && hasFirstQuote && hasLastQuote) {
                             v = value.substring(1, value.length() - 1);
+                            if (FOR.equals(key) && v.startsWith("[")) {
+                                int portIndex = Host.parse(v);
+                                if (portIndex > -1) {
+                                    String ip = v.substring(1, portIndex - 1);
+                                    String port = v.substring(portIndex);
+                                    if (port.length() >= 2) {
+                                        v = ip + port;
+                                    } else {
+                                        v = ip;
+                                    }
+                                } else {
+                                    v = v.substring(1, v.length() - 1);
+                                }
+                            }
                         } else if (hasFirstQuote || hasLastQuote) {
                             // invalid identifier,maybe throw exception ?
                             continue;
@@ -939,14 +953,6 @@ public class RemoteIpValve extends ValveBase {
                         }
                         if (!v.startsWith("_") && !"unknown".equals(v)) {
                             value = v;
-                        } else {
-                            value = null;
-                        }
-                        break;
-                    case BY:
-                    case HOST:
-                        if (!value.startsWith("_") && !"unknown".equals(value)) {
-                            // do nothing
                         } else {
                             value = null;
                         }
@@ -980,6 +986,10 @@ public class RemoteIpValve extends ValveBase {
             return protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue);
         }
         String[] forwardedProtocols = commaDelimitedListToStringArray(protocolHeaderValue);
+        return isForwardedProtoHeaderValueSecure(forwardedProtocols);
+    }
+
+    private boolean isForwardedProtoHeaderValueSecure(String[] forwardedProtocols) {
         if (forwardedProtocols.length == 0) {
             return false;
         }
@@ -989,6 +999,33 @@ public class RemoteIpValve extends ValveBase {
             }
         }
         return true;
+    }
+
+    private void setPortAndServerNameRFC7239(Request request, int defaultPort, String host) {
+        int port = defaultPort;
+        String hostHeaderValue = host;
+        if (host != null) {
+            try {
+                int portIndex = Host.parse(host);
+                if (portIndex > -1) {
+                    // todo log info
+                    hostHeaderValue = host.substring(0, portIndex);
+                    port = Integer.parseInt(host.substring(portIndex + 1));
+                }
+
+                request.getCoyoteRequest().serverName().setString(hostHeaderValue);
+                if (isChangeLocalName()) {
+                    request.getCoyoteRequest().localName().setString(hostHeaderValue);
+                }
+
+                request.setServerPort(port);
+                if (changeLocalPort) {
+                    request.setLocalPort(port);
+                }
+            }catch (IllegalArgumentException iae) {
+                // todo log err
+            }
+        }
     }
 
     private void setPorts(Request request, int defaultPort) {
