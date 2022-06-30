@@ -182,6 +182,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private final EngineState state;
     private final MemorySession engineMemorySession;
+    private MemorySegment bufSegment = null;
 
     private enum Accepted { NOT, IMPLICIT, EXPLICIT }
     private Accepted accepted = Accepted.NOT;
@@ -244,6 +245,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
         engineMemorySession = MemorySession.openImplicit();
+        bufSegment = engineMemorySession.allocateArray(ValueLayout.JAVA_BYTE, MAX_ENCRYPTED_PACKET_LENGTH);
         session = new OpenSSLSession();
         var ssl = SSL_new(sslCtx);
         // Set ssl_info_callback
@@ -287,6 +289,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             destroyed = true;
             // internal errors can cause shutdown without marking the engine closed
             isInboundDone = isOutboundDone = engineClosed = true;
+            bufSegment = null;
         }
     }
 
@@ -299,30 +302,18 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private int writePlaintextData(final MemoryAddress ssl, final ByteBuffer src) throws SSLException {
         clearLastError();
         final int pos = src.position();
-        final int len = Math.min(src.limit() - pos, MAX_PLAINTEXT_LENGTH);
-
-        if (src.isDirect()) {
-            final int sslWrote = SSL_write(ssl, MemorySegment.ofBuffer(src), len);
-            if (sslWrote > 0) {
-                src.position(pos + sslWrote);
-                return sslWrote;
-            } else {
-                checkLastError();
-            }
-        } else {
-            try (var memorySession = MemorySession.openConfined()) {
-                MemorySegment bufSegment = memorySession.allocateArray(ValueLayout.JAVA_BYTE, len);
-                MemorySegment.copy(src.array(), pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
-                final int sslWrote = SSL_write(ssl, bufSegment, len);
-                if (sslWrote > 0) {
-                    src.position(pos + sslWrote);
-                    return sslWrote;
-                } else {
-                    checkLastError();
-                }
-            }
+        final int len = Math.min(src.remaining(), MAX_PLAINTEXT_LENGTH);
+        MemorySegment srcSegment = src.isDirect() ? MemorySegment.ofBuffer(src) : bufSegment;
+        if (!src.isDirect()) {
+            MemorySegment.copy(src.array(), pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
         }
-
+        final int sslWrote = SSL_write(ssl, srcSegment, len);
+        if (sslWrote > 0) {
+            src.position(pos + sslWrote);
+            return sslWrote;
+        } else {
+            checkLastError();
+        }
         return 0;
     }
 
@@ -334,30 +325,17 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         clearLastError();
         final int pos = src.position();
         final int len = src.remaining();
-
-        if (src.isDirect()) {
-            final int netWrote = BIO_write(networkBIO, MemorySegment.ofBuffer(src), len);
-            if (netWrote > 0) {
-                src.position(pos + netWrote);
-                return netWrote;
-            } else {
-                checkLastError();
-            }
-        } else {
-            try (var memorySession = MemorySession.openConfined()) {
-                MemorySegment bufSegment = memorySession.allocateArray(ValueLayout.JAVA_BYTE, len);
-                MemorySegment.copy(src.array(), pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
-                final int netWrote = BIO_write(networkBIO, bufSegment, len);
-                if (netWrote > 0) {
-                    src.position(pos + netWrote);
-                    return netWrote;
-                } else {
-                    src.position(pos);
-                    checkLastError();
-                }
-            }
+        MemorySegment srcSegment = src.isDirect() ? MemorySegment.ofBuffer(src) : bufSegment;
+        if (!src.isDirect()) {
+            MemorySegment.copy(src.array(), pos, bufSegment, ValueLayout.JAVA_BYTE, 0, len);
         }
-
+        final int netWrote = BIO_write(networkBIO, srcSegment, len);
+        if (netWrote > 0) {
+            src.position(pos + netWrote);
+            return netWrote;
+        } else {
+            checkLastError();
+        }
         return 0;
     }
 
@@ -368,31 +346,18 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private int readPlaintextData(final MemoryAddress ssl, final ByteBuffer dst) throws SSLException {
         clearLastError();
         final int pos = dst.position();
-
-        if (dst.isDirect()) {
-            final int len = dst.remaining();
-            final int sslRead = SSL_read(ssl, MemorySegment.ofBuffer(dst), len);
-            if (sslRead > 0) {
-                dst.position(pos + sslRead);
-                return sslRead;
-            } else {
-                checkLastError();
+        final int len = Math.min(dst.remaining(), MAX_ENCRYPTED_PACKET_LENGTH);
+        MemorySegment dstSegment = dst.isDirect() ? MemorySegment.ofBuffer(dst) : bufSegment;
+        final int sslRead = SSL_read(ssl, dstSegment, len);
+        if (sslRead > 0) {
+            if (!dst.isDirect()) {
+                MemorySegment.copy(dstSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), pos, sslRead);
             }
+            dst.position(pos + sslRead);
+            return sslRead;
         } else {
-            final int len = Math.min(MAX_ENCRYPTED_PACKET_LENGTH, dst.limit() - pos);
-            try (var memorySession = MemorySession.openConfined()) {
-                MemorySegment bufSegment = memorySession.allocateArray(ValueLayout.JAVA_BYTE, len);
-                final int sslRead = SSL_read(ssl, bufSegment, len);
-                if (sslRead > 0) {
-                    MemorySegment.copy(bufSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), pos, sslRead);
-                    dst.position(pos + sslRead);
-                    return sslRead;
-                } else {
-                    checkLastError();
-                }
-            }
+            checkLastError();
         }
-
         return 0;
     }
 
@@ -403,29 +368,17 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private int readEncryptedData(final MemoryAddress networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
         clearLastError();
         final int pos = dst.position();
-
-        if (dst.isDirect()) {
-            final int bioRead = BIO_read(networkBIO, MemorySegment.ofBuffer(dst), pending);
-            if (bioRead > 0) {
-                dst.position(pos + bioRead);
-                return bioRead;
-            } else {
-                checkLastError();
+        MemorySegment dstSegment = dst.isDirect() ? MemorySegment.ofBuffer(dst) : bufSegment;
+        final int bioRead = BIO_read(networkBIO, dstSegment, pending);
+        if (bioRead > 0) {
+            if (!dst.isDirect()) {
+                MemorySegment.copy(dstSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), pos, bioRead);
             }
+            dst.position(pos + bioRead);
+            return bioRead;
         } else {
-            try (var memorySession = MemorySession.openConfined()) {
-                MemorySegment bufSegment = memorySession.allocateArray(ValueLayout.JAVA_BYTE, pending);
-                final int bioRead = BIO_read(networkBIO, bufSegment, pending);
-                if (bioRead > 0) {
-                    MemorySegment.copy(bufSegment, ValueLayout.JAVA_BYTE, 0, dst.array(), pos, bioRead);
-                    dst.position(pos + bioRead);
-                    return bioRead;
-                } else {
-                    checkLastError();
-                }
-            }
+            checkLastError();
         }
-
         return 0;
     }
 
