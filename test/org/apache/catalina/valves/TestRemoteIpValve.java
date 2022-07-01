@@ -19,11 +19,9 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.util.*;
 
-import com.google.common.collect.Lists;
 import jakarta.servlet.ServletException;
 
 import org.apache.tomcat.util.buf.StringUtils;
-import org.apache.tomcat.util.http.parser.Host;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,6 +47,7 @@ public class TestRemoteIpValve {
         private String By;
         private String Host;
         private String Proto;
+        private String Other;
 
         public String getRemoteAddr() {
             return remoteAddr;
@@ -81,6 +80,9 @@ public class TestRemoteIpValve {
         public String getBy() {
             return By;
         }
+        public String getOther() {
+            return Other;
+        }
 
         public String getHost() {
             return Host;
@@ -112,6 +114,9 @@ public class TestRemoteIpValve {
             }
             if (result.containsKey("by")) {
                 By = StringUtils.join(result.get("by"), ',');
+            }
+            if (result.containsKey("other")) {
+                Other = StringUtils.join(result.get("other"), ',');
             }
         }
     }
@@ -1191,18 +1196,6 @@ public class TestRemoteIpValve {
 
         // VERIFY
         Assert.assertEquals("org.apache.tomcat.request.forwarded",
-                Boolean.TRUE,
-                request.getAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE));
-
-        // TEST RFC 7239
-        remoteIpValve.setSupportRFC7239Only(true);
-        RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
-        remoteIpValve.setNext(rfc7239TrackerValve);
-        request.getCoyoteRequest().getMimeHeaders().addValue("Forwarded").setString("for=140.211.11.130");
-        remoteIpValve.invoke(request, null);
-
-        // VERIFY
-        Assert.assertEquals("org.apache.tomcat.request.forwarded",
             Boolean.TRUE,
             request.getAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE));
     }
@@ -1344,78 +1337,6 @@ public class TestRemoteIpValve {
         String actualPostInvokeRemoteHost = request.getRemoteHost();
         Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
-
-    @Test
-    public void testRFC7239ExampleUsage_1() throws ServletException, IOException {
-        RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setSupportRFC7239Only(true);
-        RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
-        remoteIpValve.setNext(rfc7239TrackerValve);
-
-        Request request = new MockRequest();
-        request.setCoyoteRequest(new org.apache.coyote.Request());
-        request.setRemoteAddr("192.168.0.10");
-        request.setRemoteHost("remote-host-original-value");
-        request.getCoyoteRequest().getMimeHeaders().addValue("Forwarded").setString("for=198.51.100.17,for=192.0.2.43;by=203.0.113.60;proto=http,https;host=example.com:8080");
-
-        //TEST
-        remoteIpValve.invoke(request, null);
-
-        String actualFor = rfc7239TrackerValve.getFor();
-        Assert.assertEquals("198.51.100.17", actualFor);
-
-        String actualBy = rfc7239TrackerValve.getBy();
-        Assert.assertNull(actualBy);
-
-        String actualRemoteAddr = rfc7239TrackerValve.getRemoteAddr();
-        Assert.assertEquals("192.0.2.43", actualRemoteAddr);
-        String actualRemoteHost = rfc7239TrackerValve.getRemoteHost();
-        Assert.assertEquals("192.0.2.43", actualRemoteHost);
-        String actualScheme = rfc7239TrackerValve.getScheme();
-        Assert.assertEquals("http", actualScheme);
-        int actualServerPort = rfc7239TrackerValve.getServerPort();
-        Assert.assertEquals(8080, actualServerPort);
-        String actualServerName = rfc7239TrackerValve.getServerName();
-        Assert.assertEquals("example.com", actualServerName);
-    }
-
-    @Test
-    public void testRFC7239ExampleUsage_2() throws ServletException, IOException {
-        RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setInternalProxies("192\\.168\\.0\\.10|192\\.168\\.0\\.11");
-        remoteIpValve.setTrustedProxies("proxy1|proxy2");
-        remoteIpValve.setSupportRFC7239Only(true);
-        RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
-        remoteIpValve.setNext(rfc7239TrackerValve);
-
-        Request request = new MockRequest();
-        request.setCoyoteRequest(new org.apache.coyote.Request());
-        request.setRemoteAddr("192.168.0.10");
-        request.setRemoteHost("remote-host-original-value");
-        request.getCoyoteRequest().getMimeHeaders().addValue("Forwarded")
-            .setString("for=198.51.100.17,for=proxy1,for=proxy2;proto=http;host=example.com:8080");
-
-        //TEST
-        remoteIpValve.invoke(request, null);
-
-        String actualFor = rfc7239TrackerValve.getFor();
-        Assert.assertNull(actualFor);
-
-        String actualBy = rfc7239TrackerValve.getBy();
-        Assert.assertEquals("proxy1,proxy2", actualBy);
-
-        String actualRemoteAddr = rfc7239TrackerValve.getRemoteAddr();
-        Assert.assertEquals("198.51.100.17", actualRemoteAddr);
-        String actualRemoteHost = rfc7239TrackerValve.getRemoteHost();
-        Assert.assertEquals("198.51.100.17", actualRemoteHost);
-        String actualScheme = rfc7239TrackerValve.getScheme();
-        Assert.assertEquals("http", actualScheme);
-        int actualServerPort = rfc7239TrackerValve.getServerPort();
-        Assert.assertEquals(8080, actualServerPort);
-        String actualServerName = rfc7239TrackerValve.getServerName();
-        Assert.assertEquals("example.com", actualServerName);
-    }
-
 
     @Test
     public void testInvokeUntrustedProxyInTheChainRFC7239() throws Exception {
@@ -1563,13 +1484,13 @@ public class TestRemoteIpValve {
 
         // protocol
         String actualScheme = rfc7239TrackerValve.getScheme();
-        Assert.assertEquals("x-forwarded-proto says http", "http", actualScheme);
+        Assert.assertEquals("Forwarded Proto says http", "http", actualScheme);
 
         int actualServerPort = rfc7239TrackerValve.getServerPort();
-        Assert.assertEquals("x-forwarded-proto says http", 80, actualServerPort);
+        Assert.assertEquals("Forwarded Proto says http", 80, actualServerPort);
 
         boolean actualSecure = rfc7239TrackerValve.isSecure();
-        Assert.assertFalse("x-forwarded-proto says http", actualSecure);
+        Assert.assertFalse("Forwarded Proto says http", actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
         Assert.assertTrue("postInvoke secure", actualPostInvokeSecure);
@@ -1658,6 +1579,88 @@ public class TestRemoteIpValve {
 
         String actualPostInvokeScheme = request.getScheme();
         Assert.assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
+    }
+
+    @Test
+    public void testInvokeForwardedHostIpv6WithPort() throws Exception {
+
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setSupportRFC7239Only(true);
+        RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
+        remoteIpValve.setNext(rfc7239TrackerValve);
+
+        Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+        // host and port
+        request.getCoyoteRequest().serverName().setString("10.0.0.1");
+        request.getCoyoteRequest().getMimeHeaders().addValue("Forwarded").setString("proto=https;host=[2400:dd01:103a:4041::101]:8443");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        // protocol
+        String actualServerName = rfc7239TrackerValve.getServerName();
+        Assert.assertEquals("tracked serverName", "[2400:dd01:103a:4041::101]", actualServerName);
+
+        String actualScheme = rfc7239TrackerValve.getScheme();
+        Assert.assertEquals("tracked scheme", "https", actualScheme);
+
+        int actualServerPort = rfc7239TrackerValve.getServerPort();
+        Assert.assertEquals("tracked serverPort", 8443, actualServerPort);
+
+        boolean actualSecure = rfc7239TrackerValve.isSecure();
+        Assert.assertTrue("tracked secure", actualSecure);
+
+        String actualPostInvokeServerName = request.getServerName();
+        Assert.assertEquals("postInvoke serverName", "10.0.0.1", actualPostInvokeServerName);
+
+        boolean actualPostInvokeSecure = request.isSecure();
+        Assert.assertFalse("postInvoke secure", actualPostInvokeSecure);
+
+        int actualPostInvokeServerPort = request.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
+
+        String actualPostInvokeScheme = request.getScheme();
+        Assert.assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
+    }
+
+    @Test
+    public void testRFC7239WithUserDefinedInfo() throws ServletException, IOException {
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setSupportRFC7239Only(true);
+        RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
+        remoteIpValve.setNext(rfc7239TrackerValve);
+
+        Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.getCoyoteRequest().scheme().setString("http");
+        // host and port
+        request.getCoyoteRequest().serverName().setString("10.0.0.1");
+        request.getCoyoteRequest().getMimeHeaders().addValue("Forwarded").setString("other=othervalue");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        String other = rfc7239TrackerValve.getOther();
+        Assert.assertEquals("othervalue", other);
+
     }
 
     private void assertArrayEquals(String[] expected, String[] actual) {
