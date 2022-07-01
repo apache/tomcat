@@ -18,8 +18,6 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import jakarta.servlet.ServletException;
@@ -102,7 +100,7 @@ public class TestRemoteIpValve {
             this.serverPort = request.getServerPort();
             Map<String, List<String>> result = new HashMap<>();
 
-            RemoteIpValve.parseRFC7239Value(request.getHeader("Forwarded"), result);
+            RemoteIpValve.parseRFC7239(request.getHeader("Forwarded"), result);
             if (result.containsKey("for")) {
                 For = StringUtils.join(result.get("for"), ',');
             }
@@ -1418,7 +1416,7 @@ public class TestRemoteIpValve {
     @Test
     public void testParseRFC7239() {
         Map<String, List<String>> result = new HashMap<>();
-        RemoteIpValve.parseRFC7239Value(
+        RemoteIpValve.parseRFC7239(
             "proto=http;for=203.0.113.43, for=\"[2001:db8:cafe::17]:\", for=192.0.2.60;host=proxy1, host=\"[2001:db8:cafe::17]:4711\", host=192.0.2.60",
             result);
         System.out.println(result);
@@ -1430,7 +1428,7 @@ public class TestRemoteIpValve {
         list.put("for", Lists.newArrayList("203.0.113.43","[2001:db8:cafe::17]:4711","192.0.2.60","2001:db8:cafe::17:4711"));
         list.put("host",Lists.newArrayList("proxy1","[2001:db8:cafe::17]:4711","192.0.2.60"));
         list.put("proto",Lists.newArrayList("http"));
-        System.out.println(RemoteIpValve.spliceRFC7239Element(list));
+        System.out.println(RemoteIpValve.spliceRFC7239(list));
 
     }
 
@@ -1438,11 +1436,11 @@ public class TestRemoteIpValve {
     public void testRFC7239ParseAndSplice() {
         Map<String, List<String>> result = new HashMap<>();
         String testStr = "proto=http;for=203.0.113.43, for=\"[2001:db8:cafe::17]\", for=192.0.2.60;host=proxy1, host=\"[2001:db8:cafe::17]:4711\", host=192.0.2.60";
-        RemoteIpValve.parseRFC7239Value(
+        RemoteIpValve.parseRFC7239(
             testStr,
             result);
         System.out.println(result);
-        String resultStr = RemoteIpValve.spliceRFC7239Element(result);
+        String resultStr = RemoteIpValve.spliceRFC7239(result);
         System.out.println(resultStr);
     }
 
