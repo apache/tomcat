@@ -19,7 +19,12 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletException;
