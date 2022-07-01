@@ -363,6 +363,20 @@ public class RemoteIpValve extends ValveBase {
      */
     private static final Log log = LogFactory.getLog(RemoteIpValve.class);
 
+
+    /**
+     * Header specified by RFC7239
+     */
+    private static final String forwardedHeader = "Forwarded";
+
+    /**
+     * The four directives specified in RFC 7239
+     */
+    private static final String BY = "by";
+    private static final String FOR = "for";
+    private static final String HOST = "host";
+    private static final String PROTO = "proto";
+
     /**
      * Convert a given comma delimited String into an array of String
      * @param commaDelimitedStrings The string to convert
@@ -376,6 +390,11 @@ public class RemoteIpValve extends ValveBase {
     private String hostHeader = null;
 
     private boolean changeLocalName = false;
+
+    /**
+     * @see #setSupportRFC7239Only(boolean)
+     */
+    private boolean supportRFC7239Only = false;
 
     /**
      * @see #setHttpServerPort(int)
@@ -424,18 +443,6 @@ public class RemoteIpValve extends ValveBase {
      */
     private String remoteIpHeader = "X-Forwarded-For";
 
-    private boolean supportRFC7239Only = false;
-
-    /**
-     * Some properties related to RFC7239
-     */
-    private static final String FORWARDED_HEADER = "Forwarded";
-    private static final String BY = "by";
-    private static final String FOR = "for";
-    private static final String HOST = "host";
-    private static final String PROTO = "proto";
-
-
     /**
      * @see #setRequestAttributesEnabled(boolean)
      */
@@ -456,6 +463,10 @@ public class RemoteIpValve extends ValveBase {
         super(true);
     }
 
+    /**
+     * Use legacy schema if not specified, otherwise use RFC 7239
+     * @param rfc7239Only Whether to use RFC 7239
+     */
     public void setSupportRFC7239Only(boolean rfc7239Only) {
         this.supportRFC7239Only = rfc7239Only;
     }
@@ -626,7 +637,7 @@ public class RemoteIpValve extends ValveBase {
             LinkedList<String> proxiesHeaderValue = new LinkedList<>();
             String[] remoteIpHeaderValue;
             if (supportRFC7239Only) {
-                for (Enumeration<String> e = request.getHeaders(FORWARDED_HEADER); e.hasMoreElements();) {
+                for (Enumeration<String> e = request.getHeaders(forwardedHeader); e.hasMoreElements();) {
                     parseRFC7239(e.nextElement(), forwardedValue);
                 }
                 if (forwardedValue.containsKey(FOR)) {
@@ -701,7 +712,7 @@ public class RemoteIpValve extends ValveBase {
                     } else {
                         forwardedValue.put(FOR, newRemoteIpHeaderValue);
                     }
-                    request.getCoyoteRequest().getMimeHeaders().setValue(FORWARDED_HEADER).setString(spliceRFC7239(forwardedValue));
+                    request.getCoyoteRequest().getMimeHeaders().setValue(forwardedHeader).setString(spliceRFC7239(forwardedValue));
                 } else {
                     if (proxiesHeaderValue.size() == 0) {
                         request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
@@ -721,7 +732,6 @@ public class RemoteIpValve extends ValveBase {
 
             if (supportRFC7239Only) {
                 handleProtocolAndHostInRFC7239(request, forwardedValue);
-
             } else {
 
                 if (protocolHeader != null) {
@@ -829,7 +839,7 @@ public class RemoteIpValve extends ValveBase {
 
                 MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
                 if (supportRFC7239Only) {
-                    headers.setValue(FORWARDED_HEADER).setString(spliceRFC7239(originalForwardedValue));
+                    headers.setValue(forwardedHeader).setString(spliceRFC7239(originalForwardedValue));
                 } else {
                     if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
                         headers.removeHeader(proxiesHeader);
@@ -945,6 +955,7 @@ public class RemoteIpValve extends ValveBase {
                         // handle ipv6 format,
                         if (value.length() > 2 && hasFirstQuote && hasLastQuote) {
                             v = value.substring(1, value.length() - 1);
+                            // Facilitates reuse of x-forward-for logic
                             // eg: "[ipv6]:port" -> ipv6:port
                             if (FOR.equals(key) && v.startsWith("[")) {
                                 int portIndex = Host.parse(v);
