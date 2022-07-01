@@ -36,17 +36,17 @@ import org.apache.tomcat.util.http.parser.Host;
 
 /**
  * <p>
- * This Valve currently supports two modes,<b>legacy</b>and<b>RFC 7239</b>. The default is
- * <b>legacy</b>,and <b>RFC7239</b> mode can be enabled via {@link #setSupportRFC7239Only(boolean)}.
+ * This Valve currently supports two modes,<b>legacy</b>and<b>RFC7239</b>. The default is
+ * <b>Legacy</b>,and <b>RFC7239</b> mode can be enabled via {@link #setSupportRFC7239Only(boolean)}.
  * </p>
  * <p>
  * Tomcat port of <a href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>, this valve replaces the apparent
  * client remote IP address and hostname for the request with the IP address list presented by a proxy or a load balancer via a request
- * headers (e.g. "X-Forwarded-For" in legacy mode or Forwarded For Directive in RFC7239 mode).
+ * headers (e.g. "X-Forwarded-For" in legacy mode or Forwarded For directive in RFC7239 mode).
  * </p>
  * <p>
  * Another feature of this valve is to replace the apparent scheme (http/https) and server port with the scheme presented by a proxy or a
- * load balancer via a request header (e.g. "X-Forwarded-Proto" in legacy mode or Forwarded Proto Directive in RFC7239 mode).
+ * load balancer via a request header (e.g. "X-Forwarded-Proto" in legacy mode or Forwarded Proto directive in RFC7239 mode).
  * </p>
  * <p>
  * This legacy valve proceeds as follows:
@@ -539,8 +539,8 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
-     * Use legacy schema if not specified, otherwise use RFC 7239
-     * @param rfc7239Only Whether to use RFC 7239
+     * Use legacy mode if not specified, otherwise use RFC7239
+     * @param rfc7239Only Whether to use RFC7239
      */
     public void setSupportRFC7239Only(boolean rfc7239Only) {
         this.supportRFC7239Only = rfc7239Only;

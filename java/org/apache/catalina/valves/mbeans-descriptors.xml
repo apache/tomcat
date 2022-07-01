@@ -590,6 +590,10 @@
                description="Regular expression that matches IP addresses of trusted proxies"
                type="java.lang.String"/>
 
+    <attribute name="supportRFC7239Only"
+               description="If true,the Valve will use RFC7239 mode, otherwise use Legacy mode"
+               type="boolean"/>
+
   </mbean>
 
   <mbean name="StuckThreadDetectionValve"

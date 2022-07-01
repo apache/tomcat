@@ -1021,16 +1021,20 @@
 
   <subsection name="Introduction">
 
+    <p>
+    This Valve currently supports two modes,<b>Legacy</b>and<b>RFC7239</b>. The default is
+      <b>Legacy</b>,and <b>RFC7239</b> mode can be enabled via <code>setSupportRFC7239Only</code>.
+    </p>
     <p>Tomcat port of
     <a href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
     this valve replaces the apparent client remote IP address and hostname for
     the request with the IP address list presented by a proxy or a load balancer
-    via a request headers (e.g. &quot;X-Forwarded-For&quot;).</p>
+    via a request headers (e.g. &quot;X-Forwarded-For&quot; in legacy mode or Forwarded For directive in RFC7239 mode).</p>
 
     <p>Another feature of this valve is to replace the apparent scheme
     (http/https), server port and <code>request.secure</code> with the scheme presented
     by a proxy or a load balancer via a request header
-    (e.g. &quot;X-Forwarded-Proto&quot;).</p>
+    (e.g. &quot;X-Forwarded-Proto&quot; in Legacy mode or Forwarded Proto directive in RFC7239 mode).</p>
 
     <p>This Valve may be used at the <code>Engine</code>, <code>Host</code> or
     <code>Context</code> level as required. Normally, this Valve would be used
@@ -1166,6 +1170,11 @@
         <code>ServletRequest.getLocalPort()</code> and
         <code>ServletRequest.getServerPort()</code> is modified by the this
         valve. If not specified, the default of <code>false</code> is used.</p>
+      </attribute>
+
+      <attribute name="supportRFC7239Only" required="false">
+        <p>If <code>true</code>, the value will use <strong>RFC7239</strong> mode,
+        otherwise use <strong>Legacy</strong> mode.
       </attribute>
 
     </attributes>
