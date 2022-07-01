@@ -36,16 +36,20 @@ import org.apache.tomcat.util.http.parser.Host;
 
 /**
  * <p>
+ * This Valve currently supports two modes,<b>legacy</b>and<b>RFC 7239</b>. The default is
+ * <b>legacy</b>,and <b>RFC7239</b> mode can be enabled via {@link #setSupportRFC7239Only(boolean)}.
+ * </p>
+ * <p>
  * Tomcat port of <a href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>, this valve replaces the apparent
  * client remote IP address and hostname for the request with the IP address list presented by a proxy or a load balancer via a request
- * headers (e.g. "X-Forwarded-For").
+ * headers (e.g. "X-Forwarded-For" in legacy mode or Forwarded For Directive in RFC7239 mode).
  * </p>
  * <p>
  * Another feature of this valve is to replace the apparent scheme (http/https) and server port with the scheme presented by a proxy or a
- * load balancer via a request header (e.g. "X-Forwarded-Proto").
+ * load balancer via a request header (e.g. "X-Forwarded-Proto" in legacy mode or Forwarded Proto Directive in RFC7239 mode).
  * </p>
  * <p>
- * This valve proceeds as follows:
+ * This legacy valve proceeds as follows:
  * </p>
  * <p>
  * If the incoming <code>request.getRemoteAddr()</code> matches the valve's list
@@ -164,7 +168,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * <strong>Sample with internal proxies</strong>
  * </p>
  * <p>
- * RemoteIpValve configuration:
+ * 1.Legacy RemoteIpValve configuration:
  * </p>
  * <code>
  * &lt;Valve
@@ -221,12 +225,55 @@ import org.apache.tomcat.util.http.parser.Host;
  * Note : <code>x-forwarded-by</code> header is null because only internal proxies as been traversed by the request.
  * <code>x-forwarded-by</code> is null because all the proxies are trusted or internal.
  * </p>
+ *
+ * <p>
+ * 2.RFC7239 RemoteIpValve configuration:
+ * </p>
+ * <code>
+ * &lt;Valve
+ *   className="org.apache.catalina.valves.RemoteIpValve"
+ *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
+ *   supportRFC7239Only="true"
+ *   /&gt;</code>
+ * <table border="1">
+ * <caption>Request Values</caption>
+ * <tr>
+ * <th>property</th>
+ * <th>Value Before RemoteIpValve</th>
+ * <th>Value After RemoteIpValve</th>
+ * </tr>
+ * <tr>
+ * <td>request.remoteAddr</td>
+ * <td>192.168.0.10</td>
+ * <td>140.211.11.130</td>
+ * </tr>
+ * <tr>
+ * <td>request.header['Forwarded']</td>
+ * <td>for=140.211.11.130, for=192.168.0.10;proto=https</td>
+ * <td>proto=https</td>
+ * </tr>
+ * <tr>
+ * <td>request.scheme</td>
+ * <td>http</td>
+ * <td>https</td>
+ * </tr>
+ * <tr>
+ * <td>request.secure</td>
+ * <td>false</td>
+ * <td>true</td>
+ * </tr>
+ * <tr>
+ * <td>request.serverPort</td>
+ * <td>80</td>
+ * <td>443</td>
+ * </tr>
+ * </table>
  * <hr>
  * <p>
  * <strong>Sample with trusted proxies</strong>
  * </p>
  * <p>
- * RemoteIpValve configuration:
+ * 1.Legacy RemoteIpValve configuration:
  * </p>
  * <code>
  * &lt;Valve
@@ -263,6 +310,34 @@ import org.apache.tomcat.util.http.parser.Host;
  * Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that come in <code>x-forwarded-for</code> header, they both
  * are migrated in <code>x-forwarded-by</code> header. <code>x-forwarded-by</code> is null because all the proxies are trusted or internal.
  * </p>
+ * <p>
+ * 2.RFC7239 RemoteIpValve configuration:
+ * </p>
+ * <code>
+ * &lt;Valve
+ *   className="org.apache.catalina.valves.RemoteIpValve"
+ *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
+ *   trustedProxies="proxy1|proxy2"
+ *   supportRFC7239Only="true"
+ *   /&gt;</code>
+ * <table border="1">
+ * <caption>Request Values</caption>
+ * <tr>
+ * <th>property</th>
+ * <th>Value Before RemoteIpValve</th>
+ * <th>Value After RemoteIpValve</th>
+ * </tr>
+ * <tr>
+ * <td>request.remoteAddr</td>
+ * <td>192.168.0.10</td>
+ * <td>140.211.11.130</td>
+ * </tr>
+ * <tr>
+ * <td>request.header['Forwarded']</td>
+ * <td>for=140.211.11.130, for=proxy1, for=proxy2</td>
+ * <td>by=proxy1,by=proxy2</td>
+ * </tr>
+ * </table>
  * <hr>
  * <p>
  * <strong>Sample with internal and trusted proxies</strong>
@@ -881,12 +956,13 @@ public class RemoteIpValve extends ValveBase {
                     boolean first = true;
                     // ipv6 need to be wrapped in quotes
                     for (String value : entry.getValue()) {
-                        // ipv6 handle
                         String format = null;
 
                         if (value.startsWith("[")) {
                             format = ipv6Format;
                         } else {
+                            // Converting legacy ipv6 formats to ipv6 as specified in RFC 7239.
+                            // eg: 2400:dd01:103a:4041::101:8080 -> "[2400:dd01:103a:4041::101]:8080"
                             format = otherFormat;
                             int lastColonIndex = value.lastIndexOf(":");
                             if (lastColonIndex > 0) {
@@ -950,13 +1026,15 @@ public class RemoteIpValve extends ValveBase {
                     case FOR:
                     case HOST:
                         String v;
+                        // ipv6
                         boolean hasFirstQuote = value.startsWith("\"");
                         boolean hasLastQuote = value.endsWith("\"");
-                        // handle ipv6 format,
                         if (value.length() > 2 && hasFirstQuote && hasLastQuote) {
                             v = value.substring(1, value.length() - 1);
-                            // Facilitates reuse of x-forward-for logic
-                            // eg: "[ipv6]:port" -> ipv6:port
+                            // To reuse the legacy matching logic for InternalProxies and TrustedProxies
+                            // so that the ipv6 format specified by RFC 7239 is converted to legacy format.
+                            // Only for Forwarded For Directive.
+                            // eg: "[2400:dd01:103a:4041::101]:8080" -> 2400:dd01:103a:4041::101:8080
                             if (FOR.equals(key) && v.startsWith("[")) {
                                 int portIndex = Host.parse(v);
                                 if (portIndex > -1) {
