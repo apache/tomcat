@@ -17,7 +17,11 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import jakarta.servlet.ServletException;
 
@@ -102,7 +106,7 @@ public class TestRemoteIpValve {
             this.serverPort = request.getServerPort();
             Map<String, List<String>> result = new HashMap<>();
 
-            RemoteIpValve.parseRFC7239(request.getHeader("Forwarded"), result);
+            RemoteIpValve.parseRfc7239(request.getHeader("Forwarded"), result);
             if (result.containsKey("for")) {
                 For = StringUtils.join(result.get("for"), ',');
             }
@@ -1263,7 +1267,7 @@ public class TestRemoteIpValve {
         RemoteIpValve remoteIpValve = new RemoteIpValve();
         remoteIpValve.setInternalProxies("192\\.168\\.0\\.10|192\\.168\\.0\\.11");
         remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
 
@@ -1303,7 +1307,7 @@ public class TestRemoteIpValve {
         RemoteIpValve remoteIpValve = new RemoteIpValve();
         remoteIpValve.setInternalProxies("127\\.0\\.0\\.1|192\\.168\\..*|another-internal-proxy");
         remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
 
@@ -1344,7 +1348,7 @@ public class TestRemoteIpValve {
         RemoteIpValve remoteIpValve = new RemoteIpValve();
         remoteIpValve.setInternalProxies("192\\.168\\.0\\.10|192\\.168\\.0\\.11");
         remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
 
@@ -1383,7 +1387,7 @@ public class TestRemoteIpValve {
 
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
 
@@ -1419,7 +1423,7 @@ public class TestRemoteIpValve {
 
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
 
@@ -1445,7 +1449,7 @@ public class TestRemoteIpValve {
     public void testInvokeForwardedProtoSaysHttpForIncomingHttpsRequest() throws Exception {
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
 
@@ -1507,7 +1511,7 @@ public class TestRemoteIpValve {
 
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         remoteIpValve.setTrustedProxies("foo\\.bar:123");
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
@@ -1534,7 +1538,7 @@ public class TestRemoteIpValve {
 
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
 
@@ -1586,7 +1590,7 @@ public class TestRemoteIpValve {
 
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
 
@@ -1637,7 +1641,7 @@ public class TestRemoteIpValve {
     public void testRFC7239WithUserDefinedInfo() throws ServletException, IOException {
         // PREPARE
         RemoteIpValve remoteIpValve = new RemoteIpValve();
-        remoteIpValve.setSupportRFC7239Only(true);
+        remoteIpValve.setSupportRfc7239Only(true);
         RFC7239TrackerValve rfc7239TrackerValve = new RFC7239TrackerValve();
         remoteIpValve.setNext(rfc7239TrackerValve);
 

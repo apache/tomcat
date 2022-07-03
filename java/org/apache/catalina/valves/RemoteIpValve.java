@@ -41,8 +41,8 @@ import org.apache.tomcat.util.http.parser.Host;
 
 /**
  * <p>
- * This Valve currently supports two modes,<b>legacy</b>and<b>RFC7239</b>. The default is
- * <b>Legacy</b>,and <b>RFC7239</b> mode can be enabled via {@link #setSupportRFC7239Only(boolean)}.
+ * This Valve currently supports two modes,<b>Legacy</b>and<b>RFC7239</b>. The default is
+ * <b>Legacy</b>,and <b>RFC7239</b> mode can be enabled via {@link #setSupportRfc7239Only(boolean)}.
  * </p>
  * <p>
  * Tomcat port of <a href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>, this valve replaces the apparent
@@ -472,9 +472,9 @@ public class RemoteIpValve extends ValveBase {
     private boolean changeLocalName = false;
 
     /**
-     * @see #setSupportRFC7239Only(boolean)
+     * @see #setSupportRfc7239Only(boolean)
      */
-    private boolean supportRFC7239Only = false;
+    private boolean supportRfc7239Only = false;
 
     /**
      * @see #setHttpServerPort(int)
@@ -547,8 +547,8 @@ public class RemoteIpValve extends ValveBase {
      * Use legacy mode if not specified, otherwise use RFC7239
      * @param rfc7239Only Whether to use RFC7239
      */
-    public void setSupportRFC7239Only(boolean rfc7239Only) {
-        this.supportRFC7239Only = rfc7239Only;
+    public void setSupportRfc7239Only(boolean rfc7239Only) {
+        this.supportRfc7239Only = rfc7239Only;
     }
 
     /**
@@ -716,9 +716,9 @@ public class RemoteIpValve extends ValveBase {
             String remoteIp = null;
             LinkedList<String> proxiesHeaderValue = new LinkedList<>();
             String[] remoteIpHeaderValue;
-            if (supportRFC7239Only) {
+            if (supportRfc7239Only) {
                 for (Enumeration<String> e = request.getHeaders(forwardedHeader); e.hasMoreElements();) {
-                    parseRFC7239(e.nextElement(), forwardedValue);
+                    parseRfc7239(e.nextElement(), forwardedValue);
                 }
                 if (forwardedValue.containsKey(FOR)) {
                     remoteIpHeaderValue = forwardedValue.get(FOR).toArray(new String[0]);
@@ -780,7 +780,7 @@ public class RemoteIpValve extends ValveBase {
                     request.setRemoteHost(remoteIp);
                 }
 
-                if (supportRFC7239Only) {
+                if (supportRfc7239Only) {
                     if (proxiesHeaderValue.size() == 0) {
                         forwardedValue.remove(BY);
                     } else {
@@ -810,8 +810,8 @@ public class RemoteIpValve extends ValveBase {
 
             }
 
-            if (supportRFC7239Only) {
-                handleProtocolAndHostInRFC7239(request, forwardedValue);
+            if (supportRfc7239Only) {
+                handleForwardedProtoAndHost(request, forwardedValue);
             } else {
 
                 if (protocolHeader != null) {
@@ -918,7 +918,7 @@ public class RemoteIpValve extends ValveBase {
                 request.setLocalPort(originalLocalPort);
 
                 MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
-                if (supportRFC7239Only) {
+                if (supportRfc7239Only) {
                     headers.setValue(forwardedHeader).setString(spliceRFC7239(originalForwardedValue));
                 } else {
                     if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
@@ -1009,87 +1009,92 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
-     * Parse RFC7239 Forwarded values, only the 4 commands specified in rfc7239 are parsed,
+     * Parse Rfc7239 Forwarded values, only the 4 commands specified in rfc7239 are parsed,
      * user-defined information will not be processed, but put directly into the result.
+     *
      * @param forwardedValue rfc7239 Forwarded values
-     * @param result Forwarded Directive -> [v1,v2...]
+     * @param result         Forwarded Directive -> [v1,v2...]
      */
-    public static void parseRFC7239(String forwardedValue, Map<String, List<String>> result) {
-        String[] forwardedPairs = forwardedValue.split(";");
-        for (String forwardedPair : forwardedPairs) {
-            String[] forwardedPairItems = commaDelimitedListToStringArray(forwardedPair);
-            for (String fpi : forwardedPairItems) {
-                int equalsIndex = fpi.indexOf("=");
-                // invalid forwarded pair
-                if (equalsIndex == -1 || equalsIndex == 0 || equalsIndex == fpi.length() - 1) {
-                    continue;
-                }
-                String key = fpi.substring(0, equalsIndex).toLowerCase(Locale.ROOT);
-                String value = fpi.substring(equalsIndex + 1);
-                switch (key) {
-                    case BY:
-                    case FOR:
-                    case HOST:
-                        String v;
-                        // ipv6
-                        boolean hasFirstQuote = value.startsWith("\"");
-                        boolean hasLastQuote = value.endsWith("\"");
-                        if (value.length() > 2 && hasFirstQuote && hasLastQuote) {
-                            v = value.substring(1, value.length() - 1);
-                            // To reuse the legacy matching logic for InternalProxies and TrustedProxies
-                            // so that the ipv6 format specified by RFC 7239 is converted to legacy format.
-                            // Only for Forwarded For Directive.
-                            // eg: "[2400:dd01:103a:4041::101]:8080" -> 2400:dd01:103a:4041::101:8080
-                            if (FOR.equals(key) && v.startsWith("[")) {
-                                int portIndex = Host.parse(v);
-                                if (portIndex > -1) {
-                                    String ip = v.substring(1, portIndex - 1);
-                                    String port = v.substring(portIndex);
-                                    if (port.length() >= 2) {
-                                        v = ip + port;
-                                    } else {
-                                        v = ip;
-                                    }
-                                } else {
-                                    // eg: "[ipv6]:port" -> [ipv6]:port
-                                    v = v.substring(1, v.length() - 1);
-                                }
-                            }
-                        } else if (hasFirstQuote || hasLastQuote) {
-                            // invalid identifier,maybe throw exception ?
-                            continue;
-                        } else {
-                            v = value;
-                        }
-                        // Invalid messages are skipped directly
-                        if (!v.startsWith("_") && !"unknown".equals(v)) {
-                            value = v;
-                        } else {
-                            value = null;
-                        }
-                        break;
-                    case PROTO:
-                        // Only have two types, so far.
-                        if (!"http".equalsIgnoreCase(value) && !"https".equalsIgnoreCase(value)) {
-                            value = null;
-                        }
-                        break;
-                    default:
-                        // Other information still needs to be retained.
-                        break;
-                }
-                if (value != null) {
-                    List<String> item = result.get(key);
-                    if (item == null) {
-                        item = new LinkedList<>();
-                        result.put(key, item);
+    public static void parseRfc7239(String forwardedValue, Map<String, List<String>> result) {
+        char[] chars = forwardedValue.toCharArray();
+        StringBuilder key = new StringBuilder();
+        StringBuilder value = new StringBuilder();
+        boolean isKey = true;
+        for (char c : chars) {
+            switch (c) {
+                case '=':
+                    isKey = false;
+                    break;
+                case ',':
+                case ';':
+                    isKey = true;
+                    parseForwardedDirective(key.toString(), value.toString(), result);
+                    key = new StringBuilder();
+                    value = new StringBuilder();
+                    break;
+                case ' ':
+                case '\"':
+                    break;
+                default:
+                    if (isKey) {
+                        key.append(c);
+                    } else {
+                        value.append(c);
                     }
-                    item.add(value);
-                }
+                    break;
             }
+        }
+        if (key.length() != 0 && value.length() != 0) {
+            parseForwardedDirective(key.toString(), value.toString(), result);
         }
     }
 
+    public static void parseForwardedDirective(String directive, String value, Map<String, List<String>> result) {
+        directive = directive.toLowerCase(Locale.ROOT);
+        switch (directive) {
+            case FOR:
+                // To reuse the legacy matching logic for InternalProxies and TrustedProxies
+                // so that the ipv6 format specified by RFC 7239 is converted to legacy format.
+                // Only for Forwarded For Directive.
+                // eg: "[2400:dd01:103a:4041::101]:8080" -> 2400:dd01:103a:4041::101:8080
+                if (value.startsWith("[")) {
+                    int portIndex = Host.parse(value);
+                    if (portIndex > -1) {
+                        String ip = value.substring(1, portIndex - 1);
+                        String port = value.substring(portIndex);
+                        if (port.length() >= 1) {
+                            value = ip + port;
+                        } else {
+                            value = ip;
+                        }
+                    }
+                }
+                if (value.startsWith("_") || "unknown".equals(value)) {
+                    return;
+                }
+            case BY:
+            case HOST:
+                if (value.startsWith("_") || "unknown".equals(value)) {
+                    return;
+                }
+                break;
+            case PROTO:
+                // Only have two types, so far.
+                if (!"http".equalsIgnoreCase(value) && !"https".equalsIgnoreCase(value)) {
+                    value = null;
+                }
+                break;
+            default:
+        }
+        if (value != null) {
+            List<String> item = result.get(directive);
+            if (item == null) {
+                item = new LinkedList<>();
+                result.put(directive, item);
+            }
+            item.add(value);
+        }
+    }
     /*
      * Considers the value to be secure if it exclusively holds forwards for
      * {@link #protocolHeaderHttpsValue}.
@@ -1114,7 +1119,7 @@ public class RemoteIpValve extends ValveBase {
         return true;
     }
 
-    private void handleProtocolAndHostInRFC7239(Request request, Map<String, List<String>> forwardedValue) {
+    private void handleForwardedProtoAndHost(Request request, Map<String, List<String>> forwardedValue) {
         if (forwardedValue.containsKey(PROTO)) {
             List<String> forwardedProtos = forwardedValue.get(PROTO);
             if (isForwardedProtoHeaderValueSecure(forwardedProtos.toArray(new String[0]))) {
