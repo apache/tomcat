@@ -792,20 +792,11 @@ public class RemoteIpValve extends ValveBase {
                     } else {
                         forwardedValue.put(FOR, newRemoteIpHeaderValue);
                     }
-                    request.getCoyoteRequest().getMimeHeaders().setValue(forwardedHeader).setString(spliceRFC7239(forwardedValue));
+                    request.getCoyoteRequest().getMimeHeaders().setValue(forwardedHeader).setString(spliceRfc7239(forwardedValue));
                 } else {
-                    if (proxiesHeaderValue.size() == 0) {
-                        request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
-                    } else {
-                        String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
-                        request.getCoyoteRequest().getMimeHeaders().setValue(proxiesHeader).setString(commaDelimitedListOfProxies);
-                    }
-                    if (newRemoteIpHeaderValue.size() == 0) {
-                        request.getCoyoteRequest().getMimeHeaders().removeHeader(remoteIpHeader);
-                    } else {
-                        String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
-                        request.getCoyoteRequest().getMimeHeaders().setValue(remoteIpHeader).setString(commaDelimitedRemoteIpHeaderValue);
-                    }
+                    String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
+                    String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
+                    setProxiesHeaderAndRemoteIpHeader(request, commaDelimitedListOfProxies, commaDelimitedRemoteIpHeaderValue);
                 }
 
             }
@@ -918,31 +909,36 @@ public class RemoteIpValve extends ValveBase {
                 request.setLocalPort(originalLocalPort);
 
                 MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
-                if (supportRfc7239Only) {
-                    headers.setValue(forwardedHeader).setString(spliceRFC7239(originalForwardedValue));
+                if (supportRfc7239Only && originalForwardedValue != null) {
+                    headers.setValue(forwardedHeader).setString(spliceRfc7239(originalForwardedValue));
                 } else {
-                    if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
-                        headers.removeHeader(proxiesHeader);
-                    } else {
-                        headers.setValue(proxiesHeader).setString(originalProxiesHeader);
-                    }
-
-                    if (originalRemoteIpHeader == null || originalRemoteIpHeader.length() == 0) {
-                        headers.removeHeader(remoteIpHeader);
-                    } else {
-                        headers.setValue(remoteIpHeader).setString(originalRemoteIpHeader);
-                    }
+                    setProxiesHeaderAndRemoteIpHeader(request, originalProxiesHeader, originalRemoteIpHeader);
                 }
             }
         }
     }
 
+    private void setProxiesHeaderAndRemoteIpHeader(Request request, String proxiesHeaderValue, String remoteIpHeaderValue) {
+        MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
+        if (proxiesHeaderValue == null || proxiesHeaderValue.length() == 0) {
+            headers.removeHeader(proxiesHeader);
+        } else {
+            headers.setValue(proxiesHeader).setString(proxiesHeaderValue);
+        }
+
+        if (remoteIpHeaderValue == null || remoteIpHeaderValue.length() == 0) {
+            headers.removeHeader(remoteIpHeader);
+        } else {
+            headers.setValue(remoteIpHeader).setString(remoteIpHeaderValue);
+        }
+    }
+
     /**
-     * Splice RFC7239 directives
+     * Splice rfc7239 directives
      * @param directives  Forwarded Directive -> [v1,v2...]
      * @return rfc7239 Forwarded value
      */
-    public static String spliceRFC7239(Map<String, List<String>> directives) {
+    public static String spliceRfc7239(Map<String, List<String>> directives) {
         StringBuilder result = new StringBuilder();
         String ipv6Format = "%s=\"%s\"";
         String otherFormat = "%s=%s";
@@ -1009,13 +1005,16 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
-     * Parse Rfc7239 Forwarded values, only the 4 commands specified in rfc7239 are parsed,
+     * Parse rfc7239 Forwarded values, only the 4 commands specified in rfc7239 are parsed,
      * user-defined information will not be processed, but put directly into the result.
      *
      * @param forwardedValue rfc7239 Forwarded values
      * @param result         Forwarded Directive -> [v1,v2...]
      */
     public static void parseRfc7239(String forwardedValue, Map<String, List<String>> result) {
+        if (forwardedValue == null || forwardedValue.length() == 0) {
+            return;
+        }
         char[] chars = forwardedValue.toCharArray();
         StringBuilder key = new StringBuilder();
         StringBuilder value = new StringBuilder();
