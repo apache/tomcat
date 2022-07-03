@@ -1023,7 +1023,7 @@
 
     <p>
     This Valve currently supports two modes,<b>Legacy</b>and<b>RFC7239</b>. The default is
-      <b>Legacy</b>,and <b>RFC7239</b> mode can be enabled via <code>setSupportRFC7239Only</code>.
+      <b>Legacy</b>,and <b>RFC7239</b> mode can be enabled via <code>setSupportRfc7239Only</code>.
     </p>
     <p>Tomcat port of
     <a href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
@@ -1172,7 +1172,7 @@
         valve. If not specified, the default of <code>false</code> is used.</p>
       </attribute>
 
-      <attribute name="supportRFC7239Only" required="false">
+      <attribute name="supportRfc7239Only" required="false">
         <p>If <code>true</code>, the value will use <strong>RFC7239</strong> mode,
         otherwise use <strong>Legacy</strong> mode.
       </attribute>
