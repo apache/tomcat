@@ -940,8 +940,6 @@ public class RemoteIpValve extends ValveBase {
      */
     public static String spliceRfc7239(Map<String, List<String>> directives) {
         StringBuilder result = new StringBuilder();
-        String ipv6Format = "%s=\"%s\"";
-        String otherFormat = "%s=%s";
         boolean semicolonFirst = true;
         for (Map.Entry<String, List<String>> entry : directives.entrySet()) {
             if (semicolonFirst) {
@@ -953,52 +951,53 @@ public class RemoteIpValve extends ValveBase {
                 case FOR:
                 case HOST:
                 case BY:
-                    StringBuilder item = new StringBuilder();
+                    StringBuilder forwardedPair = new StringBuilder();
                     boolean first = true;
                     // ipv6 need to be wrapped in quotes
                     for (String value : entry.getValue()) {
-                        String format = null;
-
+                        boolean isIpv6 = false;
                         if (value.startsWith("[")) {
-                            format = ipv6Format;
+                            isIpv6 = true;
                         } else {
                             // Converting legacy ipv6 formats to ipv6 as specified in RFC 7239.
                             // eg: 2400:dd01:103a:4041::101:8080 -> "[2400:dd01:103a:4041::101]:8080"
-                            format = otherFormat;
                             int lastColonIndex = value.lastIndexOf(":");
                             if (lastColonIndex > 0) {
                                 int colonIndex = value.indexOf(":");
                                 // ipv6
                                 if (colonIndex != lastColonIndex) {
                                     value = "[" + value.substring(0, lastColonIndex) + "]" + value.substring(lastColonIndex);
-                                    format = ipv6Format;
+                                    isIpv6 = true;
                                 }
                             }
                         }
-                        value = String.format(format, entry.getKey(), value);
                         if (first) {
                             first = false;
                         } else {
-                            item.append(", ");
+                            forwardedPair.append(", ");
                         }
-                        item.append(value);
+                        forwardedPair.append(entry.getKey()).append("=");
+                        if (isIpv6) {
+                            forwardedPair.append("\"").append(value).append("\"");
+                        } else {
+                            forwardedPair.append(value);
+                        }
                     }
-                    result.append(item);
+                    result.append(forwardedPair);
                     break;
                 case PROTO:
                 default:
-                    item = new StringBuilder();
+                    forwardedPair = new StringBuilder();
                     first = true;
                     for (String value : entry.getValue()) {
-                        value = String.format(otherFormat, entry.getKey(), value);
                         if (first) {
                             first = false;
                         } else {
-                            item.append(", ");
+                            forwardedPair.append(", ");
                         }
-                        item.append(value);
+                        forwardedPair.append(entry.getKey()).append("=").append(value);
                     }
-                    result.append(item);
+                    result.append(forwardedPair);
             }
         }
         return result.toString();
