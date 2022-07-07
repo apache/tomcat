@@ -230,6 +230,12 @@
         defined in a configuration file and selecting the Manager and/or
         Host Manager web applications in the installer's GUI. (markt)
       </fix>
+      <update>
+        Update the OWB module to Apache OpenWebBeans 2.0.27. (remm)
+      </update>
+      <update>
+        Update the CXF module to Apache CXF 3.5.3. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
