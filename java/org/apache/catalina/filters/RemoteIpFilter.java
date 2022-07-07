@@ -53,20 +53,21 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
- * Servlet filter to integrate "X-Forwarded-For" and "X-Forwarded-Proto" HTTP headers.
+ * Servlet filter to integrate "X-Forwarded-*" and "Forwarded" HTTP headers. So this filter supports two modes,<b>Legacy</b>and<b>RFC7239</b>.
+ * The default is <b>Legacy</b>,and <b>RFC7239</b> mode can be enabled via {@link #setSupportRfc7239Only(boolean)}.
  * </p>
  * <p>
  * Most of the design of this Servlet Filter is a port of <a
  * href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>, this servlet filter replaces the apparent client remote
  * IP address and hostname for the request with the IP address list presented by a proxy or a load balancer via a request headers (e.g.
- * "X-Forwarded-For").
+ * "X-Forwarded-For" or Forwarded For directive in RFC7239).
  * </p>
  * <p>
  * Another feature of this servlet filter is to replace the apparent scheme (http/https) and server port with the scheme presented by a
- * proxy or a load balancer via a request header (e.g. "X-Forwarded-Proto").
+ * proxy or a load balancer via a request header (e.g. "X-Forwarded-Proto" or Forwarded Proto directive in RFC7239).
  * </p>
  * <p>
- * This servlet filter proceeds as follows:
+ * This servlet filter proceeds in <b>Legacy</b> mode as follows:
  * </p>
  * <p>
  * If the incoming <code>request.getRemoteAddr()</code> matches the servlet
@@ -911,7 +912,7 @@ public class RemoteIpFilter extends GenericFilter {
             }
 
             if (supportRfc7239Only) {
-
+                handleForwardedProtoAndHost(xRequest, forwardedValue);
             } else {
                 if (protocolHeader != null) {
                     String protocolHeaderValue = request.getHeader(protocolHeader);

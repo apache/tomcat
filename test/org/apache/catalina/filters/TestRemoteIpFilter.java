@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.buf.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -150,6 +151,99 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
                 getMappingData().context = new TesterContext();
             }
             return super.getContext();
+        }
+    }
+
+    public static class RFC7239TrackerFilterChain implements FilterChain {
+        private String remoteAddr;
+        private String remoteHost;
+        private String scheme;
+        private boolean secure;
+        private String serverName;
+        private int serverPort;
+        private String For;
+        private String By;
+        private String Host;
+        private String Proto;
+        private String Other;
+        private HttpServletRequest request;
+
+        public String getRemoteAddr() {
+            return remoteAddr;
+        }
+
+        public String getRemoteHost() {
+            return remoteHost;
+        }
+
+        public String getScheme() {
+            return scheme;
+        }
+
+        public String getServerName() {
+            return serverName;
+        }
+
+        public int getServerPort() {
+            return serverPort;
+        }
+
+        public boolean isSecure() {
+            return secure;
+        }
+
+        public String getFor() {
+            return For;
+        }
+
+        public String getBy() {
+            return By;
+        }
+        public String getOther() {
+            return Other;
+        }
+
+        public String getHost() {
+            return Host;
+        }
+
+        public String getProto() {
+            return Proto;
+        }
+
+        public HttpServletRequest getRequest() {
+            return request;
+        }
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
+            this.remoteHost = request.getRemoteHost();
+            this.remoteAddr = request.getRemoteAddr();
+            this.scheme = request.getScheme();
+            this.secure = request.isSecure();
+            this.serverName = request.getServerName();
+            this.serverPort = request.getServerPort();
+            Map<String, List<String>> result = new HashMap<>();
+            HttpServletRequest req = (HttpServletRequest) request;
+            this.request = req;
+            RemoteIpFilter.parseRfc7239(req.getHeader("Forwarded"), result);
+
+            if (result.containsKey("for")) {
+                For = StringUtils.join(result.get("for"), ',');
+            }
+            if (result.containsKey("host")) {
+                Host = StringUtils.join(result.get("host"), ',');
+            }
+            if (result.containsKey("proto")) {
+                Proto = StringUtils.join(result.get("proto"), ',');
+            }
+            if (result.containsKey("by")) {
+                By = StringUtils.join(result.get("by"), ',');
+            }
+            if (result.containsKey("other")) {
+                Other = StringUtils.join(result.get("other"), ',');
+            }
+
         }
     }
 
@@ -780,5 +874,171 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertTrue(request.isSecure());
         Assert.assertEquals("https", request.getScheme());
         Assert.assertEquals(443, request.getServerPort());
+    }
+
+    private RFC7239TrackerFilterChain testRemoteIpFilterRFC7239(FilterDef filterDef, Request request)
+        throws LifecycleException, IOException, ServletException {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        filterDef.setFilterClass(RemoteIpFilter.class.getName());
+        filterDef.setFilter(remoteIpFilter);
+        filterDef.setFilterName(RemoteIpFilter.class.getName());
+        root.addFilterDef(filterDef);
+
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName(RemoteIpFilter.class.getName());
+        filterMap.addURLPatternDecoded("*");
+        root.addFilterMap(filterMap);
+
+        getTomcatInstance().start();
+
+        RFC7239TrackerFilterChain filterChain = new RFC7239TrackerFilterChain();
+
+        // TEST
+        TesterResponse response = new TesterResponse();
+        response.setRequest(request);
+        remoteIpFilter.doFilter(request, response, filterChain);
+        return filterChain;
+    }
+
+    @Test
+    public void testInvokeAllProxiesAreTrustedOrInternalRFC7239() throws Exception {
+
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("supportRfc7239Only", "true");
+
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+        request.setHeader("Forwarded", "for=140.211.11.130, for=proxy1, for=proxy2, for=192.168.0.10, for=192.168.0.11");
+
+        // TEST
+        RFC7239TrackerFilterChain tracker = testRemoteIpFilterRFC7239(filterDef, request);
+
+        // VERIFY
+        String actualForwardedFor = tracker.getFor();
+        Assert.assertNull("all proxies are trusted, Forwarded For must be null", actualForwardedFor);
+
+        String actualForwardedBy = tracker.getBy();
+        Assert.assertEquals("all proxies are trusted, they must appear in Forwarded By", "proxy1,proxy2", actualForwardedBy);
+
+        String actualRemoteAddr = tracker.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+
+        String actualRemoteHost = tracker.getRemoteHost();
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+    }
+
+    @Test
+    public void testRequestAttributesForAccessLogRFC7239() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("httpServerPort", "8080");
+        filterDef.addInitParameter("supportRfc7239Only", "true");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("192.168.0.10");
+        request.setHeader("Forwarded", "for=140.211.11.130;proto=http");
+
+        // TEST
+        RFC7239TrackerFilterChain tracker = testRemoteIpFilterRFC7239(filterDef, request);
+
+        // VERIFY
+        HttpServletRequest actualRequest = tracker.getRequest();
+        Assert.assertEquals("org.apache.catalina.AccessLog.ServerPort",
+            Integer.valueOf(8080),
+            actualRequest.getAttribute(AccessLog.SERVER_PORT_ATTRIBUTE));
+
+        Assert.assertEquals("org.apache.catalina.AccessLog.RemoteAddr",
+            "140.211.11.130",
+            actualRequest.getAttribute(AccessLog.REMOTE_ADDR_ATTRIBUTE));
+
+        Assert.assertEquals("org.apache.catalina.AccessLog.RemoteHost",
+            "140.211.11.130",
+            actualRequest.getAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE));
+    }
+
+    @Test
+    public void testInvokeForwardedHostWithPortRFC7239() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("supportRfc7239Only", "true");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        // client ip
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("192.168.0.10");
+        // protocol
+        request.setSecure(false);
+        request.setServerPort(8080);
+        request.setScheme("http");
+        // host and port
+        request.getCoyoteRequest().serverName().setString("10.0.0.1");
+        request.setHeader("Forwarded", "host=example.com:8443;proto=https");
+
+        // TEST
+        RFC7239TrackerFilterChain tracker = testRemoteIpFilterRFC7239(filterDef, request);
+
+        // VERIFY
+        // protocol
+        String actualServerName = tracker.getServerName();
+        Assert.assertEquals("postInvoke serverName", "example.com", actualServerName);
+
+        String actualScheme = tracker.getScheme();
+        Assert.assertEquals("postInvoke scheme", "https", actualScheme);
+
+        int actualServerPort = tracker.getServerPort();
+        Assert.assertEquals("postInvoke serverPort", 8443, actualServerPort);
+
+        boolean actualSecure = tracker.getRequest().isSecure();
+        Assert.assertTrue("postInvoke secure", actualSecure);
+    }
+
+    @Test
+    public void testInvokeWithMultiForwardedHeader() throws ServletException, LifecycleException, IOException {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxies", "192\\.168\\.0\\.10|192\\.168\\.0\\.11");
+        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("supportRfc7239Only", "true");
+
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+        request.addHeader("Forwarded", "for=140.211.11.130");
+        request.addHeader("Forwarded", "For=proxy1, foR=proxy2");
+        request.addHeader("Forwarded", "for=192.168.0.10, for=192.168.0.11");
+        request.addHeader("Forwarded", "host=example.com, proto=http");
+
+        // TEST
+        RFC7239TrackerFilterChain tracker = testRemoteIpFilterRFC7239(filterDef, request);
+
+        // VERIFY
+        String actualForwardedFor = tracker.getFor();
+        Assert.assertNull( actualForwardedFor);
+
+        String actualForwardedBy = tracker.getBy();
+        Assert.assertEquals( "proxy1,proxy2", actualForwardedBy);
+
+        String scheme = tracker.getScheme();
+        Assert.assertEquals("http", scheme);
+
+        String serverName = tracker.getServerName();
+        Assert.assertEquals("example.com", serverName);
+
+        String actualRemoteAddr = tracker.getRemoteAddr();
+        Assert.assertEquals("140.211.11.130", actualRemoteAddr);
+
+        String actualRemoteHost = tracker.getRemoteHost();
+        Assert.assertEquals( "140.211.11.130", actualRemoteHost);
     }
 }
