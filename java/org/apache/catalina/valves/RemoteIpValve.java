@@ -947,7 +947,7 @@ public class RemoteIpValve extends ValveBase {
             } else {
                 result.append(";");
             }
-            switch (entry.getKey().toLowerCase(Locale.ROOT)) {
+            switch (entry.getKey().toLowerCase(Locale.ENGLISH)) {
                 case FOR:
                 case HOST:
                 case BY:
@@ -1048,7 +1048,7 @@ public class RemoteIpValve extends ValveBase {
     }
 
     public static void parseForwardedDirective(String directive, String value, Map<String, List<String>> result) {
-        directive = directive.toLowerCase(Locale.ROOT);
+        directive = directive.toLowerCase(Locale.ENGLISH);
         switch (directive) {
             case FOR:
                 // To reuse the legacy matching logic for InternalProxies and TrustedProxies

@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.Locale;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;
@@ -692,6 +693,21 @@ public class RemoteIpFilter extends GenericFilter {
 
     protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
 
+    protected static final String SUPPORT_RFC7239_ONLY = "supportRfc7239Only";
+
+    /**
+     * Header specified by RFC7239
+     */
+    private static final String FORWARDED_HEADER = "Forwarded";
+
+    /**
+     * The four directives specified in RFC 7239
+     */
+    private static final String BY = "by";
+    private static final String FOR = "for";
+    private static final String HOST = "host";
+    private static final String PROTO = "proto";
+
     /**
      * Convert a given comma delimited list of regular expressions into an array of String
      *
@@ -786,26 +802,40 @@ public class RemoteIpFilter extends GenericFilter {
 
     private boolean enableLookups;
 
+    /**
+     * @see #setSupportRfc7239Only(boolean)
+     */
+    private boolean supportRfc7239Only = false;
+
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        boolean isInternal = internalProxies != null &&
-                internalProxies.matcher(request.getRemoteAddr()).matches();
+        boolean isInternal = isInternalProxy(request.getRemoteAddr());
 
-        if (isInternal || (trustedProxies != null &&
-                trustedProxies.matcher(request.getRemoteAddr()).matches())) {
+        if (isInternal || isTrustedProxy(request.getRemoteAddr())) {
+            Map<String, List<String>> forwardedValue = new HashMap<>();
             String remoteIp = null;
             LinkedList<String> proxiesHeaderValue = new LinkedList<>();
-            StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
-
-            for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
-                if (concatRemoteIpHeaderValue.length() > 0) {
-                    concatRemoteIpHeaderValue.append(", ");
+            String[] remoteIpHeaderValue;
+            if (supportRfc7239Only) {
+                for (Enumeration<String> e = request.getHeaders(FORWARDED_HEADER); e.hasMoreElements();) {
+                    parseRfc7239(e.nextElement(), forwardedValue);
                 }
+                if (forwardedValue.containsKey(FOR)) {
+                    remoteIpHeaderValue = forwardedValue.get(FOR).toArray(new String[0]);
+                } else {
+                    remoteIpHeaderValue = new String[0];
+                }
+            } else {
+                StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
+                for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
+                    if (concatRemoteIpHeaderValue.length() > 0) {
+                        concatRemoteIpHeaderValue.append(", ");
+                    }
 
-                concatRemoteIpHeaderValue.append(e.nextElement());
+                    concatRemoteIpHeaderValue.append(e.nextElement());
+                }
+             remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
             }
-
-            String[] remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
             int idx;
             if (!isInternal) {
                 proxiesHeaderValue.addFirst(request.getRemoteAddr());
@@ -814,10 +844,9 @@ public class RemoteIpFilter extends GenericFilter {
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
-                if (internalProxies !=null && internalProxies.matcher(currentRemoteIp).matches()) {
+                if (isInternalProxy(currentRemoteIp)) {
                     // do nothing, internalProxies IPs are not appended to the
-                } else if (trustedProxies != null &&
-                        trustedProxies.matcher(currentRemoteIp).matches()) {
+                } else if (isTrustedProxy(currentRemoteIp)) {
                     proxiesHeaderValue.addFirst(currentRemoteIp);
                 } else {
                     idx--; // decrement idx because break statement doesn't do it
@@ -852,56 +881,90 @@ public class RemoteIpFilter extends GenericFilter {
                     xRequest.setRemoteHost(remoteIp);
                 }
 
-                if (proxiesHeaderValue.size() == 0) {
-                    xRequest.removeHeader(proxiesHeader);
-                } else {
-                    String commaDelimitedListOfProxies = listToCommaDelimitedString(proxiesHeaderValue);
-                    xRequest.setHeader(proxiesHeader, commaDelimitedListOfProxies);
-                }
-                if (newRemoteIpHeaderValue.size() == 0) {
-                    xRequest.removeHeader(remoteIpHeader);
-                } else {
-                    String commaDelimitedRemoteIpHeaderValue = listToCommaDelimitedString(newRemoteIpHeaderValue);
-                    xRequest.setHeader(remoteIpHeader, commaDelimitedRemoteIpHeaderValue);
-                }
-            }
+                if (supportRfc7239Only) {
+                    if (proxiesHeaderValue.size() == 0) {
+                        forwardedValue.remove(BY);
+                    } else {
+                        forwardedValue.put(BY, proxiesHeaderValue);
+                    }
 
-            if (protocolHeader != null) {
-                String protocolHeaderValue = request.getHeader(protocolHeader);
-                if (protocolHeaderValue == null) {
-                    // Don't modify the secure, scheme and serverPort attributes
-                    // of the request
-                } else if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
-                    xRequest.setSecure(true);
-                    xRequest.setScheme("https");
-                    setPorts(xRequest, httpsServerPort);
-                } else {
-                    xRequest.setSecure(false);
-                    xRequest.setScheme("http");
-                    setPorts(xRequest, httpServerPort);
-                }
-            }
-
-            if (hostHeader != null) {
-                String hostHeaderValue = request.getHeader(hostHeader);
-                if (hostHeaderValue != null) {
-                    try {
-                        int portIndex = Host.parse(hostHeaderValue);
-                        if (portIndex > -1) {
-                            log.debug(sm.getString("remoteIpFilter.invalidHostWithPort", hostHeaderValue, hostHeader));
-                            hostHeaderValue = hostHeaderValue.substring(0, portIndex);
-                        }
-
-                        xRequest.setServerName(hostHeaderValue);
-                        if (isChangeLocalName()) {
-                            xRequest.setLocalName(hostHeaderValue);
-                        }
-
-                    } catch (IllegalArgumentException iae) {
-                        log.debug(sm.getString("remoteIpFilter.invalidHostHeader", hostHeaderValue, hostHeader));
+                    if (newRemoteIpHeaderValue.size() == 0) {
+                        forwardedValue.remove(FOR);
+                    } else {
+                        forwardedValue.put(FOR, newRemoteIpHeaderValue);
+                    }
+                    xRequest.setHeader(FORWARDED_HEADER, spliceRfc7239(forwardedValue));
+                }else {
+                    if (proxiesHeaderValue.size() == 0) {
+                        xRequest.removeHeader(proxiesHeader);
+                    } else {
+                        String commaDelimitedListOfProxies = listToCommaDelimitedString(proxiesHeaderValue);
+                        xRequest.setHeader(proxiesHeader, commaDelimitedListOfProxies);
+                    }
+                    if (newRemoteIpHeaderValue.size() == 0) {
+                        xRequest.removeHeader(remoteIpHeader);
+                    } else {
+                        String commaDelimitedRemoteIpHeaderValue = listToCommaDelimitedString(newRemoteIpHeaderValue);
+                        xRequest.setHeader(remoteIpHeader, commaDelimitedRemoteIpHeaderValue);
                     }
                 }
             }
+
+            if (supportRfc7239Only) {
+
+            } else {
+                if (protocolHeader != null) {
+                    String protocolHeaderValue = request.getHeader(protocolHeader);
+                    int port = 0;
+                    if (protocolHeaderValue != null) {
+                        if (isForwardedProtoHeaderValueSecure(protocolHeaderValue)) {
+                            xRequest.setSecure(true);
+                            xRequest.setScheme("https");
+                            port = httpsServerPort;
+                        } else {
+                            xRequest.setSecure(false);
+                            xRequest.setScheme("http");
+                            port = httpServerPort;
+                        }
+
+                        if (getPortHeader() != null) {
+                            String portHeaderValue = xRequest.getHeader(getPortHeader());
+                            if (portHeaderValue != null) {
+                                try {
+                                    port = Integer.parseInt(portHeaderValue);
+                                } catch (NumberFormatException nfe) {
+                                    log.debug("Invalid port value [" + portHeaderValue +
+                                        "] provided in header [" + getPortHeader() + "]");
+                                }
+                            }
+                        }
+                        setPort(xRequest, port);
+                    }
+
+                }
+
+                if (hostHeader != null) {
+                    String hostHeaderValue = request.getHeader(hostHeader);
+                    if (hostHeaderValue != null) {
+                        try {
+                            int portIndex = Host.parse(hostHeaderValue);
+                            if (portIndex > -1) {
+                                log.debug(sm.getString("remoteIpFilter.invalidHostWithPort", hostHeaderValue, hostHeader));
+                                hostHeaderValue = hostHeaderValue.substring(0, portIndex);
+                            }
+
+                            xRequest.setServerName(hostHeaderValue);
+                            if (isChangeLocalName()) {
+                                xRequest.setLocalName(hostHeaderValue);
+                            }
+
+                        } catch (IllegalArgumentException iae) {
+                            log.debug(sm.getString("remoteIpFilter.invalidHostHeader", hostHeaderValue, hostHeader));
+                        }
+                    }
+                }
+            }
+
             request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
 
             if (log.isDebugEnabled()) {
@@ -939,7 +1002,210 @@ public class RemoteIpFilter extends GenericFilter {
 
     }
 
-    /*
+    /**
+     * Splice rfc7239 directives
+     * @param directives  Forwarded Directive -> [v1,v2...]
+     * @return rfc7239 Forwarded value
+     */
+    public static String spliceRfc7239(Map<String, List<String>> directives) {
+        StringBuilder result = new StringBuilder();
+        boolean semicolonFirst = true;
+        for (Map.Entry<String, List<String>> entry : directives.entrySet()) {
+            if (semicolonFirst) {
+                semicolonFirst = false;
+            } else {
+                result.append(";");
+            }
+            switch (entry.getKey().toLowerCase(Locale.ENGLISH)) {
+                case FOR:
+                case HOST:
+                case BY:
+                    StringBuilder forwardedPair = new StringBuilder();
+                    boolean first = true;
+                    // ipv6 need to be wrapped in quotes
+                    for (String value : entry.getValue()) {
+                        boolean isIpv6 = false;
+                        if (value.startsWith("[")) {
+                            isIpv6 = true;
+                        } else {
+                            // Converting legacy ipv6 formats to ipv6 as specified in RFC 7239.
+                            // eg: 2400:dd01:103a:4041::101:8080 -> "[2400:dd01:103a:4041::101]:8080"
+                            int lastColonIndex = value.lastIndexOf(":");
+                            if (lastColonIndex > 0) {
+                                int colonIndex = value.indexOf(":");
+                                // ipv6
+                                if (colonIndex != lastColonIndex) {
+                                    value = "[" + value.substring(0, lastColonIndex) + "]" + value.substring(lastColonIndex);
+                                    isIpv6 = true;
+                                }
+                            }
+                        }
+                        if (first) {
+                            first = false;
+                        } else {
+                            forwardedPair.append(", ");
+                        }
+                        forwardedPair.append(entry.getKey()).append("=");
+                        if (isIpv6) {
+                            forwardedPair.append("\"").append(value).append("\"");
+                        } else {
+                            forwardedPair.append(value);
+                        }
+                    }
+                    result.append(forwardedPair);
+                    break;
+                case PROTO:
+                default:
+                    forwardedPair = new StringBuilder();
+                    first = true;
+                    for (String value : entry.getValue()) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            forwardedPair.append(", ");
+                        }
+                        forwardedPair.append(entry.getKey()).append("=").append(value);
+                    }
+                    result.append(forwardedPair);
+            }
+        }
+        return result.toString();
+    }
+    /**
+     * Parse rfc7239 Forwarded values, only the 4 commands specified in rfc7239 are parsed,
+     * user-defined information will not be processed, but put directly into the result.
+     *
+     * @param forwardedValue rfc7239 Forwarded values
+     * @param result         Forwarded Directive -> [v1,v2...]
+     */
+    public static void parseRfc7239(String forwardedValue, Map<String, List<String>> result) {
+        if (forwardedValue == null || forwardedValue.length() == 0) {
+            return;
+        }
+        char[] chars = forwardedValue.toCharArray();
+        StringBuilder key = new StringBuilder();
+        StringBuilder value = new StringBuilder();
+        boolean isKey = true;
+        for (char c : chars) {
+            switch (c) {
+                case '=':
+                    isKey = false;
+                    break;
+                case ',':
+                case ';':
+                    isKey = true;
+                    parseForwardedDirective(key.toString(), value.toString(), result);
+                    key = new StringBuilder();
+                    value = new StringBuilder();
+                    break;
+                case ' ':
+                case '\"':
+                    break;
+                default:
+                    if (isKey) {
+                        key.append(c);
+                    } else {
+                        value.append(c);
+                    }
+                    break;
+            }
+        }
+        if (key.length() != 0 && value.length() != 0) {
+            parseForwardedDirective(key.toString(), value.toString(), result);
+        }
+    }
+
+    public static void parseForwardedDirective(String directive, String value, Map<String, List<String>> result) {
+        directive = directive.toLowerCase(Locale.ROOT);
+        switch (directive) {
+            case FOR:
+                // To reuse the legacy matching logic for InternalProxies and TrustedProxies
+                // so that the ipv6 format specified by RFC 7239 is converted to legacy format.
+                // Only for Forwarded For Directive.
+                // eg: "[2400:dd01:103a:4041::101]:8080" -> 2400:dd01:103a:4041::101:8080
+                if (value.startsWith("[")) {
+                    int portIndex = Host.parse(value);
+                    if (portIndex > -1) {
+                        String ip = value.substring(1, portIndex - 1);
+                        String port = value.substring(portIndex);
+                        if (port.length() >= 1) {
+                            value = ip + port;
+                        } else {
+                            value = ip;
+                        }
+                    }
+                }
+                if (value.startsWith("_") || "unknown".equals(value)) {
+                    return;
+                }
+            case BY:
+            case HOST:
+                if (value.startsWith("_") || "unknown".equals(value)) {
+                    return;
+                }
+                break;
+            case PROTO:
+                // Only have two types, so far.
+                if (!"http".equalsIgnoreCase(value) && !"https".equalsIgnoreCase(value)) {
+                    value = null;
+                }
+                break;
+            default:
+        }
+        if (value != null) {
+            List<String> item = result.get(directive);
+            if (item == null) {
+                item = new LinkedList<>();
+                result.put(directive, item);
+            }
+            item.add(value);
+        }
+    }
+
+    private void handleForwardedProtoAndHost(XForwardedRequest xRequest, Map<String, List<String>> forwardedValue) {
+        if (forwardedValue.containsKey(PROTO)) {
+            List<String> forwardedProtos = forwardedValue.get(PROTO);
+            if (isForwardedProtoHeaderValueSecure(forwardedProtos.toArray(new String[0]))) {
+                xRequest.setSecure(true);
+                xRequest.setScheme("https");
+                setPort(xRequest, httpsServerPort);
+            } else {
+                xRequest.setSecure(false);
+                xRequest.setScheme("http");
+                setPort(xRequest, httpServerPort);
+            }
+        }
+        if (forwardedValue.containsKey(HOST)) {
+            // There must be only one.
+            String forwardedHost = forwardedValue.get(HOST).get(0);
+            String hostHeaderValue = null;
+            try {
+                int portIndex = Host.parse(forwardedHost);
+                if (portIndex > -1) {
+                    hostHeaderValue = forwardedHost.substring(0, portIndex);
+                    String portStr = forwardedHost.substring(portIndex + 1);
+                    // mybe it is a obfport
+                    if (!portStr.startsWith("_")) {
+                        setPort(xRequest, Integer.parseInt(portStr));
+                    }
+                } else {
+                    hostHeaderValue = forwardedHost;
+                }
+
+                xRequest.setServerName(hostHeaderValue);
+                if (isChangeLocalName()) {
+                    xRequest.setLocalName(hostHeaderValue);
+                }
+
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Invalid value [" + forwardedHost + "] found in HTTP Forwarded Host");
+                }
+            }
+        }
+    }
+
+        /*
      * Considers the value to be secure if it exclusively holds forwards for
      * {@link #protocolHeaderHttpsValue}.
      */
@@ -948,6 +1214,10 @@ public class RemoteIpFilter extends GenericFilter {
             return protocolHeaderHttpsValue.equalsIgnoreCase(protocolHeaderValue);
         }
         String[] forwardedProtocols = commaDelimitedListToStringArray(protocolHeaderValue);
+        return isForwardedProtoHeaderValueSecure(forwardedProtocols);
+    }
+
+    private boolean isForwardedProtoHeaderValueSecure(String[] forwardedProtocols) {
         if (forwardedProtocols.length == 0) {
             return false;
         }
@@ -959,22 +1229,10 @@ public class RemoteIpFilter extends GenericFilter {
         return true;
     }
 
-    private void setPorts(XForwardedRequest xrequest, int defaultPort) {
-        int port = defaultPort;
-        if (getPortHeader() != null) {
-            String portHeaderValue = xrequest.getHeader(getPortHeader());
-            if (portHeaderValue != null) {
-                try {
-                    port = Integer.parseInt(portHeaderValue);
-                } catch (NumberFormatException nfe) {
-                    log.debug("Invalid port value [" + portHeaderValue +
-                            "] provided in header [" + getPortHeader() + "]");
-                }
-            }
-        }
-        xrequest.setServerPort(port);
+    private void setPort(XForwardedRequest xRequest, int port) {
+        xRequest.setServerPort(port);
         if (isChangeLocalPort()) {
-            xrequest.setLocalPort(port);
+            xRequest.setLocalPort(port);
         }
     }
 
@@ -989,6 +1247,16 @@ public class RemoteIpFilter extends GenericFilter {
         } else {
             chain.doFilter(request, response);
         }
+    }
+
+    public boolean isInternalProxy(String originalRemoteAddr) {
+        return internalProxies != null &&
+            internalProxies.matcher(originalRemoteAddr).matches();
+    }
+
+    public boolean isTrustedProxy(String originalRemoteAddr) {
+        return (trustedProxies != null &&
+            trustedProxies.matcher(originalRemoteAddr).matches());
     }
 
     public boolean isChangeLocalName() {
@@ -1105,6 +1373,10 @@ public class RemoteIpFilter extends GenericFilter {
         if (getInitParameter(ENABLE_LOOKUPS_PARAMETER) != null) {
             setEnableLookups(Boolean.parseBoolean(getInitParameter(ENABLE_LOOKUPS_PARAMETER)));
         }
+
+        if (getInitParameter(SUPPORT_RFC7239_ONLY) != null) {
+            setSupportRfc7239Only(Boolean.parseBoolean(getInitParameter(SUPPORT_RFC7239_ONLY)));
+        }
     }
 
     /**
@@ -1181,6 +1453,14 @@ public class RemoteIpFilter extends GenericFilter {
         } else {
             this.internalProxies = Pattern.compile(internalProxies);
         }
+    }
+
+    /**
+     * Use legacy mode if not specified, otherwise use RFC7239
+     * @param rfc7239Only Whether to use RFC7239
+     */
+    public void setSupportRfc7239Only(boolean rfc7239Only) {
+        this.supportRfc7239Only = rfc7239Only;
     }
 
     /**
