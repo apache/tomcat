@@ -209,6 +209,10 @@
       <update>
         Update the CXF module to Apache CXF 3.5.3. (remm)
       </update>
+      <update>
+        Update the Apache Tomcat migration tool for Jakarta EE library to 1.0.1.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
