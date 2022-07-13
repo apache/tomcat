@@ -213,6 +213,9 @@
         Update the Apache Tomcat migration tool for Jakarta EE library to 1.0.1.
         (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
