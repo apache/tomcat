@@ -249,6 +249,12 @@
         Update the packaged version of the Tomcat Native Library to 2.0.1 to
         pick up the Windows binaries built with with OpenSSL 3.0.5. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
+      <add>
+        Improvements to Japanese translations contributed tak7iji. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
@@ -377,9 +383,6 @@
       </add>
       <add>
         Improvements to Chinese translations contributed by Dingzi2012. (markt)
-      </add>
-      <add>
-        Improvements to French translations. (remm)
       </add>
     </changelog>
   </subsection>
