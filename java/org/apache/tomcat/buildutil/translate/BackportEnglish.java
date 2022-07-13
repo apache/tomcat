@@ -38,9 +38,6 @@ public class BackportEnglish extends BackportBase {
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webfrg.header");
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webxml.header");
 
-        // Exclude keys known to be different between 10.0.x and 9.0.x
-        keysToExclude.add("java.org.apache.catalina.connector.zzz.coyoteConnector.notAsciiSuperset");
-
         BackportEnglish backport = new BackportEnglish(args);
         backport.execute();
     }
