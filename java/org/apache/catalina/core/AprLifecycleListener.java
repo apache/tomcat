@@ -256,7 +256,7 @@ public class AprLifecycleListener implements LifecycleListener {
         if (tcnVersion < rcver) {
             initInfoLogMessages.add(sm.getString("aprListener.tcnVersion",
                     Library.versionString(),
-                    TCN_REQUIRED_MAJOR + "." +
+                    TCN_RECOMMENDED_MAJOR + "." +
                     TCN_RECOMMENDED_MINOR + "." +
                     TCN_RECOMMENDED_PV));
         }
