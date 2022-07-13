@@ -154,6 +154,10 @@
         API updates and fixes. Improves memory session usage and avoids some
         allocations. Review from Maurizio Cimadamore. (remm)
       </update>
+      <update>
+        Update the minimum recommended version of the Tomcat Native Library to
+        2.0.1. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -214,10 +218,6 @@
         manifests. (markt)
       </add>
       <update>
-        Update the packaged version of the Tomcat Native Library to 1.2.34 to
-        improve the support for building with OpenSSL 3.0.x.(markt)
-      </update>
-      <update>
         Update the minimum supported version of Tomcat Native to 1.2.34 to allow
         the removal of the deprecated Java API associated with features that
         will be removed in Tomcat Native 2.0.x. (markt)
@@ -244,6 +244,10 @@
       <update>
         Update the Apache Tomcat migration tool for Jakarta EE library to 1.0.1.
         (markt)
+      </update>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 2.0.1 to
+        pick up the Windows binaries built with with OpenSSL 3.0.5. (markt)
       </update>
     </changelog>
   </subsection>
