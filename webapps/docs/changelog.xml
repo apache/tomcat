@@ -209,6 +209,9 @@
       <update>
         Update the CXF module to Apache CXF 3.5.3. (remm)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
