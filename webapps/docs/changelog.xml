@@ -215,6 +215,10 @@
       <add>
         Improvements to Japanese translations contributed by tak7iji. (markt)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.35 to
+        pick up Windows binaries built with OpenSSL 1.1.1q.(markt)
+      </update>
     </changelog>
   </subsection>
 </section>
