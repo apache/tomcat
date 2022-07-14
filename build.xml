@@ -2681,6 +2681,7 @@ gpg.exec=${gpg.exec}
 asf.ldap.username=${release.asfusername}
 </echo>
     <replace file="webapps/docs/changelog.xml"
+        encoding="UTF-8"
         token="rtext=&quot;in development&quot;"
         value="rtext=&quot;&quot;" />
   </target>
