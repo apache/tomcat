@@ -813,12 +813,11 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             // Do the duplicate accept check here rather than in serverSocketaccept()
             // so we can cache the results in the SocketWrapper
             AprSocketWrapper wrapper = new AprSocketWrapper(socket, this);
-            connections.put(socket, wrapper);
             // Bug does not affect Windows. Skip the check on that platform.
             if (!JrePlatform.IS_WINDOWS) {
                 long currentNanoTime = System.nanoTime();
                 if (wrapper.getRemotePort() == previousAcceptedPort) {
-                    if (previousAcceptedAddress != null && wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
+                    if (wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
                         if (currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
                             throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
                         }
@@ -829,6 +828,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 previousAcceptedSocketNanoTime = currentNanoTime;
             }
 
+            connections.put(socket, wrapper);
             wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
             wrapper.setReadTimeout(getConnectionTimeout());
             wrapper.setWriteTimeout(getConnectionTimeout());
