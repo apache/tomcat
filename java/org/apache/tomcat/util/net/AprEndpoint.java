@@ -817,7 +817,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             if (!JrePlatform.IS_WINDOWS) {
                 long currentNanoTime = System.nanoTime();
                 if (wrapper.getRemotePort() == previousAcceptedPort) {
-                    if (wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
+                    if (previousAcceptedAddress != null && wrapper.getRemoteAddr().equals(previousAcceptedAddress)) {
                         if (currentNanoTime - previousAcceptedSocketNanoTime < 1000) {
                             throw new IOException(sm.getString("endpoint.err.duplicateAccept"));
                         }
