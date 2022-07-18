@@ -519,8 +519,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     protected SocketChannel serverSocketAccept() throws Exception {
         SocketChannel result = serverSock.accept();
 
-        // Bug does not affect Windows. Skip the check on that platform.
-        if (!JrePlatform.IS_WINDOWS) {
+        // Bug does not affect Windows platform and Unix Domain Socket. Skip the check.
+        if (!JrePlatform.IS_WINDOWS && getUnixDomainSocketPath() == null) {
             SocketAddress currentRemoteAddress = result.getRemoteAddress();
             long currentNanoTime = System.nanoTime();
             if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&
