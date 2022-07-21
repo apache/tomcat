@@ -752,6 +752,9 @@ public class CoyoteAdapter implements Adapter {
             } catch (IllegalArgumentException e) {
                 // Too many cookies
                 if (!response.isError()) {
+                    if (log.isWarnEnabled()) {
+                        log.warn(e.getMessage());
+                    }
                     response.setError();
                     response.sendError(400);
                 }
