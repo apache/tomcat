@@ -130,8 +130,8 @@
         (markt)
       </add>
       <scode>
-        Deprecated the <code>jmvRoute</code> system property used to configure a
-        default value for the <code>jmvRoute</code> attribute of an Engine.
+        Deprecated the <code>jvmRoute</code> system property used to configure a
+        default value for the <code>jvmRoute</code> attribute of an Engine.
         (markt)
       </scode>
       <fix>
