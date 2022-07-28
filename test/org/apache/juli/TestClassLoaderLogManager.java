@@ -16,9 +16,17 @@
  */
 package org.apache.juli;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -29,6 +37,8 @@ import org.junit.Test;
  * Test cases for {@link ClassLoaderLogManager}.
  */
 public class TestClassLoaderLogManager {
+
+    private static final byte[] EMPTY_BYTES = {};
 
     @Test
     public void testReplace() {
@@ -81,6 +91,26 @@ public class TestClassLoaderLogManager {
         listThread.setRunning(false);
     }
 
+    /**
+     * Tests if a per-app root logger has a not {@code null} level.
+     */
+    @Test
+    public void testBug66184() throws IOException {
+        final ClassLoader cl = new TestClassLoader();
+        final ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(cl);
+            final ClassLoaderLogManager logManager = new ClassLoaderLogManager();
+            logManager.readConfiguration();
+            final Logger rootLogger = logManager.getLogger("");
+            assertNotNull("root logger is null", rootLogger);
+            assertNull("root logger has a parent", rootLogger.getParent());
+            assertEquals(Level.INFO, rootLogger.getLevel());
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldCL);
+        }
+    }
+
     private static class LoggerCreateThread extends Thread {
 
         private final LogManager logManager;
@@ -131,6 +161,37 @@ public class TestClassLoaderLogManager {
 
         public void setRunning(boolean running) {
             this.running = running;
+        }
+    }
+
+    private static class TestClassLoader extends ClassLoader implements WebappProperties {
+
+        @Override
+        public String getWebappName() {
+            return "webapp";
+        }
+
+        @Override
+        public String getHostName() {
+            return "localhost";
+        }
+
+        @Override
+        public String getServiceName() {
+            return "Catalina";
+        }
+
+        @Override
+        public boolean hasLoggingConfig() {
+            return true;
+        }
+
+        @Override
+        public InputStream getResourceAsStream(final String resource) {
+            if ("logging.properties".equals(resource)) {
+                return new ByteArrayInputStream(EMPTY_BYTES);
+            }
+            return null;
         }
     }
 }
