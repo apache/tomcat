@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M18 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Avoid potential NPE by skipping duplicate accept check when using a Unix
+        Domain Socket. Based on <pr>532</pr> by Han Li. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M17 (markt)" rtext="2022-07-20">
   <subsection name="Catalina">
