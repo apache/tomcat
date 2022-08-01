@@ -306,4 +306,14 @@ public class TestMediaType {
         Assert.assertEquals("2", m.getParameterValue("B"));
         Assert.assertEquals("2", m.getParameterValue("b"));
     }
+
+    @Test
+    public void TestEmptyParameter() throws Exception {
+        // RFC 9110
+        StringReader sr = new StringReader("type/sub-type;;a=1;;b=2;;");
+        MediaType m = MediaType.parseMediaType(sr);
+
+        Assert.assertEquals("1", m.getParameterValue("a"));
+        Assert.assertEquals("2", m.getParameterValue("b"));
+    }
 }
