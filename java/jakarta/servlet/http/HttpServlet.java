@@ -108,7 +108,7 @@ public abstract class HttpServlet extends GenericServlet {
 
     static {
         SENSITIVE_HTTP_HEADERS.add("cookie");
-        SENSITIVE_HTTP_HEADERS.add("www-authenticate");
+        SENSITIVE_HTTP_HEADERS.add("authorization");
     }
 
 
