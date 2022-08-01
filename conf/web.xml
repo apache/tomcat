@@ -112,8 +112,10 @@
   <!--                                                                      -->
   <!--   allowPartialPut     Should the server treat an HTTP PUT request    -->
   <!--                       with a Range header as a partial PUT? Note     -->
-  <!--                       that RFC 7233 clarified that Range headers are -->
-  <!--                       only valid for GET requests. [true]            -->
+  <!--                       that while RFC 7233 clarified that Range       -->
+  <!--                       headers only valid for GET requests, RFC 9110  -->
+  <!--                       (which obsoletes RFC 7233) now allows partial  -->
+  <!--                       puts. [true]                                   -->
 
     <servlet>
         <servlet-name>default</servlet-name>
