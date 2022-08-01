@@ -294,7 +294,7 @@ public class TestMediaType {
             sb.append(lws);
             return sb.toString();
         }
-}
+    }
 
     @Test
     public void testCase() throws Exception {
