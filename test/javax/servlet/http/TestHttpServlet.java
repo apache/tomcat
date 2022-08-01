@@ -317,7 +317,7 @@ public class TestHttpServlet extends TomcatBaseTest {
                 "X-aaa: a1, a2" + SimpleHttpClient.CRLF +
                 "X-aaa: a3" + SimpleHttpClient.CRLF +
                 "Cookie: c1-v1" + SimpleHttpClient.CRLF +
-                "WWW-Authenticate: not-a-real-credential" + SimpleHttpClient.CRLF +
+                "Authorization: not-a-real-credential" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF});
         client.setUseContentLength(true);
 
@@ -338,7 +338,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         // Sensitive headers (cookies, WWW-Authenticate) must not be reflected
         // (since RFC 7231)
         Assert.assertFalse(body.contains("cookie"));
-        Assert.assertFalse(body.contains("www-authenticate"));
+        Assert.assertFalse(body.contains("authorization"));
 
         client.disconnect();
     }
