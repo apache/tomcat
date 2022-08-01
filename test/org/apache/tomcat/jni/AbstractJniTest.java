@@ -32,7 +32,11 @@ public abstract class AbstractJniTest {
         } catch (LibraryNotFoundError lnfe) {
             nativeLibraryPresent = false;
         }
-        Assume.assumeTrue("APR Library not found", nativeLibraryPresent);
+        Assume.assumeTrue("Tomcat Native Library not found", nativeLibraryPresent);
+        if (nativeLibraryPresent) {
+            Assume.assumeTrue("Tomcat Native Library version 2.x.x or later found which does not support these tests",
+                    Library.TCN_MAJOR_VERSION < 2);
+        }
     }
 
 
