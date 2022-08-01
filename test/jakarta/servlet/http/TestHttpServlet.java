@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jakarta.servlet.AsyncContext;
@@ -315,6 +316,8 @@ public class TestHttpServlet extends TomcatBaseTest {
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
                 "X-aaa: a1, a2" + SimpleHttpClient.CRLF +
                 "X-aaa: a3" + SimpleHttpClient.CRLF +
+                "Cookie: c1-v1" + SimpleHttpClient.CRLF +
+                "WWW-Authenticate: not-a-real-credential" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF});
         client.setUseContentLength(true);
 
@@ -328,9 +331,14 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         Assert.assertTrue(client.getResponseLine(), client.isResponse200());
         // Far from perfect but good enough
+        body = body.toLowerCase(Locale.ENGLISH);
         Assert.assertTrue(body.contains("a1"));
         Assert.assertTrue(body.contains("a2"));
         Assert.assertTrue(body.contains("a3"));
+        // Sensitive headers (cookies, WWW-Authenticate) must not be reflected
+        // (since RFC 7231)
+        Assert.assertFalse(body.contains("cookie"));
+        Assert.assertFalse(body.contains("www-authenticate"));
 
         client.disconnect();
     }

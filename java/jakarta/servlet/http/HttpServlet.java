@@ -25,7 +25,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import jakarta.servlet.AsyncEvent;
 import jakarta.servlet.AsyncListener;
@@ -94,11 +97,19 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
     private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
+    private static final Set<String> SENSITIVE_HTTP_HEADERS = new HashSet<>();
+
     private final transient Object cachedAllowHeaderValueLock = new Object();
     /**
      * Cached value of the HTTP {@code Allow} header for this servlet.
      */
     private volatile String cachedAllowHeaderValue = null;
+
+
+    static {
+        SENSITIVE_HTTP_HEADERS.add("cookie");
+        SENSITIVE_HTTP_HEADERS.add("www-authenticate");
+    }
 
 
     /**
@@ -612,10 +623,13 @@ public abstract class HttpServlet extends GenericServlet {
 
         while (reqHeaderNames.hasMoreElements()) {
             String headerName = reqHeaderNames.nextElement();
-            Enumeration<String> headerValues = req.getHeaders(headerName);
-            while (headerValues.hasMoreElements()) {
-                String headerValue = headerValues.nextElement();
-                buffer.append(CRLF).append(headerName).append(": ").append(headerValue);
+            // RFC 7231, 4.3.8 - skip 'sensitive' headers
+            if (!SENSITIVE_HTTP_HEADERS.contains(headerName.toLowerCase(Locale.ENGLISH))) {
+                Enumeration<String> headerValues = req.getHeaders(headerName);
+                while (headerValues.hasMoreElements()) {
+                    String headerValue = headerValues.nextElement();
+                    buffer.append(CRLF).append(headerName).append(": ").append(headerValue);
+                }
             }
         }
 
