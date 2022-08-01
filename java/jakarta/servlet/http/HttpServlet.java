@@ -622,9 +622,7 @@ public abstract class HttpServlet extends GenericServlet {
      * @exception ServletException  if the request for the
      *                                  TRACE cannot be handled
      */
-    protected void doTrace(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException
-    {
+    protected void doTrace(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         int responseLength;
 
@@ -632,12 +630,15 @@ public abstract class HttpServlet extends GenericServlet {
         StringBuilder buffer =
                 new StringBuilder("TRACE ").append(req.getRequestURI()).append(" ").append(req.getProtocol());
 
-        Enumeration<String> reqHeaderEnum = req.getHeaderNames();
+        Enumeration<String> reqHeaderNames = req.getHeaderNames();
 
-        while( reqHeaderEnum.hasMoreElements() ) {
-            String headerName = reqHeaderEnum.nextElement();
-            buffer.append(CRLF).append(headerName).append(": ")
-                .append(req.getHeader(headerName));
+        while (reqHeaderNames.hasMoreElements()) {
+            String headerName = reqHeaderNames.nextElement();
+            Enumeration<String> headerValues = req.getHeaders(headerName);
+            while (headerValues.hasMoreElements()) {
+                String headerValue = headerValues.nextElement();
+                buffer.append(CRLF).append(headerName).append(": ").append(headerValue);
+            }
         }
 
         buffer.append(CRLF);

@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M18 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct handling of HTTP TRACE requests where there are multiple
+        instances of an HTTP header with the same name. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
