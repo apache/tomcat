@@ -23,8 +23,10 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.apache.coyote.ActionCode;
@@ -61,11 +63,19 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private static final Integer HTTP_UPGRADE_STREAM = Integer.valueOf(1);
 
+    private static final Set<String> HTTP_CONNECTION_SPECIFC_HEADERS = new HashSet<>();
+
     static {
         Response response =  new Response();
         response.setStatus(100);
         StreamProcessor.prepareHeaders(null, response, true, null, null);
         ACK_HEADERS = response.getMimeHeaders();
+
+        HTTP_CONNECTION_SPECIFC_HEADERS.add("connection");
+        HTTP_CONNECTION_SPECIFC_HEADERS.add("proxy-connection");
+        HTTP_CONNECTION_SPECIFC_HEADERS.add("keep-alive");
+        HTTP_CONNECTION_SPECIFC_HEADERS.add("transfer-encoding");
+        HTTP_CONNECTION_SPECIFC_HEADERS.add("upgrade");
     }
 
     private volatile long contentLengthReceived = 0;
@@ -287,9 +297,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     getConnectionId(), getIdAsString(), name));
         }
 
-        if ("connection".equals(name)) {
+        if (HTTP_CONNECTION_SPECIFC_HEADERS.contains(name)) {
             throw new HpackException(sm.getString("stream.header.connection",
-                    getConnectionId(), getIdAsString()));
+                    getConnectionId(), getIdAsString(), name));
         }
 
         if ("te".equals(name)) {
