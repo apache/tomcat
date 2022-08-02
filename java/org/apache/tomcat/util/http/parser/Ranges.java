@@ -31,7 +31,11 @@ public class Ranges {
 
     public Ranges(String units, List<Entry> entries) {
         // Units are lower case (RFC 9110, section 14.1)
-        this.units = units.toLowerCase(Locale.ENGLISH);
+        if (units == null) {
+            this.units = null;
+        } else {
+            this.units = units.toLowerCase(Locale.ENGLISH);
+        }
         this.entries = Collections.unmodifiableList(entries);
     }
 
