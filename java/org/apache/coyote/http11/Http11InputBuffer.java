@@ -976,7 +976,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
                     prevChr = chr;
                     chr = byteBuffer.get();
-                    if (chr == Constants.CR) {
+                    if (chr == Constants.CR && prevChr != Constants.CR) {
+                        // CR is only permitted at the start of a CRLF sequence.
                         // Possible start of CRLF - process the next byte.
                     } else if (chr == Constants.LF) {
                         // CRLF or LF is an acceptable line terminator
