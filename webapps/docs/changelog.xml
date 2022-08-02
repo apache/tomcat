@@ -130,6 +130,10 @@
         using Tomcat Native 1.2.34 onwards built with OpenSSL 3.0.x onwards.
         (markt)
       </add>
+      <fix>
+        Address an edge case in HTTP header parsing that allowed CRCRLF to be
+        used as a valid line terminator. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
