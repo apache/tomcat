@@ -39,6 +39,15 @@ class Jre9Compat extends JreCompat {
 
     private static final Log log = LogFactory.getLog(Jre9Compat.class);
     private static final StringManager sm = StringManager.getManager(Jre9Compat.class);
+    /**
+     * @see <a href="https://docs.oracle.com/javase/9/docs/api/java/util/jar/JarFile.html">Multi-Release JAR API</a>
+     */
+    private static String JDK_MULTI_RELEASE_JAR_PROPERTY =
+        System.getProperty("jdk.util.jar.enableMultiRelease", null);
+    private static Boolean JDK_MULTI_RELEASE_JAR_ENABLED =
+        JDK_MULTI_RELEASE_JAR_PROPERTY == null ?
+            null :
+            Boolean.parse(JDK_MULTI_RELEASE_JAR_PROPERTY);
 
     private static final Class<?> inaccessibleObjectExceptionClazz;
     private static final Method setDefaultUseCachesMethod;
@@ -213,6 +222,9 @@ class Jre9Compat extends JreCompat {
 
     @Override
     public boolean jarFileIsMultiRelease(JarFile jarFile) {
+        if (JDK_MULTI_RELEASE_JAR_ENABLED != null) {
+            return JDK_MULTI_RELEASE_JAR_ENABLED;
+        }
         try {
             return ((Boolean) isMultiReleaseMethod.invoke(jarFile)).booleanValue();
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
