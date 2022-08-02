@@ -115,6 +115,10 @@
         Implement the requirements of RFC 7231 and do not include sensitive
         headers in responses to HTTP TRACE requests. (markt)
       </fix>
+      <fix>
+        Implement the clarification in RFC 9110 that the units in HTTP range
+        specifiers are case insensitive. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
