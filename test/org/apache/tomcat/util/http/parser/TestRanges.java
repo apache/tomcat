@@ -18,6 +18,7 @@ package org.apache.tomcat.util.http.parser;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -95,6 +96,14 @@ public class TestRanges {
         Entry e1 = l.get(0);
         Assert.assertEquals(-1, e1.getStart());
         Assert.assertEquals(20, e1.getEnd());
+    }
+
+
+    @Test
+    public void testNullUnits() throws Exception {
+        Ranges r = new Ranges(null, new ArrayList<>());
+        Assert.assertNotNull(r);
+        Assert.assertNull(r.getUnits());
     }
 
 
