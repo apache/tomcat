@@ -127,6 +127,10 @@
         Avoid potential NPE by skipping duplicate accept check when using a Unix
         Domain Socket. Based on <pr>532</pr> by Han Li. (markt)
       </fix>
+      <fix>
+        Address an edge case in HTTP header parsing that allowed CRCRLF to be
+        used as a valid line terminator. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
