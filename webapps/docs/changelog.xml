@@ -134,6 +134,10 @@
         Address an edge case in HTTP header parsing that allowed CRCRLF to be
         used as a valid line terminator. (markt)
       </fix>
+      <fix>
+        Ensure HTTP/2 requests that include connection specific headers are
+        rejected. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
