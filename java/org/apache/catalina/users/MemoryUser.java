@@ -27,7 +27,9 @@ import org.apache.tomcat.util.security.Escape;
  *
  * @author Craig R. McClanahan
  * @since 4.1
+ * @deprecated Use {@link GenericUser} instead.
  */
+@Deprecated
 public class MemoryUser extends GenericUser<MemoryUserDatabase> {
 
 

@@ -28,7 +28,9 @@ import org.apache.tomcat.util.security.Escape;
  *
  * @author Craig R. McClanahan
  * @since 4.1
+ * @deprecated Use {@link GenericGroup} instead.
  */
+@Deprecated
 public class MemoryGroup extends GenericGroup<MemoryUserDatabase> {
 
 
