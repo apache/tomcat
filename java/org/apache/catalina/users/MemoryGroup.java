@@ -27,7 +27,7 @@ import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.buf.StringUtils.Function;
-
+import org.apache.tomcat.util.security.Escape;
 
 /**
  * <p>Concrete implementation of {@link org.apache.catalina.Group} for the
@@ -165,16 +165,18 @@ public class MemoryGroup extends AbstractGroup {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("<group groupname=\"");
-        sb.append(groupname);
+        sb.append(Escape.xml(groupname));
         sb.append("\"");
         if (description != null) {
             sb.append(" description=\"");
-            sb.append(description);
+            sb.append(Escape.xml(description));
             sb.append("\"");
         }
         sb.append(" roles=\"");
+        StringBuilder rsb = new StringBuilder();
         StringUtils.join(roles, ',', new Function<Role>(){
-            @Override public String apply(Role t) { return t.getRolename(); }}, sb);
+            @Override public String apply(Role t) { return Escape.xml(t.getRolename()); }}, rsb);
+        sb.append(rsb);
         sb.append("\"");
         sb.append("/>");
         return sb.toString();

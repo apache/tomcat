@@ -18,7 +18,7 @@ package org.apache.catalina.users;
 
 
 import org.apache.catalina.UserDatabase;
-
+import org.apache.tomcat.util.security.Escape;
 
 /**
  * <p>Concrete implementation of {@link org.apache.catalina.Role} for the
@@ -82,11 +82,11 @@ public class MemoryRole extends AbstractRole {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("<role rolename=\"");
-        sb.append(rolename);
+        sb.append(Escape.xml(rolename));
         sb.append("\"");
         if (description != null) {
             sb.append(" description=\"");
-            sb.append(description);
+            sb.append(Escape.xml(description));
             sb.append("\"");
         }
         sb.append("/>");
