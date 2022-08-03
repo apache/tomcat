@@ -116,9 +116,13 @@
         specifiers are case insensitive. (markt)
       </fix>
       <fix>
-        Propertly-escape role and group information when writing
+        Properly-escape role and group information when writing
         MemoryUserDatabase to an XML file. (schultz)
       </fix>
+      <fix>
+        Move control of XML-export logic from individual support classes into
+        MemoryUserDatabase.save(). Deprecate and discontinue use of MemoryUser,
+        MemoryRole, and MemoryGroup classes. (schultz)
     </changelog>
   </subsection>
   <subsection name="Coyote">

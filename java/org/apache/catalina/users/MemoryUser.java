@@ -33,7 +33,9 @@ import org.apache.tomcat.util.security.Escape;
  *
  * @author Craig R. McClanahan
  * @since 4.1
+ * @deprecated Use {@link AbstractUser} instead.
  */
+@Deprecated
 public class MemoryUser extends AbstractUser {
 
 

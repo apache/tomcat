@@ -26,7 +26,9 @@ import org.apache.tomcat.util.security.Escape;
  *
  * @author Craig R. McClanahan
  * @since 4.1
+ * @deprecated Use {@link AbstractRole} instead.
  */
+@Deprecated
 public class MemoryRole extends AbstractRole {
 
 
