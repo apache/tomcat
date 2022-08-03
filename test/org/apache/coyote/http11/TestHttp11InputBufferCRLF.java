@@ -203,6 +203,8 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
 
             Tomcat tomcat = getTomcatInstance();
 
+            tomcat.getConnector().setProperty("rejectIllegalHeader", "true");
+
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "TesterServlet", new TesterServlet());
             root.addServletMappingDecoded("/test", "TesterServlet");
