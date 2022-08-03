@@ -33,6 +33,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import org.apache.catalina.Group;
+import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.UserDatabaseRealm;
@@ -215,5 +217,43 @@ public class MemoryUserDatabaseTests {
         }
 
         Assert.assertEquals(expectedNames.length, j);
+    }
+
+    @Test
+    public void testDataEscaping() throws Exception {
+        File file = File.createTempFile("tomcat-users", ".xml");
+        file.deleteOnExit();
+
+        MemoryUserDatabase mud = new MemoryUserDatabase();
+        Role role = mud.createRole("role\"name", "descr&iption");
+        Group group = mud.createGroup("grou<p", null);
+        group.addRole(role);
+        Role role2 = mud.createRole("role2", null);
+        group.addRole(role2);
+        User user = mud.createUser("xml<breaker", "\"bobby", "tab'les");
+        user.addRole(role);
+        user.addRole(role2);
+        user.addGroup(group);
+        mud.setPathname(file.getAbsolutePath());
+        mud.setReadonly(false);
+        mud.save();
+
+        String xml;
+        try(java.io.FileReader in = new java.io.FileReader(file)) {
+            StringBuilder sb = new StringBuilder((int)file.length());
+            char[] buffer = new char[4096];
+            int c;
+            while(-1 != (c = in.read(buffer))) {
+                sb.append(buffer, 0, c);
+            }
+            xml = sb.toString();
+        }
+
+        Assert.assertTrue("Role is not properly-escaped",
+                          xml.contains("<role rolename=\"role&quot;name\" description=\"descr&amp;iption\""));
+        Assert.assertTrue("Group is not escaped properly",
+                          xml.contains("<group groupname=\"grou&lt;p\" roles=\"role&quot;name,role2\""));
+        Assert.assertTrue("User is not properly-escaped",
+                          xml.contains("<user username=\"xml&lt;breaker\" password=\"&quot;bobby\" fullName=\"tab&apos;les\" groups=\"grou&lt;p\" roles=\"role&quot;name,role2\""));
     }
 }

@@ -20,7 +20,7 @@ package org.apache.catalina.users;
 import org.apache.catalina.Role;
 import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.buf.StringUtils;
-
+import org.apache.tomcat.util.security.Escape;
 
 /**
  * <p>Concrete implementation of {@link org.apache.catalina.Group} for the
@@ -52,15 +52,17 @@ public class MemoryGroup extends GenericGroup<MemoryUserDatabase> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("<group groupname=\"");
-        sb.append(groupname);
+        sb.append(Escape.xml(groupname));
         sb.append("\"");
         if (description != null) {
             sb.append(" description=\"");
-            sb.append(description);
+            sb.append(Escape.xml(description));
             sb.append("\"");
         }
         sb.append(" roles=\"");
-        StringUtils.join(roles, ',', Role::getRolename, sb);
+        StringBuilder rsb = new StringBuilder();
+        StringUtils.join(roles, ',', (x) -> Escape.xml(x.getRolename()), rsb);
+        sb.append(rsb);
         sb.append("\"");
         sb.append("/>");
         return sb.toString();
