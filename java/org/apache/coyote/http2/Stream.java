@@ -62,7 +62,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private static final Integer HTTP_UPGRADE_STREAM = Integer.valueOf(1);
 
-    private static final Set<String> HTTP_CONNECTION_SPECIFC_HEADERS = new HashSet<>();
+    private static final Set<String> HTTP_CONNECTION_SPECIFIC_HEADERS = new HashSet<>();
 
     static {
         Response response =  new Response();
@@ -70,11 +70,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         StreamProcessor.prepareHeaders(null, response, true, null, null);
         ACK_HEADERS = response.getMimeHeaders();
 
-        HTTP_CONNECTION_SPECIFC_HEADERS.add("connection");
-        HTTP_CONNECTION_SPECIFC_HEADERS.add("proxy-connection");
-        HTTP_CONNECTION_SPECIFC_HEADERS.add("keep-alive");
-        HTTP_CONNECTION_SPECIFC_HEADERS.add("transfer-encoding");
-        HTTP_CONNECTION_SPECIFC_HEADERS.add("upgrade");
+        HTTP_CONNECTION_SPECIFIC_HEADERS.add("connection");
+        HTTP_CONNECTION_SPECIFIC_HEADERS.add("proxy-connection");
+        HTTP_CONNECTION_SPECIFIC_HEADERS.add("keep-alive");
+        HTTP_CONNECTION_SPECIFIC_HEADERS.add("transfer-encoding");
+        HTTP_CONNECTION_SPECIFIC_HEADERS.add("upgrade");
     }
 
     private volatile long contentLengthReceived = 0;
@@ -296,7 +296,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     getConnectionId(), getIdAsString(), name));
         }
 
-        if (HTTP_CONNECTION_SPECIFC_HEADERS.contains(name)) {
+        if (HTTP_CONNECTION_SPECIFIC_HEADERS.contains(name)) {
             throw new HpackException(sm.getString("stream.header.connection",
                     getConnectionId(), getIdAsString(), name));
         }
