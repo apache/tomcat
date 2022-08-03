@@ -44,9 +44,11 @@ class Jre9Compat extends JreCompat {
      */
     private static String JDK_MULTI_RELEASE_JAR_PROPERTY =
         System.getProperty("jdk.util.jar.enableMultiRelease", null);
+    private static boolean JDK_MULTI_RELEASE_JAR_FORCED =
+        JDK_MULTI_RELEASE_JAR_PROPERTY != null && "force".equalsIgnoreCase(JDK_MULTI_RELEASE_JAR_PROPERTY);
     private static Boolean JDK_MULTI_RELEASE_JAR_ENABLED =
         JDK_MULTI_RELEASE_JAR_PROPERTY == null ?
-            null :
+            null : // not specified -> delegate to JarFile API
             Boolean.parse(JDK_MULTI_RELEASE_JAR_PROPERTY);
 
     private static final Class<?> inaccessibleObjectExceptionClazz;
@@ -222,9 +224,10 @@ class Jre9Compat extends JreCompat {
 
     @Override
     public boolean jarFileIsMultiRelease(JarFile jarFile) {
-        if (JDK_MULTI_RELEASE_JAR_ENABLED != null) {
+        if (JDK_MULTI_RELEASE_JAR_PROPERTY != null && !JDK_MULTI_RELEASE_JAR_FORCED) {
             return JDK_MULTI_RELEASE_JAR_ENABLED;
         }
+        // either "force" or the property is not specified
         try {
             return ((Boolean) isMultiReleaseMethod.invoke(jarFile)).booleanValue();
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
