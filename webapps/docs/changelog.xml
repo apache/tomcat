@@ -119,6 +119,10 @@
         Implement the clarification in RFC 9110 that the units in HTTP range
         specifiers are case insensitive. (markt)
       </fix>
+      <fix>
+        Propertly-escape role and group information when writing
+        MemoryUserDatabase to an XML file. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
