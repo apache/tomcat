@@ -185,6 +185,8 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testUndefinedPseudoHeader() throws Exception {
+        http2Connect();
+
         List<Header> headers = new ArrayList<>(5);
         headers.add(new Header(":method", "GET"));
         headers.add(new Header(":scheme", "http"));
@@ -198,6 +200,8 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testInvalidPseudoHeader() throws Exception {
+        http2Connect();
+
         List<Header> headers = new ArrayList<>(5);
         headers.add(new Header(":method", "GET"));
         headers.add(new Header(":scheme", "http"));
@@ -406,8 +410,6 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
 
     private void doInvalidPseudoHeaderTest(List<Header> headers) throws Exception {
-        http2Connect();
-
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
