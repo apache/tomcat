@@ -785,7 +785,11 @@ public class HttpParser {
             return readHostDomainName(reader);
         }
 
-        return pos;
+        if (inIPv6) {
+            return pos;
+        } else {
+            return validatePort(reader, pos);
+        }
     }
 
 
@@ -877,7 +881,7 @@ public class HttpParser {
 
         c = reader.read();
         if (c == ':') {
-            return pos;
+            return validatePort(reader, pos);
         } else {
             if(c == -1) {
                 return -1;
@@ -902,14 +906,27 @@ public class HttpParser {
 
         if (DomainParseState.COLON == state) {
             // State identifies the state of the previous character
-            return pos - 1;
+            return validatePort(reader, pos - 1);
         } else {
             return -1;
         }
     }
 
 
-    /**
+    static int validatePort(Reader reader, int colonPosition) throws IOException {
+        // Remaining characters should be numeric ...
+        readLong(reader);
+        // ... followed by EOS
+        if (reader.read() == -1) {
+            return colonPosition;
+        } else {
+            // Invalid port
+            throw new IllegalArgumentException();
+        }
+    }
+
+
+     /**
      * Skips all characters until EOF or the specified target is found. Normally
      * used to skip invalid input until the next separator.
      */
