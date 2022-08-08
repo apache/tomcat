@@ -216,6 +216,15 @@ public class TestHttpParserHost {
             Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[1111:2222:3333]",
             Integer.valueOf(-1), IAE} );
+        // Domain name - invalid port
+        result.add(new Object[] { TestType.IPv4, "localhost:x", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv4, "localhost:-1", Integer.valueOf(-1), IAE} );
+        // IPv4 - invalid port
+        result.add(new Object[] { TestType.IPv4, "127.0.0.1:x", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv4, "127.0.0.1:-1", Integer.valueOf(-1), IAE} );
+        // IPv6 - invalid port
+        result.add(new Object[] { TestType.IPv4, "[::1]:x", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv4, "[::1]:-1", Integer.valueOf(-1), IAE} );
         return result;
     }
 
