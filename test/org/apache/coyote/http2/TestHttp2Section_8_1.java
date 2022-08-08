@@ -345,40 +345,52 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
 
     @Test
-    public void testHostHeaderInconsistent() throws Exception {
+    public void testHostHeaderInconsistent01() throws Exception {
         http2Connect();
 
-        List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
-        headers.add(new Header(":scheme", "http"));
-        headers.add(new Header(":authority", "localhost:" + getPort()));
-        headers.add(new Header(":path", "/simple"));
-        headers.add(new Header("host", "otherhost:" + getPort()));
-
-        byte[] headersFrameHeader = new byte[9];
-        ByteBuffer headersPayload = ByteBuffer.allocate(128);
-
-        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
-
-        writeFrame(headersFrameHeader, headersPayload);
-
-        parser.readFrame(true);
-
-        String trace = output.getTrace();
-        Assert.assertTrue(trace, trace.contains("0-Goaway-[1]-[9]"));
+        doTestHostHeaderInconsistent("localhost:" + getPort(), "otherhost:" + getPort());
     }
 
 
     @Test
-    public void testHostHeaderInconsistentNoPort() throws Exception {
+    public void testHostHeaderInconsistent02() throws Exception {
         http2Connect();
 
+        doTestHostHeaderInconsistent("localhost", "otherhost");
+    }
+
+
+    @Test
+    public void testHostHeaderInconsistent03() throws Exception {
+        http2Connect();
+
+        doTestHostHeaderInconsistent("localhost:" + getPort(), "localhost");
+    }
+
+
+    @Test
+    public void testHostHeaderInconsistent04() throws Exception {
+        http2Connect();
+
+        doTestHostHeaderInconsistent("localhost", "localhost:" + getPort());
+    }
+
+
+    @Test
+    public void testHostHeaderInconsistent05() throws Exception {
+        http2Connect();
+
+        doTestHostHeaderInconsistent("localhost:" + getPort(), "otherhost:" + (getPort() + 1));
+    }
+
+
+    private void doTestHostHeaderInconsistent(String authority, String host) throws Exception {
         List<Header> headers = new ArrayList<>(4);
         headers.add(new Header(":method", "GET"));
         headers.add(new Header(":scheme", "http"));
-        headers.add(new Header(":authority", "localhost"));
+        headers.add(new Header(":authority", authority));
         headers.add(new Header(":path", "/simple"));
-        headers.add(new Header("host", "otherhost"));
+        headers.add(new Header("host", host));
 
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
