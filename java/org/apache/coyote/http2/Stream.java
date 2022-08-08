@@ -458,7 +458,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             throw new HpackException(sm.getString("stream.header.invalid",
                     getConnectionId(), getIdAsString(), "host", value));
         }
-        if (i == -1 && !value.equals(coyoteRequest.serverName().getString()) ||
+        if (i == -1 && (!value.equals(coyoteRequest.serverName().getString()) || coyoteRequest.getServerPort() != -1) ||
                 i > -1 && ((!value.substring(0, i).equals(coyoteRequest.serverName().getString()) ||
                     Integer.parseInt(value.substring(i + 1)) != coyoteRequest.getServerPort()))) {
             // Host value inconsistent
