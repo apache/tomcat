@@ -296,7 +296,7 @@ public class MemoryUserDatabase implements UserDatabase {
             throw new IllegalArgumentException(msg);
         }
 
-        Group group = new GenericGroup(this, groupname, description, null);
+        Group group = new GenericGroup<>(this, groupname, description, null);
         readLock.lock();
         try {
             groups.put(group.getGroupname(), group);
@@ -321,7 +321,7 @@ public class MemoryUserDatabase implements UserDatabase {
             throw new IllegalArgumentException(msg);
         }
 
-        Role role = new GenericRole(this, rolename, description);
+        Role role = new GenericRole<>(this, rolename, description);
         readLock.lock();
         try {
             roles.put(role.getRolename(), role);
@@ -348,7 +348,7 @@ public class MemoryUserDatabase implements UserDatabase {
             throw new IllegalArgumentException(msg);
         }
 
-        User user = new GenericUser(this, username, password, fullName, null, null);
+        User user = new GenericUser<>(this, username, password, fullName, null, null);
         readLock.lock();
         try {
             users.put(user.getUsername(), user);
@@ -607,7 +607,7 @@ public class MemoryUserDatabase implements UserDatabase {
                         writer.print("\"");
                     }
                     writer.print(" roles=\"");
-                    for(Iterator<Role> roles=group.getRoles(); roles.hasNext(); ) {
+                    for (Iterator<Role> roles=group.getRoles(); roles.hasNext();) {
                         Role role = roles.next();
                         writer.print(Escape.xml(role.getRolename()));
                         if(roles.hasNext()) {
@@ -631,7 +631,7 @@ public class MemoryUserDatabase implements UserDatabase {
                         writer.print("\"");
                     }
                     writer.print(" groups=\"");
-                    for(Iterator<Group> groups=user.getGroups(); groups.hasNext(); ) {
+                    for (Iterator<Group> groups=user.getGroups(); groups.hasNext();) {
                         Group group = groups.next();
                         writer.print(Escape.xml(group.getGroupname()));
                         if(groups.hasNext()) {
@@ -639,7 +639,7 @@ public class MemoryUserDatabase implements UserDatabase {
                         }
                     }
                     writer.print("\" roles=\"");
-                    for(Iterator<Role> roles=user.getRoles(); roles.hasNext(); ) {
+                    for (Iterator<Role> roles=user.getRoles(); roles.hasNext();) {
                         Role role = roles.next();
                         writer.print(Escape.xml(role.getRolename()));
                         if(roles.hasNext()) {

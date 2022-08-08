@@ -17,7 +17,6 @@
 package org.apache.catalina.users;
 
 
-import org.apache.catalina.Role;
 import org.apache.catalina.UserDatabase;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.security.Escape;
