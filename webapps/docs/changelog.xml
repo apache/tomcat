@@ -144,6 +144,19 @@
         Ensure HTTP/2 requests that include connection specific headers are
         rejected. (markt)
       </fix>
+      <fix>
+        When processing HTTP/2 requests, allow a <code>host</code> header to be
+        used in place of an <code>:authority</code> header. (markt)
+      </fix>
+      <fix>
+        When processing HTTP/2 requests, allow a <code>host</code> header and an
+        <code>:authority</code> header to  be present providing the are
+        consistent. (markt)
+      </fix>
+      <fix>
+        When processing HTTP/2 requests, reject requests containing multiple
+        <code>host</code> headers. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
