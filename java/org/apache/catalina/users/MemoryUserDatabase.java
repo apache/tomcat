@@ -638,7 +638,7 @@ public class MemoryUserDatabase implements UserDatabase {
                         writer.print("\"");
                     }
                     writer.print(" roles=\"");
-                    for(Iterator<Role> roles=group.getRoles(); roles.hasNext(); ) {
+                    for (Iterator<Role> roles=group.getRoles(); roles.hasNext(); ) {
                         Role role = roles.next();
                         writer.print(Escape.xml(role.getRolename()));
                         if(roles.hasNext()) {
@@ -662,7 +662,7 @@ public class MemoryUserDatabase implements UserDatabase {
                         writer.print("\"");
                     }
                     writer.print(" groups=\"");
-                    for(Iterator<Group> groups=user.getGroups(); groups.hasNext(); ) {
+                    for (Iterator<Group> groups=user.getGroups(); groups.hasNext(); ) {
                         Group group = groups.next();
                         writer.print(Escape.xml(group.getGroupname()));
                         if(groups.hasNext()) {
@@ -670,7 +670,7 @@ public class MemoryUserDatabase implements UserDatabase {
                         }
                     }
                     writer.print("\" roles=\"");
-                    for(Iterator<Role> roles=user.getRoles(); roles.hasNext(); ) {
+                    for (Iterator<Role> roles=user.getRoles(); roles.hasNext(); ) {
                         Role role = roles.next();
                         writer.print(Escape.xml(role.getRolename()));
                         if(roles.hasNext()) {
