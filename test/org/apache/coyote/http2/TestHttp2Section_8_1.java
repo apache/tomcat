@@ -319,6 +319,31 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
 
     @Test
+    public void testHostHeaderConsistentNoPort() throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":authority", "localhost"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header("host", "localhost"));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame(true);
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[200]"));
+    }
+
+
+    @Test
     public void testHostHeaderInconsistent() throws Exception {
         http2Connect();
 
@@ -328,6 +353,31 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         headers.add(new Header(":authority", "localhost:" + getPort()));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header("host", "otherhost:" + getPort()));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame(true);
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("0-Goaway-[1]-[9]"));
+    }
+
+
+    @Test
+    public void testHostHeaderInconsistentNoPort() throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":authority", "localhost"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header("host", "otherhost"));
 
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
