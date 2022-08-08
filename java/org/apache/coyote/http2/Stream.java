@@ -92,6 +92,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private StreamException headerException = null;
 
     private volatile StringBuilder cookieHeader = null;
+    private volatile boolean hostHeaderSeen = false;
 
     private Object pendingWindowUpdateForStreamLock = new Object();
     private int pendingWindowUpdateForStream = 0;
@@ -380,20 +381,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
         case ":authority": {
             if (coyoteRequest.serverName().isNull()) {
-                int i;
-                try {
-                    i = Host.parse(value);
-                } catch (IllegalArgumentException iae) {
-                    // Host value invalid
-                    throw new HpackException(sm.getString("stream.header.invalid",
-                            getConnectionId(), getIdAsString(), ":authority", value));
-                }
-                if (i > -1) {
-                    coyoteRequest.serverName().setString(value.substring(0, i));
-                    coyoteRequest.setServerPort(Integer.parseInt(value.substring(i + 1)));
-                } else {
-                    coyoteRequest.serverName().setString(value);
-                }
+                parseAuthority(value, false);
             } else {
                 throw new HpackException(sm.getString("stream.header.duplicate",
                         getConnectionId(), getIdAsString(), ":authority" ));
@@ -409,6 +397,22 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 cookieHeader.append("; ");
             }
             cookieHeader.append(value);
+            break;
+        }
+        case "host": {
+            if (coyoteRequest.serverName().isNull()) {
+                // No :authority header. This is first host header. Use it.
+                hostHeaderSeen = true;
+                parseAuthority(value, true);
+            } else if (!hostHeaderSeen) {
+                // First host header - must be consistent with :authority
+                hostHeaderSeen = true;
+                compareAuthority(value);
+            } else {
+                // Multiple hosts headers - illegal
+                throw new HpackException(sm.getString("stream.header.duplicate",
+                        getConnectionId(), getIdAsString(), "host" ));
+            }
             break;
         }
         default: {
@@ -433,6 +437,45 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
         }
+    }
+
+
+    private void parseAuthority(String value, boolean host) throws HpackException {
+        int i;
+        try {
+            i = Host.parse(value);
+        } catch (IllegalArgumentException iae) {
+            // Host value invalid
+            throw new HpackException(sm.getString("stream.header.invalid",
+                    getConnectionId(), getIdAsString(), host ? "host" : ":authority", value));
+        }
+        if (i > -1) {
+            coyoteRequest.serverName().setString(value.substring(0, i));
+            coyoteRequest.setServerPort(Integer.parseInt(value.substring(i + 1)));
+        } else {
+            coyoteRequest.serverName().setString(value);
+        }
+    }
+
+
+    private void compareAuthority(String value) throws HpackException {
+        int i;
+        try {
+            i = Host.parse(value);
+        } catch (IllegalArgumentException iae) {
+            // Host value invalid
+            throw new HpackException(sm.getString("stream.header.invalid",
+                    getConnectionId(), getIdAsString(), "host", value));
+        }
+        if (i == -1 && value.equals(coyoteRequest.serverName().getString()) ||
+                i > -1 && ((!value.substring(0, i).equals(coyoteRequest.serverName().getString()) ||
+                    Integer.parseInt(value.substring(i + 1)) != coyoteRequest.getServerPort()))) {
+            // Host value inconsistent
+            throw new HpackException(sm.getString("stream.host.inconsistent",
+                    getConnectionId(), getIdAsString(), value, coyoteRequest.serverName().getString(),
+                    Integer.toString(coyoteRequest.getServerPort())));
+        }
+
     }
 
 
