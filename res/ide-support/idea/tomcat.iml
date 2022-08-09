@@ -122,7 +122,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/migration-1.0.0/jakartaee-migration-1.0.0-shaded.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/migration-1.0.1/jakartaee-migration-1.0.1-shaded.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
