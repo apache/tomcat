@@ -296,6 +296,7 @@ public class MemoryUserDatabase implements UserDatabase {
             throw new IllegalArgumentException(msg);
         }
 
+        @SuppressWarnings("deprecation")
         Group group = new MemoryGroup(this, groupname, description);
         readLock.lock();
         try {
@@ -321,6 +322,7 @@ public class MemoryUserDatabase implements UserDatabase {
             throw new IllegalArgumentException(msg);
         }
 
+        @SuppressWarnings("deprecation")
         Role role = new MemoryRole(this, rolename, description);
         readLock.lock();
         try {
@@ -348,6 +350,7 @@ public class MemoryUserDatabase implements UserDatabase {
             throw new IllegalArgumentException(msg);
         }
 
+        @SuppressWarnings("deprecation")
         User user = new MemoryUser(this, username, password, fullName);
         readLock.lock();
         try {
