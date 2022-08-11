@@ -17,6 +17,10 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.RequestDispatcher;
@@ -51,7 +55,12 @@ public class TestErrorReportValve extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort());
+        ByteChunk res = new ByteChunk();
+        List<String> values = new ArrayList<>();
+        values.add("en");
+        Map<String, List<String>> reqHead = new HashMap<>();
+        reqHead.put("Accept-Language", values);
+        getUrl("http://localhost:" + getPort(), res, reqHead, null);
 
         Assert.assertTrue(res.toString().contains("<p><b>Message</b> " +
                 ErrorServlet.ERROR_TEXT + "</p>"));
