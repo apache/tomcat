@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.83 (schultz)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Ensure that zip archives use UTC for file modification times to ensure
+        repeatable builds across time zones. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.82 (schultz)" rtext="release in progress">
   <subsection name="Catalina">

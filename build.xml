@@ -257,7 +257,7 @@
     <format property="today" pattern="MMM d yyyy" locale="en" timezone="UTC"/>
     <format property="today-iso-8601" pattern="yyyy-MM-dd" locale="en" timezone="UTC"/>
     <format property="tstamp" pattern="HH:mm:ss" locale="en" timezone="UTC"/>
-    <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss"/>
+    <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss" timezone="UTC"/>
     <format property="tstamp.iso.release" pattern="yyyy-MM-dd'T'HH:mm:ssX" timezone="UTC"/>
   </tstamp>
   <filterset id="version.filters">
@@ -909,7 +909,7 @@
     <!-- i18n JARs -->
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-de.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_de.properties" />
       </fileset>
@@ -920,7 +920,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_es.properties" />
       </fileset>
@@ -931,7 +931,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_fr.properties" />
       </fileset>
@@ -942,7 +942,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ja.properties" />
       </fileset>
@@ -953,7 +953,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ko.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ko.properties" />
       </fileset>
@@ -964,7 +964,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ru.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ru.properties" />
       </fileset>
@@ -975,7 +975,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-zh-CN.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_zh_CN.properties" />
       </fileset>
@@ -1394,7 +1394,7 @@
     </fixcrlf>
 
     <zip destfile="${tomcat.embed}/${final.name}-embed.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <fileset dir="${tomcat.embed}">
         <include name="**" />
@@ -2028,7 +2028,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <!-- Digester and dependencies -->
     <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/catalina/startup/DigesterFactory.class" />
         <include name="org/apache/catalina/util/SchemaResolver.class" />
@@ -2409,7 +2409,12 @@ asf.ldap.username=${release.asfusername}
   </target>
 
   <!-- Sets properties only required for releases -->
-  <target name="release-init" depends="gpg-init-1,gpg-init-2" />
+  <target name="release-init" depends="gpg-init-1,gpg-init-2,compile" >
+    <taskdef name="forceUtcTimeZone"
+             classname="org.apache.tomcat.buildutil.ForceUtcTimeZone"
+             classpath="${tomcat.classes}" />
+    <forceUtcTimeZone />
+  </target>
 
   <target name="gpg-init-1">
     <available file="${gpg.exec}" property="gpg.exec.available"/>
@@ -2429,7 +2434,7 @@ asf.ldap.username=${release.asfusername}
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
@@ -2466,7 +2471,7 @@ asf.ldap.username=${release.asfusername}
 
     <!-- Windows x86 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
@@ -2494,7 +2499,7 @@ asf.ldap.username=${release.asfusername}
 
     <!-- Windows x64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
@@ -2538,7 +2543,7 @@ asf.ldap.username=${release.asfusername}
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.deployer}" fullpath="${final.name}-deployer"/>
       <zipfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer" includes="**" />
@@ -2689,7 +2694,7 @@ asf.ldap.username=${release.asfusername}
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}/src" fullpath="${final-src.name}" />
       <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
@@ -3466,7 +3471,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <sequential unless:true="${jar.uptodate}">
         <jar jarfile="@{jarfile}"
              manifest="@{manifest}"
-             modificationtime="${tstamp.file}">
+             modificationtime="${tstamp.iso.release}">
           <fileset dir="@{filesDir}">
             <patternset refid="@{filesId}"/>
             <!-- Javadoc exclusions -->
