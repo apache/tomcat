@@ -518,6 +518,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         validateCpong(ajpClient.cping());
 
         TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.addHeader(0xA004, "en");
         forwardMessage.end();
 
         TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage);
@@ -532,6 +533,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         forwardMessage = ajpClient.createForwardMessage();
         forwardMessage.addAttribute(0x0C, "WRONGSECRET");
+        forwardMessage.addHeader(0xA004, "en");
         forwardMessage.end();
 
         responseHeaders = ajpClient.sendMessage(forwardMessage);
@@ -546,6 +548,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         forwardMessage = ajpClient.createForwardMessage();
         forwardMessage.addAttribute(0x0C, "RIGHTSECRET");
+        forwardMessage.addHeader(0xA004, "en");
         forwardMessage.end();
 
         responseHeaders = ajpClient.sendMessage(forwardMessage);
