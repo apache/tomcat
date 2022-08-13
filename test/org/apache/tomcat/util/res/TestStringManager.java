@@ -32,7 +32,7 @@ public class TestStringManager {
 
     private static final Locale[] ALL_LOCALES = new Locale[] {
             Locale.ENGLISH, new Locale("cs"), Locale.GERMAN, new Locale("es"), Locale.FRENCH, Locale.JAPANESE,
-            Locale.KOREAN, new Locale("pr_BR"), new Locale("ru"), Locale.SIMPLIFIED_CHINESE };
+            Locale.KOREAN, new Locale("pt_BR"), new Locale("ru"), Locale.SIMPLIFIED_CHINESE };
     private static final Set<Locale> CJK_LOCALES;
 
     static {
