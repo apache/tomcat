@@ -110,7 +110,7 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Flag used to indicate that the socket should be kept open (e.g. for keep
-     * alive or send file.
+     * alive or send file).
      */
     protected volatile boolean openSocket = false;
 
