@@ -44,6 +44,14 @@ public class TestHttp2Limits extends Http2TestBase {
     public void testSettingsOverheadLimits() throws Exception {
         http2Connect();
 
+        // This message uses i18n and needs to be used in a regular
+        // expression (since we don't know the connection ID). Generate the
+        // string as a regular expression and then replace '[' and ']' with
+        // the escaped values.
+        String limitMessage = sm.getString("upgradeHandler.tooMuchOverhead", "\\p{XDigit}++");
+        limitMessage = limitMessage.replace("[", "\\[").replace("]", "\\]");
+        RegexMatcher overHeadMatcher = RegexMatcher.matchesRegex(
+            "0-Goaway-\\[1\\]-\\[11\\]-\\[" + limitMessage + "\\]");
         for (int i = 0; i < 100; i++) {
             try {
                 sendSettings(0, false);
@@ -57,7 +65,7 @@ public class TestHttp2Limits extends Http2TestBase {
             if (trace.equals("0-Settings-Ack\n")) {
                 // Test continues
                 output.clearTrace();
-            } else if (trace.startsWith("0-Goaway-[1]-[11]-[Connection [")) {
+            } else if (overHeadMatcher.matches(trace)) {
                 // Test passed
                 return;
             } else {
