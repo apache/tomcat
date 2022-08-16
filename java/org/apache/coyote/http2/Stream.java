@@ -150,7 +150,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             throw new IllegalArgumentException();
         }
         // This processing expects bytes. Server push will have used a String
-        // to trigger a conversion if required.
+        // so trigger a conversion if required.
         hostValueMB.toBytes();
         ByteChunk valueBC = hostValueMB.getByteChunk();
         byte[] valueB = valueBC.getBytes();
