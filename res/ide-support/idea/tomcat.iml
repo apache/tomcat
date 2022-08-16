@@ -104,7 +104,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/objenesis-2.6/objenesis-2.6.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/objenesis-3.2/objenesis-3.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
