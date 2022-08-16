@@ -16,10 +16,6 @@
  */
 package org.apache.juli;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -103,9 +99,9 @@ public class TestClassLoaderLogManager {
             final ClassLoaderLogManager logManager = new ClassLoaderLogManager();
             logManager.readConfiguration();
             final Logger rootLogger = logManager.getLogger("");
-            assertNotNull("root logger is null", rootLogger);
-            assertNull("root logger has a parent", rootLogger.getParent());
-            assertEquals(Level.INFO, rootLogger.getLevel());
+            Assert.assertNotNull("root logger is null", rootLogger);
+            Assert.assertNull("root logger has a parent", rootLogger.getParent());
+            Assert.assertEquals(Level.INFO, rootLogger.getLevel());
         } finally {
             Thread.currentThread().setContextClassLoader(oldCL);
         }

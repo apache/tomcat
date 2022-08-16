@@ -128,6 +128,11 @@
         MemoryUserDatabase.save(). Deprecate and discontinue use of MemoryUser,
         MemoryRole, and MemoryGroup classes. (schultz)
       </fix>
+      <fix>
+        <bug>66184</bug>: Ensure that JULI root loggers have a default level of
+        <code>INFO</code>. Pull request <pr>533</pr> provided by Piotr P.
+        Karwasz. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
