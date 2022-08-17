@@ -42,6 +42,9 @@ public class TestHttp2Limits extends Http2TestBase {
     @Test
     public void testSettingsOverheadLimits() throws Exception {
         http2Connect();
+        String errMsg = sm.getString("upgradeHandler.tooMuchOverhead", "\\p{XDigit}++")
+            .replace("[", "\\[");
+        String overHeadMsgRegx = "0-Goaway-\\[1]-\\[11]-\\[" + errMsg + "]";
 
         for (int i = 0; i < 100; i++) {
             try {
@@ -56,7 +59,7 @@ public class TestHttp2Limits extends Http2TestBase {
             if (trace.equals("0-Settings-Ack\n")) {
                 // Test continues
                 output.clearTrace();
-            } else if (trace.startsWith("0-Goaway-[1]-[11]-[Connection [")) {
+            } else if (trace.matches(overHeadMsgRegx)) {
                 // Test passed
                 return;
             } else {
