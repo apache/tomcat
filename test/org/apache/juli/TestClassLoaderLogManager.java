@@ -87,7 +87,7 @@ public class TestClassLoaderLogManager {
         listThread.setRunning(false);
     }
 
-    /**
+    /*
      * Tests if a per-app root logger has a not {@code null} level.
      */
     @Test
