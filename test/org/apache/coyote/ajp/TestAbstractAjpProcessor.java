@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.res.StringManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -510,6 +511,10 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
         ctx.addServletMappingDecoded("/", "helloWorld");
 
+        StringManager smClient = StringManager.getManager("org.apache.catalina.valves");
+        String expectedBody = "<p><b>" + smClient.getString("errorReportValve.type") + "</b> " +
+            smClient.getString("errorReportValve.statusReport") + "</p>";
+
         SimpleAjpClient ajpClient = new SimpleAjpClient();
 
         ajpClient.setPort(getPort());
@@ -524,7 +529,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         // Expect 3 packets: headers, body, end
         validateResponseHeaders(responseHeaders, 403, "403");
         TesterAjpMessage responseBody = ajpClient.readMessage();
-        validateResponseBody(responseBody, "<p><b>Type</b> Status Report</p>");
+        validateResponseBody(responseBody, expectedBody);
         validateResponseEnd(ajpClient.readMessage(), false);
 
         ajpClient.connect();
@@ -538,7 +543,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         // Expect 3 packets: headers, body, end
         validateResponseHeaders(responseHeaders, 403, "403");
         responseBody = ajpClient.readMessage();
-        validateResponseBody(responseBody, "<p><b>Type</b> Status Report</p>");
+        validateResponseBody(responseBody, expectedBody);
         validateResponseEnd(ajpClient.readMessage(), false);
 
         ajpClient.connect();
@@ -653,8 +658,11 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             validateCpong(ajpClient.cping());
         } else {
             // Expect 3 messages: headers, error report body, end for an invalid request
+            StringManager smClient = StringManager.getManager("org.apache.catalina.valves");
+            String expectedBody = "<p><b>" + smClient.getString("errorReportValve.type") + "</b> " +
+                smClient.getString("errorReportValve.statusReport") + "</p>";
             TesterAjpMessage responseBody = ajpClient.readMessage();
-            validateResponseBody(responseBody, "<p><b>Type</b> Status Report</p>");
+            validateResponseBody(responseBody, expectedBody);
             validateResponseEnd(ajpClient.readMessage(), false);
         }
 
