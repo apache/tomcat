@@ -17,10 +17,7 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.RequestDispatcher;
@@ -31,6 +28,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.res.StringManager;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,6 +40,8 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 
 public class TestErrorReportValve extends TomcatBaseTest {
+
+    private static final StringManager sm = StringManager.getManager(TestErrorReportValve.class);
 
     @Test
     public void testBug53071() throws Exception {
@@ -56,14 +56,10 @@ public class TestErrorReportValve extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        List<String> values = new ArrayList<>();
-        values.add("en");
-        Map<String, List<String>> reqHead = new HashMap<>();
-        reqHead.put("Accept-Language", values);
-        getUrl("http://localhost:" + getPort(), res, reqHead, null);
-
-        Assert.assertTrue(res.toString().contains("<p><b>Message</b> " +
-                ErrorServlet.ERROR_TEXT + "</p>"));
+        res.setCharset(StandardCharsets.UTF_8);
+        getUrl("http://localhost:" + getPort(), res, null);
+        Assert.assertTrue(res.toString().contains("<p><b>" + sm.getString("errorReportValve.message") + "</b> " +
+            ErrorServlet.ERROR_TEXT + "</p>"));
     }
 
 
