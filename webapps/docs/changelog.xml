@@ -133,6 +133,10 @@
         <code>INFO</code>. Pull request <pr>533</pr> provided by Piotr P.
         Karwasz. (markt)
       </fix>
+      <fix>
+        Improve handling of stack overflow errors when parsing SSI expressions.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
