@@ -118,6 +118,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Make parsing of invalid filename directives in
+        <code>Content-Disposition</code> headers more robust. Invalid filename
+        directives will now be ignored rather than triggering a 500 response.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
