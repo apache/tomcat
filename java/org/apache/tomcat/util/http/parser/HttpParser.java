@@ -218,6 +218,11 @@ public class HttpParser {
             char c = input.charAt(i);
             if (input.charAt(i) == '\\') {
                 i++;
+                if (i == end) {
+                    // Input (less surrounding quotes) ended with '\'. That is
+                    // invalid so return null.
+                    return null;
+                }
                 result.append(input.charAt(i));
             } else {
                 result.append(c);
