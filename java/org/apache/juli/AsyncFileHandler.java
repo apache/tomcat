@@ -205,6 +205,12 @@ public class AsyncFileHandler extends FileHandler {
                 } catch (InterruptedException x) {
                     // Ignore the attempt to interrupt the thread.
                 } catch (Throwable x) {
+                    if (x instanceof VirtualMachineError) {
+                        throw (VirtualMachineError) x;
+                    }
+                    if (x instanceof ThreadDeath) {
+                        throw (ThreadDeath) x;
+                    }
                     x.printStackTrace();
                 }
             }
