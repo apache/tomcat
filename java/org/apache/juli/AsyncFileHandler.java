@@ -204,7 +204,7 @@ public class AsyncFileHandler extends FileHandler {
                     entry.flush();
                 } catch (InterruptedException x) {
                     // Ignore the attempt to interrupt the thread.
-                } catch (Exception x) {
+                } catch (Throwable x) {
                     x.printStackTrace();
                 }
             }
