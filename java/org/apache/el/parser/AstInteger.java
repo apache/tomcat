@@ -35,11 +35,20 @@ public final class AstInteger extends SimpleNode {
     private volatile Number number;
 
     protected Number getInteger() {
+        // The parser should ensure the format of the string to be parsed
         if (this.number == null) {
             try {
-                this.number = Long.valueOf(this.image);
-            } catch (ArithmeticException e1) {
-                this.number = new BigInteger(this.image);
+                try {
+                    this.number = Long.valueOf(this.image);
+                } catch (NumberFormatException ignore) {
+                    // Too large for Long. Try BigInteger.
+                    this.number = new BigInteger(this.image);
+                }
+            } catch (ArithmeticException | NumberFormatException e) {
+                // Too big for BigInteger.
+                // Catch NumberFormatException as well here just in case the
+                // parser provides invalid input.
+                throw new ELException(e);
             }
         }
         return number;
