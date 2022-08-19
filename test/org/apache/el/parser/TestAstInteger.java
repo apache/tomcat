@@ -41,7 +41,7 @@ public class TestAstInteger {
 
     private void doTestValid(String value) {
         ELProcessor processor = new ELProcessor();
-        Number result = processor.eval(value);
+        Number result = (Number) processor.eval(value);
         Assert.assertTrue(ELSupport.equals(null, new BigInteger(value), result));
     }
 

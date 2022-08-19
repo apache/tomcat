@@ -31,7 +31,7 @@ public class TestAstFloatingPoint {
     public void testValidDouble() {
         String value = "1.234e100";
         ELProcessor processor = new ELProcessor();
-        Number result = processor.eval(value);
+        Number result = (Number) processor.eval(value);
         Assert.assertTrue(ELSupport.equals(null, Double.valueOf(value), result));
     }
 
@@ -40,7 +40,7 @@ public class TestAstFloatingPoint {
     public void testValidBigDecimal() {
         String value = "1.234e1000";
         ELProcessor processor = new ELProcessor();
-        Number result = processor.eval(value);
+        Number result = (Number) processor.eval(value);
         Assert.assertTrue(ELSupport.equals(null, new BigDecimal(value), result));
     }
 }
