@@ -134,6 +134,11 @@
         Improve handling of stack overflow errors when parsing EL expressions.
         (markt)
       </fix>
+      <fix>
+        Correct parsing of integer and floating point literals in EL expressions
+        so that larger values are correctly parsed to <code>BigInteger</code>
+        and <code>BigDecimal</code> respectively. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
