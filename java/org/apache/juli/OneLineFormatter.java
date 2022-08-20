@@ -133,12 +133,13 @@ public class OneLineFormatter extends Formatter {
         // Thread
         sb.append(' ');
         sb.append('[');
-        if (Thread.currentThread() instanceof AsyncFileHandler.LoggerThread) {
+        final String threadName = Thread.currentThread().getName();
+        if (threadName != null && threadName.startsWith(AsyncFileHandler.THREAD_PREFIX)) {
             // If using the async handler can't get the thread name from the
             // current thread.
             sb.append(getThreadName(record.getThreadID()));
         } else {
-            sb.append(Thread.currentThread().getName());
+            sb.append(threadName);
         }
         sb.append(']');
 
