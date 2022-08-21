@@ -258,6 +258,9 @@ public class FormAuthenticator
             // Does session id match?
             String expectedSessionId = (String) session.getNote(Constants.SESSION_ID_NOTE);
             if (expectedSessionId == null || !expectedSessionId.equals(request.getRequestedSessionId())) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("formAuthenticator.sessionIdMismatch", session.getId(), expectedSessionId));
+                }
                 session.expire();
                 session = null;
             }
@@ -418,8 +421,12 @@ public class FormAuthenticator
         if (getChangeSessionIdOnAuthentication()) {
             Session session = request.getSessionInternal(false);
             if (session != null) {
+                String oldSessionId = session.getId();
                 String newSessionId = changeSessionID(request, session);
                 session.setNote(Constants.SESSION_ID_NOTE, newSessionId);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("formAuthenticator.changeSessionIdLogin", oldSessionId, newSessionId));
+                }
             }
         }
 
