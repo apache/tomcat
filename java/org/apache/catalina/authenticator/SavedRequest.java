@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.authenticator;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +27,6 @@ import java.util.Map;
 import jakarta.servlet.http.Cookie;
 
 import org.apache.tomcat.util.buf.ByteChunk;
-
 
 /**
  * Object that saves the critical information from a request so that
