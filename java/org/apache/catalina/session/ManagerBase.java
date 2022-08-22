@@ -204,6 +204,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      */
     private boolean persistAuthentication = false;
 
+    /**
+     * Determines if the session notes required by the FORM authentication
+     * process are persisted (or replicated for clusters) by this Manager.
+     */
+    private boolean persistAuthenticationNotes = false;
+
 
     // ------------------------------------------------------------ Constructors
 
@@ -575,6 +581,39 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      */
     public void setPersistAuthentication(boolean persistAuthentication) {
         this.persistAuthentication = persistAuthentication;
+    }
+
+
+    /**
+     * Return whether sessions managed by this manager shall persist
+     * authentication notes used by FORM authentication or not.
+     *
+     * @return {@code true}, sessions managed by this manager shall persist
+     *         authentication notes used by FORM authentication; {@code false}
+     *         otherwise
+     *
+     * @deprecated Will be removed in Tomcat 10.1.x where it is effectively
+     *             hard-coded to <code>true</code>
+     */
+    @Deprecated
+    public boolean getPersistAuthenticationNotes() {
+        return this.persistAuthenticationNotes;
+    }
+
+    /**
+     * Set whether sessions managed by this manager shall persist authentication
+     * notes used by FORM authentication or not.
+     *
+     * @param persistAuthentication if {@code true}, sessions managed by this
+     *                              manager shall persist authentication notes
+     *                              used by FORM authentication
+     *
+     * @deprecated Will be removed in Tomcat 10.1.x where it is effectively
+     *             hard-coded to <code>true</code>
+     */
+    @Deprecated
+    public void setPersistAuthenticationNotes(boolean persistAuthenticationNotes) {
+        this.persistAuthenticationNotes = persistAuthenticationNotes;
     }
 
 

@@ -137,6 +137,11 @@
         Improve handling of stack overflow errors when parsing SSI expressions.
         (markt)
       </fix>
+      <fix>
+        <bug>66120</bug>: Enable FORM authentication to work correctly if
+        session persistence and restoration occurs during the authentication
+        process. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -194,6 +199,10 @@
         <code>IllegalArgumentException</code> if a <code>DeltaRequest</code> is
         passed an unrecognised action type, a warning message will now be
         logged. (markt)
+      </fix>
+      <fix>
+        <bug>66120</bug>: Enable FORM authentication to work correctly if
+        session failover occurs during the authentication process. (markt)
       </fix>
     </changelog>
   </subsection>
