@@ -218,7 +218,7 @@ public class DeltaRequest implements Externalizable {
                     }
                     break;
                 default:
-                    throw new IllegalArgumentException(sm.getString("deltaRequest.invalidAttributeInfoType", info));
+                    log.warn(sm.getString("deltaRequest.invalidAttributeInfoType", info));
             }//switch
         }//for
         session.endAccess();
