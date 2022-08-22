@@ -61,7 +61,7 @@ public class AsyncFileHandler extends FileHandler {
                                Integer.toString(DEFAULT_MAX_RECORDS)));
 
     private static final ExecutorService LOGGER_SERVICE = new LoggerExecutorService(OVERFLOW_DROP_TYPE,
-            DEFAULT_MAX_RECORDS);
+            MAX_RECORDS);
 
     private final Object closeLock = new Object();
     protected volatile boolean closed = false;
@@ -180,7 +180,6 @@ public class AsyncFileHandler extends FileHandler {
                     if (executor.getQueue().offer(r, 1000, TimeUnit.MILLISECONDS)) {
                         break;
                     }
-                    ;
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RejectedExecutionException("Interrupted", e);

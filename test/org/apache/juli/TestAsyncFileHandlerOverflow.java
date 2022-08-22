@@ -16,8 +16,6 @@
  */
 package org.apache.juli;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,6 +35,7 @@ import java.util.logging.Logger;
 
 import org.apache.juli.AsyncFileHandler.LoggerExecutorService;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -136,7 +135,7 @@ public class TestAsyncFileHandlerOverflow {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         Files.copy(logsDir.resolve(PREFIX + LocalDate.now() + SUFFIX), os);
         final String actual = new String(os.toByteArray(), StandardCharsets.UTF_8);
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
         handler.close();
     }
 }
