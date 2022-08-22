@@ -141,6 +141,21 @@
         Set to <code>true</code> if you wish to have container listeners notified
         across Tomcat nodes in the cluster.
       </attribute>
+      <attribute name="persistAuthenticationNotes" required="false">
+        <p>Should authentication notes (used during FORM authentication) be
+        included when sessions are replicated? If <code>true</code>, the
+        session's authentication notes (used during FORM authentication) are
+        replicated so that an in progress FORM authentication can continue if
+        failover occurs during FORM authentication. If not specified, the
+        default value of <code>false</code> will be used.</p>
+
+        <p>Please note that all nodes must be upgraded to at least 10.0.24 (the
+        version where this feature was introduced) before this feature is
+        enabled else session replication may fail.</p>
+
+        <p>This attribute has been removed for Tomcat 10.1.x onwards which
+        always replicates FORM authenticaton notes.</p>
+      </attribute>
       <attribute name="stateTransferTimeout" required="false">
         The time in seconds to wait for a session state transfer to complete
         from another node when a node is starting up.
@@ -221,6 +236,21 @@
         Manager, or -1 (the default) for no limit. For this manager, only
         sessions where the current node is the primary node for the session are
         considered active sessions.
+      </attribute>
+      <attribute name="persistAuthenticationNotes" required="false">
+        <p>Should authentication notes (used during FORM authentication) be
+        included when sessions are replicated? If <code>true</code>, the
+        session's authentication notes (used during FORM authentication) are
+        replicated so that an in progress FORM authentication can continue if
+        failover occurs during FORM authentication. If not specified, the
+        default value of <code>false</code> will be used.</p>
+
+        <p>Please note that all nodes must be upgraded to at least 10.0.24 (the
+        version where this feature was introduced) before this feature is
+        enabled else session replication may fail.</p>
+
+        <p>This attribute has been removed for Tomcat 10.1.x onwards which
+        always replicates FORM authenticaton notes.</p>
       </attribute>
       <attribute name="rpcTimeout" required="false">
         Timeout for RPC message used for broadcast and transfer state from

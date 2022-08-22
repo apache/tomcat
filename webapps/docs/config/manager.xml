@@ -159,6 +159,17 @@
         filter pattern in order to be restored.</p>
       </attribute>
 
+      <attribute name="persistAuthenticationNotes" required="false">
+        <p>Should authentication notes (used during FORM authentication) be
+        included when session state is preserved across application restarts?
+        If <code>true</code>, the session's authentication notes are preserved
+        so that an in progress FORM authentication can continue after the
+        application has been restarted. If not specified, the default value of
+        <code>false</code> will be used.<br />See
+        <a href="#Persistence_Across_Restarts">Persistence Across Restarts</a>
+        for more information.</p>
+      </attribute>
+
       <attribute name="processExpiresFrequency" required="false">
         <p>Frequency of the session expiration, and related manager operations.
         Manager operations will be done once for the specified amount of
@@ -299,6 +310,25 @@
         is specified or a <code>SecurityManager</code> is enabled, the names of
         the <code>Principal</code> class and descendant classes must match that
         filter pattern in order to be restored.</p>
+      </attribute>
+
+      <attribute name="persistAuthenticationNotes" required="false">
+        <p>Should authentication notes (used during FORM authentication) be
+        included when sessions are swapped out to persistent storage? If
+        <code>true</code>, the session's authentication notes (used during
+        FORM authentication) are preserved so that an in progress FORM
+        authentication can continue after being reloaded (swapped in) from
+        persistent storage. If not specified, the default value of
+        <code>false</code> will be used.</p>
+
+        <p>Please note that if it is possible that the session will be swapped
+        in to a different node to the node from which it was swapped out, all
+        nodes must be upgraded to at least 10.0.24 (the version where this
+        feature was introduced) before this feature is enabled else the swapping
+        in may fail.</p>
+
+        <p>This attribute has been removed for Tomcat 10.1.x onwards which
+        always persists FORM authenticaton notes.</p>
       </attribute>
 
       <attribute name="processExpiresFrequency" required="false">
