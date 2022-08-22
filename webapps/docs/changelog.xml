@@ -187,6 +187,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        To aid future additions of new functionality, rather than throw an
+        <code>IllegalArgumentException</code> if a <code>DeltaRequest</code> is
+        passed an unrecognised action type, a warning message will now be
+        logged. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
