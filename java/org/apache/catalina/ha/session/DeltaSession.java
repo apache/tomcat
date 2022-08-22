@@ -808,6 +808,48 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
 
+    @Override
+    public void removeNote(String name) {
+        removeNote(name, true);
+    }
+
+    public void removeNote(String name, boolean addDeltaRequest) {
+        lockInternal();
+        try {
+            super.removeNote(name);
+            if (addDeltaRequest) {
+                deltaRequest.removeNote(name);
+            }
+        } finally {
+            unlockInternal();
+        }
+    }
+
+
+    @Override
+    public void setNote(String name, Object value) {
+        setNote(name, value, true);
+    }
+
+    public void setNote(String name, Object value, boolean addDeltaRequest) {
+
+        if (value == null) {
+            removeNote(name, addDeltaRequest);
+            return;
+        }
+
+        lockInternal();
+        try {
+            super.setNote(name, value);
+            if (addDeltaRequest) {
+                deltaRequest.setNote(name, value);
+            }
+        } finally {
+            unlockInternal();
+        }
+    }
+
+
     // -------------------------------------------- HttpSession Private Methods
 
     /**
@@ -852,11 +894,30 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             log.debug(sm.getString("deltaSession.readSession", id));
         }
 
+        Object nextObject = stream.readObject();
+
+        // Compatibility with versions that do not persist the authentication
+        // notes
+        if (!(nextObject instanceof Integer)) {
+            // Not an Integer so the next two objects will be
+            // 'expected session ID' and 'saved request'
+            if (nextObject != null) {
+                notes.put(org.apache.catalina.authenticator.Constants.SESSION_ID_NOTE, nextObject);
+            }
+            nextObject = stream.readObject();
+            if (nextObject != null) {
+                notes.put(org.apache.catalina.authenticator.Constants.FORM_REQUEST_NOTE, nextObject);
+            }
+
+            // Next object will be the number of attributes
+            nextObject = stream.readObject();
+        }
+
         // Deserialize the attribute count and attribute values
         if (attributes == null) {
             attributes = new ConcurrentHashMap<>();
         }
-        int n = ( (Integer) stream.readObject()).intValue();
+        int n = ((Integer) nextObject).intValue();
         boolean isValidSave = isValid;
         isValid = true;
         for (int i = 0; i < n; i++) {
@@ -954,6 +1015,12 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaSession.writeSession", id));
         }
+
+        // Write the notes associated with authentication. Without these,
+        // authentication can fail without sticky sessions or if there is a
+        // fail-over during authentication.
+        stream.writeObject(notes.get(org.apache.catalina.authenticator.Constants.SESSION_ID_NOTE));
+        stream.writeObject(notes.get(org.apache.catalina.authenticator.Constants.FORM_REQUEST_NOTE));
 
         // Accumulate the names of serializable and non-serializable attributes
         String keys[] = keys();

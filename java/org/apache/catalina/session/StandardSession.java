@@ -57,6 +57,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.TomcatPrincipal;
+import org.apache.catalina.authenticator.SavedRequest;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
@@ -1444,10 +1445,23 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 ("readObject() loading session " + id);
         }
 
-        // The next object read could either be the number of attributes (Integer) or the session's
-        // authType followed by a Principal object (not an Integer)
+        if (notes == null) {
+            notes = new Hashtable<>();
+        }
+        /*
+         * The next object read could either be the number of attributes
+         * (Integer) or if authentication information is persisted then:
+         * - authType (String)   - always present
+         * - Principal object    - always present
+         * - expected session ID - present if BZ 66120 is fixed
+         * - saved request       - present if BZ 66120 is fixed
+         *
+         * Note: Some, all or none of the above objects may be null
+         */
         Object nextObject = stream.readObject();
         if (!(nextObject instanceof Integer)) {
+            // Not an Integer so the next two objects will be authType and
+            // Principal
             setAuthType((String) nextObject);
             try {
                 setPrincipal((Principal) stream.readObject());
@@ -1460,8 +1474,22 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
                 throw e;
             }
-            // After that, the next object read should be the number of attributes (Integer)
+
             nextObject = stream.readObject();
+            if (!(nextObject instanceof Integer)) {
+                // Not an Integer so the next two objects will be
+                // 'expected session ID' and 'saved request'
+                if (nextObject != null) {
+                    notes.put(org.apache.catalina.authenticator.Constants.SESSION_ID_NOTE, nextObject);
+                }
+                nextObject = stream.readObject();
+                if (nextObject != null) {
+                    notes.put(org.apache.catalina.authenticator.Constants.FORM_REQUEST_NOTE, nextObject);
+                }
+
+                // Next object will be the number of attributes
+                nextObject = stream.readObject();
+            }
         }
 
         // Deserialize the attribute count and attribute values
@@ -1508,10 +1536,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
         if (listeners == null) {
             listeners = new ArrayList<>();
         }
-
-        if (notes == null) {
-            notes = new Hashtable<>();
-        }
     }
 
 
@@ -1552,6 +1576,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
         // Gather authentication information (if configured)
         String sessionAuthType = null;
         Principal sessionPrincipal = null;
+        String expectedSessionId = null;
+        SavedRequest savedRequest = null;
         if (getPersistAuthentication()) {
             sessionAuthType = getAuthType();
             sessionPrincipal = getPrincipal();
@@ -1560,6 +1586,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 manager.getContext().getLogger().warn(
                         sm.getString("standardSession.principalNotSerializable", id));
             }
+            expectedSessionId = (String) notes.get(org.apache.catalina.authenticator.Constants.SESSION_ID_NOTE);
+            savedRequest = (SavedRequest) notes.get(org.apache.catalina.authenticator.Constants.FORM_REQUEST_NOTE);
         }
 
         // Write authentication information (may be null values)
@@ -1570,6 +1598,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
             manager.getContext().getLogger().warn(
                     sm.getString("standardSession.principalNotSerializable", id), e);
         }
+        stream.writeObject(expectedSessionId);
+        stream.writeObject(savedRequest);
 
         // Accumulate the names of serializable and non-serializable attributes
         String keys[] = keys();
