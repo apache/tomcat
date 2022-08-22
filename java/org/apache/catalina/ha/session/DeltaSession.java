@@ -807,8 +807,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         }
     }
 
-    // -------------------------------------------- HttpSession Private Methods
 
+    // -------------------------------------------- HttpSession Private Methods
 
     /**
      * Read a serialized version of this session object from the specified
@@ -847,7 +847,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             principal = (Principal) stream.readObject();
         }
 
-        //        setId((String) stream.readObject());
         id = (String) stream.readObject();
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaSession.readSession", id));
