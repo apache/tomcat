@@ -108,6 +108,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>66183</bug>: When logging cookie values in an access log valve and
+        there are multiple cookies with the same name, log all cookie values
+        rather than just the first. Based on pull request <pr>541</pr> by Han
+        Li. (markt)
+      </fix>
+      <fix>
         <bug>66184</bug>: Ensure that JULI root loggers have a default level of
         <code>INFO</code>. Pull request <pr>533</pr> provided by Piotr P.
         Karwasz. (markt)
