@@ -104,10 +104,6 @@ public class JspC extends Task implements Options {
         JspFactory.setDefaultFactory(new JspFactoryImpl());
     }
 
-    @Deprecated
-    public static final String DEFAULT_IE_CLASS_ID =
-            "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93";
-
     // Logger
     private static final Log log = LogFactory.getLog(JspC.class);
 
