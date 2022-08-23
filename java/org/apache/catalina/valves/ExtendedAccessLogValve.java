@@ -64,7 +64,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <li><code>time-taken</code>:  Time (in seconds) taken to serve the request</li>
  * <li><code>x-threadname</code>: Current request thread name (can compare later with stacktraces)</li>
  * <li><code>x-A(XXX)</code>: Pull XXX attribute from the servlet context </li>
- * <li><code>x-C(XXX)</code>: Pull the first cookie of the name XXX </li>
+ * <li><code>x-C(XXX)</code>: Pull the cookie(s) of the name XXX </li>
  * <li><code>x-O(XXX)</code>: Pull the all response header values XXX </li>
  * <li><code>x-R(XXX)</code>: Pull XXX attribute from the servlet request </li>
  * <li><code>x-S(XXX)</code>: Pull XXX attribute from the session </li>
@@ -298,11 +298,23 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
+            StringBuilder value = new StringBuilder();
+            boolean first = true;
             Cookie[] c = request.getCookies();
             for (int i = 0; c != null && i < c.length; i++) {
                 if (name.equals(c[i].getName())) {
-                    buf.append(wrap(c[i].getValue()));
+                    if (first) {
+                        first = false;
+                    } else {
+                        value.append(',');
+                    }
+                    value.append(c[i].getValue());
                 }
+            }
+            if (value.length() == 0 ) {
+                buf.append('-');
+            } else {
+                buf.append(wrap(value.toString()));
             }
         }
     }
