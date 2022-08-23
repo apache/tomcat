@@ -133,6 +133,15 @@
         <code>INFO</code>. Pull request <pr>533</pr> provided by Piotr P.
         Karwasz. (markt)
       </fix>
+      <fix>
+        Improve handling of stack overflow errors when parsing SSI expressions.
+        (markt)
+      </fix>
+      <fix>
+        <bug>66120</bug>: Enable FORM authentication to work correctly if
+        session persistence and restoration occurs during the authentication
+        process. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -161,6 +170,39 @@
       <fix>
         When processing HTTP/2 requests, reject requests containing multiple
         <code>host</code> headers. (markt)
+      </fix>
+      <fix>
+        Make parsing of invalid filename directives in
+        <code>Content-Disposition</code> headers more robust. Invalid filename
+        directives will now be ignored rather than triggering a 500 response.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Improve handling of stack overflow errors when parsing EL expressions.
+        (markt)
+      </fix>
+      <fix>
+        Correct parsing of integer and floating point literals in EL expressions
+        so that larger values are correctly parsed to <code>BigInteger</code>
+        and <code>BigDecimal</code> respectively. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        To aid future additions of new functionality, rather than throw an
+        <code>IllegalArgumentException</code> if a <code>DeltaRequest</code> is
+        passed an unrecognised action type, a warning message will now be
+        logged. (markt)
+      </fix>
+      <fix>
+        <bug>66120</bug>: Enable FORM authentication to work correctly if
+        session failover occurs during the authentication process. (markt)
       </fix>
     </changelog>
   </subsection>

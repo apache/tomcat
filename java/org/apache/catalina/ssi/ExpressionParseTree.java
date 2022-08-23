@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 /**
  * Represents a parsed expression.
@@ -68,10 +69,18 @@ public class ExpressionParseTree {
     /**
      * Evaluates the tree and returns true or false. The specified SSIMediator
      * is used to resolve variable references.
+     *
      * @return the evaluation result
+     *
+     * @throws SSIStopProcessingException If an error occurs evaluating the tree
      */
-    public boolean evaluateTree() {
-        return root.evaluate();
+    public boolean evaluateTree() throws SSIStopProcessingException {
+        try {
+            return root.evaluate();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            throw new SSIStopProcessingException(t);
+        }
     }
 
 

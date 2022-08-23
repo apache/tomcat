@@ -53,6 +53,7 @@ public class DeltaRequest implements Externalizable {
     public static final int TYPE_MAXINTERVAL = 3;
     public static final int TYPE_AUTHTYPE = 4;
     public static final int TYPE_LISTENER = 5;
+    public static final int TYPE_NOTE = 6;
 
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;
@@ -88,6 +89,15 @@ public class DeltaRequest implements Externalizable {
 
     public void removeAttribute(String name) {
         addAction(TYPE_ATTRIBUTE, ACTION_REMOVE, name, null);
+    }
+
+    public void setNote(String name, Object value) {
+        int action = (value == null) ? ACTION_REMOVE : ACTION_SET;
+        addAction(TYPE_NOTE, action, name, value);
+    }
+
+    public void removeNote(String name) {
+        addAction(TYPE_NOTE, ACTION_REMOVE, name, null);
     }
 
     public void setMaxInactiveInterval(int interval) {
@@ -217,8 +227,22 @@ public class DeltaRequest implements Externalizable {
                         session.removeSessionListener(listener, false);
                     }
                     break;
+                case TYPE_NOTE:
+                    if (info.getAction() == ACTION_SET) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Session.setNote('" + info.getName() + "', '" + info.getValue() + "')");
+                        }
+                        session.setNote(info.getName(), info.getValue(), false);
+                    } else {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Session.removeNote('" + info.getName() + "')");
+                        }
+                        session.removeNote(info.getName(), false);
+                    }
+
+                    break;
                 default:
-                    throw new IllegalArgumentException(sm.getString("deltaRequest.invalidAttributeInfoType", info));
+                    log.warn(sm.getString("deltaRequest.invalidAttributeInfoType", info));
             }//switch
         }//for
         session.endAccess();
