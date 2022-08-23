@@ -486,6 +486,7 @@
            <code>maxHeaderCount</code> or <code>maxParameterCount</code> limits
            of a <a href="http.html">connector</a>).</li>
          <li>invalid host names</li>
+         <li>HTTP/2 stream closures</li>
          </ul>
          <p>Other errors triggered by invalid input data may be added to this
          system in later versions.</p>
