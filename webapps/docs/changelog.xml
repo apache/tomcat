@@ -183,6 +183,11 @@
         directives will now be ignored rather than triggering a 500 response.
         (markt)
       </fix>
+      <fix>
+        <bug>66194</bug>: Log HTTP/2 stream closures (usually caused by client
+        errors) via a <code>UserDataHelper</code> to broadly align it with the
+        behaviour of HTTP/1.1 for parsing issues and exceeding limits. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
