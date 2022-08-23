@@ -376,11 +376,13 @@ class Http2Parser {
         if (windowSizeIncrement == 0) {
             if (streamId == 0) {
                 throw new ConnectionException(
-                        sm.getString("http2Parser.processFrameWindowUpdate.invalidIncrement"),
+                        sm.getString("http2Parser.processFrameWindowUpdate.invalidIncrement",
+                                connectionId, Integer.toString(streamId)),
                         Http2Error.PROTOCOL_ERROR);
             } else {
                 throw new StreamException(
-                        sm.getString("http2Parser.processFrameWindowUpdate.invalidIncrement"),
+                        sm.getString("http2Parser.processFrameWindowUpdate.invalidIncrement",
+                                connectionId, Integer.toString(streamId)),
                         Http2Error.PROTOCOL_ERROR, streamId);
             }
         }
