@@ -1550,7 +1550,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
-                    if (header.equals(cookie.getName())) {
+                    if (cookieNameToLog.equals(cookie.getName())) {
                         if (first) {
                             first = false;
                         } else {

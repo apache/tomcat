@@ -308,11 +308,11 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                     } else {
                         value.append(",");
                     }
-                    value.append(wrap(c[i].getValue()));
+                    value.append(c[i].getValue());
                 }
             }
             if (value.length() != 0) {
-                buf.append(value.toString());
+                buf.append(wrap(value.toString()));
             }
         }
     }
