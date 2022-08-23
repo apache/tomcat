@@ -49,6 +49,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SendfileState;
@@ -145,6 +146,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private final AtomicLong overheadCount;
     private volatile int lastNonFinalDataPayload;
     private volatile int lastWindowUpdate;
+
+    protected final UserDataHelper userDataHelper = new UserDataHelper(log);
 
 
     Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest, SocketWrapperBase<?> socketWrapper) {
@@ -356,6 +359,23 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                                 break;
                             }
                         } catch (StreamException se) {
+                            // Log the Stream error but not necessarily all of
+                            // them
+                            UserDataHelper.Mode logMode = userDataHelper.getNextMode();
+                            if (logMode != null) {
+                                String message = sm.getString("upgradeHandler.stream.error",
+                                        connectionId, Integer.toString(se.getStreamId()));
+                                switch (logMode) {
+                                    case INFO_THEN_DEBUG:
+                                        message += sm.getString("upgradeHandler.fallToDebug");
+                                        //$FALL-THROUGH$
+                                    case INFO:
+                                        log.info(message, se);
+                                        break;
+                                    case DEBUG:
+                                        log.debug(message, se);
+                                }
+                            }
                             // Stream errors are not fatal to the connection so
                             // continue reading frames
                             Stream stream = getStream(se.getStreamId(), false);
