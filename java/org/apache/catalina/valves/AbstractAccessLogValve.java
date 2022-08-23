@@ -1551,10 +1551,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * write a specific cookie - %{xxx}c
      */
     protected static class CookieElement implements AccessLogElement {
-        private final String header;
+        private final String cookieNameToLog;
 
-        public CookieElement(String header) {
-            this.header = header;
+        public CookieElement(String cookieNameToLog) {
+            this.cookieNameToLog = cookieNameToLog;
         }
 
         @Override
@@ -1564,7 +1564,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
-                    if (header.equals(cookie.getName())) {
+                    if (cookieNameToLog.equals(cookie.getName())) {
                         value = cookie.getValue();
                         break;
                     }
