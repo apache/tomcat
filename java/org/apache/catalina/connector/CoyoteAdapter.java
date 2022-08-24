@@ -753,7 +753,7 @@ public class CoyoteAdapter implements Adapter {
                 // Too many cookies
                 if (!response.isError()) {
                     response.setError();
-                    response.sendError(400);
+                    response.sendError(400, e.getMessage());
                 }
                 return true;
             }
