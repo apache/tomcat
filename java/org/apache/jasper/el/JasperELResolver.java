@@ -188,7 +188,7 @@ public class JasperELResolver extends CompositeELResolver {
      * Extend ELResolver for Graal to avoid bean info use if possible,
      * as BeanELResolver needs manual reflection configuration.
      */
-    private static class GraalBeanELResolver extends ELResolver {
+    public static class GraalBeanELResolver extends ELResolver {
 
         @Override
         public Object getValue(ELContext context, Object base,
@@ -214,7 +214,7 @@ public class JasperELResolver extends CompositeELResolver {
             if (base == null) {
                 return;
             }
-            Method method = getWriteMethod(base.getClass(), property.toString());
+            Method method = getWriteMethod(base.getClass(), property.toString(), value.getClass());
             if (method != null) {
                 context.setPropertyResolved(base, property);
                 try {
@@ -231,35 +231,42 @@ public class JasperELResolver extends CompositeELResolver {
                 Object property) {
             Class<?> beanClass = base.getClass();
             String prop = property.toString();
-            return (getReadMethod(beanClass, prop) != null)
-                    && (getWriteMethod(beanClass, prop) != null);
+            Method readMethod = getReadMethod(beanClass, prop);
+            return readMethod == null || !(getWriteMethod(beanClass, prop, readMethod.getReturnType()) != null);
         }
 
-        public static Method getReadMethod(Class<?> beanClass, String prop) {
+        private static Method getReadMethod(Class<?> beanClass, String prop) {
             Method result = null;
-            String setter = "get" + capitalize(prop);
+            String getter = "get" + capitalize(prop);
             Method methods[] = beanClass.getMethods();
             for (Method method : methods) {
-                if (setter.equals(method.getName())) {
+                if (method.getParameterCount() == 0 && getter.equals(method.getName())) {
+                    return method;
+                }
+            }
+            getter = "is" + capitalize(prop);
+            for (Method method : methods) {
+                if (method.getParameterCount() == 0 && getter.equals(method.getName())) {
                     return method;
                 }
             }
             return result;
         }
 
-        public static Method getWriteMethod(Class<?> beanClass, String prop) {
+        private static Method getWriteMethod(Class<?> beanClass, String prop, Class<?> valueClass) {
             Method result = null;
             String setter = "set" + capitalize(prop);
             Method methods[] = beanClass.getMethods();
             for (Method method : methods) {
-                if (setter.equals(method.getName())) {
+                if (method.getParameterCount() == 1 && setter.equals(method.getName())
+                        && (valueClass == null || valueClass.isAssignableFrom(method.getParameterTypes()[0]))) {
                     return method;
                 }
             }
             return result;
         }
 
-        public static String capitalize(String name) {
+        private static String capitalize(String name) {
             if (name == null || name.length() == 0) {
                 return name;
             }
