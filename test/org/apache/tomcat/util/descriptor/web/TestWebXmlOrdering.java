@@ -362,19 +362,6 @@ public class TestWebXmlOrdering {
         WebXml.orderWebFragments(app, fragmentsWithDuplicate, null);
     }
 
-    @SuppressWarnings("deprecation")
-    @Test(expected=IllegalArgumentException.class)
-    public void testOrderWebFragmentsRelativeDuplicateDeprecated() throws MalformedURLException {
-        WebXml withDuplicate = new WebXml();
-        withDuplicate.setURL(new URL("https://example.com/original.jar"));
-        withDuplicate.setDuplicated(true);
-
-        Map<String,WebXml> fragmentsWithDuplicate = new LinkedHashMap<>();
-        fragmentsWithDuplicate.put("has-duplicate", withDuplicate);
-
-        WebXml.orderWebFragments(app, fragmentsWithDuplicate, null);
-    }
-
     private interface RelativeOrderingTestRunner {
         void init();
         void validate(String order);

@@ -89,14 +89,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     public boolean isDuplicated() {
         return !duplicates.isEmpty();
     }
-    @Deprecated
-    public void setDuplicated(boolean duplicated) {
-        if (duplicated) {
-            duplicates.add("unknown");
-        } else {
-            duplicates.clear();
-        }
-    }
     public void addDuplicate(String duplicate) {
         this.duplicates.add(duplicate);
     }
