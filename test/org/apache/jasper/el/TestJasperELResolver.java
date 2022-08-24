@@ -94,9 +94,9 @@ public class TestJasperELResolver {
         public String getFoo() {
             return "foo";
         }
-        public void setFoo(String foo) {
+        public void setFoo(@SuppressWarnings("unused") String foo) {
         }
-        public String getBar(boolean i) {
+        public String getBar(@SuppressWarnings("unused") boolean i) {
             return "bar";
         }
         public String isFoobar() {
@@ -105,7 +105,7 @@ public class TestJasperELResolver {
         public String isBla() {
             return "bla";
         }
-        public void setBla(Object bla) {
+        public void setBla(@SuppressWarnings("unused") Object bla) {
         }
     }
 }
