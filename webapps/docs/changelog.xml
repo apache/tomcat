@@ -131,6 +131,12 @@
         <bug>66233</bug>: Include an error message when sending a 400 response
         because a request has too many cookies. (markt)
       </fix>
+      <fix>
+        When web application deployment fails due to JARs with duplicate
+        fragment names, improve the error message by listing the JARs that
+        contain the duplicates. Based on pull request <pr>535</pr> by Mads
+        Rolsdorph. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
