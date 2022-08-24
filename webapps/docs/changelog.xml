@@ -220,6 +220,12 @@
         <bug>66235</bug>: Fix various issues with the bean resolver used for
         Graal. (remm)
       </fix>
+      <fix>
+        Improve the performance of the <code>ImportHandler</code> in the
+        Expression Language implementation. This removes a previous optimisation
+        that is now detrimental rather than helpful. Pull request <pr>547</pr>
+        provided by rmannibucau. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
