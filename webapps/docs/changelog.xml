@@ -127,6 +127,10 @@
         session persistence and restoration occurs during the authentication
         process. (markt)
       </fix>
+      <fix>
+        <bug>66233</bug>: Include an error message when sending a 400 response
+        because a request has too many cookies. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
