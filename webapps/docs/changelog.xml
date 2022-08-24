@@ -201,6 +201,10 @@
         so that larger values are correctly parsed to <code>BigInteger</code>
         and <code>BigDecimal</code> respectively. (markt)
       </fix>
+      <fix>
+        <bug>66235</bug>: Fix various issues with the bean resolver used for
+        Graal. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
