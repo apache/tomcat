@@ -241,25 +241,22 @@ public class JasperELResolver extends CompositeELResolver {
         }
 
         private static Method getReadMethod(Class<?> beanClass, String prop) {
-            Method result = null;
-            String getter = "get" + capitalize(prop);
             Method methods[] = beanClass.getMethods();
+            String isGetter = "is" + capitalize(prop);
+            String getter = "get" + capitalize(prop);
             for (Method method : methods) {
-                if (method.getParameterCount() == 0 && getter.equals(method.getName())) {
-                    return method;
+                if (method.getParameterCount() == 0) {
+                    if (isGetter.equals(method.getName()) && method.getReturnType().equals(boolean.class)) {
+                        return method;
+                    } else if (getter.equals(method.getName())) {
+                        return method;
+                    }
                 }
             }
-            getter = "is" + capitalize(prop);
-            for (Method method : methods) {
-                if (method.getParameterCount() == 0 && getter.equals(method.getName())) {
-                    return method;
-                }
-            }
-            return result;
+            return null;
         }
 
         private static Method getWriteMethod(Class<?> beanClass, String prop, Class<?> valueClass) {
-            Method result = null;
             String setter = "set" + capitalize(prop);
             Method methods[] = beanClass.getMethods();
             for (Method method : methods) {
@@ -268,7 +265,7 @@ public class JasperELResolver extends CompositeELResolver {
                     return method;
                 }
             }
-            return result;
+            return null;
         }
 
         private static String capitalize(String name) {

@@ -83,8 +83,9 @@ public class TestJasperELResolver {
         ELResolver resolver = new JasperELResolver.GraalBeanELResolver();
         ELContext context = new ELContextImpl(resolver);
         Assert.assertEquals("foo", resolver.getValue(context, new TestBean(), "foo"));
+        Assert.assertEquals(Boolean.TRUE, resolver.getValue(context, new TestBean(), "foo2"));
         Assert.assertEquals("bla", resolver.getValue(context, new TestBean(), "bla"));
-        Assert.assertEquals("foobar", resolver.getValue(context, new TestBean(), "foobar"));
+        Assert.assertNull(resolver.getValue(context, new TestBean(), "foobar"));
         Assert.assertNull(resolver.getValue(context, new TestBean(), "bar"));
         Assert.assertFalse(resolver.isReadOnly(context, new TestBean(), "foo"));
         Assert.assertTrue(resolver.isReadOnly(context, new TestBean(), "bla"));
@@ -96,13 +97,18 @@ public class TestJasperELResolver {
         }
         public void setFoo(@SuppressWarnings("unused") String foo) {
         }
+        public boolean isFoo2() {
+            return true;
+        }
+        public void setFoo2(@SuppressWarnings("unused") boolean foo) {
+        }
         public String getBar(@SuppressWarnings("unused") boolean i) {
             return "bar";
         }
         public String isFoobar() {
             return "foobar";
         }
-        public String isBla() {
+        public String getBla() {
             return "bla";
         }
         public void setBla(@SuppressWarnings("unused") Object bla) {
