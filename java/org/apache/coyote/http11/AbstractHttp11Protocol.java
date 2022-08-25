@@ -256,7 +256,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * CLIENT-CERT authentication. When a POST is received where the security
      * constraints require a client certificate, the POST body needs to be
      * buffered while an SSL handshake takes place to obtain the certificate. A
-     * similar buffering is required during FDORM auth.
+     * similar buffering is required during FORM auth.
      *
      * @param maxSavePostSize The maximum size POST body to buffer in bytes
      */
