@@ -137,6 +137,11 @@
         contain the duplicates. Based on pull request <pr>535</pr> by Mads
         Rolsdorph. (markt)
       </fix>
+      <fix>
+        Replace logging thread for JULI's <code>AsyncFileHandler</code> with an
+        executor to protect against failure of the logging thread. Based on pull
+        request <pr>545</pr> by Piotr P. Karwasz. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
