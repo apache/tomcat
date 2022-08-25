@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.tribes.group;
 
-import org.apache.tomcat.util.res.StringManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,6 +24,7 @@ import org.junit.Test;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
+import org.apache.tomcat.util.res.StringManager;
 
 public class TestGroupChannelOptionFlag {
     private final StringManager sm = StringManager.getManager(TestGroupChannelOptionFlag.class);

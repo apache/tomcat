@@ -21,11 +21,11 @@ import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
-import org.apache.tomcat.util.res.StringManager;
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.res.StringManager;
 
 public class TestFlowControl extends Http2TestBase {
 
