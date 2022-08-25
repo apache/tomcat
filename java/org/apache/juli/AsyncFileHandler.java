@@ -17,9 +17,13 @@
 package org.apache.juli;
 
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.LogRecord;
+
 /**
  * A {@link FileHandler} implementation that uses a queue of log entries.
  *
@@ -39,6 +43,8 @@ import java.util.logging.LogRecord;
  */
 public class AsyncFileHandler extends FileHandler {
 
+    static final String THREAD_PREFIX = "AsyncFileHandlerWriter-";
+
     public static final int OVERFLOW_DROP_LAST    = 1;
     public static final int OVERFLOW_DROP_FIRST   = 2;
     public static final int OVERFLOW_DROP_FLUSH   = 3;
@@ -54,17 +60,12 @@ public class AsyncFileHandler extends FileHandler {
             System.getProperty("org.apache.juli.AsyncMaxRecordCount",
                                Integer.toString(DEFAULT_MAX_RECORDS)));
 
-    protected static final LinkedBlockingDeque<LogEntry> queue =
-            new LinkedBlockingDeque<>(MAX_RECORDS);
-
-    protected static final LoggerThread logger = new LoggerThread();
-
-    static {
-        logger.start();
-    }
+    private static final LoggerExecutorService LOGGER_SERVICE =
+            new LoggerExecutorService(OVERFLOW_DROP_TYPE, MAX_RECORDS);
 
     private final Object closeLock = new Object();
     protected volatile boolean closed = false;
+    private final LoggerExecutorService loggerService;
 
     public AsyncFileHandler() {
         this(null, null, null);
@@ -75,7 +76,14 @@ public class AsyncFileHandler extends FileHandler {
     }
 
     public AsyncFileHandler(String directory, String prefix, String suffix, Integer maxDays) {
+        this(directory, prefix, suffix, maxDays, LOGGER_SERVICE);
+    }
+
+    AsyncFileHandler(String directory, String prefix, String suffix, Integer maxDays,
+            LoggerExecutorService loggerService) {
         super(directory, prefix, suffix, maxDays);
+        loggerService.registerHandler();
+        this.loggerService = loggerService;
     }
 
     @Override
@@ -89,7 +97,7 @@ public class AsyncFileHandler extends FileHandler {
             }
             closed = true;
         }
-        LoggerThread.deregisterHandler();
+        loggerService.deregisterHandler();
         super.close();
     }
 
@@ -104,10 +112,9 @@ public class AsyncFileHandler extends FileHandler {
             }
             closed = false;
         }
-        LoggerThread.registerHandler();
+        loggerService.registerHandler();
         super.open();
     }
-
 
     @Override
     public void publish(LogRecord record) {
@@ -117,58 +124,68 @@ public class AsyncFileHandler extends FileHandler {
         // fill source entries, before we hand the record over to another
         // thread with another class loader
         record.getSourceMethodName();
-        LogEntry entry = new LogEntry(record, this);
-        boolean added = false;
-        try {
-            while (!added && !queue.offer(entry)) {
-                switch (OVERFLOW_DROP_TYPE) {
-                    case OVERFLOW_DROP_LAST: {
-                        //remove the last added element
-                        queue.pollLast();
-                        break;
-                    }
-                    case OVERFLOW_DROP_FIRST: {
-                        //remove the first element in the queue
-                        queue.pollFirst();
-                        break;
-                    }
-                    case OVERFLOW_DROP_FLUSH: {
-                        added = queue.offer(entry, 1000, TimeUnit.MILLISECONDS);
-                        break;
-                    }
-                    case OVERFLOW_DROP_CURRENT: {
-                        added = true;
-                        break;
-                    }
-                }//switch
-            }//while
-        } catch (InterruptedException x) {
-            // Allow thread to be interrupted and back out of the publish
-            // operation. No further action required.
-        }
+        loggerService.execute(new Runnable() {
 
+            @Override
+            public void run() {
+                /*
+                 * During Tomcat shutdown, the Handlers are closed before the
+                 * executor queue is flushed therefore the closed flag is
+                 * ignored if the executor is shutting down.
+                 */
+                if (!closed || loggerService.isTerminating()) {
+                    publishInternal(record);
+                }
+            }
+        });
     }
 
     protected void publishInternal(LogRecord record) {
         super.publish(record);
     }
 
-    protected static class LoggerThread extends Thread {
+
+    static class LoggerExecutorService extends ThreadPoolExecutor {
+
+        private static final ThreadFactory THREAD_FACTORY = new ThreadFactory(THREAD_PREFIX);
 
         /*
          * Implementation note: Use of this count could be extended to
-         * start/stop the LoggerThread but that would require careful locking as
-         * the current size of the queue also needs to be taken into account and
-         * there are lost of edge cases when rapidly starting and stopping
-         * handlers.
+         * start/stop the LoggerExecutorService but that would require careful
+         * locking as the current size of the queue also needs to be taken into
+         * account and there are lost of edge cases when rapidly starting and
+         * stopping handlers.
          */
-        private static final AtomicInteger handlerCount = new AtomicInteger();
+        private final AtomicInteger handlerCount = new AtomicInteger();
 
-        public static void registerHandler() {
+        public LoggerExecutorService(final int overflowDropType, final int maxRecords) {
+            super(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>(maxRecords), THREAD_FACTORY);
+            switch (overflowDropType) {
+                case OVERFLOW_DROP_LAST:
+                default:
+                    setRejectedExecutionHandler(new DropLastPolicy());
+                    break;
+                case OVERFLOW_DROP_FIRST:
+                    setRejectedExecutionHandler(new DiscardOldestPolicy());
+                    break;
+                case OVERFLOW_DROP_FLUSH:
+                    setRejectedExecutionHandler(new DropFlushPolicy());
+                    break;
+                case OVERFLOW_DROP_CURRENT:
+                    setRejectedExecutionHandler(new DiscardPolicy());
+            }
+        }
+
+        @Override
+        public LinkedBlockingDeque<Runnable> getQueue() {
+            return (LinkedBlockingDeque<Runnable>) super.getQueue();
+        }
+
+        public void registerHandler() {
             handlerCount.incrementAndGet();
         }
 
-        public static void deregisterHandler() {
+        public void deregisterHandler() {
             int newCount = handlerCount.decrementAndGet();
             if (newCount == 0) {
                 try {
@@ -178,54 +195,46 @@ public class AsyncFileHandler extends FileHandler {
                 } catch (IllegalStateException ise) {
                     // JVM is shutting down.
                     // Allow up to 10s for for the queue to be emptied
-                    int sleepCount = 0;
-                    while (!AsyncFileHandler.queue.isEmpty() && sleepCount < 10000) {
-                        try {
-                            Thread.sleep(1);
-                        } catch (InterruptedException e) {
-                            // Ignore
-                        }
-                        sleepCount++;
+                    shutdown();
+                    try {
+                        awaitTermination(10, TimeUnit.SECONDS);
+                    } catch (InterruptedException e) {
+                        // Ignore
                     }
-                }
-            }
-        }
-
-        public LoggerThread() {
-            this.setDaemon(true);
-            this.setName("AsyncFileHandlerWriter-" + System.identityHashCode(this));
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    LogEntry entry = queue.take();
-                    entry.flush();
-                } catch (InterruptedException x) {
-                    // Ignore the attempt to interrupt the thread.
-                } catch (Exception x) {
-                    x.printStackTrace();
+                    shutdownNow();
                 }
             }
         }
     }
 
-    protected static class LogEntry {
-        private final LogRecord record;
-        private final AsyncFileHandler handler;
-        public LogEntry(LogRecord record, AsyncFileHandler handler) {
-            super();
-            this.record = record;
-            this.handler = handler;
-        }
 
-        public boolean flush() {
-            if (handler.closed) {
-                return false;
-            } else {
-                handler.publishInternal(record);
-                return true;
+    private static class DropFlushPolicy implements RejectedExecutionHandler {
+
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            while (true) {
+                if (executor.isShutdown()) {
+                    break;
+                }
+                try {
+                    if (executor.getQueue().offer(r, 1000, TimeUnit.MILLISECONDS)) {
+                        break;
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RejectedExecutionException("Interrupted", e);
+                }
+            }
+        }
+    }
+
+    private static class DropLastPolicy implements RejectedExecutionHandler {
+
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            if (!executor.isShutdown()) {
+                ((LoggerExecutorService) executor).getQueue().pollLast();
+                executor.execute(r);
             }
         }
     }
