@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tomcat.util.res.StringManager;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,6 +37,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.apache.tomcat.util.res.StringManager;
 
 public class TestErrorReportValve extends TomcatBaseTest {
 
