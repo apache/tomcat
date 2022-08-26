@@ -754,6 +754,9 @@ public class HttpParser {
                     }
                 } else {
                     octet = octet * 10 + c - '0';
+                    if (octet > 255) {
+                        break;
+                    }
                 }
             } else if (c == ':') {
                 break;
