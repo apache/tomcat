@@ -78,6 +78,8 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv4, "0.a.0.0:8080", Integer.valueOf(7), null} );
         result.add(new Object[] { TestType.IPv4, "localhost", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "localhost:8080", Integer.valueOf(9), null} );
+        result.add(new Object[] { TestType.IPv4, "4294967295.localhost", Integer.valueOf(-1), null} );
+        result.add(new Object[] { TestType.IPv4, "4294967295.com", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "tomcat.apache.org", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "tomcat.apache.org:8080", Integer.valueOf(17), null} );
         result.add(new Object[] { TestType.IPv4, "0.0.0.com", Integer.valueOf(-1), null} );

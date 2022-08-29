@@ -157,6 +157,10 @@
         errors) via a <code>UserDataHelper</code> to broadly align it with the
         behaviour of HTTP/1.1 for parsing issues and exceeding limits. (markt)
       </fix>
+      <fix>
+        <bug>66240</bug>: Avoid int overflow when parsing octets by limiting
+        the maximum value to 255. Based on a PR <pr>548</pr> by Stefan Mayr. (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
