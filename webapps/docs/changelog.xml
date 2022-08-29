@@ -226,6 +226,10 @@
         that is now detrimental rather than helpful. Pull request <pr>547</pr>
         provided by rmannibucau. (markt)
       </fix>
+      <fix>
+        Improve handling of EL error messages so instances of Number are not
+        formatted in unexpected ways. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
