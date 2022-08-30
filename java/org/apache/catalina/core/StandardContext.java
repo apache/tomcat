@@ -171,6 +171,12 @@ public class StandardContext extends ContainerBase
     // ----------------------------------------------------- Instance Variables
 
     /**
+     * Allow to fail as soon as the first context listener failed.
+     * Note that it does not impact stop phase since some listeners can just cleanup some state.
+     */
+    protected boolean exitOnFirstListenerFailure = false;
+
+    /**
      * Allow multipart/form-data requests to be parsed even when the
      * target servlet doesn't specify @MultipartConfig or have a
      * &lt;multipart-config&gt; element.
@@ -4722,6 +4728,9 @@ public class StandardContext extends ContainerBase
                 getLogger().error(sm.getString("standardContext.listenerStart",
                         instance.getClass().getName()), t);
                 ok = false;
+                if (exitOnFirstListenerFailure) {
+                    break;
+                }
             }
         }
         return ok;
@@ -6396,6 +6405,21 @@ public class StandardContext extends ContainerBase
         return startTime;
     }
 
+    /**
+     * Toggle to enable to stop deployment on first listener and skip next listeners.
+     * @return true if the first context listener will stop the context deployment, false otherwise.
+     */
+    public boolean isExitOnFirstListenerFailure() {
+        return exitOnFirstListenerFailure;
+    }
+
+    /**
+     * Enables to customize if the first context listener failure stops the deployment or not.
+     * @param value true to stop the deployment at first context listener error.
+     */
+    public void setExitOnFirstListenerFailure(final boolean value) {
+        this.exitOnFirstListenerFailure = value;
+    }
 
     private static class NoPluggabilityServletContext
             implements ServletContext {
