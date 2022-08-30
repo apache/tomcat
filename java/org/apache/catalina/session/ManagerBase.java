@@ -604,9 +604,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * Set whether sessions managed by this manager shall persist authentication
      * notes used by FORM authentication or not.
      *
-     * @param persistAuthentication if {@code true}, sessions managed by this
-     *                              manager shall persist authentication notes
-     *                              used by FORM authentication
+     * @param persistAuthenticationNotes if {@code true}, sessions managed by
+     *                                   this manager shall persist
+     *                                   authentication notes used by FORM
+     *                                   authentication
      *
      * @deprecated Will be removed in Tomcat 10.1.x where it is effectively
      *             hard-coded to <code>true</code>
