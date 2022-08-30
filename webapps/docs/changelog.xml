@@ -184,6 +184,11 @@
         Improve handling of EL error messages so instances of Number are not
         formatted in unexpected ways. (markt)
       </fix>
+      <fix>
+        Switch to using ELException rather than IllegalArgumentException when a
+        type conversion fails during an EL arithmetic operation. This is an EL
+        error so ELException seems more appropriate. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
