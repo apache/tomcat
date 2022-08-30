@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-import jakarta.el.ELException;
+import javax.el.ELException;
 
 import org.apache.el.util.MessageFactory;
 
