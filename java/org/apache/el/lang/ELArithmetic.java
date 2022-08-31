@@ -113,7 +113,7 @@ public abstract class ELArithmetic {
 
         @Override
         protected Number mod(Number num0, Number num1) {
-            return ((BigInteger) num0).mod((BigInteger) num1);
+            return ((BigInteger) num0).remainder((BigInteger) num1);
         }
 
         @Override
