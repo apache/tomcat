@@ -242,6 +242,11 @@
       <fix>
         <bug>66246</bug>: Fix JspC generates invalid web.xml due to incorrect header. (lihan)
       </fix>
+      <fix>
+        Fix a bug in <code>MethodExpression</code> handling that triggered an
+        error when invoking a static method on an instance of the class rather
+        than directly on the class. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
