@@ -1449,6 +1449,7 @@
         <include name="META-INF/**"/>
         <include name="**/service-config.txt"/>
         <include name="**/logging-non-rotatable.properties"/>
+        <include name="**/TestStrings.properties"/>
       </fileset>
     </copy>
   </target>
