@@ -194,6 +194,12 @@
         error when invoking a static method on an instance of the class rather
         than directly on the class. (markt)
       </fix>
+      <fix>
+        Use <code>BigInteger.remainder()</code> rather than
+        <code>BigInteger.mod()</code> when performing the modulus operation for
+        instances of <code>BigInteger</code> as part of an EL expression.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
