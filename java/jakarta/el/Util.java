@@ -544,11 +544,9 @@ class Util {
      * making changes keep the code in sync.
      */
     static Method getMethod(Class<?> type, Object base, Method m) {
-        // If base is null, method MUST be static
-        // If base is non-null, method may be static or non-static
         if (m == null ||
                 (Modifier.isPublic(type.getModifiers()) &&
-                        (canAccess(base, m) || base != null && canAccess(null, m)))) {
+                        (Modifier.isStatic(m.getModifiers()) && canAccess(null, m) || canAccess(base, m)))) {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();

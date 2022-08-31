@@ -16,9 +16,15 @@
  */
 package org.apache.el.util;
 
+import jakarta.el.ELContext;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.MethodExpression;
 import jakarta.el.MethodNotFoundException;
 
+import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.jasper.el.ELContextImpl;
 
 public class TestReflectionUtil {
 
@@ -59,5 +65,23 @@ public class TestReflectionUtil {
         ReflectionUtil.getMethod(null, BASE, "testD",
                 new Class[] {null},
                 new Object[] {null});
+    }
+
+    @Test
+    public void testStaticMethodOnInstance() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl(factory);
+
+        MethodExpression methodExpression = factory.createMethodExpression(context, "${\"1\".format(2)}", String.class, new Class<?>[] {});
+
+        try {
+            methodExpression.invoke(context, null);
+        } catch (IllegalArgumentException iae) {
+            // Ensure correct IllegalArgumentException is thrown
+            String msg = iae.getMessage();
+            Assert.assertTrue(msg, msg.contains("[format]"));
+            return;
+        }
+        Assert.fail("No exception");
     }
 }

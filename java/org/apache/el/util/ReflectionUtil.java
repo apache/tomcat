@@ -429,11 +429,9 @@ public class ReflectionUtil {
      * the code in sync.
      */
     private static Method getMethod(Class<?> type, Object base, Method m) {
-        // If base is null, method MUST be static
-        // If base is non-null, method may be static or non-static
         if (m == null ||
                 (Modifier.isPublic(type.getModifiers()) &&
-                        (m.canAccess(base) || base != null && m.canAccess(null)))) {
+                        (Modifier.isStatic(m.getModifiers()) && m.canAccess(null) || m.canAccess(base)))) {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();
