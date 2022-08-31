@@ -239,6 +239,9 @@
         type conversion fails during an EL arithmetic operation. This is an EL
         error so ELException seems more appropriate. (markt)
       </fix>
+      <fix>
+        <bug>66246</bug>: Fix JspC generates invalid web.xml due to incorrect header. (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
