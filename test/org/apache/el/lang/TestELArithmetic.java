@@ -98,7 +98,7 @@ public class TestELArithmetic {
     public void testMod03() {
         ELProcessor processor = new ELProcessor();
         // Large so BigInteger rather than Long is used internally
-        BigInteger result = processor.eval("1 % -9999999999999999999");
+        BigInteger result = (BigInteger) processor.eval("1 % -9999999999999999999");
         Assert.assertEquals(BigInteger.valueOf(1), result);
     }
 
