@@ -189,6 +189,11 @@
         type conversion fails during an EL arithmetic operation. This is an EL
         error so ELException seems more appropriate. (markt)
       </fix>
+      <fix>
+        Fix a bug in <code>MethodExpression</code> handling that triggered an
+        error when invoking a static method on an instance of the class rather
+        than directly on the class. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
