@@ -41,7 +41,9 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
 
     // ----------------------------------------------------- Instance Variables
 
-    private ByteBuffer buffered;
+    // Use ByteChunk since it correctly handles the special buffer size of -1
+    // for maxSavePostSize.
+    private ByteChunk buffered;
     private ByteBuffer tempRead;
     private InputBuffer buffer;
     private boolean hasRead = false;
@@ -66,8 +68,8 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
      */
     public void setLimit(int limit) {
         if (buffered == null) {
-            buffered = ByteBuffer.allocate(limit);
-            buffered.flip();
+            buffered = new ByteChunk();
+            buffered.setLimit(limit);
         }
     }
 
@@ -80,12 +82,13 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
      */
     @Override
     public void setRequest(Request request) {
+        if (buffered.getLimit() == 0) {
+            return;
+        }
         // save off the Request body
         try {
             while (buffer.doRead(this) >= 0) {
-                buffered.mark().position(buffered.limit()).limit(buffered.capacity());
-                buffered.put(tempRead);
-                buffered.limit(buffered.position()).reset();
+                buffered.append(tempRead);
                 tempRead = null;
             }
         } catch(IOException | BufferOverflowException ioe) {
@@ -104,9 +107,9 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
             return -1;
         }
 
-        handler.setByteBuffer(buffered);
+        handler.setByteBuffer(ByteBuffer.wrap(buffered.getBuffer(), buffered.getStart(), buffered.getLength()));
         hasRead = true;
-        return buffered.remaining();
+        return buffered.getLength();
     }
 
     @Override
@@ -117,10 +120,10 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
     @Override
     public void recycle() {
         if (buffered != null) {
-            if (buffered.capacity() > 65536) {
+            if (buffered.getBuffer().length > 65536) {
                 buffered = null;
             } else {
-                buffered.position(0).limit(0);
+                buffered.recycle();
             }
         }
         hasRead = false;
@@ -139,7 +142,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
 
     @Override
     public int available() {
-        int available = buffered.remaining();
+        int available = buffered.getLength();
         if (available == 0) {
             // No data buffered here. Try the next filter in the chain.
             return buffer.available();
@@ -151,7 +154,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
 
     @Override
     public boolean isFinished() {
-        return hasRead || buffered.remaining() <= 0;
+        return hasRead || buffered.getLength() <= 0;
     }
 
 
