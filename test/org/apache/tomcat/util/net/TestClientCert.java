@@ -98,6 +98,13 @@ public class TestClientCert extends TomcatBaseTest {
     }
 
     @Test
+    public void testClientCertPostZero() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setMaxSavePostSize(0);
+        doTestClientCertPost(1024, false);
+    }
+
+    @Test
     public void testClientCertPostSmaller() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         int bodySize = tomcat.getConnector().getMaxSavePostSize() / 2;
@@ -123,7 +130,8 @@ public class TestClientCert extends TomcatBaseTest {
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
-        getTomcatInstance().start();
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.start();
 
         byte[] body = new byte[bodySize];
         Arrays.fill(body, TesterSupport.DATA);
@@ -162,10 +170,16 @@ public class TestClientCert extends TomcatBaseTest {
             // POST body buffer fails so TLS handshake never happens
             Assert.assertEquals(0, count);
         } else {
+            int expectedBodySize;
+            if (tomcat.getConnector().getMaxSavePostSize() == 0) {
+                expectedBodySize = 0;
+            } else {
+                expectedBodySize = bodySize;
+            }
             Assert.assertTrue("Checking requested client issuer against " +
                     TesterSupport.getClientAuthExpectedIssuer(),
                     TesterSupport.checkLastClientAuthRequestedIssuers());
-            Assert.assertEquals("OK-" + bodySize, res.toString());
+            Assert.assertEquals("OK-" + expectedBodySize, res.toString());
         }
     }
 
