@@ -204,14 +204,14 @@
         behaviour of HTTP/1.1 for parsing issues and exceeding limits. (markt)
       </fix>
       <fix>
-        <bug>66240</bug>: Avoid int overflow when parsing octets by limiting
-        the maximum value to 255. Based on a PR <pr>548</pr> by Stefan Mayr.
-        (lihan)
-      </fix>
-      <fix>
         <bug>66236</bug>: Implement support for the special values zero and
         minus one when configuring <code>maxSavePostSize</code> for a Connector
         when used in conjunction with TLS renegotiation. (markt)
+      </fix>
+      <fix>
+        <bug>66240</bug>: Avoid int overflow when parsing octets by limiting
+        the maximum value to 255. Based on a PR <pr>548</pr> by Stefan Mayr.
+        (lihan)
       </fix>
     </changelog>
   </subsection>
