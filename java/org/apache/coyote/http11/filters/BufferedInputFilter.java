@@ -120,7 +120,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
     @Override
     public void recycle() {
         if (buffered != null) {
-            if (buffered.getBuffer().length > 65536) {
+            if (buffered.getBuffer() != null && buffered.getBuffer().length > 65536) {
                 buffered = null;
             } else {
                 buffered.recycle();
