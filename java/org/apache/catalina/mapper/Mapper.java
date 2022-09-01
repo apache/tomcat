@@ -695,6 +695,7 @@ public final class Mapper {
             if (defaultHostName == null) {
                 return;
             }
+            host.setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
             host.getCharChunk().append(defaultHostName);
         }
         host.toChars();

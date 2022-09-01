@@ -51,6 +51,8 @@ public final class MessageBytes implements Cloneable, Serializable {
         was a char[] */
     public static final int T_CHARS = 3;
 
+    public static final char[] EMPTY_CHAR_ARRAY = new char[0];
+
     private int hashCode=0;
     // did we compute the hashcode ?
     private boolean hasHashCode=false;
@@ -61,9 +63,6 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // String
     private String strValue;
-    // true if a String value was computed. Probably not needed,
-    // strValue!=null is the same
-    private boolean hasStrValue=false;
 
     /**
      * Creates a new, uninitialized MessageBytes object.
@@ -87,7 +86,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     public boolean isNull() {
-        return byteC.isNull() && charC.isNull() && !hasStrValue;
+        return type == T_NULL;
     }
 
     /**
@@ -100,7 +99,6 @@ public final class MessageBytes implements Cloneable, Serializable {
 
         strValue=null;
 
-        hasStrValue=false;
         hasHashCode=false;
         hasLongValue=false;
     }
@@ -116,7 +114,6 @@ public final class MessageBytes implements Cloneable, Serializable {
     public void setBytes(byte[] b, int off, int len) {
         byteC.setBytes( b, off, len );
         type=T_BYTES;
-        hasStrValue=false;
         hasHashCode=false;
         hasLongValue=false;
     }
@@ -131,7 +128,6 @@ public final class MessageBytes implements Cloneable, Serializable {
     public void setChars( char[] c, int off, int len ) {
         charC.setChars( c, off, len );
         type=T_CHARS;
-        hasStrValue=false;
         hasHashCode=false;
         hasLongValue=false;
     }
@@ -141,15 +137,13 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @param s The string
      */
     public void setString( String s ) {
-        strValue=s;
-        hasHashCode=false;
-        hasLongValue=false;
+        strValue = s;
+        hasHashCode = false;
+        hasLongValue = false;
         if (s == null) {
-            hasStrValue=false;
-            type=T_NULL;
+            type = T_NULL;
         } else {
-            hasStrValue=true;
-            type=T_STR;
+            type = T_STR;
         }
     }
 
@@ -161,21 +155,22 @@ public final class MessageBytes implements Cloneable, Serializable {
      */
     @Override
     public String toString() {
-        if (hasStrValue) {
-            return strValue;
+        switch (type) {
+            case T_NULL:
+            case T_STR:
+                // No conversion required
+                break;
+            case T_BYTES:
+                type = T_STR;
+                strValue = byteC.toString();
+                break;
+            case T_CHARS:
+                type = T_STR;
+                strValue = charC.toString();
+                break;
         }
 
-        switch (type) {
-        case T_CHARS:
-            strValue = charC.toString();
-            hasStrValue = true;
-            return strValue;
-        case T_BYTES:
-            strValue = byteC.toString();
-            hasStrValue = true;
-            return strValue;
-        }
-        return null;
+        return strValue;
     }
 
     //----------------------------------------
@@ -232,21 +227,26 @@ public final class MessageBytes implements Cloneable, Serializable {
 
 
     /**
-     * Do a char-&gt;byte conversion.
+     * Convert to bytes and fill the ByteChunk with the converted value.
      */
     public void toBytes() {
-        if (isNull()) {
-            return;
+        switch (type) {
+            case T_NULL:
+                byteC.recycle();
+                //$FALL-THROUGH$
+            case T_BYTES:
+                // No conversion required
+                return;
+            case T_CHARS:
+                toString();
+                //$FALL-THROUGH$
+            case T_STR: {
+                type = T_BYTES;
+                Charset charset = byteC.getCharset();
+                ByteBuffer result = charset.encode(strValue);
+                byteC.setBytes(result.array(), result.arrayOffset(), result.limit());
+            }
         }
-        if (!byteC.isNull()) {
-            type = T_BYTES;
-            return;
-        }
-        toString();
-        type = T_BYTES;
-        Charset charset = byteC.getCharset();
-        ByteBuffer result = charset.encode(strValue);
-        byteC.setBytes(result.array(), result.arrayOffset(), result.limit());
     }
 
 
@@ -255,18 +255,22 @@ public final class MessageBytes implements Cloneable, Serializable {
      * XXX Not optimized - it converts to String first.
      */
     public void toChars() {
-        if (isNull()) {
-            return;
+        switch (type) {
+            case T_NULL:
+                charC.recycle();
+                //$FALL-THROUGH$
+            case T_CHARS:
+                // No conversion required
+                return;
+            case T_BYTES:
+                toString();
+                //$FALL-THROUGH$
+            case T_STR: {
+                type = T_CHARS;
+                char cc[] = strValue.toCharArray();
+                charC.setChars(cc, 0, cc.length);
+            }
         }
-        if (!charC.isNull()) {
-            type = T_CHARS;
-            return;
-        }
-        // inefficient
-        toString();
-        type = T_CHARS;
-        char cc[] = strValue.toCharArray();
-        charC.setChars(cc, 0, cc.length);
     }
 
 
@@ -535,7 +539,6 @@ public final class MessageBytes implements Cloneable, Serializable {
             end--;
         }
         longValue=l;
-        hasStrValue=false;
         hasHashCode=false;
         hasLongValue=true;
         type=T_BYTES;
