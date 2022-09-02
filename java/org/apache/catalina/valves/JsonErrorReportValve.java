@@ -73,7 +73,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (container.getLogger().isDebugEnabled()) {
-                    container.getLogger().debug("status.setContentType", t);
+                    container.getLogger().debug("Failure to set the content-type of response", t);
                 }
             }
             Writer writer = response.getReporter();
