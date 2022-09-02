@@ -2174,6 +2174,39 @@
 </section>
 
 
+<section name="Json Error Report Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Json Error Report Valve</strong> is a simple error handler
+      for HTTP status codes that will return Json error messages.</p>
+
+    <p>By specifying this class in <code>errorReportValveClass</code> attribute
+      in <code>HOST</code>, it will be used instead of
+      <code>ErrorReportValve</code> and will return JSON response instead of HTML.
+    </p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Json Error Report Valve</strong> supports the following
+      configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+          <strong>org.apache.catalina.valves.JsonErrorReportValve</strong>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
 <section name="Crawler Session Manager Valve">
 
   <subsection name="Introduction">

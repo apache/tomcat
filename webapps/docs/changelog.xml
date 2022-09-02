@@ -142,6 +142,11 @@
         executor to protect against failure of the logging thread. Based on pull
         request <pr>545</pr> by Piotr P. Karwasz. (markt)
       </fix>
+      <add>
+        Add <code>JsonErrorReportValve</code> that extends the
+        <code>ErrorReportValve</code> that returns  response as JSON instead of
+        HTML. Back-porting kfujino's implementation. (lihan)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
