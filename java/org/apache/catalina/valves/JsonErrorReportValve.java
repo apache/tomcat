@@ -18,11 +18,9 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
