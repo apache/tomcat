@@ -295,6 +295,10 @@
       <add>
         Improvements to German translations. (markt)
       </add>
+      <add>
+        Improvements to Japanese translations. Contributed by tak7iji and
+        Shirayuking. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
