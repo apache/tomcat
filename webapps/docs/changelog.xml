@@ -283,6 +283,9 @@
         Ensure that zip archives use UTC for file modification times to ensure
         repeatable builds across time zones. (markt)
       </fix>
+      <add>
+        Improvements to Chinese translations. (lihan)
+      </add>
     </changelog>
   </subsection>
 </section>
