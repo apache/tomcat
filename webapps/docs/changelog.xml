@@ -142,6 +142,11 @@
         that connection. (markt)
       </fix>
       <fix>
+        <bug>66196</bug>: Align HTTP/1.1 with HTTP/2 and throw an exception when
+        attempting to commit a response with an header value that includes one
+        or more characters with a code point above 255. (markt)
+      </fix>
+      <fix>
         <bug>66388</bug>: Correct a regression in the refactoring that replaced
         the use of the <code>URL</code> constructors. The regression broke
         lookups for resources that contained one or more characters in their

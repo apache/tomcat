@@ -134,7 +134,7 @@ public class TestMessageBytesConversion {
     public static enum MessageBytesType {
         BYTE((x) -> x.setBytes(PREVIOUS_BYTES, 0, PREVIOUS_BYTES.length),
                 (x) -> x.setBytes(EXPECTED_BYTES, 0, EXPECTED_BYTES.length),
-                (x) -> {x.toBytes(); Assert.assertArrayEquals(EXPECTED_BYTES, x.getByteChunk().getBytes());},
+                (x) -> {x.toBytes(); Assert.assertTrue(x.getByteChunk().equals(EXPECTED_BYTES, 0, EXPECTED_BYTES.length) );},
                 (x) -> {x.toBytes(); Assert.assertTrue(x.getByteChunk().isNull());}),
 
         CHAR((x) -> x.setChars(PREVIOUS_CHARS, 0, PREVIOUS_CHARS.length),
