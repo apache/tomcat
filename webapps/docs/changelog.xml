@@ -132,6 +132,11 @@
         Based on a suggestion by Lorenzo Dalla Vecchia. (markt)
       </fix>
       <fix>
+        <bug>66196</bug>: Align HTTP/1.1 with HTTP/2 and throw an exception when
+        attempting to commit a response with an header value that includes one
+        or more characters with a code point above 255. (markt)
+      </fix>
+      <fix>
         <bug>66385</bug>: Correct a bug in HTTP/2 where a non-blocking read for
         a new frame with the NIO2 connector was incorrectly made using the read
         timeout leading to unexpected stream closure. (markt)
