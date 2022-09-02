@@ -1063,7 +1063,20 @@ public class Http11Processor extends AbstractProcessor {
 
             int size = headers.size();
             for (int i = 0; i < size; i++) {
-                outputBuffer.sendHeader(headers.getName(i), headers.getValue(i));
+                try {
+                    outputBuffer.sendHeader(headers.getName(i), headers.getValue(i));
+                } catch (IllegalArgumentException iae) {
+                    // Log the problematic header
+                    log.warn(sm.getString("http11processor.response.invalidHeader",
+                            headers.getName(i), headers.getValue(i)), iae);
+                    // Remove the problematic header
+                    headers.removeHeader(i);
+                    size--;
+                    // Header buffer is corrupted. Reset it and start again.
+                    outputBuffer.resetHeaderBuffer();
+                    i = 0;
+                    outputBuffer.sendStatus();
+                }
             }
             outputBuffer.endHeaders();
         } catch (Throwable t) {
