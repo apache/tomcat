@@ -51,9 +51,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         getEndpoint().setUseSendfile(false);
         // AJP listens on loopback by default
         getEndpoint().setAddress(InetAddress.getLoopbackAddress());
-        ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
-        setHandler(cHandler);
-        getEndpoint().setHandler(cHandler);
     }
 
 
