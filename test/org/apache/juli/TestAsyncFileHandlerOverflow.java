@@ -107,8 +107,16 @@ public class TestAsyncFileHandlerOverflow {
 
             @Override
             public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-                latch.countDown();
+                // Generally, the latch needs to be released after the
+                // RejectedExecutionHandler has completed but for the flush case
+                // the latch needs to be released first (else the test loops)
+                if (overflowDropType == AsyncFileHandler.OVERFLOW_DROP_FLUSH) {
+                    latch.countDown();
+                }
                 rejectionHandler.rejectedExecution(r, executor);
+                if (overflowDropType != AsyncFileHandler.OVERFLOW_DROP_FLUSH) {
+                    latch.countDown();
+                }
             }
         });
         this.handler = new AsyncFileHandler(logsDir.toString(), PREFIX, SUFFIX, 1, loggerService);
