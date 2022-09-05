@@ -55,7 +55,7 @@ public class TestAsyncFileHandlerOverflow {
         logger.setUseParentHandlers(false);
     }
 
-    @Parameters
+    @Parameters(name = "{index}: overflowDropType[{0}]")
     public static Collection<Object[]> parameters() {
         return Arrays.asList(new Object[][] {
                 { Integer.valueOf(AsyncFileHandler.OVERFLOW_DROP_LAST), "START\n1\n3\n" },
