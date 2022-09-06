@@ -258,7 +258,7 @@ public class Http11Processor extends AbstractProcessor {
         setSocketWrapper(socketWrapper);
 
         // Flags
-        setKeepAlive(true);
+        keepAlive = true;
         openSocket = false;
         readComplete = true;
         boolean keptAlive = false;
@@ -387,10 +387,10 @@ public class Http11Processor extends AbstractProcessor {
 
             int maxKeepAliveRequests = protocol.getMaxKeepAliveRequests();
             if (maxKeepAliveRequests == 1) {
-                setKeepAlive(false);
+                keepAlive = false;
             } else if (maxKeepAliveRequests > 0 &&
                     socketWrapper.decrementKeepAlive() <= 0) {
-                setKeepAlive(false);
+                keepAlive = false;
             }
 
             // Process the request in the adapter
@@ -503,14 +503,6 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
-    private void setKeepAlive(boolean keepAlive) {
-        // The state of keepAlive and swallowInput must be kept in sync. The
-        // connection cannot be kept alive if the input stream is not advanced
-        // to the next request.
-        inputBuffer.setSwallowInput(keepAlive);
-        this.keepAlive = keepAlive;
-    }
-
     private Request cloneRequest(Request source) throws IOException {
         Request dest = new Request();
 
@@ -579,7 +571,8 @@ public class Http11Processor extends AbstractProcessor {
             // still send the body, some may send the next request.
             // No way to differentiate, so close the connection to
             // force the client to send the next request.
-            setKeepAlive(false);
+            inputBuffer.setSwallowInput(false);
+            keepAlive = false;
         }
     }
 
@@ -599,7 +592,7 @@ public class Http11Processor extends AbstractProcessor {
             // connection is going to be closed. Disable keep-alive which will
             // trigger adding the "Connection: close" header if not already
             // present.
-            setKeepAlive(false);
+            keepAlive = false;
         }
     }
 
@@ -614,13 +607,13 @@ public class Http11Processor extends AbstractProcessor {
         } else if (protocolMB.equals(Constants.HTTP_10)) {
             http09 = false;
             http11 = false;
-            setKeepAlive(false);
+            keepAlive = false;
             protocolMB.setString(Constants.HTTP_10);
         } else if (protocolMB.equals("")) {
             // HTTP/0.9
             http09 = true;
             http11 = false;
-            setKeepAlive(false);
+            keepAlive = false;
         } else {
             // Unsupported protocol
             http09 = false;
@@ -653,9 +646,9 @@ public class Http11Processor extends AbstractProcessor {
             Set<String> tokens = new HashSet<>();
             TokenList.parseTokenList(headers.values(Constants.CONNECTION), tokens);
             if (tokens.contains(Constants.CLOSE)) {
-                setKeepAlive(false);
+                keepAlive = false;
             } else if (tokens.contains(Constants.KEEP_ALIVE_HEADER_VALUE_TOKEN)) {
-                setKeepAlive(true);
+                keepAlive = true;
             }
         }
 
@@ -673,7 +666,7 @@ public class Http11Processor extends AbstractProcessor {
                 String userAgentValue = userAgentValueMB.toString();
                 if (restrictedUserAgents.matcher(userAgentValue).matches()) {
                     http11 = false;
-                    setKeepAlive(false);
+                    keepAlive = false;
                 }
             }
         }
@@ -810,7 +803,7 @@ public class Http11Processor extends AbstractProcessor {
         MessageBytes expectMB = headers.getValue("expect");
         if (expectMB != null && !expectMB.isNull()) {
             if (expectMB.toString().trim().equalsIgnoreCase("100-continue")) {
-                setKeepAlive(false);
+                inputBuffer.setSwallowInput(false);
                 request.setExpectation(true);
             } else {
                 response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
@@ -861,7 +854,7 @@ public class Http11Processor extends AbstractProcessor {
                 // so remove it.
                 headers.removeHeader("content-length");
                 request.setContentLength(-1);
-                setKeepAlive(false);
+                keepAlive = false;
             } else {
                 inputBuffer.addActiveFilter(inputFilters[Constants.IDENTITY_FILTER]);
                 contentDelimitation = true;
@@ -999,7 +992,7 @@ public class Http11Processor extends AbstractProcessor {
             // - there is a "connection: close" header present
             // This will cause the "connection: close" header to be added if it
             // is not already present.
-            setKeepAlive(false);
+            keepAlive = false;
         }
 
         // This may disabled keep-alive to check before working out the
@@ -1013,7 +1006,7 @@ public class Http11Processor extends AbstractProcessor {
         // If we know that the request is bad this early, add the
         // Connection: close header.
         if (keepAlive && statusDropsConnection(statusCode)) {
-            setKeepAlive(false);
+            keepAlive = false;
         }
         if (!keepAlive) {
             // Avoid adding the close header twice
@@ -1205,7 +1198,7 @@ public class Http11Processor extends AbstractProcessor {
             // If we know we are closing the connection, don't drain
             // input. This way uploading a 100GB file doesn't tie up the
             // thread if the servlet has rejected it.
-            setKeepAlive(false);
+            inputBuffer.setSwallowInput(false);
         } else {
             // Need to check this again here in case the response was
             // committed before the error that requires the connection
@@ -1260,7 +1253,7 @@ public class Http11Processor extends AbstractProcessor {
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
             if (!response.isCommitted() && request.hasExpectation()) {
-                setKeepAlive(true);
+                inputBuffer.setSwallowInput(true);
                 try {
                     outputBuffer.sendAck();
                 } catch (IOException e) {
@@ -1299,7 +1292,7 @@ public class Http11Processor extends AbstractProcessor {
 
     @Override
     protected final void disableSwallowRequest() {
-        setKeepAlive(false);
+        inputBuffer.setSwallowInput(false);
     }
 
 
