@@ -803,7 +803,6 @@ public class Http11Processor extends AbstractProcessor {
         MessageBytes expectMB = headers.getValue("expect");
         if (expectMB != null && !expectMB.isNull()) {
             if (expectMB.toString().trim().equalsIgnoreCase("100-continue")) {
-                inputBuffer.setSwallowInput(false);
                 request.setExpectation(true);
             } else {
                 response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
