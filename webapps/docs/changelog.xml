@@ -213,6 +213,11 @@
         the maximum value to 255. Based on a PR <pr>548</pr> by Stefan Mayr.
         (lihan)
       </fix>
+      <fix>
+        <pr>551</pr>: Avoid potential IndexOutOfBoundsException by fixing
+        incorrect check when matching HTTP/2 preface. Submitted by 刘文章.
+        (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
