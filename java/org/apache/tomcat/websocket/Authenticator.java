@@ -22,50 +22,53 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Base class for the authentication methods used by the websocket client.
+ * Base class for the authentication methods used by the WebSocket client.
  */
 public abstract class Authenticator {
-    private static final Pattern pattern = Pattern
-            .compile("(\\w+)\\s*=\\s*(\"([^\"]+)\"|([^,=\"]+))\\s*,?");
+
+    private static final Pattern pattern = Pattern.compile("(\\w+)\\s*=\\s*(\"([^\"]+)\"|([^,=\"]+))\\s*,?");
 
     /**
-     * Generate the authentication header that will be sent to the server.
-     * @param requestUri The request URI
-     * @param WWWAuthenticate The server auth challenge
-     * @param UserProperties The user information
-     * @return The auth header
+     * Generate the authorization header that will be sent to the server.
+     *
+     * @param requestUri         The request URI
+     * @param authenticateHeader The server authentication header received
+     * @param userProperties     The user information
+     *
+     * @return The generated authorization header value
+     *
      * @throws AuthenticationException When an error occurs
      */
-    public abstract String getAuthorization(String requestUri, String WWWAuthenticate,
-            Map<String, Object> UserProperties) throws AuthenticationException;
+    public abstract String getAuthorization(String requestUri, String authenticateHeader,
+            Map<String, Object> userProperties) throws AuthenticationException;
 
     /**
      * Get the authentication method.
-     * @return the auth scheme
+     * @return the authentication scheme
      */
     public abstract String getSchemeName();
 
     /**
      * Utility method to parse the authentication header.
-     * @param WWWAuthenticate The server auth challenge
-     * @return the parsed header
+     *
+     * @param authenticateHeader The server authentication header received
+     *
+     * @return a map of authentication parameter names and values
      */
-    public Map<String, String> parseWWWAuthenticateHeader(String WWWAuthenticate) {
+    public Map<String, String> parseWWWAuthenticateHeader(String authenticateHeader) {
 
-        Matcher m = pattern.matcher(WWWAuthenticate);
-        Map<String, String> challenge = new HashMap<>();
+        Matcher m = pattern.matcher(authenticateHeader);
+        Map<String, String> parameterMap = new HashMap<>();
 
         while (m.find()) {
             String key = m.group(1);
             String qtedValue = m.group(3);
             String value = m.group(4);
 
-            challenge.put(key, qtedValue != null ? qtedValue : value);
+            parameterMap.put(key, qtedValue != null ? qtedValue : value);
 
         }
 
-        return challenge;
-
+        return parameterMap;
     }
-
 }
