@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.tomcat.util.security.MD5Encoder;
 
 /**
- * Authenticator supporting the DIGEST auth method.
+ * Authenticator supporting the DIGEST authentication method.
  */
 public class DigestAuthenticator extends Authenticator {
 
@@ -40,21 +40,21 @@ public class DigestAuthenticator extends Authenticator {
             Map<String, Object> userProperties) throws AuthenticationException {
 
         String userName = (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME);
-        String password = (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD);
+        String userPassword = (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD);
 
-        if (userName == null || password == null) {
+        if (userName == null || userPassword == null) {
             throw new AuthenticationException(
                     "Failed to perform Digest authentication due to  missing user/password");
         }
 
-        Map<String, String> wwwAuthenticate = parseWWWAuthenticateHeader(WWWAuthenticate);
+        Map<String, String> parameterMap = parseWWWAuthenticateHeader(WWWAuthenticate);
 
-        String realm = wwwAuthenticate.get("realm");
-        String nonce = wwwAuthenticate.get("nonce");
-        String messageQop = wwwAuthenticate.get("qop");
-        String algorithm = wwwAuthenticate.get("algorithm") == null ? "MD5"
-                : wwwAuthenticate.get("algorithm");
-        String opaque = wwwAuthenticate.get("opaque");
+        String realm = parameterMap.get("realm");
+        String nonce = parameterMap.get("nonce");
+        String messageQop = parameterMap.get("qop");
+        String algorithm = parameterMap.get("algorithm") == null ? "MD5"
+                : parameterMap.get("algorithm");
+        String opaque = parameterMap.get("opaque");
 
         StringBuilder challenge = new StringBuilder();
 
@@ -78,7 +78,7 @@ public class DigestAuthenticator extends Authenticator {
         challenge.append("uri=\"" + requestUri + "\",");
 
         try {
-            challenge.append("response=\"" + calculateRequestDigest(requestUri, userName, password,
+            challenge.append("response=\"" + calculateRequestDigest(requestUri, userName, userPassword,
                     realm, nonce, messageQop, algorithm) + "\",");
         }
 
