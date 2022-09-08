@@ -23,7 +23,7 @@ import java.util.Map;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
- * Authenticator supporting the BASIC auth method.
+ * Authenticator supporting the BASIC authentication method.
  */
 public class BasicAuthenticator extends Authenticator {
 
@@ -31,24 +31,24 @@ public class BasicAuthenticator extends Authenticator {
     public static final String charsetparam = "charset";
 
     @Override
-    public String getAuthorization(String requestUri, String WWWAuthenticate,
+    public String getAuthorization(String requestUri, String authenticateHeader,
             Map<String, Object> userProperties) throws AuthenticationException {
 
         String userName = (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME);
-        String password = (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD);
+        String userPassword = (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD);
 
-        if (userName == null || password == null) {
+        if (userName == null || userPassword == null) {
             throw new AuthenticationException(
                     "Failed to perform Basic authentication due to  missing user/password");
         }
 
-        Map<String, String> wwwAuthenticate = parseWWWAuthenticateHeader(WWWAuthenticate);
+        Map<String, String> parameterMap = parseWWWAuthenticateHeader(authenticateHeader);
 
-        String userPass = userName + ":" + password;
+        String userPass = userName + ":" + userPassword;
         Charset charset;
 
-        if (wwwAuthenticate.get(charsetparam) != null
-                && wwwAuthenticate.get(charsetparam).equalsIgnoreCase("UTF-8")) {
+        if (parameterMap.get(charsetparam) != null
+                && parameterMap.get(charsetparam).equalsIgnoreCase("UTF-8")) {
             charset = StandardCharsets.UTF_8;
         } else {
             charset = StandardCharsets.ISO_8859_1;
