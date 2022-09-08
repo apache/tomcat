@@ -36,7 +36,7 @@ public class DigestAuthenticator extends Authenticator {
     private long cNonce;
 
     @Override
-    public String getAuthorization(String requestUri, String WWWAuthenticate,
+    public String getAuthorization(String requestUri, String authenticateHeader,
             Map<String, Object> userProperties) throws AuthenticationException {
 
         String userName = (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME);
@@ -47,13 +47,12 @@ public class DigestAuthenticator extends Authenticator {
                     "Failed to perform Digest authentication due to  missing user/password");
         }
 
-        Map<String, String> parameterMap = parseWWWAuthenticateHeader(WWWAuthenticate);
+        Map<String, String> parameterMap = parseWWWAuthenticateHeader(authenticateHeader);
 
         String realm = parameterMap.get("realm");
         String nonce = parameterMap.get("nonce");
         String messageQop = parameterMap.get("qop");
-        String algorithm = parameterMap.get("algorithm") == null ? "MD5"
-                : parameterMap.get("algorithm");
+        String algorithm = parameterMap.get("algorithm") == null ? "MD5" : parameterMap.get("algorithm");
         String opaque = parameterMap.get("opaque");
 
         StringBuilder challenge = new StringBuilder();

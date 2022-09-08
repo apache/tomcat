@@ -30,7 +30,7 @@ public class BasicAuthenticator extends Authenticator {
     public static final String charsetparam = "charset";
 
     @Override
-    public String getAuthorization(String requestUri, String WWWAuthenticate,
+    public String getAuthorization(String requestUri, String authenticateHeader,
             Map<String, Object> userProperties) throws AuthenticationException {
 
         String userName = (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME);
@@ -41,7 +41,7 @@ public class BasicAuthenticator extends Authenticator {
                     "Failed to perform Basic authentication due to  missing user/password");
         }
 
-        Map<String, String> parameterMap = parseWWWAuthenticateHeader(WWWAuthenticate);
+        Map<String, String> parameterMap = parseWWWAuthenticateHeader(authenticateHeader);
 
         String userPass = userName + ":" + userPassword;
         Charset charset;
