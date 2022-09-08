@@ -29,7 +29,7 @@ public abstract class Authenticator {
     private static final Pattern pattern = Pattern.compile("(\\w+)\\s*=\\s*(\"([^\"]+)\"|([^,=\"]+))\\s*,?");
 
     /**
-     * Generate the authorization header that will be sent to the server.
+     * Generate the authorization header value that will be sent to the server.
      *
      * @param requestUri         The request URI
      * @param authenticateHeader The server authentication header received
@@ -44,6 +44,7 @@ public abstract class Authenticator {
 
     /**
      * Get the authentication method.
+     *
      * @return the authentication scheme
      */
     public abstract String getSchemeName();
@@ -51,7 +52,7 @@ public abstract class Authenticator {
     /**
      * Utility method to parse the authentication header.
      *
-     * @param authenticateHeader The server authentication header received
+     * @param authenticateHeader The server authenticate header received
      *
      * @return a map of authentication parameter names and values
      */
