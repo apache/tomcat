@@ -1252,7 +1252,6 @@ public class Http11Processor extends AbstractProcessor {
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
             if (!response.isCommitted() && request.hasExpectation()) {
-                inputBuffer.setSwallowInput(true);
                 try {
                     outputBuffer.sendAck();
                 } catch (IOException e) {
