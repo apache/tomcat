@@ -146,7 +146,7 @@
    <ocde>org.apache.tomcat.websocket.MAX_REDIRECTIONS</ocde>. The default value
    is 20. Redirection support can be disabled by configuring a value of zero.
    </p>
- 
+
 <p>When using the WebSocket client to connect to a server endpoint that requires
    BASIC or DIGEST authentication, the following user properties must be set:
    </p>
@@ -161,6 +161,24 @@
    by defining that realm in the optional user property:</p>
    <ul>
      <li><code>org.apache.tomcat.websocket.WS_AUTHENTICATION_REALM</code></li>
+   </ul>
+
+<p>When using the WebSocket client to connect to a server endpoint via a forward
+   proxy (also known as a gateway) that requires BASIC or DIGEST authentication,
+   the following user properties must be set:
+   </p>
+   <ul>
+     <li><code>org.apache.tomcat.websocket.WS_PROXY_AUTHENTICATION_USER_NAME
+     </code></li>
+     <li><code>org.apache.tomcat.websocket.WS_PROXY_AUTHENTICATION_PASSWORD
+     </code></li>
+   </ul>
+   <p>Optionally, the WebSocket client can be configured only to send
+   credentials if the server authentication challenge includes a specific realm
+   by defining that realm in the optional user property:</p>
+   <ul>
+     <li><code>org.apache.tomcat.websocket.WS_PROXY_AUTHENTICATION_REALM</code>
+     </li>
    </ul>
 
 </section>

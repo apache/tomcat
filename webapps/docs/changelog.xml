@@ -280,6 +280,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        <bug>62312</bug>: Add support for authenticating WebSocket clients with
+        an HTTP forward proxy when establishing a connection to a WebSocket
+        endpoint via a foward proxy that requires authentication. Based on a
+        patch provided by Joe Mokos. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
