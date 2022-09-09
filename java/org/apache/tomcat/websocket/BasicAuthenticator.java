@@ -36,11 +36,15 @@ public class BasicAuthenticator extends Authenticator {
 
         String userName = (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME);
         String userPassword = (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD);
+        String userRealm = (String) userProperties.get(Constants.WS_AUTHENTICATION_REALM);
 
         validateUsername(userName);
         validatePassword(userPassword);
 
         Map<String, String> parameterMap = parseAuthenticateHeader(authenticateHeader);
+        String realm = parameterMap.get("realm");
+
+        validateRealm(userRealm, realm);
 
         String userPass = userName + ":" + userPassword;
         Charset charset;

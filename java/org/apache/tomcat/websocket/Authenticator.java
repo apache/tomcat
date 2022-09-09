@@ -109,4 +109,30 @@ public abstract class Authenticator {
             throw new AuthenticationException(sm.getString("authenticator.nullPassword"));
         }
     }
+
+
+    protected void validateRealm(String userRealm, String serverRealm) throws AuthenticationException {
+        if (userRealm == null) {
+            return;
+        }
+
+        userRealm = userRealm.trim();
+        if (userRealm.length() == 0) {
+            return;
+        }
+
+        /*
+         * User has configured a realm. Only allow authentication to proceed if
+         * the realm in the authentication challenge matches (both BASIC and
+         * DIGEST are required to include a realm).
+         */
+        if (serverRealm != null) {
+            serverRealm = serverRealm.trim();
+            if (userRealm.equals(serverRealm)) {
+                return;
+            }
+        }
+
+        throw new AuthenticationException(sm.getString("authenticator.realmMismatch", userRealm, serverRealm));
+    }
 }
