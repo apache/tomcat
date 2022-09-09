@@ -68,7 +68,7 @@ public final class MessageFactory {
                     if (formats == null) {
                         formats = mf.getFormatsByArgumentIndex();
                     }
-                    if (!(formats[i] instanceof NumberFormat)) {
+                    if (i < formats.length && !(formats[i] instanceof NumberFormat)) {
                         args[i] = args[i].toString();
                     }
                 }
