@@ -42,10 +42,8 @@ public class DigestAuthenticator extends Authenticator {
         String userName = (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME);
         String userPassword = (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD);
 
-        if (userName == null || userPassword == null) {
-            throw new AuthenticationException(
-                    "Failed to perform Digest authentication due to  missing user/password");
-        }
+        validateUsername(userName);
+        validatePassword(userPassword);
 
         Map<String, String> parameterMap = parseAuthenticateHeader(authenticateHeader);
 
