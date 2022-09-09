@@ -41,7 +41,7 @@ public class BasicAuthenticator extends Authenticator {
                     "Failed to perform Basic authentication due to  missing user/password");
         }
 
-        Map<String, String> parameterMap = parseWWWAuthenticateHeader(authenticateHeader);
+        Map<String, String> parameterMap = parseAuthenticateHeader(authenticateHeader);
 
         String userPass = userName + ":" + userPassword;
         Charset charset;
