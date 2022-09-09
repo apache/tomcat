@@ -18,7 +18,6 @@ package org.apache.jasper.compiler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.el.ELContext;
 import javax.el.ELException;
@@ -561,7 +560,7 @@ abstract class Node implements TagConstants {
      */
     public static class PageDirective extends Node {
 
-        private final Vector<String> imports;
+        private final List<String> imports;
 
         public PageDirective(Attributes attrs, Mark start, Node parent) {
             this(JSP_PAGE_DIRECTIVE_ACTION, attrs, null, null, start, parent);
@@ -572,7 +571,7 @@ abstract class Node implements TagConstants {
                 Mark start, Node parent) {
             super(qName, PAGE_DIRECTIVE_ACTION, attrs, nonTaglibXmlnsAttrs,
                     taglibAttrs, start, parent);
-            imports = new Vector<>();
+            imports = new ArrayList<>();
         }
 
         @Override
@@ -665,7 +664,7 @@ abstract class Node implements TagConstants {
      * Represents a tag directive
      */
     public static class TagDirective extends Node {
-        private final Vector<String> imports;
+        private final List<String> imports;
 
         public TagDirective(Attributes attrs, Mark start, Node parent) {
             this(JSP_TAG_DIRECTIVE_ACTION, attrs, null, null, start, parent);
@@ -676,7 +675,7 @@ abstract class Node implements TagConstants {
                 Mark start, Node parent) {
             super(qName, TAG_DIRECTIVE_ACTION, attrs, nonTaglibXmlnsAttrs,
                     taglibAttrs, start, parent);
-            imports = new Vector<>();
+            imports = new ArrayList<>();
         }
 
         @Override
@@ -2342,12 +2341,12 @@ abstract class Node implements TagConstants {
         private boolean generatedInBuffer;
 
         public Nodes() {
-            list = new Vector<>();
+            list = new ArrayList<>();
         }
 
         public Nodes(Node.Root root) {
             this.root = root;
-            list = new Vector<>();
+            list = new ArrayList<>();
             list.add(root);
         }
 
