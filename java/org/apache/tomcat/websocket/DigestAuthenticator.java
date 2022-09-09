@@ -47,7 +47,7 @@ public class DigestAuthenticator extends Authenticator {
                     "Failed to perform Digest authentication due to  missing user/password");
         }
 
-        Map<String, String> parameterMap = parseWWWAuthenticateHeader(authenticateHeader);
+        Map<String, String> parameterMap = parseAuthenticateHeader(authenticateHeader);
 
         String realm = parameterMap.get("realm");
         String nonce = parameterMap.get("nonce");
