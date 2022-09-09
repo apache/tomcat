@@ -90,6 +90,8 @@ public class Constants {
     public static final String LOCATION_HEADER_NAME = "Location";
     public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
     public static final String WWW_AUTHENTICATE_HEADER_NAME = "WWW-Authenticate";
+    public static final String PROXY_AUTHORIZATION_HEADER_NAME = "Proxy-Authorization";
+    public static final String PROXY_AUTHENTICATE_HEADER_NAME = "Proxy-Authenticate";
     public static final String WS_VERSION_HEADER_NAME = "Sec-WebSocket-Version";
     public static final String WS_VERSION_HEADER_VALUE = "13";
     public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";
@@ -104,6 +106,7 @@ public class Constants {
     public static final int USE_PROXY = 305;
     public static final int TEMPORARY_REDIRECT = 307;
     public static final int UNAUTHORIZED = 401;
+    public static final int PROXY_AUTHENTICATION_REQUIRED = 407;
 
     // Configuration for Origin header in client
     static final String DEFAULT_ORIGIN_HEADER_VALUE =
@@ -129,6 +132,13 @@ public class Constants {
     public static final String WS_AUTHENTICATION_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME";
     public static final String WS_AUTHENTICATION_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD";
     public static final String WS_AUTHENTICATION_REALM = "org.apache.tomcat.websocket.WS_AUTHENTICATION_REALM";
+
+    public static final String WS_AUTHENTICATION_PROXY_USER_NAME =
+            "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_USER_NAME";
+    public static final String WS_AUTHENTICATION_PROXY_PASSWORD =
+            "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_PASSWORD";
+    public static final String WS_AUTHENTICATION_PROXY_REALM =
+            "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_REALM";
 
     /* Configuration for extensions
      * Note: These options are primarily present to enable this implementation

@@ -249,11 +249,14 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             }
         }
 
+        Map<String,Object> userProperties = clientEndpointConfiguration.getUserProperties();
+
         // If sa is null, no proxy is configured so need to create sa
         if (sa == null) {
             sa = new InetSocketAddress(host, port);
         } else {
-            proxyConnect = createProxyRequest(host, port);
+            proxyConnect = createProxyRequest(
+                    host, port, (String) userProperties.get(Constants.PROXY_AUTHORIZATION_HEADER_NAME));
         }
 
         // Create the initial HTTP request to open the WebSocket connection
@@ -275,8 +278,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             throw new DeploymentException(sm.getString(
                     "wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
         }
-
-        Map<String,Object> userProperties = clientEndpointConfiguration.getUserProperties();
 
         // Get the connection timeout
         long timeout = Constants.IO_TIMEOUT_MS_DEFAULT;
@@ -304,7 +305,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 channel = new AsyncChannelWrapperNonSecure(socketChannel);
                 writeRequest(channel, proxyConnect, timeout);
                 HttpResponse httpResponse = processResponse(response, channel, timeout);
-                if (httpResponse.getStatus() != 200) {
+                if (httpResponse.status == Constants.PROXY_AUTHENTICATION_REQUIRED) {
+                    return processAuthenticationChallenge(clientEndpointHolder, clientEndpointConfiguration, path,
+                        redirectSet, userProperties, request, httpResponse, AuthenticationType.PROXY);
+                } else if (httpResponse.getStatus() != 200) {
                     throw new DeploymentException(sm.getString(
                             "wsWebSocketContainer.proxyConnectFail", selectedProxy,
                             Integer.toString(httpResponse.getStatus())));
@@ -572,7 +576,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private static ByteBuffer createProxyRequest(String host, int port) {
+    private static ByteBuffer createProxyRequest(String host, int port, String authorizationHeader) {
         StringBuilder request = new StringBuilder();
         request.append("CONNECT ");
         request.append(host);
@@ -583,6 +587,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         request.append(host);
         request.append(':');
         request.append(port);
+
+        if (authorizationHeader != null) {
+            request.append("\r\n");
+            request.append(Constants.PROXY_AUTHORIZATION_HEADER_NAME);
+            request.append(':');
+            request.append(authorizationHeader);
+        }
 
         request.append("\r\n\r\n");
 
