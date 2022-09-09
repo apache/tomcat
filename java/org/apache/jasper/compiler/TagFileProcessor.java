@@ -17,10 +17,11 @@
 package org.apache.jasper.compiler;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -48,7 +49,7 @@ import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 
 class TagFileProcessor {
 
-    private Vector<Compiler> tempVector;
+    private List<Compiler> tempVector;
 
     /**
      * A visitor the tag file
@@ -113,9 +114,9 @@ class TagFileProcessor {
 
         private String example = null;
 
-        private Vector<TagAttributeInfo> attributeVector;
+        private List<TagAttributeInfo> attributeList;
 
-        private Vector<TagVariableInfo> variableVector;
+        private List<TagVariableInfo> variableList;
 
         private static final String ATTR_NAME = "the name attribute of the attribute directive";
 
@@ -137,8 +138,8 @@ class TagFileProcessor {
             this.tagLibInfo = tagLibInfo;
             this.name = name;
             this.path = path;
-            attributeVector = new Vector<>();
-            variableVector = new Vector<>();
+            attributeList = new ArrayList<>();
+            variableList = new ArrayList<>();
         }
 
         @Override
@@ -281,7 +282,7 @@ class TagFileProcessor {
             TagAttributeInfo tagAttributeInfo = new TagAttributeInfo(attrName,
                     required, type, rtexprvalue, fragment, null, deferredValue,
                     deferredMethod, deferredValueType, deferredMethodSignature);
-            attributeVector.addElement(tagAttributeInfo);
+            attributeList.add(tagAttributeInfo);
             checkUniqueName(attrName, ATTR_NAME, n, tagAttributeInfo);
         }
 
@@ -346,8 +347,7 @@ class TagFileProcessor {
                 checkUniqueName(nameGiven, VAR_NAME_GIVEN, n);
             }
 
-            variableVector.addElement(new TagVariableInfo(nameGiven,
-                    nameFromAttribute, className, declare, scope));
+            variableList.add(new TagVariableInfo(nameGiven, nameFromAttribute, className, declare, scope));
         }
 
         public TagInfo getTagInfo() throws JasperException {
@@ -363,13 +363,8 @@ class TagFileProcessor {
             String tagClassName = JspUtil.getTagHandlerClassName(
                     path, tagLibInfo.getReliableURN(), err);
 
-            TagVariableInfo[] tagVariableInfos = new TagVariableInfo[variableVector
-                    .size()];
-            variableVector.copyInto(tagVariableInfos);
-
-            TagAttributeInfo[] tagAttributeInfo = new TagAttributeInfo[attributeVector
-                    .size()];
-            attributeVector.copyInto(tagAttributeInfo);
+            TagVariableInfo[] tagVariableInfos = variableList.toArray(new TagVariableInfo[0]);
+            TagAttributeInfo[] tagAttributeInfo = attributeList.toArray(new TagAttributeInfo[0]);
 
             return new JasperTagInfo(name, tagClassName, bodycontent,
                     description, tagLibInfo, null, tagAttributeInfo,
@@ -690,7 +685,7 @@ class TagFileProcessor {
     public void loadTagFiles(Compiler compiler, Node.Nodes page)
             throws JasperException {
 
-        tempVector = new Vector<>();
+        tempVector = new ArrayList<>();
         page.visit(new TagFileLoaderVisitor(compiler));
     }
 
@@ -705,8 +700,7 @@ class TagFileProcessor {
         for (Compiler c : tempVector) {
             if (classFileName == null) {
                 c.removeGeneratedClassFiles();
-            } else if (classFileName.equals(c.getCompilationContext()
-                    .getClassFileName())) {
+            } else if (classFileName.equals(c.getCompilationContext().getClassFileName())) {
                 c.removeGeneratedClassFiles();
                 tempVector.remove(c);
                 return;

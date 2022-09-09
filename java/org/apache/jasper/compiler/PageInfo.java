@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.compiler;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.el.ExpressionFactory;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
@@ -39,7 +39,7 @@ import org.apache.jasper.JasperException;
 
 class PageInfo {
 
-    private final Vector<String> imports;
+    private final List<String> imports;
     private final Map<String,Long> dependants;
 
     private final BeanRepository beanRepository;
@@ -94,7 +94,7 @@ class PageInfo {
     private boolean hasJspRoot = false;
     private Collection<String> includePrelude;
     private Collection<String> includeCoda;
-    private final Vector<String> pluginDcls;  // Id's for tagplugin declarations
+    private final List<String> pluginDcls;  // Id's for tagplugin declarations
 
     // JSP 2.2
     private boolean errorOnUndeclaredNamespace = false;
@@ -111,13 +111,13 @@ class PageInfo {
         this.xmlPrefixMapper = new HashMap<>();
         this.nonCustomTagPrefixMap = new HashMap<>();
         this.dependants = new HashMap<>();
-        this.includePrelude = new Vector<>();
-        this.includeCoda = new Vector<>();
-        this.pluginDcls = new Vector<>();
+        this.includePrelude = new ArrayList<>();
+        this.includeCoda = new ArrayList<>();
+        this.pluginDcls = new ArrayList<>();
         this.prefixes = new HashSet<>();
 
         // Enter standard imports
-        this.imports = new Vector<>(Constants.STANDARD_IMPORTS);
+        this.imports = new ArrayList<>(Constants.STANDARD_IMPORTS);
     }
 
     public boolean isTagFile() {

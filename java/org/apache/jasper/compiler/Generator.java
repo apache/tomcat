@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.Vector;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -121,7 +120,7 @@ class Generator {
 
     private final PageInfo pageInfo;
 
-    private final Vector<String> tagHandlerPoolNames;
+    private final List<String> tagHandlerPoolNames;
 
     private GenBuffer charArrayBuffer;
 
@@ -281,14 +280,14 @@ class Generator {
 
         class TagHandlerPoolVisitor extends Node.Visitor {
 
-            private final Vector<String> names;
+            private final List<String> names;
 
             /*
              * Constructor
              *
              * @param v Vector of tag handler pool names to populate
              */
-            TagHandlerPoolVisitor(Vector<String> v) {
+            TagHandlerPoolVisitor(List<String> v) {
                 names = v;
             }
 
@@ -359,10 +358,10 @@ class Generator {
 
         class ScriptingVarVisitor extends Node.Visitor {
 
-            private final Vector<String> vars;
+            private final List<String> vars;
 
             ScriptingVarVisitor() {
-                vars = new Vector<>();
+                vars = new ArrayList<>();
             }
 
             @Override
@@ -512,7 +511,7 @@ class Generator {
         out.pushIndent();
         if (isPoolingEnabled) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printin(tagHandlerPoolNames.elementAt(i));
+                out.printin(tagHandlerPoolNames.get(i));
                 out.print(" = org.apache.jasper.runtime.TagHandlerPool.getTagHandlerPool(");
                 if (ctxt.isTagFile()) {
                     out.print("config");
@@ -548,7 +547,7 @@ class Generator {
 
         if (isPoolingEnabled) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printin(tagHandlerPoolNames.elementAt(i));
+                out.printin(tagHandlerPoolNames.get(i));
                 out.println(".release();");
             }
         }
@@ -669,8 +668,7 @@ class Generator {
     private void genPreambleClassVariableDeclarations() {
         if (isPoolingEnabled && !tagHandlerPoolNames.isEmpty()) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printil("private org.apache.jasper.runtime.TagHandlerPool "
-                        + tagHandlerPoolNames.elementAt(i) + ";");
+                out.printil("private org.apache.jasper.runtime.TagHandlerPool " + tagHandlerPoolNames.get(i) + ";");
             }
             out.println();
         }
@@ -3537,7 +3535,7 @@ class Generator {
         varInfoNames = pageInfo.getVarInfoNames();
         breakAtLF = ctxt.getOptions().getMappedFile();
         if (isPoolingEnabled) {
-            tagHandlerPoolNames = new Vector<>();
+            tagHandlerPoolNames = new ArrayList<>();
         } else {
             tagHandlerPoolNames = null;
         }
