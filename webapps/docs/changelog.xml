@@ -243,7 +243,7 @@
       </fix>
       <fix>
         Improve handling of EL error messages so instances of Number are not
-        formatted in unexpected ways. (markt)
+        formatted in unexpected ways. (markt/kkolinko)
       </fix>
       <fix>
         Switch to using ELException rather than IllegalArgumentException when a
