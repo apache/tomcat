@@ -422,7 +422,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     }
 
                     userProperties.put(Constants.AUTHORIZATION_HEADER_NAME, auth.getAuthorization(
-                            requestUri, wwwAuthenticateHeaders.get(0), userProperties));
+                            requestUri, wwwAuthenticateHeaders.get(0),
+                            (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME),
+                            (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD),
+                            (String) userProperties.get(Constants.WS_AUTHENTICATION_REALM)));
 
                     return connectToServerRecursive(
                             clientEndpointHolder, clientEndpointConfiguration, path, redirectSet);
