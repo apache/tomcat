@@ -28,6 +28,7 @@ public abstract class Authenticator {
 
     private static final Pattern pattern = Pattern.compile("(\\w+)\\s*=\\s*(\"([^\"]+)\"|([^,=\"]+))\\s*,?");
 
+
     /**
      * Generate the authorization header value that will be sent to the server.
      *
@@ -42,12 +43,30 @@ public abstract class Authenticator {
     public abstract String getAuthorization(String requestUri, String authenticateHeader,
             Map<String, Object> userProperties) throws AuthenticationException;
 
+
     /**
      * Get the authentication method.
      *
      * @return the authentication scheme
      */
     public abstract String getSchemeName();
+
+
+    /**
+     * Utility method to parse the authentication header.
+     *
+     * @param authenticateHeader The server authenticate header received
+     *
+     * @return a map of authentication parameter names and values
+     *
+     * @deprecated Use {@link Authenticator#parseAuthenticateHeader(String)}.
+     *             Will be removed in Tomcat 10.1.x onwards
+     */
+    @Deprecated
+    public Map<String, String> parseWWWAuthenticateHeader(String authenticateHeader) {
+        return parseAuthenticateHeader(authenticateHeader);
+    }
+
 
     /**
      * Utility method to parse the authentication header.
@@ -56,7 +75,7 @@ public abstract class Authenticator {
      *
      * @return a map of authentication parameter names and values
      */
-    public Map<String, String> parseWWWAuthenticateHeader(String authenticateHeader) {
+    public Map<String, String> parseAuthenticateHeader(String authenticateHeader) {
 
         Matcher m = pattern.matcher(authenticateHeader);
         Map<String, String> parameterMap = new HashMap<>();
