@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class DummyCart {
-    final List<String> items = Collections.synchronizedList(new ArrayList<>());
+    final List<String> items = Collections.synchronizedList(new ArrayList<String>());
     String submit = null;
     String item = null;
 
