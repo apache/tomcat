@@ -21,10 +21,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Base class for the authentication methods used by the WebSocket client.
  */
 public abstract class Authenticator {
+
+    private static final StringManager sm = StringManager.getManager(Authenticator.class);
 
     private static final Pattern pattern = Pattern.compile("(\\w+)\\s*=\\s*(\"([^\"]+)\"|([^,=\"]+))\\s*,?");
 
@@ -90,5 +94,19 @@ public abstract class Authenticator {
         }
 
         return parameterMap;
+    }
+
+
+    protected void validateUsername(String userName) throws AuthenticationException {
+        if (userName == null) {
+            throw new AuthenticationException(sm.getString("authenticator.nullUserName"));
+        }
+    }
+
+
+    protected void validatePassword(String password) throws AuthenticationException {
+        if (password == null) {
+            throw new AuthenticationException(sm.getString("authenticator.nullPassword"));
+        }
     }
 }
