@@ -36,7 +36,6 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.RequestDispatcher;
@@ -1521,15 +1520,13 @@ public final class CGIServlet extends HttpServlet {
          */
         protected String[] hashToStringArray(Hashtable<String,?> h)
             throws NullPointerException {
-            Vector<String> v = new Vector<>();
+            List<String> list = new ArrayList<>(h.size());
             Enumeration<String> e = h.keys();
             while (e.hasMoreElements()) {
                 String k = e.nextElement();
-                v.add(k + "=" + h.get(k).toString());
+                list.add(k + "=" + h.get(k).toString());
             }
-            String[] strArr = new String[v.size()];
-            v.copyInto(strArr);
-            return strArr;
+            return list.toArray(new String[0]);
         }
 
 
