@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
@@ -1295,9 +1296,11 @@ public class WebdavServlet extends DefaultServlet {
         if (lock != null) {
 
             // At least one of the tokens of the locks must have been given
-            for (String token : lock.tokens) {
+            Iterator<String> tokenList = lock.tokens.iterator();
+            while (tokenList.hasNext()) {
+                String token = tokenList.next();
                 if (lockTokenHeader.contains(token)) {
-                    lock.tokens.remove(token);
+                    tokenList.remove();
                 }
             }
 
@@ -1310,17 +1313,20 @@ public class WebdavServlet extends DefaultServlet {
         }
 
         // Checking inheritable collection locks
-        for (LockInfo collectionLock : collectionLocks) {
-            if (path.equals(collectionLock.path)) {
-                for (String token : collectionLock.tokens) {
+        Iterator<LockInfo> collectionLocksList = collectionLocks.iterator();
+        while (collectionLocksList.hasNext()) {
+            lock = collectionLocksList.next();
+            if (path.equals(lock.path)) {
+                Iterator<String> tokenList = lock.tokens.iterator();
+                while (tokenList.hasNext()) {
+                    String token = tokenList.next();
                     if (lockTokenHeader.contains(token)) {
-                        collectionLock.tokens.remove(token);
+                        tokenList.remove();
                         break;
                     }
                 }
-
-                if (collectionLock.tokens.isEmpty()) {
-                    collectionLocks.remove(collectionLock);
+                if (lock.tokens.isEmpty()) {
+                    collectionLocksList.remove();
                     // Removing any lock-null resource which would be present
                     lockNullResources.remove(path);
                 }
@@ -1394,12 +1400,14 @@ public class WebdavServlet extends DefaultServlet {
         }
 
         // Checking inheritable collection locks
-        for (LockInfo collectionsLock : collectionLocks) {
-            if (collectionsLock.hasExpired()) {
-                collectionLocks.remove(collectionsLock);
-            } else if (path.startsWith(collectionsLock.path)) {
+        Iterator<LockInfo> collectionLockList = collectionLocks.iterator();
+        while (collectionLockList.hasNext()) {
+            lock = collectionLockList.next();
+            if (lock.hasExpired()) {
+                collectionLockList.remove();
+            } else if (path.startsWith(lock.path)) {
                 boolean tokenMatch = false;
-                for (String token : collectionsLock.tokens) {
+                for (String token : lock.tokens) {
                     if (ifHeader.contains(token)) {
                         tokenMatch = true;
                         break;
