@@ -36,30 +36,6 @@ public abstract class Authenticator {
     /**
      * Generate the authorization header value that will be sent to the server.
      *
-     * @param requestUri         The request URI
-     * @param authenticateHeader The server authentication header received
-     * @param userProperties     The user information
-     *
-     * @return The generated authorization header value
-     *
-     * @throws AuthenticationException When an error occurs
-     *
-     * @deprecated Use {@link
-     *             #getAuthorization(String, String, String, String, String)}.
-     *             Will be removed in Tomcat 10.1.x
-     */
-    @Deprecated
-    public String getAuthorization(String requestUri, String authenticateHeader, Map<String, Object> userProperties)
-            throws AuthenticationException {
-        return getAuthorization(requestUri, authenticateHeader,
-                (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME),
-                (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD),
-                (String) userProperties.get(Constants.WS_AUTHENTICATION_REALM));
-    }
-
-    /**
-     * Generate the authorization header value that will be sent to the server.
-     *
      * @param requestUri            The request URI
      * @param authenticateHeader    The server authentication header received
      * @param userName              The user name
@@ -82,22 +58,6 @@ public abstract class Authenticator {
      * @return the authentication scheme
      */
     public abstract String getSchemeName();
-
-
-    /**
-     * Utility method to parse the authentication header.
-     *
-     * @param authenticateHeader The server authenticate header received
-     *
-     * @return a map of authentication parameter names and values
-     *
-     * @deprecated Use {@link Authenticator#parseAuthenticateHeader(String)}.
-     *             Will be removed in Tomcat 10.1.x onwards
-     */
-    @Deprecated
-    public Map<String, String> parseWWWAuthenticateHeader(String authenticateHeader) {
-        return parseAuthenticateHeader(authenticateHeader);
-    }
 
 
     /**
