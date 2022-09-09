@@ -31,12 +31,8 @@ public class BasicAuthenticator extends Authenticator {
     public static final String charsetparam = "charset";
 
     @Override
-    public String getAuthorization(String requestUri, String authenticateHeader,
-            Map<String, Object> userProperties) throws AuthenticationException {
-
-        String userName = (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME);
-        String userPassword = (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD);
-        String userRealm = (String) userProperties.get(Constants.WS_AUTHENTICATION_REALM);
+    public String getAuthorization(String requestUri, String authenticateHeader, String userName, String userPassword,
+            String userRealm) throws AuthenticationException {
 
         validateUsername(userName);
         validatePassword(userPassword);
