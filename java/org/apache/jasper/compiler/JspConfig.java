@@ -18,7 +18,7 @@ package org.apache.jasper.compiler;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Vector;
+import java.util.List;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.descriptor.JspConfigDescriptor;
@@ -40,7 +40,7 @@ public class JspConfig {
     // Logger
     private final Log log = LogFactory.getLog(JspConfig.class); // must not be static
 
-    private Vector<JspPropertyGroup> jspProperties = null;
+    private List<JspPropertyGroup> jspProperties = null;
     private final ServletContext ctxt;
     private volatile boolean initialized = false;
 
@@ -83,7 +83,7 @@ public class JspConfig {
             return;
         }
 
-        jspProperties = new Vector<>();
+        jspProperties = new ArrayList<>();
         Collection<JspPropertyGroupDescriptor> jspPropertyGroups =
                 jspConfig.getJspPropertyGroups();
 
@@ -153,7 +153,7 @@ public class JspConfig {
                 JspPropertyGroup propertyGroup =
                     new JspPropertyGroup(path, extension, property);
 
-                jspProperties.addElement(propertyGroup);
+                jspProperties.add(propertyGroup);
             }
         }
     }

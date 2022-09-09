@@ -18,10 +18,13 @@ package org.apache.jasper.compiler;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.jsp.tagext.FunctionInfo;
@@ -56,11 +59,11 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
     private static final String IMPLICIT_TLD = "implicit.tld";
 
     // Maps tag names to tag file paths
-    private final Hashtable<String,String> tagFileMap;
+    private final Map<String,String> tagFileMap;
 
     private final ParserController pc;
     private final PageInfo pi;
-    private final Vector<TagFileInfo> vec;
+    private final List<TagFileInfo> list;
 
 
     public ImplicitTagLibraryInfo(JspCompilationContext ctxt,
@@ -72,8 +75,8 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
         super(prefix, null);
         this.pc = pc;
         this.pi = pi;
-        this.tagFileMap = new Hashtable<>();
-        this.vec = new Vector<>();
+        this.tagFileMap = new ConcurrentHashMap<>();
+        this.list = Collections.synchronizedList(new ArrayList<>());
 
         // Implicit tag libraries have no functions:
         this.functions = new FunctionInfo[0];
@@ -177,20 +180,15 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
 
             TagInfo tagInfo = null;
             try {
-                tagInfo = TagFileProcessor.parseTagFileDirectives(pc,
-                        shortName,
-                        path,
-                        null,
-                        this);
+                tagInfo = TagFileProcessor.parseTagFileDirectives(pc, shortName, path, null, this);
             } catch (JasperException je) {
                 throw new RuntimeException(je.toString(), je);
             }
 
             tagFile = new TagFileInfo(shortName, path, tagInfo);
-            vec.addElement(tagFile);
+            list.add(tagFile);
 
-            this.tagFiles = new TagFileInfo[vec.size()];
-            vec.copyInto(this.tagFiles);
+            this.tagFiles = list.toArray(new TagFileInfo[0]);
         }
 
         return tagFile;

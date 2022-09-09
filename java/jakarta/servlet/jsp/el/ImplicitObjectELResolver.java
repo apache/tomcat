@@ -20,6 +20,7 @@ import java.beans.FeatureDescriptor;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Vector;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
@@ -259,11 +259,11 @@ public class ImplicitObjectELResolver extends ELResolver {
                     protected Enumeration<String> getAttributeNames() {
                         Cookie[] cookies = ((HttpServletRequest) page.getRequest()).getCookies();
                         if (cookies != null) {
-                            Vector<String> v = new Vector<>();
+                            List<String> list = new ArrayList<>(cookies.length);
                             for (Cookie cookie : cookies) {
-                                v.add(cookie.getName());
+                                list.add(cookie.getName());
                             }
-                            return v.elements();
+                            return Collections.enumeration(list);
                         }
                         return null;
                     }
