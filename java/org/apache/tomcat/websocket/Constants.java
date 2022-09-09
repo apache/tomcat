@@ -96,13 +96,14 @@ public class Constants {
     public static final String WS_PROTOCOL_HEADER_NAME = "Sec-WebSocket-Protocol";
     public static final String WS_EXTENSIONS_HEADER_NAME = "Sec-WebSocket-Extensions";
 
-    /// HTTP redirection status codes
+    // HTTP status codes
     public static final int MULTIPLE_CHOICES = 300;
     public static final int MOVED_PERMANENTLY = 301;
     public static final int FOUND = 302;
     public static final int SEE_OTHER = 303;
     public static final int USE_PROXY = 305;
     public static final int TEMPORARY_REDIRECT = 307;
+    public static final int UNAUTHORIZED = 401;
 
     // Configuration for Origin header in client
     static final String DEFAULT_ORIGIN_HEADER_VALUE =
