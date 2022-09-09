@@ -22,7 +22,13 @@ public enum AuthenticationType {
             Constants.WWW_AUTHENTICATE_HEADER_NAME,
             Constants.WS_AUTHENTICATION_USER_NAME,
             Constants.WS_AUTHENTICATION_PASSWORD,
-            Constants.WS_AUTHENTICATION_REALM);
+            Constants.WS_AUTHENTICATION_REALM),
+
+    PROXY(Constants.PROXY_AUTHORIZATION_HEADER_NAME,
+            Constants.PROXY_AUTHENTICATE_HEADER_NAME,
+            Constants.WS_AUTHENTICATION_PROXY_USER_NAME,
+            Constants.WS_AUTHENTICATION_PROXY_PASSWORD,
+            Constants.WS_AUTHENTICATION_PROXY_REALM);
 
     private final String authorizationHeaderName;
     private final String authenticateHeaderName;
