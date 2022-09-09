@@ -22,12 +22,11 @@ import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
@@ -46,12 +45,9 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class StatusTransformer {
 
-
     // --------------------------------------------------------- Public Methods
 
-
-    public static void setContentType(HttpServletResponse response,
-                                      int mode) {
+    public static void setContentType(HttpServletResponse response, int mode) {
         if (mode == 0){
             response.setContentType("text/html;charset="+Constants.CHARSET);
         } else if (mode == 1){
@@ -66,15 +62,12 @@ public class StatusTransformer {
      * @param writer the PrintWriter to use
      * @param args Path prefix for URLs
      * @param mode - 0 = HTML header, 1 = XML declaration
-     *
      */
     public static void writeHeader(PrintWriter writer, Object[] args, int mode) {
-        if (mode == 0){
+        if (mode == 0) {
             // HTML Header Section
-            writer.print(MessageFormat.format(
-                Constants.HTML_HEADER_SECTION, args
-            ));
-        } else if (mode == 1){
+            writer.print(MessageFormat.format(Constants.HTML_HEADER_SECTION, args));
+        } else if (mode == 1) {
             writer.write(Constants.XML_DECLARATION);
             writer.print(MessageFormat.format
                      (Constants.XML_STYLE, args));
@@ -93,8 +86,7 @@ public class StatusTransformer {
      */
     public static void writeBody(PrintWriter writer, Object[] args, int mode) {
         if (mode == 0){
-            writer.print(MessageFormat.format
-                         (Constants.BODY_HEADER_SECTION, args));
+            writer.print(MessageFormat.format(Constants.BODY_HEADER_SECTION, args));
         }
     }
 
@@ -106,26 +98,22 @@ public class StatusTransformer {
      * @param args What to write
      * @param mode 0 means write
      */
-    public static void writeManager(PrintWriter writer, Object[] args,
-                                    int mode) {
-        if (mode == 0){
+    public static void writeManager(PrintWriter writer, Object[] args, int mode) {
+        if (mode == 0) {
             writer.print(MessageFormat.format(Constants.MANAGER_SECTION, args));
         }
     }
 
 
-    public static void writePageHeading(PrintWriter writer, Object[] args,
-                                        int mode) {
-        if (mode == 0){
-            writer.print(MessageFormat.format
-                         (Constants.SERVER_HEADER_SECTION, args));
+    public static void writePageHeading(PrintWriter writer, Object[] args, int mode) {
+        if (mode == 0) {
+            writer.print(MessageFormat.format(Constants.SERVER_HEADER_SECTION, args));
         }
     }
 
 
-    public static void writeServerInfo(PrintWriter writer, Object[] args,
-                                       int mode){
-        if (mode == 0){
+    public static void writeServerInfo(PrintWriter writer, Object[] args, int mode){
+        if (mode == 0) {
             writer.print(MessageFormat.format(Constants.SERVER_ROW_SECTION, args));
         }
     }
@@ -240,8 +228,8 @@ public class StatusTransformer {
      */
     public static void writeConnectorState(PrintWriter writer,
             ObjectName tpName, String name, MBeanServer mBeanServer,
-            Vector<ObjectName> globalRequestProcessors,
-            Vector<ObjectName> requestProcessors, int mode, Object[] args) throws Exception {
+            List<ObjectName> globalRequestProcessors,
+            List<ObjectName> requestProcessors, int mode, Object[] args) throws Exception {
 
         if (mode == 0) {
             writer.print("<h1>");
@@ -269,10 +257,8 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration<ObjectName> enumeration = globalRequestProcessors.elements();
-            // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
-            while (enumeration.hasMoreElements()) {
-                ObjectName objectName = enumeration.nextElement();
+            for (ObjectName objectName : globalRequestProcessors) {
+                // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
                 if (name.equals(objectName.getKeyProperty("name")) && objectName.getKeyProperty("Upgrade") == null) {
                     grpName = objectName;
                 }
@@ -284,13 +270,11 @@ public class StatusTransformer {
 
             writer.print( args[4] );
             writer.print(' ');
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (grpName, "maxTime"), false));
+            writer.print(formatTime(mBeanServer.getAttribute(grpName, "maxTime"), false));
             writer.print(' ');
             writer.print(args[5]);
             writer.print(' ');
-            writer.print(formatTime(mBeanServer.getAttribute
-                                    (grpName, "processingTime"), true));
+            writer.print(formatTime(mBeanServer.getAttribute(grpName, "processingTime"), true));
             writer.print(' ');
             writer.print(args[6]);
             writer.print(' ');
@@ -302,20 +286,16 @@ public class StatusTransformer {
             writer.print(' ');
             writer.print(args[8]);
             writer.print(' ');
-            writer.print(formatSize(mBeanServer.getAttribute
-                                    (grpName, "bytesReceived"), true));
+            writer.print(formatSize(mBeanServer.getAttribute(grpName, "bytesReceived"), true));
             writer.print(' ');
             writer.print(args[9]);
             writer.print(' ');
-            writer.print(formatSize(mBeanServer.getAttribute
-                                    (grpName, "bytesSent"), true));
+            writer.print(formatSize(mBeanServer.getAttribute(grpName, "bytesSent"), true));
             writer.print("</p>");
 
             writer.print("<table border=\"0\"><tr><th>"+ args[10] + "</th><th>" + args[11] + "</th><th>" + args[12] +"</th><th>" + args[13] +"</th><th>" + args[14] + "</th><th>" + args[15] + "</th><th>" + args[16] + "</th><th>" + args[17] + "</th></tr>");
 
-            enumeration = requestProcessors.elements();
-            while (enumeration.hasMoreElements()) {
-                ObjectName objectName = enumeration.nextElement();
+            for (ObjectName objectName : requestProcessors) {
                 if (name.equals(objectName.getKeyProperty("worker"))) {
                     writer.print("<tr>");
                     writeProcessorState(writer, objectName, mBeanServer, mode);
@@ -339,10 +319,8 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration<ObjectName> enumeration = globalRequestProcessors.elements();
-            // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
-            while (enumeration.hasMoreElements()) {
-                ObjectName objectName = enumeration.nextElement();
+            for (ObjectName objectName : globalRequestProcessors) {
+                // Find the HTTP/1.1 RequestGroupInfo - BZ 65404
                 if (name.equals(objectName.getKeyProperty("name")) && objectName.getKeyProperty("Upgrade") == null) {
                     grpName = objectName;
                 }
@@ -360,9 +338,7 @@ public class StatusTransformer {
                 writer.write(" />");
 
                 writer.write("<workers>");
-                enumeration = requestProcessors.elements();
-                while (enumeration.hasMoreElements()) {
-                    ObjectName objectName = enumeration.nextElement();
+                for (ObjectName objectName : requestProcessors) {
                     if (name.equals(objectName.getKeyProperty("worker"))) {
                         writeProcessorState(writer, objectName, mBeanServer, mode);
                     }
@@ -372,7 +348,6 @@ public class StatusTransformer {
 
             writer.write("</connector>");
         }
-
     }
 
 
