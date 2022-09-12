@@ -214,6 +214,11 @@
         (lihan)
       </fix>
       <fix>
+        <pr>550</pr>: Correctly handle case where a Servlet responds to a
+        request with an expectation with a 2xx response without reading the
+        request body. Pull request provided by Malay Shah. (markt)
+      </fix>
+      <fix>
         <pr>551</pr>: Avoid potential IndexOutOfBoundsException by fixing
         incorrect check when matching HTTP/2 preface. Submitted by 刘文章.
         (lihan)
