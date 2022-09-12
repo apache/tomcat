@@ -316,7 +316,7 @@ public class TestMediaType {
     }
 
     @Test
-    public void TestEmptyParameter() throws Exception {
+    public void testEmptyParameter() throws Exception {
         // RFC 9110
         StringReader sr = new StringReader("type/sub-type;;a=1;;b=2;;");
         MediaType m = MediaType.parseMediaType(sr);
