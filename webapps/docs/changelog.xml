@@ -331,6 +331,10 @@
       <add>
         Improvements to Spanish translations. (markt)
       </add>
+      <update>
+        Update the Apache Tomcat migration tool for Jakarta EE library to 1.0.3.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
