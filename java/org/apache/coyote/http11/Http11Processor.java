@@ -1042,7 +1042,6 @@ public class Http11Processor extends AbstractProcessor {
         MessageBytes expectMB = headers.getValue("expect");
         if (expectMB != null && !expectMB.isNull()) {
             if (expectMB.toString().trim().equalsIgnoreCase("100-continue")) {
-                inputBuffer.setSwallowInput(false);
                 request.setExpectation(true);
             } else {
                 response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
@@ -1474,7 +1473,6 @@ public class Http11Processor extends AbstractProcessor {
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
             if (!response.isCommitted() && request.hasExpectation()) {
-                inputBuffer.setSwallowInput(true);
                 try {
                     outputBuffer.sendAck();
                 } catch (IOException e) {
