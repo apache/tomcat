@@ -54,6 +54,7 @@ public class MemoryRealm  extends RealmBase {
      * The Digester we will use to process in-memory database files.
      */
     private static Digester digester = null;
+    private static final Object digesterLock = new Object();
 
 
     /**
@@ -197,18 +198,18 @@ public class MemoryRealm  extends RealmBase {
      * @return a configured <code>Digester</code> to use for processing
      * the XML input file, creating a new one if necessary.
      */
-    protected synchronized Digester getDigester() {
-        if (digester == null) {
-            digester = new Digester();
-            digester.setValidating(false);
-            try {
-                digester.setFeature(
-                        "http://apache.org/xml/features/allow-java-encodings",
-                        true);
-            } catch (Exception e) {
-                log.warn(sm.getString("memoryRealm.xmlFeatureEncoding"), e);
+    protected Digester getDigester() {
+        synchronized (digesterLock) {
+            if (digester == null) {
+                digester = new Digester();
+                digester.setValidating(false);
+                try {
+                    digester.setFeature("http://apache.org/xml/features/allow-java-encodings", true);
+                } catch (Exception e) {
+                    log.warn(sm.getString("memoryRealm.xmlFeatureEncoding"), e);
+                }
+                digester.addRuleSet(new MemoryRuleSet());
             }
-            digester.addRuleSet(new MemoryRuleSet());
         }
         return digester;
     }
