@@ -109,7 +109,7 @@
     <changelog>
       <fix>
         Correct regression in the previous fix for <bug>66236</bug>. (markt)
-      </fix>      
+      </fix>
     </changelog>
   </subsection>
 </section>
