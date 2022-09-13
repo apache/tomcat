@@ -181,7 +181,7 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.addFilter(new VoidOutputFilter());
 
         // Create and add buffered input filter
-        inputBuffer.addFilter(new BufferedInputFilter());
+        inputBuffer.addFilter(new BufferedInputFilter(protocol.getMaxSwallowSize()));
 
         // Create and add the gzip filters.
         //inputBuffer.addFilter(new GzipInputFilter());
