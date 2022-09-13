@@ -33,13 +33,14 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
  */
 public class BufferedInputFilter implements InputFilter, ApplicationBufferHandler {
 
-    // -------------------------------------------------------------- Constants
-
     private static final String ENCODING_NAME = "buffered";
     private static final ByteChunk ENCODING = new ByteChunk();
 
 
-    // ----------------------------------------------------- Instance Variables
+    static {
+        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1), 0, ENCODING_NAME.length());
+    }
+
 
     // Use ByteChunk since it correctly handles the special buffer size of -1
     // for maxSavePostSize.
@@ -48,14 +49,12 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
     private InputBuffer buffer;
     private boolean hasRead = false;
 
+    private final int maxSwallowSize;
 
-    // ----------------------------------------------------- Static Initializer
 
-    static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1),
-                0, ENCODING_NAME.length());
+    public BufferedInputFilter(int maxSwallowSize) {
+        this.maxSwallowSize = maxSwallowSize;
     }
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -82,14 +81,24 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
      */
     @Override
     public void setRequest(Request request) {
-        if (buffered.getLimit() == 0) {
-            return;
-        }
         // save off the Request body
         try {
-            while (buffer.doRead(this) >= 0) {
-                buffered.append(tempRead);
-                tempRead = null;
+            if (buffered.getLimit() == 0) {
+                // Special case - ignore (swallow) body. Do so within a limit.
+                long swallowed = 0;
+                int read = 0;
+                while ((read = buffer.doRead(this)) >= 0) {
+                    swallowed += read;
+                    if (maxSwallowSize > -1 && swallowed > maxSwallowSize) {
+                        // No need for i18n - this isn't going to get logged
+                        throw new IOException("Ignored body exceeded maxSwallowSize");
+                    }
+                }
+            } else {
+                while (buffer.doRead(this) >= 0) {
+                    buffered.append(tempRead);
+                    tempRead = null;
+                }
             }
         } catch(IOException | BufferOverflowException ioe) {
             // No need for i18n - this isn't going to get logged anywhere
