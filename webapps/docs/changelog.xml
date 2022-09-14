@@ -196,7 +196,7 @@
       </fix>
       <fix>
         When processing HTTP/2 requests, allow a <code>host</code> header and an
-        <code>:authority</code> header to  be present providing the are
+        <code>:authority</code> header to  be present providing they are
         consistent. (markt)
       </fix>
       <fix>
