@@ -16,22 +16,23 @@
  */
 package cal;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 public class TableBean {
 
-    final Hashtable<String, Entries> table;
-    final JspCalendar JspCal;
-    Entries entries;
-    String date;
-    String name = null;
-    String email = null;
-    boolean processError = false;
+    private final Map<String, Entries> table;
+    private final JspCalendar JspCal;
+    private Entries entries;
+    private String date;
+    private String name = null;
+    private String email = null;
+    private boolean processError = false;
 
     public TableBean() {
-        this.table = new Hashtable<>(10);
+        this.table = new ConcurrentHashMap<>(10);
         this.JspCal = new JspCalendar();
         this.date = JspCal.getCurrentDate();
     }
