@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M20 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Prepare OpenSSL Panama module for Java 20 API changes. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M19 (markt)" rtext="release in progress">
   <subsection name="Coyote">

@@ -237,7 +237,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * @param certificateVerificationOptionalNoCA Skip CA verification in
      *   optional mode
      */
-    OpenSSLEngine(MemoryAddress sslCtx, String fallbackApplicationProtocol,
+    OpenSSLEngine(MemorySegment sslCtx, String fallbackApplicationProtocol,
             boolean clientMode, OpenSSLSessionContext sessionContext, boolean alpn,
             boolean initialized, int certificateVerificationDepth,
             boolean certificateVerificationOptionalNoCA, boolean noOcspCheck) {
@@ -299,7 +299,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Calling this function with src.remaining == 0 is undefined.
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int writePlaintextData(final MemoryAddress ssl, final ByteBuffer src) throws SSLException {
+    private int writePlaintextData(final MemorySegment ssl, final ByteBuffer src) throws SSLException {
         clearLastError();
         final int pos = src.position();
         final int len = Math.min(src.remaining(), MAX_PLAINTEXT_LENGTH);
@@ -321,7 +321,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Write encrypted data to the OpenSSL network BIO.
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int writeEncryptedData(final MemoryAddress networkBIO, final ByteBuffer src) throws SSLException {
+    private int writeEncryptedData(final MemorySegment networkBIO, final ByteBuffer src) throws SSLException {
         clearLastError();
         final int pos = src.position();
         final int len = src.remaining();
@@ -343,7 +343,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Read plain text data from the OpenSSL internal BIO
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int readPlaintextData(final MemoryAddress ssl, final ByteBuffer dst) throws SSLException {
+    private int readPlaintextData(final MemorySegment ssl, final ByteBuffer dst) throws SSLException {
         clearLastError();
         final int pos = dst.position();
         final int len = Math.min(dst.remaining(), MAX_ENCRYPTED_PACKET_LENGTH);
@@ -365,7 +365,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Read encrypted data from the OpenSSL network BIO
      * @throws SSLException if the OpenSSL error check fails
      */
-    private int readEncryptedData(final MemoryAddress networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
+    private int readEncryptedData(final MemorySegment networkBIO, final ByteBuffer dst, final int pending) throws SSLException {
         clearLastError();
         final int pos = dst.position();
         MemorySegment dstSegment = dst.isDirect() ? MemorySegment.ofBuffer(dst) : bufSegment;
@@ -716,7 +716,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (destroyed) {
             return new String[0];
         }
-        String[] enabled = getCiphers(state.ssl);
+        String[] enabled = getCiphers(state.ssl.address());
         if (enabled == null) {
             return new String[0];
         } else {
@@ -1792,8 +1792,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static class EngineState implements Runnable {
 
-        private final MemoryAddress ssl;
-        private final MemoryAddress networkBIO;
+        private final MemorySession stateSession = MemorySession.openShared();
+        private final MemorySegment ssl;
+        private final MemorySegment networkBIO;
         private final int certificateVerificationDepth;
         private final boolean noOcspCheck;
 
@@ -1804,17 +1805,22 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         private EngineState(MemoryAddress ssl, MemoryAddress networkBIO,
                 int certificateVerificationDepth, boolean noOcspCheck) {
             states.put(Long.valueOf(ssl.toRawLongValue()), this);
-            this.ssl = ssl;
-            this.networkBIO = networkBIO;
+            // Allocate another session to avoid keeping a reference through segments
+            this.ssl = MemorySegment.ofAddress(ssl, ValueLayout.ADDRESS.byteSize(), stateSession);
+            this.networkBIO = MemorySegment.ofAddress(networkBIO, ValueLayout.ADDRESS.byteSize(), stateSession);
             this.certificateVerificationDepth = certificateVerificationDepth;
             this.noOcspCheck = noOcspCheck;
         }
 
         @Override
         public void run() {
-            states.remove(Long.valueOf(ssl.toRawLongValue()));
-            BIO_free(networkBIO);
-            SSL_free(ssl);
+            try {
+                states.remove(Long.valueOf(ssl.address().toRawLongValue()));
+                BIO_free(networkBIO);
+                SSL_free(ssl);
+            } finally {
+                stateSession.close();
+            }
         }
     }
 }

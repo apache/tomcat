@@ -735,7 +735,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 sslHostConfig.setEnabledProtocols(
                         enabled.toArray(new String[0]));
                 // Reconfigure the enabled ciphers
-                sslHostConfig.setEnabledCiphers(getCiphers(state.sslCtx));
+                sslHostConfig.setEnabledCiphers(getCiphers(state.sslCtx.address()));
             }
 
             sessionContext = new OpenSSLSessionContext(this);
@@ -743,7 +743,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // this is set so always set it in case an app is configured to
             // require it
             sessionContext.setSessionIdContext(DEFAULT_SESSION_ID_CONTEXT);
-            sslHostConfig.setOpenSslContext(state.sslCtx.toRawLongValue());
+            sslHostConfig.setOpenSslContext(state.sslCtx.address().toRawLongValue());
             initialized = true;
         } catch (Exception e) {
             log.warn(sm.getString("openssl.errorSSLCtxInit"), e);
@@ -753,7 +753,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     public MemoryAddress getSSLContext() {
-        return state.sslCtx;
+        return state.sslCtx.address();
     }
 
     // DH *(*tmp_dh_callback)(SSL *ssl, int is_export, int keylength)
@@ -1373,8 +1373,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private static class ContextState implements Runnable {
 
         private final MemorySession contextMemorySession;
-        private final MemoryAddress sslCtx;
-        private final MemoryAddress confCtx;
+        private final MemorySession stateSession = MemorySession.openShared();
+        private final MemorySegment sslCtx;
+        private final MemorySegment confCtx;
         private final List<byte[]> negotiableProtocols;
 
         private X509TrustManager x509TrustManager = null;
@@ -1383,20 +1384,26 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 MemoryAddress confCtx, List<byte[]> negotiableProtocols) {
             states.put(Long.valueOf(sslCtx.toRawLongValue()), this);
             this.contextMemorySession = contextMemorySession;
-            this.sslCtx = sslCtx;
-            this.confCtx = confCtx;
+            // Allocate another session to avoid keeping a reference through segments
+            this.sslCtx = MemorySegment.ofAddress(sslCtx, ValueLayout.ADDRESS.byteSize(), stateSession);
+            if (!MemoryAddress.NULL.equals(confCtx)) {
+                this.confCtx = MemorySegment.ofAddress(confCtx, ValueLayout.ADDRESS.byteSize(), stateSession);
+            } else {
+                this.confCtx = null;
+            }
             this.negotiableProtocols = negotiableProtocols;
         }
 
         @Override
         public void run() {
             try {
-                states.remove(Long.valueOf(sslCtx.toRawLongValue()));
+                states.remove(Long.valueOf(sslCtx.address().toRawLongValue()));
                 SSL_CTX_free(sslCtx);
-                if (!MemoryAddress.NULL.equals(confCtx)) {
+                if (confCtx != null) {
                     SSL_CONF_CTX_free(confCtx);
                 }
             } finally {
+                stateSession.close();
                 contextMemorySession.close();
             }
         }
