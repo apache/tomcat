@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.io.WriteAbortedException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -955,7 +954,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         }
 
         if (notes == null) {
-            notes = new Hashtable<>();
+            notes = new ConcurrentHashMap<>();
         }
         activate();
     }

@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -206,7 +205,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * and event listeners.  <b>IMPLEMENTATION NOTE:</b> This object is
      * <em>not</em> saved and restored across session serializations!
      */
-    protected transient Map<String, Object> notes = new Hashtable<>();
+    protected transient Map<String, Object> notes = new ConcurrentHashMap<>();
 
 
     /**
@@ -1446,7 +1445,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         }
 
         if (notes == null) {
-            notes = new Hashtable<>();
+            notes = new ConcurrentHashMap<>();
         }
         /*
          * The next object read could either be the number of attributes
