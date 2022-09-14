@@ -18,7 +18,7 @@ package org.apache.catalina.tribes.util;
 
 import java.text.MessageFormat;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -180,8 +180,7 @@ public class StringManager {
     // STATIC SUPPORT METHODS
     // --------------------------------------------------------------
 
-    private static final Map<String, Map<Locale,StringManager>> managers =
-            new Hashtable<>();
+    private static final Map<String, Map<Locale,StringManager>> managers = new HashMap<>();
 
 
     /**
