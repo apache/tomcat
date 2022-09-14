@@ -17,8 +17,10 @@
 package org.apache.catalina.startup;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Concrete implementation of the <code>UserDatabase</code> interface
@@ -32,7 +34,7 @@ public final class HomesUserDatabase implements UserDatabase {
     /**
      * The set of home directories for all defined users, keyed by username.
      */
-    private final Hashtable<String,String> homes = new Hashtable<>();
+    private final Map<String,String> homes = new HashMap<>();
 
     /**
      * The UserConfig listener with which we are associated.
@@ -73,11 +75,11 @@ public final class HomesUserDatabase implements UserDatabase {
 
 
     /**
-     * Return an enumeration of the usernames defined on this server.
+     * Return an enumeration of the user names defined on this server.
      */
     @Override
     public Enumeration<String> getUsers() {
-        return homes.keys();
+        return Collections.enumeration(homes.keySet());
     }
 
 
