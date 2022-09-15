@@ -16,7 +16,8 @@
  */
 package org.apache.coyote.ajp;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Constants.
@@ -211,13 +212,13 @@ public final class Constants {
         return responseTransArray[code];
     }
 
-    private static final Hashtable<String,Integer>  responseTransHash = new Hashtable<>(20);
+    private static final Map<String,Integer>  responseTransMap = new HashMap<>(20);
 
     static {
         try {
             int i;
             for (i = 0; i < SC_RESP_AJP13_MAX; i++) {
-                responseTransHash.put(getResponseHeaderForCode(i), Integer.valueOf(0xA001 + i));
+                responseTransMap.put(getResponseHeaderForCode(i), Integer.valueOf(0xA001 + i));
             }
         }
         catch (Exception e) {
@@ -226,7 +227,7 @@ public final class Constants {
     }
 
     public static final int getResponseAjpIndex(String header) {
-        Integer i = responseTransHash.get(header);
+        Integer i = responseTransMap.get(header);
         if (i == null) {
             return 0;
         } else {
