@@ -136,7 +136,7 @@ public class NamingContextListener
 
 
     /**
-     * Objectnames hashtable.
+     * Objectnames Map.
      */
     protected HashMap<String, ObjectName> objectNames = new HashMap<>();
 
