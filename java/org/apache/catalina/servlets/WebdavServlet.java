@@ -25,6 +25,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -33,7 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Queue;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -617,15 +618,15 @@ public class WebdavServlet extends DefaultServlet {
             parseProperties(req, generatedXML, path, type, properties);
         } else {
             // The stack always contains the object of the current level
-            Stack<String> stack = new Stack<>();
-            stack.push(path);
+            Queue<String> stack = new ArrayDeque<>();
+            stack.add(path);
 
             // Stack of the objects one level below
-            Stack<String> stackBelow = new Stack<>();
+            Queue<String> stackBelow = new ArrayDeque<>();
 
             while ((!stack.isEmpty()) && (depth >= 0)) {
 
-                String currentPath = stack.pop();
+                String currentPath = stack.remove();
                 parseProperties(req, generatedXML, currentPath, type, properties);
 
                 resource = resources.getResource(currentPath);
@@ -639,7 +640,7 @@ public class WebdavServlet extends DefaultServlet {
                             newPath += "/";
                         }
                         newPath += entry;
-                        stackBelow.push(newPath);
+                        stackBelow.add(newPath);
                     }
 
                     // Displaying the lock-null resources present in that
@@ -659,7 +660,7 @@ public class WebdavServlet extends DefaultServlet {
                 if (stack.isEmpty()) {
                     depth--;
                     stack = stackBelow;
-                    stackBelow = new Stack<>();
+                    stackBelow = new ArrayDeque<>();
                 }
 
                 generatedXML.sendData();
