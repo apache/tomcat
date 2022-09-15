@@ -16,7 +16,8 @@
  */
 package org.apache.naming;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -42,31 +43,31 @@ public class ContextBindings {
     /**
      * Bindings object - naming context. Keyed by object.
      */
-    private static final Hashtable<Object,Context> objectBindings = new Hashtable<>();
+    private static final Map<Object,Context> objectBindings = new ConcurrentHashMap<>();
 
 
     /**
      * Bindings thread - naming context. Keyed by thread.
      */
-    private static final Hashtable<Thread,Context> threadBindings = new Hashtable<>();
+    private static final Map<Thread,Context> threadBindings = new ConcurrentHashMap<>();
 
 
     /**
      * Bindings thread - object. Keyed by thread.
      */
-    private static final Hashtable<Thread,Object> threadObjectBindings = new Hashtable<>();
+    private static final Map<Thread,Object> threadObjectBindings = new ConcurrentHashMap<>();
 
 
     /**
      * Bindings class loader - naming context. Keyed by class loader.
      */
-    private static final Hashtable<ClassLoader,Context> clBindings = new Hashtable<>();
+    private static final Map<ClassLoader,Context> clBindings = new ConcurrentHashMap<>();
 
 
     /**
      * Bindings class loader - object. Keyed by class loader.
      */
-    private static final Hashtable<ClassLoader,Object> clObjectBindings = new Hashtable<>();
+    private static final Map<ClassLoader,Object> clObjectBindings = new ConcurrentHashMap<>();
 
 
     /**
