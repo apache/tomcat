@@ -24,10 +24,10 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -102,7 +102,7 @@ public class RewriteValve extends ValveBase {
     /**
      * Maps to be used by the rules.
      */
-    protected Map<String, RewriteMap> maps = new Hashtable<>();
+    protected Map<String, RewriteMap> maps = new ConcurrentHashMap<>();
 
 
     /**
