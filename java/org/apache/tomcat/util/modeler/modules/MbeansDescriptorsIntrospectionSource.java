@@ -21,9 +21,9 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.management.ObjectName;
@@ -94,7 +94,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
     // ------------ Implementation for non-declared introspection classes
 
-    private static final Hashtable<String,String> specialMethods = new Hashtable<>();
+    private static final Map<String,String> specialMethods = new HashMap<>();
     static {
         specialMethods.put( "preDeregister", "");
         specialMethods.put( "postDeregister", "");
@@ -194,9 +194,9 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @param setAttMap The settable attributes map
      * @param invokeAttMap The invokable attributes map
      */
-    private void initMethods(Class<?> realClass, Method methods[], Hashtable<String,Method> attMap,
-            Hashtable<String,Method> getAttMap, Hashtable<String,Method> setAttMap,
-            Hashtable<String,Method> invokeAttMap) {
+    private void initMethods(Class<?> realClass, Method methods[], Map<String,Method> attMap,
+            Map<String,Method> getAttMap, Map<String,Method> setAttMap,
+            Map<String,Method> invokeAttMap) {
 
         for (Method method : methods) {
             String name = method.getName();
@@ -294,32 +294,29 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
         Method methods[]=null;
 
-        Hashtable<String,Method> attMap = new Hashtable<>();
+        Map<String,Method> attMap = new HashMap<>();
         // key: attribute val: getter method
-        Hashtable<String,Method> getAttMap = new Hashtable<>();
+        Map<String,Method> getAttMap = new HashMap<>();
         // key: attribute val: setter method
-        Hashtable<String,Method> setAttMap = new Hashtable<>();
+        Map<String,Method> setAttMap = new HashMap<>();
         // key: operation val: invoke method
-        Hashtable<String,Method> invokeAttMap = new Hashtable<>();
+        Map<String,Method> invokeAttMap = new HashMap<>();
 
         methods = realClass.getMethods();
 
         initMethods(realClass, methods, attMap, getAttMap, setAttMap, invokeAttMap );
 
         try {
-
-            Enumeration<String> en = attMap.keys();
-            while( en.hasMoreElements() ) {
-                String name = en.nextElement();
-                AttributeInfo ai=new AttributeInfo();
-                ai.setName( name );
-                Method gm = getAttMap.get(name);
-                if( gm!=null ) {
-                    //ai.setGetMethodObj( gm );
-                    ai.setGetMethod( gm.getName());
-                    Class<?> t=gm.getReturnType();
-                    if( t!=null ) {
-                        ai.setType( t.getName() );
+            for (Entry<String,Method> attEntry : attMap.entrySet()) {
+                String name = attEntry.getKey();
+                AttributeInfo ai = new AttributeInfo();
+                ai.setName(name);
+                Method gm = attEntry.getValue();
+                if (gm != null) {
+                    ai.setGetMethod(gm.getName());
+                    Class<?> t = gm.getReturnType();
+                    if (t != null) {
+                        ai.setType(t.getName());
                     }
                 }
                 Method sm = setAttMap.get(name);
