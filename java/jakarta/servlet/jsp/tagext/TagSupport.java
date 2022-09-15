@@ -17,8 +17,10 @@
 package jakarta.servlet.jsp.tagext;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.jsp.JspException;
 import jakarta.servlet.jsp.PageContext;
@@ -227,7 +229,7 @@ public class TagSupport implements IterationTag, Serializable {
      */
     public void setValue(String k, Object o) {
         if (values == null) {
-            values = new Hashtable<>();
+            values = new ConcurrentHashMap<>();
         }
         values.put(k, o);
     }
@@ -266,7 +268,7 @@ public class TagSupport implements IterationTag, Serializable {
         if (values == null) {
             return null;
         }
-        return values.keys();
+        return Collections.enumeration(values.keySet());
     }
 
     /**
@@ -277,7 +279,7 @@ public class TagSupport implements IterationTag, Serializable {
     /**
      * Map of object values keyed by Strings for this tag.
      */
-    private Hashtable<String, Object> values;
+    private Map<String, Object> values;
 
     /**
      * The value of the id attribute of this tag; or null.
