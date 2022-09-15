@@ -2,14 +2,14 @@
 
 ## This module is experimental
 
-It uses the JEP 424 API. More details on this API are available
-at `https://openjdk.java.net/jeps/424`.
+It uses the JEP XXX API. More details on this API are available
+at `https://openjdk.java.net/jeps/XXX`.
 
-## Building the JDK with the JEP 424 API
+## Building the JDK with the JEP XXX API
 
 Clone `https://github.com/openjdk/jdk/` in some location and
-checkout the `foreign-preview` branch. This is a Java 19 development JVM
-with the JEP 424 API. It may fail to build. When this happens, step back
+checkout the mais branch. This is a Java 20 development JVM
+with the JEP XXX API. It may fail to build. When this happens, step back
 one commit at a time until it does.
 
 ```
