@@ -81,8 +81,6 @@ public final class Constants {
     // Terminates list of attributes
     public static final byte SC_A_ARE_DONE      = (byte)0xFF;
 
-    // Ajp13 specific -  needs refactoring for the new model
-
     /**
      * Default maximum total byte size for an AJP packet
      */
@@ -213,15 +211,13 @@ public final class Constants {
         return responseTransArray[code];
     }
 
-    private static final Hashtable<String,Integer>  responseTransHash =
-            new Hashtable<>(20);
+    private static final Hashtable<String,Integer>  responseTransHash = new Hashtable<>(20);
 
     static {
         try {
             int i;
             for (i = 0; i < SC_RESP_AJP13_MAX; i++) {
-                responseTransHash.put(getResponseHeaderForCode(i),
-                        Integer.valueOf(0xA001 + i));
+                responseTransHash.put(getResponseHeaderForCode(i), Integer.valueOf(0xA001 + i));
             }
         }
         catch (Exception e) {
@@ -229,8 +225,7 @@ public final class Constants {
         }
     }
 
-    public static final int getResponseAjpIndex(String header)
-    {
+    public static final int getResponseAjpIndex(String header) {
         Integer i = responseTransHash.get(header);
         if (i == null) {
             return 0;
