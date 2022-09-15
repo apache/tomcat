@@ -273,7 +273,7 @@ public class TagSupport implements IterationTag, Serializable {
     }
 
     /**
-     * The parent, if any, of thsi tag.
+     * The parent, if any, of this tag.
      */
     private Tag parent;
 
