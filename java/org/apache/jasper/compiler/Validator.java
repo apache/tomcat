@@ -1093,7 +1093,7 @@ class Validator {
          * considered a dynamic attribute.
          */
         private void checkXmlAttributes(Node.CustomTag n,
-                Node.JspAttribute[] jspAttrs, Hashtable<String, Object> tagDataAttrs)
+                Node.JspAttribute[] jspAttrs, Map<String, Object> tagDataAttrs)
                 throws JasperException {
 
             TagInfo tagInfo = n.getTagInfo();
@@ -1297,7 +1297,7 @@ class Validator {
          */
         private void checkNamedAttributes(Node.CustomTag n,
                 Node.JspAttribute[] jspAttrs, int start,
-                Hashtable<String, Object> tagDataAttrs)
+                Map<String, Object> tagDataAttrs)
                 throws JasperException {
 
             TagInfo tagInfo = n.getTagInfo();
