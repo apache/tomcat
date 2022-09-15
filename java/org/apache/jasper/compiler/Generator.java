@@ -29,10 +29,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -911,9 +909,9 @@ class Generator {
          * handlers: <key>: tag short name <value>: introspection info of tag
          * handler for <prefix:shortName> tag
          */
-        private final Hashtable<String,Hashtable<String,TagHandlerInfo>> handlerInfos;
+        private final Map<String,Map<String,TagHandlerInfo>> handlerInfos;
 
-        private final Hashtable<String,Integer> tagVarNumbers;
+        private final Map<String,Integer> tagVarNumbers;
 
         private String parent;
 
@@ -951,8 +949,8 @@ class Generator {
             this.methodsBuffered = methodsBuffered;
             this.fragmentHelperClass = fragmentHelperClass;
             methodNesting = 0;
-            handlerInfos = new Hashtable<>();
-            tagVarNumbers = new Hashtable<>();
+            handlerInfos = new HashMap<>();
+            tagVarNumbers = new HashMap<>();
             textMap = new HashMap<>();
         }
 
@@ -2026,7 +2024,7 @@ class Generator {
 
             // Compute attribute value string for XML-style and named
             // attributes
-            Hashtable<String,String> map = new Hashtable<>();
+            Map<String,String> map = new HashMap<>();
             // Validator ensures this is non-null
             Node.JspAttribute[] attrs = n.getJspAttributes();
             for (int i = 0; i < attrs.length; i++) {
@@ -2071,9 +2069,7 @@ class Generator {
             out.print(" + " + elemName);
 
             // Write remaining attributes
-            Enumeration<String> enumeration = map.keys();
-            while (enumeration.hasMoreElements()) {
-                String attrName = enumeration.nextElement();
+            for (String attrName : map.keySet()) {
                 out.print(map.get(attrName));
             }
 
@@ -2369,10 +2365,9 @@ class Generator {
 
         private TagHandlerInfo getTagHandlerInfo(Node.CustomTag n)
                 throws JasperException {
-            Hashtable<String,TagHandlerInfo> handlerInfosByShortName =
-                handlerInfos.get(n.getPrefix());
+            Map<String,TagHandlerInfo> handlerInfosByShortName = handlerInfos.get(n.getPrefix());
             if (handlerInfosByShortName == null) {
-                handlerInfosByShortName = new Hashtable<>();
+                handlerInfosByShortName = new HashMap<>();
                 handlerInfos.put(n.getPrefix(), handlerInfosByShortName);
             }
             TagHandlerInfo handlerInfo =
@@ -4045,9 +4040,9 @@ class Generator {
      */
     private static class TagHandlerInfo {
 
-        private Hashtable<String, Method> methodMaps;
+        private Map<String, Method> methodMaps;
 
-        private Hashtable<String, Class<?>> propertyEditorMaps;
+        private Map<String, Class<?>> propertyEditorMaps;
 
         private Class<?> tagHandlerClass;
 
@@ -4065,8 +4060,8 @@ class Generator {
         TagHandlerInfo(Node n, Class<?> tagHandlerClass,
                 ErrorDispatcher err) throws JasperException {
             this.tagHandlerClass = tagHandlerClass;
-            this.methodMaps = new Hashtable<>();
-            this.propertyEditorMaps = new Hashtable<>();
+            this.methodMaps = new HashMap<>();
+            this.propertyEditorMaps = new HashMap<>();
 
             try {
                 BeanInfo tagClassInfo = Introspector.getBeanInfo(tagHandlerClass);
