@@ -24,6 +24,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,8 +37,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -5913,14 +5914,14 @@ public class StandardContext extends ContainerBase
             if (parent == null) {
             namingContextName = getName();
             } else {
-            Stack<String> stk = new Stack<>();
+            Queue<String> stk = new ArrayDeque<>();
             StringBuilder buff = new StringBuilder();
             while (parent != null) {
-                stk.push(parent.getName());
+                stk.add(parent.getName());
                 parent = parent.getParent();
             }
-            while (!stk.empty()) {
-                buff.append("/" + stk.pop());
+            while (!stk.isEmpty()) {
+                buff.append("/" + stk.remove());
             }
             buff.append(getName());
             namingContextName = buff.toString();
