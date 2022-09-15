@@ -21,6 +21,8 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -407,7 +409,7 @@ public final class IntrospectionUtils {
         objectMethods.clear();
     }
 
-    private static final Hashtable<Class<?>,Method[]> objectMethods = new Hashtable<>();
+    private static final Map<Class<?>,Method[]> objectMethods = new ConcurrentHashMap<>();
 
     public static Method[] findMethods(Class<?> c) {
         Method methods[] = objectMethods.get(c);
