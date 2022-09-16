@@ -1814,8 +1814,9 @@ public class WebdavServlet extends DefaultServlet {
 
         generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
 
-        for (String errorPath : errorList.keySet()) {
-            int errorCode = errorList.get(errorPath).intValue();
+        for (Map.Entry<String, Integer> errorEntry : errorList.entrySet()) {
+            String errorPath = errorEntry.getKey();
+            int errorCode = errorEntry.getValue().intValue();
 
             generatedXML.writeElement("D", "response", XMLWriter.OPENING);
 
