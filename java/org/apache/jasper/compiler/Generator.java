@@ -2061,8 +2061,8 @@ class Generator {
             out.print(" + " + elemName);
 
             // Write remaining attributes
-            for (String attrName : map.keySet()) {
-                out.print(map.get(attrName));
+            for (Entry<String, String> attrEntry : map.entrySet()) {
+                out.print(attrEntry.getValue());
             }
 
             // Does the <jsp:element> have nested tags other than
