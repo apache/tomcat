@@ -32,8 +32,11 @@ import org.apache.tomcat.websocket.BackgroundProcessManager;
  */
 public class WsWriteTimeout implements BackgroundProcess {
 
+    /**
+     * Note: The comparator imposes orderings that are inconsistent with equals
+     */
     private final Set<WsRemoteEndpointImplServer> endpoints =
-            new ConcurrentSkipListSet<>(new EndpointComparator());
+            new ConcurrentSkipListSet<>(Comparator.comparingLong(WsRemoteEndpointImplServer::getTimeoutExpiry));
     private final AtomicInteger count = new AtomicInteger(0);
     private int backgroundProcessCount = 0;
     private volatile int processPeriod = 1;
@@ -98,30 +101,6 @@ public class WsWriteTimeout implements BackgroundProcess {
             int newCount = count.decrementAndGet();
             if (newCount == 0) {
                 BackgroundProcessManager.getInstance().unregister(this);
-            }
-        }
-    }
-
-
-    /**
-     * Note: this comparator imposes orderings that are inconsistent with equals
-     */
-    private static class EndpointComparator implements
-            Comparator<WsRemoteEndpointImplServer> {
-
-        @Override
-        public int compare(WsRemoteEndpointImplServer o1,
-                WsRemoteEndpointImplServer o2) {
-
-            long t1 = o1.getTimeoutExpiry();
-            long t2 = o2.getTimeoutExpiry();
-
-            if (t1 < t2) {
-                return -1;
-            } else if (t1 == t2) {
-                return 0;
-            } else {
-                return 1;
             }
         }
     }
