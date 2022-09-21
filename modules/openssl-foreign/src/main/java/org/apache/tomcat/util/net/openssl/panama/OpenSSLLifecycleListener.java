@@ -21,8 +21,8 @@ import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode;
 import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode_set;
 import static org.apache.tomcat.util.openssl.openssl_h.*;
 
-import java.lang.foreign.MemoryAddress;
 import java.lang.foreign.MemorySession;
+import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.security.SecureRandom;
 
@@ -136,14 +136,14 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
     }
 
-    static MemoryAddress enginePointer = MemoryAddress.NULL;
+    static MemorySegment enginePointer = MemorySegment.NULL;
 
     static void initLibrary() {
         synchronized (lock) {
             if (OpenSSLStatus.isLibraryInitialized()) {
                 return;
             }
-            OPENSSL_init_ssl(OPENSSL_INIT_ENGINE_ALL_BUILTIN(), MemoryAddress.NULL);
+            OPENSSL_init_ssl(OPENSSL_INIT_ENGINE_ALL_BUILTIN(), MemorySegment.NULL);
             OpenSSLStatus.setLibraryInitialized(true);
         }
     }
@@ -157,9 +157,9 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
     { BN_get_rfc2409_prime_1024, NULL, 0 }
      */
     static final class DHParam {
-        final MemoryAddress dh;
+        final MemorySegment dh;
         final int min;
-        private DHParam(MemoryAddress dh, int min) {
+        private DHParam(MemorySegment dh, int min) {
             this.dh = dh;
             this.min = min;
         }
@@ -168,48 +168,48 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
     private static void initDHParameters() {
         var dh = DH_new();
-        var p = BN_get_rfc3526_prime_8192(MemoryAddress.NULL);
+        var p = BN_get_rfc3526_prime_8192(MemorySegment.NULL);
         var g = BN_new();
         BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
         dhParameters[0] = new DHParam(dh, 6145);
         dh = DH_new();
-        p = BN_get_rfc3526_prime_6144(MemoryAddress.NULL);
+        p = BN_get_rfc3526_prime_6144(MemorySegment.NULL);
         g = BN_new();
         BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
         dhParameters[1] = new DHParam(dh, 4097);
         dh = DH_new();
-        p = BN_get_rfc3526_prime_4096(MemoryAddress.NULL);
+        p = BN_get_rfc3526_prime_4096(MemorySegment.NULL);
         g = BN_new();
         BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
         dhParameters[2] = new DHParam(dh, 3073);
         dh = DH_new();
-        p = BN_get_rfc3526_prime_3072(MemoryAddress.NULL);
+        p = BN_get_rfc3526_prime_3072(MemorySegment.NULL);
         g = BN_new();
         BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
         dhParameters[3] = new DHParam(dh, 2049);
         dh = DH_new();
-        p = BN_get_rfc3526_prime_2048(MemoryAddress.NULL);
+        p = BN_get_rfc3526_prime_2048(MemorySegment.NULL);
         g = BN_new();
         BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
         dhParameters[4] = new DHParam(dh, 1025);
         dh = DH_new();
-        p = BN_get_rfc2409_prime_1024(MemoryAddress.NULL);
+        p = BN_get_rfc2409_prime_1024(MemorySegment.NULL);
         g = BN_new();
         BN_set_word(g, 2);
-        DH_set0_pqg(dh, p, MemoryAddress.NULL, g);
+        DH_set0_pqg(dh, p, MemorySegment.NULL, g);
         dhParameters[5] = new DHParam(dh, 0);
     }
 
     private static void freeDHParameters() {
         for (int i = 0; i < dhParameters.length; i++) {
             if (dhParameters[i] != null) {
-                MemoryAddress dh = dhParameters[i].dh;
-                if (dh != null && !MemoryAddress.NULL.equals(dh)) {
+                MemorySegment dh = dhParameters[i].dh;
+                if (dh != null && !MemorySegment.NULL.equals(dh)) {
                     DH_free(dh);
                     dhParameters[i] = null;
                 }
@@ -242,26 +242,26 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                     } else {
                         var engine = memorySession.allocateUtf8String(engineName);
                         enginePointer = ENGINE_by_id(engine);
-                        if (MemoryAddress.NULL.equals(enginePointer)) {
+                        if (MemorySegment.NULL.equals(enginePointer)) {
                             enginePointer = ENGINE_by_id(memorySession.allocateUtf8String("dynamic"));
                             if (enginePointer != null) {
                                 if (ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateUtf8String("SO_PATH"), engine, 0) == 0
                                         || ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateUtf8String("LOAD"),
-                                                MemoryAddress.NULL, 0) == 0) {
+                                                MemorySegment.NULL, 0) == 0) {
                                     // Engine load error
                                     ENGINE_free(enginePointer);
-                                    enginePointer = MemoryAddress.NULL;
+                                    enginePointer = MemorySegment.NULL;
                                 }
                             }
                         }
-                        if (!MemoryAddress.NULL.equals(enginePointer)) {
+                        if (!MemorySegment.NULL.equals(enginePointer)) {
                             if (ENGINE_set_default(enginePointer, ENGINE_METHOD_ALL()) == 0) {
                                 // Engine load error
                                 ENGINE_free(enginePointer);
-                                enginePointer = MemoryAddress.NULL;
+                                enginePointer = MemorySegment.NULL;
                             }
                         }
-                        if (MemoryAddress.NULL.equals(enginePointer)) {
+                        if (MemorySegment.NULL.equals(enginePointer)) {
                             throw new IllegalStateException(sm.getString("listener.engineError"));
                         }
                     }
@@ -290,7 +290,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                     final boolean enterFipsMode;
                     int fipsModeState = FIPS_OFF;
                     if (usingProviders) {
-                        var md = EVP_MD_fetch(MemoryAddress.NULL, memorySession.allocateUtf8String("SHA-512"), MemoryAddress.NULL);
+                        var md = EVP_MD_fetch(MemorySegment.NULL, memorySession.allocateUtf8String("SHA-512"), MemorySegment.NULL);
                         var provider = EVP_MD_get0_provider(md);
                         String name = OSSL_PROVIDER_get0_name(provider).getUtf8String(0);
                         EVP_MD_free(md);
@@ -392,7 +392,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
 
             try {
                 freeDHParameters();
-                if (!MemoryAddress.NULL.equals(enginePointer)) {
+                if (!MemorySegment.NULL.equals(enginePointer)) {
                     ENGINE_free(enginePointer);
                 }
                 FIPS_mode_set(0);

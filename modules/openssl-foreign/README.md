@@ -7,8 +7,8 @@ at `https://openjdk.java.net/jeps/XXX`.
 
 ## Building the JDK with the JEP XXX API
 
-Clone `https://github.com/openjdk/jdk/` in some location and
-checkout the mais branch. This is a Java 20 development JVM
+Clone `https://github.com/openjdk/panama-foreign/` in some location and
+checkout the main branch. This is a Java 20 development JVM
 with the JEP XXX API. It may fail to build. When this happens, step back
 one commit at a time until it does.
 
@@ -68,10 +68,9 @@ export JAVA_OPTS="--enable-preview --enable-native-access=ALL-UNNAMED"
 ## Generating the OpenSSL API code using jextract (optional)
 
 jextract is now available in its own standalone repository. Clone
-`https://github.com/openjdk/jextract` in some location. Please refer to the
+`https://github.com/openjdk/jextract` in some location and
+checkout the `panama` branch. Please refer to the
 instructions from the repository for building.
-However, jextract has not been adapted yet to the JEP 424 API and the generated
-code will need to be modified manually.
 
 This step is only useful to be able to use additional native APIs from OpenSSL
 or stdlib.

@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M21 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Update Panama OpenSSL code for the extensive Java 20 changes. (remm)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
