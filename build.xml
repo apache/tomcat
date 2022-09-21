@@ -2321,6 +2321,9 @@ ant.tstamp.now.iso=${tstamp.iso.release}
 # Enable insertion of detatched signatures into the Windows installer.
 do.codesigning=true
 
+# Re-use the same GPG executable.
+gpg.exec=${gpg.exec}
+
 # Reproducible builds require the use of the build tools defined below. The
 # vendors (where appropriate) and versions must match exactly for a reproducible
 # build since this data is embedded in various files, particularly JAR file
