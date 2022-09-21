@@ -111,6 +111,10 @@
         Update the Apache Tomcat migration tool for Jakarta EE library to 1.0.4.
         (markt)
       </update>
+      <add>
+        Further automation to the build process to reduce the number of manual
+        steps that release managers must perform. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
