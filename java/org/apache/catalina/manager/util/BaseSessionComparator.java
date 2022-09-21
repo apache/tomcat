@@ -29,13 +29,6 @@ import org.apache.catalina.Session;
  */
 public abstract class BaseSessionComparator<T> implements Comparator<Session> {
 
-    /**
-     *
-     */
-    public BaseSessionComparator() {
-        super();
-    }
-
     public abstract Comparable<T> getComparableObject(Session session);
 
     /* (non-Javadoc)
