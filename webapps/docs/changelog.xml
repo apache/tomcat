@@ -236,6 +236,10 @@
         so that larger values are correctly parsed to <code>BigInteger</code>
         and <code>BigDecimal</code> respectively. (markt)
       </fix>
+      <add>
+        <bug>66203</bug>: Log an error message when the JSP compiler is unable
+        to create the output directory for the generated code. (markt)
+      </add>
       <fix>
         <bug>66235</bug>: Fix various issues with the bean resolver used for
         Graal. (remm)
