@@ -112,6 +112,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        <bug>66203</bug>: Log an error message when the JSP compiler is unable
+        to create the output directory for the generated code. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
