@@ -689,9 +689,9 @@ public class JspCompilationContext {
         try {
             File base = options.getScratchDir();
             baseUrl = base.toURI().toURL();
-            outputDir = base.getAbsolutePath() + File.separator + path +
-                    File.separator;
+            outputDir = base.getAbsolutePath() + File.separator + path + File.separator;
             if (!makeOutputDir()) {
+                log.error(Localizer.getMessage("jsp.error.outputfolder.detail", outputDir));
                 throw new IllegalStateException(Localizer.getMessage("jsp.error.outputfolder"));
             }
         } catch (MalformedURLException e) {
