@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.0-M21 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Further automation to the build process to reduce the number of manual
+        steps that release managers must perform. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0-M20 (markt)" rtext="release in progress">
   <subsection name="Coyote">
