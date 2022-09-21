@@ -326,6 +326,10 @@
       <add>
         Improvements to Spanish translations. (markt)
       </add>
+      <add>
+        Further automation to the build process to reduce the number of manual
+        steps that release managers must perform. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
