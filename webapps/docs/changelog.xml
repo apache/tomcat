@@ -195,6 +195,10 @@
         so that larger values are correctly parsed to <code>BigInteger</code>
         and <code>BigDecimal</code> respectively. (markt)
       </fix>
+      <add>
+        <bug>66203</bug>: Log an error message when the JSP compiler is unable
+        to create the output directory for the generated code. (markt)
+      </add>
       <fix>
         Improve the performance of the <code>ImportHandler</code> in the
         Expression Language implementation. This removes a previous optimisation
