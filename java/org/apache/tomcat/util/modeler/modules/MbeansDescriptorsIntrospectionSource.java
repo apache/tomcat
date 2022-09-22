@@ -311,7 +311,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 String name = attEntry.getKey();
                 AttributeInfo ai = new AttributeInfo();
                 ai.setName(name);
-                Method gm = attEntry.getValue();
+                Method gm = getAttMap.get(name);
                 if (gm != null) {
                     ai.setGetMethod(gm.getName());
                     Class<?> t = gm.getReturnType();
