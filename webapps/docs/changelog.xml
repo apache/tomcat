@@ -110,6 +110,10 @@
       <update>
         Update Panama OpenSSL code for the extensive Java 20 changes. (remm)
       </update>
+      <fix>
+        Fix a regression in refactoring for Hashtables which caused mbeans to
+        lose many of their attributes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
