@@ -792,7 +792,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             log.warn(sm.getString("context.noSSL", Long.valueOf(arg.address())));
             return SSL_TLSEXT_ERR_NOACK();
         }
-        // Byte by byte read, the ALPN data is small
         try (var memorySession = MemorySession.openConfined()) {
             MemorySegment inSeg = MemorySegment.ofAddress(in.address(), inlen, memorySession);
             byte[] advertisedBytes = inSeg.toArray(ValueLayout.JAVA_BYTE);
