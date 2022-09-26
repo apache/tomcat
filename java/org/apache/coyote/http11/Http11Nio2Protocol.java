@@ -25,7 +25,7 @@ import org.apache.tomcat.util.net.Nio2Endpoint;
 /**
  * HTTP/1.1 protocol implementation using NIO2.
  */
-public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> {
+public class Http11Nio2Protocol extends AbstractHttp11Protocol<Nio2Channel> {
 
     private static final Log log = LogFactory.getLog(Http11Nio2Protocol.class);
 

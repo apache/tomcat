@@ -50,6 +50,7 @@ import org.apache.tomcat.util.modeler.Util;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
@@ -691,6 +692,27 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     public void reloadSslHostConfig(String hostName) {
         getEndpoint().reloadSslHostConfig(hostName);
+    }
+
+
+    protected String getSslImplementationShortName() {
+        if (OpenSSLImplementation.class.getName().equals(getSslImplementationName())) {
+            return "openssl";
+        }
+        if (getSslImplementationName() != null
+                && getSslImplementationName().endsWith(".panama.OpenSSLImplementation")) {
+            return "opensslforeign";
+        }
+        return "jsse";
+    }
+
+    public String getSslImplementationName() { return getEndpoint().getSslImplementationName(); }
+    public void setSslImplementationName(String s) { getEndpoint().setSslImplementationName(s); }
+
+
+    public int getSniParseLimit() { return getEndpoint().getSniParseLimit(); }
+    public void setSniParseLimit(int sniParseLimit) {
+        getEndpoint().setSniParseLimit(sniParseLimit);
     }
 
 

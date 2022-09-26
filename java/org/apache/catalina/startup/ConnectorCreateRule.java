@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import org.apache.catalina.Executor;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
-import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -86,7 +86,7 @@ public class ConnectorCreateRule extends Rule {
                 code.append(System.lineSeparator());
             }
             if (sslImplementationName != null) {
-                code.append("((").append(AbstractHttp11JsseProtocol.class.getName()).append("<?>) ");
+                code.append("((").append(AbstractHttp11Protocol.class.getName()).append("<?>) ");
                 code.append(digester.toVariableName(con)).append(".getProtocolHandler()).setSslImplementationName(\"");
                 code.append(sslImplementationName).append("\");");
                 code.append(System.lineSeparator());

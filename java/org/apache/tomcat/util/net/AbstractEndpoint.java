@@ -21,11 +21,14 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
+import java.net.SocketAddress;
 import java.net.SocketException;
+import java.nio.channels.NetworkChannel;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -47,6 +52,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
+import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.LimitLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
@@ -210,7 +216,31 @@ public abstract class AbstractEndpoint<S,U> {
         return new HashSet<>(connections.values());
     }
 
+    private SSLImplementation sslImplementation = null;
+    public SSLImplementation getSslImplementation() {
+        return sslImplementation;
+    }
+
+
     // ----------------------------------------------------------------- Properties
+
+    private String sslImplementationName = null;
+    public String getSslImplementationName() {
+        return sslImplementationName;
+    }
+    public void setSslImplementationName(String s) {
+        this.sslImplementationName = s;
+    }
+
+
+    private int sniParseLimit = 64 * 1024;
+    public int getSniParseLimit() {
+        return sniParseLimit;
+    }
+    public void setSniParseLimit(int sniParseLimit) {
+        this.sniParseLimit = sniParseLimit;
+    }
+
 
     private String defaultSSLHostConfigName = SSLHostConfig.DEFAULT_SSL_HOST_NAME;
     /**
@@ -354,7 +384,138 @@ public abstract class AbstractEndpoint<S,U> {
      * @throws Exception If the SSLContext cannot be created for the given
      *                   SSLHostConfig
      */
-    protected abstract void createSSLContext(SSLHostConfig sslHostConfig) throws Exception;
+    protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
+
+        // HTTP/2 does not permit optional certificate authentication with any
+        // version of TLS.
+        if (sslHostConfig.getCertificateVerification().isOptional() &&
+                negotiableProtocols.contains("h2")) {
+            getLog().warn(sm.getString("sslHostConfig.certificateVerificationWithHttp2", sslHostConfig.getHostName()));
+        }
+
+        boolean firstCertificate = true;
+        for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+            SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
+            if (firstCertificate) {
+                firstCertificate = false;
+                sslHostConfig.setEnabledProtocols(sslUtil.getEnabledProtocols());
+                sslHostConfig.setEnabledCiphers(sslUtil.getEnabledCiphers());
+            }
+
+            SSLContext sslContext;
+            try {
+                sslContext = sslUtil.createSSLContext(negotiableProtocols);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
+
+            certificate.setSslContext(sslContext);
+        }
+    }
+
+
+    protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
+            List<String> clientRequestedApplicationProtocols) {
+        SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
+
+        SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers);
+
+        SSLContext sslContext = certificate.getSslContext();
+        if (sslContext == null) {
+            throw new IllegalStateException(
+                    sm.getString("endpoint.jsse.noSslContext", sniHostName));
+        }
+
+        SSLEngine engine = sslContext.createSSLEngine();
+        engine.setUseClientMode(false);
+        engine.setEnabledCipherSuites(sslHostConfig.getEnabledCiphers());
+        engine.setEnabledProtocols(sslHostConfig.getEnabledProtocols());
+
+        SSLParameters sslParameters = engine.getSSLParameters();
+        sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
+        if (clientRequestedApplicationProtocols != null
+                && clientRequestedApplicationProtocols.size() > 0
+                && negotiableProtocols.size() > 0) {
+            // Only try to negotiate if both client and server have at least
+            // one protocol in common
+            // Note: Tomcat does not explicitly negotiate http/1.1
+            // TODO: Is this correct? Should it change?
+            List<String> commonProtocols = new ArrayList<>(negotiableProtocols);
+            commonProtocols.retainAll(clientRequestedApplicationProtocols);
+            if (commonProtocols.size() > 0) {
+                String[] commonProtocolsArray = commonProtocols.toArray(new String[0]);
+                sslParameters.setApplicationProtocols(commonProtocolsArray);
+            }
+        }
+        switch (sslHostConfig.getCertificateVerification()) {
+        case NONE:
+            sslParameters.setNeedClientAuth(false);
+            sslParameters.setWantClientAuth(false);
+            break;
+        case OPTIONAL:
+        case OPTIONAL_NO_CA:
+            sslParameters.setWantClientAuth(true);
+            break;
+        case REQUIRED:
+            sslParameters.setNeedClientAuth(true);
+            break;
+        }
+        // The getter (at least in OpenJDK and derivatives) returns a defensive copy
+        engine.setSSLParameters(sslParameters);
+
+        return engine;
+    }
+
+
+    private SSLHostConfigCertificate selectCertificate(
+            SSLHostConfig sslHostConfig, List<Cipher> clientCiphers) {
+
+        Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
+        if (certificates.size() == 1) {
+            return certificates.iterator().next();
+        }
+
+        LinkedHashSet<Cipher> serverCiphers = sslHostConfig.getCipherList();
+
+        List<Cipher> candidateCiphers = new ArrayList<>();
+        if (sslHostConfig.getHonorCipherOrder()) {
+            candidateCiphers.addAll(serverCiphers);
+            candidateCiphers.retainAll(clientCiphers);
+        } else {
+            candidateCiphers.addAll(clientCiphers);
+            candidateCiphers.retainAll(serverCiphers);
+        }
+
+        for (Cipher candidate : candidateCiphers) {
+            for (SSLHostConfigCertificate certificate : certificates) {
+                if (certificate.getType().isCompatibleWith(candidate.getAu())) {
+                    return certificate;
+                }
+            }
+        }
+
+        // No matches. Just return the first certificate. The handshake will
+        // then fail due to no matching ciphers.
+        return certificates.iterator().next();
+    }
+
+
+    protected void initialiseSsl() throws Exception {
+        if (isSSLEnabled()) {
+            sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
+
+            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                createSSLContext(sslHostConfig);
+            }
+
+            // Validate default SSLHostConfigName
+            if (sslHostConfigs.get(getDefaultSSLHostConfigName()) == null) {
+                throw new IllegalArgumentException(sm.getString("endpoint.noSslHostConfig",
+                        getDefaultSSLHostConfigName(), getName()));
+            }
+
+        }
+    }
 
 
     protected void destroySsl() throws Exception {
@@ -578,6 +739,9 @@ public abstract class AbstractEndpoint<S,U> {
     public void setAddress(InetAddress address) { this.address = address; }
 
 
+    protected abstract NetworkChannel getServerSocket();
+
+
     /**
      * Obtain the network address the server socket is bound to. This primarily
      * exists to enable the correct address to be used when unlocking the server
@@ -590,7 +754,17 @@ public abstract class AbstractEndpoint<S,U> {
      * @throws IOException If there is a problem determining the currently bound
      *                     socket
      */
-    protected abstract InetSocketAddress getLocalAddress() throws IOException;
+    protected final InetSocketAddress getLocalAddress() throws IOException {
+        NetworkChannel serverSock = getServerSocket();
+        if (serverSock == null) {
+            return null;
+        }
+        SocketAddress sa = serverSock.getLocalAddress();
+        if (sa instanceof InetSocketAddress) {
+            return (InetSocketAddress) sa;
+        }
+        return null;
+    }
 
 
     /**
@@ -1162,8 +1336,17 @@ public abstract class AbstractEndpoint<S,U> {
      */
 
     public abstract void bind() throws Exception;
-    public abstract void unbind() throws Exception;
+
+    public void unbind() throws Exception {
+        for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates()) {
+                certificate.setSslContext(null);
+            }
+        }
+    }
+
     public abstract void startInternal() throws Exception;
+
     public abstract void stopInternal() throws Exception;
 
 
