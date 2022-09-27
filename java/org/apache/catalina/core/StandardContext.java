@@ -28,6 +28,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -37,7 +38,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -5924,10 +5924,10 @@ public class StandardContext extends ContainerBase
             if (parent == null) {
             namingContextName = getName();
             } else {
-            Queue<String> stk = new ArrayDeque<>();
+            Deque<String> stk = new ArrayDeque<>();
             StringBuilder buff = new StringBuilder();
             while (parent != null) {
-                stk.add(parent.getName());
+                stk.addFirst(parent.getName());
                 parent = parent.getParent();
             }
             while (!stk.isEmpty()) {
