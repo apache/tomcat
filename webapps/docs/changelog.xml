@@ -182,6 +182,10 @@
         incorrect check when matching HTTP/2 preface. Submitted by 刘文章.
         (lihan)
       </fix>
+      <fix>
+        <bug>66276</bug>: Fix incorrect class cast when adding
+        a descendant of HTTP/2 streams. (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
