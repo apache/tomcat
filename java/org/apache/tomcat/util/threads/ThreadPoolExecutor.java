@@ -1938,15 +1938,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
         // save the current pool parameters to restore them later
         int savedCorePoolSize = this.getCorePoolSize();
-        TaskQueue taskQueue =
-                getQueue() instanceof TaskQueue ? (TaskQueue) getQueue() : null;
-        if (taskQueue != null) {
-            // note by slaurent : quite oddly threadPoolExecutor.setCorePoolSize
-            // checks that queue.remainingCapacity()==0. I did not understand
-            // why, but to get the intended effect of waking up idle threads, I
-            // temporarily fake this condition.
-            taskQueue.setForcedRemainingCapacity(0);
-        }
 
         // setCorePoolSize(0) wakes idle threads
         this.setCorePoolSize(0);
@@ -1955,10 +1946,6 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         // all threads of the pool are renewed in a limited time, something like
         // (threadKeepAlive + longest request time)
 
-        if (taskQueue != null) {
-            // ok, restore the state of the queue and pool
-            taskQueue.resetForcedRemainingCapacity();
-        }
         this.setCorePoolSize(savedCorePoolSize);
     }
 
