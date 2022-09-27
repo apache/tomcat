@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,6 +53,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -1042,5 +1044,26 @@ public class TestStandardContext extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.getWriter().print("OK");
         }
+    }
+
+
+    @Test
+    public void testNamingContextName() throws Exception {
+        Engine engine = new StandardEngine();
+        engine.setName("engine");
+
+        Host host = new StandardHost();
+        host.setName("host");
+        host.setParent(engine);
+
+        Context context = new StandardContext();
+        context.setName("context");
+        context.setParent(host);
+
+        Method m = StandardContext.class.getDeclaredMethod("getNamingContextName");
+        m.setAccessible(true);
+        String result = (String) m.invoke(context);
+
+        Assert.assertEquals("/engine/hostcontext", result);
     }
 }

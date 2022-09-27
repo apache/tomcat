@@ -29,12 +29,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Queue;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -618,11 +618,11 @@ public class WebdavServlet extends DefaultServlet {
             parseProperties(req, generatedXML, path, type, properties);
         } else {
             // The stack always contains the object of the current level
-            Queue<String> stack = new ArrayDeque<>();
-            stack.add(path);
+            Deque<String> stack = new ArrayDeque<>();
+            stack.addFirst(path);
 
             // Stack of the objects one level below
-            Queue<String> stackBelow = new ArrayDeque<>();
+            Deque<String> stackBelow = new ArrayDeque<>();
 
             while ((!stack.isEmpty()) && (depth >= 0)) {
 
@@ -640,7 +640,7 @@ public class WebdavServlet extends DefaultServlet {
                             newPath += "/";
                         }
                         newPath += entry;
-                        stackBelow.add(newPath);
+                        stackBelow.addFirst(newPath);
                     }
 
                     // Displaying the lock-null resources present in that
