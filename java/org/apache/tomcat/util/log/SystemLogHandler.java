@@ -19,6 +19,7 @@ package org.apache.tomcat.util.log;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.EmptyStackException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -62,7 +63,7 @@ public class SystemLogHandler extends PrintStream {
     /**
      * Thread &lt;-&gt; CaptureLog associations.
      */
-    private static final ThreadLocal<Queue<CaptureLog>> logs = new ThreadLocal<>();
+    private static final ThreadLocal<Deque<CaptureLog>> logs = new ThreadLocal<>();
 
 
     /**
@@ -88,12 +89,12 @@ public class SystemLogHandler extends PrintStream {
         } else {
             log = new CaptureLog();
         }
-        Queue<CaptureLog> stack = logs.get();
+        Deque<CaptureLog> stack = logs.get();
         if (stack == null) {
             stack = new ArrayDeque<>();
             logs.set(stack);
         }
-        stack.add(log);
+        stack.addFirst(log);
     }
 
 

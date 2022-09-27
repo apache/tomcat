@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>66277</bug>: Fix regressions in refactoring from <code>Stack</code>
+        <code>ArrayDeque</code>.
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.0 (markt)" rtext="2022-09-26">
   <subsection name="Coyote">
