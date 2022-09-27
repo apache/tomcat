@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.Deque;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -56,7 +56,7 @@ class ParserController implements TagConstants {
      * A stack to keep track of the 'current base directory'
      * for include directives that refer to relative paths.
      */
-    private final Queue<String> baseDirStack = new ArrayDeque<>();
+    private final Deque<String> baseDirStack = new ArrayDeque<>();
 
     private boolean isEncodingSpecifiedInProlog;
     private boolean isBomPresent;
@@ -519,9 +519,9 @@ class ParserController implements TagConstants {
     private String resolveFileName(String inFileName) {
         String fileName = inFileName.replace('\\', '/');
         boolean isAbsolute = fileName.startsWith("/");
-        fileName = isAbsolute ? fileName : baseDirStack.peek() + fileName;
+        fileName = isAbsolute ? fileName : baseDirStack.peekFirst() + fileName;
         String baseDir = fileName.substring(0, fileName.lastIndexOf('/') + 1);
-        baseDirStack.add(baseDir);
+        baseDirStack.addFirst(baseDir);
         return fileName;
     }
 

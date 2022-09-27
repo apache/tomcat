@@ -229,6 +229,10 @@
         instances of <code>BigInteger</code> as part of an EL expression.
         (markt)
       </fix>
+      <fix>
+        <bug>66277</bug>: Fix regressions in refactoring from <code>Stack</code>
+        <code>ArrayDeque</code>.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
