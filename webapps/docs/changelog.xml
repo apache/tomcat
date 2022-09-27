@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.68 (remm)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>66276</bug>: Fix incorrect class cast when adding
+        a descendant of HTTP/2 streams. (lihan)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.67 (remm)" rtext="2022-09-26">
   <subsection name="Coyote">

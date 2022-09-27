@@ -75,8 +75,8 @@ abstract class AbstractNonZeroStream extends AbstractStream {
         if (isDescendant(parent)) {
             parent.detachFromParent();
             // Cast is always safe since any descendant of this stream must be
-            // an instance of Stream
-            getParentStream().addChild((Stream) parent);
+            // an instance of AbstractNonZeroStream
+            getParentStream().addChild((AbstractNonZeroStream) parent);
         }
 
         if (exclusive) {
