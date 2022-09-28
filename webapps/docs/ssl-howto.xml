@@ -444,7 +444,7 @@ After that you can proceed with importing your Certificate.</p>
 <p>Each Certificate Authority tends to differ slightly from the others. They may
 require slightly different information and/or provide the certificate and
 associated certificate chain in different formats. Additionally, the rules that
-the Certificate Authorities use for issuing certifcates change over time. As a
+the Certificate Authorities use for issuing certificates change over time. As a
 result you may find that the commands given above may need to be modified. If
 you require assitance then help is available via the
 <a href="http://tomcat.apache.org/lists.html#tomcat-users">Apache Tomcat users

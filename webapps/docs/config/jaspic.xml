@@ -56,7 +56,7 @@
   <p>Users should be aware that if the static Jakarta Authentication
      configuration file configures Jakarta Authentication for a given web
      application then the Jakarta Authentication configuration will take
-     precendence over any <code>&lt;login-config&gt;</code> present in the web
+     precedence over any <code>&lt;login-config&gt;</code> present in the web
      application's <code>WEB-INF/web.xml</code> file.</p>
 
 </section>

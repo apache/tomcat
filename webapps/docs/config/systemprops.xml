@@ -227,7 +227,7 @@
 
   <properties>
     <property name="tomcat.util.scan. StandardJarScanFilter.jarsToSkip">
-      <p>A list of comma-separated file name patters that is used as the default
+      <p>A list of comma-separated file name patterns that is used as the default
          value for <code>pluggabilitySkip</code> and <code>tldSkip</code>
          attributes of the standard
          <a href="jar-scan-filter.html">JarScanFilter</a> implementation.</p>
@@ -237,7 +237,7 @@
     </property>
 
     <property name="tomcat.util.scan. StandardJarScanFilter.jarsToScan">
-      <p>A list of comma-separated file name patters that is used as the default
+      <p>A list of comma-separated file name patterns that is used as the default
          value for <code>pluggabilityScan</code> and <code>tldScan</code>
          attributes of the standard
          <a href="jar-scan-filter.html">JarScanFilter</a> implementation.</p>

@@ -668,7 +668,7 @@
 
       <attribute name="useStaticPrincipal" required="false">
         <p>This allows using a static <code>Principal</code> instance
-        disconnected from the database if needed. This makes the bahavior of
+        disconnected from the database if needed. This makes the behavior of
         authenticated prinicipals equivalent to that of the other realms.
         If there is a plan to use serialization, it is best to set this to
         <code>true</code> as the principal will always be replaced by this

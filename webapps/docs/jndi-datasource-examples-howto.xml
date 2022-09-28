@@ -87,7 +87,7 @@ that is included with Apache Tomcat solves this by triggering the driver scan
 during Tomcat startup. This is enabled by default. It means that only
 libraries visible to the common class loader and its parents will be scanned for
 database drivers. This include drivers in <code>$CATALINA_HOME/lib</code>,
-<code>$CATALINA_BASE/lib</code>, the class path and the modeul path. Drivers
+<code>$CATALINA_BASE/lib</code>, the class path and the module path. Drivers
 packaged in web applications (in <code>WEB-INF/lib</code>) and in the shared
 class loader (where configured) will not be visible and will not be loaded
 automatically. If you are considering disabling this feature, note that the scan
