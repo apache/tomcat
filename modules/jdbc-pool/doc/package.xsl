@@ -30,14 +30,14 @@
               encoding="UTF-8"
               indent="no"/>
 
-  <!-- Defined parameters (overrideable) -->
+  <!-- Defined parameters (overridable) -->
   <xsl:param    name="relative-path"    select="'.'"/>
   <xsl:param    name="void-image"       select="'/images/void.gif'"/>
   <xsl:param    name="standalone"       select="''"/>
   <xsl:param    name="buglink"          select="'https://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
   <xsl:param    name="revlink"          select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
 
-  <!-- Defined variables (non-overrideable) -->
+  <!-- Defined variables (non-overridable) -->
   <xsl:variable name="body-bg"          select="'#ffffff'"/>
   <xsl:variable name="body-fg"          select="'#000000'"/>
   <xsl:variable name="body-link"        select="'#525D76'"/>
