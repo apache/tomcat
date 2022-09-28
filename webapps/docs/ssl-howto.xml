@@ -444,7 +444,7 @@ After that you can proceed with importing your Certificate.</p>
 <p>Each Certificate Authority tends to differ slightly from the others. They may
 require slightly different information and/or provide the certificate and
 associated certificate chain in different formats. Additionally, the rules that
-the Certificate Authorities use for issuing certifcates change over time. As a
+the Certificate Authorities use for issuing certificates change over time. As a
 result you may find that the commands given above may need to be modified. If
 you require assitance then help is available via the
 <a href="http://tomcat.apache.org/lists.html#tomcat-users">Apache Tomcat users
@@ -622,7 +622,7 @@ SSL communications, and what to do about them.</p>
     </li>
 
 <li>My Java-based client aborts handshakes with exceptions such as
-    "java.lang.RuntimeException: Could not generate DH keypair" and
+    "java.lang.RuntimeException: Could not generate DH key pair" and
     "java.security.InvalidAlgorithmParameterException: Prime size must be multiple
     of 64, and can only range from 512 to 1024 (inclusive)"
 

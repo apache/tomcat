@@ -1120,7 +1120,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       IPv6 are both fully supported.
     </p>
 
-    <p>This filter mimicks Apache httpd's <code>Order</code>,
+    <p>This filter mimics Apache httpd's <code>Order</code>,
       <code>Allow from</code> and <code>Deny from</code> directives,
       with the following limitations:
     </p>

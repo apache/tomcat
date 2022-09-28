@@ -1057,7 +1057,7 @@
 
     <p>Note: The <strong>JDBC Database Realm</strong> uses a single connection
     to the database with synchronisation to prevenbt concurrent usage. It is not
-    recommended for production usage. Use the DataSource Realm instaead.</p>
+    recommended for production usage. Use the DataSource Realm instead.</p>
 
     <p>A rich set of additional attributes lets you configure the required
     connection to the underlying database, as well as the table and

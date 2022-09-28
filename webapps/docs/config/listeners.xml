@@ -307,7 +307,7 @@
         method of this class to ensure that the static initializer is not
         triggered by a web application. Defaults to <code>true</code>.</p>
         <p>Note: The underlying leak has been fixed in Java 7 update 51 onwards
-        and Java 8 onwards. This protection is therefor disabled if running on
+        and Java 8 onwards. This protection is therefore disabled if running on
         Java 8 onwards.</p>
       </attribute>
 
