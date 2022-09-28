@@ -23,7 +23,7 @@ import javax.management.ObjectName;
 
 /**
  * Structure holding the Request and Response objects. It also holds statistical
- * informations about request processing and provide management informations
+ * information about request processing and provide management information
  * about the requests being processed.
  *
  * Each thread uses a Request/Response pair that is recycled on each request.

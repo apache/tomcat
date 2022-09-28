@@ -252,7 +252,7 @@ public class ServiceRefFactory implements ObjectFactory {
                         break;
                     }
 
-                    // Load all datas relative to the handler : SOAPHeaders, config init element,
+                    // Load all data relative to the handler : SOAPHeaders, config init element,
                     // portNames to be set on
                     List<QName> headers = new ArrayList<>();
                     Hashtable<String,String> config = new Hashtable<>();
@@ -288,7 +288,7 @@ public class ServiceRefFactory implements ObjectFactory {
                         }
                     }
 
-                    // Set the handlers informations
+                    // Set the handlers information
                     handlerInfo.setHandlerClass(handlerClass);
                     handlerInfo.setHeaders(headers.toArray(new QName[0]));
                     handlerInfo.setHandlerConfig(config);

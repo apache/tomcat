@@ -64,7 +64,7 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
 
         // The time taken to shutdown the executor can vary between systems. Try
         // to avoid false test failures due to timing issues. Give the executor
-        // upto 10 seconds to close down.
+        // up to 10 seconds to close down.
         int count = 0;
         while (count < 100 && !executorServlet.tpe.isTerminated()) {
             count++;

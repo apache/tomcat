@@ -168,7 +168,7 @@ public class TestCancelledUpload extends Http2TestBase {
 
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            // Read upto 128 bytes and then return a 403 response
+            // Read up to 128 bytes and then return a 403 response
 
             InputStream is = req.getInputStream();
             byte[] buf = new byte[128];
