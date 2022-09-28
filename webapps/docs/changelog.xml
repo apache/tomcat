@@ -739,7 +739,7 @@
       <add>
          Effectively disable the
          <code>WebappClassLoaderBase.getResources()</code> method as it is not
-         used and if something accidently exposes the class loader this method
+         used and if something accidentally exposes the class loader this method
          can be used to gain access to Tomcat internals. (markt)
       </add>
     </changelog>
@@ -1331,7 +1331,7 @@
         getting the passord of a user. (remm)
       </fix>
       <docs>
-        Add Javadoc comment which listeners must be nested whithin
+        Add Javadoc comment which listeners must be nested within
         <code>Server</code> elements only. (michaelo)
       </docs>
       <add>
@@ -4333,7 +4333,7 @@
   <subsection name="General">
     <changelog>
       <scode>
-        This release contains all of the changes upto and including those in
+        This release contains all of the changes up to and including those in
         Apache Tomcat 9.0.31 plus the additional changes listed below. (markt)
       </scode>
     </changelog>

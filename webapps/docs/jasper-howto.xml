@@ -504,7 +504,7 @@ with Jasper.
 The second extension point is the Expression Language interpreter. Alternative
 interpreters may be configured through the <code>ServletContext</code>. See the
 <code>ELInterpreterFactory</code> javadoc for details of how to configure an
-alternative EL interpreter. A alternative interpreter primarily targetting tag
+alternative EL interpreter. A alternative interpreter primarily targeting tag
 settings is provided at
 <code>org.apache.jasper.optimizations.ELInterpreterTagSetters</code>. See the
 javadoc for details of the optimisations and the impact they have on

@@ -54,7 +54,7 @@
 
   <p>Users should be aware that if the static JASPIC configuration file
      configures JASPIC for a given web application then the JASPIC configuration
-     will take precendence over any <code>&lt;login-config&gt;</code> present in
+     will take precedence over any <code>&lt;login-config&gt;</code> present in
      the web application's <code>WEB-INF/web.xml</code> file.</p>
 
 </section>

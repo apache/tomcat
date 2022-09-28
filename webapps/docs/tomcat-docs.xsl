@@ -27,7 +27,7 @@
               indent="no"
               doctype-system="about:legacy-compat"/>
 
-  <!-- Defined parameters (overrideable) -->
+  <!-- Defined parameters (overridable) -->
   <xsl:param    name="home-name"           select="'The Tomcat Project'"/>
   <xsl:param    name="home-href"           select="'https://tomcat.apache.org/'"/>
   <xsl:param    name="home-logo"           select="'/images/tomcat.png'"/>

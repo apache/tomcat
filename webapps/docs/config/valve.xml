@@ -780,7 +780,7 @@
       it will be passed on.
     </p>
 
-    <p>This valve mimicks Apache's <code>Order</code>,
+    <p>This valve mimics Apache's <code>Order</code>,
       <code>Allow from</code> and <code>Deny from</code> directives,
       with the following limitations:
     </p>
@@ -2143,7 +2143,7 @@
         <code>fullyQualifiedClassName</code> or a sub-class of it. For example,
         <code>errorCode.java.io.IOException</code> specifies the file to return
         for an <code>IOException</code>. The location may be relative or
-        absolule. If relative, it must be relative to
+        absolute. If relative, it must be relative to
         <code>$CATALINA_BASE</code>. If no matching error page is found, the
         default <strong>Error Report Valve</strong> response will be
         returned.</p>

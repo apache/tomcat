@@ -62,7 +62,7 @@
   received, Tomcat will accept new connections until the current number of
   connections reaches <code>maxConnections</code>. Connections are queued inside
   the server socket created by the <strong>Connector</strong> until a thread
-  becomes avaialble to process the connection. Once <code>maxConnections</code>
+  becomes available to process the connection. Once <code>maxConnections</code>
   has been reached the operating system will queue further connections. The size
   of the  operating system provided connection queue may be controlled by the
   <code>acceptCount</code> attribute. If the operating system queue fills,
@@ -92,7 +92,7 @@
       7231 section 4.3.8, cookie and authorization headers will be excluded from
       the response to the TRACE request. If you wish to include these, you can
       implement the <code>doTrace()</code> method for the target Servlet and
-      gain full control over the reponse.</p>
+      gain full control over the response.</p>
     </attribute>
 
     <attribute name="asyncTimeout" required="false">
@@ -178,7 +178,7 @@
       expires. For HTTP/1.1 upgrade, the request body is buffered for the
       duration of the upgrade process. The limit can be disabled by setting this
       attribute to -1. Setting the attribute to zero will disable the saving of
-      the requets body data during authentication and HTTP/1.1 upgrade. If not
+      the request body data during authentication and HTTP/1.1 upgrade. If not
       specified, this attribute is set to 4096 (4 kilobytes).</p>
     </attribute>
 
