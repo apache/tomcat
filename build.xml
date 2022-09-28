@@ -2619,7 +2619,7 @@ version.dev=
 # Ensure consistent timestamps for reproducible builds.
 ant.tstamp.now.iso=${tstamp.iso.release}
 
-# Enable insertion of detatched signatures into the Windows installer.
+# Enable insertion of detached signatures into the Windows installer.
 do.codesigning=true
 
 # Re-use the same GPG executable.
@@ -2637,7 +2637,7 @@ gpg.exec=${gpg.exec}
 # Java Version:    ${java.vm.version}
 
 # The following is provided for information only. Builds will be repeatable
-# whether or not the build ennvironment in consistent with this information.
+# whether or not the build environment in consistent with this information.
 #
 # OS:              ${os.arch} ${os.name} ${os.version}
 # File encoding:   ${file.encoding}
