@@ -36,7 +36,7 @@
 <section name="Introduction">
   <p>
   Apache Tribes supports an interceptor architecture to intercept both messages and membership notifications.
-  This architecture allows decoupling of logic and opens the way for some very useful feature add ons.
+  This architecture allows decoupling of logic and opens the way for some very useful feature add-ons.
   </p>
 </section>
 
