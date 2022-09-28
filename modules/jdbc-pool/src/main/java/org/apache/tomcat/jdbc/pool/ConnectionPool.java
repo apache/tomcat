@@ -1335,7 +1335,7 @@ public class ConnectionPool {
     }
 
     /**
-     * Tread safe wrapper around a future for the regular queue
+     * Thread safe wrapper around a future for the regular queue
      * This one retrieves the pooled connection object
      * and performs the initialization according to
      * interceptors and validation rules.

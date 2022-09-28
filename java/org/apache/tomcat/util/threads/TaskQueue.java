@@ -27,7 +27,7 @@ import org.apache.tomcat.util.res.StringManager;
  * As task queue specifically designed to run with a thread pool executor. The
  * task queue is optimised to properly utilize threads within a thread pool
  * executor. If you use a normal queue, the executor will spawn threads when
- * there are idle threads and you wont be able to force items onto the queue
+ * there are idle threads and you won't be able to force items onto the queue
  * itself.
  */
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {

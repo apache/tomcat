@@ -23,7 +23,7 @@ package org.apache.coyote;
  * Some standard actions are defined in ActionCode, however custom
  * actions are permitted.
  *
- * The param object can be used to pass and return informations related with the
+ * The param object can be used to pass and return information related with the
  * action.
  *
  *

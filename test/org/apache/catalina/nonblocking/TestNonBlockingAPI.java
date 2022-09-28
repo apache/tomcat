@@ -306,9 +306,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         if (resultEnd > resultString.length()) {
                             resultEnd = resultString.length();
                         }
-                        log.error("Mis-match tx: " + new String(
+                        log.error("Mismatch tx: " + new String(
                                 DATA, dataStart, dataEnd - dataStart));
-                        log.error("Mis-match rx: " +
+                        log.error("Mismatch rx: " +
                                 resultString.substring(resultStart, resultEnd));
                         found = true;
                         break;
@@ -794,9 +794,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int written = 0;
         public volatile boolean onErrorInvoked = false;
 
-        public TestWriteListener(AsyncContext ctx, boolean unlimted) {
+        public TestWriteListener(AsyncContext ctx, boolean unlimited) {
             this.ctx = ctx;
-            this.unlimited = unlimted;
+            this.unlimited = unlimited;
         }
 
         @Override

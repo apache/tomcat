@@ -168,7 +168,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
         @Override
         public void run() {
             System.out.println("Shutting down...");
-            //create an exit thread that forces a shutdown if the JVM wont exit cleanly
+            //create an exit thread that forces a shutdown if the JVM won't exit cleanly
             SystemExit exit = new SystemExit(5000);
             exit.setDaemon(true);
             exit.start();
