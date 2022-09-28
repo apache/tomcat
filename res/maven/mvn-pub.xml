@@ -351,7 +351,7 @@
         file="${tomcat.extras.path}/catalina-ws.jar"
         src="${tomcat.extras.src.path}/catalina-ws-src.jar" />
 
-    <!-- Emedded jars -->
+    <!-- Embedded jars -->
     <!-- Skip DBCP - optional and can use standard ones above -->
     <doMavenDeploy artifactId="tomcat-embed-core"
         groupId="org.apache.tomcat.embed"
