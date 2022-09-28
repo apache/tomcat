@@ -220,7 +220,7 @@ public class Http11Processor extends AbstractProcessor {
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("http11processor.request.prepare") +
-                          " Tranfer encoding lists chunked before [" + encodingName + "]");
+                          " Transfer encoding lists chunked before [" + encodingName + "]");
             }
             return;
         }

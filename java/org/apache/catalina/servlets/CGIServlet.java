@@ -1843,7 +1843,7 @@ public final class CGIServlet extends HttpServlet {
 
     /**
      * This is an input stream specifically for reading HTTP headers. It reads
-     * upto and including the two blank lines terminating the headers. It
+     * up to and including the two blank lines terminating the headers. It
      * allows the content to be read using bytes or characters as appropriate.
      */
     protected static class HTTPHeaderInputStream extends InputStream {

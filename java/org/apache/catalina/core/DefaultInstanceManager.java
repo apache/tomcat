@@ -582,7 +582,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         // This will always be a new Field instance
         // Making this instance accessible does not affect other instances
-        // If this doens't work, just let set() fail
+        // If this doesn't work, just let set() fail
         field.trySetAccessible();
         field.set(instance, lookedupResource);
     }
@@ -622,7 +622,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         // This will always be a new Method instance
         // Making this instance accessible does not affect other instances
-        // If this doens't work, just let invoke() fail
+        // If this doesn't work, just let invoke() fail
         method.trySetAccessible();
         method.invoke(instance, lookedupResource);
     }

@@ -398,7 +398,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     // With a UDS, expect no delay connecting and no defer accept
                     socket.connect(sa);
                 }
-                // Wait for upto 1000ms acceptor threads to unlock
+                // Wait for up to 1000ms acceptor threads to unlock
                 long waitLeft = 1000;
                 while (waitLeft > 0 &&
                         acceptor.getState() == AcceptorState.RUNNING) {

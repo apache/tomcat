@@ -95,7 +95,7 @@ public interface JspPropertyGroupDescriptor {
     public String getDeferredSyntaxAllowedAsLiteral();
 
     /**
-     * Should the JSPs in this group have template text that onyl contains
+     * Should the JSPs in this group have template text that only contains
      * whitespace removed?
      *
      * @return {@code true} if the whitespace be removed, otherwise

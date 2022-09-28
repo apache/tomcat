@@ -1816,7 +1816,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
             // Needs to be async to trigger the problematic code path
             AsyncContext ac = req.startAsync();
             ServletInputStream sis = req.getInputStream();
-            // This triggers a call to Http11InputBuffer.avalable(true) which
+            // This triggers a call to Http11InputBuffer.available(true) which
             // did not handle the pipelining case.
             sis.setReadListener(new Bug64974ReadListener());
             ac.complete();

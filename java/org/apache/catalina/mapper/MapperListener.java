@@ -508,7 +508,7 @@ public class MapperListener extends LifecycleMBeanBase
     /**
      * Add this mapper to the container and all child containers
      *
-     * @param container the container (and any associated childern) to which
+     * @param container the container (and any associated children) to which
      *        the mapper is to be added
      */
     private void addListeners(Container container) {
@@ -523,7 +523,7 @@ public class MapperListener extends LifecycleMBeanBase
     /**
      * Remove this mapper from the container and all child containers
      *
-     * @param container the container (and any associated childern) from which
+     * @param container the container (and any associated children) from which
      *        the mapper is to be removed
      */
     private void removeListeners(Container container) {

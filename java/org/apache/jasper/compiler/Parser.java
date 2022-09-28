@@ -479,7 +479,7 @@ class Parser implements TagConstants {
             parseIncludeDirective(parent);
         } else if (reader.matches("taglib")) {
             if (directivesOnly) {
-                // No need to get the tagLibInfo objects. This alos suppresses
+                // No need to get the tagLibInfo objects. This also suppresses
                 // parsing of any tag files used in this tag file.
                 return;
             }

@@ -1807,7 +1807,7 @@ public interface Context extends Container, ContextBind {
 
     /**
      * Are paths used in calls to obtain a request dispatcher expected to be
-     * encoded? This applys to both how Tomcat handles calls to obtain a request
+     * encoded? This applies to both how Tomcat handles calls to obtain a request
      * dispatcher as well as how Tomcat generates paths used to obtain request
      * dispatchers internally.
      *

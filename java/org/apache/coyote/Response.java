@@ -121,7 +121,7 @@ public final class Response {
     long contentLength = -1;
     private Locale locale = DEFAULT_LOCALE;
 
-    // General informations
+    // General information
     private long contentWritten = 0;
     private long commitTimeNanos = -1;
 

@@ -595,7 +595,7 @@ public class PageContextImpl extends PageContext {
     }
 
     @Override
-    @SuppressWarnings("deprecation") // Still jave to support old JSP EL
+    @SuppressWarnings("deprecation") // Still have to support old JSP EL
     public void handlePageException(final Throwable t) throws IOException, ServletException {
         if (t == null) {
             throw new NullPointerException(Localizer.getMessage("jsp.error.page.nullThrowable"));
