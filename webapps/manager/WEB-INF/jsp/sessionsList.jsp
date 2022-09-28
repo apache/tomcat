@@ -59,7 +59,7 @@
 <div class="message"><%= JspHelper.escapeXml(request.getAttribute("message")) %></div>
 
 <form action="<%= submitUrl %>" method="post" id="sessionsForm">
-    <fieldset><legend>Active HttpSessions informations</legend>
+    <fieldset><legend>Active HttpSessions information</legend>
         <input type="hidden" name="action" id="sessionsFormAction" value="injectSessions"/>
         <input type="hidden" name="sort" id="sessionsFormSort" value="<%= JspHelper.escapeXml(request.getAttribute("sort")) %>"/>
         <% String order = (String) request.getAttribute("order");
