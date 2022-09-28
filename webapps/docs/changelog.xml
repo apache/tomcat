@@ -122,7 +122,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 10.0.26 (markt)" rtext="release in progress">
+<section name="Tomcat 10.0.26 (markt)" rtext="2022-09-27">
   <subsection name="Coyote">
     <changelog>
       <fix>
