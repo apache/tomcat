@@ -144,7 +144,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
 
 
     /**
-     * The column in the role and group tables for the decription
+     * The column in the role and group tables for the description
      */
     protected String roleAndGroupDescriptionCol = null;
 

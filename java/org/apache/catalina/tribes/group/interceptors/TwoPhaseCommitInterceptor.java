@@ -64,7 +64,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
             super.sendMessage(destination,confirmation,payload);
         } else {
             //turn off two phase commit
-            //this wont work if the interceptor has 0 as a flag
+            //this won't work if the interceptor has 0 as a flag
             //since there is no flag to turn off
             //msg.setOptions(msg.getOptions() & (~getOptionFlag()));
             super.sendMessage(destination, msg, payload);

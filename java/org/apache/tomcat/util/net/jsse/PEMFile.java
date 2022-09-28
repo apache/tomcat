@@ -294,7 +294,7 @@ public class PEMFile {
                  * fragile but acceptable in this case since the JRE depends on
                  * the toString() implementation as well.
                  * In the future, if necessary, we can parse the value of
-                 * paremeters.getEncoded() but the associated complexity and
+                 * parameters.getEncoded() but the associated complexity and
                  * unlikeliness of the JRE implementation changing means that
                  * Tomcat will use to toString() approach for now.
                  */

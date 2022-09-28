@@ -178,7 +178,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
                         (!Arrays.equals(TCP_PING_DATA,msg.getMessage().getBytes()) ) );
         }//end if
 
-        //ignore the message, it doesnt have the flag set
+        //ignore the message, it doesn't have the flag set
         if ( process ) {
             super.messageReceived(msg);
         } else if ( log.isDebugEnabled() ) {

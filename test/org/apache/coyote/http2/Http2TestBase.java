@@ -1399,7 +1399,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            // Request bodies are unusal with GET but not illegal
+            // Request bodies are unusual with GET but not illegal
             doPost(req, resp);
         }
 

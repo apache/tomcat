@@ -26,7 +26,7 @@ import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509KeyManager;
 
 /**
- * X509KeyManager which allows selection of a specific keypair and certificate
+ * X509KeyManager which allows selection of a specific key pair and certificate
  * chain (identified by their keystore alias name) to be used by the server to
  * authenticate itself to SSL clients.
  *
@@ -42,7 +42,7 @@ public final class JSSEKeyManager extends X509ExtendedKeyManager {
      * Constructor.
      *
      * @param mgr The X509KeyManager used as a delegate
-     * @param serverKeyAlias The alias name of the server's keypair and
+     * @param serverKeyAlias The alias name of the server's key pair and
      * supporting certificate chain
      */
     public JSSEKeyManager(X509KeyManager mgr, String serverKeyAlias) {
