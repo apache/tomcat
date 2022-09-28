@@ -344,7 +344,7 @@
      <doMavenInstall artifactId="tomcat-dbcp"/>
      <doMavenInstall artifactId="tomcat-websocket"/>
 
-     <!-- Emedded jars -->
+     <!-- Embedded jars -->
      <doMavenInstall artifactId="tomcat-embed-core"
          groupId="org.apache.tomcat.embed"
          file="${tomcat.embed.path}/tomcat-embed-core.jar"
@@ -456,7 +456,7 @@
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ru"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-zh-CN"/>
 
-    <!-- Emedded jars -->
+    <!-- Embedded jars -->
     <!-- Skip DBCP - optional and can use standard ones above -->
     <doMavenDeploy artifactId="tomcat-embed-core"
         groupId="org.apache.tomcat.embed"
