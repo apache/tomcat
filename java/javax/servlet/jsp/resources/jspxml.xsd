@@ -414,7 +414,7 @@
         jsp:useBean action or a custom action with an associated
         VariableInfo entry for this name.
 
-        Exact valid combinations are not expressable in XML Schema.
+        Exact valid combinations are not expressible in XML Schema.
         They are:
 
         name="Identifier" property="*"

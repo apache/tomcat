@@ -260,7 +260,7 @@
           <xsd:documentation>
 
             The service-qname element declares the specific WSDL service
-            element that is being refered to.  It is not specified if no
+            element that is being referred to.  It is not specified if no
             wsdl-file is declared.
 
           </xsd:documentation>
