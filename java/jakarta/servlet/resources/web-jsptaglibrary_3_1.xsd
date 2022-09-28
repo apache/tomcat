@@ -575,7 +575,7 @@
         short-name      a simple default short name that could be
                         used by a JSP authoring tool to create
                         names with a mnemonic value; for example,
-                        the it may be used as the prefered prefix
+                        the it may be used as the preferred prefix
                         value in taglib directives
 
         uri             a uri uniquely identifying this taglib
@@ -722,7 +722,7 @@
         declare                  Whether the variable is declared
                                  or not.  True is the default.
 
-        scope                    The scope of the scripting varaible
+        scope                    The scope of the scripting variable
                                  defined.  NESTED is default.
 
       </xsd:documentation>

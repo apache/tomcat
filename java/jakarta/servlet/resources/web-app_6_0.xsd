@@ -95,7 +95,7 @@
         file must not contain multiple elements of session-config,
         jsp-config, and login-config. When there are multiple elements of
         welcome-file-list or locale-encoding-mapping-list, the container
-        must concatenate the element contents.  The multiple occurence
+        must concatenate the element contents.  The multiple occurrence
         of the element distributable is redundant and the container
         treats that case exactly in the same way when there is only
         one distributable.

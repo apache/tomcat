@@ -122,7 +122,7 @@
           <xsd:documentation>
 
             The jaxrpc-mapping-file element contains the name of a file that
-            describes the Jakarta XML RPC mapping between the Java interaces used by
+            describes the Jakarta XML RPC mapping between the Java interfaces used by
             the application and the WSDL description in the wsdl-file.  The
             file name is a relative path within the module file.
 
@@ -140,7 +140,7 @@
           <xsd:documentation>
 
             The service-qname element declares the specific WSDL service
-            element that is being refered to.  It is not specified if no
+            element that is being referred to.  It is not specified if no
             wsdl-file is declared.
 
           </xsd:documentation>
