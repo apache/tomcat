@@ -347,7 +347,7 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     /**
-     * Create the SSLContextfor the the given SSLHostConfig.
+     * Create the SSLContext for the given SSLHostConfig.
      *
      * @param sslHostConfig The SSLHostConfig for which the SSLContext should be
      *                      created
