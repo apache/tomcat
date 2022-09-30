@@ -39,7 +39,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         sendPriority(3,  3,  15);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("3-RST-[1]\n",  output.getTrace());
     }
@@ -73,7 +73,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // Set the default window size to 1024 bytes
         sendSettings(0, false, new SettingValue(4, 1024));
         // Wait for the ack
-        parser.readFrame(true);
+        parser.readFrame();
         // Debugging Gump failure
         log.info(output.getTrace());
         output.clearTrace();
@@ -90,10 +90,10 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // stream 17's window and the connection window.
         sendSimpleGetRequest(17);
         // 17-headers, 17-1k-body
-        parser.readFrame(true);
+        parser.readFrame();
         // Debugging Gump failure
         log.info(output.getTrace());
-        parser.readFrame(true);
+        parser.readFrame();
         // Debugging Gump failure
         log.info(output.getTrace());
         output.clearTrace();
@@ -110,10 +110,10 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         // Read some frames
         // 19-headers, 21-headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Debugging Gump failure
         log.info(output.getTrace());
-        parser.readFrame(true);
+        parser.readFrame();
         // Debugging Gump failure
         log.info(output.getTrace());
         output.clearTrace();
@@ -155,7 +155,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         boolean seen21 = false;
         while (!seen19 || !seen21) {
             sendWindowUpdate(0, 1);
-            parser.readFrame(true);
+            parser.readFrame();
             // Debugging Gump failure
             log.info(output.getTrace());
             int[] data = parseBodyFrame(output.getTrace());
@@ -183,7 +183,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         Thread.sleep(1000);
 
         sendWindowUpdate(0, 1024);
-        parser.readFrame(true);
+        parser.readFrame();
 
         // Make sure you have read the big comment before the loop above. It is
         // possible that the timing of the server threads is such that there are
@@ -193,7 +193,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
             // Debugging Gump failure
             log.info(output.getTrace());
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
             data = parseBodyFrame(output.getTrace());
         }
 
@@ -221,7 +221,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
                 Assert.fail("Unexpected stream: [" + output.getTrace() + "]");
             }
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
             data = parseBodyFrame(output.getTrace());
         }
         // Debugging Gump failure
@@ -235,7 +235,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // Read remaining frames
         // 17-7k-body, 19~8k-body, 21~8k-body
         for (int i = 0; i < 3; i++) {
-            parser.readFrame(true);
+            parser.readFrame();
             // Debugging Gump failure
             log.info(output.getTrace());
         }

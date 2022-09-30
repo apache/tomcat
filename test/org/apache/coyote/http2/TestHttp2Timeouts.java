@@ -39,13 +39,13 @@ public class TestHttp2Timeouts extends Http2TestBase {
         sendSimpleGetRequest(3);
 
         // Settings
-        parser.readFrame(false);
+        parser.readFrame();
         // Headers
-        parser.readFrame(false);
+        parser.readFrame();
 
         output.clearTrace();
 
-        parser.readFrame(false);
+        parser.readFrame();
         Assert.assertEquals("3-RST-[11]\n", output.getTrace());
     }
 
@@ -61,13 +61,13 @@ public class TestHttp2Timeouts extends Http2TestBase {
         sendLargeGetRequest(3);
 
         // Settings
-        parser.readFrame(false);
+        parser.readFrame();
         // Headers
-        parser.readFrame(false);
+        parser.readFrame();
 
         output.clearTrace();
 
-        parser.readFrame(false);
+        parser.readFrame();
         Assert.assertEquals("3-RST-[11]\n", output.getTrace());
     }
 
@@ -80,10 +80,10 @@ public class TestHttp2Timeouts extends Http2TestBase {
         sendSimplePostRequest(3,  null,  false);
 
         // Headers
-        parser.readFrame(false);
+        parser.readFrame();
         output.clearTrace();
 
-        parser.readFrame(false);
+        parser.readFrame();
 
         Assert.assertEquals("3-RST-[11]\n", output.getTrace());
     }
@@ -97,10 +97,10 @@ public class TestHttp2Timeouts extends Http2TestBase {
         sendParameterPostRequest(3, null, null, 10, false);
 
         // Headers
-        parser.readFrame(false);
+        parser.readFrame();
         output.clearTrace();
 
-        parser.readFrame(false);
+        parser.readFrame();
 
         Assert.assertEquals("3-RST-[11]\n", output.getTrace());
     }

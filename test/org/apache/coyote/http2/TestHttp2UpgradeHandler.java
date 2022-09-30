@@ -53,10 +53,10 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // Headers
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         // Body
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals(
                 "3-HeadersStart\n" +
@@ -165,11 +165,11 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
             // - ping
             // - headers (for response)
             // - data (for response body)
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
 
             Assert.assertEquals("0-Settings-[3]-[200]\n" +
                     "0-Settings-End\n" +

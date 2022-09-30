@@ -39,7 +39,7 @@ public class TestHttp2Section_6_7 extends Http2TestBase {
         sendPing(0, false, "01234567".getBytes(StandardCharsets.ISO_8859_1));
 
         // Ping ack
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("0-Ping-Ack-[48,49,50,51,52,53,54,55]\n", output.getTrace());
     }
@@ -54,7 +54,7 @@ public class TestHttp2Section_6_7 extends Http2TestBase {
         sendPing(0, false, "76543210".getBytes(StandardCharsets.ISO_8859_1));
 
         // Ping ack (only for second ping)
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("0-Ping-Ack-[55,54,53,52,51,50,49,48]\n", output.getTrace());
     }

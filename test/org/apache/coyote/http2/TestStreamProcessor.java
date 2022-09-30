@@ -72,7 +72,7 @@ public class TestStreamProcessor extends Http2TestBase {
         readSimpleGetResponse();
         // Flush before startAsync means body is written in two packets so an
         // additional frame needs to be read
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals(
                 "3-HeadersStart\n" +
@@ -151,7 +151,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -201,7 +201,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -246,7 +246,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -290,7 +290,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -334,7 +334,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");
@@ -380,7 +380,7 @@ public class TestStreamProcessor extends Http2TestBase {
 
         writeFrame(frameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         StringBuilder expected = new StringBuilder();
         expected.append("3-HeadersStart\n");

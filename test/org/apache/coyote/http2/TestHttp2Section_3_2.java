@@ -61,7 +61,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         // If we don't send the preface the server should kill the connection.
         try {
             // Make the parser read something.
-            parser.readFrame(true);
+            parser.readFrame();
         } catch (IOException ioe) {
             // Expected because the server is going to drop the connection.
         }
@@ -78,7 +78,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         os.flush();
         try {
             // Make the parser read something.
-            parser.readFrame(true);
+            parser.readFrame();
         } catch (IOException ioe) {
             // Expected because the server is going to drop the connection.
         }
@@ -96,7 +96,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         os.flush();
         try {
             // Make the parser read something.
-            parser.readFrame(true);
+            parser.readFrame();
         } catch (IOException ioe) {
             // Expected because the server is going to drop the connection.
         }
