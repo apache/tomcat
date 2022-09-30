@@ -147,6 +147,11 @@
         <code>ErrorReportValve</code> that returns  response as JSON instead of
         HTML. Back-porting kfujino's implementation. (lihan)
       </add>
+      <fix>
+        Update the <code>RewriteValve</code> to perform pattern matching using
+        dotall mode to avoid unexpected behaviour if the URL includes encoded
+        line terminators. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
