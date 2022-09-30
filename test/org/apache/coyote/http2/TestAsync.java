@@ -152,12 +152,12 @@ public class TestAsync extends Http2TestBase {
         }
 
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body
 
         if (!connectionUnlimited || !streamUnlimited) {
             while (output.getBytesRead() < startingWindowSize) {
-                parser.readFrame(true);
+                parser.readFrame();
             }
 
             // Check that the right number of bytes were received
@@ -174,7 +174,7 @@ public class TestAsync extends Http2TestBase {
             }
 
             while (output.getBytesRead() < startingWindowSize + windowSizeIncrease) {
-                parser.readFrame(true);
+                parser.readFrame();
             }
 
             // Check that the right number of bytes were received
@@ -191,7 +191,7 @@ public class TestAsync extends Http2TestBase {
         }
 
         while (!output.getTrace().endsWith("3-EndOfStream\n")) {
-            parser.readFrame(true);
+            parser.readFrame();
         }
 
         // Check that the right number of bytes were received

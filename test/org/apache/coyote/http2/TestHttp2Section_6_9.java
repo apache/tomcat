@@ -47,7 +47,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         sendSimplePostRequest(3,  null,  false);
         sendWindowUpdate(3, 0);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("3-RST-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]\n",
                 output.getTrace());
@@ -109,9 +109,9 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // response at this point
         sendEmptyGetRequest(17);
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body
-        parser.readFrame(true);
+        parser.readFrame();
 
         // Release Stream 15 which is waiting for a single byte.
         sendWindowUpdate(0,  1024);
@@ -130,7 +130,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // Super size the flow control window.
         sendWindowUpdate(3, (1 << 31) - 1);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n",
                 output.getTrace());
@@ -171,7 +171,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // window.
         sendSettings(0, false, new SettingValue(4, 4 * 1024));
         // Ack
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
         output.clearTrace();
 
@@ -179,8 +179,8 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         writeFrame(dataFrameHeader, dataPayload);
 
         // Window size updates after reading POST body
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         Assert.assertEquals(
                 "0-WindowSize-[8192]\n" +
                 "3-WindowSize-[8192]\n",
@@ -188,8 +188,8 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         output.clearTrace();
 
         // Read stream 3 headers and first part of body
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         Assert.assertEquals(
                 "3-HeadersStart\n" +
                 "3-Header-[:status]-[200]\n" +
@@ -203,7 +203,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // control window. This should make the stream 3 window negative
         sendSettings(0, false, new SettingValue(4, 2 * 1024));
         // Ack
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
         output.clearTrace();
 
@@ -211,23 +211,23 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // window. The stream 3 window should still be negative
         sendSettings(0, false, new SettingValue(4, 3 * 1024));
         // Ack
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
         output.clearTrace();
 
         // Do a POST that won't be affected by the above limit
         sendSimplePostRequest(5, null);
         // Window size updates after reading POST body
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         Assert.assertEquals(
                 "0-WindowSize-[128]\n" +
                 "5-WindowSize-[128]\n",
                 output.getTrace());
         output.clearTrace();
         // Headers + body
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         Assert.assertEquals(
                 "5-HeadersStart\n" +
                 "5-Header-[:status]-[200]\n" +
@@ -244,7 +244,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
 
         // Settings ack and stream 3 body are written from different threads.
         // Order depends on server side timing. Handle both possibilities.
-        parser.readFrame(true);
+        parser.readFrame();
         String trace = output.getTrace();
         String settingsAck = "0-Settings-Ack\n";
         String endOfStreamThree = "3-Body-4096\n3-EndOfStream\n";
@@ -252,13 +252,13 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         if (settingsAck.equals(trace)) {
             // Ack the end of stream 3
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
             Assert.assertEquals(endOfStreamThree, output.getTrace());
         } else {
             // End of stream 3 thenack
             Assert.assertEquals(endOfStreamThree, output.getTrace());
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
             Assert.assertEquals(settingsAck, output.getTrace());
         }
         output.clearTrace();
@@ -278,7 +278,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // Now increase beyond the limit via a settings frame
         sendSettings(0, false, new SettingValue(4,  1 << 30));
         // Ack
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n",
                 output.getTrace());
 

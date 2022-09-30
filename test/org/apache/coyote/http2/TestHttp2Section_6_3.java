@@ -78,7 +78,7 @@ public class TestHttp2Section_6_3 extends Http2TestBase {
         os.flush();
 
         // Read reset frame
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("3-RST-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]\n",
                 output.getTrace());
