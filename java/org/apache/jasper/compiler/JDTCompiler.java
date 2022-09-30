@@ -367,15 +367,18 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else if (opt.equals("18")) {
                 // Constant not available in latest ECJ version that runs on
                 // Java 7.
-                // Constant not available in latest stable ECJ version.
-                // May be supported in a snapshot build.
                 // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_Source, "18");
             } else if (opt.equals("19")) {
-                // Constant not available in latest ECJ version shipped with
-                // Tomcat. May be supported in a snapshot build.
+                // Constant not available in latest ECJ version that runs on
+                // Java 7.
                 // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_Source, "19");
+            } else if (opt.equals("20")) {
+                // Constant not available in latest ECJ version that runs on
+                // Java 7.
+                // This is checked against the actual version below.
+                settings.put(CompilerOptions.OPTION_Source, "20");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
                 settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_7);
@@ -462,17 +465,23 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 settings.put(CompilerOptions.OPTION_TargetPlatform, "17");
                 settings.put(CompilerOptions.OPTION_Compliance, "17");
             } else if (opt.equals("18")) {
-                // Constant not available in latest stable ECJ version.
-                // May be supported in a snapshot build.
+                // Constant not available in latest ECJ version that runs on
+                // Java 7.
                 // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_TargetPlatform, "18");
                 settings.put(CompilerOptions.OPTION_Compliance, "18");
             } else if (opt.equals("19")) {
-                // Constant not available in latest ECJ version shipped with
-                // Tomcat. May be supported in a snapshot build.
+                // Constant not available in latest ECJ version that runs on
+                // Java 7.
                 // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_TargetPlatform, "19");
                 settings.put(CompilerOptions.OPTION_Compliance, "19");
+            } else if (opt.equals("20")) {
+                // Constant not available in latest ECJ version that runs on
+                // Java 7.
+                // This is checked against the actual version below.
+                settings.put(CompilerOptions.OPTION_TargetPlatform, "20");
+                settings.put(CompilerOptions.OPTION_Compliance, "20");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));
                 settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_7);
