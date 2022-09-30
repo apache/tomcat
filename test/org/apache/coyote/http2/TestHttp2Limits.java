@@ -50,7 +50,7 @@ public class TestHttp2Limits extends Http2TestBase {
         for (int i = 0; i < 100; i++) {
             try {
                 sendSettings(0, false);
-                parser.readFrame(true);
+                parser.readFrame();
             } catch (IOException ioe) {
                 // Server closed connection before client has a chance to read
                 // the Goaway frame. Treat this as a pass.
@@ -149,8 +149,8 @@ public class TestHttp2Limits extends Http2TestBase {
 
         output.clearTrace();
         sendSimpleGetRequest(5);
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
     }
 
@@ -281,7 +281,7 @@ public class TestHttp2Limits extends Http2TestBase {
         }
         case STREAM_RESET: {
             // Expect a stream reset
-            parser.readFrame(true);
+            parser.readFrame();
             Assert.assertEquals("3-RST-[11]\n", output.getTrace());
             Assert.assertNull(e);
             break;
@@ -301,7 +301,7 @@ public class TestHttp2Limits extends Http2TestBase {
             // Note: Some platforms will allow the read if if the write fails
             //       above.
             try {
-                parser.readFrame(true);
+                parser.readFrame();
                 MatcherAssert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
                         "0-Goaway-\\[1\\]-\\[11\\]-\\[" + limitMessage + "\\]"));
             } catch (IOException se) {
@@ -425,21 +425,21 @@ public class TestHttp2Limits extends Http2TestBase {
 
         switch (failMode) {
         case 0: {
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
             System.out.println(output.getTrace());
             Assert.assertEquals(getCookieResponseTrace(3, cookieCount), output.getTrace());
             break;
         }
         case 1: {
             // Check status is 400
-            parser.readFrame(true);
+            parser.readFrame();
             Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
                     "3-HeadersStart\n3-Header-[:status]-[400]"));
             output.clearTrace();
             // Check EOS followed by error page body
-            parser.readFrame(true);
+            parser.readFrame();
             Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("3-EndOfStream\n3-Body-<!doctype"));
             break;
         }
@@ -506,10 +506,10 @@ public class TestHttp2Limits extends Http2TestBase {
 
         switch (failMode) {
         case NONE: {
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
 
             String len = Integer.toString(256 + TRAILER_HEADER_VALUE.length());
 
@@ -535,7 +535,7 @@ public class TestHttp2Limits extends Http2TestBase {
             // the enhance your calm reset
             if ("3-RST-[5]\n".equals(output.getTrace())) {
                 output.clearTrace();
-                parser.readFrame(true);
+                parser.readFrame();
             }
 
             Assert.assertEquals("3-RST-[11]\n", output.getTrace());

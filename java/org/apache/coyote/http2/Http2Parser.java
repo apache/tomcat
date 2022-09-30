@@ -66,9 +66,27 @@ class Http2Parser {
      *         <code>false</code>
      *
      * @throws IOException If an IO error occurs while trying to read a frame
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11 onwards.
      */
+    @Deprecated
     boolean readFrame(boolean block) throws Http2Exception, IOException {
         return readFrame(block, null);
+    }
+
+
+    /**
+     * Read and process a single frame. The initial read is non-blocking to
+     * determine if a frame is present. Once the start of a frame is read, the
+     * remainder will be read using blocking IO.
+     *
+     * @return <code>true</code> if a frame was read otherwise
+     *         <code>false</code>
+     *
+     * @throws IOException If an IO error occurs while trying to read a frame
+     */
+    boolean readFrame() throws Http2Exception, IOException {
+        return readFrame(false, null);
     }
 
 

@@ -83,11 +83,11 @@ public class TestFlowControl extends Http2TestBase {
 
             // Read the 404 error page
             // headers
-            parser.readFrame(true);
+            parser.readFrame();
             // body
-            parser.readFrame(true);
+            parser.readFrame();
             // reset (because the request body was not fully read)
-            parser.readFrame(true);
+            parser.readFrame();
 
             // Validate response
             // Response size varies as error page is generated and includes version
@@ -140,7 +140,7 @@ public class TestFlowControl extends Http2TestBase {
         boolean found = false;
         String trace;
         do {
-            parser.readFrame(true);
+            parser.readFrame();
             trace = output.getTrace();
             output.clearTrace();
             found = trace.startsWith(prefix);

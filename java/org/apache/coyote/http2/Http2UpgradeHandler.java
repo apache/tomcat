@@ -355,7 +355,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     setConnectionTimeout(-1);
                     while (true) {
                         try {
-                            if (!parser.readFrame(false)) {
+                            if (!parser.readFrame()) {
                                 break;
                             }
                         } catch (StreamException se) {

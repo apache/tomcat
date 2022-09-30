@@ -76,7 +76,7 @@ public class TestCancelledUpload extends Http2TestBase {
             // The connection processing thread will:
             // - read the request body until the flow control window is exhausted
             // - reset the stream if further DATA frames are received
-            parser.readFrame(true);
+            parser.readFrame();
 
             // Check for reset and exit if found
             if (checkReset()) {
@@ -91,7 +91,7 @@ public class TestCancelledUpload extends Http2TestBase {
                     "3-HeadersEnd\n",
                     output.getTrace());
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
 
             // Check for reset and exit if found
             if (checkReset()) {
@@ -103,7 +103,7 @@ public class TestCancelledUpload extends Http2TestBase {
                     "3-EndOfStream\n",
                     output.getTrace());
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
 
             Assert.assertTrue(checkReset());
 
@@ -144,7 +144,7 @@ public class TestCancelledUpload extends Http2TestBase {
                 return false;
             }
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
         }
     }
 

@@ -45,8 +45,8 @@ public class TestHttpServlet extends Http2TestBase {
         // Body
         writeFrame(dataFrameHeader, dataPayload);
 
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
 
         String trace = output.getTrace();
         String[] lines = trace.split("\n");
