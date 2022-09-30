@@ -111,6 +111,10 @@
         <bug>66276</bug>: Fix incorrect class cast when adding
         a descendant of HTTP/2 streams. (lihan)
       </fix>
+      <fix>
+        <bug>66281</bug>: Fix unexpected timeouts that may appear as client
+        disconnections when using HTTP/2 and NIO2. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
