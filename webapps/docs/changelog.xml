@@ -298,6 +298,24 @@
         Further automation to the build process to reduce the number of manual
         steps that release managers must perform. (markt)
       </add>
+      <update>
+        Update Objenesis to 3.2. (markt)
+      </update>
+      <update>
+        Update UnboundID to 6.0.6. (markt)
+      </update>
+      <update>
+        Update Checkstyle to 10.3.4. (markt)
+      </update>
+      <update>
+        Update JaCoCo to 0.8.8. (markt)
+      </update>
+      <update>
+        Update SpotBugs to 4.7.2. (markt)
+      </update>
+      <update>
+        Update JSign to 4.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
