@@ -123,7 +123,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         os.write(priority);
 
         // Read Stream reset frame
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("3-RST-[6]"));

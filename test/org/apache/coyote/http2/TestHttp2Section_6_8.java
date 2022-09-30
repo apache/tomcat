@@ -47,7 +47,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         getTomcatInstance().getConnector().pause();
 
         // Go away
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("0-Goaway-[2147483647]-[0]-[null]", output.getTrace());
         output.clearTrace();
 
@@ -59,14 +59,14 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         // Should be ignored
         sendSimpleGetRequest(5);
 
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
 
         Assert.assertEquals(getSimpleResponseTrace(3),  output.getTrace());
         output.clearTrace();
 
         // Finally the go away frame
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("0-Goaway-[3]-[0]-[null]", output.getTrace());
     }
 

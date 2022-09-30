@@ -85,7 +85,7 @@ public class TestAsyncFlush extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body
 
         while (output.getBytesRead() < targetSize ) {
@@ -94,7 +94,7 @@ public class TestAsyncFlush extends Http2TestBase {
                 sendWindowUpdate(0, ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE);
                 totalWindow += ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
             }
-            parser.readFrame(true);
+            parser.readFrame();
         }
 
         // Check that the right number of bytes were received

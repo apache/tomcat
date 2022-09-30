@@ -67,8 +67,8 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // headers, body
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
 
         Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
     }
