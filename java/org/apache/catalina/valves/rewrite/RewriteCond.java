@@ -151,7 +151,7 @@ public class RewriteCond {
             this.condition = ncondition;
         } else {
             PatternCondition ncondition = new PatternCondition();
-            int flags = 0;
+            int flags = Pattern.DOTALL;
             if (isNocase()) {
                 flags |= Pattern.CASE_INSENSITIVE;
             }
