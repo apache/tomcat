@@ -247,46 +247,46 @@ cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 cglib.loc=${base-maven.loc}/cglib/cglib-nodep/${cglib.version}/cglib-nodep-${cglib.version}.jar
 
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
-objenesis.version=3.2
+objenesis.version=3.3
 objenesis.checksum.enabled=true
 objenesis.checksum.algorithm=MD5|SHA-1
-objenesis.checksum.value=5c1ee20481a06561af295034ea89c4b4|7fadf57620c8b8abdf7519533e5527367cb51f09
+objenesis.checksum.value=ab0e0b2ab81affdd7f38bcc60fd85571|1049c09f1de4331e8193e579448d0916d75b7631
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- UnboundID, used by unit tests, version 5.1.4 or later -----
-unboundid.version=6.0.3
+unboundid.version=6.0.6
 unboundid.checksum.enabled=true
 unboundid.checksum.algorithm=SHA-512
-unboundid.checksum.value=29c87814b7cdbbbc00ee8c29818b82f148001e3a64dabda8d1300c7366ba149f204b0355322a5287a6b7ccb5a2456f5f0e8c719f1a7eb637cb27646fe40191fb
+unboundid.checksum.value=080a6719ceeb55bcdcc8cac7146b4da1ef7c29107d336868e7f77666fc834ed4191bdaa54dac03eccf02bdfb0b6293809b7b8a41eee7cf420489c98018afeb9f
 unboundid.home=${base.path}/unboundid-${unboundid.version}
 unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-checkstyle.version=10.0
+checkstyle.version=10.3.4
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=c613a3036d15b67f20738ddb9a2a0aeccb58cb0163dd5b94dcc153d924ddf9c58a884bd90c59fb899870b6c5601af3e52847b97e985d6f5c58209d64b4fde2f1
+checkstyle.checksum.value=03bf9d20a83dbf44dd83e8081e293903c94b10f92b9b78051be04a6c759c43cff537acf4086da23a69c8875b3f3dbabdd11ab345d07d3d42940621c507fc1e84
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- JaCoCo code coverage tool -----
-jacoco.version=0.8.7
+jacoco.version=0.8.8
 jacoco.checksum.enabled=true
 jacoco.checksum.algorithm=MD5|SHA-1
-jacoco.checksum.value=174fde230d1090a5622119d5096bce07|983a52a030f4123b671840a27426ed73479f45cc
+jacoco.checksum.value=10a812712aa9d4bf02ad975e3e1364e4|1be58e3d5cd4f09d6b79cf9f43fc481e481e8f52
 jacoco.home=${base.path}/jacoco-${jacoco.version}
 jacoco.jar=${jacoco.home}/lib/jacocoant.jar
 jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
 
 # ----- SpotBugs (originally FindBugs) -----
-spotbugs.version=4.6.0
+spotbugs.version=4.7.2
 spotbugs.checksum.enabled=true
-spotbugs.checksum.algorithm=SHA-512
-spotbugs.checksum.value=c3ebc5761299b253e7e563a0a71f931ffa6ab3861380abb246d2258a916c9c6d40f6582dbe10b084d6932536c38f6d8bd7711456b6b7eef7c83df770915ecf1e
+spotbugs.checksum.algorithm=SHA-256
+spotbugs.checksum.value=f02a023d03b0fde70038ccb4bc8d4a964a504262d13024a97b14d9070f7d4d96
 spotbugs.home=${base.path}/spotbugs-${spotbugs.version}
 spotbugs.jar=${spotbugs.home}/lib/spotbugs-ant.jar
 spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/spotbugs-${spotbugs.version}.tgz
@@ -329,30 +329,30 @@ openssl-lib.jar=${openssl-lib.home}/tomcat-coyote-openssl-java17-${openssl-lib.v
 openssl-lib.loc=${base-maven.loc}/org/apache/tomcat/tomcat-coyote-openssl-java17/${openssl-lib.version}/tomcat-coyote-openssl-java17-${openssl-lib.version}.jar
 
 # ----- JSign, version 4.1 or later -----
-jsign.version=4.1
+jsign.version=4.2
 
-# checksums for JSign 4.1
+# checksums for JSign 4.2
 jsign.checksum.enabled=true
 jsign.checksum.algorithm=MD5|SHA-1
-jsign.checksum.value=ba760e85fe0bdb1da12152822919caec|39fa41688de11b739278b8cb8533c05888d68d5a
+jsign.checksum.value=10fb38a1182515d583a1e252c8219eae|1e3b44e0114d599b05be243513b85a51b0c45401
 
 jsign.home=${base.path}/jsign-${jsign.version}
 jsign.jar=${jsign.home}/jsign-${jsign.version}.jar
 jsign.loc=${base-maven.loc}/net/jsign/jsign/${jsign.version}/jsign-${jsign.version}.jar
 
 # ----- Derby, used by unit tests -----
-derby.version=10.15.2.0
+derby.version=10.16.1.1
 
-# checksums for Derby 10.15.2.0
+# checksums for Derby 10.16.1.1
 derby.checksum.enabled=true
 derby.checksum.algorithm=MD5|SHA-1
-derby.checksum.value=abff01351b19bc62a188bac08a8bb58b|b64da6681994f33ba5783ffae55cdb44885b9e70
+derby.checksum.value=d9c38ece80f4ec0756f54b06716a3dd6|f9ca2054b3e33ec3f3f19df4a7490352d82de54a
 derby-shared.checksum.enabled=true
 derby-shared.checksum.algorithm=MD5|SHA-1
-derby-shared.checksum.value=2cb9ab8b9cfb06c2da5a1d3825d04344|ff2dfb3e2a92d593cf111baad242d156947abbc1
+derby-shared.checksum.value=e423cba3150f195debaf7ff0d307ecf6|77a3ec6b9791c7c29c76148c5d56fc1f3f12d638
 derby-tools.checksum.enabled=true
 derby-tools.checksum.algorithm=MD5|SHA-1
-derby-tools.checksum.value=d41578eeb336b0e479be8f30bfd9ab9b|d63722381e0e893d797e4d531e219e2917898364
+derby-tools.checksum.value=25b138905deb681ff167a5a04d29c3c6|32a5335f9087022cd8ca5c85f35f8c844b1360a9
 
 derby.home=${base.path}/derby-${derby.version}
 derby.jar=${derby.home}/derby-${derby.version}.jar
@@ -361,5 +361,3 @@ derby-shared.jar=${derby.home}/derby-shared-${derby.version}.jar
 derby-shared.loc=${base-maven.loc}/org/apache/derby/derbyshared/${derby.version}/derbyshared-${derby.version}.jar
 derby-tools.jar=${derby.home}/derby-tools-${derby.version}.jar
 derby-tools.loc=${base-maven.loc}/org/apache/derby/derbytools/${derby.version}/derbytools-${derby.version}.jar
-
-
