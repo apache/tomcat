@@ -47,7 +47,7 @@ public class RewriteRule {
             positive = false;
             patternString = patternString.substring(1);
         }
-        int flags = 0;
+        int flags = Pattern.DOTALL;
         if (isNocase()) {
             flags |= Pattern.CASE_INSENSITIVE;
         }
@@ -89,7 +89,7 @@ public class RewriteRule {
         Pattern pattern = this.pattern.get();
         if (pattern == null) {
             // Parse the pattern
-            int flags = 0;
+            int flags = Pattern.DOTALL;
             if (isNocase()) {
                 flags |= Pattern.CASE_INSENSITIVE;
             }
