@@ -274,6 +274,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             throw new ProtocolException(sm.getString("upgradeHandler.pingFailed"), ioe);
         }
 
+        // Allow streams and connection to determine timeouts
+        socketWrapper.setReadTimeout(-1);
+        socketWrapper.setWriteTimeout(-1);
+
         if (webConnection != null) {
             processStreamOnContainerThread(stream);
         }
@@ -337,10 +341,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     }
                 }
                 try {
-                    // There is data to read so use the read timeout while
-                    // reading frames ...
-                    socketWrapper.setReadTimeout(getReadTimeout());
-                    // ... and disable the connection timeout
+                    // Disable the connection timeout while frames are processed
                     setConnectionTimeout(-1);
                     while (true) {
                         try {
@@ -1603,6 +1604,15 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         int thisRead = 0;
 
         while (len > 0) {
+            // Blocking reads use the protocol level read timeout. Non-blocking
+            // reads do not timeout. The intention is that once a frame has
+            // started to be read, the read timeout applies until it is
+            // completely read.
+            if (nextReadBlock) {
+                socketWrapper.setReadTimeout(protocol.getReadTimeout());
+            } else {
+                socketWrapper.setReadTimeout(-1);
+            }
             thisRead = socketWrapper.read(nextReadBlock, data, pos, len);
             if (thisRead == 0) {
                 if (nextReadBlock) {
