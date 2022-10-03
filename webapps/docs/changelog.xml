@@ -195,6 +195,11 @@
         <bug>66281</bug>: Fix unexpected timeouts that may appear as client
         disconnections when using HTTP/2 and NIO2. (markt)
       </fix>
+      <fix>
+        Enforce the requirement of RFC 7230 onwards that a request with a
+        malformed <code>content-length</code> header should always be rejected
+        with a 400 response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
