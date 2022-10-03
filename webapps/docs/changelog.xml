@@ -146,6 +146,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Documentation. Document the <code>nonceRequestParameterName</code>
+        attribute for the <code>CsrfPreventionFilter</code>. Based on
+        <pr>553</pr> by Mert Ülkgün. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
