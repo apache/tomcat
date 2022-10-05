@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 package org.apache.catalina.tribes.transport;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -27,8 +27,8 @@ import java.util.List;
  */
 public class RxTaskPool {
 
-    final List<AbstractRxTask> idle = new LinkedList<>();
-    final List<AbstractRxTask> used = new LinkedList<>();
+    final List<AbstractRxTask> idle = new ArrayList<>();
+    final List<AbstractRxTask> used = new ArrayList<>();
 
     final Object mutex = new Object();
     boolean running = true;
