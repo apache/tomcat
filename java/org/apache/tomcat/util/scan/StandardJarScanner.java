@@ -23,11 +23,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.jar.Attributes;
@@ -257,7 +257,7 @@ public class StandardJarScanner implements JarScanner {
         // Use a Deque so URLs can be removed as they are processed
         // and new URLs can be added as they are discovered during
         // processing.
-        Deque<URL> classPathUrlsToProcess = new LinkedList<>();
+        Deque<URL> classPathUrlsToProcess = new ArrayDeque<>();
 
         while (classLoader != null && classLoader != stopLoader) {
             if (classLoader instanceof URLClassLoader) {
