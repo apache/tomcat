@@ -16,11 +16,12 @@
  */
 package org.apache.jasper.compiler;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,7 +47,7 @@ class PageInfo {
     private final Set<String> varInfoNames;
     private final HashMap<String,TagLibraryInfo> taglibsMap;
     private final HashMap<String, String> jspPrefixMapper;
-    private final HashMap<String, LinkedList<String>> xmlPrefixMapper;
+    private final HashMap<String, Deque<String>> xmlPrefixMapper;
     private final HashMap<String, Mark> nonCustomTagPrefixMap;
     private final String jspFile;
     private static final String defaultLanguage = "java";
@@ -331,9 +332,9 @@ class PageInfo {
      * @param uri The URI to be pushed onto the stack
      */
     public void pushPrefixMapping(String prefix, String uri) {
-        LinkedList<String> stack = xmlPrefixMapper.get(prefix);
+        Deque<String> stack = xmlPrefixMapper.get(prefix);
         if (stack == null) {
-            stack = new LinkedList<>();
+            stack = new ArrayDeque<>();
             xmlPrefixMapper.put(prefix, stack);
         }
         stack.addFirst(uri);
@@ -346,7 +347,7 @@ class PageInfo {
      * @param prefix The prefix whose stack of URIs is to be popped
      */
     public void popPrefixMapping(String prefix) {
-        LinkedList<String> stack = xmlPrefixMapper.get(prefix);
+        Deque<String> stack = xmlPrefixMapper.get(prefix);
         stack.removeFirst();
     }
 
@@ -361,7 +362,7 @@ class PageInfo {
 
         String uri = null;
 
-        LinkedList<String> stack = xmlPrefixMapper.get(prefix);
+        Deque<String> stack = xmlPrefixMapper.get(prefix);
         if (stack == null || stack.size() == 0) {
             uri = jspPrefixMapper.get(prefix);
         } else {
