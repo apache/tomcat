@@ -18,8 +18,8 @@ package org.apache.catalina.realm;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.management.ObjectName;
@@ -50,7 +50,7 @@ public class CombinedRealm extends RealmBase {
     /**
      * The list of Realms contained by this Realm.
      */
-    protected final List<Realm> realms = new LinkedList<>();
+    protected final List<Realm> realms = new ArrayList<>();
 
     /**
      * Add a realm to the list of realms that will be used to authenticate
