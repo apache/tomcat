@@ -385,7 +385,7 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
             respHeaders.get(AuthenticatorBase.AUTH_HEADER_NAME);
 
         // Assume there is only one
-        String authHeader = authHeaders.iterator().next();
+        String authHeader = authHeaders.get(0);
         String searchFor = token + AUTH_PREFIX;
         int start = authHeader.indexOf(searchFor) + searchFor.length();
         int end = authHeader.indexOf(AUTH_SUFFIX, start);
