@@ -16,12 +16,12 @@
  */
 package org.apache.jasper.compiler;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -340,7 +340,8 @@ class PageInfo {
     public void pushPrefixMapping(String prefix, String uri) {
         Deque<String> stack = xmlPrefixMapper.get(prefix);
         if (stack == null) {
-            stack = new ArrayDeque<>();
+            // Must be LinkedList as it needs to accept nulls
+            stack = new LinkedList<>();
             xmlPrefixMapper.put(prefix, stack);
         }
         stack.addFirst(uri);
