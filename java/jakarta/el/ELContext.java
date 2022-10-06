@@ -16,11 +16,11 @@
  */
 package jakarta.el;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,7 +38,7 @@ public abstract class ELContext {
 
     private List<EvaluationListener> listeners;
 
-    private Deque<Map<String,Object>> lambdaArguments = new LinkedList<>();
+    private Deque<Map<String,Object>> lambdaArguments = new ArrayDeque<>();
 
     public ELContext() {
         this.resolved = false;
