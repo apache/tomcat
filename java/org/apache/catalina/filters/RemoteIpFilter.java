@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -798,7 +800,7 @@ public class RemoteIpFilter extends GenericFilter {
         if (isInternal || (trustedProxies != null &&
                 trustedProxies.matcher(request.getRemoteAddr()).matches())) {
             String remoteIp = null;
-            LinkedList<String> proxiesHeaderValue = new LinkedList<>();
+            Deque<String> proxiesHeaderValue = new ArrayDeque<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
 
             for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
