@@ -42,6 +42,7 @@ import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.res.StringManager;
@@ -705,7 +706,10 @@ public class RemoteIpFilter implements Filter {
      *
      * @param stringList List of strings
      * @return concatenated string
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11 onwards
      */
+    @Deprecated
     protected static String listToCommaDelimitedString(List<String> stringList) {
         if (stringList == null) {
             return "";
@@ -857,13 +861,13 @@ public class RemoteIpFilter implements Filter {
                 if (proxiesHeaderValue.size() == 0) {
                     xRequest.removeHeader(proxiesHeader);
                 } else {
-                    String commaDelimitedListOfProxies = listToCommaDelimitedString(proxiesHeaderValue);
+                    String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
                     xRequest.setHeader(proxiesHeader, commaDelimitedListOfProxies);
                 }
                 if (newRemoteIpHeaderValue.size() == 0) {
                     xRequest.removeHeader(remoteIpHeader);
                 } else {
-                    String commaDelimitedRemoteIpHeaderValue = listToCommaDelimitedString(newRemoteIpHeaderValue);
+                    String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
                     xRequest.setHeader(remoteIpHeader, commaDelimitedRemoteIpHeaderValue);
                 }
             }
