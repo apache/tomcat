@@ -29,7 +29,8 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.security.Principal;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.realm.GenericPrincipal;
@@ -65,8 +66,8 @@ public class DeltaRequest implements Externalizable {
     public static final String NAME_LISTENER = "__SET__LISTENER__";
 
     private String sessionId;
-    private LinkedList<AttributeInfo> actions = new LinkedList<>();
-    private final LinkedList<AttributeInfo> actionPool = new LinkedList<>();
+    private Deque<AttributeInfo> actions = new ArrayDeque<>();
+    private final Deque<AttributeInfo> actionPool = new ArrayDeque<>();
 
     private boolean recordAllActions = false;
 
@@ -291,7 +292,7 @@ public class DeltaRequest implements Externalizable {
         recordAllActions = in.readBoolean();
         int cnt = in.readInt();
         if (actions == null) {
-            actions = new LinkedList<>();
+            actions = new ArrayDeque<>();
         } else {
             actions.clear();
         }
@@ -322,8 +323,7 @@ public class DeltaRequest implements Externalizable {
         out.writeUTF(getSessionId());
         out.writeBoolean(recordAllActions);
         out.writeInt(getSize());
-        for ( int i=0; i<getSize(); i++ ) {
-            AttributeInfo info = actions.get(i);
+        for (AttributeInfo info : actions) {
             info.writeExternal(out);
         }
     }
