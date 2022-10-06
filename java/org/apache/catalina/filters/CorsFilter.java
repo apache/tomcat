@@ -794,7 +794,7 @@ public class CorsFilter extends GenericFilter {
      * <ul>
      * <li>If an encoded character is present in origin, it's not valid.</li>
      * <li>If origin is "null", it's valid.</li>
-     * <li>Origin should be a valid {@link URI}</li>
+     * <li>Origin should be a valid URI</li>
      * </ul>
      *
      * @param origin The origin URI
