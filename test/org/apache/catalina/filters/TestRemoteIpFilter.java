@@ -49,6 +49,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterResponse;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
@@ -158,20 +159,20 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     @Test
     public void testCommaDelimitedListToStringArray() {
         List<String> elements = Arrays.asList("element1", "element2", "element3");
-        String actual = RemoteIpFilter.listToCommaDelimitedString(elements);
-        Assert.assertEquals("element1, element2, element3", actual);
+        String actual = StringUtils.join(elements);
+        Assert.assertEquals("element1,element2,element3", actual);
     }
 
     @Test
     public void testCommaDelimitedListToStringArrayEmptyList() {
         List<String> elements = new ArrayList<>();
-        String actual = RemoteIpFilter.listToCommaDelimitedString(elements);
+        String actual = StringUtils.join(elements);
         Assert.assertEquals("", actual);
     }
 
     @Test
     public void testCommaDelimitedListToStringArrayNullList() {
-        String actual = RemoteIpFilter.listToCommaDelimitedString(null);
+        String actual = StringUtils.join((String[]) null);
         Assert.assertEquals("", actual);
     }
 
@@ -339,7 +340,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
         Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
@@ -374,7 +375,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2, proxy3", actualXForwardedBy);
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2,proxy3", actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
         Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
@@ -408,7 +409,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2, proxy3", actualXForwardedBy);
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2,proxy3", actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
         Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
@@ -442,7 +443,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
         Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
@@ -475,7 +476,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
-        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1,proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = actualRequest.getRemoteAddr();
         Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
@@ -536,7 +537,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         // VERIFY
         String actualXForwardedFor = actualRequest.getHeader("x-forwarded-for");
-        Assert.assertEquals("ip/host before untrusted-proxy must appear in x-forwarded-for", "140.211.11.130, proxy1", actualXForwardedFor);
+        Assert.assertEquals("ip/host before untrusted-proxy must appear in x-forwarded-for", "140.211.11.130,proxy1", actualXForwardedFor);
 
         String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
         Assert.assertEquals("ip/host after untrusted-proxy must appear in  x-forwarded-by", "proxy2", actualXForwardedBy);
