@@ -33,12 +33,12 @@ import org.apache.tomcat.util.ExceptionUtils;
 public class ExpressionParseTree {
     /**
      * Contains the current set of completed nodes. This is a workspace for the
-     * parser.
+     * parser. Needs to be LinkedList since it can contain {@code null}s.
      */
     private final LinkedList<Node> nodeStack = new LinkedList<>();
     /**
      * Contains operator nodes that don't yet have values. This is a workspace
-     * for the parser.
+     * for the parser. Needs to be LinkedList since it can contain {@code null}s.
      */
     private final LinkedList<OppNode> oppStack = new LinkedList<>();
     /**
