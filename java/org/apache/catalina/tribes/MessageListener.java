@@ -17,14 +17,9 @@
 package org.apache.catalina.tribes;
 
 /**
- *
- * <p>Title: MessageListener</p>
- *
- * <p>Description: The listener to be registered with the ChannelReceiver, internal Tribes component</p>
- *
- * @version 1.0
+ * The listener to be registered with the ChannelReceiver, internal Tribes
+ * component.
  */
-
 public interface MessageListener {
 
     /**

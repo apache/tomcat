@@ -28,12 +28,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * <p>Title: Member domain filter interceptor </p>
- *
- * <p>Description: Filters membership based on domain.
- * </p>
- *
- * @version 1.0
+ * Filters membership based on domain.
  */
 public class DomainFilterInterceptor extends ChannelInterceptorBase
         implements DomainFilterInterceptorMBean {

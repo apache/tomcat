@@ -23,7 +23,6 @@ import org.apache.catalina.tribes.Member;
 /**
  * The RpcCallback interface is an interface for the Tribes channel to request a
  * response object to a request that came in.
- * @version 1.0
  */
 public interface RpcCallback {
 

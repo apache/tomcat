@@ -23,7 +23,6 @@ import java.util.List;
  * A very simple thread pool class.  The pool size is set at
  * construction time and remains fixed.  Threads are cycled
  * through a FIFO idle queue.
- * @version 1.0
  */
 public class RxTaskPool {
 

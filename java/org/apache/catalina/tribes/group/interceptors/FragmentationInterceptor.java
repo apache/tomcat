@@ -40,7 +40,6 @@ import org.apache.juli.logging.LogFactory;
  * FragmentationInterceptor.expire=&lt;milliseconds&gt; - how long do we keep the fragments in memory and wait for the rest to arrive <b>default=60,000ms -&gt; 60seconds</b>
  * This setting is useful to avoid OutOfMemoryErrors<br>
  * FragmentationInterceptor.maxSize=&lt;max message size&gt; - message size in bytes <b>default=1024*100 (around a tenth of a MB)</b><br>
- * @version 1.0
  */
 public class FragmentationInterceptor extends ChannelInterceptorBase implements FragmentationInterceptorMBean {
     private static final Log log = LogFactory.getLog(FragmentationInterceptor.class);

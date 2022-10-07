@@ -41,10 +41,6 @@ import java.io.Serializable;
  * 1. ReplicatedMapEntry entry = (ReplicatedMapEntry)objectIn.readObject();<br>
  * 2. if ( isBackup(entry)||isPrimary(entry) ) entry.setOwner(owner); <br>
  * </code>
- * <br>
- *
- *
- * @version 1.0
  */
 public interface ReplicatedMapEntry extends Serializable {
 
