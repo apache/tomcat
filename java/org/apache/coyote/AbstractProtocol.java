@@ -18,7 +18,6 @@ package org.apache.coyote;
 
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -86,8 +85,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     private Handler<S> handler;
 
 
-    private final Set<Processor> waitingProcessors =
-            Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Set<Processor> waitingProcessors = ConcurrentHashMap.newKeySet();
 
     /**
      * Controller for the timeout scheduling.

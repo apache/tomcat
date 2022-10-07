@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -461,8 +460,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * The names of headers that are allowed to be sent via a trailer when using
      * chunked encoding. They are stored in lower case.
      */
-    private Set<String> allowedTrailerHeaders =
-            Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
     public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
         // Jump through some hoops so we don't end up with an empty set while
         // doing updates.

@@ -22,7 +22,6 @@ import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -112,7 +111,7 @@ public final class CustomObjectInputStream extends ObjectInputStream {
             reportedClasses = reportedClassCache.get(classLoader);
         }
         if (reportedClasses == null) {
-            reportedClasses = Collections.newSetFromMap(new ConcurrentHashMap<>());
+            reportedClasses = ConcurrentHashMap.newKeySet();
             Set<String> original;
             synchronized (reportedClassCache) {
                 original = reportedClassCache.putIfAbsent(classLoader, reportedClasses);
