@@ -21,8 +21,6 @@ import java.io.OutputStream;
 
 /**
  * Byte array output stream that exposes the byte array directly
- *
- * @version 1.0
  */
 public class DirectByteArrayOutputStream extends OutputStream {
 

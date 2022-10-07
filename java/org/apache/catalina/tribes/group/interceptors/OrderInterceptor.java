@@ -49,9 +49,6 @@ import org.apache.catalina.tribes.util.StringManager;
  * do when a message has expired or the queue has grown larger than the maxQueue value.
  * true means that the message is sent up the stack to the receiver that will receive and out of order message
  * false means, forget the message and reset the message counter. <b>default=true</b>
- *
- *
- * @version 1.1
  */
 public class OrderInterceptor extends ChannelInterceptorBase {
     protected static final StringManager sm = StringManager.getManager(OrderInterceptor.class);

@@ -31,7 +31,6 @@ import org.apache.tomcat.util.res.StringManager;
  * and notifies a listener of the changes made.
  *
  * @author Peter Rossbach
- * @version 1.1
  */
 public class WarWatcher {
 
