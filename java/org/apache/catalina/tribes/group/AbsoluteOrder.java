@@ -39,8 +39,6 @@ import org.apache.catalina.tribes.Member;
  *     <li>UniqueId comparison- byte by byte, lower byte higher rank</li>
  * </ol>
  *
- *
- * @version 1.0
  * @see org.apache.catalina.tribes.Member
  */
 public class AbsoluteOrder {

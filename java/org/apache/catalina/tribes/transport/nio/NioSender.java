@@ -43,8 +43,6 @@ import org.apache.juli.logging.LogFactory;
  * - READY_TO_WRITE -&gt; write() -&gt; READY TO WRITE | READY TO READ
  * - READY_TO_READ -&gt; read() -&gt; READY_TO_READ | TRANSFER_COMPLETE
  * - TRANSFER_COMPLETE -&gt; CONNECTED
- *
- * @version 1.0
  */
 public class NioSender extends AbstractSender {
 

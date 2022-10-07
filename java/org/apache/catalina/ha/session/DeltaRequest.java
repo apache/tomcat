@@ -21,7 +21,6 @@ package org.apache.catalina.ha.session;
  * a request is executed. These actions will then translate into invocations of methods
  * on the actual session.
  * This class is NOT thread safe. One DeltaRequest per session
- * @version 1.0
  */
 
 import java.io.ByteArrayOutputStream;

@@ -120,11 +120,6 @@ import org.apache.juli.logging.LogFactory;
  * <h2>State Diagrams</h2>
  * <a href="https://people.apache.org/~fhanik/tribes/docs/leader-election-initiate-election.jpg">Initiate an election</a><br><br>
  * <a href="https://people.apache.org/~fhanik/tribes/docs/leader-election-message-arrives.jpg">Receive an election message</a><br><br>
- *
- * @version 1.0
- *
- *
- *
  */
 public class NonBlockingCoordinator extends ChannelInterceptorBase {
 

@@ -29,7 +29,6 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * Abstraction interceptor. This component intercepts all calls to create some type of SQL statement.
  * By extending this class, one can intercept queries and update statements by overriding the {@link #createStatement(Object, Method, Object[], Object, long)}
  * method.
- * @version 1.0
  */
 public abstract class  AbstractCreateStatementInterceptor extends JdbcInterceptor {
     protected static final String CREATE_STATEMENT      = "createStatement";

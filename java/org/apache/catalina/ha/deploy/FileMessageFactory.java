@@ -40,8 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
  * that. <BR>
  * To force a cleanup, call cleanup() from the calling object. <BR>
  * This class is not thread safe.
- *
- * @version 1.0
  */
 public class FileMessageFactory {
     /*--Static Variables----------------------------------------*/

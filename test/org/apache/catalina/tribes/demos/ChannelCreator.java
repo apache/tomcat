@@ -38,18 +38,7 @@ import org.apache.catalina.tribes.transport.MultiPointSender;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- *
- * <p>Company: </p>
- *
- * @version 1.0
- */
 public class ChannelCreator {
-
 
     public static StringBuilder usage() {
         StringBuilder buf = new StringBuilder();

@@ -231,9 +231,7 @@ public class RpcChannel implements ChannelListener {
     }
 
     /**
-     *
      * Class that holds all response.
-     * @version 1.0
      */
     public static class RpcCollector {
         public final ArrayList<Response> responses = new ArrayList<>();
