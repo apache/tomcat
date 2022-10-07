@@ -804,12 +804,7 @@ public class GroupChannel extends ChannelInterceptorBase
     }
 
     /**
-     *
-     * <p>Title: Interceptor Iterator</p>
-     *
-     * <p>Description: An iterator to loop through the interceptors in a channel</p>
-     *
-     * @version 1.0
+     * An iterator to loop through the interceptors in a channel.
      */
     public static class InterceptorIterator implements Iterator<ChannelInterceptor> {
         private final ChannelInterceptor end;

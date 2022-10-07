@@ -19,9 +19,9 @@ package org.apache.catalina.tribes;
 import java.util.ArrayList;
 
 /**
- * Channel Exception<br>
  * A channel exception is thrown when an internal error happens
- * somewhere in the channel. <br>
+ * somewhere in the channel.
+ * <p>
  * When a global error happens, the cause can be retrieved using <code>getCause()</code><br><br>
  * If an application is sending a message and some of the recipients fail to receive it,
  * the application can retrieve what recipients failed by using the <code>getFaultyMembers()</code>
@@ -152,8 +152,6 @@ public class ChannelException extends Exception {
      *
      * <p>Description: Represent a failure to a specific member when a message was sent
      * to more than one member</p>
-     *
-     * @version 1.0
      */
     public static class FaultyMember {
         protected final Exception cause;

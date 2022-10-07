@@ -42,23 +42,18 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * <p>Title: A perfect failure detector </p>
- *
- * <p>Description: The TcpFailureDetector is a useful interceptor
- * that adds reliability to the membership layer.</p>
+ * The TcpFailureDetector is a useful interceptor that adds reliability to the
+ * membership layer.
  * <p>
  * If the network is busy, or the system is busy so that the membership receiver thread
  * is not getting enough time to update its table, members can be &quot;timed out&quot;
  * This failure detector will intercept the memberDisappeared message(unless its a true shutdown message)
  * and connect to the member using TCP.
- * </p>
  * <p>
- * The TcpFailureDetector works in two ways. <br>
- * 1. It intercepts memberDisappeared events
- * 2. It catches send errors
- * </p>
- *
- * @version 1.0
+ * The TcpFailureDetector works in two ways:
+ * <ol>
+ * <li>It intercepts memberDisappeared events</li>
+ * <li>It catches send errors</li>
  */
 public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFailureDetectorMBean {
 

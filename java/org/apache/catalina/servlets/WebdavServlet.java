@@ -2372,7 +2372,6 @@ public class WebdavServlet extends DefaultServlet {
  * WebDavRetCode classes.
  *
  * @author              Marc Eaddy
- * @version             1.0, 16 Nov 1997
  */
 class WebdavStatus {
 

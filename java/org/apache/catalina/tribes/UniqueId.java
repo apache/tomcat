@@ -21,11 +21,7 @@ import java.io.Serializable;
 import org.apache.catalina.tribes.util.Arrays;
 
 /**
- * <p>Title: Represents a globally unique Id</p>
- *
- * <p>Company: </p>
- *
- * @version 1.0
+ * Represents a globally unique Id.
  */
 public final class UniqueId implements Serializable{
     private static final long serialVersionUID = 1L;

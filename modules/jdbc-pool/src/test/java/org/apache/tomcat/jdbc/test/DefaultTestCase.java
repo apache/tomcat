@@ -29,10 +29,6 @@ import org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
-
-/**
- * @version 1.0
- */
 public abstract class DefaultTestCase {
 
     protected org.apache.tomcat.jdbc.pool.DataSource datasource;
