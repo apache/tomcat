@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.http2;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,7 +36,7 @@ abstract class AbstractStream {
     private final String idAsString;
 
     private volatile AbstractStream parentStream = null;
-    private final Set<AbstractNonZeroStream> childStreams = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Set<AbstractNonZeroStream> childStreams = ConcurrentHashMap.newKeySet();
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
     private volatile int connectionAllocationRequested = 0;

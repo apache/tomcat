@@ -20,7 +20,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Queue;
@@ -132,7 +131,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private final AtomicInteger nextLocalStreamId = new AtomicInteger(2);
     private final PingManager pingManager = getPingManager();
     private volatile int newStreamsSinceLastPrune = 0;
-    private final Set<AbstractStream> backLogStreams = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Set<AbstractStream> backLogStreams = ConcurrentHashMap.newKeySet();
     private long backLogSize = 0;
     // The time at which the connection will timeout unless data arrives before
     // then. -1 means no timeout.

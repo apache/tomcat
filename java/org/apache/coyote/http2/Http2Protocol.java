@@ -18,7 +18,6 @@ package org.apache.coyote.http2;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -93,8 +92,7 @@ public class Http2Protocol implements UpgradeProtocol {
     // change the default defined in ConnectionSettingsBase.
     private int initialWindowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
     // Limits
-    private Set<String> allowedTrailerHeaders =
-            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    private Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
     private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
     private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
