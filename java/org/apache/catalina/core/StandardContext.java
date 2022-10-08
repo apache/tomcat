@@ -4892,12 +4892,7 @@ public class StandardContext extends ContainerBase
                 continue;
             }
             Integer key = Integer.valueOf(loadOnStartup);
-            ArrayList<Wrapper> list = map.get(key);
-            if (list == null) {
-                list = new ArrayList<>();
-                map.put(key, list);
-            }
-            list.add(wrapper);
+            map.computeIfAbsent(key, k -> new ArrayList<>()).add(wrapper);
         }
 
         // Load the collected "load on startup" servlets
@@ -5319,12 +5314,8 @@ public class StandardContext extends ContainerBase
             String jndiName = resource.getName();
             for (InjectionTarget injectionTarget: injectionTargets) {
                 String clazz = injectionTarget.getTargetClass();
-                Map<String, String> injections = injectionMap.get(clazz);
-                if (injections == null) {
-                    injections = new HashMap<>();
-                    injectionMap.put(clazz, injections);
-                }
-                injections.put(injectionTarget.getTargetName(), jndiName);
+                injectionMap.computeIfAbsent(clazz, k -> new HashMap<>())
+                    .put(injectionTarget.getTargetName(), jndiName);
             }
         }
     }
@@ -5348,10 +5339,8 @@ public class StandardContext extends ContainerBase
         ApplicationParameter params[] = findApplicationParameters();
         for (ApplicationParameter param : params) {
             if (param.getOverride()) {
-                if (mergedParams.get(param.getName()) == null) {
-                    mergedParams.put(param.getName(),
-                            param.getValue());
-                }
+                mergedParams.computeIfAbsent(param.getName(),
+                    k -> param.getValue());
             } else {
                 mergedParams.put(param.getName(), param.getValue());
             }
@@ -5880,7 +5869,7 @@ public class StandardContext extends ContainerBase
                 parent = parent.getParent();
             }
             while (!stk.isEmpty()) {
-                buff.append("/" + stk.remove());
+                buff.append("/").append(stk.remove());
             }
             buff.append(getName());
             namingContextName = buff.toString();
