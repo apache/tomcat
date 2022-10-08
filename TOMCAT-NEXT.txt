@@ -15,10 +15,13 @@
   limitations under the License.
 ================================================================================
 
-Notes of things to consider for the next major Tomcat release (10.1.x)
-
-Deferred until 10.1.x:
+Notes of things to consider for the next major Tomcat release (11.x)
 
  1. Implement OCSP checks for client certs with NIO/NIO2.
     Useful reference:
     https://stackoverflow.com/questions/5161504/ocsp-revocation-on-client-certificate
+
+ 2. Integrate Panama OpenSSL module once Java 21 is available. Building Tomcat
+    releases would then require at least Java 21.
+
+ 3. Add QUIC support using OpenSSL and Panama.
