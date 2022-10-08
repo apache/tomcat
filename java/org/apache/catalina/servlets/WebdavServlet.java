@@ -1191,13 +1191,7 @@ public class WebdavServlet extends DefaultServlet {
                         int slash = lock.path.lastIndexOf('/');
                         String parentPath = lock.path.substring(0, slash);
 
-                        List<String> lockNulls = lockNullResources.get(parentPath);
-                        if (lockNulls == null) {
-                            lockNulls = new ArrayList<>();
-                            lockNullResources.put(parentPath, lockNulls);
-                        }
-
-                        lockNulls.add(lock.path);
+                        lockNullResources.computeIfAbsent(parentPath, k -> new ArrayList<>()).add(lock.path);
                     }
 
                     // Add the Lock-Token header as by RFC 2518 8.10.1

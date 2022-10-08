@@ -210,12 +210,7 @@ public final class Parameters {
                     "parameters.maxCountFail", Integer.valueOf(limit)));
         }
 
-        ArrayList<String> values = paramHashValues.get(key);
-        if (values == null) {
-            values = new ArrayList<>(1);
-            paramHashValues.put(key, values);
-        }
-        values.add(value);
+        paramHashValues.computeIfAbsent(key, k -> new ArrayList<>(1)).add(value);
     }
 
     public void setURLDecoder( UDecoder u ) {
