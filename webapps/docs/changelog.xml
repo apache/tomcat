@@ -1158,6 +1158,10 @@
         <code>TomcatPrincipal</code> and <code>GenericPrincipal</code>.
         Patch provided by Carsten Klein. (michaelo)
       </add>
+      <add>
+        <pr>xxx</pr>: Add support for additional user attributes to
+        <code>DataSourceRealm</code>. Patch provided by Carsten Klein. (michaelo)
+      </add>
       <fix>
         <pr>464</pr>: Fall back to the class loader used to load JULI when the
         thread context class loader is not set. In a normal Tomcat

@@ -166,6 +166,34 @@
         name. If not specified, the default is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="userAttributes" required="false">
+        <p>Comma separated list of names of columns to additionally query from
+        the "users" table named by the <code>userTable</code> attribute. These
+        are provided to the application as <i>Additional User Attributes</i>
+        through the Principal's attributes map (with configured column names
+        used as the keys). This attribute also supports the wildcard character
+        <code>*</code>, which means to query <i>all</i> columns (except, for
+        security reasons, the column containing the user's credentials).</p>
+        <p>Any of the "users" table's columns can be specified, except the
+        column containing the user's credentials (i.e. password) named by the
+        <code>userCredCol</code> attribute. If the credentials column is
+        explicitly specified, it will be ignored and a warning will be logged.
+        </p>
+        <p>Specified columns that are not present in the "users" table are
+        dropped from the list and a warning is logged, one for each missing
+        column. However, these checks are performed only once while the Realm
+        processes its first login attempt. If the structure of the "users"
+        table significantly changes after that point in time (i.e. a specified
+        column gets removed), a logged exception is likely the result for each
+        subsequent login attempt until the Realm gets restarted. Even so,
+        exceptions caused by user attribute queries do not prevent the user
+        from loggin in, but only cause the associated Principal's attributes
+        map being empty.</p>
+        <p>See the <a href="../realm-howto.html#Additional_User_Attributes">
+        Additional User Attributes How-To</a> for more information on how
+        additional user attributes can be access from your application.</p>
+      </attribute>
+
       <attribute name="userCredCol" required="true">
         <p>Name of the column, in the "users" table, which contains
         the user's credentials (i.e. password).  If a
@@ -173,6 +201,8 @@
         will assume that the passwords have been encoded with the
         specified algorithm.  Otherwise, they will be assumed to be
         in clear text.</p>
+        <p>For security reasons, the column named by this attribute cannot
+        be used as an <i>Additional User Attribute</i>.</p>
       </attribute>
 
       <attribute name="userNameCol" required="true">
@@ -192,7 +222,10 @@
       <attribute name="userTable" required="true">
         <p>Name of the "users" table, which must contain columns named
         by the <code>userNameCol</code> and <code>userCredCol</code>
-        attributes.</p>
+        attributes. More columns containing additional user information could
+        freely be added. These can be provided to the application as
+        <i>Additional User Attributes</i> configured by the
+        <code>userAttributes</code> attribute.</p>
       </attribute>
 
       <attribute name="X509UsernameRetrieverClassName" required="false">

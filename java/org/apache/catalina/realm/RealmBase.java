@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -75,6 +76,21 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     private static final List<Class<? extends DigestCredentialHandlerBase>> credentialHandlerClasses =
             new ArrayList<>();
+
+    /**
+     * The character used for delimiting user attribute names.
+     * <p>
+     * Applies to some of the Realm implementations only.
+     */
+    protected static final String USER_ATTRIBUTES_DELIMITER = ",";
+
+    /**
+     * The character used as wildcard in user attribute lists. Using it means
+     * <i>query all available user attributes</i>.
+     * <p>
+     * Applies to some of the Realm implementations only.
+     */
+    protected static final String USER_ATTRIBUTES_WILDCARD = "*";
 
     static {
         // Order is important since it determines the search order for a
@@ -1290,6 +1306,40 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
         }
         return null;
+    }
+
+
+    /**
+     * Parse the specified delimiter separated attribute names and return a list of
+     * that names or <code>null</code>, if no attributes have been specified.
+     * <p>
+     * If a wildcard character is found, return a list consisting of a single
+     * wildcard character only.
+     * 
+     * @param userAttributes comma separated names of attributes to parse
+     * @return a list containing the parsed attribute names or <code>null</code>, if
+     *         no attributes have been specified
+     */
+    protected List<String> parseUserAttributes(String userAttributes) {
+        if (userAttributes == null) {
+            return null;
+        }
+        List<String> attrs = new ArrayList<>();
+        for (String name : userAttributes.split(USER_ATTRIBUTES_DELIMITER)) {
+            name = name.trim();
+            if (name.length() == 0) {
+                continue;
+            }
+            if (name.equals(USER_ATTRIBUTES_WILDCARD)) {
+                return Collections.singletonList(USER_ATTRIBUTES_WILDCARD);
+            }
+            if (attrs.contains(name)) {
+                // skip duplicates
+                continue;
+            }
+            attrs.add(name);
+        }
+        return attrs.size() > 0 ? attrs : null;
     }
 
 
