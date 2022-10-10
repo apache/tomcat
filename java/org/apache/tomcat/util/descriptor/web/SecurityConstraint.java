@@ -682,8 +682,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
                             }
                         } else {
                             // Build the union of methods for this pattern
-                            urlMethodMap.computeIfAbsent(pattern, k -> new HashSet<>())
-                                .addAll(Arrays.asList(methods));
+                            urlMethodMap.computeIfAbsent(pattern, k -> new HashSet<>()).addAll(Arrays.asList(methods));
                         }
                     }
                 }
