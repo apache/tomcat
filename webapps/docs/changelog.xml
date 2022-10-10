@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.2 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to Commons Daemon 1.3.2. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.1 (markt)" rtext="release in progress">
   <subsection name="Catalina">
