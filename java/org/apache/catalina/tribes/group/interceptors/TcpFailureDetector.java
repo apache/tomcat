@@ -54,6 +54,7 @@ import org.apache.juli.logging.LogFactory;
  * <ol>
  * <li>It intercepts memberDisappeared events</li>
  * <li>It catches send errors</li>
+ * </ol>
  */
 public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFailureDetectorMBean {
 
