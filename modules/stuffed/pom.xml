@@ -29,8 +29,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>org.apache.catalina.startup.Tomcat</mainClass>
-        <tomcat.version>10.0.18</tomcat.version>
-        <!-- <tomcat.version>9.0.60</tomcat.version> -->
+        <tomcat.version>11.0.0-SNAPSHOT</tomcat.version>
     </properties>
 
     <dependencies>

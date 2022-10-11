@@ -49,8 +49,8 @@
   <xsl:param    name="prlink"              select="'https://github.com/apache/tomcat/pull/'"/>
   <xsl:param    name="revlink"             select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
   <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-11.0-doc'"/>
-  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-10.html'"/>
-  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-10.cgi'"/>
+  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-11.html'"/>
+  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-11.cgi'"/>
   <xsl:param    name="sitedir"             select="''"/>
   <xsl:param    name="filename"            select="'-'"/>
 

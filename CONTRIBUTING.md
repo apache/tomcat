@@ -81,7 +81,7 @@ manually generate the patch file by using diff. If this is what you want, you
 can download the sources from the "Source Code Distributions" section of the
 Download Page. There is one such page for every major Tomcat version:
 
-- [Tomcat 10](https://tomcat.apache.org/download-10.cgi)
+- [Tomcat 11](https://tomcat.apache.org/download-11.cgi)
 - [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
 - [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
 - [Tomcat 7](https://tomcat.apache.org/download-70.cgi)
@@ -153,7 +153,7 @@ Apache Tomcat has very loosely defined coding conventions, but the following
 guidelines will be useful:
 
 * Use spaces for indenting, not tabs
-* 100 char line width for Java source, 80 char line width for documentation
+* 120 char line width for Java source, 80 char line width for documentation
 source (.txt, .xml)
 * Java source: { at end of line, 4 space indents
 * XML source: 2 space indents
