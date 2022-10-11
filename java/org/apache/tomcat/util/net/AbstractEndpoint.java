@@ -381,8 +381,8 @@ public abstract class AbstractEndpoint<S,U> {
      *
      * @param sslHostConfig The SSLHostConfig for which the SSLContext should be
      *                      created
-     * @throws Exception If the SSLContext cannot be created for the given
-     *                   SSLHostConfig
+     * @throws IllegalArgumentException If the SSLContext cannot be created for
+     *                      the given SSLHostConfig
      */
     protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
 
