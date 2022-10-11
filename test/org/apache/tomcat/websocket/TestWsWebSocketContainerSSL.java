@@ -81,46 +81,6 @@ public class TestWsWebSocketContainerSSL extends WebSocketBaseTest {
 
     private static final String MESSAGE_STRING_1 = "qwerty";
 
-    @SuppressWarnings("removal")
-    @Test
-    public void testConnectToServerEndpointSslLegacy() throws Exception {
-
-        Tomcat tomcat = getTomcatInstance();
-        // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
-        Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
-
-        tomcat.start();
-
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
-        ClientEndpointConfig clientEndpointConfig =
-                ClientEndpointConfig.Builder.create().build();
-        clientEndpointConfig.getUserProperties().put(
-                org.apache.tomcat.websocket.Constants.SSL_TRUSTSTORE_PROPERTY,
-                TesterSupport.CA_JKS);
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
-                clientEndpointConfig,
-                new URI("wss://localhost:" + getPort() +
-                        TesterEchoServer.Config.PATH_ASYNC));
-        CountDownLatch latch = new CountDownLatch(1);
-        BasicText handler = new BasicText(latch);
-        wsSession.addMessageHandler(handler);
-        wsSession.getBasicRemote().sendText(MESSAGE_STRING_1);
-
-        boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
-
-        Assert.assertTrue(latchResult);
-
-        Queue<String> messages = handler.getMessages();
-        Assert.assertEquals(1, messages.size());
-        Assert.assertEquals(MESSAGE_STRING_1, messages.peek());
-    }
-
-
     @Test
     public void testConnectToServerEndpointSSL() throws Exception {
 

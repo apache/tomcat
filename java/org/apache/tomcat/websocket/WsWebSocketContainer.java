@@ -17,10 +17,7 @@
 package org.apache.tomcat.websocket;
 
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
@@ -31,7 +28,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,7 +49,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
-import javax.net.ssl.TrustManagerFactory;
 
 import jakarta.websocket.ClientEndpoint;
 import jakarta.websocket.ClientEndpointConfig;
@@ -74,7 +69,6 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.security.KeyStoreUtil;
 
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
 
@@ -923,58 +917,20 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    @SuppressWarnings("removal")
     private SSLEngine createSSLEngine(ClientEndpointConfig clientEndpointConfig, String host, int port)
             throws DeploymentException {
 
-        Map<String,Object> userProperties = clientEndpointConfig.getUserProperties();
         try {
             // See if a custom SSLContext has been provided
             SSLContext sslContext = clientEndpointConfig.getSSLContext();
 
-            // If no SSLContext is found, try the pre WebSocket 2.1 Tomcat
-            // specific method
-            if (sslContext == null) {
-                sslContext = (SSLContext) userProperties.get(Constants.SSL_CONTEXT_PROPERTY);
-            }
-
             if (sslContext == null) {
                 // Create the SSL Context
                 sslContext = SSLContext.getInstance("TLS");
-
-                // Trust store
-                String sslTrustStoreValue =
-                        (String) userProperties.get(Constants.SSL_TRUSTSTORE_PROPERTY);
-                if (sslTrustStoreValue != null) {
-                    String sslTrustStorePwdValue = (String) userProperties.get(
-                            Constants.SSL_TRUSTSTORE_PWD_PROPERTY);
-                    if (sslTrustStorePwdValue == null) {
-                        sslTrustStorePwdValue = Constants.SSL_TRUSTSTORE_PWD_DEFAULT;
-                    }
-
-                    File keyStoreFile = new File(sslTrustStoreValue);
-                    KeyStore ks = KeyStore.getInstance("JKS");
-                    try (InputStream is = new FileInputStream(keyStoreFile)) {
-                        KeyStoreUtil.load(ks, is, sslTrustStorePwdValue.toCharArray());
-                    }
-
-                    TrustManagerFactory tmf = TrustManagerFactory.getInstance(
-                            TrustManagerFactory.getDefaultAlgorithm());
-                    tmf.init(ks);
-
-                    sslContext.init(null, tmf.getTrustManagers(), null);
-                } else {
-                    sslContext.init(null, null, null);
-                }
+                sslContext.init(null, null, null);
             }
 
             SSLEngine engine = sslContext.createSSLEngine(host, port);
-
-            String sslProtocolsValue =
-                    (String) userProperties.get(Constants.SSL_PROTOCOLS_PROPERTY);
-            if (sslProtocolsValue != null) {
-                engine.setEnabledProtocols(sslProtocolsValue.split(","));
-            }
 
             engine.setUseClientMode(true);
 

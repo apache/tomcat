@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -704,32 +703,6 @@ public class RemoteIpFilter extends GenericFilter {
     protected static String[] commaDelimitedListToStringArray(String commaDelimitedStrings) {
         return (commaDelimitedStrings == null || commaDelimitedStrings.length() == 0) ? new String[0] : commaSeparatedValuesPattern
             .split(commaDelimitedStrings);
-    }
-
-    /**
-     * Convert a list of strings in a comma delimited string.
-     *
-     * @param stringList List of strings
-     * @return concatenated string
-     *
-     * @deprecated Unused. Will be removed in Tomcat 11 onwards
-     */
-    @Deprecated
-    protected static String listToCommaDelimitedString(List<String> stringList) {
-        if (stringList == null) {
-            return "";
-        }
-        StringBuilder result = new StringBuilder();
-        for (Iterator<String> it = stringList.iterator(); it.hasNext();) {
-            Object element = it.next();
-            if (element != null) {
-                result.append(element);
-                if (it.hasNext()) {
-                    result.append(", ");
-                }
-            }
-        }
-        return result.toString();
     }
 
     /**

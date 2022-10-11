@@ -153,28 +153,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     protected String getSecret() {
         return secret;
     }
-    /**
-     * Set the required secret that must be included with every request.
-     *
-     * @param requiredSecret The required secret
-     *
-     * @deprecated Replaced by {@link #setSecret(String)}.
-     *             Will be removed in Tomcat 11 onwards
-     */
-    @Deprecated
-    public void setRequiredSecret(String requiredSecret) {
-        setSecret(requiredSecret);
-    }
-    /**
-     * @return The current secret
-     *
-     * @deprecated Replaced by {@link #getSecret()}.
-     *             Will be removed in Tomcat 11 onwards
-     */
-    @Deprecated
-    protected String getRequiredSecret() {
-        return getSecret();
-    }
 
 
     private boolean secretRequired = true;

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.Extension;
 
 /**
@@ -47,36 +46,6 @@ public class Constants {
             .intValue();
 
     // Client connection
-    /**
-     * Property name to set to configure the value that is passed to
-     * {@link javax.net.ssl.SSLEngine#setEnabledProtocols(String[])}. The value
-     * should be a comma separated string.
-     *
-     * @deprecated This will be removed in Tomcat 11.
-     *             Use {@link ClientEndpointConfig#getSSLContext()}
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_PROTOCOLS_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_PROTOCOLS";
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_TRUSTSTORE_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_TRUSTSTORE";
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_TRUSTSTORE_PWD_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_TRUSTSTORE_PWD_DEFAULT = "changeit";
-    /**
-     * Property name to set to configure used SSLContext. The value should be an
-     * instance of SSLContext. If this property is present, the SSL_TRUSTSTORE*
-     * properties are ignored.
-     *
-     * @deprecated This will be removed in Tomcat 11.
-     *             Use {@link ClientEndpointConfig#getSSLContext()}
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.x")
-    public static final String SSL_CONTEXT_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_CONTEXT";
     /**
      * Property name to set to configure the timeout (in milliseconds) when
      * establishing a WebSocket connection to server. The default is
