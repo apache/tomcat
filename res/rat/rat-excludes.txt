@@ -234,4 +234,4 @@ output/dist/temp/safeToDelete.tmp
 
 output/res/checkstyle/*
 
-tomcat-10.1.x/**
+tomcat-11.0.x/**

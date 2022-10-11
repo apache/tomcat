@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 10.1" default="deploy" basedir="."
+<project name="Tomcat 11.0" default="deploy" basedir="."
   xmlns:if="ant:if"
   xmlns:unless="ant:unless"
   xmlns:jacoco="antlib:org.jacoco.ant"
@@ -2068,7 +2068,7 @@
       <executiondata>
         <file file="${coverage.datafile}"/>
       </executiondata>
-      <structure name="Tomcat 10.1.x Code Coverage">
+      <structure name="Tomcat 11.0.x Code Coverage">
         <classfiles>
           <fileset dir="${tomcat.classes}"/>
         </classfiles>
