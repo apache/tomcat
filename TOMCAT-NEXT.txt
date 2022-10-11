@@ -25,3 +25,10 @@ Notes of things to consider for the next major Tomcat release (11.x)
     releases would then require at least Java 21.
 
  3. Add QUIC support using OpenSSL and Panama.
+ 
+ 4. Remove SecurityManager (assuming Jakarta EE 11 does so).
+ 
+ 5. Update minimum Java version to 17 (assuming Jakarta EE 11 does so).
+ 
+ 6. Implement an optional Loom module that provides
+    o.a.c.http11.Http11BioLoomProtocol
