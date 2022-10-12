@@ -16,13 +16,27 @@
  */
 package org.apache.coyote.http11;
 
-/**
- * Dummy implementation for now that just extends the standard NIO
- * implementation.
- */
-public class Http11BioLoomProtocol extends Http11NioProtocol {
+import java.net.Socket;
 
-    // ----------------------------------------------------- JMX related methods
+import org.apache.coyote.Processor;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.BioLoomEndpoint;
+
+public class Http11BioLoomProtocol extends AbstractHttp11Protocol<Socket> {
+
+    private static final Log log = LogFactory.getLog(Http11BioLoomProtocol.class);
+
+    public Http11BioLoomProtocol() {
+        super(new BioLoomEndpoint());
+    }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
+    }
+
 
     @Override
     protected String getNamePrefix() {
@@ -31,5 +45,12 @@ public class Http11BioLoomProtocol extends Http11NioProtocol {
         } else {
             return "http-bio-loom";
         }
+    }
+
+
+    @Override
+    protected Processor createProcessor() {
+        Http11Processor processor = new Http11LoomProcessor(this, adapter);
+        return processor;
     }
 }
