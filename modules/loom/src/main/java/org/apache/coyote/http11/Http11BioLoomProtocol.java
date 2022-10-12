@@ -50,7 +50,6 @@ public class Http11BioLoomProtocol extends AbstractHttp11Protocol<Socket> {
 
     @Override
     protected Processor createProcessor() {
-        Http11Processor processor = new Http11LoomProcessor(this, adapter);
-        return processor;
+        return new Http11LoomProcessor(this, adapter);
     }
 }
