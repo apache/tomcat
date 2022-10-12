@@ -3497,8 +3497,7 @@ public class StandardContext extends ContainerBase
     @Override
     public FilterDef[] findFilterDefs() {
         synchronized (filterDefs) {
-            FilterDef results[] = new FilterDef[filterDefs.size()];
-            return filterDefs.values().toArray(results);
+            return filterDefs.values().toArray(new FilterDef[0]);
         }
     }
 
@@ -3532,9 +3531,7 @@ public class StandardContext extends ContainerBase
      */
     public MessageDestination[] findMessageDestinations() {
         synchronized (messageDestinations) {
-            MessageDestination results[] =
-                new MessageDestination[messageDestinations.size()];
-            return messageDestinations.values().toArray(results);
+            return messageDestinations.values().toArray(new MessageDestination[0]);
         }
     }
 
@@ -3558,8 +3555,7 @@ public class StandardContext extends ContainerBase
     @Override
     public String[] findMimeMappings() {
         synchronized (mimeMappings) {
-            String results[] = new String[mimeMappings.size()];
-            return mimeMappings.keySet().toArray(results);
+            return mimeMappings.keySet().toArray(new String[0]);
         }
     }
 
@@ -3663,8 +3659,7 @@ public class StandardContext extends ContainerBase
     @Override
     public String[] findServletMappings() {
         synchronized (servletMappingsLock) {
-            String results[] = new String[servletMappings.size()];
-            return servletMappings.keySet().toArray(results);
+            return servletMappings.keySet().toArray(new String[0]);
         }
     }
 

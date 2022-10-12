@@ -1747,8 +1747,7 @@ public class JspC extends Task implements Options {
             }
         }
 
-        URL urlsA[]=new URL[urls.size()];
-        urls.toArray(urlsA);
+        URL[] urlsA = urls.toArray(new URL[0]);
         loader = new URLClassLoader(urlsA, this.getClass().getClassLoader());
         return loader;
     }

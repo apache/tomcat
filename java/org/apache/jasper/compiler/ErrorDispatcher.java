@@ -373,8 +373,7 @@ public class ErrorDispatcher {
 
         JavacErrorDetail[] errDetails = null;
         if (errors.size() > 0) {
-            errDetails = new JavacErrorDetail[errors.size()];
-            errors.toArray(errDetails);
+            errDetails = errors.toArray(new JavacErrorDetail[0]);
         }
 
         return errDetails;
