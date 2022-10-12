@@ -830,7 +830,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (size == 0) {
             return new String[0];
         } else {
-            return enabled.toArray(new String[size]);
+            return enabled.toArray(new String[0]);
         }
     }
 
