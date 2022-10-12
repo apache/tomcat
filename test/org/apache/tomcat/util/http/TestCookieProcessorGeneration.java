@@ -102,7 +102,7 @@ public class TestCookieProcessorGeneration {
 
     @Test
     public void testMaxAgeZero() {
-        doTestMaxAge(0, "foo=bar; Max-Age=0; Expires=Thu, 01-Jan-1970 00:00:10 GMT");
+        doTestMaxAge(0, "foo=bar; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT");
     }
 
     @Test

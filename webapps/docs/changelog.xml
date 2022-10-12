@@ -113,6 +113,15 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct the date format used with the expires attribute of HTTP cookies.
+        A single space rather than a single dash should be used to separate the
+        day, month and year components to be compliant with RFC 6265. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
