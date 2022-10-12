@@ -418,9 +418,7 @@ public abstract class AbstractReplicatedMap<K,V>
 //------------------------------------------------------------------------------
     public Member[] getMapMembers(HashMap<Member, Long> members) {
         synchronized (members) {
-            Member[] result = new Member[members.size()];
-            members.keySet().toArray(result);
-            return result;
+            return members.keySet().toArray(new Member[0]);
         }
     }
     public Member[] getMapMembers() {

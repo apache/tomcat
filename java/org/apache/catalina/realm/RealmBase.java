@@ -793,9 +793,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
         if(results == null || results.size() == 0) {
             return null;
         }
-        SecurityConstraint [] array = new SecurityConstraint[results.size()];
-        results.toArray(array);
-        return array;
+        return results.toArray(new SecurityConstraint [0]);
     }
 
 

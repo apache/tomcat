@@ -878,8 +878,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             results.addAll(Arrays.asList(values2));
         }
 
-        String values[] = new String[results.size()];
-        return results.toArray(values);
+        return results.toArray(new String[0]);
     }
 
 

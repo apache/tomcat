@@ -88,7 +88,7 @@ public class TestWsSubprotocols extends WebSocketBaseTest {
         }
         Assert.assertNotNull(SubProtocolsEndpoint.subprotocols);
         Assert.assertArrayEquals(new String[]{"sp1","sp2"},
-                SubProtocolsEndpoint.subprotocols.toArray(new String[2]));
+                SubProtocolsEndpoint.subprotocols.toArray(new String[0]));
         wsSession.close();
         SubProtocolsEndpoint.recycle();
     }

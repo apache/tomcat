@@ -149,8 +149,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         }
 
         public synchronized boolean checkIdleKeepAlive() {
-            DataSender[] list = new DataSender[notinuse.size()];
-            notinuse.toArray(list);
+            DataSender[] list = notinuse.toArray(new DataSender[0]);
             boolean result = false;
             for (DataSender dataSender : list) {
                 result = result | dataSender.keepalive();
