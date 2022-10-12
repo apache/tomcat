@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http11;
 
+import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
@@ -63,7 +64,11 @@ public class Http11NioProtocol extends AbstractHttp11Protocol<NioChannel> {
     }
 
 
-    // ----------------------------------------------------- JMX related methods
+    @Override
+    protected Processor createProcessor() {
+        return new Http11Processor(this, adapter);
+    }
+
 
     @Override
     protected String getNamePrefix() {
