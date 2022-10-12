@@ -606,8 +606,7 @@ public class StandardWrapper extends ContainerBase
             }
         }
 
-        String[] methodNames = new String[allow.size()];
-        return allow.toArray(methodNames);
+        return allow.toArray(new String[0]);
     }
 
 
@@ -914,8 +913,7 @@ public class StandardWrapper extends ContainerBase
 
         parametersLock.readLock().lock();
         try {
-            String results[] = new String[parameters.size()];
-            return parameters.keySet().toArray(results);
+            return parameters.keySet().toArray(new String[0]);
         } finally {
             parametersLock.readLock().unlock();
         }
@@ -979,8 +977,7 @@ public class StandardWrapper extends ContainerBase
 
         referencesLock.readLock().lock();
         try {
-            String results[] = new String[references.size()];
-            return references.keySet().toArray(results);
+            return references.keySet().toArray(new String[0]);
         } finally {
             referencesLock.readLock().unlock();
         }

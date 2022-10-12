@@ -2845,8 +2845,7 @@ public class ContextConfig implements LifecycleListener {
         } else {
             values.add(ev.stringifyValue());
         }
-        String[] result = new String[values.size()];
-        return values.toArray(result);
+        return values.toArray(new String[0]);
     }
 
     protected Map<String,String> processAnnotationWebInitParams(

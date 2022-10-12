@@ -157,8 +157,7 @@ public class Arrays {
                 list.add(member);
             }
         }
-        Member[] result = new Member[list.size()];
-        list.toArray(result);
+        Member[] result = list.toArray(new Member[0]);
         AbsoluteOrder.absoluteOrder(result);
         return result;
     }
