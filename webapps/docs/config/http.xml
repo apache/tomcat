@@ -525,6 +525,11 @@
       the request line, header names and header values. If not specified, this
       attribute is set to the value of the <code>maxHttpHeaderSize</code>
       attribute.</p>
+      <p>If you see "Request header is too large" errors you can increase this,
+      but be aware that Tomcat will allocate the full amount you specify for
+      every request. For example, if you specify a maxHttpRequestHeaderSize of
+      1 MB and your application handles 100 concurrent requests, you will see
+      100 MB of heap consumed by request headers.</p>
     </attribute>
 
     <attribute name="maxHttpResponseHeaderSize" required="false">
