@@ -272,14 +272,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      * @return the listener array
      */
     public ClusterListener[] findClusterListeners() {
-        if (clusterListeners.size() > 0) {
-            ClusterListener[] listener = new ClusterListener[clusterListeners.size()];
-            clusterListeners.toArray(listener);
-            return listener;
-        } else {
-            return new ClusterListener[0];
-        }
-
+        return clusterListeners.toArray(new ClusterListener[0]);
     }
 
     /**

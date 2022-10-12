@@ -237,8 +237,7 @@ public class Membership implements Cloneable {
             }
 
             if (list != null) {
-                Member[] result = new Member[list.size()];
-                list.toArray(result);
+                Member[] result = list.toArray(new Member[0]);
                 for (Member member : result) {
                     removeMember(member);
                 }

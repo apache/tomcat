@@ -1581,8 +1581,7 @@ public class JNDIRealm extends RealmBase {
         if (userRoleAttribute != null) {
             list.add(userRoleAttribute);
         }
-        String[] attrIds = new String[list.size()];
-        list.toArray(attrIds);
+        String[] attrIds = list.toArray(new String[0]);
 
         // Use pattern or search for user entry
         if (userPatternArray != null && curUserPattern >= 0) {
@@ -2892,7 +2891,7 @@ public class JNDIRealm extends RealmBase {
                 startingPoint = endParenLoc+1;
                 startParenLoc = userPatternString.indexOf('(', startingPoint);
             }
-            return pathList.toArray(new String[] {});
+            return pathList.toArray(new String[0]);
         }
         return null;
     }

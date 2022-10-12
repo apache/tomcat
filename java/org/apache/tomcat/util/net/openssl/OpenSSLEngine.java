@@ -826,12 +826,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if ((opts & SSL.SSL_OP_NO_SSLv3) == 0) {
             enabled.add(Constants.SSL_PROTO_SSLv3);
         }
-        int size = enabled.size();
-        if (size == 0) {
-            return new String[0];
-        } else {
-            return enabled.toArray(new String[size]);
-        }
+        return enabled.toArray(new String[0]);
     }
 
     @Override

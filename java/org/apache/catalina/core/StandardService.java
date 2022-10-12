@@ -367,9 +367,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     public Executor[] findExecutors() {
         synchronized (executors) {
-            Executor[] arr = new Executor[executors.size()];
-            executors.toArray(arr);
-            return arr;
+            return executors.toArray(new Executor[0]);
         }
     }
 
