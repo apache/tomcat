@@ -21,9 +21,7 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
-import java.net.SocketAddress;
 import java.net.SocketException;
-import java.nio.channels.NetworkChannel;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -739,9 +737,6 @@ public abstract class AbstractEndpoint<S,U> {
     public void setAddress(InetAddress address) { this.address = address; }
 
 
-    protected abstract NetworkChannel getServerSocket();
-
-
     /**
      * Obtain the network address the server socket is bound to. This primarily
      * exists to enable the correct address to be used when unlocking the server
@@ -754,17 +749,7 @@ public abstract class AbstractEndpoint<S,U> {
      * @throws IOException If there is a problem determining the currently bound
      *                     socket
      */
-    protected final InetSocketAddress getLocalAddress() throws IOException {
-        NetworkChannel serverSock = getServerSocket();
-        if (serverSock == null) {
-            return null;
-        }
-        SocketAddress sa = serverSock.getLocalAddress();
-        if (sa instanceof InetSocketAddress) {
-            return (InetSocketAddress) sa;
-        }
-        return null;
-    }
+    protected abstract InetSocketAddress getLocalAddress() throws IOException;
 
 
     /**
