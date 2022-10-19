@@ -75,7 +75,6 @@ class Validator {
             new JspUtil.ValidAttribute("session"),
             new JspUtil.ValidAttribute("buffer"),
             new JspUtil.ValidAttribute("autoFlush"),
-            new JspUtil.ValidAttribute("isThreadSafe"),
             new JspUtil.ValidAttribute("info"),
             new JspUtil.ValidAttribute("errorPage"),
             new JspUtil.ValidAttribute("isErrorPage"),
@@ -160,13 +159,6 @@ class Validator {
                     } else if (!pageInfo.getAutoFlush().equals(value)) {
                         err.jspError(n, "jsp.error.page.conflict.autoflush",
                                 pageInfo.getAutoFlush(), value);
-                    }
-                } else if ("isThreadSafe".equals(attr)) {
-                    if (pageInfo.getIsThreadSafe() == null) {
-                        pageInfo.setIsThreadSafe(value, n, err);
-                    } else if (!pageInfo.getIsThreadSafe().equals(value)) {
-                        err.jspError(n, "jsp.error.page.conflict.isthreadsafe",
-                                pageInfo.getIsThreadSafe(), value);
                     }
                 } else if ("isELIgnored".equals(attr)) {
                     if (pageInfo.getIsELIgnored() == null) {
