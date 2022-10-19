@@ -59,11 +59,6 @@ import jakarta.el.ELContext;
  * The following methods provide <B>convenient access</B> to implicit objects:
  * <code>getOut()</code>
  *
- * <p>
- * The following methods provide <B>programmatic access</b> to the
- * Expression Language evaluator:
- * <code>getExpressionEvaluator()</code>, <code>getVariableResolver()</code>
- *
  * @since JSP 2.0
  */
 
