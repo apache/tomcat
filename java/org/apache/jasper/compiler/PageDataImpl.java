@@ -365,22 +365,7 @@ class PageDataImpl extends PageData implements TagConstants {
         }
 
         @Override
-    public void visit(Node.ParamsAction n) throws JasperException {
-            appendTag(n);
-        }
-
-        @Override
-    public void visit(Node.FallBackAction n) throws JasperException {
-            appendTag(n);
-        }
-
-        @Override
     public void visit(Node.UseBean n) throws JasperException {
-            appendTag(n);
-        }
-
-        @Override
-    public void visit(Node.PlugIn n) throws JasperException {
             appendTag(n);
         }
 

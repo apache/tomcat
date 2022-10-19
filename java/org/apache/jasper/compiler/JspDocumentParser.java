@@ -1029,23 +1029,6 @@ class JspDocumentParser
                     taglibAttrs,
                     start,
                     current);
-        } else if (localName.equals(PARAMS_ACTION)) {
-            node =
-                new Node.ParamsAction(
-                    qName,
-                    nonTaglibXmlnsAttrs,
-                    taglibAttrs,
-                    start,
-                    current);
-        } else if (localName.equals(PLUGIN_ACTION)) {
-            node =
-                new Node.PlugIn(
-                    qName,
-                    nonTaglibAttrs,
-                    nonTaglibXmlnsAttrs,
-                    taglibAttrs,
-                    start,
-                    current);
         } else if (localName.equals(TEXT_ACTION)) {
             node =
                 new Node.JspText(
@@ -1170,14 +1153,6 @@ class JspDocumentParser
                 new Node.JspElement(
                     qName,
                     nonTaglibAttrs,
-                    nonTaglibXmlnsAttrs,
-                    taglibAttrs,
-                    start,
-                    current);
-        } else if (localName.equals(FALLBACK_ACTION)) {
-            node =
-                new Node.FallBackAction(
-                    qName,
                     nonTaglibXmlnsAttrs,
                     taglibAttrs,
                     start,

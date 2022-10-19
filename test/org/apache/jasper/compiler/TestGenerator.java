@@ -750,11 +750,6 @@ public class TestGenerator extends TomcatBaseTest {
     }
 
     @Test
-    public void testPlugin01() throws Exception {
-        doTestJsp("plugin-01.jspx");
-    }
-
-    @Test
     public void testForward01() throws Exception {
         doTestJsp("forward-01.jsp");
     }

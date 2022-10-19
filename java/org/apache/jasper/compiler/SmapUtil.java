@@ -530,12 +530,6 @@ public class SmapUtil {
         }
 
         @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-            doSmap(n);
-            visitBody(n);
-        }
-
-        @Override
         public void visit(Node.CustomTag n) throws JasperException {
             doSmap(n);
             visitBody(n);

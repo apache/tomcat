@@ -483,21 +483,6 @@ class Validator {
                 new JspUtil.ValidAttribute("type"),
                 new JspUtil.ValidAttribute("beanName", false) };
 
-        private static final JspUtil.ValidAttribute[] plugInAttrs = {
-                new JspUtil.ValidAttribute("type", true),
-                new JspUtil.ValidAttribute("code", true),
-                new JspUtil.ValidAttribute("codebase"),
-                new JspUtil.ValidAttribute("align"),
-                new JspUtil.ValidAttribute("archive"),
-                new JspUtil.ValidAttribute("height", false),
-                new JspUtil.ValidAttribute("hspace"),
-                new JspUtil.ValidAttribute("jreversion"),
-                new JspUtil.ValidAttribute("name"),
-                new JspUtil.ValidAttribute("vspace"),
-                new JspUtil.ValidAttribute("width", false),
-                new JspUtil.ValidAttribute("nspluginurl"),
-                new JspUtil.ValidAttribute("iepluginurl") };
-
         private static final JspUtil.ValidAttribute[] attributeAttrs = {
                 new JspUtil.ValidAttribute("name", true),
                 new JspUtil.ValidAttribute("trim"),
@@ -585,16 +570,6 @@ class Validator {
         }
 
         @Override
-        public void visit(Node.ParamsAction n) throws JasperException {
-            // Make sure we've got at least one nested jsp:param
-            Node.Nodes subElems = n.getBody();
-            if (subElems == null) {
-                err.jspError(n, "jsp.error.params.emptyBody");
-            }
-            visitBody(n);
-        }
-
-        @Override
         public void visit(Node.IncludeAction n) throws JasperException {
             JspUtil.checkAttributes("Include action", n, includeActionAttrs,
                     err);
@@ -675,45 +650,6 @@ class Validator {
             }
 
             beanInfo.addBean(n, name, className, scope);
-
-            visitBody(n);
-        }
-
-        @SuppressWarnings("null") // type can't be null after initial test
-        @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-            JspUtil.checkAttributes("Plugin", n, plugInAttrs, err);
-
-            throwErrorIfExpression(n, "type", "jsp:plugin");
-            throwErrorIfExpression(n, "code", "jsp:plugin");
-            throwErrorIfExpression(n, "codebase", "jsp:plugin");
-            throwErrorIfExpression(n, "align", "jsp:plugin");
-            throwErrorIfExpression(n, "archive", "jsp:plugin");
-            throwErrorIfExpression(n, "hspace", "jsp:plugin");
-            throwErrorIfExpression(n, "jreversion", "jsp:plugin");
-            throwErrorIfExpression(n, "name", "jsp:plugin");
-            throwErrorIfExpression(n, "vspace", "jsp:plugin");
-            throwErrorIfExpression(n, "nspluginurl", "jsp:plugin");
-            throwErrorIfExpression(n, "iepluginurl", "jsp:plugin");
-
-            String type = n.getTextAttribute("type");
-            if (type == null) {
-                err.jspError(n, "jsp.error.plugin.notype");
-            }
-            if (!type.equals("bean") && !type.equals("applet")) {
-                err.jspError(n, "jsp.error.plugin.badtype");
-            }
-            if (n.getTextAttribute("code") == null) {
-                err.jspError(n, "jsp.error.plugin.nocode");
-            }
-
-            Node.JspAttribute width = getJspAttribute(null, "width", null,
-                    null, n.getAttributeValue("width"), n, null, false);
-            n.setWidth(width);
-
-            Node.JspAttribute height = getJspAttribute(null, "height", null,
-                    null, n.getAttributeValue("height"), n, null, false);
-            n.setHeight(height);
 
             visitBody(n);
         }

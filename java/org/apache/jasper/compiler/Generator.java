@@ -1524,14 +1524,6 @@ class Generator {
         }
 
         @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-
-            // As of JSP 3.1, jsp:plugin must not generate any output
-            n.setBeginJavaLine(out.getJavaLine());
-            n.setEndJavaLine(out.getJavaLine());
-        }
-
-        @Override
         public void visit(Node.NamedAttribute n) throws JasperException {
             // Don't visit body of this tag - we already did earlier.
         }
