@@ -17,7 +17,6 @@
 package jakarta.el;
 
 import java.beans.BeanInfo;
-import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -25,9 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
@@ -184,28 +181,6 @@ public class BeanELResolver extends ELResolver {
 
         context.setPropertyResolved(base, property);
         return this.readOnly || this.property(context, base, property).isReadOnly(base);
-    }
-
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        if (base == null) {
-            return null;
-        }
-
-        try {
-            BeanInfo info = Introspector.getBeanInfo(base.getClass());
-            PropertyDescriptor[] pds = info.getPropertyDescriptors();
-            for (PropertyDescriptor pd : pds) {
-                pd.setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
-                pd.setValue(TYPE, pd.getPropertyType());
-            }
-            return Arrays.asList((FeatureDescriptor[]) pds).iterator();
-        } catch (IntrospectionException e) {
-            //
-        }
-
-        return null;
     }
 
     @Override

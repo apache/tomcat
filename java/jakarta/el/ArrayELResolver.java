@@ -16,9 +16,7 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
 import java.lang.reflect.Array;
-import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -126,12 +124,6 @@ public class ArrayELResolver extends ELResolver {
         }
 
         return this.readOnly;
-    }
-
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return null;
     }
 
     @Override

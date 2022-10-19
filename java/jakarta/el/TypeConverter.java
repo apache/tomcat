@@ -16,9 +16,6 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 /**
  * @since EL 3.0
  */
@@ -43,13 +40,6 @@ public abstract class TypeConverter extends ELResolver {
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         return false;
-    }
-
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
-            Object base) {
-        return null;
     }
 
     @Override

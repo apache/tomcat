@@ -16,13 +16,11 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -184,19 +182,6 @@ public class StaticFieldELResolver extends ELResolver {
         return true;
     }
 
-
-    /**
-     * Always returns <code>null</code>.
-     *
-     * @deprecated This method will be removed, without replacement, in EL 6.0 /
-     *             Tomcat 11.
-     */
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
-            Object base) {
-        return null;
-    }
 
     /**
      * Always returns <code>String.class</code>.
