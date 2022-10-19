@@ -16,9 +16,7 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.ListResourceBundle;
 import java.util.ResourceBundle;
 
@@ -223,53 +221,6 @@ public class TestResourceBundleELResolver {
 
         Assert.assertTrue(result);
         Assert.assertTrue(context.isPropertyResolved());
-    }
-
-    /**
-     * Tests that a valid FeatureDescriptors are not returned if base is not
-     * ResourceBundle.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    @Test
-    public void testGetFeatureDescriptors01() {
-        ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
-
-        Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(
-                context, new Object());
-
-        Assert.assertNull(result);
-    }
-
-    /**
-     * Tests that a valid FeatureDescriptors are returned.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    @Test
-    public void testGetFeatureDescriptors02() {
-        ResourceBundleELResolver resolver = new ResourceBundleELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
-
-        ResourceBundle resourceBundle = new TesterResourceBundle(
-                new Object[][] { { "key", "value" } });
-        Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(
-                context, resourceBundle);
-
-        while (result.hasNext()) {
-            FeatureDescriptor featureDescriptor = result.next();
-            Assert.assertEquals("key", featureDescriptor.getDisplayName());
-            Assert.assertEquals("key", featureDescriptor.getName());
-            Assert.assertEquals("", featureDescriptor.getShortDescription());
-            Assert.assertFalse(featureDescriptor.isExpert());
-            Assert.assertFalse(featureDescriptor.isHidden());
-            Assert.assertTrue(featureDescriptor.isPreferred());
-            Assert.assertEquals(String.class,
-                    featureDescriptor.getValue(ELResolver.TYPE));
-            Assert.assertEquals(Boolean.TRUE, featureDescriptor
-                    .getValue(ELResolver.RESOLVABLE_AT_DESIGN_TIME));
-        }
     }
 
     private static class TesterResourceBundle extends ListResourceBundle {

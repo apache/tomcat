@@ -16,9 +16,6 @@
  */
 package jakarta.servlet.jsp.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -104,12 +101,6 @@ public class NotFoundELResolver extends ELResolver {
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
         return false;
-    }
-
-    @Deprecated(forRemoval = true, since = "JSP 3.1")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return Collections.emptyIterator();
     }
 
     /**

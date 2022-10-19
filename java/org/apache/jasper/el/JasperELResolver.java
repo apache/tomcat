@@ -16,9 +16,7 @@
  */
 package org.apache.jasper.el;
 
-import java.beans.FeatureDescriptor;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -280,12 +278,6 @@ public class JasperELResolver extends CompositeELResolver {
         @Override
         public Class<?> getType(ELContext context, Object base,
                 Object property) {
-            return null;
-        }
-
-        @Override
-        public Iterator<FeatureDescriptor> getFeatureDescriptors(
-                ELContext context, Object base) {
             return null;
         }
 
