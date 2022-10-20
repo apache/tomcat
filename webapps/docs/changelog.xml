@@ -122,6 +122,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>66317</bug>: Fix for Lambda coercion security manager missing
+        privileges. Based on pull request #557 by Isaac Rivera Rivas (lihan)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
