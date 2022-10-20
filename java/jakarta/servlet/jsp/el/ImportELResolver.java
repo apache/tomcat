@@ -48,6 +48,13 @@ public class ImportELResolver extends ELResolver {
         AST_IDENTIFIER_KEY = key;
     }
 
+    /**
+     * Default constructor.
+     */
+    public ImportELResolver() {
+        super();
+    }
+
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);

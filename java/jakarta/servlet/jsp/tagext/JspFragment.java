@@ -55,6 +55,13 @@ import jakarta.servlet.jsp.JspException;
 public abstract class JspFragment {
 
     /**
+     * Default constructor.
+     */
+    public JspFragment() {
+        // NO-OP by default
+    }
+
+    /**
      * Executes the fragment and directs all output to the given Writer,
      * or the JspWriter returned by the getOut() method of the JspContext
      * associated with the fragment if out is null.
