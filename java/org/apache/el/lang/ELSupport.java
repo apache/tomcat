@@ -627,14 +627,28 @@ public class ELSupport {
             final Class<T> type) {
         // Create a dynamic proxy for the functional interface
         @SuppressWarnings("unchecked")
-        T result = (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[] { type },
-                (Object obj, Method method, Object[] args) -> {
-            // Functional interfaces have a single, abstract method
-            if (!Modifier.isAbstract(method.getModifiers())) {
-                throw new ELException(MessageFactory.get("elSupport.coerce.nonAbstract", type, method));
-            }
-            return lambdaExpression.invoke(ctx, args);
-        });
+        T result = null;
+        if (System.getSecurityManager() !=  null) {
+            result = AccessController.doPrivileged((PrivilegedAction<T>)() -> {
+                return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[] { type },
+                    (Object obj, Method method, Object[] args) -> {
+                    // Functional interfaces have a single, abstract method
+                    if (!Modifier.isAbstract(method.getModifiers())) {
+                        throw new ELException(MessageFactory.get("elSupport.coerce.nonAbstract", type, method));
+                    }
+                    return lambdaExpression.invoke(ctx, args);
+                });
+           });
+       } else {
+            result = (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[] { type },
+                    (Object obj, Method method, Object[] args) -> {
+                // Functional interfaces have a single, abstract method
+                if (!Modifier.isAbstract(method.getModifiers())) {
+                    throw new ELException(MessageFactory.get("elSupport.coerce.nonAbstract", type, method));
+                }
+                return lambdaExpression.invoke(ctx, args);
+            });
+       }
         return result;
     }
 
