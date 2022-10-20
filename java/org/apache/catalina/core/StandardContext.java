@@ -813,7 +813,7 @@ public class StandardContext extends ContainerBase
 
     private boolean mapperDirectoryRedirectEnabled = false;
 
-    private boolean useRelativeRedirects = !Globals.STRICT_SERVLET_COMPLIANCE;
+    private boolean useRelativeRedirects = true;
 
     private boolean dispatchersUseEncodedPaths = true;
 
