@@ -35,6 +35,13 @@ public class NotFoundELResolver extends ELResolver {
     private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     /**
+     * Default constructor.
+     */
+    public NotFoundELResolver() {
+        super();
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Resolves the property and always returns {@code null} unless the provided

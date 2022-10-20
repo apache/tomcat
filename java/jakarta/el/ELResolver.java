@@ -27,6 +27,9 @@ public abstract class ELResolver {
     public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
 
     /**
+     * Obtain the value of the given property on the given object using the
+     * given context.
+     *
      * @param context The EL context for this evaluation
      * @param base The base object on which the property is to be found
      * @param property The property whose value is to be returned
@@ -63,6 +66,9 @@ public abstract class ELResolver {
     }
 
     /**
+     * Obtain the type of the given property on the given object using the given
+     * context.
+     *
      * @param context The EL context for this evaluation
      * @param base The base object on which the property is to be found
      * @param property The property whose type is to be returned
@@ -80,6 +86,9 @@ public abstract class ELResolver {
             Object property);
 
     /**
+     * Set the value of the given property on the given object using the given
+     * context.
+     *
      * @param context  The EL context for this evaluation
      * @param base     The base object on which the property is to be found
      * @param property The property whose value is to be set
@@ -100,6 +109,9 @@ public abstract class ELResolver {
             Object property, Object value);
 
     /**
+     * Determine if the given property on the given object is read-only using
+     * the given context.
+     *
      * @param context The EL context for this evaluation
      * @param base The base object on which the property is to be found
      * @param property The property to be checked for read only status

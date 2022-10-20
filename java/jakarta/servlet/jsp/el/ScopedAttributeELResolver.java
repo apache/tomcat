@@ -24,10 +24,19 @@ import jakarta.servlet.jsp.JspContext;
 import jakarta.servlet.jsp.PageContext;
 
 /**
+ * An ELResolver for working with JSP scoped attributes which may have page,
+ * request, session or application scope.
  *
  * @since JSP 2.1
  */
 public class ScopedAttributeELResolver extends ELResolver {
+
+    /**
+     * Default constructor.
+     */
+    public ScopedAttributeELResolver() {
+        super();
+    }
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
