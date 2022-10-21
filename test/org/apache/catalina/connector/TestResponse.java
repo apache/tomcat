@@ -645,7 +645,7 @@ public class TestResponse extends TomcatBaseTest {
     private static final String TEXT_ISO_8859_1 = TEXT + ";charset=" + ISO_8859_1;
     private static final String TEXT_UTF_8 = TEXT + ";charset=" + UTF_8;
     private static final String TEXT_UNKNOWN = TEXT + ";charset=" + UNKNOWN;
-    private static final Locale UNDETERMINED = new Locale("und");
+    private static final Locale UNDETERMINED = Locale.forLanguageTag("xxx");
 
     @Test
     public void testSetCharacterEncoding01() {
