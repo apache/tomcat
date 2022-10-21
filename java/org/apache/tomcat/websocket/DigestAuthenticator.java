@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.tomcat.util.security.MD5Encoder;
 
 /**
- * Authenticator supporting the DIGEST auth method.
+ * Authenticator supporting the DIGEST authentication method.
  */
 public class DigestAuthenticator extends Authenticator {
 
@@ -36,25 +36,21 @@ public class DigestAuthenticator extends Authenticator {
     private long cNonce;
 
     @Override
-    public String getAuthorization(String requestUri, String WWWAuthenticate,
-            Map<String, Object> userProperties) throws AuthenticationException {
+    public String getAuthorization(String requestUri, String authenticateHeader, String userName, String userPassword,
+            String userRealm) throws AuthenticationException {
 
-        String userName = (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME);
-        String password = (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD);
+        validateUsername(userName);
+        validatePassword(userPassword);
 
-        if (userName == null || password == null) {
-            throw new AuthenticationException(
-                    "Failed to perform Digest authentication due to  missing user/password");
-        }
+        Map<String, String> parameterMap = parseAuthenticateHeader(authenticateHeader);
+        String realm = parameterMap.get("realm");
 
-        Map<String, String> wwwAuthenticate = parseWWWAuthenticateHeader(WWWAuthenticate);
+        validateRealm(userRealm, realm);
 
-        String realm = wwwAuthenticate.get("realm");
-        String nonce = wwwAuthenticate.get("nonce");
-        String messageQop = wwwAuthenticate.get("qop");
-        String algorithm = wwwAuthenticate.get("algorithm") == null ? "MD5"
-                : wwwAuthenticate.get("algorithm");
-        String opaque = wwwAuthenticate.get("opaque");
+        String nonce = parameterMap.get("nonce");
+        String messageQop = parameterMap.get("qop");
+        String algorithm = parameterMap.get("algorithm") == null ? "MD5" : parameterMap.get("algorithm");
+        String opaque = parameterMap.get("opaque");
 
         StringBuilder challenge = new StringBuilder();
 
@@ -78,7 +74,7 @@ public class DigestAuthenticator extends Authenticator {
         challenge.append("uri=\"" + requestUri + "\",");
 
         try {
-            challenge.append("response=\"" + calculateRequestDigest(requestUri, userName, password,
+            challenge.append("response=\"" + calculateRequestDigest(requestUri, userName, userPassword,
                     realm, nonce, messageQop, algorithm) + "\",");
         }
 

@@ -18,8 +18,10 @@ package org.apache.catalina.startup;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -43,9 +45,9 @@ public final class PasswdUserDatabase implements UserDatabase {
 
 
     /**
-     * The set of home directories for all defined users, keyed by username.
+     * The set of home directories for all defined users, keyed by user name.
      */
-    private final Hashtable<String,String> homes = new Hashtable<>();
+    private final Map<String,String> homes = new HashMap<>();
 
 
     /**
@@ -87,11 +89,11 @@ public final class PasswdUserDatabase implements UserDatabase {
 
 
     /**
-     * Return an enumeration of the usernames defined on this server.
+     * Return an enumeration of the user names defined on this server.
      */
     @Override
     public Enumeration<String> getUsers() {
-        return homes.keys();
+        return Collections.enumeration(homes.keySet());
     }
 
 

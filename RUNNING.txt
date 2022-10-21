@@ -20,16 +20,16 @@
             ===================================================
 
 Apache Tomcat @VERSION_MAJOR_MINOR@ requires a Java Standard Edition Runtime
-Environment (JRE) version 8 or later.
+Environment (JRE) version @MIN_JAVA_VERSION@ or later.
 
 =============================
-Running With JRE 8 Or Later
+Running With JRE @MIN_JAVA_VERSION@ Or Later
 =============================
 
 (1) Download and Install a Java SE Runtime Environment (JRE)
 
 (1.1) Download a Java SE Runtime Environment (JRE),
-      release version 8 or later, from
+      release version @MIN_JAVA_VERSION@ or later, from
       http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 (1.2) Install the JRE according to the instructions included with the

@@ -331,7 +331,7 @@
         connection peer address (<code>xxx=peer</code>)</li>
     <li><b><code>%{xxx}i</code></b> write value of incoming header with name <code>xxx</code> (escaped if required)</li>
     <li><b><code>%{xxx}o</code></b> write value of outgoing header with name <code>xxx</code> (escaped if required)</li>
-    <li><b><code>%{xxx}c</code></b> write value of cookie with name <code>xxx</code> (escaped if required)</li>
+    <li><b><code>%{xxx}c</code></b> write value of cookie(s) with name <code>xxx</code> (comma separated and escaped if required)</li>
     <li><b><code>%{xxx}r</code></b> write value of ServletRequest attribute with name <code>xxx</code> (escaped if required)</li>
     <li><b><code>%{xxx}s</code></b> write value of HttpSession attribute with name <code>xxx</code> (escaped if required)</li>
     <li><b><code>%{xxx}p</code></b> write local (server) port (<code>xxx==local</code>) or
@@ -493,7 +493,7 @@
     <li><b><code>cs(XXX)</code></b> for incoming request headers with name XXX</li>
     <li><b><code>sc(XXX)</code></b> for outgoing response headers with name XXX</li>
     <li><b><code>x-A(XXX)</code></b> for the servlet context attribute with name XXX</li>
-    <li><b><code>x-C(XXX)</code></b> for the first cookie with name XXX</li>
+    <li><b><code>x-C(XXX)</code></b> for the cookie(s) with name XXX (comma separated if required)</li>
     <li><b><code>x-O(XXX)</code></b> for a concatenation of all outgoing response headers with name XXX</li>
     <li><b><code>x-P(XXX)</code></b> for the URL encoded (using UTF-8) request parameter with name XXX</li>
     <li><b><code>x-R(XXX)</code></b> for the request attribute with name XXX</li>
@@ -780,7 +780,7 @@
       it will be passed on.
     </p>
 
-    <p>This valve mimicks Apache's <code>Order</code>,
+    <p>This valve mimics Apache's <code>Order</code>,
       <code>Allow from</code> and <code>Deny from</code> directives,
       with the following limitations:
     </p>
@@ -2143,7 +2143,7 @@
         <code>fullyQualifiedClassName</code> or a sub-class of it. For example,
         <code>errorCode.java.io.IOException</code> specifies the file to return
         for an <code>IOException</code>. The location may be relative or
-        absolule. If relative, it must be relative to
+        absolute. If relative, it must be relative to
         <code>$CATALINA_BASE</code>. If no matching error page is found, the
         default <strong>Error Report Valve</strong> response will be
         returned.</p>

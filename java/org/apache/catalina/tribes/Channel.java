@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.StringJoiner;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -166,9 +167,8 @@ public interface Channel {
      * to trigger certain behavior. Most flags are used to trigger channel interceptors
      * as the message passes through the channel stack. <br>
      * However, there are five default flags that every channel implementation must implement<br>
-     * SEND_OPTIONS_ASYNCHRONOUS - Message is sent and an ACK is received when the message has been received and
-     * processed by the recipient<br>
-     * If no ack is received, the message is not considered successful<br>
+     * SEND_OPTIONS_ASYNCHRONOUS - Message will be placed on a queue and sent by a separate thread<br>
+     * If the queue is full, behaviour depends on {@link MessageDispatchInterceptor#isAlwaysSend()}
      * @see #send(Member[], Serializable , int)
      * @see #send(Member[], Serializable, int, ErrorHandler)
      */

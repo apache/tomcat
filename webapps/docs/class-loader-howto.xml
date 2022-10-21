@@ -140,10 +140,10 @@ loaders as it is initialized:</p>
         configuration files from current state</li>
     <li><em>catalina-tribes.jar</em> &#8212; Group communication package.</li>
     <li><em>ecj-*.jar</em> &#8212; Eclipse JDT Java compiler.</li>
-    <li><em>el-api.jar</em> &#8212; EL 5.0 API.</li>
+    <li><em>el-api.jar</em> &#8212; EL 6.0 API.</li>
     <li><em>jasper.jar</em> &#8212; Tomcat Jasper JSP Compiler and Runtime.</li>
     <li><em>jasper-el.jar</em> &#8212; Tomcat Jasper EL implementation.</li>
-    <li><em>jsp-api.jar</em> &#8212; JSP 3.1 API.</li>
+    <li><em>jsp-api.jar</em> &#8212; JSP 4.0 API.</li>
     <li><em>servlet-api.jar</em> &#8212; Servlet 6.0 API.</li>
     <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.</li>
     <li><em>tomcat-coyote.jar</em> &#8212; Tomcat connectors and utility classes.</li>

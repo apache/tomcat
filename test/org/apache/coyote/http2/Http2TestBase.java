@@ -156,11 +156,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         // - ping
         // - headers (for response)
         // - data (for response body)
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
 
         Assert.assertEquals("0-Settings-[3]-[200]\n" +
                 "0-Settings-End\n" +
@@ -511,9 +511,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void readSimpleGetResponse() throws Http2Exception, IOException {
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body
-        parser.readFrame(true);
+        parser.readFrame();
     }
 
 
@@ -528,23 +528,23 @@ public abstract class Http2TestBase extends TomcatBaseTest {
          */
 
         // Connection window update after reading request body
-        parser.readFrame(true);
+        parser.readFrame();
         // Stream window update after reading request body
-        parser.readFrame(true);
+        parser.readFrame();
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body (includes end of stream)
-        parser.readFrame(true);
+        parser.readFrame();
 
         if (padding) {
             // Connection window update for padding
-            parser.readFrame(true);
+            parser.readFrame();
 
             // If EndOfStream has not been received then the stream window
             // update must have been received so a further frame needs to be
             // read for EndOfStream.
             if (!output.getTrace().contains("EndOfStream")) {
-                parser.readFrame(true);
+                parser.readFrame();
             }
         }
     }
@@ -979,7 +979,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void skipWindowSizeFrames() throws Http2Exception, IOException {
         do {
             output.clearTrace();
-            parser.readFrame(true);
+            parser.readFrame();
         } while (output.getTrace().contains("WindowSize"));
     }
 
@@ -987,7 +987,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     void handleGoAwayResponse(int lastStream, Http2Error expectedError)
             throws Http2Exception, IOException {
         try {
-            parser.readFrame(true);
+            parser.readFrame();
 
             Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
                     "0-Goaway-[" + lastStream + "]-[" + expectedError.getCode() + "]-["));
@@ -1430,7 +1430,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            // Request bodies are unusal with GET but not illegal
+            // Request bodies are unusual with GET but not illegal
             doPost(req, resp);
         }
 

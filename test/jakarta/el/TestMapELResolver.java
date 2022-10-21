@@ -16,10 +16,8 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -233,53 +231,6 @@ public class TestMapELResolver {
 
         Assert.assertTrue(result);
         Assert.assertTrue(context.isPropertyResolved());
-    }
-
-    /**
-     * Tests that a valid FeatureDescriptors are not returned if base is not
-     * Map.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    @Test
-    public void testGetFeatureDescriptors01() {
-        MapELResolver mapELResolver = new MapELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
-
-        Iterator<FeatureDescriptor> result = mapELResolver
-                .getFeatureDescriptors(context, new Object());
-
-        Assert.assertNull(result);
-    }
-
-    /**
-     * Tests that a valid FeatureDescriptors are returned.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    @Test
-    public void testGetFeatureDescriptors02() {
-        MapELResolver mapELResolver = new MapELResolver();
-        ELContext context = new StandardELContext(
-                ELManager.getExpressionFactory());
-
-        Map<String, String> map = new HashMap<>();
-        map.put("key", "value");
-        Iterator<FeatureDescriptor> result = mapELResolver
-                .getFeatureDescriptors(context, map);
-
-        while (result.hasNext()) {
-            FeatureDescriptor featureDescriptor = result.next();
-            Assert.assertEquals("key", featureDescriptor.getDisplayName());
-            Assert.assertEquals("key", featureDescriptor.getName());
-            Assert.assertEquals("", featureDescriptor.getShortDescription());
-            Assert.assertFalse(featureDescriptor.isExpert());
-            Assert.assertFalse(featureDescriptor.isHidden());
-            Assert.assertTrue(featureDescriptor.isPreferred());
-            Assert.assertEquals("key".getClass(),
-                    featureDescriptor.getValue(ELResolver.TYPE));
-            Assert.assertEquals(Boolean.TRUE, featureDescriptor
-                    .getValue(ELResolver.RESOLVABLE_AT_DESIGN_TIME));
-        }
     }
 
     private void doNegativeTest(Object base, Object trigger,

@@ -29,14 +29,14 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.RequestDispatcher;
@@ -307,7 +307,7 @@ public final class CGIServlet extends HttpServlet {
     private static final Object expandFileLock = new Object();
 
     /** the shell environment variables to be passed to the CGI script */
-    private final Hashtable<String,String> shellEnv = new Hashtable<>();
+    private final Map<String,String> shellEnv = new HashMap<>();
 
     /**
      * Enable creation of script command line arguments from query-string.
@@ -699,7 +699,7 @@ public final class CGIServlet extends HttpServlet {
         private File tmpDir = null;
 
         /** derived cgi environment */
-        private Hashtable<String, String> env = null;
+        private Map<String, String> env = null;
 
         /** cgi command to be invoked */
         private String command = null;
@@ -980,7 +980,7 @@ public final class CGIServlet extends HttpServlet {
              */
 
             // Add the shell environment variables (if any)
-            Hashtable<String, String> envp = new Hashtable<>(shellEnv);
+            Map<String, String> envp = new HashMap<>(shellEnv);
 
             // Add the CGI environment variables
             String sPathInfoOrig = null;
@@ -1318,7 +1318,7 @@ public final class CGIServlet extends HttpServlet {
          * @return   CGI environment
          *
          */
-        protected Hashtable<String,String> getEnvironment() {
+        protected Map<String,String> getEnvironment() {
             return env;
         }
 
@@ -1417,7 +1417,7 @@ public final class CGIServlet extends HttpServlet {
         private final String command;
 
         /** environment used when invoking the cgi script */
-        private final Hashtable<String,String> env;
+        private final Map<String,String> env;
 
         /** working directory used when invoking the cgi script */
         private final File wd;
@@ -1449,7 +1449,7 @@ public final class CGIServlet extends HttpServlet {
          * @param  params   ArrayList with the script's query command line
          *                  parameters as strings
          */
-        protected CGIRunner(String command, Hashtable<String,String> env,
+        protected CGIRunner(String command, Map<String,String> env,
                             File wd, ArrayList<String> params) {
             this.command = command;
             this.env = env;
@@ -1512,24 +1512,19 @@ public final class CGIServlet extends HttpServlet {
          * key/value pair in the Hashtable to a String in the form
          * "key=value" (hashkey + "=" + hash.get(hashkey).toString())
          *
-         * @param  h   Hashtable to convert
+         * @param  map Hashtable to convert
          *
          * @return     converted string array
          *
          * @exception  NullPointerException   if a hash key has a null value
          *
          */
-        protected String[] hashToStringArray(Hashtable<String,?> h)
-            throws NullPointerException {
-            Vector<String> v = new Vector<>();
-            Enumeration<String> e = h.keys();
-            while (e.hasMoreElements()) {
-                String k = e.nextElement();
-                v.add(k + "=" + h.get(k).toString());
+        protected String[] mapToStringArray(Map<String,?> map) throws NullPointerException {
+            List<String> list = new ArrayList<>(map.size());
+            for (Entry<String,?> entry : map.entrySet()) {
+                list.add(entry.getKey() + "=" + entry.getValue().toString());
             }
-            String[] strArr = new String[v.size()];
-            v.copyInto(strArr);
-            return strArr;
+            return list.toArray(new String[0]);
         }
 
 
@@ -1633,7 +1628,7 @@ public final class CGIServlet extends HttpServlet {
                 rt = Runtime.getRuntime();
                 proc = rt.exec(
                         cmdAndArgs.toArray(new String[0]),
-                        hashToStringArray(env), wd);
+                        mapToStringArray(env), wd);
 
                 String sContentLength = env.get("CONTENT_LENGTH");
 
@@ -1848,7 +1843,7 @@ public final class CGIServlet extends HttpServlet {
 
     /**
      * This is an input stream specifically for reading HTTP headers. It reads
-     * upto and including the two blank lines terminating the headers. It
+     * up to and including the two blank lines terminating the headers. It
      * allows the content to be read using bytes or characters as appropriate.
      */
     protected static class HTTPHeaderInputStream extends InputStream {

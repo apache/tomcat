@@ -50,8 +50,7 @@ public class JspException extends Exception {
     /**
      * Constructs a new <code>JSPException</code> with the specified detail
      * message and cause. The cause is saved for later retrieval by the
-     * <code>java.lang.Throwable.getCause()</code> and {@link #getRootCause()}
-     * methods.
+     * <code>java.lang.Throwable.getCause()</code> method.
      *
      * @see java.lang.Exception#Exception(String, Throwable)
      *
@@ -71,8 +70,7 @@ public class JspException extends Exception {
     /**
      * Constructs a new <code>JSPException</code> with the specified cause.
      * The cause is saved for later retrieval by the
-     * <code>java.lang.Throwable.getCause()</code> and {@link #getRootCause()}
-     * methods.
+     * <code>java.lang.Throwable.getCause()</code> method.
      *
      * @see java.lang.Exception#Exception(Throwable)
      *
@@ -83,19 +81,5 @@ public class JspException extends Exception {
 
     public JspException(Throwable cause) {
         super(cause);
-    }
-
-
-    /**
-     * Returns the exception that caused this JSP exception.
-     *
-     * @return  the <code>Throwable</code> that caused this JSP exception
-     *
-     * @deprecated As of JSP 2.1, replaced by
-     * <code>java.lang.Throwable.getCause()</code>
-     */
-    @Deprecated
-    public Throwable getRootCause() {
-        return getCause();
     }
 }

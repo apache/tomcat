@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +50,7 @@ import org.apache.tomcat.util.modeler.Util;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
@@ -64,9 +64,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public AbstractHttp11Protocol(AbstractEndpoint<S,?> endpoint) {
         super(endpoint);
         setConnectionTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
-        ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
-        setHandler(cHandler);
-        getEndpoint().setHandler(cHandler);
     }
 
 
@@ -227,7 +224,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * CLIENT-CERT authentication. When a POST is received where the security
      * constraints require a client certificate, the POST body needs to be
      * buffered while an SSL handshake takes place to obtain the certificate. A
-     * similar buffering is required during FDORM auth.
+     * similar buffering is required during FORM auth.
      *
      * @param maxSavePostSize The maximum size POST body to buffer in bytes
      */
@@ -464,8 +461,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * The names of headers that are allowed to be sent via a trailer when using
      * chunked encoding. They are stored in lower case.
      */
-    private Set<String> allowedTrailerHeaders =
-            Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
     public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
         // Jump through some hoops so we don't end up with an empty set while
         // doing updates.
@@ -699,13 +695,31 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    protected String getSslImplementationShortName() {
+        if (OpenSSLImplementation.class.getName().equals(getSslImplementationName())) {
+            return "openssl";
+        }
+        if (getSslImplementationName() != null
+                && getSslImplementationName().endsWith(".panama.OpenSSLImplementation")) {
+            return "opensslforeign";
+        }
+        return "jsse";
+    }
+
+    public String getSslImplementationName() { return getEndpoint().getSslImplementationName(); }
+    public void setSslImplementationName(String s) { getEndpoint().setSslImplementationName(s); }
+
+
+    public int getSniParseLimit() { return getEndpoint().getSniParseLimit(); }
+    public void setSniParseLimit(int sniParseLimit) {
+        getEndpoint().setSniParseLimit(sniParseLimit);
+    }
+
+
     // ------------------------------------------------------------- Common code
 
     @Override
-    protected Processor createProcessor() {
-        Http11Processor processor = new Http11Processor(this, adapter);
-        return processor;
-    }
+    protected abstract Processor createProcessor();
 
 
     @Override

@@ -25,7 +25,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import jakarta.servlet.AsyncEvent;
 import jakarta.servlet.AsyncListener;
@@ -95,6 +98,8 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
     private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
+    private static final Set<String> SENSITIVE_HTTP_HEADERS = new HashSet<>();
+
     /**
      * @deprecated May be removed in a future release
      *
@@ -115,6 +120,12 @@ public abstract class HttpServlet extends GenericServlet {
      * property.
      */
     private volatile boolean cachedUseLegacyDoHead;
+
+    static {
+        SENSITIVE_HTTP_HEADERS.add("cookie");
+        SENSITIVE_HTTP_HEADERS.add("authorization");
+    }
+
 
     /**
      * Does nothing, because this is an abstract class.
@@ -622,9 +633,7 @@ public abstract class HttpServlet extends GenericServlet {
      * @exception ServletException  if the request for the
      *                                  TRACE cannot be handled
      */
-    protected void doTrace(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException
-    {
+    protected void doTrace(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         int responseLength;
 
@@ -632,12 +641,18 @@ public abstract class HttpServlet extends GenericServlet {
         StringBuilder buffer =
                 new StringBuilder("TRACE ").append(req.getRequestURI()).append(" ").append(req.getProtocol());
 
-        Enumeration<String> reqHeaderEnum = req.getHeaderNames();
+        Enumeration<String> reqHeaderNames = req.getHeaderNames();
 
-        while( reqHeaderEnum.hasMoreElements() ) {
-            String headerName = reqHeaderEnum.nextElement();
-            buffer.append(CRLF).append(headerName).append(": ")
-                .append(req.getHeader(headerName));
+        while (reqHeaderNames.hasMoreElements()) {
+            String headerName = reqHeaderNames.nextElement();
+            // RFC 7231, 4.3.8 - skip 'sensitive' headers
+            if (!SENSITIVE_HTTP_HEADERS.contains(headerName.toLowerCase(Locale.ENGLISH))) {
+                Enumeration<String> headerValues = req.getHeaders(headerName);
+                while (headerValues.hasMoreElements()) {
+                    String headerValue = headerValues.nextElement();
+                    buffer.append(CRLF).append(headerName).append(": ").append(headerValue);
+                }
+            }
         }
 
         buffer.append(CRLF);

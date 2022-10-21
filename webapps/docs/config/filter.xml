@@ -307,6 +307,12 @@
         value of 5 will be used.</p>
       </attribute>
 
+      <attribute name="nonceRequestParameterName" required="false">
+        <p>The name of the request parameter used for the nonce. If not set, the
+        default value of <code>org.apache.catalina.filters.CSRF_NONCE</code>
+        will be used.</p>
+      </attribute>
+
       <attribute name="randomClass" required="false">
         <p>The name of the class to use to generate nonces. The class must be an
         instance of <code>java.util.Random</code>. If not set, the default value
@@ -1120,7 +1126,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       IPv6 are both fully supported.
     </p>
 
-    <p>This filter mimicks Apache httpd's <code>Order</code>,
+    <p>This filter mimics Apache httpd's <code>Order</code>,
       <code>Allow from</code> and <code>Deny from</code> directives,
       with the following limitations:
     </p>

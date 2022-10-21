@@ -136,7 +136,7 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
             // this name as having a duplicate so Tomcat can handle it
             // correctly when the fragments are being ordered.
             String duplicateName = fragment.getName();
-            fragments.get(duplicateName).setDuplicated(true);
+            fragments.get(duplicateName).addDuplicate(url.toString());
             // Rename the current fragment so it doesn't clash
             fragment.setName(url.toString());
         }

@@ -29,16 +29,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,8 +52,6 @@ import org.apache.jasper.TrimSpacesOption;
 import org.apache.jasper.compiler.Node.ChildInfoBase;
 import org.apache.jasper.compiler.Node.NamedAttribute;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.xml.sax.Attributes;
 
 /**
@@ -81,8 +76,6 @@ import org.xml.sax.Attributes;
  */
 
 class Generator {
-
-    private final Log log = LogFactory.getLog(Generator.class); // must not be static
 
     private static final Class<?>[] OBJECT_CLASS = { Object.class };
 
@@ -114,7 +107,7 @@ class Generator {
 
     private final PageInfo pageInfo;
 
-    private final Vector<String> tagHandlerPoolNames;
+    private final List<String> tagHandlerPoolNames;
 
     private GenBuffer charArrayBuffer;
 
@@ -274,14 +267,14 @@ class Generator {
 
         class TagHandlerPoolVisitor extends Node.Visitor {
 
-            private final Vector<String> names;
+            private final List<String> names;
 
             /*
              * Constructor
              *
              * @param v Vector of tag handler pool names to populate
              */
-            TagHandlerPoolVisitor(Vector<String> v) {
+            TagHandlerPoolVisitor(List<String> v) {
                 names = v;
             }
 
@@ -352,10 +345,10 @@ class Generator {
 
         class ScriptingVarVisitor extends Node.Visitor {
 
-            private final Vector<String> vars;
+            private final List<String> vars;
 
             ScriptingVarVisitor() {
-                vars = new Vector<>();
+                vars = new ArrayList<>();
             }
 
             @Override
@@ -505,7 +498,7 @@ class Generator {
         out.pushIndent();
         if (isPoolingEnabled) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printin(tagHandlerPoolNames.elementAt(i));
+                out.printin(tagHandlerPoolNames.get(i));
                 out.print(" = org.apache.jasper.runtime.TagHandlerPool.getTagHandlerPool(");
                 if (ctxt.isTagFile()) {
                     out.print("config");
@@ -541,7 +534,7 @@ class Generator {
 
         if (isPoolingEnabled) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printin(tagHandlerPoolNames.elementAt(i));
+                out.printin(tagHandlerPoolNames.get(i));
                 out.println(".release();");
             }
         }
@@ -662,8 +655,7 @@ class Generator {
     private void genPreambleClassVariableDeclarations() {
         if (isPoolingEnabled && !tagHandlerPoolNames.isEmpty()) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printil("private org.apache.jasper.runtime.TagHandlerPool "
-                        + tagHandlerPoolNames.elementAt(i) + ";");
+                out.printil("private org.apache.jasper.runtime.TagHandlerPool " + tagHandlerPoolNames.get(i) + ";");
             }
             out.println();
         }
@@ -761,14 +753,7 @@ class Generator {
         genPreambleMethods();
 
         // Now the service method
-        if (pageInfo.isThreadSafe()) {
-            out.printin("public void ");
-        } else {
-            // This is unlikely to perform well.
-            out.printin("public synchronized void ");
-            // As required by JSP 3.1, log a warning
-            log.warn(Localizer.getMessage("jsp.warning.isThreadSafe", ctxt.getJspFile()));
-        }
+        out.printin("public void ");
         out.print(serviceMethodName);
         out.println("(final jakarta.servlet.http.HttpServletRequest request, final jakarta.servlet.http.HttpServletResponse response)");
         out.pushIndent();
@@ -837,7 +822,7 @@ class Generator {
         out.println(");");
 
         if (ctxt.getOptions().isXpoweredBy()) {
-            out.printil("response.addHeader(\"X-Powered-By\", \"JSP/3.1\");");
+            out.printil("response.addHeader(\"X-Powered-By\", \"JSP/4.0\");");
         }
 
         out.printil("pageContext = _jspxFactory.getPageContext(this, request, response,");
@@ -915,9 +900,9 @@ class Generator {
          * handlers: <key>: tag short name <value>: introspection info of tag
          * handler for <prefix:shortName> tag
          */
-        private final Hashtable<String,Hashtable<String,TagHandlerInfo>> handlerInfos;
+        private final Map<String,Map<String,TagHandlerInfo>> handlerInfos;
 
-        private final Hashtable<String,Integer> tagVarNumbers;
+        private final Map<String,Integer> tagVarNumbers;
 
         private String parent;
 
@@ -958,8 +943,8 @@ class Generator {
             this.fragmentHelperClass = fragmentHelperClass;
             this.useInstanceManagerForTags = useInstanceManagerForTags;
             methodNesting = 0;
-            handlerInfos = new Hashtable<>();
-            tagVarNumbers = new Hashtable<>();
+            handlerInfos = new HashMap<>();
+            tagVarNumbers = new HashMap<>();
             textMap = new HashMap<>();
         }
 
@@ -1539,14 +1524,6 @@ class Generator {
         }
 
         @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-
-            // As of JSP 3.1, jsp:plugin must not generate any output
-            n.setBeginJavaLine(out.getJavaLine());
-            n.setEndJavaLine(out.getJavaLine());
-        }
-
-        @Override
         public void visit(Node.NamedAttribute n) throws JasperException {
             // Don't visit body of this tag - we already did earlier.
         }
@@ -1796,7 +1773,7 @@ class Generator {
 
             // Compute attribute value string for XML-style and named
             // attributes
-            Hashtable<String,String> map = new Hashtable<>();
+            Map<String,String> map = new HashMap<>();
             // Validator ensures this is non-null
             Node.JspAttribute[] attrs = n.getJspAttributes();
             for (int i = 0; i < attrs.length; i++) {
@@ -1841,10 +1818,8 @@ class Generator {
             out.print(" + " + elemName);
 
             // Write remaining attributes
-            Enumeration<String> enumeration = map.keys();
-            while (enumeration.hasMoreElements()) {
-                String attrName = enumeration.nextElement();
-                out.print(map.get(attrName));
+            for (Entry<String, String> attrEntry : map.entrySet()) {
+                out.print(attrEntry.getValue());
             }
 
             // Does the <jsp:element> have nested tags other than
@@ -2139,10 +2114,9 @@ class Generator {
 
         private TagHandlerInfo getTagHandlerInfo(Node.CustomTag n)
                 throws JasperException {
-            Hashtable<String,TagHandlerInfo> handlerInfosByShortName =
-                handlerInfos.get(n.getPrefix());
+            Map<String,TagHandlerInfo> handlerInfosByShortName = handlerInfos.get(n.getPrefix());
             if (handlerInfosByShortName == null) {
-                handlerInfosByShortName = new Hashtable<>();
+                handlerInfosByShortName = new HashMap<>();
                 handlerInfos.put(n.getPrefix(), handlerInfosByShortName);
             }
             TagHandlerInfo handlerInfo =
@@ -3336,7 +3310,7 @@ class Generator {
         varInfoNames = pageInfo.getVarInfoNames();
         breakAtLF = ctxt.getOptions().getMappedFile();
         if (isPoolingEnabled) {
-            tagHandlerPoolNames = new Vector<>();
+            tagHandlerPoolNames = new ArrayList<>();
         } else {
             tagHandlerPoolNames = null;
         }
@@ -3817,9 +3791,9 @@ class Generator {
      */
     private static class TagHandlerInfo {
 
-        private Hashtable<String, Method> methodMaps;
+        private Map<String, Method> methodMaps;
 
-        private Hashtable<String, Class<?>> propertyEditorMaps;
+        private Map<String, Class<?>> propertyEditorMaps;
 
         private Class<?> tagHandlerClass;
 
@@ -3837,8 +3811,8 @@ class Generator {
         TagHandlerInfo(Node n, Class<?> tagHandlerClass,
                 ErrorDispatcher err) throws JasperException {
             this.tagHandlerClass = tagHandlerClass;
-            this.methodMaps = new Hashtable<>();
-            this.propertyEditorMaps = new Hashtable<>();
+            this.methodMaps = new HashMap<>();
+            this.propertyEditorMaps = new HashMap<>();
 
             try {
                 BeanInfo tagClassInfo = Introspector.getBeanInfo(tagHandlerClass);

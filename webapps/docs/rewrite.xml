@@ -44,7 +44,7 @@
 
   <p>The rewrite valve can be configured as a valve added in a Host.
      See <a href="config/host.html">virtual-server</a> documentation for
-     informations how to configure it. It will use a <code>rewrite.config</code> file
+     information on how to configure it. It will use a <code>rewrite.config</code> file
      containing the rewrite directives, it must be placed in the Host configuration
      folder.
   </p>

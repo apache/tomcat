@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 package org.apache.catalina.tribes.transport;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * A very simple thread pool class.  The pool size is set at
  * construction time and remains fixed.  Threads are cycled
  * through a FIFO idle queue.
- * @version 1.0
  */
 public class RxTaskPool {
 
-    final List<AbstractRxTask> idle = new LinkedList<>();
-    final List<AbstractRxTask> used = new LinkedList<>();
+    final List<AbstractRxTask> idle = new ArrayList<>();
+    final List<AbstractRxTask> used = new ArrayList<>();
 
     final Object mutex = new Object();
     boolean running = true;

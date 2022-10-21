@@ -16,7 +16,8 @@
  */
 package org.apache.naming;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Handles the access control on the JNDI contexts.
@@ -30,13 +31,13 @@ public class ContextAccessController {
     /**
      * Catalina context names on which writing is not allowed.
      */
-    private static final Hashtable<Object,Object> readOnlyContexts = new Hashtable<>();
+    private static final Map<Object,Object> readOnlyContexts = new ConcurrentHashMap<>();
 
 
     /**
      * Security tokens repository.
      */
-    private static final Hashtable<Object,Object> securityTokens = new Hashtable<>();
+    private static final Map<Object,Object> securityTokens = new ConcurrentHashMap<>();
 
 
     // --------------------------------------------------------- Public Methods

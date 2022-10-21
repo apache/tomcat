@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.tribes.membership;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -93,7 +92,7 @@ public class Membership implements Cloneable {
      * @param includeLocal - TBA
      */
     public Membership(Member local, boolean includeLocal) {
-        this(local, new MemberComparator(), includeLocal);
+        this(local, Comparator.comparingLong(Member::getMemberAliveTime).reversed(), includeLocal);
     }
 
     public Membership(Member local) {
@@ -238,8 +237,7 @@ public class Membership implements Cloneable {
             }
 
             if (list != null) {
-                Member[] result = new Member[list.size()];
-                list.toArray(result);
+                Member[] result = list.toArray(new Member[0]);
                 for (Member member : result) {
                     removeMember(member);
                 }
@@ -289,24 +287,6 @@ public class Membership implements Cloneable {
 
 
     // --------------------------------------------- Inner Class
-
-    private static class MemberComparator implements Comparator<Member>, Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public int compare(Member m1, Member m2) {
-            // Longer alive time, means sort first
-            long result = m2.getMemberAliveTime() - m1.getMemberAliveTime();
-            if (result < 0) {
-                return -1;
-            } else if (result == 0) {
-                return 0;
-            } else {
-                return 1;
-            }
-        }
-    }
 
     /**
      * Inner class that represents a member entry

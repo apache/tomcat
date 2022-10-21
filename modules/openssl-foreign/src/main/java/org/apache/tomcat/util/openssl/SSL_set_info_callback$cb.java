@@ -26,15 +26,15 @@ import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 public interface SSL_set_info_callback$cb {
 
-    void apply(java.lang.foreign.MemoryAddress _x0, int _x1, int _x2);
+    void apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
     static MemorySegment allocate(SSL_set_info_callback$cb fi, MemorySession session) {
         return RuntimeHelper.upcallStub(SSL_set_info_callback$cb.class, fi, constants$21.SSL_set_info_callback$cb$FUNC, session);
     }
-    static SSL_set_info_callback$cb ofAddress(MemoryAddress addr, MemorySession session) {
-        MemorySegment symbol = MemorySegment.ofAddress(addr, 0, session);
-        return (java.lang.foreign.MemoryAddress __x0, int __x1, int __x2) -> {
+    static SSL_set_info_callback$cb ofAddress(MemorySegment addr, MemorySession session) {
+        MemorySegment symbol = MemorySegment.ofAddress(addr.address(), 0, session);
+        return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
             try {
-                constants$21.SSL_set_info_callback$cb$MH.invokeExact((Addressable)symbol, (java.lang.foreign.Addressable)__x0, __x1, __x2);
+                constants$21.SSL_set_info_callback$cb$MH.invokeExact((MemorySegment)symbol, __x0, __x1, __x2);
             } catch (Throwable ex$) {
                 throw new AssertionError("should not reach here", ex$);
             }

@@ -512,6 +512,10 @@ public class ClassLoaderLogManager extends LogManager {
         if (is != null) {
             readConfiguration(is, classLoader);
         }
+
+        if (localRootLogger.getParent() == null && localRootLogger.getLevel() == null) {
+            localRootLogger.setLevel(Level.INFO);
+        }
         try {
             // Use a ThreadLocal to work around
             // https://bugs.openjdk.java.net/browse/JDK-8195096

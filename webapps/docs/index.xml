@@ -35,7 +35,7 @@
 
 <p>This is the top-level entry point of the documentation bundle for the
 <strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version
-<version-major-minor/> implements the Servlet 6.0 and JavaServer Pages 3.1
+<version-major-minor/> implements the Servlet 6.0 and JavaServer Pages 4.0
 <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">specifications</a> from
 <a href="https://jakarta.ee/">Jakarta EE</a>, and includes many
 additional features that make it a useful platform for developing and deploying
@@ -170,16 +170,16 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     <a href="https://jakarta.ee/specifications/servlet/6.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>JSP 3.1
-    <a href="https://jakarta.ee/specifications/pages/3.1/">
+<li>JSP 4.0
+    <a href="https://jakarta.ee/specifications/pages/4.0/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/pages/3.1/apidocs">
+    <a href="https://jakarta.ee/specifications/pages/4.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>EL 5.0
-    <a href="https://jakarta.ee/specifications/expression-language/5.0/">
+<li>EL 6.0
+    <a href="https://jakarta.ee/specifications/expression-language/6.0/">
     <strong>Specification</strong></a> and
-    <a href="https://jakarta.ee/specifications/expression-language/5.0/apidocs">
+    <a href="https://jakarta.ee/specifications/expression-language/6.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
 <li>WebSocket 2.1

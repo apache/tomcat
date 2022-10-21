@@ -16,7 +16,7 @@
  */
 package org.apache.catalina.authenticator;
 
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +29,6 @@ import jakarta.servlet.http.Cookie;
 
 import org.apache.tomcat.util.buf.ByteChunk;
 
-
 /**
  * Object that saves the critical information from a request so that
  * form-based authentication can reproduce it once the user has been
@@ -41,7 +40,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
  *
  * @author Craig R. McClanahan
  */
-public final class SavedRequest {
+public final class SavedRequest implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The set of Cookies associated with this Request.

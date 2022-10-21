@@ -20,10 +20,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.res.StringManager;
@@ -704,29 +706,6 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
     /**
-     * Convert a list of strings in a comma delimited string.
-     *
-     * @param stringList List of strings
-     * @return concatenated string
-     */
-    protected static String listToCommaDelimitedString(List<String> stringList) {
-        if (stringList == null) {
-            return "";
-        }
-        StringBuilder result = new StringBuilder();
-        for (Iterator<String> it = stringList.iterator(); it.hasNext();) {
-            Object element = it.next();
-            if (element != null) {
-                result.append(element);
-                if (it.hasNext()) {
-                    result.append(", ");
-                }
-            }
-        }
-        return result.toString();
-    }
-
-    /**
      * @see #setHttpServerPort(int)
      */
     private int httpServerPort = 80;
@@ -794,7 +773,7 @@ public class RemoteIpFilter extends GenericFilter {
         if (isInternal || (trustedProxies != null &&
                 trustedProxies.matcher(request.getRemoteAddr()).matches())) {
             String remoteIp = null;
-            LinkedList<String> proxiesHeaderValue = new LinkedList<>();
+            Deque<String> proxiesHeaderValue = new ArrayDeque<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
 
             for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
@@ -855,13 +834,13 @@ public class RemoteIpFilter extends GenericFilter {
                 if (proxiesHeaderValue.size() == 0) {
                     xRequest.removeHeader(proxiesHeader);
                 } else {
-                    String commaDelimitedListOfProxies = listToCommaDelimitedString(proxiesHeaderValue);
+                    String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
                     xRequest.setHeader(proxiesHeader, commaDelimitedListOfProxies);
                 }
                 if (newRemoteIpHeaderValue.size() == 0) {
                     xRequest.removeHeader(remoteIpHeader);
                 } else {
-                    String commaDelimitedRemoteIpHeaderValue = listToCommaDelimitedString(newRemoteIpHeaderValue);
+                    String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
                     xRequest.setHeader(remoteIpHeader, commaDelimitedRemoteIpHeaderValue);
                 }
             }

@@ -117,7 +117,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         sendSettings(0, false, new SettingValue(0xFF,0xFF));
 
         // Ack
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
                 "0-Settings-Ack"));

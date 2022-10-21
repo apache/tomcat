@@ -16,8 +16,6 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -148,13 +146,6 @@ public class BeanNameELResolver extends ELResolver {
 
         // Return value undefined
         return false;
-    }
-
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
-            Object base) {
-        return null;
     }
 
     @Override

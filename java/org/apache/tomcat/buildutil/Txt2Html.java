@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
@@ -50,7 +50,7 @@ public class Txt2Html
     private File todir;
 
     /** The file to be converted into HTML */
-    private final List<FileSet> filesets = new LinkedList<>();
+    private final List<FileSet> filesets = new ArrayList<>();
 
     /**
      * The encoding of the source files (.java and .jsp).  Once they use

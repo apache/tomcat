@@ -45,6 +45,7 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.Escape;
 import org.xml.sax.Attributes;
 
 /**
@@ -295,7 +296,7 @@ public class MemoryUserDatabase implements UserDatabase {
             throw new IllegalArgumentException(msg);
         }
 
-        MemoryGroup group = new MemoryGroup(this, groupname, description);
+        Group group = new GenericGroup<>(this, groupname, description, null);
         readLock.lock();
         try {
             groups.put(group.getGroupname(), group);
@@ -320,7 +321,7 @@ public class MemoryUserDatabase implements UserDatabase {
             throw new IllegalArgumentException(msg);
         }
 
-        MemoryRole role = new MemoryRole(this, rolename, description);
+        Role role = new GenericRole<>(this, rolename, description);
         readLock.lock();
         try {
             roles.put(role.getRolename(), role);
@@ -347,7 +348,7 @@ public class MemoryUserDatabase implements UserDatabase {
             throw new IllegalArgumentException(msg);
         }
 
-        MemoryUser user = new MemoryUser(this, username, password, fullName);
+        User user = new GenericUser<>(this, username, password, fullName, null, null);
         readLock.lock();
         try {
             users.put(user.getUsername(), user);
@@ -582,19 +583,70 @@ public class MemoryUserDatabase implements UserDatabase {
                 // Print entries for each defined role, group, and user
                 Iterator<?> values = null;
                 values = getRoles();
-                while (values.hasNext()) {
-                    writer.print("  ");
-                    writer.println(values.next());
+                while(values.hasNext()) {
+                    Role role = (Role)values.next();
+                    writer.print("  <role rolename=\"");
+                    writer.print(Escape.xml(role.getRolename()));
+                    writer.print("\"");
+                    if(null != role.getDescription()) {
+                        writer.print(" description=\"");
+                        writer.print(Escape.xml(role.getDescription()));
+                        writer.print("\"");
+                    }
+                    writer.println("/>");
                 }
                 values = getGroups();
                 while (values.hasNext()) {
-                    writer.print("  ");
-                    writer.println(values.next());
+                    Group group = (Group)values.next();
+                    writer.print("  <group groupname=\"");
+                    writer.print(Escape.xml(group.getName()));
+                    writer.print("\"");
+                    if(null != group.getDescription()) {
+                        writer.print(" description=\"");
+                        writer.print(Escape.xml(group.getDescription()));
+                        writer.print("\"");
+                    }
+                    writer.print(" roles=\"");
+                    for (Iterator<Role> roles=group.getRoles(); roles.hasNext();) {
+                        Role role = roles.next();
+                        writer.print(Escape.xml(role.getRolename()));
+                        if(roles.hasNext()) {
+                            writer.print(',');
+                        }
+                    }
+                    writer.println("\"/>");
                 }
+
                 values = getUsers();
                 while (values.hasNext()) {
-                    writer.print("  ");
-                    writer.println(((MemoryUser) values.next()).toXml());
+                    User user = (User)values.next();
+                    writer.print("  <user username=\"");
+                    writer.print(Escape.xml(user.getUsername()));
+                    writer.print("\" password=\"");
+                    writer.print(Escape.xml(user.getPassword()));
+                    writer.print("\"");
+                    if(null != user.getFullName()) {
+                        writer.print(" fullName=\"");
+                        writer.print(Escape.xml(user.getFullName()));
+                        writer.print("\"");
+                    }
+                    writer.print(" groups=\"");
+                    for (Iterator<Group> groups=user.getGroups(); groups.hasNext();) {
+                        Group group = groups.next();
+                        writer.print(Escape.xml(group.getGroupname()));
+                        if(groups.hasNext()) {
+                            writer.print(',');
+                        }
+                    }
+                    writer.print("\" roles=\"");
+                    for (Iterator<Role> roles=user.getRoles(); roles.hasNext();) {
+                        Role role = roles.next();
+                        writer.print(Escape.xml(role.getRolename()));
+                        if(roles.hasNext()) {
+                            writer.print(',');
+                        }
+                    }
+                    writer.print("\"/>");
                 }
 
                 // Print the file epilog

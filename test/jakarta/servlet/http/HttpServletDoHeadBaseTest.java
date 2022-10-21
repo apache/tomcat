@@ -128,11 +128,11 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             writeFrame(frameHeaderGet, headersPayloadGet);
 
             // Want the headers frame for stream 3
-            parser.readFrame(true);
+            parser.readFrame();
             while (!output.getTrace().startsWith("3-HeadersStart\n")) {
                 debug.append(output.getTrace());
                 output.clearTrace();
-                parser.readFrame(true);
+                parser.readFrame();
             }
             String traceGet = output.getTrace();
             debug.append(output.getTrace());
@@ -145,11 +145,11 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             writeFrame(frameHeaderHead, headersPayloadHead);
 
             // Want the headers frame for stream 5
-            parser.readFrame(true);
+            parser.readFrame();
             while (!output.getTrace().startsWith("5-HeadersStart\n")) {
                 debug.append(output.getTrace());
                 output.clearTrace();
-                parser.readFrame(true);
+                parser.readFrame();
             }
             String traceHead = output.getTrace();
             debug.append(output.getTrace());

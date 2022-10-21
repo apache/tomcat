@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jakarta.servlet.AsyncContext;
@@ -40,6 +41,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.net.TesterSupport.SimpleServlet;
 
 public class TestHttpServlet extends TomcatBaseTest {
 
@@ -289,6 +291,64 @@ public class TestHttpServlet extends TomcatBaseTest {
             Assert.assertTrue(client.getResponseLine(), client.isResponse400());
         } else {
             Assert.assertTrue(client.getResponseLine(), client.isResponse405());
+        }
+    }
+
+
+    @Test
+    public void testTrace() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setAllowTrace(true);
+
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+
+        // Map the test Servlet
+        Tomcat.addServlet(ctx, "servlet", new SimpleServlet());
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        TraceClient client = new TraceClient();
+        client.setPort(getPort());
+        client.setRequest(new String[] {
+                "TRACE / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "X-aaa: a1, a2" + SimpleHttpClient.CRLF +
+                "X-aaa: a3" + SimpleHttpClient.CRLF +
+                "Cookie: c1-v1" + SimpleHttpClient.CRLF +
+                "Authorization: not-a-real-credential" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF});
+        client.setUseContentLength(true);
+
+        client.connect();
+        client.sendRequest();
+        client.readResponse(true);
+
+        String body = client.getResponseBody();
+
+        System.out.println(body);
+
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+        // Far from perfect but good enough
+        body = body.toLowerCase(Locale.ENGLISH);
+        Assert.assertTrue(body.contains("a1"));
+        Assert.assertTrue(body.contains("a2"));
+        Assert.assertTrue(body.contains("a3"));
+        // Sensitive headers (cookies, WWW-Authenticate) must not be reflected
+        // (since RFC 7231)
+        Assert.assertFalse(body.contains("cookie"));
+        Assert.assertFalse(body.contains("authorization"));
+
+        client.disconnect();
+    }
+
+
+    private static final class TraceClient extends SimpleHttpClient {
+
+        @Override
+        public boolean isResponseBodyOK() {
+            return true;
         }
     }
 

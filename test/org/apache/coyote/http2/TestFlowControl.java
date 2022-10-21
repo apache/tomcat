@@ -18,7 +18,6 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
@@ -26,8 +25,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.res.StringManager;
 
 public class TestFlowControl extends Http2TestBase {
+
+    private static final StringManager sm = StringManager.getManager(TestFlowControl.class);
 
     /*
      * https://tomcat.markmail.org/thread/lijsebphms7hr3zj
@@ -81,11 +83,11 @@ public class TestFlowControl extends Http2TestBase {
 
             // Read the 404 error page
             // headers
-            parser.readFrame(true);
+            parser.readFrame();
             // body
-            parser.readFrame(true);
+            parser.readFrame();
             // reset (because the request body was not fully read)
-            parser.readFrame(true);
+            parser.readFrame();
 
             // Validate response
             // Response size varies as error page is generated and includes version
@@ -95,7 +97,7 @@ public class TestFlowControl extends Http2TestBase {
             int end = trace.indexOf("]", start);
             String contentLength = trace.substring(start, end);
             // Language will depend on locale
-            String language = Locale.getDefault().getLanguage();
+            String language = sm.getLocale().toLanguageTag();
 
             Assert.assertEquals(
                     "3-HeadersStart\n" +
@@ -138,7 +140,7 @@ public class TestFlowControl extends Http2TestBase {
         boolean found = false;
         String trace;
         do {
-            parser.readFrame(true);
+            parser.readFrame();
             trace = output.getTrace();
             output.clearTrace();
             found = trace.startsWith(prefix);

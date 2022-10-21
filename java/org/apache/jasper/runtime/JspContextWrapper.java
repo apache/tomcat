@@ -46,10 +46,7 @@ import jakarta.servlet.jsp.JspContext;
 import jakarta.servlet.jsp.JspFactory;
 import jakarta.servlet.jsp.JspWriter;
 import jakarta.servlet.jsp.PageContext;
-import jakarta.servlet.jsp.el.ELException;
-import jakarta.servlet.jsp.el.ExpressionEvaluator;
 import jakarta.servlet.jsp.el.NotFoundELResolver;
-import jakarta.servlet.jsp.el.VariableResolver;
 import jakarta.servlet.jsp.tagext.BodyContent;
 import jakarta.servlet.jsp.tagext.JspTag;
 import jakarta.servlet.jsp.tagext.VariableInfo;
@@ -68,8 +65,7 @@ import org.apache.jasper.compiler.Localizer;
  * @author Jan Luehe
  * @author Jacob Hookom
  */
-@SuppressWarnings("deprecation") // Have to support old JSP EL API
-public class JspContextWrapper extends PageContext implements VariableResolver {
+public class JspContextWrapper extends PageContext{
 
     private final JspTag jspTag;
 
@@ -339,12 +335,6 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     }
 
     @Override
-    @Deprecated
-    public VariableResolver getVariableResolver() {
-        return this;
-    }
-
-    @Override
     public BodyContent pushBody() {
         return invokingJspCtxt.pushBody();
     }
@@ -360,12 +350,6 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     }
 
     @Override
-    @Deprecated
-    public ExpressionEvaluator getExpressionEvaluator() {
-        return invokingJspCtxt.getExpressionEvaluator();
-    }
-
-    @Override
     public void handlePageException(Exception ex) throws IOException,
             ServletException {
         // Should never be called since handleException() called with a
@@ -377,16 +361,6 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     public void handlePageException(Throwable t) throws IOException,
             ServletException {
         invokingJspCtxt.handlePageException(t);
-    }
-
-    /**
-     * VariableResolver interface
-     */
-    @Override
-    @Deprecated
-    public Object resolveVariable(String pName) throws ELException {
-        ELContext ctx = this.getELContext();
-        return ctx.getELResolver().getValue(ctx, null, pName);
     }
 
     /**

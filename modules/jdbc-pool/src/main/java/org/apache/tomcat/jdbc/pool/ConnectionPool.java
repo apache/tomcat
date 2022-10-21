@@ -51,7 +51,6 @@ import org.apache.juli.logging.LogFactory;
  * The ConnectionPool uses a {@link PoolProperties} object for storing all the meta information about the connection pool.
  * As the underlying implementation, the connection pool uses {@link java.util.concurrent.BlockingQueue} to store active and idle connections.
  * A custom implementation of a fair {@link FairBlockingQueue} blocking queue is provided with the connection pool itself.
- * @version 1.0
  */
 public class ConnectionPool {
 
@@ -1397,7 +1396,7 @@ public class ConnectionPool {
     }
 
     /**
-     * Tread safe wrapper around a future for the regular queue
+     * Thread safe wrapper around a future for the regular queue
      * This one retrieves the pooled connection object
      * and performs the initialization according to
      * interceptors and validation rules.

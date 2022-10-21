@@ -16,15 +16,15 @@
  */
 package org.apache.catalina.manager;
 
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerNotification;
@@ -47,8 +47,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Remy Maucherat
  */
-public class StatusManagerServlet
-    extends HttpServlet implements NotificationListener {
+public class StatusManagerServlet extends HttpServlet implements NotificationListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -62,30 +61,28 @@ public class StatusManagerServlet
     /**
      * Vector of thread pools object names.
      */
-    protected final Vector<ObjectName> threadPools = new Vector<>();
+    protected final List<ObjectName> threadPools = Collections.synchronizedList(new ArrayList<>());
 
 
     /**
      * Vector of request processors object names.
      */
-    protected final Vector<ObjectName> requestProcessors = new Vector<>();
+    protected final List<ObjectName> requestProcessors = Collections.synchronizedList(new ArrayList<>());
 
 
     /**
      * Vector of global request processors object names.
      */
-    protected final Vector<ObjectName> globalRequestProcessors = new Vector<>();
+    protected final List<ObjectName> globalRequestProcessors = Collections.synchronizedList(new ArrayList<>());
 
 
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Initialize this servlet.
@@ -105,7 +102,7 @@ public class StatusManagerServlet
             Iterator<ObjectInstance> iterator = set.iterator();
             while (iterator.hasNext()) {
                 ObjectInstance oi = iterator.next();
-                threadPools.addElement(oi.getObjectName());
+                threadPools.add(oi.getObjectName());
             }
 
             // Query Global Request Processors
@@ -115,7 +112,7 @@ public class StatusManagerServlet
             iterator = set.iterator();
             while (iterator.hasNext()) {
                 ObjectInstance oi = iterator.next();
-                globalRequestProcessors.addElement(oi.getObjectName());
+                globalRequestProcessors.add(oi.getObjectName());
             }
 
             // Query Request Processors
@@ -125,7 +122,7 @@ public class StatusManagerServlet
             iterator = set.iterator();
             while (iterator.hasNext()) {
                 ObjectInstance oi = iterator.next();
-                requestProcessors.addElement(oi.getObjectName());
+                requestProcessors.add(oi.getObjectName());
             }
 
             // Register with MBean server
@@ -282,9 +279,7 @@ public class StatusManagerServlet
             // use StatusTransformer to output status
             StatusTransformer.writeVMState(writer,mode, args);
 
-            Enumeration<ObjectName> enumeration = threadPools.elements();
-            while (enumeration.hasMoreElements()) {
-                ObjectName objectName = enumeration.nextElement();
+            for (ObjectName objectName : threadPools) {
                 String name = objectName.getKeyProperty("name");
                 args = new Object[19];
                 args[0] = smClient.getString("htmlManagerServlet.connectorStateMaxThreads");
@@ -307,18 +302,14 @@ public class StatusManagerServlet
                 args[17] = smClient.getString("htmlManagerServlet.connectorStateTableTitleRequest");
                 args[18] = smClient.getString("htmlManagerServlet.connectorStateHint");
                 // use StatusTransformer to output status
-                StatusTransformer.writeConnectorState
-                    (writer, objectName,
-                     name, mBeanServer, globalRequestProcessors,
-                     requestProcessors, mode, args);
+                StatusTransformer.writeConnectorState(writer, objectName, name, mBeanServer, globalRequestProcessors,
+                        requestProcessors, mode, args);
             }
 
-            if ((request.getPathInfo() != null)
-                && (request.getPathInfo().equals("/all"))) {
+            if ((request.getPathInfo() != null) && (request.getPathInfo().equals("/all"))) {
                 // Note: Retrieving the full status is much slower
                 // use StatusTransformer to output status
-                StatusTransformer.writeDetailedState
-                    (writer, mBeanServer, mode);
+                StatusTransformer.writeDetailedState(writer, mBeanServer, mode);
             }
 
         } catch (Exception e) {
@@ -327,11 +318,10 @@ public class StatusManagerServlet
 
         // use StatusTransformer to output status
         StatusTransformer.writeFooter(writer, mode);
-
     }
 
-    // ------------------------------------------- NotificationListener Methods
 
+    // ------------------------------------------- NotificationListener Methods
 
     @Override
     public void handleNotification(Notification notification,
@@ -345,23 +335,22 @@ public class StatusManagerServlet
                 String type = objectName.getKeyProperty("type");
                 if (type != null) {
                     if (type.equals("ThreadPool")) {
-                        threadPools.addElement(objectName);
+                        threadPools.add(objectName);
                     } else if (type.equals("GlobalRequestProcessor")) {
-                        globalRequestProcessors.addElement(objectName);
+                        globalRequestProcessors.add(objectName);
                     } else if (type.equals("RequestProcessor")) {
-                        requestProcessors.addElement(objectName);
+                        requestProcessors.add(objectName);
                     }
                 }
-            } else if (notification.getType().equals
-                       (MBeanServerNotification.UNREGISTRATION_NOTIFICATION)) {
+            } else if (notification.getType().equals(MBeanServerNotification.UNREGISTRATION_NOTIFICATION)) {
                 String type = objectName.getKeyProperty("type");
                 if (type != null) {
                     if (type.equals("ThreadPool")) {
-                        threadPools.removeElement(objectName);
+                        threadPools.remove(objectName);
                     } else if (type.equals("GlobalRequestProcessor")) {
-                        globalRequestProcessors.removeElement(objectName);
+                        globalRequestProcessors.remove(objectName);
                     } else if (type.equals("RequestProcessor")) {
-                        requestProcessors.removeElement(objectName);
+                        requestProcessors.remove(objectName);
                     }
                 }
             }

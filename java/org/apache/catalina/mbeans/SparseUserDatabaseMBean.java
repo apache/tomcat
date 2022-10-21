@@ -36,7 +36,7 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
  * <code>org.apache.catalina.users.SparseUserDatabase</code> component.
- * The main difference is that the MBeans are created on demand (for exemple,
+ * The main difference is that the MBeans are created on demand (for example,
  * the findUser method would register the corresponding user and make it
  * available for management. All the MBeans created for users, groups and roles
  * are then discarded when save is invoked.</p>

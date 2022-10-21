@@ -118,7 +118,7 @@
 
       <attribute name="value" required="true">
         <p>The parameter value that will be presented to the application
-        when requested from the JNDI context.  This value must be convertable
+        when requested from the JNDI context.  This value must be convertible
         to the Java type defined by the <code>type</code> attribute.</p>
       </attribute>
 

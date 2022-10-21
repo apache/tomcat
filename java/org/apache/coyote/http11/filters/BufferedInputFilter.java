@@ -33,27 +33,28 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
  */
 public class BufferedInputFilter implements InputFilter, ApplicationBufferHandler {
 
-    // -------------------------------------------------------------- Constants
-
     private static final String ENCODING_NAME = "buffered";
     private static final ByteChunk ENCODING = new ByteChunk();
 
 
-    // ----------------------------------------------------- Instance Variables
+    static {
+        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1), 0, ENCODING_NAME.length());
+    }
 
-    private ByteBuffer buffered;
+
+    // Use ByteChunk since it correctly handles the special buffer size of -1
+    // for maxSavePostSize.
+    private ByteChunk buffered;
     private ByteBuffer tempRead;
     private InputBuffer buffer;
     private boolean hasRead = false;
 
+    private final int maxSwallowSize;
 
-    // ----------------------------------------------------- Static Initializer
 
-    static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1),
-                0, ENCODING_NAME.length());
+    public BufferedInputFilter(int maxSwallowSize) {
+        this.maxSwallowSize = maxSwallowSize;
     }
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -66,8 +67,8 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
      */
     public void setLimit(int limit) {
         if (buffered == null) {
-            buffered = ByteBuffer.allocate(limit);
-            buffered.flip();
+            buffered = new ByteChunk();
+            buffered.setLimit(limit);
         }
     }
 
@@ -82,11 +83,22 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
     public void setRequest(Request request) {
         // save off the Request body
         try {
-            while (buffer.doRead(this) >= 0) {
-                buffered.mark().position(buffered.limit()).limit(buffered.capacity());
-                buffered.put(tempRead);
-                buffered.limit(buffered.position()).reset();
-                tempRead = null;
+            if (buffered.getLimit() == 0) {
+                // Special case - ignore (swallow) body. Do so within a limit.
+                long swallowed = 0;
+                int read = 0;
+                while ((read = buffer.doRead(this)) >= 0) {
+                    swallowed += read;
+                    if (maxSwallowSize > -1 && swallowed > maxSwallowSize) {
+                        // No need for i18n - this isn't going to get logged
+                        throw new IOException("Ignored body exceeded maxSwallowSize");
+                    }
+                }
+            } else {
+                while (buffer.doRead(this) >= 0) {
+                    buffered.append(tempRead);
+                    tempRead = null;
+                }
             }
         } catch(IOException | BufferOverflowException ioe) {
             // No need for i18n - this isn't going to get logged anywhere
@@ -104,9 +116,9 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
             return -1;
         }
 
-        handler.setByteBuffer(buffered);
+        handler.setByteBuffer(ByteBuffer.wrap(buffered.getBuffer(), buffered.getStart(), buffered.getLength()));
         hasRead = true;
-        return buffered.remaining();
+        return buffered.getLength();
     }
 
     @Override
@@ -117,10 +129,10 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
     @Override
     public void recycle() {
         if (buffered != null) {
-            if (buffered.capacity() > 65536) {
+            if (buffered.getBuffer() != null && buffered.getBuffer().length > 65536) {
                 buffered = null;
             } else {
-                buffered.position(0).limit(0);
+                buffered.recycle();
             }
         }
         hasRead = false;
@@ -139,7 +151,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
 
     @Override
     public int available() {
-        int available = buffered.remaining();
+        int available = buffered.getLength();
         if (available == 0) {
             // No data buffered here. Try the next filter in the chain.
             return buffer.available();
@@ -151,7 +163,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
 
     @Override
     public boolean isFinished() {
-        return hasRead || buffered.remaining() <= 0;
+        return hasRead || buffered.getLength() <= 0;
     }
 
 

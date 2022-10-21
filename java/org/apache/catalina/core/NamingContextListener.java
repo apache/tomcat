@@ -133,7 +133,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
 
     /**
-     * Objectnames hashtable.
+     * Objectnames Map.
      */
     protected HashMap<String, ObjectName> objectNames = new HashMap<>();
 

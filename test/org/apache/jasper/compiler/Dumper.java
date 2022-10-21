@@ -135,20 +135,6 @@ class Dumper {
         }
 
         @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-            printAttributes("<jsp:plugin", n.getAttributes(), ">");
-            dumpBody(n);
-            printString("</jsp:plugin>");
-        }
-
-        @Override
-        public void visit(Node.ParamsAction n) throws JasperException {
-            printAttributes("<jsp:params", n.getAttributes(), ">");
-            dumpBody(n);
-            printString("</jsp:params>");
-        }
-
-        @Override
         public void visit(Node.ParamAction n) throws JasperException {
             printAttributes("<jsp:param", n.getAttributes(), ">");
             dumpBody(n);

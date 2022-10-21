@@ -16,12 +16,8 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -103,32 +99,6 @@ public class MapELResolver extends ELResolver {
         }
 
         return this.readOnly;
-    }
-
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        if (base instanceof Map<?, ?>) {
-            Iterator<?> itr = ((Map<?, ?>) base).keySet().iterator();
-            List<FeatureDescriptor> feats = new ArrayList<>();
-            Object key;
-            FeatureDescriptor desc;
-            while (itr.hasNext()) {
-                key = itr.next();
-                desc = new FeatureDescriptor();
-                desc.setDisplayName(key.toString());
-                desc.setShortDescription("");
-                desc.setExpert(false);
-                desc.setHidden(false);
-                desc.setName(key.toString());
-                desc.setPreferred(true);
-                desc.setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
-                desc.setValue(TYPE, key.getClass());
-                feats.add(desc);
-            }
-            return feats.iterator();
-        }
-        return null;
     }
 
     @Override

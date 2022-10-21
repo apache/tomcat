@@ -81,10 +81,18 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
                 CRLF,
                 Boolean.FALSE, Boolean.FALSE, parameterSets);
 
-        // Invalid HTTP/1.1 request
+        // Invalid (request target) HTTP/1.1 request
         addRequestWithSplits("GET /te<st HTTP/1.1" + CRLF +
                 "Host: localhost:8080" + CRLF +
                 "Connection: close" + CRLF +
+                CRLF,
+                Boolean.FALSE, Boolean.FALSE, parameterSets);
+
+        // Invalid (use of CR) HTTP/1.1 request
+        addRequestWithSplits("GET /test HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "Connection: close" + CRLF +
+                "X-aaa: bbb" + CR + CRLF +
                 CRLF,
                 Boolean.FALSE, Boolean.FALSE, parameterSets);
 
@@ -116,6 +124,12 @@ public class TestHttp11InputBufferCRLF extends TomcatBaseTest {
                 LF,
                 Boolean.FALSE, parameterSets);
 
+        // Invalid HTTP/1.1 request using CR rather than CRLF
+        addRequestWithSplits("GET /test HTTP/1.1" + CR +
+                "Host: localhost:8080" + CR +
+                "Connection: close" + CR +
+                CR,
+                Boolean.FALSE, Boolean.FALSE, parameterSets);
 
         return parameterSets;
     }

@@ -529,8 +529,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     public ContextEjb[] findEjbs() {
 
         synchronized (ejbs) {
-            ContextEjb results[] = new ContextEjb[ejbs.size()];
-            return ejbs.values().toArray(results);
+            return ejbs.values().toArray(new ContextEjb[0]);
         }
 
     }
@@ -559,8 +558,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     public ContextEnvironment[] findEnvironments() {
 
         synchronized (envs) {
-            ContextEnvironment results[] = new ContextEnvironment[envs.size()];
-            return envs.values().toArray(results);
+            return envs.values().toArray(new ContextEnvironment[0]);
         }
 
     }
@@ -588,8 +586,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     public ContextLocalEjb[] findLocalEjbs() {
 
         synchronized (localEjbs) {
-            ContextLocalEjb results[] = new ContextLocalEjb[localEjbs.size()];
-            return localEjbs.values().toArray(results);
+            return localEjbs.values().toArray(new ContextLocalEjb[0]);
         }
 
     }
@@ -617,9 +614,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     public MessageDestinationRef[] findMessageDestinationRefs() {
 
         synchronized (mdrs) {
-            MessageDestinationRef results[] =
-                new MessageDestinationRef[mdrs.size()];
-            return mdrs.values().toArray(results);
+            return mdrs.values().toArray(new MessageDestinationRef[0]);
         }
 
     }
@@ -662,9 +657,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     public ContextResourceLink[] findResourceLinks() {
 
         synchronized (resourceLinks) {
-            ContextResourceLink results[] =
-                new ContextResourceLink[resourceLinks.size()];
-            return resourceLinks.values().toArray(results);
+            return resourceLinks.values().toArray(new ContextResourceLink[0]);
         }
 
     }
@@ -677,8 +670,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     public ContextResource[] findResources() {
 
         synchronized (resources) {
-            ContextResource results[] = new ContextResource[resources.size()];
-            return resources.values().toArray(results);
+            return resources.values().toArray(new ContextResource[0]);
         }
 
     }
@@ -707,8 +699,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     public ContextResourceEnvRef[] findResourceEnvRefs() {
 
         synchronized (resourceEnvRefs) {
-            ContextResourceEnvRef results[] = new ContextResourceEnvRef[resourceEnvRefs.size()];
-            return resourceEnvRefs.values().toArray(results);
+            return resourceEnvRefs.values().toArray(new ContextResourceEnvRef[0]);
         }
 
     }
@@ -736,8 +727,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
     public ContextService[] findServices() {
 
         synchronized (services) {
-            ContextService results[] = new ContextService[services.size()];
-            return services.values().toArray(results);
+            return services.values().toArray(new ContextService[0]);
         }
 
     }

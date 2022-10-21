@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes.transport;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.catalina.tribes.Member;
@@ -122,8 +123,8 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         public SenderQueue(PooledSender parent, int limit) {
             this.limit = limit;
             this.parent = parent;
-            notinuse = new java.util.LinkedList<>();
-            inuse = new java.util.LinkedList<>();
+            notinuse = new ArrayList<>();
+            inuse = new ArrayList<>();
         }
 
         /**
@@ -148,8 +149,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         }
 
         public synchronized boolean checkIdleKeepAlive() {
-            DataSender[] list = new DataSender[notinuse.size()];
-            notinuse.toArray(list);
+            DataSender[] list = notinuse.toArray(new DataSender[0]);
             boolean result = false;
             for (DataSender dataSender : list) {
                 result = result | dataSender.keepalive();

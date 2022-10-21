@@ -1292,7 +1292,7 @@ public class Response implements HttpServletResponse {
             // In this case, the default Tomcat values are assumed, but without
             // reference to org.apache.catalina.STRICT_SERVLET_COMPLIANCE.
             String locationUri;
-            // Relative redirects require HTTP/1.1
+            // Relative redirects require HTTP/1.1 or later
             if (getRequest().getCoyoteRequest().getSupportsRelativeRedirects() &&
                     (context == null || context.getUseRelativeRedirects())) {
                 locationUri = location;

@@ -76,7 +76,7 @@ import org.apache.tomcat.util.net.jsse.JSSESupport;
  * @author Mladen Turk
  * @author Remy Maucherat
  */
-public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> {
+public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,SocketChannel> {
 
 
     // -------------------------------------------------------------- Constants
@@ -398,7 +398,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     // With a UDS, expect no delay connecting and no defer accept
                     socket.connect(sa);
                 }
-                // Wait for upto 1000ms acceptor threads to unlock
+                // Wait for up to 1000ms acceptor threads to unlock
                 long waitLeft = 1000;
                 while (waitLeft > 0 &&
                         acceptor.getState() == AcceptorState.RUNNING) {
@@ -519,8 +519,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     protected SocketChannel serverSocketAccept() throws Exception {
         SocketChannel result = serverSock.accept();
 
-        // Bug does not affect Windows. Skip the check on that platform.
-        if (!JrePlatform.IS_WINDOWS) {
+        // Bug does not affect Windows platform and Unix Domain Socket. Skip the check.
+        if (!JrePlatform.IS_WINDOWS && getUnixDomainSocketPath() == null) {
             SocketAddress currentRemoteAddress = result.getRemoteAddress();
             long currentNanoTime = System.nanoTime();
             if (currentRemoteAddress.equals(previousAcceptedSocketRemoteAddress) &&

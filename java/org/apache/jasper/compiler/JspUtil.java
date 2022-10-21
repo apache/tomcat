@@ -375,17 +375,6 @@ public class JspUtil {
         /*
          * Build up the base call to the interpreter.
          */
-        // XXX - We use a proprietary call to the interpreter for now
-        // as the current standard machinery is inefficient and requires
-        // lots of wrappers and adapters. This should all clear up once
-        // the EL interpreter moves out of JSTL and into its own project.
-        // In the future, this should be replaced by code that calls
-        // ExpressionEvaluator.parseExpression() and then cache the resulting
-        // expression objects. The interpreterCall would simply select
-        // one of the pre-cached expressions and evaluate it.
-        // Note that PageContextImpl implements VariableResolver and
-        // the generated Servlet/SimpleTag implements FunctionMapper, so
-        // that machinery is already in place (mroth).
         targetType = toJavaSourceType(targetType);
         StringBuilder call = new StringBuilder(
                 "("

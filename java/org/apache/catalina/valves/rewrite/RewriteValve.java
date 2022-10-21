@@ -24,10 +24,10 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -102,7 +102,7 @@ public class RewriteValve extends ValveBase {
     /**
      * Maps to be used by the rules.
      */
-    protected Map<String, RewriteMap> maps = new Hashtable<>();
+    protected Map<String, RewriteMap> maps = new ConcurrentHashMap<>();
 
 
     /**
@@ -492,49 +492,39 @@ public class RewriteValve extends ValveBase {
                         contextPath = request.getContextPath();
                     }
                     // Populated the encoded (i.e. undecoded) requestURI
-                    request.getCoyoteRequest().requestURI().setString(null);
+                    request.getCoyoteRequest().requestURI().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
                     CharChunk chunk = request.getCoyoteRequest().requestURI().getCharChunk();
-                    chunk.recycle();
                     if (context) {
                         // This is neither decoded nor normalized
                         chunk.append(contextPath);
                     }
                     chunk.append(URLEncoder.DEFAULT.encode(urlStringDecoded, uriCharset));
-                    request.getCoyoteRequest().requestURI().toChars();
                     // Decoded and normalized URI
                     // Rewriting may have denormalized the URL
                     urlStringDecoded = RequestUtil.normalize(urlStringDecoded);
-                    request.getCoyoteRequest().decodedURI().setString(null);
+                    request.getCoyoteRequest().decodedURI().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
                     chunk = request.getCoyoteRequest().decodedURI().getCharChunk();
-                    chunk.recycle();
                     if (context) {
                         // This is decoded and normalized
                         chunk.append(request.getServletContext().getContextPath());
                     }
                     chunk.append(urlStringDecoded);
-                    request.getCoyoteRequest().decodedURI().toChars();
                     // Set the new Query if there is one
                     if (queryStringDecoded != null) {
-                        request.getCoyoteRequest().queryString().setString(null);
+                        request.getCoyoteRequest().queryString().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
                         chunk = request.getCoyoteRequest().queryString().getCharChunk();
-                        chunk.recycle();
                         chunk.append(URLEncoder.QUERY.encode(queryStringDecoded, uriCharset));
                         if (qsa && originalQueryStringEncoded != null &&
                                 originalQueryStringEncoded.length() > 0) {
                             chunk.append('&');
                             chunk.append(originalQueryStringEncoded);
                         }
-                        if (!chunk.isNull()) {
-                            request.getCoyoteRequest().queryString().toChars();
-                        }
                     }
                     // Set the new host if it changed
                     if (!host.equals(request.getServerName())) {
-                        request.getCoyoteRequest().serverName().setString(null);
+                        request.getCoyoteRequest().serverName().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
                         chunk = request.getCoyoteRequest().serverName().getCharChunk();
-                        chunk.recycle();
                         chunk.append(host.toString());
-                        request.getCoyoteRequest().serverName().toChars();
                     }
                     request.getMappingData().recycle();
                     // Reinvoke the whole request recursively

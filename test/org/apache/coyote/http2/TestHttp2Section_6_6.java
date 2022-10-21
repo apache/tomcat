@@ -63,15 +63,15 @@ public class TestHttp2Section_6_6  extends Http2TestBase {
 
         // Read the response
         // push promise
-        parser.readFrame(true);
+        parser.readFrame();
         // stream 3 response headers
-        parser.readFrame(true);
+        parser.readFrame();
         // stream 3 response body
-        parser.readFrame(true);
+        parser.readFrame();
         // stream 2 response headers
-        parser.readFrame(true);
+        parser.readFrame();
         // stream 2 response body
-        parser.readFrame(true);
+        parser.readFrame();
 
         String trace = output.getTrace();
 

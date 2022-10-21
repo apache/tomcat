@@ -35,11 +35,19 @@ public final class AstFloatingPoint extends SimpleNode {
     private volatile Number number;
 
     public Number getFloatingPoint() {
+        // The parser should ensure the format of the string to be parsed.
         if (this.number == null) {
             try {
-                this.number = Double.valueOf(this.image);
-            } catch (ArithmeticException e0) {
-                this.number = new BigDecimal(this.image);
+                Double d = Double.valueOf(this.image);
+                if (d.isInfinite() || d.isNaN()) {
+                    this.number = new BigDecimal(this.image);
+                } else {
+                    this.number = d;
+                }
+            } catch (NumberFormatException e) {
+                // Catch NumberFormatException here just in case the parser
+                // provides invalid input.
+                throw new ELException(e);
             }
         }
         return this.number;

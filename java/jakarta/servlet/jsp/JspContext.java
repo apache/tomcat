@@ -59,11 +59,6 @@ import jakarta.el.ELContext;
  * The following methods provide <B>convenient access</B> to implicit objects:
  * <code>getOut()</code>
  *
- * <p>
- * The following methods provide <B>programmatic access</b> to the
- * Expression Language evaluator:
- * <code>getExpressionEvaluator()</code>, <code>getVariableResolver()</code>
- *
  * @since JSP 2.0
  */
 
@@ -215,40 +210,12 @@ public abstract class JspContext {
     public abstract JspWriter getOut();
 
     /**
-     * Provides programmatic access to the ExpressionEvaluator.
-     * The JSP Container must return a valid instance of an
-     * ExpressionEvaluator that can parse EL expressions.
-     *
-     * @return A valid instance of an ExpressionEvaluator.
-     * @since JSP 2.0
-     * @deprecated As of JSP 2.1, replaced by
-     *             JspApplicationContext.getExpressionFactory()
-     */
-    @Deprecated
-    public abstract jakarta.servlet.jsp.el.ExpressionEvaluator getExpressionEvaluator();
-
-    /**
      * Obtain the ELContext for this JSPContext. Each JSPContext has a dedicated
      * ELCOntext.
      *
      * @return the ELContext for this JSPContext
      */
     public abstract ELContext getELContext();
-
-    /**
-     * Returns an instance of a VariableResolver that provides access to the
-     * implicit objects specified in the JSP specification using this JspContext
-     * as the context object.
-     *
-     * @return A valid instance of a VariableResolver.
-     * @since JSP 2.0
-     * @deprecated As of JSP 2.1,
-     *             replaced by jakarta.el.ELContext.getELResolver()
-     *             which can be obtained by
-     *             jspContext.getELContext().getELResolver()
-     */
-    @Deprecated
-    public abstract jakarta.servlet.jsp.el.VariableResolver getVariableResolver();
 
     /**
      * Return a new JspWriter object that sends output to the

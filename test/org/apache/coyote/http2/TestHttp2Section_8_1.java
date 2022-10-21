@@ -75,10 +75,10 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         // Trailers
         writeFrame(trailerFrameHeader, trailerPayload);
 
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
 
         String len;
         if (allowTrailerHeader) {
@@ -155,7 +155,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("3-HeadersStart\n" +
                 "3-Header-[:status]-[100]\n" +
@@ -166,10 +166,10 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         // Write the body
         writeFrame(dataFrameHeader, dataPayload);
 
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
 
         Assert.assertEquals("0-WindowSize-[256]\n" +
                 "3-WindowSize-[256]\n" +
@@ -186,6 +186,8 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testUndefinedPseudoHeader() throws Exception {
+        http2Connect();
+
         List<Header> headers = new ArrayList<>(5);
         headers.add(new Header(":method", "GET"));
         headers.add(new Header(":scheme", "http"));
@@ -199,6 +201,8 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testInvalidPseudoHeader() throws Exception {
+        http2Connect();
+
         List<Header> headers = new ArrayList<>(5);
         headers.add(new Header(":method", "GET"));
         headers.add(new Header(":scheme", "http"));
@@ -239,15 +243,174 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         writeFrame(headersFrameHeader, headersPayload);
 
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("3-RST-[1]\n", output.getTrace());
     }
 
 
-    private void doInvalidPseudoHeaderTest(List<Header> headers) throws Exception {
+    @Test
+    public void testHostHeaderValid() throws Exception {
         http2Connect();
 
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header("host", "localhost:" + getPort()));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[200]"));
+    }
+
+
+    @Test
+    public void testHostHeaderDuplicate() throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header("host", "localhost:" + getPort()));
+        headers.add(new Header("host", "localhost:" + getPort()));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("0-Goaway-[1]-[9]"));
+    }
+
+
+    @Test
+    public void testHostHeaderConsistent() throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header("host", "localhost:" + getPort()));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[200]"));
+    }
+
+
+    @Test
+    public void testHostHeaderConsistentNoPort() throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":authority", "localhost"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header("host", "localhost"));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[200]"));
+    }
+
+
+    @Test
+    public void testHostHeaderInconsistent01() throws Exception {
+        http2Connect();
+
+        doTestHostHeaderInconsistent("localhost:" + getPort(), "otherhost:" + getPort());
+    }
+
+
+    @Test
+    public void testHostHeaderInconsistent02() throws Exception {
+        http2Connect();
+
+        doTestHostHeaderInconsistent("localhost", "otherhost");
+    }
+
+
+    @Test
+    public void testHostHeaderInconsistent03() throws Exception {
+        http2Connect();
+
+        doTestHostHeaderInconsistent("localhost:" + getPort(), "localhost");
+    }
+
+
+    @Test
+    public void testHostHeaderInconsistent04() throws Exception {
+        http2Connect();
+
+        doTestHostHeaderInconsistent("localhost", "localhost:" + getPort());
+    }
+
+
+    @Test
+    public void testHostHeaderInconsistent05() throws Exception {
+        http2Connect();
+
+        doTestHostHeaderInconsistent("localhost:" + getPort(), "otherhost:" + (getPort() + 1));
+    }
+
+
+    private void doTestHostHeaderInconsistent(String authority, String host) throws Exception {
+        List<Header> headers = new ArrayList<>(4);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":authority", authority));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header("host", host));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers , 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("0-Goaway-[1]-[9]"));
+    }
+
+
+    private void doInvalidPseudoHeaderTest(List<Header> headers) throws Exception {
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
@@ -256,7 +419,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("3-RST-[1]\n", output.getTrace());
     }

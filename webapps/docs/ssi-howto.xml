@@ -142,7 +142,7 @@ false.</li>
  whose type will be processed by the SSI servlet. The directives take the form of an HTML
  comment. The directive is replaced by the results of interpreting it before sending the
  page to the client. The general form of a directive is: </p>
-<p> <code>&lt;!--#directive [parm=value] --&gt;</code></p>
+<p> <code>&lt;!--#directive [param=value] --&gt;</code></p>
 <p>The directives are:</p>
 <ul>
 <li>

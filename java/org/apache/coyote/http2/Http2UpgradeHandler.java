@@ -20,7 +20,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Queue;
@@ -49,6 +48,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SendfileState;
@@ -131,7 +131,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private final AtomicInteger nextLocalStreamId = new AtomicInteger(2);
     private final PingManager pingManager = getPingManager();
     private volatile int newStreamsSinceLastPrune = 0;
-    private final Set<AbstractStream> backLogStreams = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Set<AbstractStream> backLogStreams = ConcurrentHashMap.newKeySet();
     private long backLogSize = 0;
     // The time at which the connection will timeout unless data arrives before
     // then. -1 means no timeout.
@@ -145,6 +145,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private final AtomicLong overheadCount;
     private volatile int lastNonFinalDataPayload;
     private volatile int lastWindowUpdate;
+
+    protected final UserDataHelper userDataHelper = new UserDataHelper(log);
 
 
     Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest, SocketWrapperBase<?> socketWrapper) {
@@ -264,6 +266,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             log.debug(sm.getString("upgradeHandler.prefaceReceived", connectionId));
         }
 
+        // Allow streams and connection to determine timeouts
+        socketWrapper.setReadTimeout(-1);
+        socketWrapper.setWriteTimeout(-1);
+
         processConnection(webConnection, stream);
     }
 
@@ -345,17 +351,31 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     socketWrapper.getLock().unlock();
                 }
                 try {
-                    // There is data to read so use the read timeout while
-                    // reading frames ...
-                    socketWrapper.setReadTimeout(protocol.getReadTimeout());
-                    // ... and disable the connection timeout
+                    // Disable the connection timeout while frames are processed
                     setConnectionTimeout(-1);
                     while (true) {
                         try {
-                            if (!parser.readFrame(false)) {
+                            if (!parser.readFrame()) {
                                 break;
                             }
                         } catch (StreamException se) {
+                            // Log the Stream error but not necessarily all of
+                            // them
+                            UserDataHelper.Mode logMode = userDataHelper.getNextMode();
+                            if (logMode != null) {
+                                String message = sm.getString("upgradeHandler.stream.error",
+                                        connectionId, Integer.toString(se.getStreamId()));
+                                switch (logMode) {
+                                    case INFO_THEN_DEBUG:
+                                        message += sm.getString("upgradeHandler.fallToDebug");
+                                        //$FALL-THROUGH$
+                                    case INFO:
+                                        log.info(message, se);
+                                        break;
+                                    case DEBUG:
+                                        log.debug(message, se);
+                                }
+                            }
                             // Stream errors are not fatal to the connection so
                             // continue reading frames
                             Stream stream = getStream(se.getStreamId(), false);
@@ -1508,6 +1528,15 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         int thisRead = 0;
 
         while (len > 0) {
+            // Blocking reads use the protocol level read timeout. Non-blocking
+            // reads do not timeout. The intention is that once a frame has
+            // started to be read, the read timeout applies until it is
+            // completely read.
+            if (nextReadBlock) {
+                socketWrapper.setReadTimeout(protocol.getReadTimeout());
+            } else {
+                socketWrapper.setReadTimeout(-1);
+            }
             thisRead = socketWrapper.read(nextReadBlock, data, pos, len);
             if (thisRead == 0) {
                 if (nextReadBlock) {

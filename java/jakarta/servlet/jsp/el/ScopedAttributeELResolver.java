@@ -16,11 +16,6 @@
  */
 package jakarta.servlet.jsp.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 
 import jakarta.el.ELContext;
@@ -29,10 +24,19 @@ import jakarta.servlet.jsp.JspContext;
 import jakarta.servlet.jsp.PageContext;
 
 /**
+ * An ELResolver for working with JSP scoped attributes which may have page,
+ * request, session or application scope.
  *
  * @since JSP 2.1
  */
 public class ScopedAttributeELResolver extends ELResolver {
+
+    /**
+     * Default constructor.
+     */
+    public ScopedAttributeELResolver() {
+        super();
+    }
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
@@ -95,84 +99,6 @@ public class ScopedAttributeELResolver extends ELResolver {
         }
 
         return false;
-    }
-
-    @Deprecated(forRemoval = true, since = "JSP 3.1")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-
-        PageContext ctxt = (PageContext) context.getContext(JspContext.class);
-        List<FeatureDescriptor> list = new ArrayList<>();
-        Enumeration<String> e;
-        Object value;
-        String name;
-
-        e = ctxt.getAttributeNamesInScope(PageContext.PAGE_SCOPE);
-        while (e.hasMoreElements()) {
-            name = e.nextElement();
-            value = ctxt.getAttribute(name, PageContext.PAGE_SCOPE);
-            FeatureDescriptor descriptor = new FeatureDescriptor();
-            descriptor.setName(name);
-            descriptor.setDisplayName(name);
-            descriptor.setExpert(false);
-            descriptor.setHidden(false);
-            descriptor.setPreferred(true);
-            descriptor.setShortDescription("page scoped attribute");
-            descriptor.setValue("type", value.getClass());
-            descriptor.setValue("resolvableAtDesignTime", Boolean.FALSE);
-            list.add(descriptor);
-        }
-
-        e = ctxt.getAttributeNamesInScope(PageContext.REQUEST_SCOPE);
-        while (e.hasMoreElements()) {
-            name = e.nextElement();
-            value = ctxt.getAttribute(name, PageContext.REQUEST_SCOPE);
-            FeatureDescriptor descriptor = new FeatureDescriptor();
-            descriptor.setName(name);
-            descriptor.setDisplayName(name);
-            descriptor.setExpert(false);
-            descriptor.setHidden(false);
-            descriptor.setPreferred(true);
-            descriptor.setShortDescription("request scope attribute");
-            descriptor.setValue("type", value.getClass());
-            descriptor.setValue("resolvableAtDesignTime", Boolean.FALSE);
-            list.add(descriptor);
-        }
-
-        if (ctxt.getSession() != null) {
-            e = ctxt.getAttributeNamesInScope(PageContext.SESSION_SCOPE);
-            while (e.hasMoreElements()) {
-                name = e.nextElement();
-                value = ctxt.getAttribute(name, PageContext.SESSION_SCOPE);
-                FeatureDescriptor descriptor = new FeatureDescriptor();
-                descriptor.setName(name);
-                descriptor.setDisplayName(name);
-                descriptor.setExpert(false);
-                descriptor.setHidden(false);
-                descriptor.setPreferred(true);
-                descriptor.setShortDescription("session scoped attribute");
-                descriptor.setValue("type", value.getClass());
-                descriptor.setValue("resolvableAtDesignTime", Boolean.FALSE);
-                list.add(descriptor);
-            }
-        }
-
-        e = ctxt.getAttributeNamesInScope(PageContext.APPLICATION_SCOPE);
-        while (e.hasMoreElements()) {
-            name = e.nextElement();
-            value = ctxt.getAttribute(name, PageContext.APPLICATION_SCOPE);
-            FeatureDescriptor descriptor = new FeatureDescriptor();
-            descriptor.setName(name);
-            descriptor.setDisplayName(name);
-            descriptor.setExpert(false);
-            descriptor.setHidden(false);
-            descriptor.setPreferred(true);
-            descriptor.setShortDescription("application scoped attribute");
-            descriptor.setValue("type", value.getClass());
-            descriptor.setValue("resolvableAtDesignTime", Boolean.FALSE);
-            list.add(descriptor);
-        }
-        return list.iterator();
     }
 
     @Override

@@ -777,8 +777,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     @Override
     public Container[] findChildren() {
         synchronized (children) {
-            Container results[] = new Container[children.size()];
-            return children.values().toArray(results);
+            return children.values().toArray(new Container[0]);
         }
     }
 
@@ -790,9 +789,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      */
     @Override
     public ContainerListener[] findContainerListeners() {
-        ContainerListener[] results =
-            new ContainerListener[0];
-        return listeners.toArray(results);
+        return listeners.toArray(new ContainerListener[0]);
     }
 
 

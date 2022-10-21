@@ -62,8 +62,8 @@ the details of your particular environment.</p>
 information, documentation, and software that is useful in developing
 web applications with Tomcat.</p>
 <ul>
-<li><p><a href="https://jakarta.ee/specifications/pages/3.1/">https://jakarta.ee/specifications/pages/3.1/</a> -
-    <i>Jakarta Server Pages (JSP), Version 3.1</i>.  Describes
+<li><p><a href="https://jakarta.ee/specifications/pages/4.0/">https://jakarta.ee/specifications/pages/4.0/</a> -
+    <i>Jakarta Server Pages (JSP), Version 4.0</i>.  Describes
     the programming environment provided by standard implementations
     of the Jakarta Server Pages technology.  In conjunction with
     the Servlet API Specification (see below), this document describes

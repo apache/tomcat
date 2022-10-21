@@ -23,7 +23,7 @@
   <groupId>org.apache.tomcat.experimental</groupId>
   <artifactId>tomcat-embed-programmatic</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Exerimental Minimal Tomcat for Programmatic Use</description>
+  <description>Experimental Minimal Tomcat for Programmatic Use</description>
   <url>https://tomcat.apache.org/</url>
   <licenses>
     <license>

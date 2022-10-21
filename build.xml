@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 10.1" default="deploy" basedir="."
+<project name="Tomcat 11.0" default="deploy" basedir="."
   xmlns:if="ant:if"
   xmlns:unless="ant:unless"
   xmlns:jacoco="antlib:org.jacoco.ant"
@@ -59,10 +59,10 @@
   <!-- Exact spec versions (for the manifests etc.) -->
   <property name="servlet.spec.version"    value="6.0" />
   <property name="servlet.revision"        value="" />
-  <property name="jsp.spec.version"        value="3.1" />
-  <property name="jsp.revision"            value="" />
-  <property name="el.spec.version"         value="5.0" />
-  <property name="el.revision"             value="" />
+  <property name="jsp.spec.version"        value="4.0" />
+  <property name="jsp.revision"            value="-SNAPSHOT" />
+  <property name="el.spec.version"         value="6.0" />
+  <property name="el.revision"             value="-SNAPSHOT" />
   <property name="websocket.spec.version"  value="2.1" />
   <property name="websocket.revision"      value="" />
   <property name="jaspic.spec.version"     value="3.0" />
@@ -252,7 +252,7 @@
     <format property="today" pattern="MMM d yyyy" locale="en" timezone="UTC"/>
     <format property="today-iso-8601" pattern="yyyy-MM-dd" locale="en" timezone="UTC"/>
     <format property="tstamp" pattern="HH:mm:ss" locale="en" timezone="UTC"/>
-    <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss"/>
+    <format property="tstamp.file" pattern="yyyy-MM-dd HH:mm:ss" timezone="UTC"/>
     <format property="tstamp.iso.release" pattern="yyyy-MM-dd'T'HH:mm:ssX" timezone="UTC"/>
   </tstamp>
   <filterset id="version.filters">
@@ -1195,7 +1195,7 @@
     <!-- i18n JARs -->
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-cs.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_cs.properties" />
       </fileset>
@@ -1206,7 +1206,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-de.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_de.properties" />
       </fileset>
@@ -1217,7 +1217,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_es.properties" />
       </fileset>
@@ -1228,7 +1228,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_fr.properties" />
       </fileset>
@@ -1239,7 +1239,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ja.properties" />
       </fileset>
@@ -1250,7 +1250,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ko.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ko.properties" />
       </fileset>
@@ -1261,7 +1261,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-pt-BR.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_pt_BR.properties" />
       </fileset>
@@ -1272,7 +1272,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ru.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_ru.properties" />
       </fileset>
@@ -1283,7 +1283,7 @@
     </jar>
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-zh-CN.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.i18n}">
         <include name="**/LocalStrings_zh_CN.properties" />
       </fileset>
@@ -1806,7 +1806,7 @@
     </fixcrlf>
 
     <zip destfile="${tomcat.embed}/${final.name}-embed.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <fileset dir="${tomcat.embed}">
         <include name="**" />
@@ -1864,6 +1864,7 @@
         <include name="META-INF/**"/>
         <include name="**/service-config.txt"/>
         <include name="**/logging-non-rotatable.properties"/>
+        <include name="**/TestStrings.properties"/>
       </fileset>
     </copy>
   </target>
@@ -2067,7 +2068,7 @@
       <executiondata>
         <file file="${coverage.datafile}"/>
       </executiondata>
-      <structure name="Tomcat 10.1.x Code Coverage">
+      <structure name="Tomcat 11.0.x Code Coverage">
         <classfiles>
           <fileset dir="${tomcat.classes}"/>
         </classfiles>
@@ -2347,7 +2348,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../websocketapi"/>
       <link href="../jaspicapi"/>
       <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
-      <link href="https://jakarta.ee/specifications/platform/9/apidocs/"/>
+      <link href="https://jakarta.ee/specifications/platform/10/apidocs/"/>
       <packageset dir="${tomcat.dist}/src/java/">
         <include name="org/**"/>
         <exclude name="org/apache/el/parser/**"/>
@@ -2386,7 +2387,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <!-- Digester and dependencies -->
     <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar"
          manifest="${tomcat.manifests}/default.manifest"
-         modificationtime="${tstamp.file}">
+         modificationtime="${tstamp.iso.release}">
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/catalina/startup/DigesterFactory.class" />
         <include name="org/apache/catalina/util/SchemaResolver.class" />
@@ -2632,7 +2633,7 @@ skip.installer property in build.properties" />
   </target>
 
   <target name="-pre-release-lone-target-check">
-    <fail message="The pre-release target must be called all on its own. Specifically, you must run 'ant release' /after/ 'and pre-release' in order to properly configure the build.">
+    <fail message="The pre-release target must be called all on its own. Specifically, you must run 'ant release' /after/ 'ant pre-release' in order to properly configure the build.">
       <condition>
         <not>
           <equals arg1="${ant.project.invoked-targets}" arg2="pre-release" />
@@ -2664,18 +2665,27 @@ skip.installer property in build.properties" />
 # limitations under the License.
 # -----------------------------------------------------------------------------
 
-# This file was auto-generated by the pre-release Ant target
+# This file was auto-generated by the pre-release Ant target.
+
+# Any unwanted settings may be over-ridden in a build.properties file located
+# in the same directory as this file.
 
 # Set the version-dev to "" (empty string) as this is not a development release.
 version.dev=
 
-# Ensure consistent timestamps for reproducible builds
+# Ensure consistent timestamps for reproducible builds.
 ant.tstamp.now.iso=${tstamp.iso.release}
+
+# Enable insertion of detached signatures into the Windows installer.
+do.codesigning=true
+
+# Re-use the same GPG executable.
+gpg.exec=${gpg.exec}
 
 # Reproducible builds require the use of the build tools defined below. The
 # vendors (where appropriate) and versions must match exactly for a reproducible
 # build since this data is embedded in various files, particularly JAR file
-# manifests, as part of the build process
+# manifests, as part of the build process.
 #
 # Apache Ant:      ${ant.version}
 #
@@ -2684,7 +2694,7 @@ ant.tstamp.now.iso=${tstamp.iso.release}
 # Java Version:    ${java.vm.version}
 
 # The following is provided for information only. Builds will be repeatable
-# whether or not the build ennvironment in consistent with this information
+# whether or not the build environment in consistent with this information.
 #
 # OS:              ${os.arch} ${os.name} ${os.version}
 # File encoding:   ${file.encoding}
@@ -2708,18 +2718,19 @@ ant.tstamp.now.iso=${tstamp.iso.release}
 # limitations under the License.
 # -----------------------------------------------------------------------------
 
-# This file was auto-generated by the pre-release Ant target
+# This file was auto-generated by the pre-release Ant target.
 
-# Remove version-dev to from the version since this is not a development release.
+# Remove "-dev" from the version since this is not a development release.
 maven.asf.release.deploy.version=${version.major}.${version.minor}.${version.build}${version.suffix}
 
-# Re-use the same GPG executable
+# Re-use the same GPG executable.
 gpg.exec=${gpg.exec}
 
-# Set the user name to use to upload the artefacts to Nexus
+# Set the user name to use to upload the artefacts to Nexus.
 asf.ldap.username=${release.asfusername}
 </echo>
     <replace file="webapps/docs/changelog.xml"
+        encoding="UTF-8"
         token="rtext=&quot;in development&quot;"
         value="rtext=&quot;&quot;" />
   </target>
@@ -2759,7 +2770,12 @@ asf.ldap.username=${release.asfusername}
   </target>
 
   <!-- Sets properties only required for releases -->
-  <target name="release-init" depends="gpg-init-1,gpg-init-2" />
+  <target name="release-init" depends="gpg-init-1,gpg-init-2,compile" >
+    <taskdef name="forceUtcTimeZone"
+             classname="org.apache.tomcat.buildutil.ForceUtcTimeZone"
+             classpath="${tomcat.classes}" />
+    <forceUtcTimeZone />
+  </target>
 
   <target name="gpg-init-1">
     <available file="${gpg.exec}" property="gpg.exec.available"/>
@@ -2779,7 +2795,7 @@ asf.ldap.username=${release.asfusername}
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
@@ -2816,7 +2832,7 @@ asf.ldap.username=${release.asfusername}
 
     <!-- Windows x86 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
@@ -2844,7 +2860,7 @@ asf.ldap.username=${release.asfusername}
 
     <!-- Windows x64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}" fullpath="${final.name}"/>
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
@@ -2888,7 +2904,7 @@ asf.ldap.username=${release.asfusername}
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.deployer}" fullpath="${final.name}-deployer"/>
       <zipfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer" includes="**" />
@@ -3040,7 +3056,7 @@ asf.ldap.username=${release.asfusername}
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset file="${tomcat.dist}/src" fullpath="${final-src.name}" />
       <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
@@ -3916,7 +3932,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <sequential unless:true="${jar.uptodate}">
         <jar jarfile="@{jarfile}"
              manifest="@{manifest}"
-             modificationtime="${tstamp.file}">
+             modificationtime="${tstamp.iso.release}">
           <fileset dir="@{filesDir}">
             <patternset refid="@{filesId}"/>
             <!-- Javadoc exclusions -->
@@ -3972,7 +3988,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <fixcrlf srcdir="${tomcat.graal}/${graalPrefix}" eol="lf"
         encoding="ISO-8859-1" fixlast="false" />
     <zip destfile="${jarfile}" update="true" filesonly="true"
-         modificationtime="${tstamp.file}"
+         modificationtime="${tstamp.iso.release}"
          encoding="UTF8">
       <zipfileset dir="${tomcat.graal}/${graalPrefix}" prefix="META-INF/native-image/${graalPrefix}" includes="*.*"/>
     </zip>

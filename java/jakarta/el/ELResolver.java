@@ -16,8 +16,6 @@
  */
 package jakarta.el;
 
-import java.util.Iterator;
-
 /**
  * @author Jacob Hookom [jacob/hookom.net]
  *
@@ -29,6 +27,9 @@ public abstract class ELResolver {
     public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
 
     /**
+     * Obtain the value of the given property on the given object using the
+     * given context.
+     *
      * @param context The EL context for this evaluation
      * @param base The base object on which the property is to be found
      * @param property The property whose value is to be returned
@@ -65,6 +66,9 @@ public abstract class ELResolver {
     }
 
     /**
+     * Obtain the type of the given property on the given object using the given
+     * context.
+     *
      * @param context The EL context for this evaluation
      * @param base The base object on which the property is to be found
      * @param property The property whose type is to be returned
@@ -82,6 +86,9 @@ public abstract class ELResolver {
             Object property);
 
     /**
+     * Set the value of the given property on the given object using the given
+     * context.
+     *
      * @param context  The EL context for this evaluation
      * @param base     The base object on which the property is to be found
      * @param property The property whose value is to be set
@@ -102,6 +109,9 @@ public abstract class ELResolver {
             Object property, Object value);
 
     /**
+     * Determine if the given property on the given object is read-only using
+     * the given context.
+     *
      * @param context The EL context for this evaluation
      * @param base The base object on which the property is to be found
      * @param property The property to be checked for read only status
@@ -117,26 +127,6 @@ public abstract class ELResolver {
      */
     public abstract boolean isReadOnly(ELContext context, Object base,
             Object property);
-
-    /**
-     * Obtain the feature descriptors for the resolvable properties of the given
-     * object.
-     * <p>
-     * The default implementation returns {@code null}.
-     *
-     * @param context The context in which the examination takes place
-     * @param base The object to examine
-     *
-     * @return An iterator, possibly empty, of feature descriptors of the given
-     *         object
-     *
-     * @deprecated This method will be removed, without replacement, in EL 6.0 /
-     *             Tomcat 11.
-     */
-    @Deprecated(forRemoval = true, since = "EL 5.0")
-    public Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return null;
-    }
 
     /**
      * Obtain the most common type that is acceptable for the given base object.

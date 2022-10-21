@@ -18,7 +18,7 @@ package org.apache.tomcat.util.net.openssl.panama;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
 
-import java.lang.foreign.MemoryAddress;
+import java.lang.foreign.MemorySegment;
 
 /**
  * Stats exposed by an OpenSSL session context.
@@ -27,9 +27,9 @@ import java.lang.foreign.MemoryAddress;
  */
 public final class OpenSSLSessionStats {
 
-    private final MemoryAddress ctx;
+    private final MemorySegment ctx;
 
-    OpenSSLSessionStats(MemoryAddress ctx) {
+    OpenSSLSessionStats(MemorySegment ctx) {
         this.ctx = ctx;
     }
 

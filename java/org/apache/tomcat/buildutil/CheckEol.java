@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
@@ -42,7 +41,7 @@ import org.apache.tools.ant.types.FileSet;
 public class CheckEol extends Task {
 
     /** The files to be checked */
-    private final List<FileSet> filesets = new LinkedList<>();
+    private final List<FileSet> filesets = new ArrayList<>();
 
     /** The line ending mode (either LF, CRLF, or null for OS specific) */
     private Mode mode;

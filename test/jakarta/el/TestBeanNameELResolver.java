@@ -469,35 +469,6 @@ public class TestBeanNameELResolver {
 
 
     /**
-     * Confirm it returns null for 'valid' input.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    public void testGetFeatureDescriptors01() {
-        BeanNameELResolver resolver = createBeanNameELResolver();
-        ELContext context =
-                new StandardELContext(ELManager.getExpressionFactory());
-
-        Object result = resolver.getFeatureDescriptors(context, null);
-
-        Assert.assertNull(result);
-        Assert.assertFalse(context.isPropertyResolved());
-    }
-
-
-    /**
-     * Confirm it returns null for invalid input.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    public void testGetFeatureDescriptors02() {
-        BeanNameELResolver resolver = createBeanNameELResolver();
-
-        Object result = resolver.getFeatureDescriptors(null, new Object());
-
-        Assert.assertNull(result);
-    }
-
-
-    /**
      * Confirm it returns String.class for 'valid' input.
      */
     public void testGetCommonPropertyType01() {

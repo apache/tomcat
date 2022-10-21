@@ -208,7 +208,7 @@ public class Cache {
         // used first. This is a background process so we can afford to take the
         // time to order the elements first
         TreeSet<CachedResource> orderedResources =
-                new TreeSet<>(new EvictionOrder());
+                new TreeSet<>(Comparator.comparingLong(CachedResource::getNextCheck).reversed());
         orderedResources.addAll(resourceCache.values());
 
         Iterator<CachedResource> iter = orderedResources.iterator();
@@ -341,24 +341,5 @@ public class Cache {
 
     public long getSize() {
         return size.get() / 1024;
-    }
-
-    private static class EvictionOrder implements Comparator<CachedResource> {
-
-        @Override
-        public int compare(CachedResource cr1, CachedResource cr2) {
-            long nc1 = cr1.getNextCheck();
-            long nc2 = cr2.getNextCheck();
-
-            // Oldest resource should be first (so iterator goes from oldest to
-            // youngest.
-            if (nc1 == nc2) {
-                return 0;
-            } else if (nc1 > nc2) {
-                return -1;
-            } else {
-                return 1;
-            }
-        }
     }
 }

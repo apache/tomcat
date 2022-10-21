@@ -29,6 +29,7 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -625,17 +626,24 @@ public class ELSupport {
 
     private static <T> T coerceToFunctionalInterface(final ELContext ctx, final LambdaExpression lambdaExpression,
             final Class<T> type) {
-        // Create a dynamic proxy for the functional interface
-        @SuppressWarnings("unchecked")
-        T result = (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[] { type },
+        Supplier<T> proxy = () -> {
+            // Create a dynamic proxy for the functional interface
+            @SuppressWarnings("unchecked")
+            T result = (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type},
                 (Object obj, Method method, Object[] args) -> {
-            // Functional interfaces have a single, abstract method
-            if (!Modifier.isAbstract(method.getModifiers())) {
-                throw new ELException(MessageFactory.get("elSupport.coerce.nonAbstract", type, method));
-            }
-            return lambdaExpression.invoke(ctx, args);
-        });
-        return result;
+                    // Functional interfaces have a single, abstract method
+                    if (!Modifier.isAbstract(method.getModifiers())) {
+                        throw new ELException(MessageFactory.get("elSupport.coerce.nonAbstract", type, method));
+                    }
+                    return lambdaExpression.invoke(ctx, args);
+                });
+            return result;
+        };
+        if (System.getSecurityManager() !=  null) {
+            return AccessController.doPrivileged((PrivilegedAction<T>) proxy::get);
+        } else {
+            return proxy.get();
+        }
     }
 
 

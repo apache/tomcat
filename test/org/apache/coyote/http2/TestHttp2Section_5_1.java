@@ -94,7 +94,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // Then try sending some data (which should fail)
         sendData(3, new byte[] {});
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("3-RST-[" + Http2Error.STREAM_CLOSED.getCode() + "]"));
@@ -200,11 +200,11 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendClientPreface();
 
         // validateHttp2InitialResponse() - modified
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
 
         Assert.assertEquals("0-Settings-[3]-[1]\n" +
                 "0-Settings-End\n" +
@@ -227,7 +227,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // 1 * error
         // for a total of 9 frames (could be in any order)
         for (int i = 0; i < 9; i++) {
-            parser.readFrame(true);
+            parser.readFrame();
         }
 
         Assert.assertTrue(output.getTrace(),
@@ -245,14 +245,14 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // Read until the end of stream 3
         while (!output.getTrace().contains("3-EndOfStream")) {
-            parser.readFrame(true);
+            parser.readFrame();
         }
         output.clearTrace();
 
         // Confirm another request can be sent once concurrency falls back below limit
         sendSimpleGetRequest(7);
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         Assert.assertEquals(getSimpleResponseTrace(7), output.getTrace());
     }
 
@@ -267,11 +267,11 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendClientPreface();
 
         // validateHttp2InitialResponse() - modified
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
 
         Assert.assertEquals("0-Settings-[3]-[1]\n" +
                 "0-Settings-End\n" +
@@ -294,7 +294,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // 1 * error
         // for a total of 9 frames (could be in any order)
         for (int i = 0; i < 9; i++) {
-            parser.readFrame(true);
+            parser.readFrame();
         }
 
         Assert.assertTrue(output.getTrace(),
@@ -309,7 +309,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendRst(3, Http2Error.NO_ERROR.getCode());
         // Client reset triggers a write error which in turn triggers a server
         // reset
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("3-RST-[5]\n", output.getTrace());
         output.clearTrace();
 
@@ -318,8 +318,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // Confirm another request can be sent once concurrency falls back below limit
         sendSimpleGetRequest(7);
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
         Assert.assertEquals(getSimpleResponseTrace(7), output.getTrace());
     }
 
@@ -336,11 +336,11 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
             sendClientPreface();
 
             // validateHttp2InitialResponse() - modified
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
-            parser.readFrame(true);
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
 
             Assert.assertEquals("0-Settings-[3]-[1]\n" +
                     "0-Settings-End\n" +
@@ -362,9 +362,9 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
             // 56k-1 of body (7 * ~8k)
             // 1 * error (could be in any order)
             for (int i = 0; i < 8; i++) {
-                parser.readFrame(true);
+                parser.readFrame();
             }
-            parser.readFrame(true);
+            parser.readFrame();
 
             Assert.assertTrue(output.getTrace(),
                     output.getTrace().contains("5-RST-[" + Http2Error.REFUSED_STREAM.getCode() + "]"));
@@ -377,7 +377,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
             // Allow for the 8k still in the stream window
             sendWindowUpdate(3, (1 << 31) - 1);
 
-            parser.readFrame(true);
+            parser.readFrame();
             Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n", output.getTrace());
         } finally {
             LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
@@ -395,11 +395,11 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendClientPreface();
 
         // validateHttp2InitialResponse() - modified
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
+        parser.readFrame();
 
         Assert.assertEquals("0-Settings-[3]-[1]\n" +
                 "0-Settings-End\n" +
@@ -432,9 +432,9 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Could be in any order
         //
         for (int i = 0; i < 9; i++) {
-            parser.readFrame(true);
+            parser.readFrame();
         }
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().contains("5-RST-[" + Http2Error.REFUSED_STREAM.getCode() + "]"));
@@ -446,7 +446,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Allow for the 8k still in the connection window
         sendWindowUpdate(0, (1 << 31) - 1);
 
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().contains("0-Goaway-[5]-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]"));
     }

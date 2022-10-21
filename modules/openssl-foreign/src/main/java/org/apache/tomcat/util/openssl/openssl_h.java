@@ -254,7 +254,7 @@ public class openssl_h  {
     public static MethodHandle OPENSSL_sk_num$MH() {
         return RuntimeHelper.requireNonNull(constants$0.OPENSSL_sk_num$MH,"OPENSSL_sk_num");
     }
-    public static int OPENSSL_sk_num ( Addressable x0) {
+    public static int OPENSSL_sk_num ( MemorySegment x0) {
         var mh$ = OPENSSL_sk_num$MH();
         try {
             return (int)mh$.invokeExact(x0);
@@ -265,10 +265,10 @@ public class openssl_h  {
     public static MethodHandle OPENSSL_sk_value$MH() {
         return RuntimeHelper.requireNonNull(constants$0.OPENSSL_sk_value$MH,"OPENSSL_sk_value");
     }
-    public static MemoryAddress OPENSSL_sk_value ( Addressable x0,  int x1) {
+    public static MemorySegment OPENSSL_sk_value ( MemorySegment x0,  int x1) {
         var mh$ = OPENSSL_sk_value$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(x0, x1);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(x0, x1);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -287,10 +287,10 @@ public class openssl_h  {
     public static MethodHandle OpenSSL_version$MH() {
         return RuntimeHelper.requireNonNull(constants$0.OpenSSL_version$MH,"OpenSSL_version");
     }
-    public static MemoryAddress OpenSSL_version ( int type) {
+    public static MemorySegment OpenSSL_version ( int type) {
         var mh$ = OpenSSL_version$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(type);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(type);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -298,7 +298,7 @@ public class openssl_h  {
     public static MethodHandle CRYPTO_free$MH() {
         return RuntimeHelper.requireNonNull(constants$0.CRYPTO_free$MH,"CRYPTO_free");
     }
-    public static void CRYPTO_free ( Addressable ptr,  Addressable file,  int line) {
+    public static void CRYPTO_free ( MemorySegment ptr,  MemorySegment file,  int line) {
         var mh$ = CRYPTO_free$MH();
         try {
             mh$.invokeExact(ptr, file, line);
@@ -306,103 +306,10 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
-    public static int PTHREAD_CREATE_JOINABLE() {
-        return (int)0L;
-    }
-    public static int PTHREAD_CREATE_DETACHED() {
-        return (int)1L;
-    }
-    public static int PTHREAD_MUTEX_TIMED_NP() {
-        return (int)0L;
-    }
-    public static int PTHREAD_MUTEX_RECURSIVE_NP() {
-        return (int)1L;
-    }
-    public static int PTHREAD_MUTEX_ERRORCHECK_NP() {
-        return (int)2L;
-    }
-    public static int PTHREAD_MUTEX_ADAPTIVE_NP() {
-        return (int)3L;
-    }
-    public static int PTHREAD_MUTEX_NORMAL() {
-        return (int)0L;
-    }
-    public static int PTHREAD_MUTEX_RECURSIVE() {
-        return (int)1L;
-    }
-    public static int PTHREAD_MUTEX_ERRORCHECK() {
-        return (int)2L;
-    }
-    public static int PTHREAD_MUTEX_DEFAULT() {
-        return (int)0L;
-    }
-    public static int PTHREAD_MUTEX_STALLED() {
-        return (int)0L;
-    }
-    public static int PTHREAD_MUTEX_STALLED_NP() {
-        return (int)0L;
-    }
-    public static int PTHREAD_MUTEX_ROBUST() {
-        return (int)1L;
-    }
-    public static int PTHREAD_MUTEX_ROBUST_NP() {
-        return (int)1L;
-    }
-    public static int PTHREAD_PRIO_NONE() {
-        return (int)0L;
-    }
-    public static int PTHREAD_PRIO_INHERIT() {
-        return (int)1L;
-    }
-    public static int PTHREAD_PRIO_PROTECT() {
-        return (int)2L;
-    }
-    public static int PTHREAD_RWLOCK_PREFER_READER_NP() {
-        return (int)0L;
-    }
-    public static int PTHREAD_RWLOCK_PREFER_WRITER_NP() {
-        return (int)1L;
-    }
-    public static int PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP() {
-        return (int)2L;
-    }
-    public static int PTHREAD_RWLOCK_DEFAULT_NP() {
-        return (int)0L;
-    }
-    public static int PTHREAD_INHERIT_SCHED() {
-        return (int)0L;
-    }
-    public static int PTHREAD_EXPLICIT_SCHED() {
-        return (int)1L;
-    }
-    public static int PTHREAD_SCOPE_SYSTEM() {
-        return (int)0L;
-    }
-    public static int PTHREAD_SCOPE_PROCESS() {
-        return (int)1L;
-    }
-    public static int PTHREAD_PROCESS_PRIVATE() {
-        return (int)0L;
-    }
-    public static int PTHREAD_PROCESS_SHARED() {
-        return (int)1L;
-    }
-    public static int PTHREAD_CANCEL_ENABLE() {
-        return (int)0L;
-    }
-    public static int PTHREAD_CANCEL_DISABLE() {
-        return (int)1L;
-    }
-    public static int PTHREAD_CANCEL_DEFERRED() {
-        return (int)0L;
-    }
-    public static int PTHREAD_CANCEL_ASYNCHRONOUS() {
-        return (int)1L;
-    }
     public static MethodHandle BIO_ctrl_pending$MH() {
         return RuntimeHelper.requireNonNull(constants$0.BIO_ctrl_pending$MH,"BIO_ctrl_pending");
     }
-    public static long BIO_ctrl_pending ( Addressable b) {
+    public static long BIO_ctrl_pending ( MemorySegment b) {
         var mh$ = BIO_ctrl_pending$MH();
         try {
             return (long)mh$.invokeExact(b);
@@ -413,10 +320,10 @@ public class openssl_h  {
     public static MethodHandle BIO_s_file$MH() {
         return RuntimeHelper.requireNonNull(constants$1.BIO_s_file$MH,"BIO_s_file");
     }
-    public static MemoryAddress BIO_s_file () {
+    public static MemorySegment BIO_s_file () {
         var mh$ = BIO_s_file$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -424,10 +331,10 @@ public class openssl_h  {
     public static MethodHandle BIO_new_file$MH() {
         return RuntimeHelper.requireNonNull(constants$1.BIO_new_file$MH,"BIO_new_file");
     }
-    public static MemoryAddress BIO_new_file ( Addressable filename,  Addressable mode) {
+    public static MemorySegment BIO_new_file ( MemorySegment filename,  MemorySegment mode) {
         var mh$ = BIO_new_file$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(filename, mode);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(filename, mode);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -435,10 +342,10 @@ public class openssl_h  {
     public static MethodHandle BIO_new$MH() {
         return RuntimeHelper.requireNonNull(constants$1.BIO_new$MH,"BIO_new");
     }
-    public static MemoryAddress BIO_new ( Addressable type) {
+    public static MemorySegment BIO_new ( MemorySegment type) {
         var mh$ = BIO_new$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(type);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(type);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -446,7 +353,7 @@ public class openssl_h  {
     public static MethodHandle BIO_free$MH() {
         return RuntimeHelper.requireNonNull(constants$1.BIO_free$MH,"BIO_free");
     }
-    public static int BIO_free ( Addressable a) {
+    public static int BIO_free ( MemorySegment a) {
         var mh$ = BIO_free$MH();
         try {
             return (int)mh$.invokeExact(a);
@@ -457,7 +364,7 @@ public class openssl_h  {
     public static MethodHandle BIO_read$MH() {
         return RuntimeHelper.requireNonNull(constants$1.BIO_read$MH,"BIO_read");
     }
-    public static int BIO_read ( Addressable b,  Addressable data,  int dlen) {
+    public static int BIO_read ( MemorySegment b,  MemorySegment data,  int dlen) {
         var mh$ = BIO_read$MH();
         try {
             return (int)mh$.invokeExact(b, data, dlen);
@@ -468,7 +375,7 @@ public class openssl_h  {
     public static MethodHandle BIO_write$MH() {
         return RuntimeHelper.requireNonNull(constants$1.BIO_write$MH,"BIO_write");
     }
-    public static int BIO_write ( Addressable b,  Addressable data,  int dlen) {
+    public static int BIO_write ( MemorySegment b,  MemorySegment data,  int dlen) {
         var mh$ = BIO_write$MH();
         try {
             return (int)mh$.invokeExact(b, data, dlen);
@@ -479,7 +386,7 @@ public class openssl_h  {
     public static MethodHandle BIO_ctrl$MH() {
         return RuntimeHelper.requireNonNull(constants$2.BIO_ctrl$MH,"BIO_ctrl");
     }
-    public static long BIO_ctrl ( Addressable bp,  int cmd,  long larg,  Addressable parg) {
+    public static long BIO_ctrl ( MemorySegment bp,  int cmd,  long larg,  MemorySegment parg) {
         var mh$ = BIO_ctrl$MH();
         try {
             return (long)mh$.invokeExact(bp, cmd, larg, parg);
@@ -490,10 +397,10 @@ public class openssl_h  {
     public static MethodHandle BIO_s_mem$MH() {
         return RuntimeHelper.requireNonNull(constants$2.BIO_s_mem$MH,"BIO_s_mem");
     }
-    public static MemoryAddress BIO_s_mem () {
+    public static MemorySegment BIO_s_mem () {
         var mh$ = BIO_s_mem$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -501,10 +408,10 @@ public class openssl_h  {
     public static MethodHandle BIO_s_bio$MH() {
         return RuntimeHelper.requireNonNull(constants$2.BIO_s_bio$MH,"BIO_s_bio");
     }
-    public static MemoryAddress BIO_s_bio () {
+    public static MemorySegment BIO_s_bio () {
         var mh$ = BIO_s_bio$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -512,7 +419,7 @@ public class openssl_h  {
     public static MethodHandle BIO_new_bio_pair$MH() {
         return RuntimeHelper.requireNonNull(constants$2.BIO_new_bio_pair$MH,"BIO_new_bio_pair");
     }
-    public static int BIO_new_bio_pair ( Addressable bio1,  long writebuf1,  Addressable bio2,  long writebuf2) {
+    public static int BIO_new_bio_pair ( MemorySegment bio1,  long writebuf1,  MemorySegment bio2,  long writebuf2) {
         var mh$ = BIO_new_bio_pair$MH();
         try {
             return (int)mh$.invokeExact(bio1, writebuf1, bio2, writebuf2);
@@ -523,10 +430,10 @@ public class openssl_h  {
     public static MethodHandle BN_new$MH() {
         return RuntimeHelper.requireNonNull(constants$2.BN_new$MH,"BN_new");
     }
-    public static MemoryAddress BN_new () {
+    public static MemorySegment BN_new () {
         var mh$ = BN_new$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -534,7 +441,7 @@ public class openssl_h  {
     public static MethodHandle BN_set_word$MH() {
         return RuntimeHelper.requireNonNull(constants$2.BN_set_word$MH,"BN_set_word");
     }
-    public static int BN_set_word ( Addressable a,  long w) {
+    public static int BN_set_word ( MemorySegment a,  long w) {
         var mh$ = BN_set_word$MH();
         try {
             return (int)mh$.invokeExact(a, w);
@@ -545,10 +452,10 @@ public class openssl_h  {
     public static MethodHandle BN_get_rfc2409_prime_768$MH() {
         return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc2409_prime_768$MH,"BN_get_rfc2409_prime_768");
     }
-    public static MemoryAddress BN_get_rfc2409_prime_768 ( Addressable bn) {
+    public static MemorySegment BN_get_rfc2409_prime_768 ( MemorySegment bn) {
         var mh$ = BN_get_rfc2409_prime_768$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bn);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bn);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -556,10 +463,10 @@ public class openssl_h  {
     public static MethodHandle BN_get_rfc2409_prime_1024$MH() {
         return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc2409_prime_1024$MH,"BN_get_rfc2409_prime_1024");
     }
-    public static MemoryAddress BN_get_rfc2409_prime_1024 ( Addressable bn) {
+    public static MemorySegment BN_get_rfc2409_prime_1024 ( MemorySegment bn) {
         var mh$ = BN_get_rfc2409_prime_1024$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bn);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bn);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -567,10 +474,10 @@ public class openssl_h  {
     public static MethodHandle BN_get_rfc3526_prime_1536$MH() {
         return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_1536$MH,"BN_get_rfc3526_prime_1536");
     }
-    public static MemoryAddress BN_get_rfc3526_prime_1536 ( Addressable bn) {
+    public static MemorySegment BN_get_rfc3526_prime_1536 ( MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_1536$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bn);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bn);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -578,10 +485,10 @@ public class openssl_h  {
     public static MethodHandle BN_get_rfc3526_prime_2048$MH() {
         return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_2048$MH,"BN_get_rfc3526_prime_2048");
     }
-    public static MemoryAddress BN_get_rfc3526_prime_2048 ( Addressable bn) {
+    public static MemorySegment BN_get_rfc3526_prime_2048 ( MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_2048$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bn);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bn);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -589,10 +496,10 @@ public class openssl_h  {
     public static MethodHandle BN_get_rfc3526_prime_3072$MH() {
         return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_3072$MH,"BN_get_rfc3526_prime_3072");
     }
-    public static MemoryAddress BN_get_rfc3526_prime_3072 ( Addressable bn) {
+    public static MemorySegment BN_get_rfc3526_prime_3072 ( MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_3072$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bn);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bn);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -600,10 +507,10 @@ public class openssl_h  {
     public static MethodHandle BN_get_rfc3526_prime_4096$MH() {
         return RuntimeHelper.requireNonNull(constants$3.BN_get_rfc3526_prime_4096$MH,"BN_get_rfc3526_prime_4096");
     }
-    public static MemoryAddress BN_get_rfc3526_prime_4096 ( Addressable bn) {
+    public static MemorySegment BN_get_rfc3526_prime_4096 ( MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_4096$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bn);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bn);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -611,10 +518,10 @@ public class openssl_h  {
     public static MethodHandle BN_get_rfc3526_prime_6144$MH() {
         return RuntimeHelper.requireNonNull(constants$4.BN_get_rfc3526_prime_6144$MH,"BN_get_rfc3526_prime_6144");
     }
-    public static MemoryAddress BN_get_rfc3526_prime_6144 ( Addressable bn) {
+    public static MemorySegment BN_get_rfc3526_prime_6144 ( MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_6144$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bn);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bn);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -622,10 +529,10 @@ public class openssl_h  {
     public static MethodHandle BN_get_rfc3526_prime_8192$MH() {
         return RuntimeHelper.requireNonNull(constants$4.BN_get_rfc3526_prime_8192$MH,"BN_get_rfc3526_prime_8192");
     }
-    public static MemoryAddress BN_get_rfc3526_prime_8192 ( Addressable bn) {
+    public static MemorySegment BN_get_rfc3526_prime_8192 ( MemorySegment bn) {
         var mh$ = BN_get_rfc3526_prime_8192$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bn);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bn);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -633,7 +540,7 @@ public class openssl_h  {
     public static MethodHandle ASN1_STRING_length$MH() {
         return RuntimeHelper.requireNonNull(constants$4.ASN1_STRING_length$MH,"ASN1_STRING_length");
     }
-    public static int ASN1_STRING_length ( Addressable x) {
+    public static int ASN1_STRING_length ( MemorySegment x) {
         var mh$ = ASN1_STRING_length$MH();
         try {
             return (int)mh$.invokeExact(x);
@@ -644,10 +551,10 @@ public class openssl_h  {
     public static MethodHandle ASN1_STRING_get0_data$MH() {
         return RuntimeHelper.requireNonNull(constants$4.ASN1_STRING_get0_data$MH,"ASN1_STRING_get0_data");
     }
-    public static MemoryAddress ASN1_STRING_get0_data ( Addressable x) {
+    public static MemorySegment ASN1_STRING_get0_data ( MemorySegment x) {
         var mh$ = ASN1_STRING_get0_data$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(x);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(x);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -655,10 +562,10 @@ public class openssl_h  {
     public static MethodHandle EVP_MD_get0_provider$MH() {
         return RuntimeHelper.requireNonNull(constants$4.EVP_MD_get0_provider$MH,"EVP_MD_get0_provider");
     }
-    public static MemoryAddress EVP_MD_get0_provider ( Addressable md) {
+    public static MemorySegment EVP_MD_get0_provider ( MemorySegment md) {
         var mh$ = EVP_MD_get0_provider$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(md);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(md);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -666,10 +573,10 @@ public class openssl_h  {
     public static MethodHandle EVP_MD_fetch$MH() {
         return RuntimeHelper.requireNonNull(constants$4.EVP_MD_fetch$MH,"EVP_MD_fetch");
     }
-    public static MemoryAddress EVP_MD_fetch ( Addressable ctx,  Addressable algorithm,  Addressable properties) {
+    public static MemorySegment EVP_MD_fetch ( MemorySegment ctx,  MemorySegment algorithm,  MemorySegment properties) {
         var mh$ = EVP_MD_fetch$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ctx, algorithm, properties);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ctx, algorithm, properties);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -677,7 +584,7 @@ public class openssl_h  {
     public static MethodHandle EVP_MD_free$MH() {
         return RuntimeHelper.requireNonNull(constants$5.EVP_MD_free$MH,"EVP_MD_free");
     }
-    public static void EVP_MD_free ( Addressable md) {
+    public static void EVP_MD_free ( MemorySegment md) {
         var mh$ = EVP_MD_free$MH();
         try {
             mh$.invokeExact(md);
@@ -688,7 +595,7 @@ public class openssl_h  {
     public static MethodHandle EVP_PKEY_get_base_id$MH() {
         return RuntimeHelper.requireNonNull(constants$5.EVP_PKEY_get_base_id$MH,"EVP_PKEY_get_base_id");
     }
-    public static int EVP_PKEY_get_base_id ( Addressable pkey) {
+    public static int EVP_PKEY_get_base_id ( MemorySegment pkey) {
         var mh$ = EVP_PKEY_get_base_id$MH();
         try {
             return (int)mh$.invokeExact(pkey);
@@ -699,7 +606,7 @@ public class openssl_h  {
     public static MethodHandle EVP_PKEY_get_bits$MH() {
         return RuntimeHelper.requireNonNull(constants$5.EVP_PKEY_get_bits$MH,"EVP_PKEY_get_bits");
     }
-    public static int EVP_PKEY_get_bits ( Addressable pkey) {
+    public static int EVP_PKEY_get_bits ( MemorySegment pkey) {
         var mh$ = EVP_PKEY_get_bits$MH();
         try {
             return (int)mh$.invokeExact(pkey);
@@ -707,19 +614,10 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
-    public static int POINT_CONVERSION_COMPRESSED() {
-        return (int)2L;
-    }
-    public static int POINT_CONVERSION_UNCOMPRESSED() {
-        return (int)4L;
-    }
-    public static int POINT_CONVERSION_HYBRID() {
-        return (int)6L;
-    }
     public static MethodHandle EC_GROUP_free$MH() {
         return RuntimeHelper.requireNonNull(constants$5.EC_GROUP_free$MH,"EC_GROUP_free");
     }
-    public static void EC_GROUP_free ( Addressable group) {
+    public static void EC_GROUP_free ( MemorySegment group) {
         var mh$ = EC_GROUP_free$MH();
         try {
             mh$.invokeExact(group);
@@ -730,7 +628,7 @@ public class openssl_h  {
     public static MethodHandle EC_GROUP_get_curve_name$MH() {
         return RuntimeHelper.requireNonNull(constants$5.EC_GROUP_get_curve_name$MH,"EC_GROUP_get_curve_name");
     }
-    public static int EC_GROUP_get_curve_name ( Addressable group) {
+    public static int EC_GROUP_get_curve_name ( MemorySegment group) {
         var mh$ = EC_GROUP_get_curve_name$MH();
         try {
             return (int)mh$.invokeExact(group);
@@ -741,10 +639,10 @@ public class openssl_h  {
     public static MethodHandle EC_KEY_new_by_curve_name$MH() {
         return RuntimeHelper.requireNonNull(constants$5.EC_KEY_new_by_curve_name$MH,"EC_KEY_new_by_curve_name");
     }
-    public static MemoryAddress EC_KEY_new_by_curve_name ( int nid) {
+    public static MemorySegment EC_KEY_new_by_curve_name ( int nid) {
         var mh$ = EC_KEY_new_by_curve_name$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(nid);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(nid);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -752,7 +650,7 @@ public class openssl_h  {
     public static MethodHandle EC_KEY_free$MH() {
         return RuntimeHelper.requireNonNull(constants$6.EC_KEY_free$MH,"EC_KEY_free");
     }
-    public static void EC_KEY_free ( Addressable key) {
+    public static void EC_KEY_free ( MemorySegment key) {
         var mh$ = EC_KEY_free$MH();
         try {
             mh$.invokeExact(key);
@@ -763,10 +661,10 @@ public class openssl_h  {
     public static MethodHandle DH_new$MH() {
         return RuntimeHelper.requireNonNull(constants$6.DH_new$MH,"DH_new");
     }
-    public static MemoryAddress DH_new () {
+    public static MemorySegment DH_new () {
         var mh$ = DH_new$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -774,7 +672,7 @@ public class openssl_h  {
     public static MethodHandle DH_free$MH() {
         return RuntimeHelper.requireNonNull(constants$6.DH_free$MH,"DH_free");
     }
-    public static void DH_free ( Addressable dh) {
+    public static void DH_free ( MemorySegment dh) {
         var mh$ = DH_free$MH();
         try {
             mh$.invokeExact(dh);
@@ -785,7 +683,7 @@ public class openssl_h  {
     public static MethodHandle DH_set0_pqg$MH() {
         return RuntimeHelper.requireNonNull(constants$6.DH_set0_pqg$MH,"DH_set0_pqg");
     }
-    public static int DH_set0_pqg ( Addressable dh,  Addressable p,  Addressable q,  Addressable g) {
+    public static int DH_set0_pqg ( MemorySegment dh,  MemorySegment p,  MemorySegment q,  MemorySegment g) {
         var mh$ = DH_set0_pqg$MH();
         try {
             return (int)mh$.invokeExact(dh, p, q, g);
@@ -793,19 +691,10 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
-    public static int X509_LU_NONE() {
-        return (int)0L;
-    }
-    public static int X509_LU_X509() {
-        return (int)1L;
-    }
-    public static int X509_LU_CRL() {
-        return (int)2L;
-    }
     public static MethodHandle X509_STORE_set_flags$MH() {
         return RuntimeHelper.requireNonNull(constants$6.X509_STORE_set_flags$MH,"X509_STORE_set_flags");
     }
-    public static int X509_STORE_set_flags ( Addressable ctx,  long flags) {
+    public static int X509_STORE_set_flags ( MemorySegment ctx,  long flags) {
         var mh$ = X509_STORE_set_flags$MH();
         try {
             return (int)mh$.invokeExact(ctx, flags);
@@ -816,10 +705,10 @@ public class openssl_h  {
     public static MethodHandle X509_STORE_CTX_get0_untrusted$MH() {
         return RuntimeHelper.requireNonNull(constants$6.X509_STORE_CTX_get0_untrusted$MH,"X509_STORE_CTX_get0_untrusted");
     }
-    public static MemoryAddress X509_STORE_CTX_get0_untrusted ( Addressable ctx) {
+    public static MemorySegment X509_STORE_CTX_get0_untrusted ( MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get0_untrusted$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ctx);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -827,10 +716,10 @@ public class openssl_h  {
     public static MethodHandle X509_STORE_add_lookup$MH() {
         return RuntimeHelper.requireNonNull(constants$7.X509_STORE_add_lookup$MH,"X509_STORE_add_lookup");
     }
-    public static MemoryAddress X509_STORE_add_lookup ( Addressable v,  Addressable m) {
+    public static MemorySegment X509_STORE_add_lookup ( MemorySegment v,  MemorySegment m) {
         var mh$ = X509_STORE_add_lookup$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(v, m);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(v, m);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -838,10 +727,10 @@ public class openssl_h  {
     public static MethodHandle X509_LOOKUP_hash_dir$MH() {
         return RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_hash_dir$MH,"X509_LOOKUP_hash_dir");
     }
-    public static MemoryAddress X509_LOOKUP_hash_dir () {
+    public static MemorySegment X509_LOOKUP_hash_dir () {
         var mh$ = X509_LOOKUP_hash_dir$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -849,10 +738,10 @@ public class openssl_h  {
     public static MethodHandle X509_LOOKUP_file$MH() {
         return RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_file$MH,"X509_LOOKUP_file");
     }
-    public static MemoryAddress X509_LOOKUP_file () {
+    public static MemorySegment X509_LOOKUP_file () {
         var mh$ = X509_LOOKUP_file$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -860,7 +749,7 @@ public class openssl_h  {
     public static MethodHandle X509_LOOKUP_ctrl$MH() {
         return RuntimeHelper.requireNonNull(constants$7.X509_LOOKUP_ctrl$MH,"X509_LOOKUP_ctrl");
     }
-    public static int X509_LOOKUP_ctrl ( Addressable ctx,  int cmd,  Addressable argc,  long argl,  Addressable ret) {
+    public static int X509_LOOKUP_ctrl ( MemorySegment ctx,  int cmd,  MemorySegment argc,  long argl,  MemorySegment ret) {
         var mh$ = X509_LOOKUP_ctrl$MH();
         try {
             return (int)mh$.invokeExact(ctx, cmd, argc, argl, ret);
@@ -871,10 +760,10 @@ public class openssl_h  {
     public static MethodHandle X509_STORE_CTX_get_ex_data$MH() {
         return RuntimeHelper.requireNonNull(constants$7.X509_STORE_CTX_get_ex_data$MH,"X509_STORE_CTX_get_ex_data");
     }
-    public static MemoryAddress X509_STORE_CTX_get_ex_data ( Addressable ctx,  int idx) {
+    public static MemorySegment X509_STORE_CTX_get_ex_data ( MemorySegment ctx,  int idx) {
         var mh$ = X509_STORE_CTX_get_ex_data$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ctx, idx);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ctx, idx);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -882,7 +771,7 @@ public class openssl_h  {
     public static MethodHandle X509_STORE_CTX_get_error$MH() {
         return RuntimeHelper.requireNonNull(constants$7.X509_STORE_CTX_get_error$MH,"X509_STORE_CTX_get_error");
     }
-    public static int X509_STORE_CTX_get_error ( Addressable ctx) {
+    public static int X509_STORE_CTX_get_error ( MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get_error$MH();
         try {
             return (int)mh$.invokeExact(ctx);
@@ -893,7 +782,7 @@ public class openssl_h  {
     public static MethodHandle X509_STORE_CTX_set_error$MH() {
         return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_set_error$MH,"X509_STORE_CTX_set_error");
     }
-    public static void X509_STORE_CTX_set_error ( Addressable ctx,  int s) {
+    public static void X509_STORE_CTX_set_error ( MemorySegment ctx,  int s) {
         var mh$ = X509_STORE_CTX_set_error$MH();
         try {
             mh$.invokeExact(ctx, s);
@@ -904,7 +793,7 @@ public class openssl_h  {
     public static MethodHandle X509_STORE_CTX_get_error_depth$MH() {
         return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get_error_depth$MH,"X509_STORE_CTX_get_error_depth");
     }
-    public static int X509_STORE_CTX_get_error_depth ( Addressable ctx) {
+    public static int X509_STORE_CTX_get_error_depth ( MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get_error_depth$MH();
         try {
             return (int)mh$.invokeExact(ctx);
@@ -915,10 +804,10 @@ public class openssl_h  {
     public static MethodHandle X509_STORE_CTX_get_current_cert$MH() {
         return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get_current_cert$MH,"X509_STORE_CTX_get_current_cert");
     }
-    public static MemoryAddress X509_STORE_CTX_get_current_cert ( Addressable ctx) {
+    public static MemorySegment X509_STORE_CTX_get_current_cert ( MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get_current_cert$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ctx);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -926,10 +815,10 @@ public class openssl_h  {
     public static MethodHandle X509_STORE_CTX_get0_current_issuer$MH() {
         return RuntimeHelper.requireNonNull(constants$8.X509_STORE_CTX_get0_current_issuer$MH,"X509_STORE_CTX_get0_current_issuer");
     }
-    public static MemoryAddress X509_STORE_CTX_get0_current_issuer ( Addressable ctx) {
+    public static MemorySegment X509_STORE_CTX_get0_current_issuer ( MemorySegment ctx) {
         var mh$ = X509_STORE_CTX_get0_current_issuer$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ctx);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -937,10 +826,10 @@ public class openssl_h  {
     public static MethodHandle d2i_X509_bio$MH() {
         return RuntimeHelper.requireNonNull(constants$8.d2i_X509_bio$MH,"d2i_X509_bio");
     }
-    public static MemoryAddress d2i_X509_bio ( Addressable bp,  Addressable x509) {
+    public static MemorySegment d2i_X509_bio ( MemorySegment bp,  MemorySegment x509) {
         var mh$ = d2i_X509_bio$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bp, x509);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bp, x509);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -948,7 +837,7 @@ public class openssl_h  {
     public static MethodHandle X509_free$MH() {
         return RuntimeHelper.requireNonNull(constants$8.X509_free$MH,"X509_free");
     }
-    public static void X509_free ( Addressable a) {
+    public static void X509_free ( MemorySegment a) {
         var mh$ = X509_free$MH();
         try {
             mh$.invokeExact(a);
@@ -959,10 +848,10 @@ public class openssl_h  {
     public static MethodHandle d2i_X509$MH() {
         return RuntimeHelper.requireNonNull(constants$9.d2i_X509$MH,"d2i_X509");
     }
-    public static MemoryAddress d2i_X509 ( Addressable a,  Addressable in,  long len) {
+    public static MemorySegment d2i_X509 ( MemorySegment a,  MemorySegment in,  long len) {
         var mh$ = d2i_X509$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(a, in, len);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(a, in, len);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -970,7 +859,7 @@ public class openssl_h  {
     public static MethodHandle i2d_X509$MH() {
         return RuntimeHelper.requireNonNull(constants$9.i2d_X509$MH,"i2d_X509");
     }
-    public static int i2d_X509 ( Addressable a,  Addressable out) {
+    public static int i2d_X509 ( MemorySegment a,  MemorySegment out) {
         var mh$ = i2d_X509$MH();
         try {
             return (int)mh$.invokeExact(a, out);
@@ -981,7 +870,7 @@ public class openssl_h  {
     public static MethodHandle X509_get_ext_by_NID$MH() {
         return RuntimeHelper.requireNonNull(constants$9.X509_get_ext_by_NID$MH,"X509_get_ext_by_NID");
     }
-    public static int X509_get_ext_by_NID ( Addressable x,  int nid,  int lastpos) {
+    public static int X509_get_ext_by_NID ( MemorySegment x,  int nid,  int lastpos) {
         var mh$ = X509_get_ext_by_NID$MH();
         try {
             return (int)mh$.invokeExact(x, nid, lastpos);
@@ -992,10 +881,10 @@ public class openssl_h  {
     public static MethodHandle X509_get_ext$MH() {
         return RuntimeHelper.requireNonNull(constants$9.X509_get_ext$MH,"X509_get_ext");
     }
-    public static MemoryAddress X509_get_ext ( Addressable x,  int loc) {
+    public static MemorySegment X509_get_ext ( MemorySegment x,  int loc) {
         var mh$ = X509_get_ext$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(x, loc);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(x, loc);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1003,10 +892,10 @@ public class openssl_h  {
     public static MethodHandle X509_EXTENSION_get_data$MH() {
         return RuntimeHelper.requireNonNull(constants$9.X509_EXTENSION_get_data$MH,"X509_EXTENSION_get_data");
     }
-    public static MemoryAddress X509_EXTENSION_get_data ( Addressable ne) {
+    public static MemorySegment X509_EXTENSION_get_data ( MemorySegment ne) {
         var mh$ = X509_EXTENSION_get_data$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ne);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ne);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1014,10 +903,10 @@ public class openssl_h  {
     public static MethodHandle PEM_read_bio_X509_AUX$MH() {
         return RuntimeHelper.requireNonNull(constants$9.PEM_read_bio_X509_AUX$MH,"PEM_read_bio_X509_AUX");
     }
-    public static MemoryAddress PEM_read_bio_X509_AUX ( Addressable out,  Addressable x,  Addressable cb,  Addressable u) {
+    public static MemorySegment PEM_read_bio_X509_AUX ( MemorySegment out,  MemorySegment x,  MemorySegment cb,  MemorySegment u) {
         var mh$ = PEM_read_bio_X509_AUX$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(out, x, cb, u);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1025,10 +914,10 @@ public class openssl_h  {
     public static MethodHandle PEM_read_bio_ECPKParameters$MH() {
         return RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_ECPKParameters$MH,"PEM_read_bio_ECPKParameters");
     }
-    public static MemoryAddress PEM_read_bio_ECPKParameters ( Addressable out,  Addressable x,  Addressable cb,  Addressable u) {
+    public static MemorySegment PEM_read_bio_ECPKParameters ( MemorySegment out,  MemorySegment x,  MemorySegment cb,  MemorySegment u) {
         var mh$ = PEM_read_bio_ECPKParameters$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(out, x, cb, u);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1036,10 +925,10 @@ public class openssl_h  {
     public static MethodHandle PEM_read_bio_DHparams$MH() {
         return RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_DHparams$MH,"PEM_read_bio_DHparams");
     }
-    public static MemoryAddress PEM_read_bio_DHparams ( Addressable out,  Addressable x,  Addressable cb,  Addressable u) {
+    public static MemorySegment PEM_read_bio_DHparams ( MemorySegment out,  MemorySegment x,  MemorySegment cb,  MemorySegment u) {
         var mh$ = PEM_read_bio_DHparams$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(out, x, cb, u);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1047,63 +936,18 @@ public class openssl_h  {
     public static MethodHandle PEM_read_bio_PrivateKey$MH() {
         return RuntimeHelper.requireNonNull(constants$10.PEM_read_bio_PrivateKey$MH,"PEM_read_bio_PrivateKey");
     }
-    public static MemoryAddress PEM_read_bio_PrivateKey ( Addressable out,  Addressable x,  Addressable cb,  Addressable u) {
+    public static MemorySegment PEM_read_bio_PrivateKey ( MemorySegment out,  MemorySegment x,  MemorySegment cb,  MemorySegment u) {
         var mh$ = PEM_read_bio_PrivateKey$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(out, x, cb, u);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
-    public static int CT_LOG_ENTRY_TYPE_NOT_SET() {
-        return (int)-1L;
-    }
-    public static int CT_LOG_ENTRY_TYPE_X509() {
-        return (int)0L;
-    }
-    public static int CT_LOG_ENTRY_TYPE_PRECERT() {
-        return (int)1L;
-    }
-    public static int SCT_VERSION_NOT_SET() {
-        return (int)-1L;
-    }
-    public static int SCT_VERSION_V1() {
-        return (int)0L;
-    }
-    public static int SCT_SOURCE_UNKNOWN() {
-        return (int)0L;
-    }
-    public static int SCT_SOURCE_TLS_EXTENSION() {
-        return (int)1L;
-    }
-    public static int SCT_SOURCE_X509V3_EXTENSION() {
-        return (int)2L;
-    }
-    public static int SCT_SOURCE_OCSP_STAPLED_RESPONSE() {
-        return (int)3L;
-    }
-    public static int SCT_VALIDATION_STATUS_NOT_SET() {
-        return (int)0L;
-    }
-    public static int SCT_VALIDATION_STATUS_UNKNOWN_LOG() {
-        return (int)1L;
-    }
-    public static int SCT_VALIDATION_STATUS_VALID() {
-        return (int)2L;
-    }
-    public static int SCT_VALIDATION_STATUS_INVALID() {
-        return (int)3L;
-    }
-    public static int SCT_VALIDATION_STATUS_UNVERIFIED() {
-        return (int)4L;
-    }
-    public static int SCT_VALIDATION_STATUS_UNKNOWN_VERSION() {
-        return (int)5L;
-    }
     public static MethodHandle SSL_CTX_get_options$MH() {
         return RuntimeHelper.requireNonNull(constants$10.SSL_CTX_get_options$MH,"SSL_CTX_get_options");
     }
-    public static long SSL_CTX_get_options ( Addressable ctx) {
+    public static long SSL_CTX_get_options ( MemorySegment ctx) {
         var mh$ = SSL_CTX_get_options$MH();
         try {
             return (long)mh$.invokeExact(ctx);
@@ -1114,7 +958,7 @@ public class openssl_h  {
     public static MethodHandle SSL_get_options$MH() {
         return RuntimeHelper.requireNonNull(constants$10.SSL_get_options$MH,"SSL_get_options");
     }
-    public static long SSL_get_options ( Addressable s) {
+    public static long SSL_get_options ( MemorySegment s) {
         var mh$ = SSL_get_options$MH();
         try {
             return (long)mh$.invokeExact(s);
@@ -1125,7 +969,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_clear_options$MH() {
         return RuntimeHelper.requireNonNull(constants$10.SSL_CTX_clear_options$MH,"SSL_CTX_clear_options");
     }
-    public static long SSL_CTX_clear_options ( Addressable ctx,  long op) {
+    public static long SSL_CTX_clear_options ( MemorySegment ctx,  long op) {
         var mh$ = SSL_CTX_clear_options$MH();
         try {
             return (long)mh$.invokeExact(ctx, op);
@@ -1136,7 +980,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_options$MH() {
         return RuntimeHelper.requireNonNull(constants$11.SSL_CTX_set_options$MH,"SSL_CTX_set_options");
     }
-    public static long SSL_CTX_set_options ( Addressable ctx,  long op) {
+    public static long SSL_CTX_set_options ( MemorySegment ctx,  long op) {
         var mh$ = SSL_CTX_set_options$MH();
         try {
             return (long)mh$.invokeExact(ctx, op);
@@ -1147,7 +991,7 @@ public class openssl_h  {
     public static MethodHandle SSL_set_options$MH() {
         return RuntimeHelper.requireNonNull(constants$11.SSL_set_options$MH,"SSL_set_options");
     }
-    public static long SSL_set_options ( Addressable s,  long op) {
+    public static long SSL_set_options ( MemorySegment s,  long op) {
         var mh$ = SSL_set_options$MH();
         try {
             return (long)mh$.invokeExact(s, op);
@@ -1158,7 +1002,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_alpn_select_cb$MH() {
         return RuntimeHelper.requireNonNull(constants$11.SSL_CTX_set_alpn_select_cb$MH,"SSL_CTX_set_alpn_select_cb");
     }
-    public static void SSL_CTX_set_alpn_select_cb ( Addressable ctx,  Addressable cb,  Addressable arg) {
+    public static void SSL_CTX_set_alpn_select_cb ( MemorySegment ctx,  MemorySegment cb,  MemorySegment arg) {
         var mh$ = SSL_CTX_set_alpn_select_cb$MH();
         try {
             mh$.invokeExact(ctx, cb, arg);
@@ -1169,7 +1013,7 @@ public class openssl_h  {
     public static MethodHandle SSL_get0_alpn_selected$MH() {
         return RuntimeHelper.requireNonNull(constants$11.SSL_get0_alpn_selected$MH,"SSL_get0_alpn_selected");
     }
-    public static void SSL_get0_alpn_selected ( Addressable ssl,  Addressable data,  Addressable len) {
+    public static void SSL_get0_alpn_selected ( MemorySegment ssl,  MemorySegment data,  MemorySegment len) {
         var mh$ = SSL_get0_alpn_selected$MH();
         try {
             mh$.invokeExact(ssl, data, len);
@@ -1177,160 +1021,10 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
-    public static int TLS_ST_BEFORE() {
-        return (int)0L;
-    }
-    public static int TLS_ST_OK() {
-        return (int)1L;
-    }
-    public static int DTLS_ST_CR_HELLO_VERIFY_REQUEST() {
-        return (int)2L;
-    }
-    public static int TLS_ST_CR_SRVR_HELLO() {
-        return (int)3L;
-    }
-    public static int TLS_ST_CR_CERT() {
-        return (int)4L;
-    }
-    public static int TLS_ST_CR_CERT_STATUS() {
-        return (int)5L;
-    }
-    public static int TLS_ST_CR_KEY_EXCH() {
-        return (int)6L;
-    }
-    public static int TLS_ST_CR_CERT_REQ() {
-        return (int)7L;
-    }
-    public static int TLS_ST_CR_SRVR_DONE() {
-        return (int)8L;
-    }
-    public static int TLS_ST_CR_SESSION_TICKET() {
-        return (int)9L;
-    }
-    public static int TLS_ST_CR_CHANGE() {
-        return (int)10L;
-    }
-    public static int TLS_ST_CR_FINISHED() {
-        return (int)11L;
-    }
-    public static int TLS_ST_CW_CLNT_HELLO() {
-        return (int)12L;
-    }
-    public static int TLS_ST_CW_CERT() {
-        return (int)13L;
-    }
-    public static int TLS_ST_CW_KEY_EXCH() {
-        return (int)14L;
-    }
-    public static int TLS_ST_CW_CERT_VRFY() {
-        return (int)15L;
-    }
-    public static int TLS_ST_CW_CHANGE() {
-        return (int)16L;
-    }
-    public static int TLS_ST_CW_NEXT_PROTO() {
-        return (int)17L;
-    }
-    public static int TLS_ST_CW_FINISHED() {
-        return (int)18L;
-    }
-    public static int TLS_ST_SW_HELLO_REQ() {
-        return (int)19L;
-    }
-    public static int TLS_ST_SR_CLNT_HELLO() {
-        return (int)20L;
-    }
-    public static int DTLS_ST_SW_HELLO_VERIFY_REQUEST() {
-        return (int)21L;
-    }
-    public static int TLS_ST_SW_SRVR_HELLO() {
-        return (int)22L;
-    }
-    public static int TLS_ST_SW_CERT() {
-        return (int)23L;
-    }
-    public static int TLS_ST_SW_KEY_EXCH() {
-        return (int)24L;
-    }
-    public static int TLS_ST_SW_CERT_REQ() {
-        return (int)25L;
-    }
-    public static int TLS_ST_SW_SRVR_DONE() {
-        return (int)26L;
-    }
-    public static int TLS_ST_SR_CERT() {
-        return (int)27L;
-    }
-    public static int TLS_ST_SR_KEY_EXCH() {
-        return (int)28L;
-    }
-    public static int TLS_ST_SR_CERT_VRFY() {
-        return (int)29L;
-    }
-    public static int TLS_ST_SR_NEXT_PROTO() {
-        return (int)30L;
-    }
-    public static int TLS_ST_SR_CHANGE() {
-        return (int)31L;
-    }
-    public static int TLS_ST_SR_FINISHED() {
-        return (int)32L;
-    }
-    public static int TLS_ST_SW_SESSION_TICKET() {
-        return (int)33L;
-    }
-    public static int TLS_ST_SW_CERT_STATUS() {
-        return (int)34L;
-    }
-    public static int TLS_ST_SW_CHANGE() {
-        return (int)35L;
-    }
-    public static int TLS_ST_SW_FINISHED() {
-        return (int)36L;
-    }
-    public static int TLS_ST_SW_ENCRYPTED_EXTENSIONS() {
-        return (int)37L;
-    }
-    public static int TLS_ST_CR_ENCRYPTED_EXTENSIONS() {
-        return (int)38L;
-    }
-    public static int TLS_ST_CR_CERT_VRFY() {
-        return (int)39L;
-    }
-    public static int TLS_ST_SW_CERT_VRFY() {
-        return (int)40L;
-    }
-    public static int TLS_ST_CR_HELLO_REQ() {
-        return (int)41L;
-    }
-    public static int TLS_ST_SW_KEY_UPDATE() {
-        return (int)42L;
-    }
-    public static int TLS_ST_CW_KEY_UPDATE() {
-        return (int)43L;
-    }
-    public static int TLS_ST_SR_KEY_UPDATE() {
-        return (int)44L;
-    }
-    public static int TLS_ST_CR_KEY_UPDATE() {
-        return (int)45L;
-    }
-    public static int TLS_ST_EARLY_DATA() {
-        return (int)46L;
-    }
-    public static int TLS_ST_PENDING_EARLY_DATA_END() {
-        return (int)47L;
-    }
-    public static int TLS_ST_CW_END_OF_EARLY_DATA() {
-        return (int)48L;
-    }
-    public static int TLS_ST_SR_END_OF_EARLY_DATA() {
-        return (int)49L;
-    }
     public static MethodHandle SSL_in_init$MH() {
         return RuntimeHelper.requireNonNull(constants$11.SSL_in_init$MH,"SSL_in_init");
     }
-    public static int SSL_in_init ( Addressable s) {
+    public static int SSL_in_init ( MemorySegment s) {
         var mh$ = SSL_in_init$MH();
         try {
             return (int)mh$.invokeExact(s);
@@ -1341,7 +1035,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_cipher_list$MH() {
         return RuntimeHelper.requireNonNull(constants$11.SSL_CTX_set_cipher_list$MH,"SSL_CTX_set_cipher_list");
     }
-    public static int SSL_CTX_set_cipher_list ( Addressable x0,  Addressable str) {
+    public static int SSL_CTX_set_cipher_list ( MemorySegment x0,  MemorySegment str) {
         var mh$ = SSL_CTX_set_cipher_list$MH();
         try {
             return (int)mh$.invokeExact(x0, str);
@@ -1352,10 +1046,10 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_new$MH() {
         return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_new$MH,"SSL_CTX_new");
     }
-    public static MemoryAddress SSL_CTX_new ( Addressable meth) {
+    public static MemorySegment SSL_CTX_new ( MemorySegment meth) {
         var mh$ = SSL_CTX_new$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(meth);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(meth);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1363,7 +1057,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_free$MH() {
         return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_free$MH,"SSL_CTX_free");
     }
-    public static void SSL_CTX_free ( Addressable x0) {
+    public static void SSL_CTX_free ( MemorySegment x0) {
         var mh$ = SSL_CTX_free$MH();
         try {
             mh$.invokeExact(x0);
@@ -1374,7 +1068,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_timeout$MH() {
         return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_set_timeout$MH,"SSL_CTX_set_timeout");
     }
-    public static long SSL_CTX_set_timeout ( Addressable ctx,  long t) {
+    public static long SSL_CTX_set_timeout ( MemorySegment ctx,  long t) {
         var mh$ = SSL_CTX_set_timeout$MH();
         try {
             return (long)mh$.invokeExact(ctx, t);
@@ -1385,7 +1079,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_get_timeout$MH() {
         return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_get_timeout$MH,"SSL_CTX_get_timeout");
     }
-    public static long SSL_CTX_get_timeout ( Addressable ctx) {
+    public static long SSL_CTX_get_timeout ( MemorySegment ctx) {
         var mh$ = SSL_CTX_get_timeout$MH();
         try {
             return (long)mh$.invokeExact(ctx);
@@ -1396,10 +1090,10 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_get_cert_store$MH() {
         return RuntimeHelper.requireNonNull(constants$12.SSL_CTX_get_cert_store$MH,"SSL_CTX_get_cert_store");
     }
-    public static MemoryAddress SSL_CTX_get_cert_store ( Addressable x0) {
+    public static MemorySegment SSL_CTX_get_cert_store ( MemorySegment x0) {
         var mh$ = SSL_CTX_get_cert_store$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(x0);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(x0);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1407,10 +1101,10 @@ public class openssl_h  {
     public static MethodHandle SSL_get_current_cipher$MH() {
         return RuntimeHelper.requireNonNull(constants$12.SSL_get_current_cipher$MH,"SSL_get_current_cipher");
     }
-    public static MemoryAddress SSL_get_current_cipher ( Addressable s) {
+    public static MemorySegment SSL_get_current_cipher ( MemorySegment s) {
         var mh$ = SSL_get_current_cipher$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(s);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(s);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1418,10 +1112,10 @@ public class openssl_h  {
     public static MethodHandle SSL_CIPHER_get_name$MH() {
         return RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_name$MH,"SSL_CIPHER_get_name");
     }
-    public static MemoryAddress SSL_CIPHER_get_name ( Addressable c) {
+    public static MemorySegment SSL_CIPHER_get_name ( MemorySegment c) {
         var mh$ = SSL_CIPHER_get_name$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(c);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(c);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1429,7 +1123,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CIPHER_get_kx_nid$MH() {
         return RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_kx_nid$MH,"SSL_CIPHER_get_kx_nid");
     }
-    public static int SSL_CIPHER_get_kx_nid ( Addressable c) {
+    public static int SSL_CIPHER_get_kx_nid ( MemorySegment c) {
         var mh$ = SSL_CIPHER_get_kx_nid$MH();
         try {
             return (int)mh$.invokeExact(c);
@@ -1440,7 +1134,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CIPHER_get_auth_nid$MH() {
         return RuntimeHelper.requireNonNull(constants$13.SSL_CIPHER_get_auth_nid$MH,"SSL_CIPHER_get_auth_nid");
     }
-    public static int SSL_CIPHER_get_auth_nid ( Addressable c) {
+    public static int SSL_CIPHER_get_auth_nid ( MemorySegment c) {
         var mh$ = SSL_CIPHER_get_auth_nid$MH();
         try {
             return (int)mh$.invokeExact(c);
@@ -1451,7 +1145,7 @@ public class openssl_h  {
     public static MethodHandle SSL_pending$MH() {
         return RuntimeHelper.requireNonNull(constants$13.SSL_pending$MH,"SSL_pending");
     }
-    public static int SSL_pending ( Addressable s) {
+    public static int SSL_pending ( MemorySegment s) {
         var mh$ = SSL_pending$MH();
         try {
             return (int)mh$.invokeExact(s);
@@ -1462,7 +1156,7 @@ public class openssl_h  {
     public static MethodHandle SSL_set_bio$MH() {
         return RuntimeHelper.requireNonNull(constants$13.SSL_set_bio$MH,"SSL_set_bio");
     }
-    public static void SSL_set_bio ( Addressable s,  Addressable rbio,  Addressable wbio) {
+    public static void SSL_set_bio ( MemorySegment s,  MemorySegment rbio,  MemorySegment wbio) {
         var mh$ = SSL_set_bio$MH();
         try {
             mh$.invokeExact(s, rbio, wbio);
@@ -1473,7 +1167,7 @@ public class openssl_h  {
     public static MethodHandle SSL_set_cipher_list$MH() {
         return RuntimeHelper.requireNonNull(constants$13.SSL_set_cipher_list$MH,"SSL_set_cipher_list");
     }
-    public static int SSL_set_cipher_list ( Addressable s,  Addressable str) {
+    public static int SSL_set_cipher_list ( MemorySegment s,  MemorySegment str) {
         var mh$ = SSL_set_cipher_list$MH();
         try {
             return (int)mh$.invokeExact(s, str);
@@ -1484,7 +1178,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_ciphersuites$MH() {
         return RuntimeHelper.requireNonNull(constants$14.SSL_CTX_set_ciphersuites$MH,"SSL_CTX_set_ciphersuites");
     }
-    public static int SSL_CTX_set_ciphersuites ( Addressable ctx,  Addressable str) {
+    public static int SSL_CTX_set_ciphersuites ( MemorySegment ctx,  MemorySegment str) {
         var mh$ = SSL_CTX_set_ciphersuites$MH();
         try {
             return (int)mh$.invokeExact(ctx, str);
@@ -1495,7 +1189,7 @@ public class openssl_h  {
     public static MethodHandle SSL_set_verify$MH() {
         return RuntimeHelper.requireNonNull(constants$14.SSL_set_verify$MH,"SSL_set_verify");
     }
-    public static void SSL_set_verify ( Addressable s,  int mode,  Addressable callback) {
+    public static void SSL_set_verify ( MemorySegment s,  int mode,  MemorySegment callback) {
         var mh$ = SSL_set_verify$MH();
         try {
             mh$.invokeExact(s, mode, callback);
@@ -1506,7 +1200,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_use_certificate_chain_file$MH() {
         return RuntimeHelper.requireNonNull(constants$14.SSL_CTX_use_certificate_chain_file$MH,"SSL_CTX_use_certificate_chain_file");
     }
-    public static int SSL_CTX_use_certificate_chain_file ( Addressable ctx,  Addressable file) {
+    public static int SSL_CTX_use_certificate_chain_file ( MemorySegment ctx,  MemorySegment file) {
         var mh$ = SSL_CTX_use_certificate_chain_file$MH();
         try {
             return (int)mh$.invokeExact(ctx, file);
@@ -1517,10 +1211,10 @@ public class openssl_h  {
     public static MethodHandle SSL_load_client_CA_file$MH() {
         return RuntimeHelper.requireNonNull(constants$14.SSL_load_client_CA_file$MH,"SSL_load_client_CA_file");
     }
-    public static MemoryAddress SSL_load_client_CA_file ( Addressable file) {
+    public static MemorySegment SSL_load_client_CA_file ( MemorySegment file) {
         var mh$ = SSL_load_client_CA_file$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(file);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(file);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1528,7 +1222,7 @@ public class openssl_h  {
     public static MethodHandle SSL_add_file_cert_subjects_to_stack$MH() {
         return RuntimeHelper.requireNonNull(constants$14.SSL_add_file_cert_subjects_to_stack$MH,"SSL_add_file_cert_subjects_to_stack");
     }
-    public static int SSL_add_file_cert_subjects_to_stack ( Addressable stackCAs,  Addressable file) {
+    public static int SSL_add_file_cert_subjects_to_stack ( MemorySegment stackCAs,  MemorySegment file) {
         var mh$ = SSL_add_file_cert_subjects_to_stack$MH();
         try {
             return (int)mh$.invokeExact(stackCAs, file);
@@ -1539,7 +1233,7 @@ public class openssl_h  {
     public static MethodHandle SSL_SESSION_get_time$MH() {
         return RuntimeHelper.requireNonNull(constants$14.SSL_SESSION_get_time$MH,"SSL_SESSION_get_time");
     }
-    public static long SSL_SESSION_get_time ( Addressable s) {
+    public static long SSL_SESSION_get_time ( MemorySegment s) {
         var mh$ = SSL_SESSION_get_time$MH();
         try {
             return (long)mh$.invokeExact(s);
@@ -1550,10 +1244,10 @@ public class openssl_h  {
     public static MethodHandle SSL_SESSION_get_id$MH() {
         return RuntimeHelper.requireNonNull(constants$15.SSL_SESSION_get_id$MH,"SSL_SESSION_get_id");
     }
-    public static MemoryAddress SSL_SESSION_get_id ( Addressable s,  Addressable len) {
+    public static MemorySegment SSL_SESSION_get_id ( MemorySegment s,  MemorySegment len) {
         var mh$ = SSL_SESSION_get_id$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(s, len);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(s, len);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1561,10 +1255,10 @@ public class openssl_h  {
     public static MethodHandle SSL_get1_peer_certificate$MH() {
         return RuntimeHelper.requireNonNull(constants$15.SSL_get1_peer_certificate$MH,"SSL_get1_peer_certificate");
     }
-    public static MemoryAddress SSL_get1_peer_certificate ( Addressable s) {
+    public static MemorySegment SSL_get1_peer_certificate ( MemorySegment s) {
         var mh$ = SSL_get1_peer_certificate$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(s);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(s);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1572,10 +1266,10 @@ public class openssl_h  {
     public static MethodHandle SSL_get_peer_cert_chain$MH() {
         return RuntimeHelper.requireNonNull(constants$15.SSL_get_peer_cert_chain$MH,"SSL_get_peer_cert_chain");
     }
-    public static MemoryAddress SSL_get_peer_cert_chain ( Addressable s) {
+    public static MemorySegment SSL_get_peer_cert_chain ( MemorySegment s) {
         var mh$ = SSL_get_peer_cert_chain$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(s);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(s);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1583,7 +1277,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_verify$MH() {
         return RuntimeHelper.requireNonNull(constants$15.SSL_CTX_set_verify$MH,"SSL_CTX_set_verify");
     }
-    public static void SSL_CTX_set_verify ( Addressable ctx,  int mode,  Addressable callback) {
+    public static void SSL_CTX_set_verify ( MemorySegment ctx,  int mode,  MemorySegment callback) {
         var mh$ = SSL_CTX_set_verify$MH();
         try {
             mh$.invokeExact(ctx, mode, callback);
@@ -1594,7 +1288,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_cert_verify_callback$MH() {
         return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_set_cert_verify_callback$MH,"SSL_CTX_set_cert_verify_callback");
     }
-    public static void SSL_CTX_set_cert_verify_callback ( Addressable ctx,  Addressable cb,  Addressable arg) {
+    public static void SSL_CTX_set_cert_verify_callback ( MemorySegment ctx,  MemorySegment cb,  MemorySegment arg) {
         var mh$ = SSL_CTX_set_cert_verify_callback$MH();
         try {
             mh$.invokeExact(ctx, cb, arg);
@@ -1605,7 +1299,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_use_PrivateKey$MH() {
         return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_use_PrivateKey$MH,"SSL_CTX_use_PrivateKey");
     }
-    public static int SSL_CTX_use_PrivateKey ( Addressable ctx,  Addressable pkey) {
+    public static int SSL_CTX_use_PrivateKey ( MemorySegment ctx,  MemorySegment pkey) {
         var mh$ = SSL_CTX_use_PrivateKey$MH();
         try {
             return (int)mh$.invokeExact(ctx, pkey);
@@ -1616,7 +1310,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_use_certificate$MH() {
         return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_use_certificate$MH,"SSL_CTX_use_certificate");
     }
-    public static int SSL_CTX_use_certificate ( Addressable ctx,  Addressable x) {
+    public static int SSL_CTX_use_certificate ( MemorySegment ctx,  MemorySegment x) {
         var mh$ = SSL_CTX_use_certificate$MH();
         try {
             return (int)mh$.invokeExact(ctx, x);
@@ -1627,7 +1321,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_default_passwd_cb$MH() {
         return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_set_default_passwd_cb$MH,"SSL_CTX_set_default_passwd_cb");
     }
-    public static void SSL_CTX_set_default_passwd_cb ( Addressable ctx,  Addressable cb) {
+    public static void SSL_CTX_set_default_passwd_cb ( MemorySegment ctx,  MemorySegment cb) {
         var mh$ = SSL_CTX_set_default_passwd_cb$MH();
         try {
             mh$.invokeExact(ctx, cb);
@@ -1638,7 +1332,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_check_private_key$MH() {
         return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_check_private_key$MH,"SSL_CTX_check_private_key");
     }
-    public static int SSL_CTX_check_private_key ( Addressable ctx) {
+    public static int SSL_CTX_check_private_key ( MemorySegment ctx) {
         var mh$ = SSL_CTX_check_private_key$MH();
         try {
             return (int)mh$.invokeExact(ctx);
@@ -1649,7 +1343,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_session_id_context$MH() {
         return RuntimeHelper.requireNonNull(constants$16.SSL_CTX_set_session_id_context$MH,"SSL_CTX_set_session_id_context");
     }
-    public static int SSL_CTX_set_session_id_context ( Addressable ctx,  Addressable sid_ctx,  int sid_ctx_len) {
+    public static int SSL_CTX_set_session_id_context ( MemorySegment ctx,  MemorySegment sid_ctx,  int sid_ctx_len) {
         var mh$ = SSL_CTX_set_session_id_context$MH();
         try {
             return (int)mh$.invokeExact(ctx, sid_ctx, sid_ctx_len);
@@ -1660,10 +1354,10 @@ public class openssl_h  {
     public static MethodHandle SSL_new$MH() {
         return RuntimeHelper.requireNonNull(constants$17.SSL_new$MH,"SSL_new");
     }
-    public static MemoryAddress SSL_new ( Addressable ctx) {
+    public static MemorySegment SSL_new ( MemorySegment ctx) {
         var mh$ = SSL_new$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ctx);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1671,7 +1365,7 @@ public class openssl_h  {
     public static MethodHandle SSL_free$MH() {
         return RuntimeHelper.requireNonNull(constants$17.SSL_free$MH,"SSL_free");
     }
-    public static void SSL_free ( Addressable ssl) {
+    public static void SSL_free ( MemorySegment ssl) {
         var mh$ = SSL_free$MH();
         try {
             mh$.invokeExact(ssl);
@@ -1682,7 +1376,7 @@ public class openssl_h  {
     public static MethodHandle SSL_read$MH() {
         return RuntimeHelper.requireNonNull(constants$17.SSL_read$MH,"SSL_read");
     }
-    public static int SSL_read ( Addressable ssl,  Addressable buf,  int num) {
+    public static int SSL_read ( MemorySegment ssl,  MemorySegment buf,  int num) {
         var mh$ = SSL_read$MH();
         try {
             return (int)mh$.invokeExact(ssl, buf, num);
@@ -1693,7 +1387,7 @@ public class openssl_h  {
     public static MethodHandle SSL_write$MH() {
         return RuntimeHelper.requireNonNull(constants$17.SSL_write$MH,"SSL_write");
     }
-    public static int SSL_write ( Addressable ssl,  Addressable buf,  int num) {
+    public static int SSL_write ( MemorySegment ssl,  MemorySegment buf,  int num) {
         var mh$ = SSL_write$MH();
         try {
             return (int)mh$.invokeExact(ssl, buf, num);
@@ -1704,7 +1398,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_ctrl$MH() {
         return RuntimeHelper.requireNonNull(constants$17.SSL_CTX_ctrl$MH,"SSL_CTX_ctrl");
     }
-    public static long SSL_CTX_ctrl ( Addressable ctx,  int cmd,  long larg,  Addressable parg) {
+    public static long SSL_CTX_ctrl ( MemorySegment ctx,  int cmd,  long larg,  MemorySegment parg) {
         var mh$ = SSL_CTX_ctrl$MH();
         try {
             return (long)mh$.invokeExact(ctx, cmd, larg, parg);
@@ -1715,10 +1409,10 @@ public class openssl_h  {
     public static MethodHandle SSL_get_version$MH() {
         return RuntimeHelper.requireNonNull(constants$17.SSL_get_version$MH,"SSL_get_version");
     }
-    public static MemoryAddress SSL_get_version ( Addressable s) {
+    public static MemorySegment SSL_get_version ( MemorySegment s) {
         var mh$ = SSL_get_version$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(s);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(s);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1726,10 +1420,10 @@ public class openssl_h  {
     public static MethodHandle TLS_server_method$MH() {
         return RuntimeHelper.requireNonNull(constants$18.TLS_server_method$MH,"TLS_server_method");
     }
-    public static MemoryAddress TLS_server_method () {
+    public static MemorySegment TLS_server_method () {
         var mh$ = TLS_server_method$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1737,10 +1431,10 @@ public class openssl_h  {
     public static MethodHandle SSL_get_ciphers$MH() {
         return RuntimeHelper.requireNonNull(constants$18.SSL_get_ciphers$MH,"SSL_get_ciphers");
     }
-    public static MemoryAddress SSL_get_ciphers ( Addressable s) {
+    public static MemorySegment SSL_get_ciphers ( MemorySegment s) {
         var mh$ = SSL_get_ciphers$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(s);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(s);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1748,10 +1442,10 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_get_ciphers$MH() {
         return RuntimeHelper.requireNonNull(constants$18.SSL_CTX_get_ciphers$MH,"SSL_CTX_get_ciphers");
     }
-    public static MemoryAddress SSL_CTX_get_ciphers ( Addressable ctx) {
+    public static MemorySegment SSL_CTX_get_ciphers ( MemorySegment ctx) {
         var mh$ = SSL_CTX_get_ciphers$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ctx);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1759,7 +1453,7 @@ public class openssl_h  {
     public static MethodHandle SSL_do_handshake$MH() {
         return RuntimeHelper.requireNonNull(constants$18.SSL_do_handshake$MH,"SSL_do_handshake");
     }
-    public static int SSL_do_handshake ( Addressable s) {
+    public static int SSL_do_handshake ( MemorySegment s) {
         var mh$ = SSL_do_handshake$MH();
         try {
             return (int)mh$.invokeExact(s);
@@ -1770,7 +1464,7 @@ public class openssl_h  {
     public static MethodHandle SSL_renegotiate$MH() {
         return RuntimeHelper.requireNonNull(constants$18.SSL_renegotiate$MH,"SSL_renegotiate");
     }
-    public static int SSL_renegotiate ( Addressable s) {
+    public static int SSL_renegotiate ( MemorySegment s) {
         var mh$ = SSL_renegotiate$MH();
         try {
             return (int)mh$.invokeExact(s);
@@ -1781,7 +1475,7 @@ public class openssl_h  {
     public static MethodHandle SSL_renegotiate_pending$MH() {
         return RuntimeHelper.requireNonNull(constants$18.SSL_renegotiate_pending$MH,"SSL_renegotiate_pending");
     }
-    public static int SSL_renegotiate_pending ( Addressable s) {
+    public static int SSL_renegotiate_pending ( MemorySegment s) {
         var mh$ = SSL_renegotiate_pending$MH();
         try {
             return (int)mh$.invokeExact(s);
@@ -1792,7 +1486,7 @@ public class openssl_h  {
     public static MethodHandle SSL_shutdown$MH() {
         return RuntimeHelper.requireNonNull(constants$19.SSL_shutdown$MH,"SSL_shutdown");
     }
-    public static int SSL_shutdown ( Addressable s) {
+    public static int SSL_shutdown ( MemorySegment s) {
         var mh$ = SSL_shutdown$MH();
         try {
             return (int)mh$.invokeExact(s);
@@ -1803,7 +1497,7 @@ public class openssl_h  {
     public static MethodHandle SSL_verify_client_post_handshake$MH() {
         return RuntimeHelper.requireNonNull(constants$19.SSL_verify_client_post_handshake$MH,"SSL_verify_client_post_handshake");
     }
-    public static int SSL_verify_client_post_handshake ( Addressable s) {
+    public static int SSL_verify_client_post_handshake ( MemorySegment s) {
         var mh$ = SSL_verify_client_post_handshake$MH();
         try {
             return (int)mh$.invokeExact(s);
@@ -1814,7 +1508,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_client_CA_list$MH() {
         return RuntimeHelper.requireNonNull(constants$19.SSL_CTX_set_client_CA_list$MH,"SSL_CTX_set_client_CA_list");
     }
-    public static void SSL_CTX_set_client_CA_list ( Addressable ctx,  Addressable name_list) {
+    public static void SSL_CTX_set_client_CA_list ( MemorySegment ctx,  MemorySegment name_list) {
         var mh$ = SSL_CTX_set_client_CA_list$MH();
         try {
             mh$.invokeExact(ctx, name_list);
@@ -1825,10 +1519,10 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_get_client_CA_list$MH() {
         return RuntimeHelper.requireNonNull(constants$19.SSL_CTX_get_client_CA_list$MH,"SSL_CTX_get_client_CA_list");
     }
-    public static MemoryAddress SSL_CTX_get_client_CA_list ( Addressable s) {
+    public static MemorySegment SSL_CTX_get_client_CA_list ( MemorySegment s) {
         var mh$ = SSL_CTX_get_client_CA_list$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(s);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(s);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1836,7 +1530,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_add_client_CA$MH() {
         return RuntimeHelper.requireNonNull(constants$19.SSL_CTX_add_client_CA$MH,"SSL_CTX_add_client_CA");
     }
-    public static int SSL_CTX_add_client_CA ( Addressable ctx,  Addressable x) {
+    public static int SSL_CTX_add_client_CA ( MemorySegment ctx,  MemorySegment x) {
         var mh$ = SSL_CTX_add_client_CA$MH();
         try {
             return (int)mh$.invokeExact(ctx, x);
@@ -1847,7 +1541,7 @@ public class openssl_h  {
     public static MethodHandle SSL_set_connect_state$MH() {
         return RuntimeHelper.requireNonNull(constants$19.SSL_set_connect_state$MH,"SSL_set_connect_state");
     }
-    public static void SSL_set_connect_state ( Addressable s) {
+    public static void SSL_set_connect_state ( MemorySegment s) {
         var mh$ = SSL_set_connect_state$MH();
         try {
             mh$.invokeExact(s);
@@ -1858,7 +1552,7 @@ public class openssl_h  {
     public static MethodHandle SSL_set_accept_state$MH() {
         return RuntimeHelper.requireNonNull(constants$20.SSL_set_accept_state$MH,"SSL_set_accept_state");
     }
-    public static void SSL_set_accept_state ( Addressable s) {
+    public static void SSL_set_accept_state ( MemorySegment s) {
         var mh$ = SSL_set_accept_state$MH();
         try {
             mh$.invokeExact(s);
@@ -1869,10 +1563,10 @@ public class openssl_h  {
     public static MethodHandle SSL_get_privatekey$MH() {
         return RuntimeHelper.requireNonNull(constants$20.SSL_get_privatekey$MH,"SSL_get_privatekey");
     }
-    public static MemoryAddress SSL_get_privatekey ( Addressable ssl) {
+    public static MemorySegment SSL_get_privatekey ( MemorySegment ssl) {
         var mh$ = SSL_get_privatekey$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ssl);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1880,7 +1574,7 @@ public class openssl_h  {
     public static MethodHandle SSL_get_shutdown$MH() {
         return RuntimeHelper.requireNonNull(constants$20.SSL_get_shutdown$MH,"SSL_get_shutdown");
     }
-    public static int SSL_get_shutdown ( Addressable ssl) {
+    public static int SSL_get_shutdown ( MemorySegment ssl) {
         var mh$ = SSL_get_shutdown$MH();
         try {
             return (int)mh$.invokeExact(ssl);
@@ -1891,7 +1585,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_default_verify_paths$MH() {
         return RuntimeHelper.requireNonNull(constants$20.SSL_CTX_set_default_verify_paths$MH,"SSL_CTX_set_default_verify_paths");
     }
-    public static int SSL_CTX_set_default_verify_paths ( Addressable ctx) {
+    public static int SSL_CTX_set_default_verify_paths ( MemorySegment ctx) {
         var mh$ = SSL_CTX_set_default_verify_paths$MH();
         try {
             return (int)mh$.invokeExact(ctx);
@@ -1902,7 +1596,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_load_verify_locations$MH() {
         return RuntimeHelper.requireNonNull(constants$20.SSL_CTX_load_verify_locations$MH,"SSL_CTX_load_verify_locations");
     }
-    public static int SSL_CTX_load_verify_locations ( Addressable ctx,  Addressable CAfile,  Addressable CApath) {
+    public static int SSL_CTX_load_verify_locations ( MemorySegment ctx,  MemorySegment CAfile,  MemorySegment CApath) {
         var mh$ = SSL_CTX_load_verify_locations$MH();
         try {
             return (int)mh$.invokeExact(ctx, CAfile, CApath);
@@ -1913,10 +1607,10 @@ public class openssl_h  {
     public static MethodHandle SSL_get_session$MH() {
         return RuntimeHelper.requireNonNull(constants$20.SSL_get_session$MH,"SSL_get_session");
     }
-    public static MemoryAddress SSL_get_session ( Addressable ssl) {
+    public static MemorySegment SSL_get_session ( MemorySegment ssl) {
         var mh$ = SSL_get_session$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(ssl);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1924,7 +1618,7 @@ public class openssl_h  {
     public static MethodHandle SSL_set_info_callback$MH() {
         return RuntimeHelper.requireNonNull(constants$21.SSL_set_info_callback$MH,"SSL_set_info_callback");
     }
-    public static void SSL_set_info_callback ( Addressable ssl,  Addressable cb) {
+    public static void SSL_set_info_callback ( MemorySegment ssl,  MemorySegment cb) {
         var mh$ = SSL_set_info_callback$MH();
         try {
             mh$.invokeExact(ssl, cb);
@@ -1935,7 +1629,7 @@ public class openssl_h  {
     public static MethodHandle SSL_set_verify_result$MH() {
         return RuntimeHelper.requireNonNull(constants$21.SSL_set_verify_result$MH,"SSL_set_verify_result");
     }
-    public static void SSL_set_verify_result ( Addressable ssl,  long v) {
+    public static void SSL_set_verify_result ( MemorySegment ssl,  long v) {
         var mh$ = SSL_set_verify_result$MH();
         try {
             mh$.invokeExact(ssl, v);
@@ -1957,7 +1651,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CTX_set_tmp_dh_callback$MH() {
         return RuntimeHelper.requireNonNull(constants$22.SSL_CTX_set_tmp_dh_callback$MH,"SSL_CTX_set_tmp_dh_callback");
     }
-    public static void SSL_CTX_set_tmp_dh_callback ( Addressable ctx,  Addressable dh) {
+    public static void SSL_CTX_set_tmp_dh_callback ( MemorySegment ctx,  MemorySegment dh) {
         var mh$ = SSL_CTX_set_tmp_dh_callback$MH();
         try {
             mh$.invokeExact(ctx, dh);
@@ -1968,10 +1662,10 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_CTX_new$MH() {
         return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_new$MH,"SSL_CONF_CTX_new");
     }
-    public static MemoryAddress SSL_CONF_CTX_new () {
+    public static MemorySegment SSL_CONF_CTX_new () {
         var mh$ = SSL_CONF_CTX_new$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -1979,7 +1673,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_CTX_finish$MH() {
         return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_finish$MH,"SSL_CONF_CTX_finish");
     }
-    public static int SSL_CONF_CTX_finish ( Addressable cctx) {
+    public static int SSL_CONF_CTX_finish ( MemorySegment cctx) {
         var mh$ = SSL_CONF_CTX_finish$MH();
         try {
             return (int)mh$.invokeExact(cctx);
@@ -1990,7 +1684,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_CTX_free$MH() {
         return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_free$MH,"SSL_CONF_CTX_free");
     }
-    public static void SSL_CONF_CTX_free ( Addressable cctx) {
+    public static void SSL_CONF_CTX_free ( MemorySegment cctx) {
         var mh$ = SSL_CONF_CTX_free$MH();
         try {
             mh$.invokeExact(cctx);
@@ -2001,7 +1695,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_CTX_set_flags$MH() {
         return RuntimeHelper.requireNonNull(constants$22.SSL_CONF_CTX_set_flags$MH,"SSL_CONF_CTX_set_flags");
     }
-    public static int SSL_CONF_CTX_set_flags ( Addressable cctx,  int flags) {
+    public static int SSL_CONF_CTX_set_flags ( MemorySegment cctx,  int flags) {
         var mh$ = SSL_CONF_CTX_set_flags$MH();
         try {
             return (int)mh$.invokeExact(cctx, flags);
@@ -2012,7 +1706,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_CTX_set_ssl_ctx$MH() {
         return RuntimeHelper.requireNonNull(constants$23.SSL_CONF_CTX_set_ssl_ctx$MH,"SSL_CONF_CTX_set_ssl_ctx");
     }
-    public static void SSL_CONF_CTX_set_ssl_ctx ( Addressable cctx,  Addressable ctx) {
+    public static void SSL_CONF_CTX_set_ssl_ctx ( MemorySegment cctx,  MemorySegment ctx) {
         var mh$ = SSL_CONF_CTX_set_ssl_ctx$MH();
         try {
             mh$.invokeExact(cctx, ctx);
@@ -2023,7 +1717,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_cmd$MH() {
         return RuntimeHelper.requireNonNull(constants$23.SSL_CONF_cmd$MH,"SSL_CONF_cmd");
     }
-    public static int SSL_CONF_cmd ( Addressable cctx,  Addressable cmd,  Addressable value) {
+    public static int SSL_CONF_cmd ( MemorySegment cctx,  MemorySegment cmd,  MemorySegment value) {
         var mh$ = SSL_CONF_cmd$MH();
         try {
             return (int)mh$.invokeExact(cctx, cmd, value);
@@ -2034,7 +1728,7 @@ public class openssl_h  {
     public static MethodHandle SSL_CONF_cmd_value_type$MH() {
         return RuntimeHelper.requireNonNull(constants$23.SSL_CONF_cmd_value_type$MH,"SSL_CONF_cmd_value_type");
     }
-    public static int SSL_CONF_cmd_value_type ( Addressable cctx,  Addressable cmd) {
+    public static int SSL_CONF_cmd_value_type ( MemorySegment cctx,  MemorySegment cmd) {
         var mh$ = SSL_CONF_cmd_value_type$MH();
         try {
             return (int)mh$.invokeExact(cctx, cmd);
@@ -2042,16 +1736,10 @@ public class openssl_h  {
             throw new AssertionError("should not reach here", ex$);
         }
     }
-    public static int SSL_CT_VALIDATION_PERMISSIVE() {
-        return (int)0L;
-    }
-    public static int SSL_CT_VALIDATION_STRICT() {
-        return (int)1L;
-    }
     public static MethodHandle OPENSSL_init_ssl$MH() {
         return RuntimeHelper.requireNonNull(constants$23.OPENSSL_init_ssl$MH,"OPENSSL_init_ssl");
     }
-    public static int OPENSSL_init_ssl ( long opts,  Addressable settings) {
+    public static int OPENSSL_init_ssl ( long opts,  MemorySegment settings) {
         var mh$ = OPENSSL_init_ssl$MH();
         try {
             return (int)mh$.invokeExact(opts, settings);
@@ -2095,10 +1783,10 @@ public class openssl_h  {
     public static MethodHandle ERR_error_string$MH() {
         return RuntimeHelper.requireNonNull(constants$24.ERR_error_string$MH,"ERR_error_string");
     }
-    public static MemoryAddress ERR_error_string ( long e,  Addressable buf) {
+    public static MemorySegment ERR_error_string ( long e,  MemorySegment buf) {
         var mh$ = ERR_error_string$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(e, buf);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(e, buf);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2106,7 +1794,7 @@ public class openssl_h  {
     public static MethodHandle PKCS12_verify_mac$MH() {
         return RuntimeHelper.requireNonNull(constants$24.PKCS12_verify_mac$MH,"PKCS12_verify_mac");
     }
-    public static int PKCS12_verify_mac ( Addressable p12,  Addressable pass,  int passlen) {
+    public static int PKCS12_verify_mac ( MemorySegment p12,  MemorySegment pass,  int passlen) {
         var mh$ = PKCS12_verify_mac$MH();
         try {
             return (int)mh$.invokeExact(p12, pass, passlen);
@@ -2117,7 +1805,7 @@ public class openssl_h  {
     public static MethodHandle PKCS12_free$MH() {
         return RuntimeHelper.requireNonNull(constants$24.PKCS12_free$MH,"PKCS12_free");
     }
-    public static void PKCS12_free ( Addressable a) {
+    public static void PKCS12_free ( MemorySegment a) {
         var mh$ = PKCS12_free$MH();
         try {
             mh$.invokeExact(a);
@@ -2128,7 +1816,7 @@ public class openssl_h  {
     public static MethodHandle PKCS12_parse$MH() {
         return RuntimeHelper.requireNonNull(constants$24.PKCS12_parse$MH,"PKCS12_parse");
     }
-    public static int PKCS12_parse ( Addressable p12,  Addressable pass,  Addressable pkey,  Addressable cert,  Addressable ca) {
+    public static int PKCS12_parse ( MemorySegment p12,  MemorySegment pass,  MemorySegment pkey,  MemorySegment cert,  MemorySegment ca) {
         var mh$ = PKCS12_parse$MH();
         try {
             return (int)mh$.invokeExact(p12, pass, pkey, cert, ca);
@@ -2139,10 +1827,10 @@ public class openssl_h  {
     public static MethodHandle d2i_PKCS12_bio$MH() {
         return RuntimeHelper.requireNonNull(constants$24.d2i_PKCS12_bio$MH,"d2i_PKCS12_bio");
     }
-    public static MemoryAddress d2i_PKCS12_bio ( Addressable bp,  Addressable p12) {
+    public static MemorySegment d2i_PKCS12_bio ( MemorySegment bp,  MemorySegment p12) {
         var mh$ = d2i_PKCS12_bio$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bp, p12);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bp, p12);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2150,7 +1838,7 @@ public class openssl_h  {
     public static MethodHandle RAND_seed$MH() {
         return RuntimeHelper.requireNonNull(constants$25.RAND_seed$MH,"RAND_seed");
     }
-    public static void RAND_seed ( Addressable buf,  int num) {
+    public static void RAND_seed ( MemorySegment buf,  int num) {
         var mh$ = RAND_seed$MH();
         try {
             mh$.invokeExact(buf, num);
@@ -2161,7 +1849,7 @@ public class openssl_h  {
     public static MethodHandle RAND_load_file$MH() {
         return RuntimeHelper.requireNonNull(constants$25.RAND_load_file$MH,"RAND_load_file");
     }
-    public static int RAND_load_file ( Addressable file,  long max_bytes) {
+    public static int RAND_load_file ( MemorySegment file,  long max_bytes) {
         var mh$ = RAND_load_file$MH();
         try {
             return (int)mh$.invokeExact(file, max_bytes);
@@ -2172,7 +1860,7 @@ public class openssl_h  {
     public static MethodHandle X509_check_issued$MH() {
         return RuntimeHelper.requireNonNull(constants$25.X509_check_issued$MH,"X509_check_issued");
     }
-    public static int X509_check_issued ( Addressable issuer,  Addressable subject) {
+    public static int X509_check_issued ( MemorySegment issuer,  MemorySegment subject) {
         var mh$ = X509_check_issued$MH();
         try {
             return (int)mh$.invokeExact(issuer, subject);
@@ -2183,10 +1871,10 @@ public class openssl_h  {
     public static MethodHandle ENGINE_by_id$MH() {
         return RuntimeHelper.requireNonNull(constants$25.ENGINE_by_id$MH,"ENGINE_by_id");
     }
-    public static MemoryAddress ENGINE_by_id ( Addressable id) {
+    public static MemorySegment ENGINE_by_id ( MemorySegment id) {
         var mh$ = ENGINE_by_id$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(id);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(id);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2205,7 +1893,7 @@ public class openssl_h  {
     public static MethodHandle ENGINE_ctrl_cmd_string$MH() {
         return RuntimeHelper.requireNonNull(constants$25.ENGINE_ctrl_cmd_string$MH,"ENGINE_ctrl_cmd_string");
     }
-    public static int ENGINE_ctrl_cmd_string ( Addressable e,  Addressable cmd_name,  Addressable arg,  int cmd_optional) {
+    public static int ENGINE_ctrl_cmd_string ( MemorySegment e,  MemorySegment cmd_name,  MemorySegment arg,  int cmd_optional) {
         var mh$ = ENGINE_ctrl_cmd_string$MH();
         try {
             return (int)mh$.invokeExact(e, cmd_name, arg, cmd_optional);
@@ -2216,7 +1904,7 @@ public class openssl_h  {
     public static MethodHandle ENGINE_free$MH() {
         return RuntimeHelper.requireNonNull(constants$26.ENGINE_free$MH,"ENGINE_free");
     }
-    public static int ENGINE_free ( Addressable e) {
+    public static int ENGINE_free ( MemorySegment e) {
         var mh$ = ENGINE_free$MH();
         try {
             return (int)mh$.invokeExact(e);
@@ -2227,10 +1915,10 @@ public class openssl_h  {
     public static MethodHandle ENGINE_load_private_key$MH() {
         return RuntimeHelper.requireNonNull(constants$26.ENGINE_load_private_key$MH,"ENGINE_load_private_key");
     }
-    public static MemoryAddress ENGINE_load_private_key ( Addressable e,  Addressable key_id,  Addressable ui_method,  Addressable callback_data) {
+    public static MemorySegment ENGINE_load_private_key ( MemorySegment e,  MemorySegment key_id,  MemorySegment ui_method,  MemorySegment callback_data) {
         var mh$ = ENGINE_load_private_key$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(e, key_id, ui_method, callback_data);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(e, key_id, ui_method, callback_data);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2238,7 +1926,7 @@ public class openssl_h  {
     public static MethodHandle ENGINE_set_default$MH() {
         return RuntimeHelper.requireNonNull(constants$26.ENGINE_set_default$MH,"ENGINE_set_default");
     }
-    public static int ENGINE_set_default ( Addressable e,  int flags) {
+    public static int ENGINE_set_default ( MemorySegment e,  int flags) {
         var mh$ = ENGINE_set_default$MH();
         try {
             return (int)mh$.invokeExact(e, flags);
@@ -2249,10 +1937,10 @@ public class openssl_h  {
     public static MethodHandle OCSP_cert_to_id$MH() {
         return RuntimeHelper.requireNonNull(constants$26.OCSP_cert_to_id$MH,"OCSP_cert_to_id");
     }
-    public static MemoryAddress OCSP_cert_to_id ( Addressable dgst,  Addressable subject,  Addressable issuer) {
+    public static MemorySegment OCSP_cert_to_id ( MemorySegment dgst,  MemorySegment subject,  MemorySegment issuer) {
         var mh$ = OCSP_cert_to_id$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(dgst, subject, issuer);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(dgst, subject, issuer);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2260,10 +1948,10 @@ public class openssl_h  {
     public static MethodHandle OCSP_request_add0_id$MH() {
         return RuntimeHelper.requireNonNull(constants$26.OCSP_request_add0_id$MH,"OCSP_request_add0_id");
     }
-    public static MemoryAddress OCSP_request_add0_id ( Addressable req,  Addressable cid) {
+    public static MemorySegment OCSP_request_add0_id ( MemorySegment req,  MemorySegment cid) {
         var mh$ = OCSP_request_add0_id$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(req, cid);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(req, cid);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2271,7 +1959,7 @@ public class openssl_h  {
     public static MethodHandle OCSP_response_status$MH() {
         return RuntimeHelper.requireNonNull(constants$26.OCSP_response_status$MH,"OCSP_response_status");
     }
-    public static int OCSP_response_status ( Addressable resp) {
+    public static int OCSP_response_status ( MemorySegment resp) {
         var mh$ = OCSP_response_status$MH();
         try {
             return (int)mh$.invokeExact(resp);
@@ -2282,10 +1970,10 @@ public class openssl_h  {
     public static MethodHandle OCSP_response_get1_basic$MH() {
         return RuntimeHelper.requireNonNull(constants$27.OCSP_response_get1_basic$MH,"OCSP_response_get1_basic");
     }
-    public static MemoryAddress OCSP_response_get1_basic ( Addressable resp) {
+    public static MemorySegment OCSP_response_get1_basic ( MemorySegment resp) {
         var mh$ = OCSP_response_get1_basic$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(resp);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(resp);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2293,10 +1981,10 @@ public class openssl_h  {
     public static MethodHandle OCSP_resp_get0$MH() {
         return RuntimeHelper.requireNonNull(constants$27.OCSP_resp_get0$MH,"OCSP_resp_get0");
     }
-    public static MemoryAddress OCSP_resp_get0 ( Addressable bs,  int idx) {
+    public static MemorySegment OCSP_resp_get0 ( MemorySegment bs,  int idx) {
         var mh$ = OCSP_resp_get0$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(bs, idx);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(bs, idx);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2304,7 +1992,7 @@ public class openssl_h  {
     public static MethodHandle OCSP_resp_find$MH() {
         return RuntimeHelper.requireNonNull(constants$27.OCSP_resp_find$MH,"OCSP_resp_find");
     }
-    public static int OCSP_resp_find ( Addressable bs,  Addressable id,  int last) {
+    public static int OCSP_resp_find ( MemorySegment bs,  MemorySegment id,  int last) {
         var mh$ = OCSP_resp_find$MH();
         try {
             return (int)mh$.invokeExact(bs, id, last);
@@ -2315,7 +2003,7 @@ public class openssl_h  {
     public static MethodHandle OCSP_single_get0_status$MH() {
         return RuntimeHelper.requireNonNull(constants$27.OCSP_single_get0_status$MH,"OCSP_single_get0_status");
     }
-    public static int OCSP_single_get0_status ( Addressable single,  Addressable reason,  Addressable revtime,  Addressable thisupd,  Addressable nextupd) {
+    public static int OCSP_single_get0_status ( MemorySegment single,  MemorySegment reason,  MemorySegment revtime,  MemorySegment thisupd,  MemorySegment nextupd) {
         var mh$ = OCSP_single_get0_status$MH();
         try {
             return (int)mh$.invokeExact(single, reason, revtime, thisupd, nextupd);
@@ -2326,7 +2014,7 @@ public class openssl_h  {
     public static MethodHandle OCSP_BASICRESP_free$MH() {
         return RuntimeHelper.requireNonNull(constants$27.OCSP_BASICRESP_free$MH,"OCSP_BASICRESP_free");
     }
-    public static void OCSP_BASICRESP_free ( Addressable a) {
+    public static void OCSP_BASICRESP_free ( MemorySegment a) {
         var mh$ = OCSP_BASICRESP_free$MH();
         try {
             mh$.invokeExact(a);
@@ -2337,7 +2025,7 @@ public class openssl_h  {
     public static MethodHandle OCSP_RESPONSE_free$MH() {
         return RuntimeHelper.requireNonNull(constants$27.OCSP_RESPONSE_free$MH,"OCSP_RESPONSE_free");
     }
-    public static void OCSP_RESPONSE_free ( Addressable a) {
+    public static void OCSP_RESPONSE_free ( MemorySegment a) {
         var mh$ = OCSP_RESPONSE_free$MH();
         try {
             mh$.invokeExact(a);
@@ -2348,10 +2036,10 @@ public class openssl_h  {
     public static MethodHandle d2i_OCSP_RESPONSE$MH() {
         return RuntimeHelper.requireNonNull(constants$28.d2i_OCSP_RESPONSE$MH,"d2i_OCSP_RESPONSE");
     }
-    public static MemoryAddress d2i_OCSP_RESPONSE ( Addressable a,  Addressable in,  long len) {
+    public static MemorySegment d2i_OCSP_RESPONSE ( MemorySegment a,  MemorySegment in,  long len) {
         var mh$ = d2i_OCSP_RESPONSE$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(a, in, len);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(a, in, len);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2359,7 +2047,7 @@ public class openssl_h  {
     public static MethodHandle OCSP_CERTID_free$MH() {
         return RuntimeHelper.requireNonNull(constants$28.OCSP_CERTID_free$MH,"OCSP_CERTID_free");
     }
-    public static void OCSP_CERTID_free ( Addressable a) {
+    public static void OCSP_CERTID_free ( MemorySegment a) {
         var mh$ = OCSP_CERTID_free$MH();
         try {
             mh$.invokeExact(a);
@@ -2370,10 +2058,10 @@ public class openssl_h  {
     public static MethodHandle OCSP_REQUEST_new$MH() {
         return RuntimeHelper.requireNonNull(constants$28.OCSP_REQUEST_new$MH,"OCSP_REQUEST_new");
     }
-    public static MemoryAddress OCSP_REQUEST_new () {
+    public static MemorySegment OCSP_REQUEST_new () {
         var mh$ = OCSP_REQUEST_new$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact();
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact();
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
@@ -2381,7 +2069,7 @@ public class openssl_h  {
     public static MethodHandle OCSP_REQUEST_free$MH() {
         return RuntimeHelper.requireNonNull(constants$28.OCSP_REQUEST_free$MH,"OCSP_REQUEST_free");
     }
-    public static void OCSP_REQUEST_free ( Addressable a) {
+    public static void OCSP_REQUEST_free ( MemorySegment a) {
         var mh$ = OCSP_REQUEST_free$MH();
         try {
             mh$.invokeExact(a);
@@ -2392,7 +2080,7 @@ public class openssl_h  {
     public static MethodHandle i2d_OCSP_REQUEST$MH() {
         return RuntimeHelper.requireNonNull(constants$28.i2d_OCSP_REQUEST$MH,"i2d_OCSP_REQUEST");
     }
-    public static int i2d_OCSP_REQUEST ( Addressable a,  Addressable out) {
+    public static int i2d_OCSP_REQUEST ( MemorySegment a,  MemorySegment out) {
         var mh$ = i2d_OCSP_REQUEST$MH();
         try {
             return (int)mh$.invokeExact(a, out);
@@ -2403,10 +2091,10 @@ public class openssl_h  {
     public static MethodHandle OSSL_PROVIDER_get0_name$MH() {
         return RuntimeHelper.requireNonNull(constants$28.OSSL_PROVIDER_get0_name$MH,"OSSL_PROVIDER_get0_name");
     }
-    public static MemoryAddress OSSL_PROVIDER_get0_name ( Addressable prov) {
+    public static MemorySegment OSSL_PROVIDER_get0_name ( MemorySegment prov) {
         var mh$ = OSSL_PROVIDER_get0_name$MH();
         try {
-            return (java.lang.foreign.MemoryAddress)mh$.invokeExact(prov);
+            return (java.lang.foreign.MemorySegment)mh$.invokeExact(prov);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

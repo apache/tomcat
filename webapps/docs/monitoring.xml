@@ -153,12 +153,12 @@ senderAddress=${cluster.server.address},senderPort=${cluster.server.port}"
     />
     <!-- get current maxActiveSession from ClusterTest application
        echo it to Ant output and store at
-       property <em>clustertest.maxActiveSessions.orginal</em>
+       property <em>clustertest.maxActiveSessions.original</em>
     -->
     <jmx:get
       name="Catalina:type=Manager,context=/ClusterTest,host=localhost"
       attribute="maxActiveSessions"
-      resultproperty="clustertest.maxActiveSessions.orginal"
+      resultproperty="clustertest.maxActiveSessions.original"
       echo="true"
     />
     <!-- set maxActiveSession to 100

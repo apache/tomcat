@@ -58,15 +58,6 @@ public interface TagConstants {
     public static final String PARAM_ACTION = "param";
     public static final String JSP_PARAM_ACTION = "jsp:param";
 
-    public static final String PARAMS_ACTION = "params";
-    public static final String JSP_PARAMS_ACTION = "jsp:params";
-
-    public static final String PLUGIN_ACTION = "plugin";
-    public static final String JSP_PLUGIN_ACTION = "jsp:plugin";
-
-    public static final String FALLBACK_ACTION = "fallback";
-    public static final String JSP_FALLBACK_ACTION = "jsp:fallback";
-
     public static final String TEXT_ACTION = "text";
     public static final String JSP_TEXT_ACTION = "jsp:text";
     public static final String JSP_TEXT_ACTION_END = "</jsp:text>";

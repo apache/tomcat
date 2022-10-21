@@ -123,7 +123,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // - case differences on case insensitive file systems
         // - Windows removing a trailing ' ' or '.' from the file name
         //
-        // In all cases, a mis-match here results in the resource not being
+        // In all cases, a mismatch here results in the resource not being
         // found
         //
         // absPath is normalized so canPath needs to be normalized as well

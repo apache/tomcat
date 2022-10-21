@@ -17,13 +17,13 @@
 -->
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/tomcat-10.1.x/java/org/apache/catalina/startup/Bootstrap.java"/>
+<listEntry value="/tomcat-11.0.x/java/org/apache/catalina/startup/Bootstrap.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.apache.catalina.startup.Bootstrap"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="stop"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="tomcat-10.1.x"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dcatalina.home=${project_loc:/tomcat-10.1.x/java/org/apache/catalina/startup/Bootstrap.java}/output/build"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="tomcat-11.0.x"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dcatalina.home=${project_loc:/tomcat-11.0.x/java/org/apache/catalina/startup/Bootstrap.java}/output/build"/>
 </launchConfiguration>

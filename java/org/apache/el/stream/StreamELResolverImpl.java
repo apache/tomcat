@@ -16,7 +16,6 @@
  */
 package org.apache.el.stream;
 
-import java.beans.FeatureDescriptor;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
@@ -46,13 +45,6 @@ public class StreamELResolverImpl extends ELResolver {
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         return false;
-    }
-
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
-            Object base) {
-        return null;
     }
 
     @Override

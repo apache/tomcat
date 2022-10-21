@@ -1816,7 +1816,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
             // Needs to be async to trigger the problematic code path
             AsyncContext ac = req.startAsync();
             ServletInputStream sis = req.getInputStream();
-            // This triggers a call to Http11InputBuffer.avalable(true) which
+            // This triggers a call to Http11InputBuffer.available(true) which
             // did not handle the pipelining case.
             sis.setReadListener(new Bug64974ReadListener());
             ac.complete();
@@ -1952,5 +1952,59 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
         Assert.assertTrue(client.getResponseBody().contains("test - data"));
+    }
+
+
+    @Test
+    public void test100ContinueWithNoAck() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        final Connector connector = tomcat.getConnector();
+        connector.setProperty("continueResponseTiming", "onRead");
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add servlet
+        Tomcat.addServlet(ctx, "TestPostNoReadServlet", new TestPostNoReadServlet());
+        ctx.addServletMappingDecoded("/foo", "TestPostNoReadServlet");
+
+        tomcat.start();
+
+        String request =
+            "POST /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Expect: 100-continue"  + SimpleHttpClient.CRLF +
+                "Content-Length: 10"  + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF +
+                "0123456789";
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest(false);
+
+        Assert.assertTrue(client.isResponse200());
+
+        if (client.getResponseHeaders().contains("Connection: close")) {
+            client.connect();
+        }
+
+        client.processRequest(false);
+
+        Assert.assertTrue(client.isResponse200());
+
+    }
+
+
+    private static class TestPostNoReadServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        }
     }
 }

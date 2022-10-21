@@ -16,9 +16,6 @@
  */
 package jakarta.servlet.jsp.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Objects;
 
 import jakarta.el.ELClass;
@@ -46,6 +43,13 @@ public class ImportELResolver extends ELResolver {
             //         this just allows a short-cut.
         }
         AST_IDENTIFIER_KEY = key;
+    }
+
+    /**
+     * Default constructor.
+     */
+    public ImportELResolver() {
+        super();
     }
 
     @Override
@@ -125,12 +129,6 @@ public class ImportELResolver extends ELResolver {
 
         // In normal usage, ScopedAttributeELResolver will have responded.
         return false;
-    }
-
-    @Deprecated(forRemoval = true, since = "JSP 3.1")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return Collections.emptyIterator();
     }
 
     @Override

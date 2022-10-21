@@ -31,7 +31,7 @@ public class TestHttp2Section_3_5 extends Http2TestBase {
         doHttpUpgrade();
 
         // Server settings
-        parser.readFrame(true);
+        parser.readFrame();
         Assert.assertEquals("0-Settings-[3]-[200]\n" +
                 "0-Settings-End\n"
                 , output.getTrace());
@@ -57,7 +57,7 @@ public class TestHttp2Section_3_5 extends Http2TestBase {
         // acknowledgement. Of the settings. As the preface was invalid, it
         // should be a GOAWAY frame.
         try {
-            parser.readFrame(true);
+            parser.readFrame();
             Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("0-Goaway-[1]-[1]-["));
         } catch (IOException ioe) {
             // Ignore

@@ -20,6 +20,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
+import jakarta.el.ELException;
+
 import org.apache.el.util.MessageFactory;
 
 
@@ -111,7 +113,7 @@ public abstract class ELArithmetic {
 
         @Override
         protected Number mod(Number num0, Number num1) {
-            return ((BigInteger) num0).mod((BigInteger) num1);
+            return ((BigInteger) num0).remainder((BigInteger) num1);
         }
 
         @Override
@@ -363,9 +365,6 @@ public abstract class ELArithmetic {
             Number.class.isAssignableFrom(type);
     }
 
-    /**
-     *
-     */
     protected ELArithmetic() {
         super();
     }
@@ -395,8 +394,7 @@ public abstract class ELArithmetic {
             return coerce(Short.valueOf((short) ((Character) obj).charValue()));
         }
 
-        throw new IllegalArgumentException(MessageFactory.get("error.convert",
-                obj, obj.getClass(), "Number"));
+        throw new ELException(MessageFactory.get("error.convert", obj, obj.getClass(), "Number"));
     }
 
     protected abstract Number coerce(final String str);
@@ -404,5 +402,4 @@ public abstract class ELArithmetic {
     protected abstract Number divide(final Number num0, final Number num1);
 
     protected abstract boolean matches(final Object obj0, final Object obj1);
-
 }

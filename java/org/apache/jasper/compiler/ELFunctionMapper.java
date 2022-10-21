@@ -114,13 +114,6 @@ public class ELFunctionMapper {
         }
 
         @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-            doMap(n.getHeight());
-            doMap(n.getWidth());
-            visitBody(n);
-        }
-
-        @Override
         public void visit(Node.JspElement n) throws JasperException {
 
             Node.JspAttribute[] attrs = n.getJspAttributes();

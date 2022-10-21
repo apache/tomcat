@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -346,6 +348,18 @@ public class TestWebXmlOrdering {
         c.addAfterOrdering("b");
 
         WebXml.orderWebFragments(app, fragments, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testOrderWebFragmentsRelativeDuplicate() throws MalformedURLException {
+        WebXml withDuplicate = new WebXml();
+        withDuplicate.setURL(new URL("https://example.com/original.jar"));
+        withDuplicate.addDuplicate("https://example.com/duplicate.jar");
+
+        Map<String,WebXml> fragmentsWithDuplicate = new LinkedHashMap<>();
+        fragmentsWithDuplicate.put("has-duplicate", withDuplicate);
+
+        WebXml.orderWebFragments(app, fragmentsWithDuplicate, null);
     }
 
     private interface RelativeOrderingTestRunner {

@@ -34,7 +34,7 @@ public class Constants$root {
     static final  OfLong C_LONG_LONG$LAYOUT = JAVA_LONG.withBitAlignment(64);
     static final  OfFloat C_FLOAT$LAYOUT = JAVA_FLOAT.withBitAlignment(32);
     static final  OfDouble C_DOUBLE$LAYOUT = JAVA_DOUBLE.withBitAlignment(64);
-    static final  OfAddress C_POINTER$LAYOUT = ADDRESS.withBitAlignment(64);
+    static final  OfAddress C_POINTER$LAYOUT = ADDRESS.withBitAlignment(64).asUnbounded();
 }
 
 

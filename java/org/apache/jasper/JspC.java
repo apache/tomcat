@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -103,10 +102,6 @@ public class JspC extends Task implements Options {
         // the Validator uses this to access the EL ExpressionFactory
         JspFactory.setDefaultFactory(new JspFactoryImpl());
     }
-
-    @Deprecated
-    public static final String DEFAULT_IE_CLASS_ID =
-            "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93";
 
     // Logger
     private static final Log log = LogFactory.getLog(JspC.class);
@@ -227,7 +222,7 @@ public class JspC extends Task implements Options {
     /**
      * The pages.
      */
-    protected final List<String> pages = new Vector<>();
+    protected final List<String> pages = new ArrayList<>();
 
     /**
      * Needs better documentation, this data member does.
@@ -852,7 +847,7 @@ public class JspC extends Task implements Options {
     protected void addExtension(final String extension) {
         if(extension != null) {
             if(extensions == null) {
-                extensions = new Vector<>();
+                extensions = new ArrayList<>();
             }
 
             extensions.add(extension);
@@ -1752,8 +1747,7 @@ public class JspC extends Task implements Options {
             }
         }
 
-        URL urlsA[]=new URL[urls.size()];
-        urls.toArray(urlsA);
+        URL[] urlsA = urls.toArray(new URL[0]);
         loader = new URLClassLoader(urlsA, this.getClass().getClassLoader());
         return loader;
     }

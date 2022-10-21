@@ -104,11 +104,11 @@ public class TestStream extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body
-        parser.readFrame(true);
+        parser.readFrame();
         // Trailers
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals(
                 "3-HeadersStart\n" +

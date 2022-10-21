@@ -18,11 +18,9 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -41,25 +39,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
 
     @Override
     protected void report(Request request, Response response, Throwable throwable) {
-
         int statusCode = response.getStatus();
-
-        // Do nothing on a 1xx, 2xx and 3xx status
-        // Do nothing if anything has been written already
-        // Do nothing if the response hasn't been explicitly marked as in error
-        //    and that error has not been reported.
-        if (statusCode < 400 || response.getContentWritten() > 0 || !response.setErrorReported()) {
-            return;
-        }
-
-        // If an error has occurred that prevents further I/O, don't waste time
-        // producing an error report that will never be read
-        AtomicBoolean result = new AtomicBoolean(false);
-        response.getCoyoteResponse().action(ActionCode.IS_IO_ALLOWED, result);
-        if (!result.get()) {
-            return;
-        }
-
         StringManager smClient = StringManager.getManager(Constants.Package, request.getLocales());
         response.setLocale(smClient.getLocale());
         String type = null;
@@ -93,7 +73,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (container.getLogger().isDebugEnabled()) {
-                    container.getLogger().debug("status.setContentType", t);
+                    container.getLogger().debug("Failure to set the content-type of response", t);
                 }
             }
             Writer writer = response.getReporter();

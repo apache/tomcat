@@ -17,10 +17,7 @@
 package org.apache.tomcat.websocket;
 
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
@@ -31,7 +28,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,7 +49,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
-import javax.net.ssl.TrustManagerFactory;
 
 import jakarta.websocket.ClientEndpoint;
 import jakarta.websocket.ClientEndpointConfig;
@@ -74,7 +69,6 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.security.KeyStoreUtil;
 
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
 
@@ -250,11 +244,14 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             }
         }
 
+        Map<String,Object> userProperties = clientEndpointConfiguration.getUserProperties();
+
         // If sa is null, no proxy is configured so need to create sa
         if (sa == null) {
             sa = new InetSocketAddress(host, port);
         } else {
-            proxyConnect = createProxyRequest(host, port);
+            proxyConnect = createProxyRequest(
+                    host, port, (String) userProperties.get(Constants.PROXY_AUTHORIZATION_HEADER_NAME));
         }
 
         // Create the initial HTTP request to open the WebSocket connection
@@ -276,8 +273,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             throw new DeploymentException(sm.getString(
                     "wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
         }
-
-        Map<String,Object> userProperties = clientEndpointConfiguration.getUserProperties();
 
         // Get the connection timeout
         long timeout = Constants.IO_TIMEOUT_MS_DEFAULT;
@@ -305,7 +300,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 channel = new AsyncChannelWrapperNonSecure(socketChannel);
                 writeRequest(channel, proxyConnect, timeout);
                 HttpResponse httpResponse = processResponse(response, channel, timeout);
-                if (httpResponse.getStatus() != 200) {
+                if (httpResponse.status == Constants.PROXY_AUTHENTICATION_REQUIRED) {
+                    return processAuthenticationChallenge(clientEndpointHolder, clientEndpointConfiguration, path,
+                        redirectSet, userProperties, request, httpResponse, AuthenticationType.PROXY);
+                } else if (httpResponse.getStatus() != 200) {
                     throw new DeploymentException(sm.getString(
                             "wsWebSocketContainer.proxyConnectFail", selectedProxy,
                             Integer.toString(httpResponse.getStatus())));
@@ -389,43 +387,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     return connectToServerRecursive(
                             clientEndpointHolder, clientEndpointConfiguration, redirectLocation, redirectSet);
 
-                }
-
-                else if (httpResponse.status == 401) {
-
-                    if (userProperties.get(Constants.AUTHORIZATION_HEADER_NAME) != null) {
-                        throw new DeploymentException(sm.getString(
-                                "wsWebSocketContainer.failedAuthentication",
-                                Integer.valueOf(httpResponse.status)));
-                    }
-
-                    List<String> wwwAuthenticateHeaders = httpResponse.getHandshakeResponse()
-                            .getHeaders().get(Constants.WWW_AUTHENTICATE_HEADER_NAME);
-
-                    if (wwwAuthenticateHeaders == null || wwwAuthenticateHeaders.isEmpty() ||
-                            wwwAuthenticateHeaders.get(0) == null || wwwAuthenticateHeaders.get(0).isEmpty()) {
-                        throw new DeploymentException(sm.getString(
-                                "wsWebSocketContainer.missingWWWAuthenticateHeader",
-                                Integer.toString(httpResponse.status)));
-                    }
-
-                    String authScheme = wwwAuthenticateHeaders.get(0).split("\\s+", 2)[0];
-                    String requestUri = new String(request.array(), StandardCharsets.ISO_8859_1)
-                            .split("\\s", 3)[1];
-
-                    Authenticator auth = AuthenticatorFactory.getAuthenticator(authScheme);
-
-                    if (auth == null) {
-                        throw new DeploymentException(
-                                sm.getString("wsWebSocketContainer.unsupportedAuthScheme",
-                                        Integer.valueOf(httpResponse.status), authScheme));
-                    }
-
-                    userProperties.put(Constants.AUTHORIZATION_HEADER_NAME, auth.getAuthorization(
-                            requestUri, wwwAuthenticateHeaders.get(0), userProperties));
-
-                    return connectToServerRecursive(
-                            clientEndpointHolder, clientEndpointConfiguration, path, redirectSet);
+                } else if (httpResponse.status == Constants.UNAUTHORIZED) {
+                    return processAuthenticationChallenge(clientEndpointHolder, clientEndpointConfiguration, path,
+                            redirectSet, userProperties, request, httpResponse, AuthenticationType.WWW);
 
                 } else {
                     throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
@@ -524,6 +488,52 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
+    private Session processAuthenticationChallenge(ClientEndpointHolder clientEndpointHolder,
+            ClientEndpointConfig clientEndpointConfiguration, URI path, Set<URI> redirectSet,
+            Map<String,Object> userProperties, ByteBuffer request, HttpResponse httpResponse,
+            AuthenticationType authenticationType)
+            throws DeploymentException, AuthenticationException {
+
+        if (userProperties.get(authenticationType.getAuthorizationHeaderName()) != null) {
+            throw new DeploymentException(sm.getString(
+                    "wsWebSocketContainer.failedAuthentication",
+                    Integer.valueOf(httpResponse.status), authenticationType.getAuthorizationHeaderName()));
+        }
+
+        List<String> authenticateHeaders = httpResponse.getHandshakeResponse().getHeaders().get(
+                authenticationType.getAuthenticateHeaderName());
+
+        if (authenticateHeaders == null || authenticateHeaders.isEmpty() ||
+                authenticateHeaders.get(0) == null || authenticateHeaders.get(0).isEmpty()) {
+            throw new DeploymentException(sm.getString(
+                    "wsWebSocketContainer.missingAuthenticateHeader",
+                    Integer.toString(httpResponse.status), authenticationType.getAuthenticateHeaderName()));
+        }
+
+        String authScheme = authenticateHeaders.get(0).split("\\s+", 2)[0];
+
+        Authenticator auth = AuthenticatorFactory.getAuthenticator(authScheme);
+
+        if (auth == null) {
+            throw new DeploymentException(
+                    sm.getString("wsWebSocketContainer.unsupportedAuthScheme",
+                            Integer.valueOf(httpResponse.status), authScheme));
+        }
+
+        String requestUri = new String(request.array(), StandardCharsets.ISO_8859_1).split("\\s", 3)[1];
+
+        userProperties.put(authenticationType.getAuthorizationHeaderName(), auth.getAuthorization(
+                requestUri, authenticateHeaders.get(0),
+                (String) userProperties.get(authenticationType.getUserNameProperty()),
+                (String) userProperties.get(authenticationType.getUserPasswordProperty()),
+                (String) userProperties.get(authenticationType.getUserRealmProperty())));
+
+        return connectToServerRecursive(
+                clientEndpointHolder, clientEndpointConfiguration, path, redirectSet);
+    }
+
+
+
     private static void writeRequest(AsyncChannelWrapper channel, ByteBuffer request,
             long timeout) throws TimeoutException, InterruptedException, ExecutionException {
         int toWrite = request.limit();
@@ -561,7 +571,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private static ByteBuffer createProxyRequest(String host, int port) {
+    private static ByteBuffer createProxyRequest(String host, int port, String authorizationHeader) {
         StringBuilder request = new StringBuilder();
         request.append("CONNECT ");
         request.append(host);
@@ -572,6 +582,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         request.append(host);
         request.append(':');
         request.append(port);
+
+        if (authorizationHeader != null) {
+            request.append("\r\n");
+            request.append(Constants.PROXY_AUTHORIZATION_HEADER_NAME);
+            request.append(':');
+            request.append(authorizationHeader);
+        }
 
         request.append("\r\n\r\n");
 
@@ -900,58 +917,20 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    @SuppressWarnings("removal")
     private SSLEngine createSSLEngine(ClientEndpointConfig clientEndpointConfig, String host, int port)
             throws DeploymentException {
 
-        Map<String,Object> userProperties = clientEndpointConfig.getUserProperties();
         try {
             // See if a custom SSLContext has been provided
             SSLContext sslContext = clientEndpointConfig.getSSLContext();
 
-            // If no SSLContext is found, try the pre WebSocket 2.1 Tomcat
-            // specific method
-            if (sslContext == null) {
-                sslContext = (SSLContext) userProperties.get(Constants.SSL_CONTEXT_PROPERTY);
-            }
-
             if (sslContext == null) {
                 // Create the SSL Context
                 sslContext = SSLContext.getInstance("TLS");
-
-                // Trust store
-                String sslTrustStoreValue =
-                        (String) userProperties.get(Constants.SSL_TRUSTSTORE_PROPERTY);
-                if (sslTrustStoreValue != null) {
-                    String sslTrustStorePwdValue = (String) userProperties.get(
-                            Constants.SSL_TRUSTSTORE_PWD_PROPERTY);
-                    if (sslTrustStorePwdValue == null) {
-                        sslTrustStorePwdValue = Constants.SSL_TRUSTSTORE_PWD_DEFAULT;
-                    }
-
-                    File keyStoreFile = new File(sslTrustStoreValue);
-                    KeyStore ks = KeyStore.getInstance("JKS");
-                    try (InputStream is = new FileInputStream(keyStoreFile)) {
-                        KeyStoreUtil.load(ks, is, sslTrustStorePwdValue.toCharArray());
-                    }
-
-                    TrustManagerFactory tmf = TrustManagerFactory.getInstance(
-                            TrustManagerFactory.getDefaultAlgorithm());
-                    tmf.init(ks);
-
-                    sslContext.init(null, tmf.getTrustManagers(), null);
-                } else {
-                    sslContext.init(null, null, null);
-                }
+                sslContext.init(null, null, null);
             }
 
             SSLEngine engine = sslContext.createSSLEngine(host, port);
-
-            String sslProtocolsValue =
-                    (String) userProperties.get(Constants.SSL_PROTOCOLS_PROPERTY);
-            if (sslProtocolsValue != null) {
-                engine.setEnabledProtocols(sslProtocolsValue.split(","));
-            }
 
             engine.setUseClientMode(true);
 

@@ -31,7 +31,6 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -150,7 +149,7 @@ public class HostConfig implements LifecycleListener {
      * Set of applications which are being serviced, and shouldn't be
      * deployed/undeployed/redeployed at the moment.
      */
-    private Set<String> servicedSet = Collections.newSetFromMap(new ConcurrentHashMap<String,Boolean>());
+    private Set<String> servicedSet = ConcurrentHashMap.newKeySet();
 
     /**
      * The <code>Digester</code> instance used to parse context descriptors.

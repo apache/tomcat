@@ -47,8 +47,7 @@ import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 
 /**
  * Example of how the lazy replicated map works, also shows how the BackupManager
- * works in a Tomcat cluster
- * @version 1.1
+ * works in a Tomcat cluster.
  */
 public class MapDemo implements ChannelListener, MembershipListener{
 
@@ -168,7 +167,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
         @Override
         public void run() {
             System.out.println("Shutting down...");
-            //create an exit thread that forces a shutdown if the JVM wont exit cleanly
+            //create an exit thread that forces a shutdown if the JVM won't exit cleanly
             SystemExit exit = new SystemExit(5000);
             exit.setDaemon(true);
             exit.start();

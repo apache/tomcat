@@ -720,11 +720,6 @@ public class TestGenerator extends TomcatBaseTest {
     }
 
     @Test
-    public void testSingleThreaded() throws Exception {
-        doTestJsp("single-threaded.jsp");
-    }
-
-    @Test
     public void testXpoweredBy() throws Exception {
         doTestJsp("x-powered-by.jsp");
     }
@@ -752,11 +747,6 @@ public class TestGenerator extends TomcatBaseTest {
     @Test
     public void testXmlDoctype02() throws Exception {
         doTestJsp("xml-doctype-02.jspx");
-    }
-
-    @Test
-    public void testPlugin01() throws Exception {
-        doTestJsp("plugin-01.jspx");
     }
 
     @Test

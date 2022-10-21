@@ -16,18 +16,16 @@
 */
 package jakarta.servlet.jsp.el;
 
-import java.beans.FeatureDescriptor;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Vector;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
@@ -160,25 +158,6 @@ public class ImplicitObjectELResolver extends ELResolver {
         return false;
     }
 
-    @Deprecated(forRemoval = true, since = "JSP 3.1")
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        List<FeatureDescriptor> feats = new ArrayList<>(SCOPE_NAMES.length);
-        FeatureDescriptor feat;
-        for (String scopeName : SCOPE_NAMES) {
-            feat = new FeatureDescriptor();
-            feat.setDisplayName(scopeName);
-            feat.setExpert(false);
-            feat.setHidden(false);
-            feat.setName(scopeName);
-            feat.setPreferred(true);
-            feat.setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
-            feat.setValue(TYPE, String.class);
-            feats.add(feat);
-        }
-        return feats.iterator();
-    }
-
     @Override
     public Class<String> getCommonPropertyType(ELContext context, Object base) {
         if (base == null) {
@@ -259,11 +238,11 @@ public class ImplicitObjectELResolver extends ELResolver {
                     protected Enumeration<String> getAttributeNames() {
                         Cookie[] cookies = ((HttpServletRequest) page.getRequest()).getCookies();
                         if (cookies != null) {
-                            Vector<String> v = new Vector<>();
+                            List<String> list = new ArrayList<>(cookies.length);
                             for (Cookie cookie : cookies) {
-                                v.add(cookie.getName());
+                                list.add(cookie.getName());
                             }
-                            return v.elements();
+                            return Collections.enumeration(list);
                         }
                         return null;
                     }

@@ -65,7 +65,7 @@
 
       <attribute name="jvmRoute" required="false">
         <p>A routing identifier for this Tomcat instance. It will be added
-        to the session id to allow for stateless stickyness routing by
+        to the session id to allow for stateless stickiness routing by
         load balancers. The details on how the <code>jvmRoute</code>
         will be included in the id are implementation dependent.
         See <a href="#Standard_Implementation">Standard Implementation</a>

@@ -38,11 +38,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -2769,20 +2769,23 @@ public class DefaultServlet extends HttpServlet {
         protected Comparator<WebResource> resourceLastModifiedComparatorAsc;
 
         public SortManager(boolean directoriesFirst) {
-            resourceNameComparator = new ResourceNameComparator();
-            resourceNameComparatorAsc = Collections.reverseOrder(resourceNameComparator);
-            resourceSizeComparator = new ResourceSizeComparator(resourceNameComparator);
-            resourceSizeComparatorAsc = Collections.reverseOrder(resourceSizeComparator);
-            resourceLastModifiedComparator = new ResourceLastModifiedDateComparator(resourceNameComparator);
-            resourceLastModifiedComparatorAsc = Collections.reverseOrder(resourceLastModifiedComparator);
+            resourceNameComparator = Comparator.comparing(WebResource::getName);
+            resourceNameComparatorAsc = resourceNameComparator.reversed();
+            resourceSizeComparator =
+                    Comparator.comparing(WebResource::getContentLength).thenComparing(resourceNameComparator);
+            resourceSizeComparatorAsc = resourceSizeComparator.reversed();
+            resourceLastModifiedComparator =
+                    Comparator.comparing(WebResource::getLastModified).thenComparing(resourceNameComparator);
+            resourceLastModifiedComparatorAsc = resourceLastModifiedComparator.reversed();
 
-            if(directoriesFirst) {
-                resourceNameComparator = new DirsFirstComparator(resourceNameComparator);
-                resourceNameComparatorAsc = new DirsFirstComparator(resourceNameComparatorAsc);
-                resourceSizeComparator = new DirsFirstComparator(resourceSizeComparator);
-                resourceSizeComparatorAsc = new DirsFirstComparator(resourceSizeComparatorAsc);
-                resourceLastModifiedComparator = new DirsFirstComparator(resourceLastModifiedComparator);
-                resourceLastModifiedComparatorAsc = new DirsFirstComparator(resourceLastModifiedComparatorAsc);
+            if (directoriesFirst) {
+                Comparator<WebResource> dirsFirst = comparingTrueFirst(WebResource::isDirectory);
+                resourceNameComparator = dirsFirst.thenComparing(resourceNameComparator);
+                resourceNameComparatorAsc = dirsFirst.thenComparing(resourceNameComparatorAsc);
+                resourceSizeComparator = dirsFirst.thenComparing(resourceSizeComparator);
+                resourceSizeComparatorAsc = dirsFirst.thenComparing(resourceSizeComparatorAsc);
+                resourceLastModifiedComparator = dirsFirst.thenComparing(resourceLastModifiedComparator);
+                resourceLastModifiedComparatorAsc = dirsFirst.thenComparing(resourceLastModifiedComparatorAsc);
             }
 
             defaultResourceComparator = resourceNameComparator;
@@ -2926,74 +2929,24 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    private static class DirsFirstComparator implements Comparator<WebResource> {
-        private final Comparator<WebResource> base;
-
-        public DirsFirstComparator(Comparator<WebResource> core) {
-            this.base = core;
-        }
-
-        @Override
-        public int compare(WebResource r1, WebResource r2) {
-            if(r1.isDirectory()) {
-                if(r2.isDirectory()) {
-                    return base.compare(r1, r2);
+    private static Comparator<WebResource> comparingTrueFirst(Function<WebResource,Boolean> keyExtractor) {
+        return (s1, s2) -> {
+            Boolean r1 = keyExtractor.apply(s1);
+            Boolean r2 = keyExtractor.apply(s2);
+            if (r1.booleanValue()) {
+                if (r2.booleanValue()) {
+                    return 0;
                 } else {
-                    return -1; // r1, directory, first
+                    return -1; // r1 (property is true) first
                 }
-            } else if(r2.isDirectory()) {
-                return 1; // r2, directory, first
+            } else if (r2.booleanValue()) {
+                return 1; // r2 (property is true) first
             } else {
-                return base.compare(r1, r2);
+                return 0;
             }
-        }
+        };
     }
 
-    private static class ResourceNameComparator implements Comparator<WebResource> {
-        @Override
-        public int compare(WebResource r1, WebResource r2) {
-            return r1.getName().compareTo(r2.getName());
-        }
-    }
-
-
-    private static class ResourceSizeComparator implements Comparator<WebResource> {
-        private Comparator<WebResource> base;
-
-        public ResourceSizeComparator(Comparator<WebResource> base) {
-            this.base = base;
-        }
-
-        @Override
-        public int compare(WebResource r1, WebResource r2) {
-            int c = Long.compare(r1.getContentLength(), r2.getContentLength());
-
-            if(0 == c) {
-                return base.compare(r1, r2);
-            } else {
-                return c;
-            }
-        }
-    }
-
-    private static class ResourceLastModifiedDateComparator implements Comparator<WebResource> {
-        private Comparator<WebResource> base;
-
-        public ResourceLastModifiedDateComparator(Comparator<WebResource> base) {
-            this.base = base;
-        }
-
-        @Override
-        public int compare(WebResource r1, WebResource r2) {
-            int c = Long.compare(r1.getLastModified(), r2.getLastModified());
-
-            if(0 == c) {
-                return base.compare(r1, r2);
-            } else {
-                return c;
-            }
-        }
-    }
 
     static enum BomConfig {
         /**

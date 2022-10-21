@@ -16,6 +16,10 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestMessageBytes {
@@ -65,5 +69,68 @@ public class TestMessageBytes {
         mb.setString("foo");
         mb.recycle();
         mb.toChars();
+    }
+
+
+    /*
+     * Checks the the optimized code is at least twice as fast as the
+     * non-optimized code.
+     */
+    @Test
+    public void testConversionPerformance() {
+        long optimized = -1;
+        long nonOptimized = -1;
+
+        /*
+         * One loop is likely to be enough as the optimised code is
+         * significantly (3x to 4x on markt's desktop) faster than the
+         * non-optimised code. Loop three times allows once to warn up the JVM
+         * once to run the test and once more in case of unexpected CI /GC
+         * slowness. The test will exit early if possible.
+         */
+        for (int i = 0; i < 3; i++) {
+            optimized = doTestConversionPerformance(StandardCharsets.ISO_8859_1);
+            // US_ASCII chosen as the conversion is the same and it is another
+            // Charset available on all platforms.
+            nonOptimized = doTestConversionPerformance(StandardCharsets.US_ASCII);
+
+            System.out.println(optimized + " " + nonOptimized);
+            if (optimized * 2 < nonOptimized) {
+                break;
+            }
+        }
+
+        Assert.assertTrue("Non-optimised code was faster (" + nonOptimized + "ns) compared to optimized (" + optimized + "ns)", optimized < nonOptimized);
+    }
+
+
+    private long doTestConversionPerformance(Charset charset) {
+        MessageBytes mb = MessageBytes.newInstance();
+
+        int loops = 1000000;
+
+        long start = System.nanoTime();
+        for (int i = 0; i < loops; i++) {
+            mb.recycle();
+            mb.setCharset(charset);
+            mb.setString("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF");
+            mb.toBytes();
+        }
+        return System.nanoTime() - start;
     }
 }

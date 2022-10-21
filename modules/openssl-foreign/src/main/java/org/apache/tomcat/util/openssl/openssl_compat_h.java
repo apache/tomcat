@@ -70,7 +70,7 @@ public class openssl_compat_h  {
         return RuntimeHelper.requireNonNull(EVP_PKEY_base_id$MH,
                 "EVP_PKEY_base_id");
     }
-    public static int EVP_PKEY_base_id(Addressable pkey) {
+    public static int EVP_PKEY_base_id(MemorySegment pkey) {
         var mh$ = EVP_PKEY_base_id$MH();
         try {
             return (int) mh$.invokeExact(pkey);
@@ -87,7 +87,7 @@ public class openssl_compat_h  {
     public static MethodHandle EVP_PKEY_bits$MH() {
         return RuntimeHelper.requireNonNull(EVP_PKEY_bits$MH, "EVP_PKEY_bits");
     }
-    public static int EVP_PKEY_bits(Addressable pkey) {
+    public static int EVP_PKEY_bits(MemorySegment pkey) {
         var mh$ = EVP_PKEY_bits$MH();
         try {
             return (int) mh$.invokeExact(pkey);
@@ -107,10 +107,10 @@ public class openssl_compat_h  {
         return RuntimeHelper.requireNonNull(SSL_get_peer_certificate$MH,
                 "SSL_get_peer_certificate");
     }
-    public static MemoryAddress SSL_get_peer_certificate(Addressable s) {
+    public static MemorySegment SSL_get_peer_certificate(MemorySegment s) {
         var mh$ = SSL_get_peer_certificate$MH();
         try {
-            return (java.lang.foreign.MemoryAddress) mh$.invokeExact(s);
+            return (java.lang.foreign.MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }

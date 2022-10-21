@@ -120,11 +120,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     protected static final int TIMING_STATS_CACHE_SIZE = 100;
 
-    protected final Deque<SessionTiming> sessionCreationTiming =
-            new LinkedList<>();
-
-    protected final Deque<SessionTiming> sessionExpirationTiming =
-            new LinkedList<>();
+    // Use LinkedList as the Deques are initialised by filling with null
+    protected final Deque<SessionTiming> sessionCreationTiming = new LinkedList<>();
+    protected final Deque<SessionTiming> sessionExpirationTiming = new LinkedList<>();
 
     /**
      * Number of sessions that have expired.

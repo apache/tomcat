@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 10.1 Maven Deployment" default="" basedir="."
+<project name="Tomcat 11.0 Maven Deployment" default="" basedir="."
          xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:if="ant:if"
          xmlns:unless="ant:unless">
@@ -79,7 +79,7 @@
         <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
         <param name="src" value="@{src}"/>
         <param name="src.skip" value="@{src.skip}"/>
-        <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-dev"/>
+        <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-SNAPSHOT"/>
       </antcall>
     </sequential>
   </macrodef>
@@ -348,7 +348,7 @@
      <doMavenInstall artifactId="tomcat-dbcp"/>
      <doMavenInstall artifactId="tomcat-websocket"/>
 
-     <!-- Emedded jars -->
+     <!-- Embedded jars -->
      <doMavenInstall artifactId="tomcat-embed-core"
          groupId="org.apache.tomcat.embed"
          file="${tomcat.embed.path}/tomcat-embed-core.jar"
@@ -464,7 +464,7 @@
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ru"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-zh-CN"/>
 
-    <!-- Emedded jars -->
+    <!-- Embedded jars -->
     <!-- Skip DBCP - optional and can use standard ones above -->
     <doMavenDeploy artifactId="tomcat-embed-core"
         groupId="org.apache.tomcat.embed"
@@ -504,7 +504,7 @@
       <param name="maven.repo.repositoryId"
              value="${maven.snapshot.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
-      <param name="maven.deploy.version" value="10.1.0-SNAPSHOT"/>
+      <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-SNAPSHOT"/>
       <param name="maven.deploy.binary.version"
              value="${maven.asf.release.deploy.version}-dev"/>
     </antcall>

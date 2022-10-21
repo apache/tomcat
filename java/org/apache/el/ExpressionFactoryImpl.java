@@ -25,6 +25,7 @@ import jakarta.el.ValueExpression;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.ExpressionBuilder;
 import org.apache.el.stream.StreamELResolverImpl;
+import org.apache.el.util.ExceptionUtils;
 import org.apache.el.util.MessageFactory;
 
 
@@ -35,6 +36,10 @@ import org.apache.el.util.MessageFactory;
  */
 @aQute.bnd.annotation.spi.ServiceProvider(value=ExpressionFactory.class)
 public class ExpressionFactoryImpl extends ExpressionFactory {
+
+    static {
+        ExceptionUtils.preload();
+    }
 
     @Override
     public <T> T coerceToType(Object obj, Class<T> type) {

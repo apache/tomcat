@@ -68,7 +68,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/ecj-4.23/ecj-4.23.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/ecj-4.25/ecj-4.25.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -122,7 +122,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$TOMCAT_BUILD_LIBS$/migration-1.0.0/jakartaee-migration-1.0.0-shaded.jar!/" />
+          <root url="jar://$TOMCAT_BUILD_LIBS$/migration-1.0.4/jakartaee-migration-1.0.4-shaded.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

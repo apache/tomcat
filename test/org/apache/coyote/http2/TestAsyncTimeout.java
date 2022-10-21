@@ -79,9 +79,9 @@ public class TestAsyncTimeout extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body
-        parser.readFrame(true);
+        parser.readFrame();
 
         // Check that the expected text was received
         String trace = output.getTrace();

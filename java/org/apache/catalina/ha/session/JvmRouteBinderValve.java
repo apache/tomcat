@@ -24,6 +24,7 @@ import org.apache.catalina.Cluster;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
+import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.ha.CatalinaCluster;
@@ -327,6 +328,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
         fireLifecycleEvent("Before session migration", catalinaSession);
         catalinaSession.getManager().changeSessionId(catalinaSession, newSessionID);
         changeRequestSessionID(request, sessionId, newSessionID);
+        changeSessionAuthenticationNote(sessionId, newSessionID, catalinaSession);
         fireLifecycleEvent("After session migration", catalinaSession);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("jvmRoute.changeSession", sessionId,
@@ -352,6 +354,23 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
                 log.debug(sm.getString("jvmRoute.set.originalsessionid",sessionIdAttribute,sessionId));
             }
             request.setAttribute(sessionIdAttribute, sessionId);
+        }
+    }
+
+
+    /**
+     * Change the current session ID that is stored in a session note during
+     * authentication. It is part of the CSRF protection.
+     *
+     * @param sessionId         The original session ID
+     * @param newSessionID      The new session ID for node migration
+     * @param catalinaSession   The session object (that will be using the new
+     *                              session ID at the point this method is
+     *                              called)
+     */
+    protected void changeSessionAuthenticationNote(String sessionId, String newSessionID, Session catalinaSession) {
+        if (sessionId.equals(catalinaSession.getNote(Constants.SESSION_ID_NOTE))) {
+            catalinaSession.setNote(Constants.SESSION_ID_NOTE, newSessionID);
         }
     }
 

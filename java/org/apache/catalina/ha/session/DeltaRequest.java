@@ -21,7 +21,6 @@ package org.apache.catalina.ha.session;
  * a request is executed. These actions will then translate into invocations of methods
  * on the actual session.
  * This class is NOT thread safe. One DeltaRequest per session
- * @version 1.0
  */
 
 import java.io.ByteArrayOutputStream;
@@ -29,7 +28,8 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.security.Principal;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.realm.GenericPrincipal;
@@ -53,6 +53,7 @@ public class DeltaRequest implements Externalizable {
     public static final int TYPE_MAXINTERVAL = 3;
     public static final int TYPE_AUTHTYPE = 4;
     public static final int TYPE_LISTENER = 5;
+    public static final int TYPE_NOTE = 6;
 
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;
@@ -64,8 +65,8 @@ public class DeltaRequest implements Externalizable {
     public static final String NAME_LISTENER = "__SET__LISTENER__";
 
     private String sessionId;
-    private LinkedList<AttributeInfo> actions = new LinkedList<>();
-    private final LinkedList<AttributeInfo> actionPool = new LinkedList<>();
+    private Deque<AttributeInfo> actions = new ArrayDeque<>();
+    private final Deque<AttributeInfo> actionPool = new ArrayDeque<>();
 
     private boolean recordAllActions = false;
 
@@ -88,6 +89,15 @@ public class DeltaRequest implements Externalizable {
 
     public void removeAttribute(String name) {
         addAction(TYPE_ATTRIBUTE, ACTION_REMOVE, name, null);
+    }
+
+    public void setNote(String name, Object value) {
+        int action = (value == null) ? ACTION_REMOVE : ACTION_SET;
+        addAction(TYPE_NOTE, action, name, value);
+    }
+
+    public void removeNote(String name) {
+        addAction(TYPE_NOTE, ACTION_REMOVE, name, null);
     }
 
     public void setMaxInactiveInterval(int interval) {
@@ -217,8 +227,22 @@ public class DeltaRequest implements Externalizable {
                         session.removeSessionListener(listener, false);
                     }
                     break;
+                case TYPE_NOTE:
+                    if (info.getAction() == ACTION_SET) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Session.setNote('" + info.getName() + "', '" + info.getValue() + "')");
+                        }
+                        session.setNote(info.getName(), info.getValue(), false);
+                    } else {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Session.removeNote('" + info.getName() + "')");
+                        }
+                        session.removeNote(info.getName(), false);
+                    }
+
+                    break;
                 default:
-                    throw new IllegalArgumentException(sm.getString("deltaRequest.invalidAttributeInfoType", info));
+                    log.warn(sm.getString("deltaRequest.invalidAttributeInfoType", info));
             }//switch
         }//for
         session.endAccess();
@@ -267,7 +291,7 @@ public class DeltaRequest implements Externalizable {
         recordAllActions = in.readBoolean();
         int cnt = in.readInt();
         if (actions == null) {
-            actions = new LinkedList<>();
+            actions = new ArrayDeque<>();
         } else {
             actions.clear();
         }
@@ -298,8 +322,7 @@ public class DeltaRequest implements Externalizable {
         out.writeUTF(getSessionId());
         out.writeBoolean(recordAllActions);
         out.writeInt(getSize());
-        for ( int i=0; i<getSize(); i++ ) {
-            AttributeInfo info = actions.get(i);
+        for (AttributeInfo info : actions) {
             info.writeExternal(out);
         }
     }

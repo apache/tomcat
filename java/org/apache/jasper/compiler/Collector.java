@@ -84,17 +84,6 @@ class Collector {
         }
 
         @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-            if (n.getHeight() != null && n.getHeight().isExpression()) {
-                scriptingElementSeen = true;
-            }
-            if (n.getWidth() != null && n.getWidth().isExpression()) {
-                scriptingElementSeen = true;
-            }
-            visitBody(n);
-        }
-
-        @Override
         public void visit(Node.CustomTag n) throws JasperException {
             // Check to see what kinds of element we see as child elements
             checkSeen( n.getChildInfo(), n );

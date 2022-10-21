@@ -55,7 +55,7 @@ public class TestHttp2Section_5_5 extends Http2TestBase {
         // Unknown setting (should be ack'd)
         sendSettings(0, false, new SettingValue(1 << 15, 0));
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("0-Settings-Ack\n",  output.getTrace());
     }
@@ -71,7 +71,7 @@ public class TestHttp2Section_5_5 extends Http2TestBase {
         // Ping
         sendPing();
 
-        parser.readFrame(true);
+        parser.readFrame();
 
         Assert.assertEquals("0-Ping-Ack-[0,0,0,0,0,0,0,0]\n", output.getTrace());
     }

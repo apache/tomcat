@@ -23,8 +23,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * simple generation of a UUID
- * @version 1.0
+ * Smple generation of a UUID.
  */
 public class UUIDGenerator {
     private static final Log log = LogFactory.getLog(UUIDGenerator.class);

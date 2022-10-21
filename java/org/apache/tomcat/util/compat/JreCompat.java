@@ -48,7 +48,7 @@ public class JreCompat {
         }
         graalAvailable = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
 
-        // This is Tomcat 10.1.x with a minimum Java version of Java 11.
+        // This is Tomcat 11.0.x with a minimum Java version of Java 11.
         // Look for the highest supported JVM first
         if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();

@@ -18,7 +18,6 @@ package org.apache.jasper.compiler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -563,7 +562,7 @@ abstract class Node implements TagConstants {
      */
     public static class PageDirective extends Node {
 
-        private final Vector<String> imports;
+        private final List<String> imports;
 
         public PageDirective(Attributes attrs, Mark start, Node parent) {
             this(JSP_PAGE_DIRECTIVE_ACTION, attrs, null, null, start, parent);
@@ -574,7 +573,7 @@ abstract class Node implements TagConstants {
                 Mark start, Node parent) {
             super(qName, PAGE_DIRECTIVE_ACTION, attrs, nonTaglibXmlnsAttrs,
                     taglibAttrs, start, parent);
-            imports = new Vector<>();
+            imports = new ArrayList<>();
         }
 
         @Override
@@ -667,7 +666,7 @@ abstract class Node implements TagConstants {
      * Represents a tag directive
      */
     public static class TagDirective extends Node {
-        private final Vector<String> imports;
+        private final List<String> imports;
 
         public TagDirective(Attributes attrs, Mark start, Node parent) {
             this(JSP_TAG_DIRECTIVE_ACTION, attrs, null, null, start, parent);
@@ -678,7 +677,7 @@ abstract class Node implements TagConstants {
                 Mark start, Node parent) {
             super(qName, TAG_DIRECTIVE_ACTION, attrs, nonTaglibXmlnsAttrs,
                     taglibAttrs, start, parent);
-            imports = new Vector<>();
+            imports = new ArrayList<>();
         }
 
         @Override
@@ -1007,48 +1006,6 @@ abstract class Node implements TagConstants {
     }
 
     /**
-     * Represents a params action
-     */
-    public static class ParamsAction extends Node {
-
-        public ParamsAction(Mark start, Node parent) {
-            this(JSP_PARAMS_ACTION, null, null, start, parent);
-        }
-
-        public ParamsAction(String qName, Attributes nonTaglibXmlnsAttrs,
-                Attributes taglibAttrs, Mark start, Node parent) {
-            super(qName, PARAMS_ACTION, null, nonTaglibXmlnsAttrs, taglibAttrs,
-                    start, parent);
-        }
-
-        @Override
-        public void accept(Visitor v) throws JasperException {
-            v.visit(this);
-        }
-    }
-
-    /**
-     * Represents a fallback action
-     */
-    public static class FallBackAction extends Node {
-
-        public FallBackAction(Mark start, Node parent) {
-            this(JSP_FALLBACK_ACTION, null, null, start, parent);
-        }
-
-        public FallBackAction(String qName, Attributes nonTaglibXmlnsAttrs,
-                Attributes taglibAttrs, Mark start, Node parent) {
-            super(qName, FALLBACK_ACTION, null, nonTaglibXmlnsAttrs,
-                    taglibAttrs, start, parent);
-        }
-
-        @Override
-        public void accept(Visitor v) throws JasperException {
-            v.visit(this);
-        }
-    }
-
-    /**
      * Represents an include action
      */
     public static class IncludeAction extends Node {
@@ -1195,48 +1152,6 @@ abstract class Node implements TagConstants {
 
         public JspAttribute getBeanName() {
             return beanName;
-        }
-    }
-
-    /**
-     * Represents a plugin action
-     */
-    public static class PlugIn extends Node {
-
-        private JspAttribute width;
-
-        private JspAttribute height;
-
-        public PlugIn(Attributes attrs, Mark start, Node parent) {
-            this(JSP_PLUGIN_ACTION, attrs, null, null, start, parent);
-        }
-
-        public PlugIn(String qName, Attributes attrs,
-                Attributes nonTaglibXmlnsAttrs, Attributes taglibAttrs,
-                Mark start, Node parent) {
-            super(qName, PLUGIN_ACTION, attrs, nonTaglibXmlnsAttrs,
-                    taglibAttrs, start, parent);
-        }
-
-        @Override
-        public void accept(Visitor v) throws JasperException {
-            v.visit(this);
-        }
-
-        public void setHeight(JspAttribute height) {
-            this.height = height;
-        }
-
-        public void setWidth(JspAttribute width) {
-            this.width = width;
-        }
-
-        public JspAttribute getHeight() {
-            return height;
-        }
-
-        public JspAttribute getWidth() {
-            return width;
         }
     }
 
@@ -2344,12 +2259,12 @@ abstract class Node implements TagConstants {
         private boolean generatedInBuffer;
 
         public Nodes() {
-            list = new Vector<>();
+            list = new ArrayList<>();
         }
 
         public Nodes(Node.Root root) {
             this.root = root;
-            list = new Vector<>();
+            list = new ArrayList<>();
             list.add(root);
         }
 
@@ -2520,22 +2435,7 @@ abstract class Node implements TagConstants {
             visitBody(n);
         }
 
-        public void visit(ParamsAction n) throws JasperException {
-            doVisit(n);
-            visitBody(n);
-        }
-
-        public void visit(FallBackAction n) throws JasperException {
-            doVisit(n);
-            visitBody(n);
-        }
-
         public void visit(UseBean n) throws JasperException {
-            doVisit(n);
-            visitBody(n);
-        }
-
-        public void visit(PlugIn n) throws JasperException {
             doVisit(n);
             visitBody(n);
         }

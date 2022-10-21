@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Function;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +44,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.DistributedManager;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.manager.util.BaseSessionComparator;
 import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.ServerInfo;
@@ -1079,78 +1078,53 @@ public final class HTMLManagerServlet extends ManagerServlet {
     protected Comparator<Session> getComparator(String sortBy) {
         Comparator<Session> comparator = null;
         if ("CreationTime".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<Date>() {
-                @Override
-                public Comparable<Date> getComparableObject(Session session) {
-                    return new Date(session.getCreationTime());
-                }
-            };
+            return Comparator.comparingLong(Session::getCreationTime);
+
         } else if ("id".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<String>() {
-                @Override
-                public Comparable<String> getComparableObject(Session session) {
-                    return session.getId();
-                }
-            };
+            return comparingNullable(Session::getId);
+
         } else if ("LastAccessedTime".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<Date>() {
-                @Override
-                public Comparable<Date> getComparableObject(Session session) {
-                    return new Date(session.getLastAccessedTime());
-                }
-            };
+            return Comparator.comparingLong(Session::getLastAccessedTime);
+
         } else if ("MaxInactiveInterval".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<Integer>() {
-                @Override
-                public Comparable<Integer> getComparableObject(Session session) {
-                    return Integer.valueOf(session.getMaxInactiveInterval());
-                }
-            };
+            return Comparator.comparingInt(Session::getMaxInactiveInterval);
+
         } else if ("new".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<Boolean>() {
-                @Override
-                public Comparable<Boolean> getComparableObject(Session session) {
-                    return Boolean.valueOf(session.getSession().isNew());
-                }
-            };
+            return Comparator.comparing(s -> Boolean.valueOf(s.getSession().isNew()));
+
         } else if ("locale".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<String>() {
-                @Override
-                public Comparable<String> getComparableObject(Session session) {
-                    return JspHelper.guessDisplayLocaleFromSession(session);
-                }
-            };
+            return Comparator.comparing(JspHelper::guessDisplayLocaleFromSession);
+
         } else if ("user".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<String>() {
-                @Override
-                public Comparable<String> getComparableObject(Session session) {
-                    return JspHelper.guessDisplayUserFromSession(session);
-                }
-            };
+            return comparingNullable(JspHelper::guessDisplayUserFromSession);
+
         } else if ("UsedTime".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<Date>() {
-                @Override
-                public Comparable<Date> getComparableObject(Session session) {
-                    return new Date(SessionUtils.getUsedTimeForSession(session));
-                }
-            };
+            return Comparator.comparingLong(SessionUtils::getUsedTimeForSession);
+
         } else if ("InactiveTime".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<Date>() {
-                @Override
-                public Comparable<Date> getComparableObject(Session session) {
-                    return new Date(SessionUtils.getInactiveTimeForSession(session));
-                }
-            };
+            return Comparator.comparingLong(SessionUtils::getInactiveTimeForSession);
+
         } else if ("TTL".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator<Date>() {
-                @Override
-                public Comparable<Date> getComparableObject(Session session) {
-                    return new Date(SessionUtils.getTTLForSession(session));
-                }
-            };
+            return Comparator.comparingLong(SessionUtils::getTTLForSession);
+
         }
         return comparator;
     }
+
+
+    /*
+     * Like Comparator.comparing() but allows objects being compared to be null.
+     * null values are ordered before all other values.
+     */
+    private static <U extends Comparable<? super U>> Comparator<Session> comparingNullable(
+            Function<Session, ? extends U> keyExtractor) {
+        return (s1, s2) -> {
+            U c1 = keyExtractor.apply(s1);
+            U c2 = keyExtractor.apply(s2);
+            return c1 == null ? (c2 == null ? 0 : -1) : (c2 == null ? 1 : c1.compareTo(c2));
+        };
+    }
+
 
     // ------------------------------------------------------ Private Constants
 

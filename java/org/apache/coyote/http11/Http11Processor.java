@@ -110,7 +110,7 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Flag used to indicate that the socket should be kept open (e.g. for keep
-     * alive or send file.
+     * alive or send file).
      */
     private volatile boolean openSocket = false;
 
@@ -181,7 +181,7 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.addFilter(new VoidOutputFilter());
 
         // Create and add buffered input filter
-        inputBuffer.addFilter(new BufferedInputFilter());
+        inputBuffer.addFilter(new BufferedInputFilter(protocol.getMaxSwallowSize()));
 
         // Create and add the gzip filters.
         //inputBuffer.addFilter(new GzipInputFilter());
@@ -220,7 +220,7 @@ public class Http11Processor extends AbstractProcessor {
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("http11processor.request.prepare") +
-                          " Tranfer encoding lists chunked before [" + encodingName + "]");
+                          " Transfer encoding lists chunked before [" + encodingName + "]");
             }
             return;
         }
@@ -803,7 +803,6 @@ public class Http11Processor extends AbstractProcessor {
         MessageBytes expectMB = headers.getValue("expect");
         if (expectMB != null && !expectMB.isNull()) {
             if (expectMB.toString().trim().equalsIgnoreCase("100-continue")) {
-                inputBuffer.setSwallowInput(false);
                 request.setExpectation(true);
             } else {
                 response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
@@ -1063,7 +1062,20 @@ public class Http11Processor extends AbstractProcessor {
 
             int size = headers.size();
             for (int i = 0; i < size; i++) {
-                outputBuffer.sendHeader(headers.getName(i), headers.getValue(i));
+                try {
+                    outputBuffer.sendHeader(headers.getName(i), headers.getValue(i));
+                } catch (IllegalArgumentException iae) {
+                    // Log the problematic header
+                    log.warn(sm.getString("http11processor.response.invalidHeader",
+                            headers.getName(i), headers.getValue(i)), iae);
+                    // Remove the problematic header
+                    headers.removeHeader(i);
+                    size--;
+                    // Header buffer is corrupted. Reset it and start again.
+                    outputBuffer.resetHeaderBuffer();
+                    i = 0;
+                    outputBuffer.sendStatus();
+                }
             }
             outputBuffer.endHeaders();
         } catch (Throwable t) {
@@ -1240,7 +1252,6 @@ public class Http11Processor extends AbstractProcessor {
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
             if (!response.isCommitted() && request.hasExpectation()) {
-                inputBuffer.setSwallowInput(true);
                 try {
                     outputBuffer.sendAck();
                 } catch (IOException e) {

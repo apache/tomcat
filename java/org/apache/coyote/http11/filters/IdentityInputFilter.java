@@ -34,19 +34,16 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class IdentityInputFilter implements InputFilter, ApplicationBufferHandler {
 
-    private static final StringManager sm = StringManager.getManager(
-            IdentityInputFilter.class.getPackage().getName());
+    private static final StringManager sm = StringManager.getManager(IdentityInputFilter.class);
 
 
     // -------------------------------------------------------------- Constants
-
 
     protected static final String ENCODING_NAME = "identity";
     protected static final ByteChunk ENCODING = new ByteChunk();
 
 
     // ----------------------------------------------------- Static Initializer
-
 
     static {
         ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1),
@@ -55,7 +52,6 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Content length.

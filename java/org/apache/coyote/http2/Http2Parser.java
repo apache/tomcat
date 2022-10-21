@@ -56,19 +56,17 @@ class Http2Parser {
 
 
     /**
-     * Read and process a single frame. Once the start of a frame is read, the
+     * Read and process a single frame. The initial read is non-blocking to
+     * determine if a frame is present. Once the start of a frame is read, the
      * remainder will be read using blocking IO.
-     *
-     * @param block Should this method block until a frame is available if no
-     *              frame is available immediately?
      *
      * @return <code>true</code> if a frame was read otherwise
      *         <code>false</code>
      *
      * @throws IOException If an IO error occurs while trying to read a frame
      */
-    boolean readFrame(boolean block) throws Http2Exception, IOException {
-        return readFrame(block, null);
+    boolean readFrame() throws Http2Exception, IOException {
+        return readFrame(false, null);
     }
 
 
@@ -417,11 +415,13 @@ class Http2Parser {
         if (windowSizeIncrement == 0) {
             if (streamId == 0) {
                 throw new ConnectionException(
-                        sm.getString("http2Parser.processFrameWindowUpdate.invalidIncrement"),
+                        sm.getString("http2Parser.processFrameWindowUpdate.invalidIncrement",
+                                connectionId, Integer.toString(streamId)),
                         Http2Error.PROTOCOL_ERROR);
             } else {
                 throw new StreamException(
-                        sm.getString("http2Parser.processFrameWindowUpdate.invalidIncrement"),
+                        sm.getString("http2Parser.processFrameWindowUpdate.invalidIncrement",
+                                connectionId, Integer.toString(streamId)),
                         Http2Error.PROTOCOL_ERROR, streamId);
             }
         }

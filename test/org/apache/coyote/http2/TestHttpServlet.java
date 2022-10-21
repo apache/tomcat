@@ -22,7 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /*
- * Implement here rather than jakarta.servlet.http.TestHttpServley because it
+ * Implement here rather than jakarta.servlet.http.TestHttpServlet because it
  * needs access to package private classes.
  */
 public class TestHttpServlet extends Http2TestBase {
@@ -45,8 +45,8 @@ public class TestHttpServlet extends Http2TestBase {
         // Body
         writeFrame(dataFrameHeader, dataPayload);
 
-        parser.readFrame(true);
-        parser.readFrame(true);
+        parser.readFrame();
+        parser.readFrame();
 
         String trace = output.getTrace();
         String[] lines = trace.split("\n");

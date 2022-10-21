@@ -16,10 +16,7 @@
  */
 package jakarta.el;
 
-import java.beans.FeatureDescriptor;
-import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -364,41 +361,6 @@ public class TestBeanELResolver {
 
         Assert.assertTrue(result);
         Assert.assertTrue(context.isPropertyResolved());
-    }
-
-    /**
-     * Tests that a valid FeatureDescriptors are not returned if base is not
-     * Map.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    @Test
-    public void testGetFeatureDescriptors01() {
-        BeanELResolver resolver = new BeanELResolver();
-        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
-
-        Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(context, null);
-
-        Assert.assertNull(result);
-    }
-
-    /**
-     * Tests that a valid FeatureDescriptors are returned.
-     */
-    @Deprecated(forRemoval = true, since = "Tomcat 10.1.0")
-    @Test
-    public void testGetFeatureDescriptors02() {
-        BeanELResolver resolver = new BeanELResolver();
-        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
-
-        Iterator<FeatureDescriptor> result = resolver.getFeatureDescriptors(context, new Bean());
-
-        while (result.hasNext()) {
-            PropertyDescriptor featureDescriptor = (PropertyDescriptor) result.next();
-            Assert.assertEquals(featureDescriptor.getPropertyType(),
-                    featureDescriptor.getValue(ELResolver.TYPE));
-            Assert.assertEquals(Boolean.TRUE,
-                    featureDescriptor.getValue(ELResolver.RESOLVABLE_AT_DESIGN_TIME));
-        }
     }
 
     /**

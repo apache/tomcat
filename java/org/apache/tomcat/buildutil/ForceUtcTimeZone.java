@@ -14,35 +14,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package jakarta.servlet.jsp.el;
+package org.apache.tomcat.buildutil;
 
+import java.util.TimeZone;
 
-/**
- * Represents a parsing error encountered while parsing an EL expression.
- *
- * @since JSP 2.0
- * @deprecated As of JSP 2.1, replaced by jakarta.el.ELException
- */
-@Deprecated
-public class ELParseException extends ELException {
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
 
-    private static final long serialVersionUID = 1L;
+public class ForceUtcTimeZone extends Task {
 
-
-    /**
-     * Creates an ELParseException with no detail message.
-     */
-    public ELParseException () {
-        super ();
-    }
-
-
-    /**
-     * Creates an ELParseException with the provided detail message.
-     *
-     * @param pMessage the detail message
-     */
-    public ELParseException (String pMessage) {
-        super (pMessage);
+    @Override
+    public void execute() throws BuildException {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 }

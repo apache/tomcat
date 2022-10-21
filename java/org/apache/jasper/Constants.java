@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class Constants {
 
-    public static final String SPEC_VERSION = "3.1";
+    public static final String SPEC_VERSION = "4.0";
 
     /**
      * These classes/packages are automatically imported by the

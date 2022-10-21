@@ -16,19 +16,21 @@
 */
 package sessions;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class DummyCart {
-    final Vector<String> v = new Vector<>();
+    final List<String> items = Collections.synchronizedList(new ArrayList<>());
     String submit = null;
     String item = null;
 
     private void addItem(String name) {
-        v.addElement(name);
+        items.add(name);
     }
 
     private void removeItem(String name) {
-        v.removeElement(name);
+        items.remove(name);
     }
 
     public void setItem(String name) {
@@ -40,9 +42,7 @@ public class DummyCart {
     }
 
     public String[] getItems() {
-        String[] s = new String[v.size()];
-        v.copyInto(s);
-        return s;
+        return items.toArray(new String[0]);
     }
 
     public void processRequest() {

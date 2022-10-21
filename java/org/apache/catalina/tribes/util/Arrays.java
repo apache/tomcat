@@ -27,9 +27,6 @@ import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.membership.Membership;
 
-/**
- * @version 1.0
- */
 public class Arrays {
     protected static final StringManager sm = StringManager.getManager(Arrays.class);
 
@@ -160,8 +157,7 @@ public class Arrays {
                 list.add(member);
             }
         }
-        Member[] result = new Member[list.size()];
-        list.toArray(result);
+        Member[] result = list.toArray(new Member[0]);
         AbsoluteOrder.absoluteOrder(result);
         return result;
     }

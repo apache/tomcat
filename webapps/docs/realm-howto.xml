@@ -848,7 +848,7 @@ to all virtual hosts and web applications.  The default contents of the
     with all its roles. The cached user is <strong>not</strong> saved and
     restored across sessions serialisations. When the user's principal object
     is serialized for any reason, it will also be replaced by a static
-    equivalent object with roles that will no longer reflect the databse
+    equivalent object with roles that will no longer reflect the database
     contents.</li>
 </ul>
 

@@ -438,6 +438,7 @@ public class ApplicationContext implements ServletContext {
 
         try {
             // Map the URI
+            uriMB.setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
             CharChunk uriCC = uriMB.getCharChunk();
             try {
                 uriCC.append(context.getPath());

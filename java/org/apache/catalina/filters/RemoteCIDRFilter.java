@@ -22,7 +22,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import jakarta.servlet.FilterChain;
@@ -220,7 +219,7 @@ public final class RemoteCIDRFilter extends FilterBase {
             return Collections.emptyList();
         }
 
-        final List<String> messages = new LinkedList<>();
+        final List<String> messages = new ArrayList<>();
         NetMask nm;
 
         for (final String s : input.split("\\s*,\\s*")) {

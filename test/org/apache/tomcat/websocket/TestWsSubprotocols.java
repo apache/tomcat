@@ -79,7 +79,7 @@ public class TestWsSubprotocols extends WebSocketBaseTest {
 
         Assert.assertTrue(wsSession.isOpen());
         Assert.assertEquals("sp2", wsSession.getNegotiatedSubprotocol());
-        // Client thread might move faster than server. Wait for upto 5s for the
+        // Client thread might move faster than server. Wait for up to 5s for the
         // subProtocols to be set
         int count = 0;
         while (count < 50 && SubProtocolsEndpoint.subprotocols == null) {
@@ -88,7 +88,7 @@ public class TestWsSubprotocols extends WebSocketBaseTest {
         }
         Assert.assertNotNull(SubProtocolsEndpoint.subprotocols);
         Assert.assertArrayEquals(new String[]{"sp1","sp2"},
-                SubProtocolsEndpoint.subprotocols.toArray(new String[2]));
+                SubProtocolsEndpoint.subprotocols.toArray(new String[0]));
         wsSession.close();
         SubProtocolsEndpoint.recycle();
     }

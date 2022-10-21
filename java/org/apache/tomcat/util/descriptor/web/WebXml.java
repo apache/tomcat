@@ -85,12 +85,15 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      * to know as the action that the specification requires (see 8.2.2 1.e and
      * 2.c) varies depending on the ordering method used.
      */
-    private boolean duplicated = false;
+    private final List<String> duplicates = new ArrayList<>();
     public boolean isDuplicated() {
-        return duplicated;
+        return !duplicates.isEmpty();
     }
-    public void setDuplicated(boolean duplicated) {
-        this.duplicated = duplicated;
+    public void addDuplicate(String duplicate) {
+        this.duplicates.add(duplicate);
+    }
+    public List<String> getDuplicates() {
+        return new ArrayList<>(this.duplicates);
     }
 
     /**
@@ -2166,8 +2169,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             // Stage 0. Check there were no fragments with duplicate names
             for (WebXml fragment : fragments.values()) {
                 if (fragment.isDuplicated()) {
+                    List<String> duplicates = fragment.getDuplicates();
+                    duplicates.add(0, fragment.getURL().toString());
                     throw new IllegalArgumentException(
-                            sm.getString("webXml.duplicateFragment", fragment.getName()));
+                            sm.getString("webXml.duplicateFragment", fragment.getName(), duplicates));
                 }
             }
             // Stage 1. Make all dependencies bi-directional - this makes the

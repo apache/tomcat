@@ -84,11 +84,11 @@ public class McastServiceImpl extends MembershipProviderBase {
      */
     protected final long sendFrequency;
     /**
-     * Reuse the sendPacket, no need to create a new one everytime
+     * Reuse the sendPacket, no need to create a new one every time
      */
     protected DatagramPacket sendPacket;
     /**
-     * Reuse the receivePacket, no need to create a new one everytime
+     * Reuse the receivePacket, no need to create a new one every time
      */
     protected DatagramPacket receivePacket;
 

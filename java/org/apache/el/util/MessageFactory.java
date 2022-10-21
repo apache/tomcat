@@ -16,7 +16,9 @@
  */
 package org.apache.el.util;
 
+import java.text.Format;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -25,13 +27,25 @@ import java.util.ResourceBundle;
  */
 public final class MessageFactory {
 
-    static final ResourceBundle bundle = ResourceBundle.getBundle("org.apache.el.LocalStrings");
+    private static final ResourceBundle DEFAULT_BUNDLE = ResourceBundle.getBundle("org.apache.el.LocalStrings");
 
-    public MessageFactory() {
-        super();
-    }
+    private static final MessageFactory DEFAULT_MESSAGE_FACTORY = new MessageFactory(DEFAULT_BUNDLE);
 
     public static String get(final String key) {
+        return DEFAULT_MESSAGE_FACTORY.getInternal(key);
+    }
+
+    public static String get(final String key, final Object... args) {
+        return DEFAULT_MESSAGE_FACTORY.getInternal(key, args);
+    }
+
+    private final ResourceBundle bundle;
+
+    public MessageFactory(ResourceBundle bundle) {
+        this.bundle = bundle;
+    }
+
+    protected String getInternal(final String key) {
         try {
             return bundle.getString(key);
         } catch (MissingResourceException e) {
@@ -39,10 +53,28 @@ public final class MessageFactory {
         }
     }
 
-    public static String get(final String key, final Object... args) {
-        String value = get(key);
+    protected String getInternal(final String key, final Object... args) {
+        String value = getInternal(key);
 
         MessageFormat mf = new MessageFormat(value);
+        Format[] formats = null;
+
+        // Unless an argument has been explicitly configured to use a number
+        // format, convert all Number arguments to String else MessageFormat may
+        // try to format them in unexpected ways.
+        if (args != null) {
+            for (int i = 0; i < args.length; i++) {
+                if (args[i] instanceof Number) {
+                    if (formats == null) {
+                        formats = mf.getFormatsByArgumentIndex();
+                    }
+                    if (i < formats.length && !(formats[i] instanceof NumberFormat)) {
+                        args[i] = args[i].toString();
+                    }
+                }
+            }
+        }
+
         return mf.format(args, new StringBuffer(), null).toString();
     }
 }

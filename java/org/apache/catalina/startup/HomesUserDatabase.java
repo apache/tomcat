@@ -16,11 +16,11 @@
  */
 package org.apache.catalina.startup;
 
-
 import java.io.File;
+import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Hashtable;
-
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Concrete implementation of the <code>UserDatabase</code> interface
@@ -29,39 +29,17 @@ import java.util.Hashtable;
  *
  * @author Craig R. McClanahan
  */
-public final class HomesUserDatabase
-    implements UserDatabase {
-
-
-    // --------------------------------------------------------- Constructors
-
-
-    /**
-     * Initialize a new instance of this user database component.
-     */
-    public HomesUserDatabase() {
-
-        super();
-
-    }
-
-
-    // --------------------------------------------------- Instance Variables
-
+public final class HomesUserDatabase implements UserDatabase {
 
     /**
      * The set of home directories for all defined users, keyed by username.
      */
-    private final Hashtable<String,String> homes = new Hashtable<>();
-
+    private final Map<String,String> homes = new HashMap<>();
 
     /**
      * The UserConfig listener with which we are associated.
      */
     private UserConfig userConfig = null;
-
-
-    // ----------------------------------------------------------- Properties
 
 
     /**
@@ -85,9 +63,6 @@ public final class HomesUserDatabase
     }
 
 
-    // ------------------------------------------------------- Public Methods
-
-
     /**
      * Return an absolute pathname to the home directory for the specified user.
      *
@@ -100,15 +75,12 @@ public final class HomesUserDatabase
 
 
     /**
-     * Return an enumeration of the usernames defined on this server.
+     * Return an enumeration of the user names defined on this server.
      */
     @Override
     public Enumeration<String> getUsers() {
-        return homes.keys();
+        return Collections.enumeration(homes.keySet());
     }
-
-
-    // ------------------------------------------------------ Private Methods
 
 
     /**

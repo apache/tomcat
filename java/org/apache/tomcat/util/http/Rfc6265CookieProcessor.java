@@ -176,7 +176,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
                 header.append(sameSiteCookiesValue.getValue());
             }
         } else {
-            // Use explict config
+            // Use explicit config
             header.append("; SameSite=");
             header.append(cookieSameSite);
         }

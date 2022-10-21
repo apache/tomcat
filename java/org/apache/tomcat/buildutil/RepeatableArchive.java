@@ -25,9 +25,9 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -49,7 +49,7 @@ import org.apache.tools.ant.types.FileSet;
  */
 public class RepeatableArchive extends Task {
 
-    private final List<FileSet> filesets = new LinkedList<>();
+    private final List<FileSet> filesets = new ArrayList<>();
 
     private String datetime;
     private String pattern;

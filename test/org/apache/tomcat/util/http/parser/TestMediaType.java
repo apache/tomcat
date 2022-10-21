@@ -302,7 +302,7 @@ public class TestMediaType {
             sb.append(lws);
             return sb.toString();
         }
-}
+    }
 
     @Test
     public void testCase() throws Exception {
@@ -312,6 +312,16 @@ public class TestMediaType {
         Assert.assertEquals("1", m.getParameterValue("A"));
         Assert.assertEquals("1", m.getParameterValue("a"));
         Assert.assertEquals("2", m.getParameterValue("B"));
+        Assert.assertEquals("2", m.getParameterValue("b"));
+    }
+
+    @Test
+    public void testEmptyParameter() throws Exception {
+        // RFC 9110
+        StringReader sr = new StringReader("type/sub-type;;a=1;;b=2;;");
+        MediaType m = MediaType.parseMediaType(sr);
+
+        Assert.assertEquals("1", m.getParameterValue("a"));
         Assert.assertEquals("2", m.getParameterValue("b"));
     }
 }

@@ -36,7 +36,7 @@ import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.ProtocolHandler;
-import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -110,7 +110,7 @@ public class TestCustomSslTrustManager extends TomcatBaseTest {
 
         // Override the defaults
         ProtocolHandler handler = connector.getProtocolHandler();
-        if (handler instanceof AbstractHttp11JsseProtocol) {
+        if (handler instanceof AbstractHttp11Protocol) {
             connector.findSslHostConfigs()[0].setTruststoreFile(null);
         } else {
             // Unexpected

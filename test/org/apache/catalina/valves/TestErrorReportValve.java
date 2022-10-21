@@ -17,6 +17,7 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.RequestDispatcher;
@@ -36,8 +37,11 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.apache.tomcat.util.res.StringManager;
 
 public class TestErrorReportValve extends TomcatBaseTest {
+
+    private static final StringManager sm = StringManager.getManager(TestErrorReportValve.class);
 
     @Test
     public void testBug53071() throws Exception {
@@ -51,10 +55,11 @@ public class TestErrorReportValve extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort());
-
-        Assert.assertTrue(res.toString().contains("<p><b>Message</b> " +
-                ErrorServlet.ERROR_TEXT + "</p>"));
+        ByteChunk res = new ByteChunk();
+        res.setCharset(StandardCharsets.UTF_8);
+        getUrl("http://localhost:" + getPort(), res, null);
+        Assert.assertTrue(res.toString().contains("<p><b>" + sm.getString("errorReportValve.message") + "</b> " +
+            ErrorServlet.ERROR_TEXT + "</p>"));
     }
 
 

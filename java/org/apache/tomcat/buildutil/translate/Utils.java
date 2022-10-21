@@ -26,16 +26,27 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Utils {
 
     private static final Pattern ESCAPE_LEADING_SPACE = Pattern.compile("^(\\s)", Pattern.MULTILINE);
 
+    private static final Set<String> KEYS_WITH_UNNECESSARY_ESCAPING = new HashSet<>();
+
     // Package private so it is visible to tests
     static final String PADDING = "POEDITOR_EXPORT_PADDING_DO_NOT_DELETE";
+
+    static {
+        KEYS_WITH_UNNECESSARY_ESCAPING.add("arrays.malformed.arrays");
+        KEYS_WITH_UNNECESSARY_ESCAPING.add("jsp.error.attribute.deferredmix");
+        KEYS_WITH_UNNECESSARY_ESCAPING.add("jsp.error.el.template.deferred");
+    }
+
 
     private Utils() {
         // Utility class. Hide default constructor.
@@ -83,6 +94,20 @@ public class Utils {
         }
 
         return formatValueCommon(result);
+    }
+
+
+    /*
+     * Values containing "[{n}]" and "'" need to have the "'" escaped as "''".
+     * POEditor attempts to do this automatically but does it for any value
+     * containing "{" or "}" leading to some unnecessary escaping. This method
+     * undoes the unnecessary escaping.
+     */
+    static String fixUnnecessaryEscaping(String key, String value) {
+        if (KEYS_WITH_UNNECESSARY_ESCAPING.contains(key)) {
+            return value.replace("''", "'");
+        }
+        return value;
     }
 
 
