@@ -983,9 +983,10 @@ public class ContextConfig implements LifecycleListener {
                     Boolean.valueOf(context.getXmlNamespaceAware())));
         }
         
-        // If the defaultWebXml is not null and equals NoDefaultWebXml, then no need to proceed the web xml configuration.
-        if (this.defaultWebXml != null && !this.defaultWebXml.equals(Constants.NoDefaultWebXml))
+        // If the defaultWebXml is not null and equals NoDefaultWebXml, then no need to proceed the web xml configuration
+        if (this.defaultWebXml != null && !this.defaultWebXml.equals(Constants.NoDefaultWebXml)) {
             webConfig();
+        }
 
         if (!context.getIgnoreAnnotations()) {
             applicationAnnotationsConfig();
