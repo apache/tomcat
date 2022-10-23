@@ -983,7 +983,9 @@ public class ContextConfig implements LifecycleListener {
                     Boolean.valueOf(context.getXmlNamespaceAware())));
         }
 
-        webConfig();
+        if(!skipWebXmlFileScan()) {
+            webConfig();
+        }
 
         if (!context.getIgnoreAnnotations()) {
             applicationAnnotationsConfig();
@@ -1023,6 +1025,14 @@ public class ContextConfig implements LifecycleListener {
 
     }
 
+    /**
+     * Considering the embbed tomcat environment scenario, this step can be used to be skipped.
+     *
+     * @return true if no need to scan web.xml files, otherwise false
+     */
+    protected boolean skipWebXmlFileScan() {
+        return false;
+    }
 
     /**
      * Process a "stop" event for this Context.
