@@ -206,9 +206,6 @@ public class NioSender extends AbstractSender {
                 //we have written everything, or we are starting a new package
                 //protect against buffer overwrite
                 int byteswritten = isUdpBased()?dataChannel.write(writebuf) : socketChannel.write(writebuf);
-                if (byteswritten == -1 ) {
-                    throw new EOFException();
-                }
                 remaining -= byteswritten;
                 //if the entire message was written from the buffer
                 //reset the position counter
