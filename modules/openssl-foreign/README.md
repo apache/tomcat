@@ -2,14 +2,14 @@
 
 ## This module is experimental
 
-It uses the JEP XXX API. More details on this API are available
-at `https://openjdk.java.net/jeps/XXX`.
+It uses the JEP 434 API. More details on this API are available
+at `https://openjdk.java.net/jeps/434`.
 
-## Building the JDK with the JEP XXX API
+## Building Java 20 with the JEP 434 API
 
 Clone `https://github.com/openjdk/panama-foreign/` in some location and
 checkout the main branch. This is a Java 20 development JVM
-with the JEP XXX API. It may fail to build. When this happens, step back
+with the JEP 434 API. It may fail to build. When this happens, step back
 one commit at a time until it does.
 
 ```
