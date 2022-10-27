@@ -127,6 +127,11 @@
       <update>
         Update to Commons Daemon 1.3.2. (markt)
       </update>
+      <fix>
+        <bug>66323</bug>: Move module start up parameters from
+        <code>JDK_JAVA_OPTIONS</code> to <code>JAVA_OPTS</code> now that the
+        minimum Java version is 11 and these options are always required. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
