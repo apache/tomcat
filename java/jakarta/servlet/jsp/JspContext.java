@@ -211,7 +211,7 @@ public abstract class JspContext {
 
     /**
      * Obtain the ELContext for this JSPContext. Each JSPContext has a dedicated
-     * ELCOntext.
+     * ELContext.
      *
      * @return the ELContext for this JSPContext
      */
