@@ -27,6 +27,8 @@ import jakarta.el.FunctionMapper;
 import jakarta.el.ImportHandler;
 import jakarta.el.VariableMapper;
 
+import org.apache.el.util.MessageFactory;
+
 public final class EvaluationContext extends ELContext {
 
     private final ELContext elContext;
@@ -34,6 +36,8 @@ public final class EvaluationContext extends ELContext {
     private final FunctionMapper fnMapper;
 
     private final VariableMapper varMapper;
+
+    private LambdaExpressionNestedState lambdaExpressionNestedState;
 
     public EvaluationContext(ELContext elContext, FunctionMapper fnMapper,
             VariableMapper varMapper) {
@@ -149,5 +153,36 @@ public final class EvaluationContext extends ELContext {
     @Override
     public <T> T convertToType(Object obj, Class<T> type) {
         return elContext.convertToType(obj, type);
+    }
+
+
+    public LambdaExpressionNestedState getLambdaExpressionNestedState() {
+        // State is stored in the EvaluationContext instance associated with the
+        // outermost lambda expression of a set of nested expressions.
+
+        if (lambdaExpressionNestedState != null) {
+            // This instance is storing state so it must be associated with the
+            // outermost lambda expression.
+            return lambdaExpressionNestedState;
+        }
+
+        // Check to see if the associated lambda expression is nested as state
+        // will be stored in the EvaluationContext associated with the outermost
+        // lambda expression.
+        if (elContext instanceof EvaluationContext) {
+            return ((EvaluationContext) elContext).getLambdaExpressionNestedState();
+        }
+
+        return null;
+    }
+
+
+    public void setLambdaExpressionNestedState(LambdaExpressionNestedState lambdaExpressionNestedState) {
+      if (this.lambdaExpressionNestedState != null) {
+          // Should never happen
+          throw new IllegalStateException(MessageFactory.get("error.lambda.wrongNestedState"));
+      }
+
+        this.lambdaExpressionNestedState = lambdaExpressionNestedState;
     }
 }

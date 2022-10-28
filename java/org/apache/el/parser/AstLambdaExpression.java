@@ -25,11 +25,10 @@ import jakarta.el.LambdaExpression;
 
 import org.apache.el.ValueExpressionImpl;
 import org.apache.el.lang.EvaluationContext;
+import org.apache.el.lang.LambdaExpressionNestedState;
 import org.apache.el.util.MessageFactory;
 
 public class AstLambdaExpression extends SimpleNode {
-
-    private NestedState nestedState = null;
 
     public AstLambdaExpression(int id) {
         super(id);
@@ -40,7 +39,14 @@ public class AstLambdaExpression extends SimpleNode {
 
         // Correct evaluation requires knowledge of the whole set of nested
         // expressions, not just the current expression
-        NestedState state = getNestedState();
+        LambdaExpressionNestedState state = ctx.getLambdaExpressionNestedState();
+        if (state == null) {
+            // This must be an outer lambda expression. Create and populate the
+            // state.
+            state = new LambdaExpressionNestedState();
+            populateNestedState(state);
+            ctx.setLambdaExpressionNestedState(state);
+        }
 
         // Check that there are not more sets of parameters than there are
         // nested expressions.
@@ -109,29 +115,15 @@ public class AstLambdaExpression extends SimpleNode {
     }
 
 
-    private NestedState getNestedState() {
-        if (nestedState == null) {
-            setNestedState(new NestedState());
-        }
-        return nestedState;
-    }
-
-
-    private void setNestedState(NestedState nestedState) {
-        if (this.nestedState != null) {
-            // Should never happen
-            throw new IllegalStateException(MessageFactory.get("error.lambda.wrongNestedState"));
-        }
-        this.nestedState = nestedState;
-
+    private void populateNestedState(LambdaExpressionNestedState lambdaExpressionNestedState) {
         // Increment the nesting count for the current expression
-        nestedState.incrementNestingCount();
+        lambdaExpressionNestedState.incrementNestingCount();
 
         if (jjtGetNumChildren() > 1) {
             Node firstChild = jjtGetChild(0);
             if (firstChild instanceof AstLambdaParameters) {
                 if (firstChild.jjtGetNumChildren() > 0) {
-                    nestedState.setHasFormalParameters();
+                    lambdaExpressionNestedState.setHasFormalParameters();
                 }
             } else {
                 // Can't be a lambda expression
@@ -139,7 +131,7 @@ public class AstLambdaExpression extends SimpleNode {
             }
             Node secondChild = jjtGetChild(1);
             if (secondChild instanceof AstLambdaExpression) {
-                ((AstLambdaExpression) secondChild).setNestedState(nestedState);
+                ((AstLambdaExpression) secondChild).populateNestedState(lambdaExpressionNestedState);
             }
         }
     }
@@ -154,29 +146,6 @@ public class AstLambdaExpression extends SimpleNode {
             result.append(n.toString());
         }
         return result.toString();
-    }
-
-
-    private static class NestedState {
-
-        private int nestingCount = 0;
-        private boolean hasFormalParameters = false;
-
-        private void incrementNestingCount() {
-            nestingCount++;
-        }
-
-        private int getNestingCount() {
-            return nestingCount;
-        }
-
-        private void setHasFormalParameters() {
-            hasFormalParameters = true;
-        }
-
-        private boolean getHasFormalParameters() {
-            return hasFormalParameters;
-        }
     }
 }
 /* JavaCC - OriginalChecksum=071159eff10c8e15ec612c765ae4480a (do not edit this line) */
