@@ -120,6 +120,10 @@
         <bug>66317</bug>: Fix for Lambda coercion security manager missing
         privileges. Based on pull request #557 by Isaac Rivera Rivas (lihan)
       </fix>
+      <fix>
+        <bug>66325</bug>: Fix concurrency issue in evaluation of expression
+        language containing lambda expressions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
