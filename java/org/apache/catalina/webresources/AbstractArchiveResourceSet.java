@@ -41,6 +41,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     protected final Object archiveLock = new Object();
     private long archiveUseCount = 0;
     private JarContents jarContents;
+    private boolean retainBloomFilterForArchives = false;
 
     protected final void setBaseUrl(URL baseUrl) {
         this.baseUrl = baseUrl;
@@ -308,13 +309,16 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 sm.getString("abstractArchiveResourceSet.setReadOnlyFalse"));
     }
 
+    @SuppressWarnings("deprecation")
     protected JarFile openJarFile() throws IOException {
         synchronized (archiveLock) {
             if (archive == null) {
                 archive = JreCompat.getInstance().jarFileNewInstance(getBase());
                 WebResourceRoot root = getRoot();
-                if ((root.getContext() != null) && root.getContext().getUseBloomFilterForArchives()) {
+                if (root.getArchiveIndexStrategyEnum().getUsesBloom() ||
+                        root.getContext() != null && root.getContext().getUseBloomFilterForArchives()) {
                     jarContents = new JarContents(archive);
+                    retainBloomFilterForArchives = root.getArchiveIndexStrategyEnum().getRetain();
                 }
             }
             archiveUseCount++;
@@ -339,7 +343,9 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 }
                 archive = null;
                 archiveEntries = null;
-                jarContents = null;
+                if (!retainBloomFilterForArchives) {
+                    jarContents = null;
+                }
             }
         }
     }

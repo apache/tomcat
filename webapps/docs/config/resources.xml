@@ -142,6 +142,20 @@
         used.</p>
       </attribute>
 
+      <attribute name="archiveIndexStrategy" required="false">
+        <p>If this is <code>simple</code> then a hash map will be used for
+        JAR archive lookups, unless useBloomFilterForArchives in
+        <a href="context.html">Context</a> is explicitly defined.</p>
+        <p>If this is <code>bloom</code> then a bloom filter will be used to
+        speed up archive lookups. This can be beneficial to the deployment
+        speed to web applications that contain very large amount of JARs.</p>
+        <p>If this is <code>purged</code> then a bloom filter will be used to
+        speed up archive lookups, but can be purged at runtime. It is recommended
+        to use <code>bloom</code> to avoid reinitializing the bloom filters.</p>
+        <p>If not specified, the default value of <code>simple</code> will be
+        used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>

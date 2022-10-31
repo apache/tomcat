@@ -1934,14 +1934,21 @@ public interface Context extends Container, ContextBind {
     /**
      * @return <code>true</code> if the resources archive lookup will
      * use a bloom filter.
+     *
+     * @deprecated This method will be removed in Tomcat 11 onwards.
+     *             Use {@link WebResourceRoot#getArchiveIndexStrategy()}
      */
+    @Deprecated
     public boolean getUseBloomFilterForArchives();
 
     /**
      * Set bloom filter flag value.
      *
      * @param useBloomFilterForArchives The new fast class path scan flag
+     *
+     * @deprecated This method will be removed in Tomcat 11 onwards
+     *             Use {@link WebResourceRoot#setArchiveIndexStrategy(String)}
      */
+    @Deprecated
     public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives);
-
 }

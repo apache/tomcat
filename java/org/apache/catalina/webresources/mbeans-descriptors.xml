@@ -52,6 +52,11 @@
                  type="java.util.List"
             writeable="false"/>
 
+    <attribute   name="archiveIndexStrategy"
+          description="Strategy to use for the resources archive lookup"
+                 type="java.lang.String"
+            writeable="true"/>
+
   </mbean>
 
   <mbean         name="Cache"
