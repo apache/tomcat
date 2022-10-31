@@ -140,6 +140,18 @@
       <update>
         Update to Commons Daemon 1.3.2. (markt)
       </update>
+      <add>
+        Improvements to Chinese translations. Contributed by DigitalCat and
+        lihan. (markt)
+      </add>
+      <add>
+        Improvements to French translations. Contributed by Mathieu Bouchard.
+        (markt)
+      </add>
+      <add>
+        Improvements to Japanese translations. Contributed by Shirayuking.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
