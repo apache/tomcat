@@ -81,6 +81,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     private boolean trackLockedFiles = false;
     private final Set<TrackedWebResource> trackedResources = ConcurrentHashMap.newKeySet();
 
+    private ArchiveIndexStrategy archiveIndexStrategy = ArchiveIndexStrategy.SIMPLE;
+
     // Constructs to make iteration over all WebResourceSets simpler
     private final List<WebResourceSet> mainResources = new ArrayList<>();
     private final List<List<WebResourceSet>> allResources =
@@ -553,6 +555,21 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     @Override
     public boolean getTrackLockedFiles() {
         return trackLockedFiles;
+    }
+
+    @Override
+    public void setArchiveIndexStrategy(String archiveIndexStrategy) {
+        this.archiveIndexStrategy = ArchiveIndexStrategy.valueOf(archiveIndexStrategy.toUpperCase(Locale.ENGLISH));
+    }
+
+    @Override
+    public String getArchiveIndexStrategy() {
+        return this.archiveIndexStrategy.name();
+    }
+
+    @Override
+    public ArchiveIndexStrategy getArchiveIndexStrategyEnum() {
+        return this.archiveIndexStrategy;
     }
 
     public List<String> getTrackedResources() {

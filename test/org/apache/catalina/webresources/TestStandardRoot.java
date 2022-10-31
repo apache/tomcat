@@ -23,6 +23,7 @@ import java.net.URL;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.webresources.StandardRoot.BaseLocation;
 
 public class TestStandardRoot {
@@ -76,5 +77,18 @@ public class TestStandardRoot {
         BaseLocation baseLocation = new BaseLocation(url);
         Assert.assertEquals(expectedBasePath, baseLocation.getBasePath());
         Assert.assertEquals(expectedArchivePath, baseLocation.getArchivePath());
+    }
+
+    @Test
+    public void testArchiveIndexStrategy() {
+        WebResourceRoot root = new StandardRoot();
+        root.setArchiveIndexStrategy(WebResourceRoot.ArchiveIndexStrategy.BLOOM.name());
+        Assert.assertEquals(WebResourceRoot.ArchiveIndexStrategy.BLOOM.name(), root.getArchiveIndexStrategy());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testArchiveIndexStrategyUnrecognized() {
+        WebResourceRoot root = new StandardRoot();
+        root.setArchiveIndexStrategy("UNRECOGNIZED");
     }
 }
