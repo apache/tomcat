@@ -322,7 +322,7 @@
                type="boolean"/>
 
     <attribute name="useBloomFilterForArchives"
-               description="Use a bloom filter for archives lookups"
+               description="DEPRECATED: Use a bloom filter for archives lookups"
                type="boolean"/>
 
     <attribute name="useHttpOnly"
