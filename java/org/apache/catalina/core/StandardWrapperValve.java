@@ -108,17 +108,7 @@ final class StandardWrapperValve extends ValveBase {
         if (!unavailable && wrapper.isUnavailable()) {
             container.getLogger().info(sm.getString("standardWrapper.isUnavailable",
                     wrapper.getName()));
-            long available = wrapper.getAvailable();
-            if ((available > 0L) && (available < Long.MAX_VALUE)) {
-                response.setDateHeader("Retry-After", available);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                        sm.getString("standardWrapper.isUnavailable",
-                                wrapper.getName()));
-            } else if (available == Long.MAX_VALUE) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                        sm.getString("standardWrapper.notFound",
-                                wrapper.getName()));
-            }
+            checkWrapperAvailable(response, wrapper);
             unavailable = true;
         }
 
@@ -131,17 +121,7 @@ final class StandardWrapperValve extends ValveBase {
             container.getLogger().error(
                     sm.getString("standardWrapper.allocateException",
                             wrapper.getName()), e);
-            long available = wrapper.getAvailable();
-            if ((available > 0L) && (available < Long.MAX_VALUE)) {
-                response.setDateHeader("Retry-After", available);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                           sm.getString("standardWrapper.isUnavailable",
-                                        wrapper.getName()));
-            } else if (available == Long.MAX_VALUE) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                           sm.getString("standardWrapper.notFound",
-                                        wrapper.getName()));
-            }
+            checkWrapperAvailable(response, wrapper);
         } catch (ServletException e) {
             container.getLogger().error(sm.getString("standardWrapper.allocateException",
                              wrapper.getName()), StandardWrapper.getRootCause(e));
@@ -217,20 +197,8 @@ final class StandardWrapperValve extends ValveBase {
             container.getLogger().error(sm.getString(
                     "standardWrapper.serviceException", wrapper.getName(),
                     context.getName()), e);
-            //            throwable = e;
-            //            exception(request, response, e);
             wrapper.unavailable(e);
-            long available = wrapper.getAvailable();
-            if ((available > 0L) && (available < Long.MAX_VALUE)) {
-                response.setDateHeader("Retry-After", available);
-                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                           sm.getString("standardWrapper.isUnavailable",
-                                        wrapper.getName()));
-            } else if (available == Long.MAX_VALUE) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                            sm.getString("standardWrapper.notFound",
-                                        wrapper.getName()));
-            }
+            checkWrapperAvailable(response, wrapper);
             // Do not save exception in 'throwable', because we
             // do not want to do exception(request, response, e) processing
         } catch (ServletException e) {
@@ -296,6 +264,20 @@ final class StandardWrapperValve extends ValveBase {
             if( time < minTime) {
                 minTime=time;
             }
+        }
+    }
+
+    private void checkWrapperAvailable(Response response, StandardWrapper wrapper) throws IOException {
+        long available = wrapper.getAvailable();
+        if ((available > 0L) && (available < Long.MAX_VALUE)) {
+            response.setDateHeader("Retry-After", available);
+            response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+                       sm.getString("standardWrapper.isUnavailable",
+                                    wrapper.getName()));
+        } else if (available == Long.MAX_VALUE) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                        sm.getString("standardWrapper.notFound",
+                                    wrapper.getName()));
         }
     }
 
