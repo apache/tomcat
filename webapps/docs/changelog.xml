@@ -155,8 +155,13 @@
       <fix>
         <bug>66323</bug>: Move module start up parameters from
         <code>JDK_JAVA_OPTIONS</code> to <code>JAVA_OPTS</code> now that the
-        minimum Java version is 11 and these options are always required. (markt)
+        minimum Java version is 11 and these options are always required.
+        (markt)
       </fix>
+      <add>
+        Improvements to Chinese translations. Contributed by DigitalCat and
+        lihan. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
