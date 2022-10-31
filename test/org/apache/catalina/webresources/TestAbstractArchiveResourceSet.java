@@ -78,32 +78,6 @@ public class TestAbstractArchiveResourceSet {
         Assert.assertNull(getJarContents(jarResourceSet));
     }
 
-    @Deprecated
-    @Test
-    public void testBloomFilterWithSimpleArchiveIndexing() throws Exception {
-        WebResourceRoot root = new TesterWebResourceRoot();
-
-        root.setArchiveIndexStrategy(WebResourceRoot.ArchiveIndexStrategy.SIMPLE.name());
-        root.getContext().setUseBloomFilterForArchives(true);
-
-        File file = new File("webapps/examples/WEB-INF/lib/taglibs-standard-impl-1.2.5-migrated-0.0.1.jar");
-
-        JarResourceSet jarResourceSet = new JarResourceSet(root, "/WEB-INF/classes", file.getAbsolutePath(), "/");
-        jarResourceSet.getArchiveEntries(false);
-        Assert.assertNotNull(getJarContents(jarResourceSet));
-
-        WebResource r1 = jarResourceSet.getResource("/WEB-INF/classes/org/");
-        Assert.assertTrue(r1.isDirectory());
-        Assert.assertNotNull(getJarContents(jarResourceSet));
-
-        WebResource r2 = jarResourceSet.getResource("/WEB-INF/classes/org");
-        Assert.assertTrue(r2.isDirectory());
-        Assert.assertNotNull(getJarContents(jarResourceSet));
-
-        jarResourceSet.gc();
-        Assert.assertNull(getJarContents(jarResourceSet));
-    }
-
     private JarContents getJarContents(Object target)
         throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
         Field field = AbstractArchiveResourceSet.class.getDeclaredField("jarContents");

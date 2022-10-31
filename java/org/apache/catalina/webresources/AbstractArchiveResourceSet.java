@@ -309,14 +309,12 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 sm.getString("abstractArchiveResourceSet.setReadOnlyFalse"));
     }
 
-    @SuppressWarnings("deprecation")
     protected JarFile openJarFile() throws IOException {
         synchronized (archiveLock) {
             if (archive == null) {
                 archive = new JarFile(new File(getBase()), true, ZipFile.OPEN_READ, Runtime.version());
                 WebResourceRoot root = getRoot();
-                if (root.getArchiveIndexStrategyEnum().getUsesBloom() ||
-                        root.getContext() != null && root.getContext().getUseBloomFilterForArchives()) {
+                if (root.getArchiveIndexStrategyEnum().getUsesBloom()) {
                     jarContents = new JarContents(archive);
                     retainBloomFilterForArchives = root.getArchiveIndexStrategyEnum().getRetain();
                 }

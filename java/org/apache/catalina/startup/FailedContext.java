@@ -835,11 +835,4 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public boolean getParallelAnnotationScanning() { return false; }
     @Override
     public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
-
-    @Override
-    public boolean getUseBloomFilterForArchives() { return false; }
-
-    @Override
-    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives) {}
-
 }

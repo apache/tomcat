@@ -1305,16 +1305,4 @@ public class TesterContext implements Context {
     public boolean getParallelAnnotationScanning() { return false; }
     @Override
     public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
-
-    boolean useBloomFilterForArchives = false;
-    @Override
-    public boolean getUseBloomFilterForArchives() {
-        return useBloomFilterForArchives;
-    }
-
-    @Override
-    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives) {
-        this.useBloomFilterForArchives = useBloomFilterForArchives;
-    }
-
 }
