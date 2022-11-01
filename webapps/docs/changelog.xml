@@ -113,6 +113,19 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>66029</bug>: Add a configuration option to allow bloom filters used
+        to index JAR files to be retained for the lifetime of the web
+        application. Prior to this addition, the indexes were always flushed by
+        the periodic calls to <code>WebResourceRoot.gc()</code>. As part of this
+        addition, configuration of archive indexing moves from
+        <code>Context</code> to <code>WebResourceRoot</code>. Based on a patch
+        provided by Rahul Jaisimha. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
@@ -128,6 +141,10 @@
         <bug>66317</bug>: Fix for Lambda coercion security manager missing
         privileges. Based on pull request #557 by Isaac Rivera Rivas (lihan)
       </fix>
+      <fix>
+        <bug>66325</bug>: Fix concurrency issue in evaluation of expression
+        language containing lambda expressions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -135,6 +152,30 @@
       <update>
         Update to Commons Daemon 1.3.2. (markt)
       </update>
+      <fix>
+        <bug>66323</bug>: Move module start up parameters from
+        <code>JDK_JAVA_OPTIONS</code> to <code>JAVA_OPTS</code> now that the
+        minimum Java version is 11 and these options are always required.
+        (markt)
+      </fix>
+      <add>
+        Improvements to Chinese translations. Contributed by DigitalCat and
+        lihan. (markt)
+      </add>
+      <add>
+        Improvements to French translations. Contributed by Mathieu Bouchard.
+        (markt)
+      </add>
+      <add>
+        Improvements to Japanese translations. Contributed by Shirayuking.
+        (markt)
+      </add>
+      <add>
+        Improvements to Korean translations. (markt)
+      </add>
+      <add>
+        Improvements to Spanish translations. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

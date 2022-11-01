@@ -245,11 +245,7 @@ class HpackEncoder {
     private void addToDynamicTable(String headerName, String val) {
         int pos = entryPositionCounter++;
         DynamicTableEntry d = new DynamicTableEntry(headerName, val, -pos);
-        List<TableEntry> existing = dynamicTable.get(headerName);
-        if (existing == null) {
-            dynamicTable.put(headerName, existing = new ArrayList<>(1));
-        }
-        existing.add(d);
+        dynamicTable.computeIfAbsent(headerName, k -> new ArrayList<>(1)).add(d);
         evictionQueue.add(d);
         currentTableSize += d.getSize();
         runEvictionIfRequired();

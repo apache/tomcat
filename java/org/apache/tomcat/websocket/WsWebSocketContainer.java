@@ -606,12 +606,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             if (endpointSessionMap.size() == 0) {
                 BackgroundProcessManager.getInstance().register(this);
             }
-            Set<WsSession> wsSessions = endpointSessionMap.get(key);
-            if (wsSessions == null) {
-                wsSessions = new HashSet<>();
-                endpointSessionMap.put(key, wsSessions);
-            }
-            wsSessions.add(wsSession);
+            endpointSessionMap.computeIfAbsent(key, k -> new HashSet<>()).add(wsSession);
         }
         sessions.put(wsSession, wsSession);
     }
@@ -892,11 +887,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         // expected to handle splitting into individual values
         String headerValue = line.substring(index + 1).trim();
 
-        List<String> values = headers.get(headerName);
-        if (values == null) {
-            values = new ArrayList<>(1);
-            headers.put(headerName, values);
-        }
+        List<String> values = headers.computeIfAbsent(headerName, k -> new ArrayList<>(1));
         values.add(headerValue);
     }
 

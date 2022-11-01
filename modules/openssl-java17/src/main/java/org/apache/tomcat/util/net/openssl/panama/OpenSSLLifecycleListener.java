@@ -396,7 +396,9 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                 if (!MemoryAddress.NULL.equals(enginePointer)) {
                     ENGINE_free(enginePointer);
                 }
-                FIPS_mode_set(0);
+                if (OpenSSL_version_num() < 0x3000000fL) {
+                    FIPS_mode_set(0);
+                }
             } finally {
                 OpenSSLStatus.setInitialized(false);
                 fipsModeActive = false;

@@ -1943,19 +1943,4 @@ public interface Context extends Container, ContextBind {
      * @param dispatcherWrapsSameObject the new flag value
      */
     public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject);
-
-
-    /**
-     * @return <code>true</code> if the resources archive lookup will
-     * use a bloom filter.
-     */
-    public boolean getUseBloomFilterForArchives();
-
-    /**
-     * Set bloom filter flag value.
-     *
-     * @param useBloomFilterForArchives The new fast class path scan flag
-     */
-    public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives);
-
 }

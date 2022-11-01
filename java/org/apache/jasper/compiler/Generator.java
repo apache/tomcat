@@ -2114,11 +2114,8 @@ class Generator {
 
         private TagHandlerInfo getTagHandlerInfo(Node.CustomTag n)
                 throws JasperException {
-            Map<String,TagHandlerInfo> handlerInfosByShortName = handlerInfos.get(n.getPrefix());
-            if (handlerInfosByShortName == null) {
-                handlerInfosByShortName = new HashMap<>();
-                handlerInfos.put(n.getPrefix(), handlerInfosByShortName);
-            }
+            Map<String, TagHandlerInfo> handlerInfosByShortName = handlerInfos.
+                computeIfAbsent(n.getPrefix(), k -> new HashMap<>());
             TagHandlerInfo handlerInfo =
                 handlerInfosByShortName.get(n.getLocalName());
             if (handlerInfo == null) {

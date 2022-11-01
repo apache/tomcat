@@ -400,6 +400,27 @@ public interface WebResourceRoot extends Lifecycle {
     boolean getTrackLockedFiles();
 
     /**
+     * Set the strategy to use for the resources archive lookup.
+     *
+     * @param archiveIndexStrategy The strategy to use for the resources archive lookup
+     */
+    void setArchiveIndexStrategy(String archiveIndexStrategy);
+
+    /**
+     * Get the strategy to use for the resources archive lookup.
+     *
+     * @return The strategy to use for the resources archive lookup
+     */
+    String getArchiveIndexStrategy();
+
+    /**
+     * Get the strategy to use for the resources archive lookup.
+     *
+     * @return The strategy to use for the resources archive lookup
+     */
+    ArchiveIndexStrategy getArchiveIndexStrategyEnum();
+
+    /**
      * This method will be invoked by the context on a periodic basis and allows
      * the implementation a method that executes periodic tasks, such as purging
      * expired cache entries.
@@ -462,6 +483,28 @@ public interface WebResourceRoot extends Lifecycle {
         RESOURCE_JAR,
         POST,
         CLASSES_JAR
+    }
+
+    enum ArchiveIndexStrategy {
+        SIMPLE(false, false),
+        BLOOM(true, true),
+        PURGED(true, false);
+
+        private final boolean usesBloom;
+        private final boolean retain;
+
+        ArchiveIndexStrategy(boolean usesBloom, boolean retain) {
+            this.usesBloom = usesBloom;
+            this.retain = retain;
+        }
+
+        public boolean getUsesBloom() {
+            return usesBloom;
+        }
+
+        public boolean getRetain() {
+            return retain;
+        }
     }
 
     /**

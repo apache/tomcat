@@ -638,14 +638,6 @@
         penalty.</p>
       </attribute>
 
-      <attribute name="useBloomFilterForArchives" required="false">
-        <p>If this is <code>true</code> then a bloom filter will be used to
-        speed up archive lookups. This can be beneficial to the deployment
-        speed to web applications that contain very large amount of JARs.</p>
-        <p>If not specified, the default value of <code>false</code> will be
-        used.</p>
-      </attribute>
-
       <attribute name="useHttpOnly" required="false">
        <p>Should the HttpOnly flag be set on session cookies to prevent client
           side script from accessing the session ID? Defaults to
