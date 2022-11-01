@@ -525,12 +525,7 @@ public class Tomcat {
      * @param role The role name
      */
     public void addRole(String user, String role) {
-        List<String> roles = userRoles.get(user);
-        if (roles == null) {
-            roles = new ArrayList<>();
-            userRoles.put(user, roles);
-        }
-        roles.add(role);
+        userRoles.computeIfAbsent(user, k -> new ArrayList<>()).add(role);
     }
 
     // ------- Extra customization -------

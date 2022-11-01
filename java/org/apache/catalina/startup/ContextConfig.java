@@ -1869,13 +1869,7 @@ public class ContextConfig implements LifecycleListener {
                 } else {
                     handlesTypesNonAnnotations = true;
                 }
-                Set<ServletContainerInitializer> scis =
-                        typeInitializerMap.get(type);
-                if (scis == null) {
-                    scis = new HashSet<>();
-                    typeInitializerMap.put(type, scis);
-                }
-                scis.add(sci);
+                typeInitializerMap.computeIfAbsent(type, k -> new HashSet<>()).add(sci);
             }
         }
     }
@@ -2407,11 +2401,7 @@ public class ContextConfig implements LifecycleListener {
                 }
 
                 for (ServletContainerInitializer sci : entry.getSciSet()) {
-                    Set<Class<?>> classes = initializerClassMap.get(sci);
-                    if (classes == null) {
-                        classes = new HashSet<>();
-                        initializerClassMap.put(sci, classes);
-                    }
+                    Set<Class<?>> classes = initializerClassMap.computeIfAbsent(sci, k -> new HashSet<>());
                     classes.add(clazz);
                 }
             }

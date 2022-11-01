@@ -706,11 +706,7 @@ public abstract class PersistentManagerBase extends ManagerBase
          * carry on.
          */
         synchronized (this) {
-            swapInLock = sessionSwapInLocks.get(id);
-            if (swapInLock == null) {
-                swapInLock = new Object();
-                sessionSwapInLocks.put(id, swapInLock);
-            }
+            swapInLock = sessionSwapInLocks.computeIfAbsent(id, k -> new Object());
         }
 
         Session session = null;
