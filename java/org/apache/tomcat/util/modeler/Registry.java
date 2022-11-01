@@ -277,11 +277,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         if (domain == null) {
             domain = "";
         }
-        Hashtable<String, Integer> domainTable = idDomains.get(domain);
-        if (domainTable == null) {
-            domainTable = new Hashtable<>();
-            idDomains.put(domain, domainTable);
-        }
+        Hashtable<String, Integer> domainTable = idDomains.computeIfAbsent(domain, k -> new Hashtable<>());
         if (name == null) {
             name = "";
         }
@@ -291,11 +287,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             return i.intValue();
         }
 
-        int id[] = ids.get(domain);
-        if (id == null) {
-            id = new int[1];
-            ids.put(domain, id);
-        }
+        int[] id = ids.computeIfAbsent(domain, k -> new int[1]);
         int code = id[0]++;
         domainTable.put(name, Integer.valueOf(code));
         return code;

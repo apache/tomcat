@@ -256,15 +256,8 @@ public class UpgradeUtil {
         List<Transformation> result = new ArrayList<>(negotiatedExtensions.size());
 
         for (Extension extension : negotiatedExtensions) {
-            List<List<Extension.Parameter>> preferences =
-                    extensionPreferences.get(extension.getName());
-
-            if (preferences == null) {
-                preferences = new ArrayList<>();
-                extensionPreferences.put(extension.getName(), preferences);
-            }
-
-            preferences.add(extension.getParameters());
+            extensionPreferences.computeIfAbsent(extension.getName(), k -> new ArrayList<>())
+                .add(extension.getParameters());
         }
 
         for (Map.Entry<String,List<List<Extension.Parameter>>> entry :
