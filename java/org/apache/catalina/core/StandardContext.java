@@ -5002,6 +5002,7 @@ public class StandardContext extends ContainerBase
                     cl.setClearReferencesHttpClientKeepAliveThread(getClearReferencesHttpClientKeepAliveThread());
                     cl.setClearReferencesObjectStreamClassCaches(getClearReferencesObjectStreamClassCaches());
                     cl.setClearReferencesThreadLocals(getClearReferencesThreadLocals());
+                    cl.setSkipMemoryLeakChecksOnJvmShutdown(getSkipMemoryLeakChecksOnJvmShutdown());
                 }
 
                 // By calling unbindThread and bindThread in a row, we setup the
