@@ -71,14 +71,9 @@ public class ResourceLinkFactory implements ObjectFactory {
             String globalName) {
         validateGlobalContext(globalContext);
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        Map<String,String> registrations = globalResourceRegistrations.get(cl);
-        if (registrations == null) {
-            // Web application initialization is single threaded so this is
-            // safe.
-            registrations = new HashMap<>();
-            globalResourceRegistrations.put(cl, registrations);
-        }
-        registrations.put(localName, globalName);
+        // Web application initialization is single threaded so this is
+        // safe.
+        globalResourceRegistrations.computeIfAbsent(cl, k -> new HashMap<>()).put(localName, globalName);
     }
 
 

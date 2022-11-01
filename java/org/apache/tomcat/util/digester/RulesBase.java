@@ -103,12 +103,7 @@ public class RulesBase implements Rules {
             pattern = pattern.substring(0, patternLength-1);
         }
 
-        List<Rule> list = cache.get(pattern);
-        if (list == null) {
-            list = new ArrayList<>();
-            cache.put(pattern, list);
-        }
-        list.add(rule);
+        cache.computeIfAbsent(pattern, k -> new ArrayList<>()).add(rule);
         rules.add(rule);
         if (this.digester != null) {
             rule.setDigester(this.digester);
