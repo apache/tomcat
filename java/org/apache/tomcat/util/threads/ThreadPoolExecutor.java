@@ -1942,6 +1942,18 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     }
 
     /**
+     * Returns the current number of threads in the pool.
+     * <br><b>NOTE</b>: this method only used in {@link TaskQueue#offer(Runnable)},
+     * where operations are frequent, can greatly reduce unnecessary
+     * performance overhead by a lock-free way.
+     * @return the number of threads
+     */
+    protected int getPoolSizeNoLock() {
+        return runStateAtLeast(ctl.get(), TIDYING) ? 0
+            : workers.size();
+    }
+
+    /**
      * Returns the approximate number of threads that are actively
      * executing tasks.
      *
