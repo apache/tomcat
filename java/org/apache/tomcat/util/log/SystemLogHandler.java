@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.EmptyStackException;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -83,7 +83,7 @@ public class SystemLogHandler extends PrintStream {
         if (!reuse.isEmpty()) {
             try {
                 log = reuse.remove();
-            } catch (EmptyStackException e) {
+            } catch (NoSuchElementException e) {
                 log = new CaptureLog();
             }
         } else {
