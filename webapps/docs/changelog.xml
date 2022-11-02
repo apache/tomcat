@@ -114,6 +114,11 @@
         <code>Context</code> was ignored and the default was always used.
         (markt)
       </fix>
+      <fix>
+        <bug>66331</bug>: Fix a regression in refactoring for <code>Stack</code>
+        on the <code>SystemLogHandler</code> which caught incorrect exception.
+        (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
