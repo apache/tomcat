@@ -84,7 +84,7 @@ import java.util.regex.Pattern;
  *    implementation class name for this Handler. Default value: unset</li>
  *   <li><code>formatter</code> - The <code>java.util.logging.Formatter</code>
  *    implementation class name for this Handler. Default value:
- *    <code>java.util.logging.SimpleFormatter</code></li>
+ *    <code>org.apache.juli.OneLineFormatter</code></li>
  *   <li><code>maxDays</code> - The maximum number of days to keep the log
  *    files. If the specified value is <code>&lt;=0</code> then the log files
  *    will be kept on the file system forever, otherwise they will be kept the
