@@ -19,6 +19,7 @@ package org.apache.tomcat.util.net;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ScatteringByteChannel;
 import java.nio.channels.SocketChannel;
@@ -260,12 +261,12 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
         @Override
         public int write(ByteBuffer src) throws IOException {
             checkInterruptStatus();
-            return -1;
+            throw new ClosedChannelException();
         }
         @Override
         public long write(ByteBuffer[] srcs, int offset, int length)
                 throws IOException {
-            return -1L;
+            throw new ClosedChannelException();
         }
         @Override
         public String toString() {
