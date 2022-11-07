@@ -137,6 +137,11 @@
         stream is cancelled due to an attempt to write to the stream when it is
         in a state that does not permit writes. (markt)
       </add>
+      <scode>
+        NIO writes never return -1 so refactor <code>CLOSED_NIO_CHANNEL</code>
+        not to do so and remove checks for this return value. Based on
+        <pr>562</pr> by tianshuang. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
