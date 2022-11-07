@@ -119,6 +119,10 @@
         on the <code>SystemLogHandler</code> which caught incorrect exception.
         (lihan)
       </fix>
+      <fix>
+        <bug>66338</bug>: Fix a regression that caused a nuance in refactoring
+        for <code>ErrorReportValve</code>. (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
