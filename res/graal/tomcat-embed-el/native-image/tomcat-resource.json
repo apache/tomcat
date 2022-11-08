@@ -1,7 +1,7 @@
 {
   "bundles":[
     {"name":"jakarta.el.LocalStrings"},
-    {"name":"org.apache.el.Messages"}
+    {"name":"org.apache.el.LocalStrings"}
   ],
   "resources":[
     {"pattern":".*/mbeans-descriptors.xml$"},
