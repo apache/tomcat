@@ -74,6 +74,15 @@
 <section name="Expression Language">
   <properties>
 
+    <property name="org.apache.el. GET_CLASSLOADER_USE_PRIVILEGED">
+      <p>Controls whether the EL API classes make use of a privileged block to
+      obtain the thread context class loader. When using the EL API within
+      Apache Tomcat this does not need to be set as all calls are already
+      wrapped in a privileged block further up the stack. It may be required if
+      using the EL API under a SecurityManager outside of Apache Tomcat.</p>
+      <p>If not specified, the default of <code>false</code> will be used.</p>
+    </property>
+
     <property name="org.apache.el.BeanELResolver. CACHE_SIZE">
       <p>The number of jakarta.el.BeanELResolver.BeanProperties objects that will
       be cached by the EL Parser.</p>
