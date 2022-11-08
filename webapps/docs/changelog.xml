@@ -203,6 +203,10 @@
         Graal native image support. Pull request <pr>564</pr> provided by
         Sébastien Deleuze. (markt)
       </fix>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 2.0.2 to
+        pick up the Windows binaries built with with OpenSSL 3.0.7. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
