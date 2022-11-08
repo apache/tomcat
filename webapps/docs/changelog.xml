@@ -151,6 +151,10 @@
         not to do so and remove checks for this return value. Based on
         <pr>562</pr> by tianshuang. (markt)
       </scode>
+      <scode>
+        Remove unnecessary code that exposed the <code>asyncTimeout</code> to
+        components that never used it. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
