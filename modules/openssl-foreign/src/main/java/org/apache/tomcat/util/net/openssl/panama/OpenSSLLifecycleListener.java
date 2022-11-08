@@ -21,7 +21,7 @@ import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode;
 import static org.apache.tomcat.util.openssl.openssl_compat_h.FIPS_mode_set;
 import static org.apache.tomcat.util.openssl.openssl_h.*;
 
-import java.lang.foreign.MemorySession;
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.security.SecureRandom;
@@ -229,7 +229,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                 return;
             }
 
-            try (var memorySession = MemorySession.openConfined()) {
+            try (var memorySession = Arena.openConfined()) {
 
                 // Main library init
                 initLibrary();

@@ -16,7 +16,7 @@
  */
 package org.apache.tomcat.util.net.openssl.panama;
 
-import java.lang.foreign.MemorySession;
+import java.lang.foreign.Arena;
 import java.lang.foreign.ValueLayout;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
@@ -67,7 +67,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
         if (keys.length != TICKET_KEYS_SIZE) {
             throw new IllegalArgumentException(sm.getString("sessionContext.invalidTicketKeysLength", keys.length));
         }
-        try (var memorySession = MemorySession.openConfined()) {
+        try (var memorySession = Arena.openConfined()) {
             var array = memorySession.allocateArray(ValueLayout.JAVA_BYTE, keys);
             // #define SSL_CTX_set_tlsext_ticket_keys(ctx, keys, keylen)
             //     SSL_CTX_ctrl((ctx),SSL_CTRL_SET_TLSEXT_TICKET_KEYS, (keylen), (keys))
@@ -144,7 +144,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
      * @return {@code true} if success, {@code false} otherwise.
      */
     public boolean setSessionIdContext(byte[] sidCtx) {
-        try (var memorySession = MemorySession.openConfined()) {
+        try (var memorySession = Arena.openConfined()) {
             var array = memorySession.allocateArray(ValueLayout.JAVA_BYTE, sidCtx);
             return (SSL_CTX_set_session_id_context(context.getSSLContext(), array, sidCtx.length) == 1);
         }
