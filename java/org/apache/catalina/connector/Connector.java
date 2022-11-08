@@ -393,7 +393,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setAsyncTimeout(long asyncTimeout) {
         this.asyncTimeout= asyncTimeout;
-        setProperty("asyncTimeout", String.valueOf(asyncTimeout));
     }
 
 
