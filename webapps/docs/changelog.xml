@@ -204,8 +204,12 @@
         Sébastien Deleuze. (markt)
       </fix>
       <update>
-        Update the packaged version of the Tomcat Native Library to 2.0.2 to
-        pick up the Windows binaries built with with OpenSSL 3.0.7. (markt)
+        Update the packaged version of the Apache Tomcat Native Library to 2.0.2
+        to pick up the Windows binaries built with with OpenSSL 3.0.7. (markt)
+      </update>
+      <update>
+        Update the packaged version of the Apache Tomcat Migration Tool for
+        Jakarta EE to 1.0.5. (markt)
       </update>
     </changelog>
   </subsection>

@@ -41,6 +41,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jakartaee.ClassConverter;
 import org.apache.tomcat.jakartaee.EESpecProfile;
+import org.apache.tomcat.jakartaee.EESpecProfiles;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.compat.JreCompat;
@@ -368,7 +369,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
             if (getJakartaConverter() != null) {
                 EESpecProfile profile = null;
                 try {
-                    profile = EESpecProfile.valueOf(getJakartaConverter());
+                    profile = EESpecProfiles.valueOf(getJakartaConverter());
                 } catch (IllegalArgumentException ignored) {
                     // Use default value
                     log.warn(sm.getString("webappLoader.unknownProfile", getJakartaConverter()));
