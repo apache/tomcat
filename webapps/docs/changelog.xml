@@ -151,6 +151,13 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>66294</bug>: Make the use of a privileged block to obtain the
+        thread context class loader added to address <bug>62080</bug> optional
+        and disabled by default. This is now controlled by the
+        <code>org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED</code> system
+        property. (markt)
+      </fix>
+      <fix>
         <bug>66325</bug>: Fix concurrency issue in evaluation of expression
         language containing lambda expressions. (markt)
       </fix>
