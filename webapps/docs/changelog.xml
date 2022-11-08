@@ -191,6 +191,11 @@
         Improvements to Japanese translations. Contributed by Shirayuking.
         (markt)
       </add>
+      <fix>
+        Correct a regression in the removal of the APR connector that broke
+        Graal native image support. Pull request <pr>564</pr> provided by
+        Sébastien Deleuze. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
