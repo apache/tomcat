@@ -93,7 +93,7 @@ tools to check out source code files, and check in modified versions.</p>
 <p>Detailed instructions for installing and using source code control
 applications is beyond the scope of this manual.  However, CVS server and
 client tools for many platforms (along with documentation) can be downloaded
-from <a href="http://www.cvshome.org/">http://www.cvshome.org/</a>.</p>
+from <a href="https://www.nongnu.org/cvs/">https://www.nongnu.org/cvs/</a>.</p>
 
 </subsection>
 
