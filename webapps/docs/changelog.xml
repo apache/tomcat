@@ -132,6 +132,11 @@
         <bug>66338</bug>: Fix a regression that caused a nuance in refactoring
         for <code>ErrorReportValve</code>. (lihan)
       </fix>
+      <fix>
+        Escape values used to construct output for the
+        <code>JsonErrorReportValve</code> to ensure that it always outputs valid
+        JSON. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
