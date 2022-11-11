@@ -23,6 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Used to identify generated code.
+ *
  * @since Common Annotations 1.0
  */
 @Documented
