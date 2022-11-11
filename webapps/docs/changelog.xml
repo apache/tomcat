@@ -145,6 +145,13 @@
         <code>JsonErrorReportValve</code> to ensure that it always outputs valid
         JSON. (markt)
       </fix>
+      <fix>
+        Correct the default implementation of
+        <code>HttpServletRequest.isTrailerFieldsReady()</code> to return
+        <code>true</code> so it is consistent with the default implementation of
+        <code>HttpServletRequest.getTrailerFields()</code> and with the Servlet
+        API provided by the Jakarta EE project. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
