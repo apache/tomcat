@@ -23,6 +23,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Added to a method required to be called after the object has been constructed
+ * and before it used.
+ *
  * @since Common Annotations 1.0
  */
 @Documented

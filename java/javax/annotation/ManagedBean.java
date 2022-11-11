@@ -22,6 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Identifies a POJO as a managed bean.
+ *
  * @since Common Annotations 1.1
  */
 @Target(ElementType.TYPE)

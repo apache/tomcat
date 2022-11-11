@@ -23,6 +23,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Used to define the order in which classes or parameters should be used. The
+ * annotated class or parameter defines how the prority value is used.
+ *
  * @since Common Annotations 1.2
  */
 @Documented
