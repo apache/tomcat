@@ -611,6 +611,6 @@ public interface HttpServletRequest extends ServletRequest {
      * @since Servlet 4.0
      */
     public default boolean isTrailerFieldsReady() {
-        return false;
+        return true;
     }
 }
