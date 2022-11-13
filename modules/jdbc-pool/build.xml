@@ -185,7 +185,9 @@
 
   <target name="build-src">
     <!-- connection pool source file-->
-    <jar jarfile="${tomcat-jdbc-src.jar}" update="true">
+    <jar jarfile="${tomcat-jdbc-src.jar}"
+         update="true"
+         modificationtime="${tstamp.file}">
       <fileset dir="${basedir}/src/main/java">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
@@ -207,7 +209,9 @@
       <include name="org/apache/tomcat/jdbc/**" />
     </javac>
     <!-- connection pool JAR File -->
-    <jar jarfile="${tomcat-jdbc-test.jar}" update="true">
+    <jar jarfile="${tomcat-jdbc-test.jar}"
+         update="true"
+         modificationtime="${tstamp.file}">
       <fileset dir="${tomcat.testclasses}">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
@@ -216,7 +220,9 @@
       </fileset>
       <fileset refid="license.notice"/>
     </jar>
-    <jar jarfile="${tomcat-jdbc-test-src.jar}" update="true">
+    <jar jarfile="${tomcat-jdbc-test-src.jar}"
+         update="true"
+         modificationtime="${tstamp.file}">
       <fileset dir="${basedir}/src/test/java">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
