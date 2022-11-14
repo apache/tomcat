@@ -26,6 +26,7 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.util.Locale;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -249,7 +250,7 @@ public final class MessageBytes implements Cloneable, Serializable {
             return;
         }
 
-        if (getCharset() == ByteChunk.DEFAULT_CHARSET) {
+        if (!JreCompat.isJre16Available() && getCharset() == ByteChunk.DEFAULT_CHARSET) {
             if (type == T_CHARS) {
                 toBytesSimple(charC.getChars(), charC.getStart(), charC.getLength());
             } else {
