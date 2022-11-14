@@ -175,6 +175,11 @@
         Remove unnecessary code that exposed the <code>asyncTimeout</code> to
         components that never used it. (markt)
       </scode>
+      <fix>
+        Ensure that all <code>MessageBytes</code> conversions to byte arrays are
+        valid for the configured character set and throw an exception if not.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
