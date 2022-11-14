@@ -23,7 +23,10 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
+
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestMessageBytes {
 
@@ -100,6 +103,10 @@ public class TestMessageBytes {
      */
     @Test
     public void testConversionPerformance() {
+
+        // ISO_8859_1 conversion appears to be optimised in Java 16 onwards
+        Assume.assumeFalse(JreCompat.isJre16Available());
+
         long optimized = -1;
         long nonOptimized = -1;
 
@@ -110,7 +117,7 @@ public class TestMessageBytes {
          * once to run the test and once more in case of unexpected CI /GC
          * slowness. The test will exit early if possible.
          *
-         * MeesageBytes only optimises conversion for ISO_8859_1
+         * MessageBytes only optimises conversion for ISO_8859_1
          */
         for (int i = 0; i < 3; i++) {
             optimized = doTestOptimisedConversionPerformance();
