@@ -27,6 +27,7 @@ ADD target/tomcat-stuffed-1.0.jar /deployments/app.jar
 ADD conf /deployments/conf
 ADD webapps /deployments/webapps
 # COPY *.war /deployments/
+RUN chmod 777 /deployments/conf
 RUN chmod 777 /deployments/webapps
 
 WORKDIR /deployments
