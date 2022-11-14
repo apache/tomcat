@@ -367,14 +367,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
 
             // Set Jakarta class converter
             if (getJakartaConverter() != null) {
-                EESpecProfile profile = null;
-                try {
-                    profile = EESpecProfiles.valueOf(getJakartaConverter());
-                } catch (IllegalArgumentException ignored) {
-                    // Use default value
-                    log.warn(sm.getString("webappLoader.unknownProfile", getJakartaConverter()));
-                }
-                classLoader.addTransformer((profile != null) ? new ClassConverter(profile) : new ClassConverter());
+                MigrationUtil.addJakartaEETransformer(classLoader, getJakartaConverter());
             }
 
             // Configure our repositories
@@ -630,5 +623,25 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
         name.append(contextName);
 
         return name.toString();
+    }
+
+
+    /*
+     * Implemented in a sub-class so EESpecProfile and EESpecProfiles are not
+     * loaded unless a profile is configured. Otherwise, tomcat-embed-core.jar
+     * has a runtime dependency on the migration tool whether it is used or not.
+     */
+    private static class MigrationUtil {
+
+        public static void addJakartaEETransformer(WebappClassLoaderBase webappClassLoader, String profileName) {
+            EESpecProfile profile = null;
+            try {
+                profile = EESpecProfiles.valueOf(profileName);
+            } catch (IllegalArgumentException ignored) {
+                // Use default value
+                log.warn(sm.getString("webappLoader.unknownProfile", profileName));
+            }
+            webappClassLoader.addTransformer((profile != null) ? new ClassConverter(profile) : new ClassConverter());
+        }
     }
 }

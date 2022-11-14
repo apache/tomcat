@@ -152,6 +152,11 @@
         <code>HttpServletRequest.getTrailerFields()</code> and with the Servlet
         API provided by the Jakarta EE project. (markt)
       </fix>
+      <fix>
+        Refactor <code>WebappLoader</code> so it only has a runtime dependency
+        on the migration tool for Jakarta EE if configured to use the converter
+        as classes are loaded. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
