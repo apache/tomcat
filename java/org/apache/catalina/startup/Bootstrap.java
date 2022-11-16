@@ -179,7 +179,7 @@ public final class Bootstrap {
                 URL url = uri.toURL();
                 repositories.add(new Repository(repository, RepositoryType.URL));
                 continue;
-            } catch (MalformedURLException | URISyntaxException e) {
+            } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
                 // Ignore
             }
 
