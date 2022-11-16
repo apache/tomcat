@@ -17,7 +17,10 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.regex.Pattern;
 
@@ -102,22 +105,22 @@ public final class UriUtil {
     }
 
 
-    public static URL buildJarUrl(File jarFile) throws MalformedURLException {
+    public static URL buildJarUrl(File jarFile) throws IOException {
         return buildJarUrl(jarFile, null);
     }
 
 
-    public static URL buildJarUrl(File jarFile, String entryPath) throws MalformedURLException {
+    public static URL buildJarUrl(File jarFile, String entryPath) throws IOException {
         return buildJarUrl(jarFile.toURI().toString(), entryPath);
     }
 
 
-    public static URL buildJarUrl(String fileUrlString) throws MalformedURLException {
+    public static URL buildJarUrl(String fileUrlString) throws IOException {
         return buildJarUrl(fileUrlString, null);
     }
 
 
-    public static URL buildJarUrl(String fileUrlString, String entryPath) throws MalformedURLException {
+    public static URL buildJarUrl(String fileUrlString, String entryPath) throws IOException {
         String safeString = makeSafeForJarUrl(fileUrlString);
         StringBuilder sb = new StringBuilder();
         sb.append(safeString);
@@ -125,13 +128,25 @@ public final class UriUtil {
         if (entryPath != null) {
             sb.append(makeSafeForJarUrl(entryPath));
         }
-        return new URL("jar", null, -1, sb.toString());
+        URI uri;
+        try {
+            uri = new URI("jar", sb.toString(), null);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+        return uri.toURL();
     }
 
 
-    public static URL buildJarSafeUrl(File file) throws MalformedURLException {
+    public static URL buildJarSafeUrl(File file) throws IOException {
         String safe = makeSafeForJarUrl(file.toURI().toString());
-        return new URL(safe);
+        URI uri;
+        try {
+            uri = new URI(safe);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+        return uri.toURL();
     }
 
 
@@ -173,9 +188,9 @@ public final class UriUtil {
      *
      * @return The equivalent JAR URL
      *
-     * @throws MalformedURLException If the conversion fails
+     * @throws IOException If the conversion fails
      */
-    public static URL warToJar(URL warUrl) throws MalformedURLException {
+    public static URL warToJar(URL warUrl) throws IOException {
         // Assumes that the spec is absolute and starts war:file:/...
         String file = warUrl.getFile();
         if (file.contains("*/")) {
@@ -185,8 +200,13 @@ public final class UriUtil {
         } else if (PATTERN_CUSTOM != null) {
             file = file.replaceFirst(PATTERN_CUSTOM.pattern(), "!/");
         }
-
-        return new URL("jar", warUrl.getHost(), warUrl.getPort(), file);
+        URI uri;
+        try {
+            uri = new URI("jar", file, null);
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+        return uri.toURL();
     }
 
 
@@ -227,5 +247,40 @@ public final class UriUtil {
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * Replicates the behaviour of {@link URI#resolve(String)} and adds support
+     * for URIs of the form {@code jar:file:/... }.
+     *
+     * @param base      The base URI to resolve against
+     * @param target    The path to resolve
+     *
+     * @return  The resulting URI as per {@link URI#resolve(String)}
+     *
+     * @throws MalformedURLException
+     *              If the base URI cannot be converted to a URL
+     * @throws URISyntaxException
+     *              If the resulting URL cannot be converted to a URI
+     */
+    public static URI resolve(URI base, String target) throws MalformedURLException, URISyntaxException {
+        if (base.getScheme().equals("jar")) {
+            /*
+             * Previously used:
+             * new URL(base.toURL(), target).toURI()
+             * This delegated the work to the jar stream handler which correctly
+             * resolved the target against the base.
+             *
+             * Deprecation of all the URL constructors mean a different approach
+             * is required.
+             */
+            URI fileUri = new URI(base.getSchemeSpecificPart());
+            URI fileUriResolved = fileUri.resolve(target);
+
+            return new URI("jar:" + fileUriResolved.toString());
+        } else {
+            return base.resolve(target);
+        }
     }
 }

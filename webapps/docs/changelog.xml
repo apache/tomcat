@@ -248,6 +248,11 @@
         Update the packaged version of the Apache Tomcat Migration Tool for
         Jakarta EE to 1.0.5. (markt)
       </update>
+      <scode>
+        Refactor code base to replace use of URL constructors. While they are
+        deprecated in Java 20 onwards, the reasons for deprecation are valid for
+        all versions so move away from them now. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
