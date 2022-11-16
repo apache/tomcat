@@ -48,9 +48,10 @@
     {"name":"org.apache.tomcat.util.threads.LocalStrings"}
   ],
   "resources":[
-    {"pattern":".*/mbeans-descriptors.xml$"},
-    {"pattern":".*/*.properties$"},
-    {"pattern":".*/*.dtd$"},
-    {"pattern":".*/*.xsd$"}
+    {"pattern":"^org/apache/tomcat/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^org/apache/catalina/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^org/apache/coyote/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^org/apache/catalina/.*\\.properties$"},
+    {"pattern":"^org/apache/tomcat/.*\\.dtd$"}
   ]
 }
