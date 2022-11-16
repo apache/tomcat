@@ -19,7 +19,6 @@ package org.apache.catalina.webresources;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -250,7 +249,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
-        } catch (MalformedURLException e) {
+        } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
     }

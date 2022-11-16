@@ -18,7 +18,6 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -144,7 +143,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
-        } catch (MalformedURLException e) {
+        } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
     }
