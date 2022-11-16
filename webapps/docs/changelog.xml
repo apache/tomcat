@@ -299,6 +299,11 @@
         deprecated in Java 20 onwards, the reasons for deprecation are valid for
         all versions so move away from them now. (markt)
       </scode>
+      <scode>
+        Refine the Tomcat native image metadata to avoid including unintended
+        non-Tomcat resources. Pull request <pr>569</pr> provided by Sébastien
+        Deleuze. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
