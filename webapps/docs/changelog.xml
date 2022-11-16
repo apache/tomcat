@@ -130,7 +130,7 @@
   <subsection name="Catalina">
     <changelog>
       <add>
-        <bug>66029</bug>: Add a configuration option to allow bloom filters used
+        <bug>66209</bug>: Add a configuration option to allow bloom filters used
         to index JAR files to be retained for the lifetime of the web
         application. Prior to this addition, the indexes were always flushed by
         the periodic calls to <code>WebResourceRoot.gc()</code>. As part of this
