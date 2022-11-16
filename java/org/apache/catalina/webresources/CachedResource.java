@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -459,7 +461,14 @@ public class CachedResource implements WebResource {
             } else {
                 // The stream handler has been inherited by a URL that was
                 // constructed from a cache URL. We need to break that link.
-                URL constructedURL = new URL(u.toExternalForm());
+                URI constructedURI;
+                try {
+                    constructedURI = new URI(u.toExternalForm());
+                } catch (URISyntaxException e) {
+                    // Not ideal but consistent with API
+                    throw new IOException(e);
+                }
+                URL constructedURL = constructedURI.toURL();
                 return constructedURL.openConnection();
             }
         }

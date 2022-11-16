@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -1672,10 +1673,11 @@ public class ContextConfig implements LifecycleListener {
         if (globalWebXml != null) {
             URLConnection uc = null;
             try {
-                URL url = new URL(globalWebXml.getSystemId());
+                URI uri = new URI(globalWebXml.getSystemId());
+                URL url = uri.toURL();
                 uc = url.openConnection();
                 globalTimeStamp = uc.getLastModified();
-            } catch (IOException e) {
+            } catch (IOException | URISyntaxException e) {
                 globalTimeStamp = -1;
             } finally {
                 if (uc != null) {
@@ -1692,10 +1694,11 @@ public class ContextConfig implements LifecycleListener {
         if (hostWebXml != null) {
             URLConnection uc = null;
             try {
-                URL url = new URL(hostWebXml.getSystemId());
+                URI uri = new URI(hostWebXml.getSystemId());
+                URL url = uri.toURL();
                 uc = url.openConnection();
                 hostTimeStamp = uc.getLastModified();
-            } catch (IOException e) {
+            } catch (IOException | URISyntaxException e) {
                 hostTimeStamp = -1;
             } finally {
                 if (uc != null) {
