@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Map;
 
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -118,12 +118,8 @@ public class LocalResolver implements EntityResolver2 {
             if (base == null) {
                 systemUri = new URI(systemId);
             } else {
-                // Can't use URI.resolve() because "jar:..." URLs are not valid
-                // hierarchical URIs so resolve() does not work. new URL()
-                // delegates to the jar: stream handler and it manages to figure
-                // it out.
                 URI baseUri = new URI(base);
-                systemUri = new URL(baseUri.toURL(), systemId).toURI();
+                systemUri = UriUtil.resolve(baseUri, systemId);
             }
             systemUri = systemUri.normalize();
         } catch (URISyntaxException e) {

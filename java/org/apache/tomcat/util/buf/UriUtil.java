@@ -18,6 +18,8 @@ package org.apache.tomcat.util.buf;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.regex.Pattern;
 
@@ -227,5 +229,40 @@ public final class UriUtil {
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * Replicates the behaviour of {@link URI#resolve(String)} and adds support
+     * for URIs of the form {@code jar:file:/... }.
+     *
+     * @param base      The base URI to resolve against
+     * @param target    The path to resolve
+     *
+     * @return  The resulting URI as per {@link URI#resolve(String)}
+     *
+     * @throws MalformedURLException
+     *              If the base URI cannot be converted to a URL
+     * @throws URISyntaxException
+     *              If the resulting URL cannot be converted to a URI
+     */
+    public static URI resolve(URI base, String target) throws MalformedURLException, URISyntaxException {
+        if (base.getScheme().equals("jar")) {
+            /*
+             * Previously used:
+             * new URL(base.toURL(), target).toURI()
+             * This delegated the work to the jar stream handler which correctly
+             * resolved the target against the base.
+             *
+             * Deprecation of all the URL constructors mean a different approach
+             * is required.
+             */
+            URI fileUri = new URI(base.getSchemeSpecificPart());
+            URI fileUriResolved = fileUri.resolve(target);
+
+            return new URI("jar:" + fileUriResolved.toString());
+        } else {
+            return base.resolve(target);
+        }
     }
 }
