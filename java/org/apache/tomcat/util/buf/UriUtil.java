@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -105,22 +104,22 @@ public final class UriUtil {
     }
 
 
-    public static URL buildJarUrl(File jarFile) throws IOException {
+    public static URL buildJarUrl(File jarFile) throws MalformedURLException {
         return buildJarUrl(jarFile, null);
     }
 
 
-    public static URL buildJarUrl(File jarFile, String entryPath) throws IOException {
+    public static URL buildJarUrl(File jarFile, String entryPath) throws MalformedURLException {
         return buildJarUrl(jarFile.toURI().toString(), entryPath);
     }
 
 
-    public static URL buildJarUrl(String fileUrlString) throws IOException {
+    public static URL buildJarUrl(String fileUrlString) throws MalformedURLException {
         return buildJarUrl(fileUrlString, null);
     }
 
 
-    public static URL buildJarUrl(String fileUrlString, String entryPath) throws IOException {
+    public static URL buildJarUrl(String fileUrlString, String entryPath) throws MalformedURLException {
         String safeString = makeSafeForJarUrl(fileUrlString);
         StringBuilder sb = new StringBuilder();
         sb.append(safeString);
@@ -128,25 +127,13 @@ public final class UriUtil {
         if (entryPath != null) {
             sb.append(makeSafeForJarUrl(entryPath));
         }
-        URI uri;
-        try {
-            uri = new URI("jar", sb.toString(), null);
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
-        return uri.toURL();
+        return new URL("jar", null, -1, sb.toString());
     }
 
 
-    public static URL buildJarSafeUrl(File file) throws IOException {
+    public static URL buildJarSafeUrl(File file) throws MalformedURLException {
         String safe = makeSafeForJarUrl(file.toURI().toString());
-        URI uri;
-        try {
-            uri = new URI(safe);
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
-        return uri.toURL();
+        return new URL(safe);
     }
 
 
@@ -188,9 +175,9 @@ public final class UriUtil {
      *
      * @return The equivalent JAR URL
      *
-     * @throws IOException If the conversion fails
+     * @throws MalformedURLException If the conversion fails
      */
-    public static URL warToJar(URL warUrl) throws IOException {
+    public static URL warToJar(URL warUrl) throws MalformedURLException {
         // Assumes that the spec is absolute and starts war:file:/...
         String file = warUrl.getFile();
         if (file.contains("*/")) {
@@ -200,13 +187,8 @@ public final class UriUtil {
         } else if (PATTERN_CUSTOM != null) {
             file = file.replaceFirst(PATTERN_CUSTOM.pattern(), "!/");
         }
-        URI uri;
-        try {
-            uri = new URI("jar", file, null);
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
-        return uri.toURL();
+
+        return new URL("jar", warUrl.getHost(), warUrl.getPort(), file);
     }
 
 
