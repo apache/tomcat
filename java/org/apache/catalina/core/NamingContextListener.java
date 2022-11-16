@@ -21,6 +21,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -852,8 +854,9 @@ public class NamingContextListener
                 URL wsdlURL = null;
 
                 try {
-                    wsdlURL = new URL(service.getWsdlfile());
-                } catch (MalformedURLException e) {
+                    URI wsdlURI = new URI(service.getWsdlfile());
+                    wsdlURL = wsdlURI.toURL();
+                } catch (MalformedURLException | URISyntaxException e) {
                     // Ignore and carry on
                 }
                 if (wsdlURL == null) {
@@ -885,8 +888,9 @@ public class NamingContextListener
                 URL jaxrpcURL = null;
 
                 try {
-                    jaxrpcURL = new URL(service.getJaxrpcmappingfile());
-                } catch (MalformedURLException e) {
+                    URI jaxrpcURI = new URI(service.getJaxrpcmappingfile());
+                    jaxrpcURL = jaxrpcURI.toURL();
+                } catch (MalformedURLException | URISyntaxException e) {
                     // Ignore and carry on
                 }
                 if (jaxrpcURL == null) {
