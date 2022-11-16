@@ -19,6 +19,8 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.AccessController;
@@ -1576,8 +1578,9 @@ public class Response implements HttpServletResponse {
         // Is this a valid absolute URL?
         URL url = null;
         try {
-            url = new URL(location);
-        } catch (MalformedURLException e) {
+            URI uri = new URI(location);
+            url = uri.toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             return false;
         }
 

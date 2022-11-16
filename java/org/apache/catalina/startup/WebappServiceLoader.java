@@ -21,6 +21,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -179,7 +181,14 @@ public class WebappServiceLoader<T> {
                 String base = jarUrl.toExternalForm();
                 URL url;
                 if (base.endsWith("/")) {
-                    url = new URL(base + configFile);
+                    URI uri;
+                    try {
+                        uri = new URI(base + configFile);
+                    } catch (URISyntaxException e) {
+                        // Not ideal but consistent with public API
+                        throw new IOException(e);
+                    }
+                    url = uri.toURL();
                 } else {
                     url = JarFactory.getJarEntryURL(jarUrl, configFile);
                 }

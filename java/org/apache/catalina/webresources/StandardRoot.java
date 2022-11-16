@@ -19,7 +19,7 @@ package org.apache.catalina.webresources;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -825,8 +825,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 }
                 String fileUrl = jarUrl.substring(4, endOfFileUrl);
                 try {
-                    f = new File(new URL(fileUrl).toURI());
-                } catch (MalformedURLException | URISyntaxException e) {
+                    f = new File(new URI(fileUrl));
+                } catch (URISyntaxException e) {
                     throw new IllegalArgumentException(e);
                 }
                 int startOfArchivePath = endOfFileUrl + 2;
