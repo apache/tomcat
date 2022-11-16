@@ -2,11 +2,5 @@
   "bundles":[
     {"name":"javax.el.LocalStrings"},
     {"name":"org.apache.el.Messages"}
-  ],
-  "resources":[
-    {"pattern":".*/mbeans-descriptors.xml$"},
-    {"pattern":".*/*.properties$"},
-    {"pattern":".*/*.dtd$"},
-    {"pattern":".*/*.xsd$"}
   ]
 }
