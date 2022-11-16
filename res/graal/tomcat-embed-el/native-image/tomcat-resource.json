@@ -2,11 +2,5 @@
   "bundles":[
     {"name":"jakarta.el.LocalStrings"},
     {"name":"org.apache.el.LocalStrings"}
-  ],
-  "resources":[
-    {"pattern":".*/mbeans-descriptors.xml$"},
-    {"pattern":".*/*.properties$"},
-    {"pattern":".*/*.dtd$"},
-    {"pattern":".*/*.xsd$"}
   ]
 }
