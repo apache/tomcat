@@ -69,7 +69,7 @@ public class CatalinaProperties {
                     // No '/'. Must be a file name rather than a URL
                     fileName = configUrl;
                 } else {
-                    is = (new URI(configUrl)).toURL().openStream();
+                    is = new URI(configUrl).toURL().openStream();
                 }
             }
         } catch (Throwable t) {
