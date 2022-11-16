@@ -126,7 +126,7 @@ public class JarResourceRoot extends AbstractResource {
     public URL getURL() {
         String url = baseUrl + "!/";
         try {
-            return (new URI(url)).toURL();
+            return new URI(url).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getUrlFail", url), e);
@@ -138,7 +138,7 @@ public class JarResourceRoot extends AbstractResource {
     @Override
     public URL getCodeBase() {
         try {
-            return (new URI(baseUrl)).toURL();
+            return new URI(baseUrl).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("fileResource.getUrlFail", baseUrl), e);

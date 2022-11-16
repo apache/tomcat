@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -388,8 +390,12 @@ public class JspCServletContext implements ServletContext {
         // Strip leading '/'
         path = path.substring(1);
 
-        URL url = new URL(myResourceBaseURL, path);
-        try (InputStream is = url.openStream()) {
+        URL url = null;
+        try {
+            URI uri = new URI(myResourceBaseURL.toExternalForm() + path);
+            url = uri.toURL();
+            try (InputStream is = url.openStream()) {
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             url = null;
@@ -402,9 +408,9 @@ public class JspCServletContext implements ServletContext {
             for (URL jarUrl : resourceJARs) {
                 try (Jar jar = JarFactory.newInstance(jarUrl)) {
                     if (jar.exists(jarPath)) {
-                        return new URL(jar.getURL(jarPath));
+                        return new URI(jar.getURL(jarPath)).toURL();
                     }
-                } catch (IOException ioe) {
+                } catch (IOException | URISyntaxException ioe) {
                     // Ignore
                 }
             }

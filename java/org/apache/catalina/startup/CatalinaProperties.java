@@ -63,7 +63,7 @@ public class CatalinaProperties {
         try {
             String configUrl = System.getProperty("catalina.config");
             if (configUrl != null) {
-                is = (new URI(configUrl)).toURL().openStream();
+                is = new URI(configUrl).toURL().openStream();
             }
         } catch (Throwable t) {
             handleThrowable(t);

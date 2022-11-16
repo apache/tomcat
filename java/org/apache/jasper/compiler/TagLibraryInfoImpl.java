@@ -255,7 +255,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             try {
                 // Can't use RequestUtils.normalize since that package is not
                 // available to Jasper.
-                uri = (new URI(uri)).normalize().toString();
+                uri = new URI(uri).normalize().toString();
                 if (uri.startsWith("../")) {
                     // Trying to go outside context root
                     err.jspError("jsp.error.taglibDirective.uriInvalid", uri);

@@ -302,7 +302,7 @@ public final class ClassLoaderFactory {
         // the URL will be used as is. It is therefore necessary to ensure that
         // the sequence "!/" is not present in a class loader URL.
         String result = urlString.replaceAll("!/", "%21/");
-        return (new URI(result)).toURL();
+        return new URI(result).toURL();
     }
 
 
@@ -310,7 +310,7 @@ public final class ClassLoaderFactory {
         // Could be a directory or a file
         String fileUrlString = file.toURI().toString();
         fileUrlString = fileUrlString.replaceAll("!/", "%21/");
-        return (new URI(fileUrlString)).toURL();
+        return new URI(fileUrlString).toURL();
     }
 
 

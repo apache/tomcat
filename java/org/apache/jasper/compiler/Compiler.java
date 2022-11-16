@@ -23,6 +23,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
@@ -506,12 +507,12 @@ public abstract class Compiler {
                     // Assume we constructed this correctly
                     int entryStart = key.lastIndexOf("!/");
                     String entry = key.substring(entryStart + 2);
-                    try (Jar jar = JarFactory.newInstance(new URL(key.substring(4, entryStart)))) {
+                    try (Jar jar = JarFactory.newInstance(new URI(key.substring(4, entryStart)).toURL())) {
                         includeLastModified = jar.getLastModified(entry);
                     }
                 } else {
                     if (key.startsWith("jar:") || key.startsWith("file:")) {
-                        includeUrl = new URL(key);
+                        includeUrl = new URI(key).toURL();
                     } else {
                         includeUrl = ctxt.getResource(include.getKey());
                     }

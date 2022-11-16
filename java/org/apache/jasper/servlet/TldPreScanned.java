@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.servlet;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 
@@ -43,7 +44,7 @@ public class TldPreScanned extends TldScanner {
                 String fileUrl = str.substring(a + 4, b);
                 String path = str.substring(b + 2);
                 try {
-                    parseTld(new TldResourcePath(new URL(fileUrl), null, path));
+                    parseTld(new TldResourcePath(new URI(fileUrl).toURL(), null, path));
                 } catch (Exception e) {
                     throw new IllegalStateException(e);
                 }
