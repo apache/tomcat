@@ -157,6 +157,11 @@
         on the migration tool for Jakarta EE if configured to use the converter
         as classes are loaded. (markt)
       </fix>
+      <fix>
+        Improve the behavior of the credential handler attribute that is set in
+        the Servlet context so that it actually reflects what is used during
+        authentication. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
