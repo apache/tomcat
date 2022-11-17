@@ -114,6 +114,11 @@
         <code>HttpServletRequest.getTrailerFields()</code> and with the Servlet
         API provided by the Jakarta EE project. (markt)
       </fix>
+      <fix>
+        Improve the behavior of the credential handler attribute that is set in
+        the Servlet context so that it actually reflects what is used during
+        authentication. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
