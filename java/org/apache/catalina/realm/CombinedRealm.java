@@ -260,6 +260,12 @@ public class CombinedRealm extends RealmBase {
                 }
             }
         }
+
+        if (getCredentialHandler() == null) {
+            // Set a credential handler that will ask the nested realms so that it can
+            // be set by the context in the attributes, it won't be used directly
+            super.setCredentialHandler(new CombinedRealmCredentialHandler());
+        }
         super.startInternal();
     }
 
@@ -491,5 +497,34 @@ public class CombinedRealm extends RealmBase {
         // CredentialHandlers. It might be a mis-configuration so warn the user.
         log.warn(sm.getString("combinedRealm.setCredentialHandler"));
         super.setCredentialHandler(credentialHandler);
+    }
+
+    private class CombinedRealmCredentialHandler implements CredentialHandler {
+
+        @Override
+        public boolean matches(String inputCredentials,
+                String storedCredentials) {
+            for (Realm realm : realms) {
+                if (realm.getCredentialHandler().matches(inputCredentials, storedCredentials)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String mutate(String inputCredentials) {
+            if (realms.isEmpty()) {
+                return null;
+            }
+            for (Realm realm : realms) {
+                String mutatedCredentials = realm.getCredentialHandler().mutate(inputCredentials);
+                if (mutatedCredentials != null) {
+                    return mutatedCredentials;
+                }
+            }
+            return null;
+       }
+
     }
 }
