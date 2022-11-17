@@ -5034,23 +5034,26 @@ public class StandardContext extends ContainerBase
                 getLogger();
 
                 Realm realm = getRealmInternal();
-                if(null != realm) {
+                if (null != realm) {
                     if (realm instanceof Lifecycle) {
                         ((Lifecycle) realm).start();
                     }
+                }
 
+                realm = getRealm();
+                if (null != realm) {
                     // Place the CredentialHandler into the ServletContext so
                     // applications can have access to it. Wrap it in a "safe"
                     // handler so application's can't modify it.
                     CredentialHandler safeHandler = new CredentialHandler() {
                         @Override
                         public boolean matches(String inputCredentials, String storedCredentials) {
-                            return getRealmInternal().getCredentialHandler().matches(inputCredentials, storedCredentials);
+                            return getRealm().getCredentialHandler().matches(inputCredentials, storedCredentials);
                         }
 
                         @Override
                         public String mutate(String inputCredentials) {
-                            return getRealmInternal().getCredentialHandler().mutate(inputCredentials);
+                            return getRealm().getCredentialHandler().mutate(inputCredentials);
                         }
                     };
                     context.setAttribute(Globals.CREDENTIAL_HANDLER, safeHandler);
