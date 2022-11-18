@@ -162,6 +162,10 @@
         the Servlet context so that it actually reflects what is used during
         authentication. (remm)
       </fix>
+      <add>
+        Add support for the new attribute for error dispatches
+        <code>jakarta.servlet.error.query_string</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

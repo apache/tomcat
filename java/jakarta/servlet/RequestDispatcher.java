@@ -214,6 +214,14 @@ public interface RequestDispatcher {
     public static final String ERROR_REQUEST_URI = "jakarta.servlet.error.request_uri";
 
     /**
+     * The name of the request attribute under which the query string for request whose processing caused the error is
+     * propagated during an error dispatch
+     *
+     * @since Servlet 6.1
+     */
+    static final String ERROR_QUERY_STRING = "jakarta.servlet.error.query_string";
+
+    /**
      * The name of the request attribute that should be set by the container
      * when custom error-handling servlet or JSP page is invoked. The value of
      * the attribute is of type {@code java.lang.String}. See the chapter
