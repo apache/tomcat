@@ -595,10 +595,9 @@ public class PageContextImpl extends PageContext {
             request.setAttribute(PageContext.EXCEPTION, t);
             request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
                     Integer.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
-            request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
-                    ((HttpServletRequest) request).getRequestURI());
-            request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
-                    config.getServletName());
+            request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI, ((HttpServletRequest) request).getRequestURI());
+            request.setAttribute(RequestDispatcher.ERROR_QUERY_STRING, ((HttpServletRequest) request).getQueryString());
+            request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME, config.getServletName());
             try {
                 forward(errorPageURL);
             } catch (IllegalStateException ise) {
