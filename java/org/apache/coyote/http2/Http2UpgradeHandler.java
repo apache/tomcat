@@ -599,7 +599,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         socketWrapper.getLock().lock();
         try {
             if (state != null) {
+                boolean active = state.isActive();
                 state.sendReset();
+                if (active) {
+                    activeRemoteStreamCount.decrementAndGet();
+                }
             }
             socketWrapper.write(true, rstFrame, 0, rstFrame.length);
             socketWrapper.flush(true);
