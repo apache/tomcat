@@ -352,10 +352,11 @@
     </attribute>
 
     <attribute name="bindOnInit" required="false">
-      <p>Controls when the socket used by the connector is bound. By default it
-      is bound when the connector is initiated and unbound when the connector is
-      destroyed. If set to <code>false</code>, the socket will be bound when the
-      connector is started and unbound when it is stopped.</p>
+      <p>Controls when the socket used by the connector is bound. If set to
+      <code>true</code> it is bound when the connector is initiated and unbound
+      when the connector is destroyed. If set to <code>false</code>, the socket
+      will be bound when the connector is started and unbound when it is
+      stopped. If not specified, the default is <code>true</code>.</p>
     </attribute>
 
     <attribute name="clientCertProvider" required="false">
