@@ -521,13 +521,11 @@ public abstract class PageContext
         }
 
         return new ErrorData(
-            (Throwable)getRequest().getAttribute(
-                    RequestDispatcher.ERROR_EXCEPTION),
+            (Throwable)getRequest().getAttribute(RequestDispatcher.ERROR_EXCEPTION),
             status,
-            (String)getRequest().getAttribute(
-                    RequestDispatcher.ERROR_REQUEST_URI),
-            (String)getRequest().getAttribute(
-                    RequestDispatcher.ERROR_SERVLET_NAME)
+            (String)getRequest().getAttribute(RequestDispatcher.ERROR_REQUEST_URI),
+            (String)getRequest().getAttribute(RequestDispatcher.ERROR_SERVLET_NAME),
+            (String)getRequest().getAttribute(RequestDispatcher.ERROR_QUERY_STRING)
             );
     }
 

@@ -219,6 +219,12 @@
         <bug>66325</bug>: Fix concurrency issue in evaluation of expression
         language containing lambda expressions. (markt)
       </fix>
+      <add>
+        Update the <code>ErrorData</code> class in the JSP API to align with the
+        recent changes in the Jakarta Pages specification to support the new
+        error dispatch attribute
+        <code>jakarta.servlet.error.query_string</code>.
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
