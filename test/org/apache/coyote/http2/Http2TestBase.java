@@ -127,6 +127,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void validateHttp2InitialResponse() throws Exception {
+        validateHttp2InitialResponse(200);
+    }
+
+    protected void validateHttp2InitialResponse(long maxConcurrentStreams) throws Exception {
+
         // - 101 response acts as acknowledgement of the HTTP2-Settings header
         // Need to read 5 frames
         // - settings (server settings - must be first)
@@ -140,7 +145,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         parser.readFrame();
         parser.readFrame();
 
-        Assert.assertEquals("0-Settings-[3]-[200]\n" +
+        Assert.assertEquals("0-Settings-[3]-[" + maxConcurrentStreams + "]\n" +
                 "0-Settings-End\n" +
                 "0-Settings-Ack\n" +
                 "0-Ping-[0,0,0,0,0,0,0,1]\n" +
@@ -576,15 +581,20 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
     protected void enableHttp2(long maxConcurrentStreams, boolean tls) {
+        enableHttp2(maxConcurrentStreams, tls, 10000, 10000, 25000, 5000, 5000);
+    }
+
+    protected void enableHttp2(long maxConcurrentStreams, boolean tls, long readTimeout, long writeTimeout,
+            long keepAliveTimeout, long streamReadTimout, long streamWriteTimeout) {
         Tomcat tomcat = getTomcatInstance();
         Connector connector = tomcat.getConnector();
         http2Protocol = new UpgradableHttp2Protocol();
         // Short timeouts for now. May need to increase these for CI systems.
-        http2Protocol.setReadTimeout(10000);
-        http2Protocol.setWriteTimeout(10000);
-        http2Protocol.setKeepAliveTimeout(25000);
-        http2Protocol.setStreamReadTimeout(5000);
-        http2Protocol.setStreamWriteTimeout(5000);
+        http2Protocol.setReadTimeout(readTimeout);
+        http2Protocol.setWriteTimeout(writeTimeout);
+        http2Protocol.setKeepAliveTimeout(keepAliveTimeout);
+        http2Protocol.setStreamReadTimeout(streamReadTimout);
+        http2Protocol.setStreamWriteTimeout(streamWriteTimeout);
         http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
         connector.addUpgradeProtocol(http2Protocol);
         if (tls) {

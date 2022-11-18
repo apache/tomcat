@@ -186,4 +186,55 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
                     , output.getTrace());
         }
     }
+
+
+    @Test
+    public void testActiveConnectionCountAndClientTimeout() throws Exception {
+
+        enableHttp2(2, false, 10000, 10000, 4000, 2000, 2000);
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = tomcat.addContext("", null);
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse(2);
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataFramePayload = ByteBuffer.allocate(128);
+
+        // Should be able to make more than 2 requests even if they timeout
+        // since they should be removed from active connections once they
+        // timeout
+        for (int stream = 3; stream < 8; stream += 2) {
+            // Don't write the body. Allow the read to timeout.
+            buildPostRequest(frameHeader, headersPayload, false, dataFrameHeader, dataFramePayload, null, stream);
+            writeFrame(frameHeader, headersPayload);
+
+            // 500 response (triggered by IOException trying to read body that never arrived)
+            parser.readFrame();
+            Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                    stream + "-HeadersStart\n" +
+                    stream + "-Header-[:status]-[500]\n"));
+            output.clearTrace();
+
+            // reset frame
+            parser.readFrame();
+            Assert.assertEquals(stream + "-RST-[11]\n", output.getTrace());
+            output.clearTrace();
+
+            // Prepare buffers for re-use
+            headersPayload.clear();
+            dataFramePayload.clear();
+        }
+    }
 }
