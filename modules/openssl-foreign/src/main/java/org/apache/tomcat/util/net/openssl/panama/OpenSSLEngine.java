@@ -1809,11 +1809,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         private EngineState(MemorySegment ssl, MemorySegment networkBIO,
                 int certificateVerificationDepth, boolean noOcspCheck) {
             states.put(Long.valueOf(ssl.address()), this);
-            // Allocate another session to avoid keeping a reference through segments
-            this.ssl = MemorySegment.ofAddress(ssl.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
-            this.networkBIO = MemorySegment.ofAddress(networkBIO.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
             this.certificateVerificationDepth = certificateVerificationDepth;
             this.noOcspCheck = noOcspCheck;
+            // Allocate another session to avoid keeping a reference through segments
+            // This also allows making further accesses to the main pointers safer
+            this.ssl = MemorySegment.ofAddress(ssl.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
+            this.networkBIO = MemorySegment.ofAddress(networkBIO.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
         }
 
         @Override

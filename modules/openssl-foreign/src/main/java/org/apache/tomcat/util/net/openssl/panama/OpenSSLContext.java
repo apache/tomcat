@@ -24,6 +24,7 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.MemorySession;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
@@ -174,6 +175,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     private final ContextState state;
+    private final MemorySession contextMemorySession;
     private final Cleanable cleanable;
 
     private static String[] getCiphers(MemorySegment sslCtx) {
@@ -205,7 +207,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
-        Arena contextMemorySession = Arena.openShared();
+        contextMemorySession = MemorySession.implicit();
 
         MemorySegment sslCtx = MemorySegment.NULL;
         MemorySegment confCtx = MemorySegment.NULL;
@@ -329,7 +331,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Set int pem_password_cb(char *buf, int size, int rwflag, void *u) callback
             openSSLCallbackPassword =
                     Linker.nativeLinker().upcallStub(openSSLCallbackPasswordHandle,
-                    openSSLCallbackPasswordFunctionDescriptor, contextMemorySession.session());
+                    openSSLCallbackPasswordFunctionDescriptor, contextMemorySession);
             SSL_CTX_set_default_passwd_cb(sslCtx, openSSLCallbackPassword);
 
             alpn = (negotiableProtocols != null && negotiableProtocols.size() > 0);
@@ -345,7 +347,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         } catch(Exception e) {
             throw new SSLException(sm.getString("openssl.errorSSLCtxInit"), e);
         } finally {
-            state = new ContextState(contextMemorySession, sslCtx, confCtx, negotiableProtocolsBytes);
+            state = new ContextState(sslCtx, confCtx, negotiableProtocolsBytes);
             /*
              * When an SSLHostConfig is replaced at runtime, it is not possible to
              * call destroy() on the associated OpenSSLContext since it is likely
@@ -608,7 +610,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             var openSSLCallbackVerify =
                     Linker.nativeLinker().upcallStub(openSSLCallbackVerifyHandle,
-                    openSSLCallbackVerifyFunctionDescriptor, state.contextMemorySession.session());
+                    openSSLCallbackVerifyFunctionDescriptor, contextMemorySession);
             // Leave this just in case but in Tomcat this is always set again by the engine
             SSL_CTX_set_verify(state.sslCtx, value, openSSLCallbackVerify);
 
@@ -618,7 +620,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 state.x509TrustManager = chooseTrustManager(tms);
                 var openSSLCallbackCertVerify =
                         Linker.nativeLinker().upcallStub(openSSLCallbackCertVerifyHandle,
-                                openSSLCallbackCertVerifyFunctionDescriptor, state.contextMemorySession.session());
+                                openSSLCallbackCertVerifyFunctionDescriptor, contextMemorySession);
                 SSL_CTX_set_cert_verify_callback(state.sslCtx, openSSLCallbackCertVerify, state.sslCtx);
 
                 // Pass along the DER encoded certificates of the accepted client
@@ -676,7 +678,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //        MemoryAddress in, int inlen, MemoryAddress arg
                 var openSSLCallbackAlpnSelectProto =
                         Linker.nativeLinker().upcallStub(openSSLCallbackAlpnSelectProtoHandle,
-                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, state.contextMemorySession.session());
+                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, contextMemorySession);
                 SSL_CTX_set_alpn_select_cb(state.sslCtx, openSSLCallbackAlpnSelectProto, state.sslCtx);
             }
 
@@ -1137,7 +1139,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             // Set callback for DH parameters
             var openSSLCallbackTmpDH = Linker.nativeLinker().upcallStub(openSSLCallbackTmpDHHandle,
-                    openSSLCallbackTmpDHFunctionDescriptor, state.contextMemorySession.session());
+                    openSSLCallbackTmpDHFunctionDescriptor, contextMemorySession);
             SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
             // Set certificate chain file
             if (certificate.getCertificateChainFile() != null) {
@@ -1225,7 +1227,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             // Set callback for DH parameters
             var openSSLCallbackTmpDH = Linker.nativeLinker().upcallStub(openSSLCallbackTmpDHHandle,
-                    openSSLCallbackTmpDHFunctionDescriptor, state.contextMemorySession.session());
+                    openSSLCallbackTmpDHFunctionDescriptor, contextMemorySession);
             SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
             for (int i = 1; i < chain.length; i++) {
                 //SSLContext.addChainCertificateRaw(state.ctx, chain[i].getEncoded());
@@ -1370,7 +1372,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static class ContextState implements Runnable {
 
-        private final Arena contextMemorySession;
         private final Arena stateSession = Arena.openShared();
         private final MemorySegment sslCtx;
         private final MemorySegment confCtx;
@@ -1378,18 +1379,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         private X509TrustManager x509TrustManager = null;
 
-        private ContextState(Arena contextMemorySession, MemorySegment sslCtx,
-                MemorySegment confCtx, List<byte[]> negotiableProtocols) {
+        private ContextState(MemorySegment sslCtx, MemorySegment confCtx, List<byte[]> negotiableProtocols) {
             states.put(Long.valueOf(sslCtx.address()), this);
-            this.contextMemorySession = contextMemorySession;
+            this.negotiableProtocols = negotiableProtocols;
             // Allocate another session to avoid keeping a reference through segments
+            // This also allows making further accesses to the main pointers safer
             this.sslCtx = MemorySegment.ofAddress(sslCtx.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
             if (!MemorySegment.NULL.equals(confCtx)) {
                 this.confCtx = MemorySegment.ofAddress(confCtx.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
             } else {
                 this.confCtx = null;
             }
-            this.negotiableProtocols = negotiableProtocols;
         }
 
         @Override
@@ -1402,7 +1402,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             } finally {
                 stateSession.close();
-                contextMemorySession.close();
             }
         }
     }
