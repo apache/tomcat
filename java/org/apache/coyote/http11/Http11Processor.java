@@ -283,11 +283,11 @@ public class Http11Processor extends AbstractProcessor {
                 // parse headers.
                 prepareRequestProtocol();
 
-                //if (protocol.isPaused()) {
-                //    // 503 - Service unavailable
-                //    response.setStatus(503);
-                //    setErrorState(ErrorState.CLOSE_CLEAN, null);
-                //} else {
+                if (protocol.isPaused()) {
+                    // 503 - Service unavailable
+                    response.setStatus(503);
+                    setErrorState(ErrorState.CLOSE_CLEAN, null);
+                } else {
                     keptAlive = true;
                     // Set this every time in case limit has been changed via JMX
                     request.getMimeHeaders().setLimit(protocol.getMaxHeaderCount());
@@ -302,7 +302,7 @@ public class Http11Processor extends AbstractProcessor {
                     if (!protocol.getDisableUploadTimeout()) {
                         socketWrapper.setReadTimeout(protocol.getConnectionUploadTimeout());
                     }
-                //}
+                }
             } catch (IOException e) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.header.parse"), e);
