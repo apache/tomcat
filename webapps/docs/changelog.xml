@@ -115,6 +115,10 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>66175</bug>: Change the default character set used by the
+        <code>BasicAuthenticator</code> from ISO-8859-1 to UTF-8. (markt)
+      </fix>
       <add>
         <bug>66209</bug>: Add a configuration option to allow bloom filters used
         to index JAR files to be retained for the lifetime of the web
