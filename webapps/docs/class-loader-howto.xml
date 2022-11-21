@@ -130,36 +130,51 @@ loaders as it is initialized:</p>
     </ul>
     <p>By default, this includes the following:</p>
     <ul>
-    <li><em>annotations-api.jar</em> &#8212; JavaEE annotations classes.</li>
+    <li><em>annotations-api.jar</em> &#8212; Common Annotations 1.2 classes.
+        </li>
     <li><em>catalina.jar</em> &#8212; Implementation of the Catalina servlet
         container portion of Tomcat.</li>
-    <li><em>catalina-ant.jar</em> &#8212; Tomcat Catalina Ant tasks.</li>
-    <li><em>catalina-ha.jar</em> &#8212; High availability package.</li>
-    <li><em>catalina-storeconfig.jar</em> &#8212; Generation of XML
-        configuration files from current state</li>
-    <li><em>catalina-tribes.jar</em> &#8212; Group communication package.</li>
-    <li><em>ecj-*.jar</em> &#8212; Eclipse JDT Java compiler.</li>
-    <li><em>el-api.jar</em> &#8212; EL 3.0 API.</li>
-    <li><em>jasper.jar</em> &#8212; Tomcat Jasper JSP Compiler and Runtime.</li>
-    <li><em>jasper-el.jar</em> &#8212; Tomcat Jasper EL implementation.</li>
-    <li><em>jsp-api.jar</em> &#8212; JSP 2.3 API.</li>
-    <li><em>servlet-api.jar</em> &#8212; Servlet 3.1 API.</li>
-    <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.</li>
-    <li><em>tomcat-coyote.jar</em> &#8212; Tomcat connectors and utility classes.</li>
-    <li><em>tomcat-dbcp.jar</em> &#8212; Database connection pool
+    <li><em>catalina-ant.jar</em> &#8212; Optional. Tomcat Catalina Ant tasks
+        for working with the Manager web application.</li>
+    <li><em>catalina-ha.jar</em> &#8212; Optional. High availability package
+        that provides session clustering functionality built on Tribes.</li>
+    <li><em>catalina-storeconfig.jar</em> &#8212; Optional. Generation of XML
+        configuration files from current state.</li>
+    <li><em>catalina-tribes.jar</em> &#8212; Optional. Group communication
+        package used by the high availabaility package.</li>
+    <li><em>ecj-*.jar</em> &#8212; Optional. Eclipse JDT Java compiler used to
+        compile JSPs to Servlets.</li>
+    <li><em>el-api.jar</em> &#8212; Optional. EL 3.0 API.</li>
+    <li><em>jasper.jar</em> &#8212; Optional. Tomcat Jasper JSP Compiler and
+        Runtime.</li>
+    <li><em>jasper-el.jar</em> &#8212; Optional. Tomcat EL implementation.</li>
+    <li><em>jaspic-api.jar</em> &#8212; JASPIC 1.1 API.</li>
+    <li><em>jsp-api.jar</em> &#8212; Optional. JSP 2.3 API.</li>
+    <li><em>servlet-api.jar</em> &#8212; Java Servlet 3.1 API.</li>
+    <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.
+        </li>
+    <li><em>tomcat-coyote.jar</em> &#8212; Tomcat connectors and utility
+        classes.</li>
+    <li><em>tomcat-dbcp.jar</em> &#8212; Optional. Database connection pool
         implementation based on package-renamed copy of Apache Commons Pool 2
         and Apache Commons DBCP 2.</li>
-    <li><em>tomcat-i18n-**.jar</em> &#8212; Optional JARs containing resource bundles
-        for other languages. As default bundles are also included in each
-        individual JAR, they can be safely removed if no internationalization
-        of messages is needed.</li>
-    <li><em>tomcat-jdbc.jar</em> &#8212; An alternative database connection pool
-        implementation, known as Tomcat JDBC pool. See
+    <li><em>tomcat-i18n-**.jar</em> &#8212; Optional JARs containing resource
+        bundles for other languages. As default bundles are also included in
+        each individual JAR, they can be safely removed if no
+        internationalization of messages is needed.</li>
+    <li><em>tomcat-jdbc.jar</em> &#8212; Optional. An alternative database
+        connection pool implementation, known as Tomcat JDBC pool. See
         <a href="jdbc-pool.html">documentation</a> for more details.</li>
-    <li><em>tomcat-util.jar</em> &#8212; Common classes used by various components of
-        Apache Tomcat.</li>
-    <li><em>tomcat-websocket.jar</em> &#8212; WebSocket 1.1 implementation</li>
-    <li><em>websocket-api.jar</em> &#8212; WebSocket 1.1 API</li>
+    <li><em>tomcat-jni.jar</em> &#8212; Provides the integration with the Tomcat
+        Native library.</li>
+    <li><em>tomcat-util.jar</em> &#8212; Common classes used by various
+        components of Apache Tomcat.</li>
+    <li><em>tomcat-util-scan.jar</em> &#8212; Provides the class scanning
+        functionality used by Tomcat.</li>
+    <li><em>tomcat-websocket.jar</em> &#8212; Optional. Java WebSocket 1.1
+        implementation</li>
+    <li><em>websocket-api.jar</em> &#8212; Optional. Java WebSocket 1.1 API
+        </li>
     </ul></li>
 <li><p><strong>WebappX</strong> &#8212; A class loader is created for each web
     application that is deployed in a single Tomcat instance.  All unpacked
