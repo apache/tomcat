@@ -112,6 +112,11 @@
         the Servlet context so that it actually reflects what is used during
         authentication. (remm)
       </fix>
+      <fix>
+        <bug>66359</bug>: Update javadoc for RemoteIpValve and RemoteIpFilter with
+        correct <code>protocolHeader</code> default value of "X-Forwarded-Proto".
+        (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

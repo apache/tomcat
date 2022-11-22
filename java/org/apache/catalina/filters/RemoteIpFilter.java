@@ -80,7 +80,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>otherwise, the ip/host is declared to be the remote ip and looping is stopped.</li>
  * </ul>
  * </li>
- * <li>If the request http header named <code>$protocolHeader</code> (e.g. <code>x-forwarded-proto</code>) consists only of forwards that match
+ * <li>If the request http header named <code>$protocolHeader</code> (default value <code>X-Forwarded-Proto</code>) consists only of forwards that match
  * <code>protocolHeaderHttpsValue</code> configuration parameter (default <code>https</code>) then <code>request.isSecure = true</code>,
  * <code>request.scheme = https</code> and <code>request.serverPort = 443</code>. Note that 443 can be overwritten with the
  * <code>$httpsServerPort</code> configuration parameter.</li>
@@ -144,7 +144,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <td>Name of the http header read by this servlet filter that holds the flag that this request</td>
  * <td>N/A</td>
  * <td>Compliant http header name like <code>X-Forwarded-Proto</code>, <code>X-Forwarded-Ssl</code> or <code>Front-End-Https</code></td>
- * <td><code>null</code></td>
+ * <td><code>X-Forwarded-Proto</code></td>
  * </tr>
  * <tr>
  * <td>protocolHeaderHttpsValue</td>
@@ -1226,7 +1226,7 @@ public class RemoteIpFilter implements Filter {
      * request.secure will not be modified.
      * </p>
      * <p>
-     * Default value : <code>null</code>
+     * Default value : <code>X-Forwarded-Proto</code>
      * </p>
      * @param protocolHeader The header name
      */
