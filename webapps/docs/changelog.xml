@@ -175,6 +175,10 @@
         Add support for the new attribute for error dispatches
         <code>jakarta.servlet.error.query_string</code>. (markt)
       </add>
+      <update>
+        Update <code>ignoreAnnotation</code> attribute on <code>Context</code>
+        to dissociate it from <code>metadata-complete</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

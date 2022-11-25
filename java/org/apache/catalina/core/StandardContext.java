@@ -400,6 +400,12 @@ public class StandardContext extends ContainerBase
 
 
     /**
+     * Ignore annotations.
+     */
+    private boolean metadataComplete = false;
+
+
+    /**
      * The Loader implementation with which this Container is associated.
      */
     private Loader loader = null;
@@ -2017,6 +2023,21 @@ public class StandardContext extends ContainerBase
         this.ignoreAnnotations = ignoreAnnotations;
         support.firePropertyChange("ignoreAnnotations", oldIgnoreAnnotations,
                 this.ignoreAnnotations);
+    }
+
+
+    @Override
+    public boolean getMetadataComplete() {
+        return this.metadataComplete;
+    }
+
+
+    @Override
+    public void setMetadataComplete(boolean metadataComplete) {
+        boolean oldMetadataComplete = this.metadataComplete;
+        this.metadataComplete = metadataComplete;
+        support.firePropertyChange("metadataComplete", oldMetadataComplete,
+                this.metadataComplete);
     }
 
 

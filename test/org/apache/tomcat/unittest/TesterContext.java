@@ -1305,4 +1305,10 @@ public class TesterContext implements Context {
     public boolean getParallelAnnotationScanning() { return false; }
     @Override
     public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
+
+    @Override
+    public boolean getMetadataComplete() { return false; }
+    @Override
+    public void setMetadataComplete(boolean metadataComplete) { /* NO-OP */ }
+
 }

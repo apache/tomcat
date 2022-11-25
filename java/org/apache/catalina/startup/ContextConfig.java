@@ -1473,7 +1473,7 @@ public class ContextConfig implements LifecycleListener {
 
         // messageDestinations were ignored in Tomcat 6, so ignore here
 
-        context.setIgnoreAnnotations(webxml.isMetadataComplete());
+        context.setMetadataComplete(webxml.isMetadataComplete());
         for (Entry<String, String> entry :
                 webxml.getMimeMappings().entrySet()) {
             context.addMimeMapping(entry.getKey(), entry.getValue());

@@ -426,6 +426,13 @@
         used.</p>
       </attribute>
 
+      <attribute name="ignoreAnnotations" required="false">
+        <p>Set to <code>true</code> to have Tomcat ignore all annotations
+        present on classes.</p>
+        <p>If not specified, the default value of <code>false</code> is
+        used.</p>
+      </attribute>
+
       <attribute name="logEffectiveWebXml" required="false">
         <p>Set to <code>true</code> if you want the effective web.xml used for a
         web application to be logged (at INFO level) when the application

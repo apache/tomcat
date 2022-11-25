@@ -79,7 +79,7 @@
         <TransientAttribute>effectiveMajorVersion</TransientAttribute>
         <TransientAttribute>effectiveMinorVersion</TransientAttribute>
         <TransientAttribute>webappVersion</TransientAttribute>
-        <TransientAttribute>ignoreAnnotations</TransientAttribute>
+        <TransientAttribute>metadataComplete</TransientAttribute>
      </Description>
      <Description
         id="org.apache.catalina.deploy.NamingResourcesImpl.[GlobalNamingResources]"

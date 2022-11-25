@@ -441,6 +441,26 @@ public interface Context extends Container, ContextBind {
 
 
     /**
+     * Determine if the matadata of the application is complete. This typically
+     * means annotations which add to the application metadata will be
+     * ignored.
+     *
+     * @return {@code true} if metadata is complete for this web
+     *         application
+     */
+    public boolean getMetadataComplete();
+
+
+    /**
+     * Set the boolean on the metadata complete flag for this web
+     * application.
+     *
+     * @param metadataComplete The boolean on the metadata complete flag
+     */
+    public void setMetadataComplete(boolean metadataComplete);
+
+
+    /**
      * @return the login configuration descriptor for this web application.
      */
     public LoginConfig getLoginConfig();
