@@ -192,7 +192,7 @@ public class SmapStratum {
             LineInfo li = (LineInfo)lineData.get(i);
             System.out.print(li.toString());
         }
-*/
+ */
         //Incorporate each LineInfo into the previous LineInfo's
         //outputLineIncrement, if possible
         int i = 0;

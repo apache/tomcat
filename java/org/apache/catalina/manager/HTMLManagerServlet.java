@@ -53,26 +53,26 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
 /**
-* Servlet that enables remote management of the web applications deployed
-* within the same virtual host as this web application is.  Normally, this
-* functionality will be protected by a security constraint in the web
-* application deployment descriptor.  However, this requirement can be
-* relaxed during testing.
-* <p>
-* The difference between the <code>ManagerServlet</code> and this
-* Servlet is that this Servlet prints out a HTML interface which
-* makes it easier to administrate.
-* <p>
-* However if you use a software that parses the output of
-* <code>ManagerServlet</code> you won't be able to upgrade
-* to this Servlet since the output are not in the
-* same format ar from <code>ManagerServlet</code>
-*
-* @author Bip Thelin
-* @author Malcolm Edgar
-* @author Glenn L. Nielsen
-* @see ManagerServlet
-*/
+ * Servlet that enables remote management of the web applications deployed
+ * within the same virtual host as this web application is.  Normally, this
+ * functionality will be protected by a security constraint in the web
+ * application deployment descriptor.  However, this requirement can be
+ * relaxed during testing.
+ * <p>
+ * The difference between the <code>ManagerServlet</code> and this
+ * Servlet is that this Servlet prints out a HTML interface which
+ * makes it easier to administrate.
+ * <p>
+ * However if you use a software that parses the output of
+ * <code>ManagerServlet</code> you won't be able to upgrade
+ * to this Servlet since the output are not in the
+ * same format ar from <code>ManagerServlet</code>
+ *
+ * @author Bip Thelin
+ * @author Malcolm Edgar
+ * @author Glenn L. Nielsen
+ * @see ManagerServlet
+ */
 public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final long serialVersionUID = 1L;

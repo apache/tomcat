@@ -49,7 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
      the methods ( before 1.1 final )
    - is the security enough to prevent Registry being used to avoid the
      permission checks in the mbean server ?
-*/
+ */
 
 /**
  * Registry for modeler MBeans.

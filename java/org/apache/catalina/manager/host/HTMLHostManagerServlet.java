@@ -36,26 +36,26 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
 /**
-* Servlet that enables remote management of the virtual hosts deployed
-* on the server.  Normally, this functionality will be protected by a security
-* constraint in the web application deployment descriptor.  However,
-* this requirement can be relaxed during testing.
-* <p>
-* The difference between the <code>HostManagerServlet</code> and this
-* Servlet is that this Servlet prints out an HTML interface which
-* makes it easier to administrate.
-* <p>
-* However if you use a software that parses the output of
-* <code>HostManagerServlet</code> you won't be able to upgrade
-* to this Servlet since the output are not in the
-* same format as from <code>HostManagerServlet</code>
-*
-* @author Bip Thelin
-* @author Malcolm Edgar
-* @author Glenn L. Nielsen
-* @author Peter Rossbach
-* @see org.apache.catalina.manager.ManagerServlet
-*/
+ * Servlet that enables remote management of the virtual hosts deployed
+ * on the server.  Normally, this functionality will be protected by a security
+ * constraint in the web application deployment descriptor.  However,
+ * this requirement can be relaxed during testing.
+ * <p>
+ * The difference between the <code>HostManagerServlet</code> and this
+ * Servlet is that this Servlet prints out an HTML interface which
+ * makes it easier to administrate.
+ * <p>
+ * However if you use a software that parses the output of
+ * <code>HostManagerServlet</code> you won't be able to upgrade
+ * to this Servlet since the output are not in the
+ * same format as from <code>HostManagerServlet</code>
+ *
+ * @author Bip Thelin
+ * @author Malcolm Edgar
+ * @author Glenn L. Nielsen
+ * @author Peter Rossbach
+ * @see org.apache.catalina.manager.ManagerServlet
+ */
 public final class HTMLHostManagerServlet extends HostManagerServlet {
 
     private static final long serialVersionUID = 1L;

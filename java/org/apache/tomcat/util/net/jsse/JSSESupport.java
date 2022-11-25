@@ -46,7 +46,7 @@ import org.apache.tomcat.util.res.StringManager;
    @author Craig R. McClanahan
    Parts cribbed from JSSECertCompat
    Parts cribbed from CertificatesValve
-*/
+ */
 public class JSSESupport implements SSLSupport, SSLSessionManager {
 
     private static final Log log = LogFactory.getLog(JSSESupport.class);
