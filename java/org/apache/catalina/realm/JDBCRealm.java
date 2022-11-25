@@ -31,24 +31,24 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
-*
-* Implementation of <b>Realm</b> that works with any JDBC supported database.
-* See the JDBCRealm.howto for more details on how to set up the database and
-* for configuration options.
-*
-* <p>For a <b>Realm</b> implementation that supports connection pooling and
-* doesn't require synchronisation of <code>authenticate()</code>,
-* <code>getPassword()</code>, <code>roles()</code> and
-* <code>getPrincipal()</code> or the ugly connection logic use the
-* <code>DataSourceRealm</code>.</p>
-*
-* @author Craig R. McClanahan
-* @author Carson McDonald
-* @author Ignacio Ortega
-*
-* @deprecated Will be removed in Tomcat 10 onwards. Use the DataSourceRealm
-*             instead.
-*/
+ *
+ * Implementation of <b>Realm</b> that works with any JDBC supported database.
+ * See the JDBCRealm.howto for more details on how to set up the database and
+ * for configuration options.
+ *
+ * <p>For a <b>Realm</b> implementation that supports connection pooling and
+ * doesn't require synchronisation of <code>authenticate()</code>,
+ * <code>getPassword()</code>, <code>roles()</code> and
+ * <code>getPrincipal()</code> or the ugly connection logic use the
+ * <code>DataSourceRealm</code>.</p>
+ *
+ * @author Craig R. McClanahan
+ * @author Carson McDonald
+ * @author Ignacio Ortega
+ *
+ * @deprecated Will be removed in Tomcat 10 onwards. Use the DataSourceRealm
+ *             instead.
+ */
 @Deprecated
 public class JDBCRealm
     extends RealmBase {

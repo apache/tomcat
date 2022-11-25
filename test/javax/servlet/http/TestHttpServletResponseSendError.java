@@ -291,7 +291,7 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
                     ac.dispatch("/dispatch");
                 }
             }
-*/
+ */
             if (throwException) {
                 throw new SendErrorException();
             } else {

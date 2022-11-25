@@ -32,7 +32,7 @@ import org.apache.tomcat.util.net.SSLUtil;
    Concrete implementation class for JSSE
 
    @author EKR
-*/
+ */
 
 public class JSSEImplementation extends SSLImplementation {
 

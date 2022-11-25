@@ -61,7 +61,7 @@ import org.apache.tomcat.util.res.StringManager;
    - scan "common" values ( length, cookies, etc ) during the parse
    ( addHeader hook )
 
-*/
+ */
 
 
 /**
@@ -424,7 +424,7 @@ public class MimeHeaders {
 
     This is less frequent than add() -
     we want to keep add O(1).
-*/
+ */
 class NamesEnumerator implements Enumeration<String> {
     private int pos;
     private final int size;
@@ -474,7 +474,7 @@ class NamesEnumerator implements Enumeration<String> {
 
 /** Enumerate the values for a (possibly ) multiple
     value element.
-*/
+ */
 class ValuesEnumerator implements Enumeration<String> {
     private int pos;
     private final int size;
