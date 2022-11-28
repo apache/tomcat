@@ -151,6 +151,10 @@
         deprecated in Java 20 onwards, the reasons for deprecation are valid for
         all versions so move away from them now. (markt)
       </scode>
+      <add>
+        Update the internal fork of Apache Commons BCEL to b015e90 (2022-11-28,
+        6.7.0-RC1). (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
