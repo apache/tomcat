@@ -308,6 +308,10 @@
         non-Tomcat resources. Pull request <pr>569</pr> provided by Sébastien
         Deleuze. (markt)
       </scode>
+      <add>
+        Update the internal fork of Apache Commons BCEL to b015e90 (2022-11-28,
+        6.7.0-RC1). (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
