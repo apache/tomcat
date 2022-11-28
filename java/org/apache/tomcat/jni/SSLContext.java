@@ -225,7 +225,7 @@ public final class SSLContext {
      * Point setCertificateFile at a PEM encoded certificate.  If
      * the certificate is encrypted, then you will be prompted for a
      * pass phrase.  Note that a kill -HUP will prompt again. A test
-     * certificate can be generated with `make certificate' under
+     * certificate can be generated with 'make certificate' under
      * built time. Keep in mind that if you've both a RSA and a DSA
      * certificate you can configure both in parallel (to also allow
      * the use of DSA ciphers, etc.)
