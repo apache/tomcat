@@ -165,6 +165,9 @@
         Update the internal fork of Apache Commons BCEL to b015e90 (2022-11-28,
         6.7.0-RC1). (markt)
       </add>
+      <update>
+        Update to Commons Daemon 1.3.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
