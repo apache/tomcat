@@ -68,6 +68,9 @@ src/main/java/org/apache/commons/pool2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
 rel/commons-pool-2.11.1 (2021-08-17)
 
+Note: Changes beyond 2.11.1 require matching changes in DBCP that are not yet
+      (as of 2022-11-29) implemented
+
 DBCP2
 No unused code removed
 Sub-tree
