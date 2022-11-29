@@ -55,7 +55,7 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  * <p>Temporary files, which are created for file items, should be
  * deleted later on.</p>
  *
- * @since FileUpload 1.1
+ * @since 1.1
  */
 public class DiskFileItem
     implements FileItem {
@@ -300,7 +300,7 @@ public class DiskFileItem
             return cachedContent != null ? cachedContent.clone() : new byte[0];
         }
 
-        byte[] fileData = new byte[(int) getSize()];
+        final byte[] fileData = new byte[(int) getSize()];
 
         try (InputStream fis = Files.newInputStream(dfos.getFile().toPath())) {
             IOUtils.readFully(fis, fileData);
@@ -338,14 +338,14 @@ public class DiskFileItem
     @Override
     public String getString() {
         try {
-            byte[] rawData = get();
+            final byte[] rawData = get();
             String charset = getCharSet();
             if (charset == null) {
                 charset = defaultCharset;
             }
             return new String(rawData, charset);
         } catch (final IOException e) {
-            return new String(new byte[0]);
+            return "";
         }
     }
 
@@ -374,7 +374,7 @@ public class DiskFileItem
         if (isInMemory()) {
             try (OutputStream fout = Files.newOutputStream(file.toPath())) {
                 fout.write(get());
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new IOException("Unexpected output data");
             }
         } else {
@@ -415,18 +415,18 @@ public class DiskFileItem
     }
 
     /**
-     * Deletes the underlying storage for a file item, including deleting any
-     * associated temporary disk file. Although this storage will be deleted
-     * automatically when the {@code FileItem} instance is garbage
-     * collected, this method can be used to ensure that this is done at an
-     * earlier time, thus preserving system resources.
+     * Deletes the underlying storage for a file item, including deleting any associated temporary disk file.
+     * This method can be used to ensure that this is done at an earlier time, thus preserving system resources.
      */
     @Override
     public void delete() {
         cachedContent = null;
         final File outputFile = getStoreLocation();
         if (outputFile != null && !isInMemory() && outputFile.exists()) {
-            outputFile.delete();
+            if (!outputFile.delete()) {
+                final String desc = "Cannot delete " + outputFile.toString();
+                throw new IllegalStateException(desc, new IOException(desc));
+            }
         }
     }
 
@@ -436,7 +436,7 @@ public class DiskFileItem
      *
      * @return The name of the form field.
      *
-     * @see #setFieldName(java.lang.String)
+     * @see #setFieldName(String)
      *
      */
     @Override
@@ -530,22 +530,6 @@ public class DiskFileItem
     }
 
     // ------------------------------------------------------ Protected methods
-
-    /**
-     * Removes the file contents from the temporary storage.
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        if (dfos == null || dfos.isInMemory()) {
-            return;
-        }
-        final File outputFile = dfos.getFile();
-
-        if (outputFile != null && outputFile.exists()) {
-            outputFile.delete();
-        }
-        super.finalize();
-    }
 
     /**
      * Creates and returns a {@link java.io.File File} representing a uniquely

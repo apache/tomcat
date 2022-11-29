@@ -367,7 +367,7 @@ public abstract class FileUploadBase {
         if (boundaryStr == null) {
             return null;
         }
-        byte[] boundary;
+        final byte[] boundary;
         boundary = boundaryStr.getBytes(StandardCharsets.ISO_8859_1);
         return boundary;
     }

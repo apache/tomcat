@@ -54,7 +54,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * <p>Temporary files, which are created for file items, should be
  * deleted later on.</p>
  *
- * @since FileUpload 1.1
+ * @since 1.1
  */
 public class DiskFileItemFactory implements FileItemFactory {
 
