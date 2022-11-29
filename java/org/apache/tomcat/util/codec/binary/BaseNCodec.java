@@ -40,7 +40,7 @@ public abstract class BaseNCodec {
     static class Context {
 
         /**
-         * Place holder for the bytes we're dealing with for our based logic.
+         * Placeholder for the bytes we're dealing with for our based logic.
          * Bitwise operations store and extract the encoding or decoding from this variable.
          */
         int ibitWorkArea;
@@ -77,9 +77,6 @@ public abstract class BaseNCodec {
          * variable helps track that.
          */
         int modulus;
-
-        Context() {
-        }
 
         /**
          * Returns a String useful for debugging (especially within a debugger.)
@@ -188,9 +185,7 @@ public abstract class BaseNCodec {
         // Integer.MAX_VALUE length array.
         // The result is that we may have to allocate an array of this size more than once if
         // the capacity must be expanded again.
-        return (minCapacity > MAX_BUFFER_SIZE) ?
-            minCapacity :
-            MAX_BUFFER_SIZE;
+        return Math.max(minCapacity, MAX_BUFFER_SIZE);
     }
 
     /**
@@ -217,7 +212,8 @@ public abstract class BaseNCodec {
         return b;
     }
 
-    protected final byte pad; // instance variable just in case it needs to vary later
+    /** Pad byte. Instance variable just in case it needs to vary later. */
+    protected final byte pad;
 
     /** Number of bytes in each full block of unencoded data, e.g. 4 for Base64 and 5 for Base32 */
     private final int unencodedBlockSize;
@@ -228,7 +224,7 @@ public abstract class BaseNCodec {
     /**
      * Chunksize for encoding. Not used when decoding.
      * A value of zero or less implies no chunking of the encoded data.
-     * Rounded down to nearest multiple of encodedBlockSize.
+     * Rounded down to the nearest multiple of encodedBlockSize.
      */
     protected final int lineLength;
 
@@ -426,7 +422,7 @@ public abstract class BaseNCodec {
      *
      * @param pArray byte[] array which will later be encoded
      *
-     * @return amount of space needed to encoded the supplied array.
+     * @return amount of space needed to encode the supplied array.
      * Returns a long since a max-len array will require &gt; Integer.MAX_VALUE
      */
     public long getEncodedLength(final byte[] pArray) {
