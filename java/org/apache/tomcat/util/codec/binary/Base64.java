@@ -353,7 +353,7 @@ public class Base64 extends BaseNCodec {
      * </p>
      *
      * @param lineLength
-     *            Each line of encoded data will be at most of the given length (rounded down to nearest multiple of
+     *            Each line of encoded data will be at most of the given length (rounded down to the nearest multiple of
      *            4). If lineLength &lt;= 0, then the output will not be divided into lines (chunks). Ignored when
      *            decoding.
      * @since 1.4
@@ -376,7 +376,7 @@ public class Base64 extends BaseNCodec {
      * </p>
      *
      * @param lineLength
-     *            Each line of encoded data will be at most of the given length (rounded down to nearest multiple of
+     *            Each line of encoded data will be at most of the given length (rounded down to the nearest multiple of
      *            4). If lineLength &lt;= 0, then the output will not be divided into lines (chunks). Ignored when
      *            decoding.
      * @param lineSeparator
@@ -403,7 +403,7 @@ public class Base64 extends BaseNCodec {
      * </p>
      *
      * @param lineLength
-     *            Each line of encoded data will be at most of the given length (rounded down to nearest multiple of
+     *            Each line of encoded data will be at most of the given length (rounded down to the nearest multiple of
      *            4). If lineLength &lt;= 0, then the output will not be divided into lines (chunks). Ignored when
      *            decoding.
      * @param lineSeparator
@@ -462,8 +462,8 @@ public class Base64 extends BaseNCodec {
      * https://svn.apache.org/repos/asf/webservices/commons/trunk/modules/util/
      * </p>
      *
-     * @param in
-     *            byte[] array of ascii data to base64 decode.
+     * @param input
+     *            byte[] array of ASCII data to base64 decode.
      * @param inPos
      *            Position to start reading data from.
      * @param inAvail
@@ -472,7 +472,7 @@ public class Base64 extends BaseNCodec {
      *            the context to be used
      */
     @Override
-    void decode(final byte[] in, int inPos, final int inAvail, final Context context) {
+    void decode(final byte[] input, int inPos, final int inAvail, final Context context) {
         if (context.eof) {
             return;
         }
@@ -481,7 +481,7 @@ public class Base64 extends BaseNCodec {
         }
         for (int i = 0; i < inAvail; i++) {
             final byte[] buffer = ensureBufferSize(decodeSize, context);
-            final byte b = in[inPos++];
+            final byte b = input[inPos++];
             if (b == pad) {
                 // We're done.
                 context.eof = true;
@@ -629,7 +629,7 @@ public class Base64 extends BaseNCodec {
      *
      * @param octet
      *            The value to test
-     * @return {@code true} if the value is defined in the the Base64 alphabet {@code false} otherwise.
+     * @return {@code true} if the value is defined in the Base64 alphabet {@code false} otherwise.
      */
     @Override
     protected boolean isInAlphabet(final byte octet) {
