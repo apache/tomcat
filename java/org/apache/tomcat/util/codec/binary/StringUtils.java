@@ -41,10 +41,7 @@ public class StringUtils {
      * @return the encoded bytes
      */
     private static byte[] getBytes(final String string, final Charset charset) {
-        if (string == null) {
-            return null;
-        }
-        return string.getBytes(charset);
+        return string == null ? null : string.getBytes(charset);
     }
 
     /**
