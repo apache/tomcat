@@ -1101,8 +1101,14 @@
     <Bug code="ES"/>
   </Match>
   <Match>
+    <!--  Cast is safe -->
+    <Class name="org.apache.juli.AsyncFileHandler$DropLastPolicy"/>
+    <Method name="rejectedExecution"/>
+    <Bug pattern="BC_UNCONFIRMED_CAST"/>
+  </Match>
+  <Match>
     <!--  Dummy thread -->
-    <Class name="org.apache.juli.AsyncFileHandler$LoggerThread"/>
+    <Class name="org.apache.juli.AsyncFileHandler$LoggerExecutorService"/>
     <Method name="deregisterHandler"/>
     <Bug pattern="DM_USELESS_THREAD"/>
   </Match>
