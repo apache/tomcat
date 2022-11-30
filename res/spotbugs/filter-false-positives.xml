@@ -903,6 +903,12 @@
     <Bug pattern="AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION" />
   </Match>
   <Match>
+    <!-- Method is package private in 9.0.x onwards -->
+    <Class name="org.apache.coyote.AsyncStateMachine" />
+    <Method name="recycle" />
+    <Bug pattern="PS_PUBLIC_SEMAPHORES" />
+  </Match>
+  <Match>
     <!-- readChunk will not be null due to previous call to readBytes() -->
     <Class name="org.apache.coyote.http11.filters.ChunkedInputFilter" />
     <Method name="parseHeader"/>
@@ -1294,6 +1300,11 @@
       <Field name="numActive"/>
     </Or>
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
+    <!-- Public API is a design decision of Commons -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.SoftReferenceObjectPool" />
+    <Bug pattern="PS_PUBLIC_SEMAPHORES" />
   </Match>
   <Match>
     <!-- Return value is ignored but a null result will trigger an exception -->
