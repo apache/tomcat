@@ -81,19 +81,17 @@ execute the <code>ant</code> shell command directly.</p>
 </subsection>
 
 
-<subsection name="CVS">
+<subsection name="Source Code Control">
 
 <p>Besides the required tools described above, you are strongly encouraged
-to download and install a <em>source code control</em> system, such as the
-<strong>Concurrent Version System</strong> (CVS), to maintain historical
-versions of the source files that make up your web application.  Besides
-the server, you will also need appropriate client
-tools to check out source code files, and check in modified versions.</p>
+to download and install a <em>source code control</em> system, such as Git,
+Subversion, CVS or one of the many alternatives. You will need appropriate
+client tools to check out source code files, and check in modified versions and,
+depending on the tool and hosting option you choose, you may need to obtain and
+install server software or sign up for an account with a cloud provider.</p>
 
 <p>Detailed instructions for installing and using source code control
-applications is beyond the scope of this manual.  However, CVS server and
-client tools for many platforms (along with documentation) can be downloaded
-from <a href="http://www.cvshome.org/">http://www.cvshome.org/</a>.</p>
+applications is beyond the scope of this manual.</p>
 
 </subsection>
 

@@ -156,7 +156,8 @@
         <p>A regular expression defining paths to ignore when
         <code>autoDeploy</code> and <code>deployOnStartup</code> are set. This
         allows you to keep your configuration in a version control system, for
-        example, and not deploy a .svn or CVS folder that happens to be in the
+        example, and not deploy a <code>.svn</code>, <code>.git</code> or other
+        configuration control system folder that happens to be in the
         <code>appBase</code>.</p>
         <p>This regular expression is relative to <code>appBase</code>. It is
         also <em>anchored</em>, meaning the match is performed against the
