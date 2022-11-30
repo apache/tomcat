@@ -171,6 +171,10 @@
         Update the internal fork of Apache Commons FileUpload to aa8eff6
         (2022-11-29, 2.0-SNAPSHOT). (markt)
       </update>
+      <add>
+        Improvements to Japanese translations. Contributed by Shirayuking and
+        tak7iji. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
