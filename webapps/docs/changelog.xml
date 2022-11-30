@@ -246,6 +246,11 @@
         <bug>66348</bug>: Update the JARs listed in the class loader
         documentation and note which ones are optional. (markt)
       </fix>
+      <fix>
+        Documentation. Replace references in the application developer's guide
+        to CVS with more general references to a source code control system.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
