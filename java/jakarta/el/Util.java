@@ -43,8 +43,8 @@ class Util {
     private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
-    private static final boolean GET_CLASSLOADER_USE_PRIVILEGED =
-            Boolean.getBoolean("org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED");
+    private static final boolean GET_CLASSLOADER_USE_PRIVILEGED = System.getSecurityManager() == null ? Boolean.getBoolean("org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED") :
+        AccessController.doPrivileged(new PrivilegedGetBoolean("org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED"));
 
     /**
      * Checks whether the supplied Throwable is one that needs to be
@@ -857,6 +857,20 @@ class Util {
         @Override
         public ClassLoader run() {
             return Thread.currentThread().getContextClassLoader();
+        }
+    }
+
+    private static class PrivilegedGetBoolean implements PrivilegedAction<Boolean> {
+
+        private String property;
+
+        public PrivilegedGetBoolean(String prop){
+            property = prop;
+        }
+
+        @Override
+        public Boolean run() {
+            return Boolean.getBoolean(property);
         }
     }
 }
