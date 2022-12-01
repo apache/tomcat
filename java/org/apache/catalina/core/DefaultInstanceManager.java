@@ -104,6 +104,7 @@ public class DefaultInstanceManager implements InstanceManager {
     protected final ClassLoader containerClassLoader;
     protected final boolean privileged;
     protected final boolean ignoreAnnotations;
+    protected final boolean metadataComplete;
     private final Set<String> restrictedClasses;
     private final ManagedConcurrentWeakHashMap<Class<?>, AnnotationCacheEntry[]> annotationCache =
             new ManagedConcurrentWeakHashMap<>();
@@ -118,6 +119,7 @@ public class DefaultInstanceManager implements InstanceManager {
         privileged = catalinaContext.getPrivileged();
         this.containerClassLoader = containerClassLoader;
         ignoreAnnotations = catalinaContext.getIgnoreAnnotations();
+        metadataComplete = catalinaContext.getMetadataComplete();
         Log log = catalinaContext.getLogger();
         Set<String> classNames = new HashSet<>();
         loadProperties(classNames,
@@ -328,45 +330,47 @@ public class DefaultInstanceManager implements InstanceManager {
                                 continue;
                             }
                         }
-                        Resource resourceAnnotation;
-                        Annotation ejbAnnotation;
-                        Annotation webServiceRefAnnotation;
-                        Annotation persistenceContextAnnotation;
-                        Annotation persistenceUnitAnnotation;
-                        if ((resourceAnnotation = method.getAnnotation(Resource.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(
-                                    method.getName(),
-                                    method.getParameterTypes(),
-                                    resourceAnnotation.name(),
-                                    AnnotationCacheEntryType.SETTER));
-                        } else if (EJB_PRESENT &&
-                                (ejbAnnotation = method.getAnnotation(EJB.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(
-                                    method.getName(),
-                                    method.getParameterTypes(),
-                                    ((EJB) ejbAnnotation).name(),
-                                    AnnotationCacheEntryType.SETTER));
-                        } else if (WS_PRESENT && (webServiceRefAnnotation =
-                                method.getAnnotation(WebServiceRef.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(
-                                    method.getName(),
-                                    method.getParameterTypes(),
-                                    ((WebServiceRef) webServiceRefAnnotation).name(),
-                                    AnnotationCacheEntryType.SETTER));
-                        } else if (JPA_PRESENT && (persistenceContextAnnotation =
-                                method.getAnnotation(PersistenceContext.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(
-                                    method.getName(),
-                                    method.getParameterTypes(),
-                                    ((PersistenceContext) persistenceContextAnnotation).name(),
-                                    AnnotationCacheEntryType.SETTER));
-                        } else if (JPA_PRESENT && (persistenceUnitAnnotation =
-                                method.getAnnotation(PersistenceUnit.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(
-                                    method.getName(),
-                                    method.getParameterTypes(),
-                                    ((PersistenceUnit) persistenceUnitAnnotation).name(),
-                                    AnnotationCacheEntryType.SETTER));
+                        if (!metadataComplete) {
+                            Resource resourceAnnotation;
+                            Annotation ejbAnnotation;
+                            Annotation webServiceRefAnnotation;
+                            Annotation persistenceContextAnnotation;
+                            Annotation persistenceUnitAnnotation;
+                            if ((resourceAnnotation = method.getAnnotation(Resource.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(
+                                        method.getName(),
+                                        method.getParameterTypes(),
+                                        resourceAnnotation.name(),
+                                        AnnotationCacheEntryType.SETTER));
+                            } else if (EJB_PRESENT &&
+                                    (ejbAnnotation = method.getAnnotation(EJB.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(
+                                        method.getName(),
+                                        method.getParameterTypes(),
+                                        ((EJB) ejbAnnotation).name(),
+                                        AnnotationCacheEntryType.SETTER));
+                            } else if (WS_PRESENT && (webServiceRefAnnotation =
+                                    method.getAnnotation(WebServiceRef.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(
+                                        method.getName(),
+                                        method.getParameterTypes(),
+                                        ((WebServiceRef) webServiceRefAnnotation).name(),
+                                        AnnotationCacheEntryType.SETTER));
+                            } else if (JPA_PRESENT && (persistenceContextAnnotation =
+                                    method.getAnnotation(PersistenceContext.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(
+                                        method.getName(),
+                                        method.getParameterTypes(),
+                                        ((PersistenceContext) persistenceContextAnnotation).name(),
+                                        AnnotationCacheEntryType.SETTER));
+                            } else if (JPA_PRESENT && (persistenceUnitAnnotation =
+                                    method.getAnnotation(PersistenceUnit.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(
+                                        method.getName(),
+                                        method.getParameterTypes(),
+                                        ((PersistenceUnit) persistenceUnitAnnotation).name(),
+                                        AnnotationCacheEntryType.SETTER));
+                            }
                         }
                     }
 
@@ -410,29 +414,31 @@ public class DefaultInstanceManager implements InstanceManager {
                                     fieldName, null,
                                     injections.get(fieldName),
                                     AnnotationCacheEntryType.FIELD));
-                        } else if ((resourceAnnotation =
-                                field.getAnnotation(Resource.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    resourceAnnotation.name(), AnnotationCacheEntryType.FIELD));
-                        } else if (EJB_PRESENT &&
-                                (ejbAnnotation = field.getAnnotation(EJB.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    ((EJB) ejbAnnotation).name(), AnnotationCacheEntryType.FIELD));
-                        } else if (WS_PRESENT && (webServiceRefAnnotation =
-                                field.getAnnotation(WebServiceRef.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    ((WebServiceRef) webServiceRefAnnotation).name(),
-                                    AnnotationCacheEntryType.FIELD));
-                        } else if (JPA_PRESENT && (persistenceContextAnnotation =
-                                field.getAnnotation(PersistenceContext.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    ((PersistenceContext) persistenceContextAnnotation).name(),
-                                    AnnotationCacheEntryType.FIELD));
-                        } else if (JPA_PRESENT && (persistenceUnitAnnotation =
-                                field.getAnnotation(PersistenceUnit.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    ((PersistenceUnit) persistenceUnitAnnotation).name(),
-                                    AnnotationCacheEntryType.FIELD));
+                        } else if (!metadataComplete) {
+                            if ((resourceAnnotation =
+                                    field.getAnnotation(Resource.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(fieldName, null,
+                                        resourceAnnotation.name(), AnnotationCacheEntryType.FIELD));
+                            } else if (EJB_PRESENT &&
+                                    (ejbAnnotation = field.getAnnotation(EJB.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(fieldName, null,
+                                        ((EJB) ejbAnnotation).name(), AnnotationCacheEntryType.FIELD));
+                            } else if (WS_PRESENT && (webServiceRefAnnotation =
+                                    field.getAnnotation(WebServiceRef.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(fieldName, null,
+                                        ((WebServiceRef) webServiceRefAnnotation).name(),
+                                        AnnotationCacheEntryType.FIELD));
+                            } else if (JPA_PRESENT && (persistenceContextAnnotation =
+                                    field.getAnnotation(PersistenceContext.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(fieldName, null,
+                                        ((PersistenceContext) persistenceContextAnnotation).name(),
+                                        AnnotationCacheEntryType.FIELD));
+                            } else if (JPA_PRESENT && (persistenceUnitAnnotation =
+                                    field.getAnnotation(PersistenceUnit.class)) != null) {
+                                annotations.add(new AnnotationCacheEntry(fieldName, null,
+                                        ((PersistenceUnit) persistenceUnitAnnotation).name(),
+                                        AnnotationCacheEntryType.FIELD));
+                            }
                         }
                     }
                 }
@@ -693,19 +699,19 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
 
-    private static Method findPostConstruct(Method currentPostConstruct,
+    private Method findPostConstruct(Method currentPostConstruct,
             String postConstructFromXml, Method method) {
         return findLifecycleCallback(currentPostConstruct,
             postConstructFromXml, method, PostConstruct.class);
     }
 
-    private static Method findPreDestroy(Method currentPreDestroy,
+    private Method findPreDestroy(Method currentPreDestroy,
         String preDestroyFromXml, Method method) {
         return findLifecycleCallback(currentPreDestroy,
             preDestroyFromXml, method, PreDestroy.class);
     }
 
-    private static Method findLifecycleCallback(Method currentMethod,
+    private Method findLifecycleCallback(Method currentMethod,
             String methodNameFromXml, Method method,
             Class<? extends Annotation> annotation) {
         Method result = currentMethod;
@@ -717,7 +723,7 @@ public class DefaultInstanceManager implements InstanceManager {
                 }
                 result = method;
             }
-        } else {
+        } else if (!metadataComplete) {
             if (method.isAnnotationPresent(annotation)) {
                 if (currentMethod != null || !Introspection.isValidLifecycleCallback(method)) {
                     throw new IllegalArgumentException(

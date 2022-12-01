@@ -64,9 +64,11 @@ public class WebAnnotationSet {
      * @param context The context which will have its annotations processed
      */
     public static void loadApplicationAnnotations(Context context) {
-        loadApplicationListenerAnnotations(context);
-        loadApplicationFilterAnnotations(context);
-        loadApplicationServletAnnotations(context);
+        if (!context.getMetadataComplete()) {
+            loadApplicationListenerAnnotations(context);
+            loadApplicationFilterAnnotations(context);
+            loadApplicationServletAnnotations(context);
+        }
     }
 
 
@@ -137,23 +139,21 @@ public class WebAnnotationSet {
                 loadFieldsAnnotation(context, clazz);
                 loadMethodsAnnotation(context, clazz);
 
-                if (!context.getMetadataComplete()) {
-                    /* Process RunAs annotation which can be only on servlets.
-                     * Ref JSR 250, equivalent to the run-as element in
-                     * the deployment descriptor
-                     */
-                    RunAs runAs = clazz.getAnnotation(RunAs.class);
-                    if (runAs != null) {
-                        wrapper.setRunAs(runAs.value());
-                    }
+                /* Process RunAs annotation which can be only on servlets.
+                 * Ref JSR 250, equivalent to the run-as element in
+                 * the deployment descriptor
+                 */
+                RunAs runAs = clazz.getAnnotation(RunAs.class);
+                if (runAs != null) {
+                    wrapper.setRunAs(runAs.value());
+                }
 
-                    // Process ServletSecurity annotation
-                    ServletSecurity servletSecurity = clazz.getAnnotation(ServletSecurity.class);
-                    if (servletSecurity != null) {
-                        context.addServletSecurity(
-                                new ApplicationServletRegistration(wrapper, context),
-                                new ServletSecurityElement(servletSecurity));
-                    }
+                // Process ServletSecurity annotation
+                ServletSecurity servletSecurity = clazz.getAnnotation(ServletSecurity.class);
+                if (servletSecurity != null) {
+                    context.addServletSecurity(
+                            new ApplicationServletRegistration(wrapper, context),
+                            new ServletSecurityElement(servletSecurity));
                 }
             }
         }
@@ -253,16 +253,15 @@ public class WebAnnotationSet {
             }
         }
         */
-        if (!context.getMetadataComplete()) {
-            /* Process DeclareRoles annotation.
-             * Ref JSR 250, equivalent to the security-role element in
-             * the deployment descriptor
-             */
-            DeclareRoles declareRolesAnnotation = clazz.getAnnotation(DeclareRoles.class);
-            if (declareRolesAnnotation != null && declareRolesAnnotation.value() != null) {
-                for (String role : declareRolesAnnotation.value()) {
-                    context.addSecurityRole(role);
-                }
+
+        /* Process DeclareRoles annotation.
+         * Ref JSR 250, equivalent to the security-role element in
+         * the deployment descriptor
+         */
+        DeclareRoles declareRolesAnnotation = clazz.getAnnotation(DeclareRoles.class);
+        if (declareRolesAnnotation != null && declareRolesAnnotation.value() != null) {
+            for (String role : declareRolesAnnotation.value()) {
+                context.addSecurityRole(role);
             }
         }
     }
