@@ -210,14 +210,17 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
     private void validateCookieValue(String value) {
         int start = 0;
         int end = value.length();
+        boolean quoted = false;
 
         if (end > 1 && value.charAt(0) == '"' && value.charAt(end - 1) == '"') {
-            start = 1;
-            end--;
+            quoted = true;
         }
 
         char[] chars = value.toCharArray();
         for (int i = start; i < end; i++) {
+            if (quoted && (i == start || i == end - 1)) {
+                continue;
+            }
             char c = chars[i];
             if (c < 0x21 || c == 0x22 || c == 0x2c || c == 0x3b || c == 0x5c || c == 0x7f) {
                 throw new IllegalArgumentException(sm.getString(

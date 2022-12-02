@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M2 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Update Cookie parsing and handling to treat the quotes in a quoted
+        cookie value as part of the value as required by RFC 6265 and explicitly
+        clarified in RFC 6265bis. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.0-M1 (markt)" rtext="release in progress">
   <subsection name="General">
