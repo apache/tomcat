@@ -20,9 +20,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 import java.util.Locale;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -246,7 +250,7 @@ public final class MessageBytes implements Cloneable, Serializable {
             return;
         }
 
-        if (getCharset() == ByteChunk.DEFAULT_CHARSET) {
+        if (!JreCompat.isJre16Available() && getCharset() == ByteChunk.DEFAULT_CHARSET) {
             if (type == T_CHARS) {
                 toBytesSimple(charC.getChars(), charC.getStart(), charC.getLength());
             } else {
@@ -258,11 +262,23 @@ public final class MessageBytes implements Cloneable, Serializable {
         }
 
         ByteBuffer bb;
-        if (type == T_CHARS) {
-            bb = getCharset().encode(CharBuffer.wrap(charC));
-        } else {
-            // Must be T_STR
-            bb = getCharset().encode(strValue);
+        CharsetEncoder encoder = getCharset().newEncoder();
+        encoder.onMalformedInput(CodingErrorAction.REPORT);
+        encoder.onUnmappableCharacter(CodingErrorAction.REPORT);
+
+        try {
+            if (type == T_CHARS) {
+                bb = encoder.encode(CharBuffer.wrap(charC));
+            } else {
+                // Must be T_STR
+                bb = encoder.encode(CharBuffer.wrap(strValue));
+            }
+        } catch (CharacterCodingException cce) {
+            // Some calls to this conversion originate in application code and
+            // the Servlet API methods do not declare a suitable exception that
+            // can be thrown. Therefore stick with the uncaught exception type
+            // used by the old, pre-Java 16 optimised version of this code.
+            throw new IllegalArgumentException(cce);
         }
 
         byteC.setBytes(bb.array(), bb.arrayOffset(), bb.limit());

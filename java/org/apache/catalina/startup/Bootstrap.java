@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,8 +158,7 @@ public final class Bootstrap {
     }
 
 
-    private ClassLoader createClassLoader(String name, ClassLoader parent)
-        throws Exception {
+    private ClassLoader createClassLoader(String name, ClassLoader parent) throws Exception {
 
         String value = CatalinaProperties.getProperty(name + ".loader");
         if ((value == null) || (value.equals(""))) {
@@ -173,11 +174,12 @@ public final class Bootstrap {
         for (String repository : repositoryPaths) {
             // Check for a JAR URL repository
             try {
+                URI uri = new URI(repository);
                 @SuppressWarnings("unused")
-                URL url = new URL(repository);
+                URL url = uri.toURL();
                 repositories.add(new Repository(repository, RepositoryType.URL));
                 continue;
-            } catch (MalformedURLException e) {
+            } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
                 // Ignore
             }
 

@@ -31,6 +31,7 @@ public final class ErrorData {
     private final int statusCode;
     private final String uri;
     private final String servletName;
+    private final String queryString;
 
     /**
      * Creates a new ErrorData object.
@@ -43,13 +44,37 @@ public final class ErrorData {
      *            The request URI
      * @param servletName
      *            The name of the servlet invoked
+     *
+     * @deprecated Use {#link {@link ErrorData#ErrorData(Throwable, int, String,
+     *             String, String)}
      */
+    @Deprecated(since = "4.0", forRemoval = true)
     public ErrorData(Throwable throwable, int statusCode, String uri,
             String servletName) {
+        this(throwable, statusCode, uri, servletName, null);
+    }
+
+    /**
+     * Creates a new ErrorData object.
+     *
+     * @param throwable
+     *            The Throwable that is the cause of the error
+     * @param statusCode
+     *            The status code of the error
+     * @param uri
+     *            The request URI
+     * @param servletName
+     *            The name of the servlet invoked
+     * @param queryString
+     *            The request query string
+     */
+    public ErrorData(Throwable throwable, int statusCode, String uri,
+            String servletName, String queryString) {
         this.throwable = throwable;
         this.statusCode = statusCode;
         this.uri = uri;
         this.servletName = servletName;
+        this.queryString = queryString;
     }
 
     /**
@@ -86,5 +111,15 @@ public final class ErrorData {
      */
     public String getServletName() {
         return this.servletName;
+    }
+
+    /**
+     * Returns the request query string or {@code null} if the request had no
+     * query string.
+     *
+     * @return The request query string
+     */
+    public String getQueryString() {
+        return this.queryString;
     }
 }

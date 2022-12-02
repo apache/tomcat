@@ -19,6 +19,8 @@ package org.apache.catalina.startup;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
@@ -288,21 +290,21 @@ public final class ClassLoaderFactory {
      * org.apache.tomcat.util.buf.UriUtil but that class is not visible until
      * after the class loaders have been constructed.
      */
-    private static URL buildClassLoaderUrl(String urlString) throws MalformedURLException {
+    private static URL buildClassLoaderUrl(String urlString) throws MalformedURLException, URISyntaxException {
         // URLs passed to class loaders may point to directories that contain
         // JARs. If these URLs are used to construct URLs for resources in a JAR
         // the URL will be used as is. It is therefore necessary to ensure that
         // the sequence "!/" is not present in a class loader URL.
         String result = urlString.replaceAll("!/", "%21/");
-        return new URL(result);
+        return new URI(result).toURL();
     }
 
 
-    private static URL buildClassLoaderUrl(File file) throws MalformedURLException {
+    private static URL buildClassLoaderUrl(File file) throws MalformedURLException, URISyntaxException {
         // Could be a directory or a file
         String fileUrlString = file.toURI().toString();
         fileUrlString = fileUrlString.replaceAll("!/", "%21/");
-        return new URL(fileUrlString);
+        return new URI(fileUrlString).toURL();
     }
 
 

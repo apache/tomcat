@@ -73,9 +73,13 @@
     {"name":"org.apache.tomcat.websocket.server.LocalStrings"}
   ],
   "resources":[
-    {"pattern":".*/mbeans-descriptors.xml$"},
-    {"pattern":".*/*.properties$"},
-    {"pattern":".*/*.dtd$"},
-    {"pattern":".*/*.xsd$"}
+    {"pattern":"^org/apache/tomcat/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^org/apache/catalina/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^org/apache/coyote/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^org/apache/catalina/.*\\.properties$"},
+    {"pattern":"^jakarta/servlet/resources/.*"},
+    {"pattern":"^org/apache/tomcat/.*\\.dtd$"},
+    {"pattern":"^org/apache/jasper/.*mbeans-descriptors\\.xml$"},
+    {"pattern":"^jakarta/servlet/jsp/resources/.*"}
   ]
 }

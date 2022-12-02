@@ -164,6 +164,9 @@ class StreamStateMachine {
         stateChange(State.IDLE, State.CLOSED_FINAL);
     }
 
+    final synchronized String getCurrentStateName() {
+        return state.name();
+    }
 
     private enum State {
         IDLE               (false, false, false, true,

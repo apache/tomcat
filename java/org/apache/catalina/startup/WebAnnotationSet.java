@@ -64,9 +64,11 @@ public class WebAnnotationSet {
      * @param context The context which will have its annotations processed
      */
     public static void loadApplicationAnnotations(Context context) {
-        loadApplicationListenerAnnotations(context);
-        loadApplicationFilterAnnotations(context);
-        loadApplicationServletAnnotations(context);
+        if (!context.getMetadataComplete()) {
+            loadApplicationListenerAnnotations(context);
+            loadApplicationFilterAnnotations(context);
+            loadApplicationServletAnnotations(context);
+        }
     }
 
 
@@ -251,6 +253,7 @@ public class WebAnnotationSet {
             }
         }
         */
+
         /* Process DeclareRoles annotation.
          * Ref JSR 250, equivalent to the security-role element in
          * the deployment descriptor

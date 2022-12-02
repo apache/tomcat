@@ -20,7 +20,8 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
@@ -132,11 +133,11 @@ public class DeployTask extends AbstractCatalinaCommandTask {
         if (war != null) {
             if (PROTOCOL_PATTERN.matcher(war).lookingAt()) {
                 try {
-                    URL url = new URL(war);
-                    URLConnection conn = url.openConnection();
+                    URI uri = new URI(war);
+                    URLConnection conn = uri.toURL().openConnection();
                     contentLength = conn.getContentLengthLong();
                     stream = new BufferedInputStream(conn.getInputStream(), 1024);
-                } catch (IOException e) {
+                } catch (IOException | URISyntaxException e) {
                     throw new BuildException(e);
                 }
             } else {

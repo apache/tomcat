@@ -16,13 +16,39 @@
  */
 package org.apache.tomcat.util.buf;
 
-import java.nio.charset.Charset;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 public class TestMessageBytes {
+
+    private static final String CONVERSION_STRING =
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
+            "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
+
+    private static final int CONVERSION_LOOPS = 1000000;
 
     @Test
     public void testToStringFromNull() {
@@ -73,11 +99,14 @@ public class TestMessageBytes {
 
 
     /*
-     * Checks the the optimized code is at least twice as fast as the
-     * non-optimized code.
+     * Checks the the optimized code is faster than the non-optimized code.
      */
     @Test
     public void testConversionPerformance() {
+
+        // ISO_8859_1 conversion appears to be optimised in Java 16 onwards
+        Assume.assumeFalse(JreCompat.isJre16Available());
+
         long optimized = -1;
         long nonOptimized = -1;
 
@@ -87,12 +116,12 @@ public class TestMessageBytes {
          * non-optimised code. Loop three times allows once to warn up the JVM
          * once to run the test and once more in case of unexpected CI /GC
          * slowness. The test will exit early if possible.
+         *
+         * MessageBytes only optimises conversion for ISO_8859_1
          */
         for (int i = 0; i < 3; i++) {
-            optimized = doTestConversionPerformance(StandardCharsets.ISO_8859_1);
-            // US_ASCII chosen as the conversion is the same and it is another
-            // Charset available on all platforms.
-            nonOptimized = doTestConversionPerformance(StandardCharsets.US_ASCII);
+            optimized = doTestOptimisedConversionPerformance();
+            nonOptimized = doTestConversionPerformance();
 
             System.out.println(optimized + " " + nonOptimized);
             if (optimized * 2 < nonOptimized) {
@@ -100,36 +129,35 @@ public class TestMessageBytes {
             }
         }
 
-        Assert.assertTrue("Non-optimised code was faster (" + nonOptimized + "ns) compared to optimized (" + optimized + "ns)", optimized < nonOptimized);
+        Assert.assertTrue("Non-optimised code was faster (" + nonOptimized + "ns) compared to optimized (" +
+                optimized + "ns)", optimized < nonOptimized);
     }
 
 
-    private long doTestConversionPerformance(Charset charset) {
+    private long doTestOptimisedConversionPerformance() {
         MessageBytes mb = MessageBytes.newInstance();
 
-        int loops = 1000000;
-
         long start = System.nanoTime();
-        for (int i = 0; i < loops; i++) {
+        for (int i = 0; i < CONVERSION_LOOPS; i++) {
             mb.recycle();
-            mb.setCharset(charset);
-            mb.setString("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF" +
-                    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF");
+            mb.setCharset(StandardCharsets.ISO_8859_1);
+            mb.setString(CONVERSION_STRING);
             mb.toBytes();
+        }
+        return System.nanoTime() - start;
+    }
+
+
+    private long doTestConversionPerformance() {
+        long start = System.nanoTime();
+        for (int i = 0; i < CONVERSION_LOOPS; i++) {
+            CharsetEncoder encoder = StandardCharsets.ISO_8859_1.newEncoder().onMalformedInput(
+                    CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT);
+            try {
+                encoder.encode(CharBuffer.wrap(CONVERSION_STRING));
+            } catch (CharacterCodingException cce) {
+                Assert.fail();
+            }
         }
         return System.nanoTime() - start;
     }

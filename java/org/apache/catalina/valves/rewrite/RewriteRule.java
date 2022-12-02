@@ -164,9 +164,9 @@ public class RewriteRule {
      *  can be chained with the following rule, etc.). This has the following
      *  effect: if a rule matches, then processing continues as usual, i.e.,
      *  the flag has no effect. If the rule does not match, then all following
-     *  chained rules are skipped. For instance, use it to remove the ``.www''
+     *  chained rules are skipped. For instance, use it to remove the ".www"
      *  part inside a per-directory rule set when you let an external redirect
-     *  happen (where the ``.www'' part should not to occur!).
+     *  happen (where the ".www" part should not to occur!).
      */
     protected boolean chain = false;
 
@@ -305,7 +305,7 @@ public class RewriteRule {
      *  specify them as a number or use one of the following symbolic names:
      *  temp (default), permanent, seeother. Use it for rules which should
      *  canonicalize the URL and give it back to the client, e.g., translate
-     *  ``/~'' into ``/u/'' or always append a slash to /u/user, etc. Note:
+     *  "/~" into "/u/" or always append a slash to /u/user, etc. Note:
      *  When you use this flag, make sure that the substitution field is a
      *  valid URL! If not, you are redirecting to an invalid location!
      *  And remember that this flag itself only prefixes the URL with

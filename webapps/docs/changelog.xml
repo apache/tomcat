@@ -104,7 +104,9 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 11.0.0-M1 (markt)" rtext="in development">
+<section name="Tomcat 11.0.0-M2 (markt)" rtext="in development">
+</section>
+<section name="Tomcat 11.0.0-M1 (markt)" rtext="release in progress">
   <subsection name="General">
     <changelog>
       <scode>
@@ -115,8 +117,12 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>66175</bug>: Change the default character set used by the
+        <code>BasicAuthenticator</code> from ISO-8859-1 to UTF-8. (markt)
+      </fix>
       <add>
-        <bug>66029</bug>: Add a configuration option to allow bloom filters used
+        <bug>66209</bug>: Add a configuration option to allow bloom filters used
         to index JAR files to be retained for the lifetime of the web
         application. Prior to this addition, the indexes were always flushed by
         the periodic calls to <code>WebResourceRoot.gc()</code>. As part of this
@@ -140,6 +146,41 @@
         <bug>66338</bug>: Fix a regression that caused a nuance in refactoring
         for <code>ErrorReportValve</code>. (lihan)
       </fix>
+      <fix>
+        Escape values used to construct output for the
+        <code>JsonErrorReportValve</code> to ensure that it always outputs valid
+        JSON. (markt)
+      </fix>
+      <fix>
+        Correct the default implementation of
+        <code>HttpServletRequest.isTrailerFieldsReady()</code> to return
+        <code>true</code> so it is consistent with the default implementation of
+        <code>HttpServletRequest.getTrailerFields()</code> and with the Servlet
+        API provided by the Jakarta EE project. (markt)
+      </fix>
+      <fix>
+        Refactor <code>WebappLoader</code> so it only has a runtime dependency
+        on the migration tool for Jakarta EE if configured to use the converter
+        as classes are loaded. (markt)
+      </fix>
+      <fix>
+        Improve the behavior of the credential handler attribute that is set in
+        the Servlet context so that it actually reflects what is used during
+        authentication. (remm)
+      </fix>
+      <fix>
+        <bug>66359</bug>: Update javadoc for RemoteIpValve and RemoteIpFilter with
+        correct <code>protocolHeader</code> default value of "X-Forwarded-Proto".
+        (lihan)
+      </fix>
+      <add>
+        Add support for the new attribute for error dispatches
+        <code>jakarta.servlet.error.query_string</code>. (markt)
+      </add>
+      <update>
+        Update <code>ignoreAnnotation</code> attribute on <code>Context</code>
+        to dissociate it from <code>metadata-complete</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -149,10 +190,42 @@
         A single space rather than a single dash should be used to separate the
         day, month and year components to be compliant with RFC 6265. (markt)
       </fix>
+      <add>
+        Include the name of the current stream state in the error message when a
+        stream is cancelled due to an attempt to write to the stream when it is
+        in a state that does not permit writes. (markt)
+      </add>
+      <scode>
+        NIO writes never return -1 so refactor <code>CLOSED_NIO_CHANNEL</code>
+        not to do so and remove checks for this return value. Based on
+        <pr>562</pr> by tianshuang. (markt)
+      </scode>
+      <scode>
+        Remove unnecessary code that exposed the <code>asyncTimeout</code> to
+        components that never used it. (markt)
+      </scode>
+      <fix>
+        Ensure that all <code>MessageBytes</code> conversions to byte arrays are
+        valid for the configured character set and throw an exception if not.
+        (markt)
+      </fix>
+      <fix>
+        When an HTTP/2 stream was reset, the current active stream count was not
+        reduced. If enough resets occurred on a connection, the current active
+        stream count limit was reached and no new streams could be created on
+        that connection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <fix>
+        <bug>66294</bug>: Make the use of a privileged block to obtain the
+        thread context class loader added to address <bug>62080</bug> optional
+        and disabled by default. This is now controlled by the
+        <code>org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED</code> system
+        property. (markt)
+      </fix>
       <fix>
         <bug>66317</bug>: Fix for Lambda coercion security manager missing
         privileges. Based on pull request #557 by Isaac Rivera Rivas (lihan)
@@ -161,12 +234,39 @@
         <bug>66325</bug>: Fix concurrency issue in evaluation of expression
         language containing lambda expressions. (markt)
       </fix>
+      <add>
+        Update the <code>ErrorData</code> class in the JSP API to align with the
+        recent changes in the Jakarta Pages specification to support the new
+        error dispatch attribute
+        <code>jakarta.servlet.error.query_string</code>.
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>66348</bug>: Update the JARs listed in the class loader
+        documentation and note which ones are optional. (markt)
+      </fix>
+      <fix>
+        Documentation. Replace references in the application developer's guide
+        to CVS with more general references to a source code control system.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>66346</bug>: Ensure all JDBC pool JARs are reproducible. Pull
+        request <pr>566</pr> provided by John Neffenger. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
     <changelog>
       <update>
-        Update to Commons Daemon 1.3.2. (markt)
+        Update to Commons Daemon 1.3.3. (markt)
       </update>
       <fix>
         <bug>66323</bug>: Move module start up parameters from
@@ -183,8 +283,8 @@
         (markt)
       </add>
       <add>
-        Improvements to Japanese translations. Contributed by Shirayuking.
-        (markt)
+        Improvements to Japanese translations. Contributed by Shirayuking and
+        tak7iji. (markt)
       </add>
       <add>
         Improvements to Korean translations. (markt)
@@ -192,6 +292,41 @@
       <add>
         Improvements to Spanish translations. (markt)
       </add>
+      <fix>
+        Correct a regression in the removal of the APR connector that broke
+        Graal native image support. Pull request <pr>564</pr> provided by
+        Sébastien Deleuze. (markt)
+      </fix>
+      <update>
+        Update the packaged version of the Apache Tomcat Native Library to 2.0.2
+        to pick up the Windows binaries built with with OpenSSL 3.0.7. (markt)
+      </update>
+      <update>
+        Update the packaged version of the Apache Tomcat Migration Tool for
+        Jakarta EE to 1.0.5. (markt)
+      </update>
+      <scode>
+        Refactor code base to replace use of URL constructors. While they are
+        deprecated in Java 20 onwards, the reasons for deprecation are valid for
+        all versions so move away from them now. (markt)
+      </scode>
+      <scode>
+        Refine the Tomcat native image metadata to avoid including unintended
+        non-Tomcat resources. Pull request <pr>569</pr> provided by Sébastien
+        Deleuze. (markt)
+      </scode>
+      <update>
+        Update the internal fork of Apache Commons BCEL to b015e90 (2022-11-28,
+        6.7.0-RC1). (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons Codec to ae32a3f (2022-11-29,
+        1.16-SNAPSHOT). (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons FileUpload to aa8eff6
+        (2022-11-29, 2.0-SNAPSHOT). (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

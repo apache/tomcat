@@ -397,6 +397,11 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setIgnoreAnnotations(boolean ignoreAnnotations) { /* NO-OP */ }
 
     @Override
+    public boolean getMetadataComplete() { return false; }
+    @Override
+    public void setMetadataComplete(boolean metadataComplete) { /* NO-OP */ }
+
+    @Override
     public LoginConfig getLoginConfig() { return null; }
     @Override
     public void setLoginConfig(LoginConfig config) { /* NO-OP */ }

@@ -1372,9 +1372,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                         }
                     }
                     n = getSocket().write(buffer);
-                    if (n == -1) {
-                        throw new EOFException();
-                    } else if (n == 0 && (buffer.hasRemaining() || getSocket().getOutboundRemaining() > 0)) {
+                    if (n == 0 && (buffer.hasRemaining() || getSocket().getOutboundRemaining() > 0)) {
                         // n == 0 could be an incomplete write but it could also
                         // indicate that a previous incomplete write of the
                         // outbound buffer (for TLS) has now completed. Only
@@ -1405,9 +1403,6 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
             } else {
                 do {
                     n = getSocket().write(buffer);
-                    if (n == -1) {
-                        throw new EOFException();
-                    }
                 } while (n > 0 && buffer.hasRemaining());
                 // If there is data left in the buffer the socket will be registered for
                 // write further up the stack. This is to ensure the socket is only

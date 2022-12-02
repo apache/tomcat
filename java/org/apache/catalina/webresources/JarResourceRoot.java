@@ -19,6 +19,8 @@ package org.apache.catalina.webresources;
 import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.util.jar.Manifest;
@@ -124,8 +126,8 @@ public class JarResourceRoot extends AbstractResource {
     public URL getURL() {
         String url = baseUrl + "!/";
         try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
+            return new URI(url).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getUrlFail", url), e);
             }
@@ -136,8 +138,8 @@ public class JarResourceRoot extends AbstractResource {
     @Override
     public URL getCodeBase() {
         try {
-            return new URL(baseUrl);
-        } catch (MalformedURLException e) {
+            return new URI(baseUrl).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("fileResource.getUrlFail", baseUrl), e);
             }

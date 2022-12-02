@@ -599,7 +599,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         socketWrapper.getLock().lock();
         try {
             if (state != null) {
+                boolean active = state.isActive();
                 state.sendReset();
+                if (active) {
+                    activeRemoteStreamCount.decrementAndGet();
+                }
             }
             socketWrapper.write(true, rstFrame, 0, rstFrame.length);
             socketWrapper.flush(true);
@@ -937,7 +941,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             synchronized (this) {
                 if (!stream.canWrite()) {
                     stream.doStreamCancel(sm.getString("upgradeHandler.stream.notWritable",
-                            stream.getConnectionId(), stream.getIdAsString()), Http2Error.STREAM_CLOSED);
+                            stream.getConnectionId(), stream.getIdAsString(), stream.state.getCurrentStateName() ),
+                            Http2Error.STREAM_CLOSED);
                 }
                 long windowSize = getWindowSize();
                 if (stream.getConnectionAllocationMade() > 0) {

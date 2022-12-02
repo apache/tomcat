@@ -167,57 +167,29 @@ build is performed.</p>
 
 <p>As mentioned earlier, it is highly recommended that you place all of the
 source files that comprise your application under the management of a
-source code control system like the Concurrent Version System (CVS).  If you
-elect to do this, every directory and file in the source hierarchy should be
-registered and saved -- but none of the generated files.  If you register
-binary format files (such as images or JAR libraries), be sure to indicate
-this to your source code control system.</p>
+source code control system.  If you elect to do this, every directory and file
+in the source hierarchy should be registered and saved -- but none of the
+generated files.  If you register binary format files (such as images or JAR
+libraries), be sure to indicate this to your source code control system.</p>
 
 <p>We recommended (in the previous section) that you should not store the
 contents of the <code>build/</code> and <code>dist/</code> directories
-created by your development process in the source code control system.  An
-easy way to tell CVS to ignore these directories is to create a file named
-<code>.cvsignore</code> (note the leading period) in your top-level source
-directory, with the following contents:</p>
-<source>build
-dist
-build.properties</source>
+created by your development process in the source code control system. Source
+code control systems typically provide mechanisms to ignore these directories
+(Git uses a <code>.gitignore</code> file, Subversion uses the
+<code>svn:ignore</code> property, CVS uses a <code>.cvsignore</code> file, etc.)
+You should configure your source code control system to ignore:</p>
+<ul>
+  <li>build</li>
+  <li>dist</li>
+  <li>build.properties</li>
+</ul>
 
 <p>The reason for mentioning <code>build.properties</code> here will be
 explained in the <a href="processes.html">Processes</a> section.</p>
 
 <p>Detailed instructions for your source code control environment are beyond
-the scope of this manual.  However, the following steps are followed when
-using a command-line CVS client:</p>
-<ul>
-<li>To refresh the state of your source code to that stored in the
-    the source repository, go to your project source directory, and
-    execute <code>cvs update -dP</code>.
-    <br/><br/></li>
-<li>When you create a new subdirectory in the source code hierarchy, register
-    it in CVS with a command like <code>cvs add {subdirname}</code>.
-    <br/><br/></li>
-<li>When you first create a new source code file, navigate to the directory
-    that contains it, and register the new file with a command like
-    <code>cvs add {filename}</code>.
-    <br/><br/></li>
-<li>If you no longer need a particular source code file, navigate to the
-    containing directory and remove the file.  Then, deregister it in CVS
-    with a command like <code>cvs remove {filename}</code>.
-    <br/><br/></li>
-<li>While you are creating, modifying, and deleting source files, changes
-    are not yet reflected in the server repository.  To save your changes in
-    their current state, go to the project source directory
-    and execute <code>cvs commit</code>.  You will be asked to write a brief
-    description of the changes you have just completed, which will be stored
-    with the new version of any updated source file.</li>
-</ul>
-
-<p>CVS, like other source code control systems, has many additional features
-(such as the ability to tag the files that made up a particular release, and
-support for multiple development branches that can later be merged).  See the
-links and references in the <a href="introduction.html">Introduction</a> for
-more information.</p>
+the scope of this manual.</p>
 
 </section>
 

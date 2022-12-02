@@ -17,7 +17,7 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 
 import org.junit.Assert;
@@ -37,7 +37,7 @@ public abstract class TesterUriUtilBase {
 
 
     @Test
-    public void testBuildJarUrl01() throws MalformedURLException {
+    public void testBuildJarUrl01() throws IOException {
         File jarFile = new File("/patha/pathb!/pathc");
         String result = UriUtil.buildJarUrl(jarFile).toString();
 
@@ -47,7 +47,7 @@ public abstract class TesterUriUtilBase {
 
 
     @Test
-    public void testBuildJarUrl02() throws MalformedURLException {
+    public void testBuildJarUrl02() throws IOException {
         File jarFile = new File("/patha/pathb*/pathc");
         String result = UriUtil.buildJarUrl(jarFile).toString();
 
@@ -60,7 +60,7 @@ public abstract class TesterUriUtilBase {
 
 
     @Test
-    public void testBuildJarUrl03() throws MalformedURLException {
+    public void testBuildJarUrl03() throws IOException {
         File jarFile = new File("/patha/pathb^/pathc");
         String result = UriUtil.buildJarUrl(jarFile).toString();
 
@@ -73,7 +73,7 @@ public abstract class TesterUriUtilBase {
 
 
     @Test
-    public void testBuildJarUrl04() throws MalformedURLException {
+    public void testBuildJarUrl04() throws IOException {
         File jarFile = new File("/patha/pathb" + separator + "/pathc");
         String result = UriUtil.buildJarUrl(jarFile).toString();
 
@@ -86,24 +86,24 @@ public abstract class TesterUriUtilBase {
 
 
     @Test
-    public void testWarToJar01() throws MalformedURLException {
+    public void testWarToJar01() throws IOException {
         doTestWarToJar("^");
     }
 
 
     @Test
-    public void testWarToJar02() throws MalformedURLException {
+    public void testWarToJar02() throws IOException {
         doTestWarToJar("*");
     }
 
 
     @Test
-    public void testWarToJar03() throws MalformedURLException {
+    public void testWarToJar03() throws IOException {
         doTestWarToJar(separator);
     }
 
 
-    private void doTestWarToJar(String separator) throws MalformedURLException {
+    private void doTestWarToJar(String separator) throws IOException {
         URL warUrl = new URL("war:file:/external/path" + separator + "/internal/path");
         URL jarUrl = UriUtil.warToJar(warUrl);
         Assert.assertEquals("jar:file:/external/path!/internal/path", jarUrl.toString());
@@ -111,7 +111,7 @@ public abstract class TesterUriUtilBase {
 
 
     // @Test /* Uncomment to test performance for different implementations. */
-    public void performanceTestBuildJarUrl() throws MalformedURLException {
+    public void performanceTestBuildJarUrl() throws IOException {
         File jarFile = new File("/patha/pathb^/pathc");
 
         URL url = null;

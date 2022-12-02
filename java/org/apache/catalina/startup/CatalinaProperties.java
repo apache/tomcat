@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -69,7 +69,7 @@ public class CatalinaProperties {
                     // No '/'. Must be a file name rather than a URL
                     fileName = configUrl;
                 } else {
-                    is = (new URL(configUrl)).openStream();
+                    is = new URI(configUrl).toURL().openStream();
                 }
             }
         } catch (Throwable t) {
