@@ -1129,13 +1129,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             return this;
         }
 
-        @Override
-        public void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight) {
-            lastStreamId = Integer.toString(streamId);
-            trace.append(lastStreamId + "-Reprioritise-[" + parentStreamId + "]-[" + exclusive +
-                    "]-[" + weight + "]\n");
-        }
-
 
         @Override
         public void emitHeader(String name, String value) {
@@ -1287,6 +1280,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         public long getBytesRead() {
             return bytesRead;
+        }
+
+
+        @Override
+        public void increaseOverheadCount(FrameType frameType) {
+            // NO-OP. Client doesn't track overhead.
         }
     }
 

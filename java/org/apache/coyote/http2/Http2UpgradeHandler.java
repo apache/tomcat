@@ -1489,7 +1489,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private void increaseOverheadCount(FrameType frameType) {
+    @Override
+    public void increaseOverheadCount(FrameType frameType) {
         // An overhead frame increases the overhead count by
         // overheadCountFactor. By default, this means an overhead frame
         // increases the overhead count by 10. A simple browser request is
@@ -1705,34 +1706,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
         }
         maxActiveRemoteStreamId = newMaxActiveRemoteStreamId;
-    }
-
-
-    @Override
-    public void reprioritise(int streamId, int parentStreamId,
-            boolean exclusive, int weight) throws Http2Exception {
-        if (streamId == parentStreamId) {
-            throw new ConnectionException(sm.getString("upgradeHandler.dependency.invalid",
-                    getConnectionId(), Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR);
-        }
-
-        increaseOverheadCount(FrameType.PRIORITY);
-
-        synchronized (priorityTreeLock) {
-            // Need to look up stream and parent stream inside the lock else it
-            // is possible for a stream to be recycled before it is
-            // reprioritised. This can result in incorrect references to the
-            // non-recycled stream being retained after reprioritisation.
-            AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId);
-            if (abstractNonZeroStream == null) {
-                abstractNonZeroStream = createRemoteStream(streamId);
-            }
-            AbstractStream parentStream = getAbstractNonZeroStream(parentStreamId);
-            if (parentStream == null) {
-                parentStream = this;
-            }
-            abstractNonZeroStream.rePrioritise(parentStream, exclusive, weight);
-        }
     }
 
 

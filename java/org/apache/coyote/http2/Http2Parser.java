@@ -254,12 +254,8 @@ class Http2Parser {
                                     Integer.toString(payloadSize)), Http2Error.PROTOCOL_ERROR);
                 }
             }
-            if (priority) {
-                boolean exclusive = ByteUtil.isBit7Set(optional[optionalPos]);
-                int parentStreamId = ByteUtil.get31Bits(optional, optionalPos);
-                int weight = ByteUtil.getOneByte(optional, optionalPos + 4) + 1;
-                output.reprioritise(streamId, parentStreamId, exclusive, weight);
-            }
+
+            // Ignore RFC 7450 priority data if present
 
             payloadSize -= optionalLen;
             payloadSize -= padLength;
@@ -277,24 +273,15 @@ class Http2Parser {
     }
 
 
-    protected void readPriorityFrame(int streamId, ByteBuffer buffer) throws Http2Exception, IOException {
-        byte[] payload = new byte[5];
-        if (buffer == null) {
-            input.fill(true, payload);
-        } else {
-            buffer.get(payload);
+    protected void readPriorityFrame(int streamId, ByteBuffer buffer) throws IOException {
+        // RFC 7450 priority frames are ignored. Still need to treat as overhead.
+        try {
+            swallowPayload(streamId, FrameType.PRIORITY.getId(), 5, false, buffer);
+        } catch (ConnectionException e) {
+            // Will never happen because swallowPayload() is called with isPadding set
+            // to false
         }
-
-        boolean exclusive = ByteUtil.isBit7Set(payload[0]);
-        int parentStreamId = ByteUtil.get31Bits(payload, 0);
-        int weight = ByteUtil.getOneByte(payload, 4) + 1;
-
-        if (streamId == parentStreamId) {
-            throw new StreamException(sm.getString("http2Parser.processFramePriority.invalidParent",
-                    connectionId, Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR, streamId);
-        }
-
-        output.reprioritise(streamId, parentStreamId, exclusive, weight);
+        output.increaseOverheadCount(FrameType.PRIORITY);
     }
 
 
@@ -780,10 +767,6 @@ class Http2Parser {
         void headersContinue(int payloadSize, boolean endOfHeaders);
         void headersEnd(int streamId) throws Http2Exception;
 
-        // Priority frames (also headers)
-        void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight)
-                throws Http2Exception;
-
         // Reset frames
         void reset(int streamId, long errorCode) throws Http2Exception;
 
@@ -815,5 +798,7 @@ class Http2Parser {
          *         frame
          */
         void onSwallowedUnknownFrame(int streamId, int frameTypeId, int flags, int size) throws IOException;
+
+        void increaseOverheadCount(FrameType frameType);
     }
 }
