@@ -45,6 +45,9 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
     static final long DEFAULT_MAX_HEADER_LIST_SIZE = 1 << 15;
 
+    // Defaults (defined by Tomcat)
+    static final long DEFAULT_NO_RFC7540_PRIORITIES = 1;
+
     Map<Setting, Long> current = new ConcurrentHashMap<>();
     Map<Setting, Long> pending = new ConcurrentHashMap<>();
 
@@ -58,6 +61,7 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
         current.put(Setting.INITIAL_WINDOW_SIZE,    Long.valueOf(DEFAULT_INITIAL_WINDOW_SIZE));
         current.put(Setting.MAX_FRAME_SIZE,         Long.valueOf(DEFAULT_MAX_FRAME_SIZE));
         current.put(Setting.MAX_HEADER_LIST_SIZE,   Long.valueOf(DEFAULT_MAX_HEADER_LIST_SIZE));
+        current.put(Setting.NO_RFC7540_PRIORITIES,  Long.valueOf(DEFAULT_NO_RFC7540_PRIORITIES));
     }
 
 
@@ -85,6 +89,9 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
             break;
         case MAX_HEADER_LIST_SIZE:
             // No further validation required
+            break;
+        case NO_RFC7540_PRIORITIES:
+            validateNoRfc7540Priorities(value);
             break;
         case UNKNOWN:
             // Unrecognised. Ignore it.
@@ -207,6 +214,15 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
             String msg = sm.getString("connectionSettings.maxFrameSizeInvalid",
                     connectionId, Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
                     Integer.toString(MAX_MAX_FRAME_SIZE));
+            throwException(msg, Http2Error.PROTOCOL_ERROR);
+        }
+    }
+
+
+    private void validateNoRfc7540Priorities(long noRfc7540Priorities) throws T {
+        if (noRfc7540Priorities < 0 || noRfc7540Priorities > 1) {
+            String msg = sm.getString("connectionSettings.noRfc7540PrioritiesInvalid",
+                    connectionId, Long.toString(noRfc7540Priorities));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
         }
     }
