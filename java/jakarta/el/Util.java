@@ -43,8 +43,8 @@ class Util {
     private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
-    private static final boolean GET_CLASSLOADER_USE_PRIVILEGED = System.getSecurityManager() == null ? Boolean.getBoolean("org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED") :
-        AccessController.doPrivileged(new PrivilegedGetBoolean("org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED"));
+    private static final boolean GET_CLASSLOADER_IGNORE_PRIVILEGED = System.getSecurityManager() == null ? Boolean.getBoolean("org.apache.el.GET_CLASSLOADER_IGNORE_PRIVILEGED") :
+        AccessController.doPrivileged(new PrivilegedGetBoolean("org.apache.el.GET_CLASSLOADER_IGNORE_PRIVILEGED"));
 
     /**
      * Checks whether the supplied Throwable is one that needs to be
@@ -658,7 +658,7 @@ class Util {
 
     static ClassLoader getContextClassLoader() {
         ClassLoader tccl;
-        if (System.getSecurityManager() != null && GET_CLASSLOADER_USE_PRIVILEGED) {
+        if (System.getSecurityManager() != null && !GET_CLASSLOADER_IGNORE_PRIVILEGED) {
             PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
             tccl = AccessController.doPrivileged(pa);
         } else {
