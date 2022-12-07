@@ -95,6 +95,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private Object pendingWindowUpdateForStreamLock = new Object();
     private int pendingWindowUpdateForStream = 0;
 
+    private volatile int urgency = Constants.DEFAULT_URGENCY;
+    private volatile boolean incremental = Constants.DEFAULT_INCREMENTAL;
+
 
     Stream(Integer identifier, Http2UpgradeHandler handler) {
         this(identifier, handler, null);
@@ -104,7 +107,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     Stream(Integer identifier, Http2UpgradeHandler handler, Request coyoteRequest) {
         super(handler.getConnectionId(), identifier);
         this.handler = handler;
-        handler.addChild(this);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
         if (coyoteRequest == null) {
             // HTTP/2 new request
@@ -830,6 +832,26 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
         return result;
+    }
+
+
+    public int getUrgency() {
+        return urgency;
+    }
+
+
+    public void setUrgency(int urgency) {
+        this.urgency = urgency;
+    }
+
+
+    public boolean getIncremental() {
+        return incremental;
+    }
+
+
+    public void setIncremental(boolean incremental) {
+        this.incremental = incremental;
     }
 
 

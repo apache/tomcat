@@ -17,7 +17,6 @@
 package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -36,8 +35,6 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
     protected final StreamStateMachine state;
 
-    private volatile int weight = Constants.DEFAULT_WEIGHT;
-
 
     AbstractNonZeroStream(String connectionId, Integer identifier) {
         super(identifier);
@@ -48,12 +45,6 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     AbstractNonZeroStream(Integer identifier, StreamStateMachine state) {
         super(identifier);
         this.state = state;
-    }
-
-
-    @Override
-    final int getWeight() {
-        return weight;
     }
 
 
@@ -71,27 +62,7 @@ abstract class AbstractNonZeroStream extends AbstractStream {
                     parent.getIdAsString(), Integer.toString(weight)));
         }
 
-        // Check if new parent is a descendant of this stream
-        if (isDescendant(parent)) {
-            parent.detachFromParent();
-            // Cast is always safe since any descendant of this stream must be
-            // an instance of AbstractNonZeroStream
-            getParentStream().addChild((AbstractNonZeroStream) parent);
-        }
-
-        if (exclusive) {
-            // Need to move children of the new parent to be children of this
-            // stream. Slightly convoluted to avoid concurrent modification.
-            Iterator<AbstractNonZeroStream> parentsChildren = parent.getChildStreams().iterator();
-            while (parentsChildren.hasNext()) {
-                AbstractNonZeroStream parentsChild = parentsChildren.next();
-                parentsChildren.remove();
-                this.addChild(parentsChild);
-            }
-        }
-        detachFromParent();
-        parent.addChild(this);
-        this.weight = weight;
+        // TODO
     }
 
 
@@ -109,29 +80,7 @@ abstract class AbstractNonZeroStream extends AbstractStream {
                     parent.getIdAsString(), Integer.toString(weight)));
         }
 
-        parent.addChild(this);
-        this.weight = weight;
-    }
-
-
-    /*
-     * Used when "recycling" a stream and replacing a Stream instance with a
-     * RecycledStream instance.
-     *
-     * Replace this stream with the provided stream in the parent/child
-     * hierarchy.
-     *
-     * Changes to the priority tree need to be synchronized at the connection
-     * level. This is the caller's responsibility.
-     */
-    void replaceStream(AbstractNonZeroStream replacement) {
-        getParentStream().addChild(replacement);
-        detachFromParent();
-        for (AbstractNonZeroStream child : getChildStreams()) {
-            replacement.addChild(child);
-        }
-        getChildStreams().clear();
-        replacement.weight = weight;
+        // TODO
     }
 
 
