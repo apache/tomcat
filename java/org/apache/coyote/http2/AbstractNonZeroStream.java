@@ -18,18 +18,11 @@ package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
-
 /**
  * Base class for all streams other than stream 0, the connection. Primarily
  * provides functionality shared between full Stream and RecycledStream.
  */
 abstract class AbstractNonZeroStream extends AbstractStream {
-
-    private static final Log log = LogFactory.getLog(AbstractNonZeroStream.class);
-    private static final StringManager sm = StringManager.getManager(AbstractNonZeroStream.class);
 
     protected static final ByteBuffer ZERO_LENGTH_BYTEBUFFER = ByteBuffer.allocate(0);
 
@@ -45,42 +38,6 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     AbstractNonZeroStream(Integer identifier, StreamStateMachine state) {
         super(identifier);
         this.state = state;
-    }
-
-
-    /*
-     * General method used when reprioritising a stream and care needs to be
-     * taken not to create circular references.
-     *
-     * Changes to the priority tree need to be synchronized at the connection
-     * level. This is the caller's responsibility.
-     */
-    final void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdAsString(), Boolean.toString(exclusive),
-                    parent.getIdAsString(), Integer.toString(weight)));
-        }
-
-        // TODO
-    }
-
-
-    /*
-     * Used when removing closed streams from the tree and we know there is no
-     * need to check for circular references.
-     *
-     * Changes to the priority tree need to be synchronized at the connection
-     * level. This is the caller's responsibility.
-     */
-    final void rePrioritise(AbstractStream parent, int weight) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.reprioritisation.debug",
-                    getConnectionId(), getIdAsString(), Boolean.FALSE,
-                    parent.getIdAsString(), Integer.toString(weight)));
-        }
-
-        // TODO
     }
 
 
