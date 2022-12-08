@@ -27,10 +27,10 @@ import static java.lang.foreign.ValueLayout.*;
 public interface SSL_CTX_set_tmp_dh_callback$dh {
 
     java.lang.foreign.MemorySegment apply(java.lang.foreign.MemorySegment _x0, int _x1, int _x2);
-    static MemorySegment allocate(SSL_CTX_set_tmp_dh_callback$dh fi, MemorySession session) {
+    static MemorySegment allocate(SSL_CTX_set_tmp_dh_callback$dh fi, SegmentScope session) {
         return RuntimeHelper.upcallStub(SSL_CTX_set_tmp_dh_callback$dh.class, fi, constants$21.SSL_CTX_set_tmp_dh_callback$dh$FUNC, session);
     }
-    static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemorySegment addr, MemorySession session) {
+    static SSL_CTX_set_tmp_dh_callback$dh ofAddress(MemorySegment addr, SegmentScope session) {
         MemorySegment symbol = MemorySegment.ofAddress(addr.address(), 0, session);
         return (java.lang.foreign.MemorySegment __x0, int __x1, int __x2) -> {
             try {

@@ -22,7 +22,7 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.MemorySession;
+import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -31,6 +31,8 @@ import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
@@ -105,11 +107,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         OpenSSLLifecycleListener.initLibrary();
 
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
-        try (var memorySession = Arena.openConfined()) {
+        try (var localArena = Arena.openConfined()) {
             var sslCtx = SSL_CTX_new(TLS_server_method());
             try {
                 SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
-                SSL_CTX_set_cipher_list(sslCtx, memorySession.allocateUtf8String("ALL"));
+                SSL_CTX_set_cipher_list(sslCtx, localArena.allocateUtf8String("ALL"));
                 var ssl = SSL_new(sslCtx);
                 SSL_set_accept_state(ssl);
                 try {
@@ -183,7 +185,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private final EngineState state;
-    private final MemorySession engineMemorySession;
+    private final SegmentScope engineScope;
     private final Cleanable cleanable;
     private MemorySegment bufSegment = null;
 
@@ -247,13 +249,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (sslCtx == null) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
-        engineMemorySession = MemorySession.implicit();
-        bufSegment = MemorySegment.allocateNative(MAX_ENCRYPTED_PACKET_LENGTH, engineMemorySession);
+        engineScope = SegmentScope.auto();
+        bufSegment = MemorySegment.allocateNative(MAX_ENCRYPTED_PACKET_LENGTH, engineScope);
         session = new OpenSSLSession();
         var ssl = SSL_new(sslCtx);
         // Set ssl_info_callback
         var openSSLCallbackInfo = Linker.nativeLinker().upcallStub(openSSLCallbackInfoHandle,
-                openSSLCallbackInfoFunctionDescriptor, engineMemorySession);
+                openSSLCallbackInfoFunctionDescriptor, engineScope);
         SSL_set_info_callback(ssl, openSSLCallbackInfo);
         if (clientMode) {
             SSL_set_connect_state(ssl);
@@ -261,9 +263,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             SSL_set_accept_state(ssl);
         }
         SSL_set_verify_result(ssl, X509_V_OK());
-        try (var memorySession = Arena.openConfined()) {
-            var internalBIOPointer = memorySession.allocate(ValueLayout.ADDRESS);
-            var networkBIOPointer = memorySession.allocate(ValueLayout.ADDRESS);
+        try (var localArena = Arena.openConfined()) {
+            var internalBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
+            var networkBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
             BIO_new_bio_pair(internalBIOPointer, 0, networkBIOPointer, 0);
             var internalBIO = internalBIOPointer.get(ValueLayout.ADDRESS, 0);
             var networkBIO = networkBIOPointer.get(ValueLayout.ADDRESS, 0);
@@ -768,8 +770,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         buf.setLength(buf.length() - 1);
 
         final String cipherSuiteSpec = buf.toString();
-        try (var memorySession = Arena.openConfined()) {
-            SSL_set_cipher_list(state.ssl, memorySession.allocateUtf8String(cipherSuiteSpec));
+        try (var localArena = Arena.openConfined()) {
+            SSL_set_cipher_list(state.ssl, localArena.allocateUtf8String(cipherSuiteSpec));
         } catch (Exception e) {
             throw new IllegalStateException(sm.getString("engine.failedCipherSuite", cipherSuiteSpec), e);
         }
@@ -905,15 +907,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private byte[] getPeerCertificate() {
-        try (var memorySession = Arena.openConfined()) {
+        try (var localArena = Arena.openConfined()) {
             MemorySegment/*(X509*)*/ x509 = (OpenSSLContext.OPENSSL_3 ? SSL_get1_peer_certificate(state.ssl) : SSL_get_peer_certificate(state.ssl));
-            MemorySegment bufPointer = memorySession.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+            MemorySegment bufPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
             int length = i2d_X509(x509, bufPointer);
             if (length <= 0) {
                 return null;
             }
             MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-            byte[] certificate = MemorySegment.ofAddress(buf.address(), length, memorySession.session()).toArray(ValueLayout.JAVA_BYTE);
+            byte[] certificate = MemorySegment.ofAddress(buf.address(), length, localArena.scope()).toArray(ValueLayout.JAVA_BYTE);
             X509_free(x509);
             CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
             return certificate;
@@ -927,17 +929,17 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return null;
         }
         byte[][] certificateChain = new byte[len][];
-        try (var memorySession = Arena.openConfined()) {
+        try (var localArena = Arena.openConfined()) {
             for (int i = 0; i < len; i++) {
                 MemorySegment/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
-                MemorySegment bufPointer = memorySession.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+                MemorySegment bufPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
                 int length = i2d_X509(x509, bufPointer);
                 if (length < 0) {
                     certificateChain[i] = new byte[0];
                     continue;
                 }
                 MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-                byte[] certificate = MemorySegment.ofAddress(buf.address(), length, memorySession.session()).toArray(ValueLayout.JAVA_BYTE);
+                byte[] certificate = MemorySegment.ofAddress(buf.address(), length, localArena.scope()).toArray(ValueLayout.JAVA_BYTE);
                 certificateChain[i] = certificate;
                 CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
             }
@@ -946,11 +948,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private String getProtocolNegotiated() {
-        try (var memorySession = Arena.openConfined()) {
-            MemorySegment lenAddress = memorySession.allocate(ValueLayout.JAVA_INT, 0);
-            MemorySegment protocolPointer = memorySession.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+        try (var localArena = Arena.openConfined()) {
+            MemorySegment lenAddress = localArena.allocate(ValueLayout.JAVA_INT, 0);
+            MemorySegment protocolPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
             SSL_get0_alpn_selected(state.ssl, protocolPointer, lenAddress);
-            if (MemorySegment.NULL.equals(protocolPointer.address())) {
+            if (MemorySegment.NULL.equals(protocolPointer)) {
                 return null;
             }
             int length = lenAddress.get(ValueLayout.JAVA_INT, 0);
@@ -958,7 +960,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return null;
             }
             MemorySegment protocolAddress = protocolPointer.get(ValueLayout.ADDRESS, 0);
-            byte[] name = MemorySegment.ofAddress(protocolAddress.address(), length, memorySession.session()).toArray(ValueLayout.JAVA_BYTE);
+            byte[] name = MemorySegment.ofAddress(protocolAddress.address(), length, localArena.scope()).toArray(ValueLayout.JAVA_BYTE);
             if (log.isDebugEnabled()) {
                 log.debug("Protocol negotiated [" + new String(name) + "]");
             }
@@ -1046,10 +1048,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         String sslError = null;
         long error = ERR_get_error();
         if (error != SSL_ERROR_NONE()) {
-            try (var memorySession = Arena.openConfined()) {
+            try (var localArena = Arena.openConfined()) {
                 do {
                     // Loop until getLastErrorNumber() returns SSL_ERROR_NONE
-                    var buf = memorySession.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
+                    var buf = localArena.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
                     ERR_error_string(error, buf);
                     String err = buf.getUtf8String(0);
                     if (sslError == null) {
@@ -1202,7 +1204,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             var openSSLCallbackVerify =
                     Linker.nativeLinker().upcallStub(openSSLCallbackVerifyHandle,
-                    openSSLCallbackVerifyFunctionDescriptor, engineMemorySession);
+                    openSSLCallbackVerifyFunctionDescriptor, engineScope);
             int value = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_PEER() | SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
@@ -1322,13 +1324,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     // sslutils.c ssl_ocsp_request(x509, issuer, x509ctx);
                     int nid = X509_get_ext_by_NID(x509, NID_info_access(), -1);
                     if (nid >= 0) {
-                        try (var memorySession = Arena.openConfined()) {
+                        try (var localArenal = Arena.openConfined()) {
                             MemorySegment ext = X509_get_ext(x509, nid);
                             MemorySegment os = X509_EXTENSION_get_data(ext);
                             int length = ASN1_STRING_length(os);
                             MemorySegment data = ASN1_STRING_get0_data(os);
                             // ocsp_urls = decode_OCSP_url(os);
-                            byte[] asn1String = MemorySegment.ofAddress(data.address(), length, memorySession.session()).toArray(ValueLayout.JAVA_BYTE);
+                            byte[] asn1String = MemorySegment.ofAddress(data.address(), length, localArenal.scope()).toArray(ValueLayout.JAVA_BYTE);
                             Asn1Parser parser = new Asn1Parser(asn1String);
                             // Parse the byte sequence
                             ArrayList<String> urls = new ArrayList<>();
@@ -1341,12 +1343,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                 // Use OpenSSL to build OCSP request
                                 for (String urlString : urls) {
                                     try {
-                                        URL url = new URL(urlString);
-                                        ocspResponse = processOCSPRequest(url, issuer, x509, x509ctx, memorySession);
+                                        URL url = (new URI(urlString)).toURL();
+                                        ocspResponse = processOCSPRequest(url, issuer, x509, x509ctx, localArenal);
                                         if (log.isDebugEnabled()) {
                                             log.debug("OCSP response for URL: " + urlString + " was " + ocspResponse);
                                         }
-                                    } catch (MalformedURLException e) {
+                                    } catch (MalformedURLException | URISyntaxException e) {
                                         log.warn(sm.getString("engine.invalidOCSPURL", urlString));
                                     }
                                     if (ocspResponse != V_OCSP_CERTSTATUS_UNKNOWN()) {
@@ -1392,7 +1394,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private static int processOCSPRequest(URL url, MemorySegment issuer, MemorySegment x509,
-            MemorySegment /*X509_STORE_CTX*/ x509ctx, Arena memorySession) {
+            MemorySegment /*X509_STORE_CTX*/ x509ctx, Arena localArena) {
         MemorySegment ocspRequest = MemorySegment.NULL;
         MemorySegment ocspResponse = MemorySegment.NULL;
         MemorySegment id = MemorySegment.NULL;
@@ -1413,7 +1415,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (MemorySegment.NULL.equals(ocspOneReq)) {
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
-            MemorySegment bufPointer = memorySession.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+            MemorySegment bufPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
             int requestLength = i2d_OCSP_REQUEST(ocspRequest, bufPointer);
             if (requestLength <= 0) {
                 return V_OCSP_CERTSTATUS_UNKNOWN();
@@ -1424,7 +1426,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // Host: urlHost:urlPort
             // Content-Type: application/ocsp-request
             // Content-Length: ocspRequestData.length
-            byte[] ocspRequestData = MemorySegment.ofAddress(buf.address(), requestLength, memorySession.session()).toArray(ValueLayout.JAVA_BYTE);
+            byte[] ocspRequestData = MemorySegment.ofAddress(buf.address(), requestLength, localArena.scope()).toArray(ValueLayout.JAVA_BYTE);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoInput(true);
@@ -1444,8 +1446,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 baos.write(responseBuf, 0, read);
             }
             byte[] responseData = baos.toByteArray();
-            var nativeResponseData = memorySession.allocateArray(ValueLayout.JAVA_BYTE, responseData);
-            var nativeResponseDataPointer = memorySession.allocate(ValueLayout.ADDRESS, nativeResponseData);
+            var nativeResponseData = localArena.allocateArray(ValueLayout.JAVA_BYTE, responseData);
+            var nativeResponseDataPointer = localArena.allocate(ValueLayout.ADDRESS, nativeResponseData);
             ocspResponse = d2i_OCSP_RESPONSE(MemorySegment.NULL, nativeResponseDataPointer, responseData.length);
             if (!MemorySegment.NULL.equals(ocspResponse)) {
                 if (OCSP_response_status(ocspResponse) == OCSP_RESPONSE_STATUS_SUCCESSFUL()) {
@@ -1505,8 +1507,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             byte[] id = null;
             synchronized (OpenSSLEngine.this) {
                 if (!destroyed) {
-                    try (var memorySession = Arena.openConfined()) {
-                        MemorySegment lenPointer = memorySession.allocate(ValueLayout.ADDRESS);
+                    try (var localArena = Arena.openConfined()) {
+                        MemorySegment lenPointer = localArena.allocate(ValueLayout.ADDRESS);
                         var session = SSL_get_session(state.ssl);
                         if (MemorySegment.NULL.equals(session)) {
                             return new byte[0];
@@ -1514,7 +1516,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         MemorySegment sessionId = SSL_SESSION_get_id(session, lenPointer);
                         int len = lenPointer.get(ValueLayout.JAVA_INT, 0);
                         id = (len == 0) ? new byte[0]
-                                : MemorySegment.ofAddress(sessionId.address(), len, memorySession.session()).toArray(ValueLayout.JAVA_BYTE);
+                                : MemorySegment.ofAddress(sessionId.address(), len, localArena.scope()).toArray(ValueLayout.JAVA_BYTE);
                     }
                 }
             }
@@ -1796,7 +1798,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static class EngineState implements Runnable {
 
-        private final Arena stateSession = Arena.openShared();
+        private final Arena stateArena = Arena.openShared();
         private final MemorySegment ssl;
         private final MemorySegment networkBIO;
         private final int certificateVerificationDepth;
@@ -1813,8 +1815,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             this.noOcspCheck = noOcspCheck;
             // Allocate another session to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
-            this.ssl = MemorySegment.ofAddress(ssl.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
-            this.networkBIO = MemorySegment.ofAddress(networkBIO.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
+            this.ssl = MemorySegment.ofAddress(ssl.address(), ValueLayout.ADDRESS.byteSize(), stateArena.scope());
+            this.networkBIO = MemorySegment.ofAddress(networkBIO.address(), ValueLayout.ADDRESS.byteSize(), stateArena.scope());
         }
 
         @Override
@@ -1824,7 +1826,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 BIO_free(networkBIO);
                 SSL_free(ssl);
             } finally {
-                stateSession.close();
+                stateArena.close();
             }
         }
     }
