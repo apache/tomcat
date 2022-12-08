@@ -115,6 +115,10 @@
       <add>
         Add an RFC 8941 structured field parser. (markt)
       </add>
+      <add>
+        Add a parser for the <code>priority</code> HTTP header field defined in
+        RFC 9218. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
