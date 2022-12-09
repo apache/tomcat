@@ -17,6 +17,7 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -42,6 +43,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Host;
+import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.WriteBuffer;
 import org.apache.tomcat.util.res.StringManager;
@@ -416,6 +418,16 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 // Multiple hosts headers - illegal
                 throw new HpackException(sm.getString("stream.header.duplicate",
                         getConnectionId(), getIdAsString(), "host" ));
+            }
+            break;
+        }
+        case "priority": {
+            try {
+                Priority p = Priority.parsePriority(new StringReader(value));
+                setUrgency(p.getUrgency());
+                setIncremental(p.getIncremental());
+            } catch (IOException ioe) {
+                // Not possible with StringReader
             }
             break;
         }
