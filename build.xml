@@ -505,7 +505,6 @@
     -->
     <include name="org/apache/coyote/**" />
     <include name="org/apache/tomcat/jni/**" />
-    <include name="org/apache/jk/**" />
     <include name="org/apache/tomcat/util/**" />
     <exclude name="org/apache/tomcat/util/descriptor/tld/**" />
   </patternset>
