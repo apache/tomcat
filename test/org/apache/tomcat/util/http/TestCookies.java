@@ -29,9 +29,12 @@ public class TestCookies {
     private final Cookie FOO = new Cookie("foo", "bar");
     private final Cookie FOO_EMPTY = new Cookie("foo", "");
     private final Cookie FOO_CONTROL = new Cookie("foo", "b\u00e1r");
+    private final Cookie FOO_CONTROL_QUOTED = new Cookie("foo", "\"b\u00e1r\"");
+    private final Cookie FOO_QUOTED = new Cookie("foo", "\"bar\"");
     private final Cookie BAR = new Cookie("bar", "rab");
     private final Cookie BAR_EMPTY = new Cookie("bar", "");
     private final Cookie A = new Cookie("a", "b");
+    private final Cookie A_QUOTED = new Cookie("a", "\"b\"");
     private final Cookie HASH_EMPTY = new Cookie("#", "");
     private final Cookie $PORT = new Cookie("$Port", "8080");
     // RFC 2109 attributes are generally interpreted as additional cookies by
@@ -74,8 +77,13 @@ public class TestCookies {
 
     @Test
     public void testQuotedValueRfc6265() {
-        test("foo=bar;a=\"b\"", FOO, A);
-        test("foo=bar;a=\"b\";", FOO, A);
+        test("foo=bar;a=\"b\"", FOO, A_QUOTED);
+        test("foo=bar;a=\"b\";", FOO, A_QUOTED);
+    }
+
+    @Test
+    public void testInvalidQuotedValueRfc6265() {
+        test("a=\"b\"x;foo=bar", FOO);
     }
 
     @Test
@@ -109,7 +117,7 @@ public class TestCookies {
 
     @Test
     public void v1QuotedValueRfc6265() {
-        test("$Version=1;foo=\"bar\";a=b; ; ", $VERSION_1, FOO, A);
+        test("$Version=1;foo=\"bar\";a=b; ; ", $VERSION_1, FOO_QUOTED, A);
     }
 
     @Test
@@ -126,7 +134,7 @@ public class TestCookies {
 
     @Test
     public void v1QuoteInQuotedValueRfc6265() {
-        FOO.setValue("b'ar");
+        FOO.setValue("\"b'ar\"");
         test("$Version=1;foo=\"b'ar\";a=b", $VERSION_1, FOO, A);
     }
 
@@ -155,28 +163,28 @@ public class TestCookies {
 
     @Test
     public void v1DomainIsParsedRfc6265() {
-        FOO.setDomain("apache.org");
+        FOO_QUOTED.setDomain("apache.org");
         A.setDomain("yahoo.com");
         test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b;$Domain=yahoo.com",
-                $VERSION_1, FOO, $DOMAIN_ASF, A, $DOMAIN_YAHOO);
+                $VERSION_1, FOO_QUOTED, $DOMAIN_ASF, A, $DOMAIN_YAHOO);
     }
 
     @Test
     public void v1DomainOnlyAffectsPrecedingCookieRfc6265() {
-        FOO.setDomain("apache.org");
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b", $VERSION_1, FOO, $DOMAIN_ASF, A);
+        FOO_QUOTED.setDomain("apache.org");
+        test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b", $VERSION_1, FOO_QUOTED, $DOMAIN_ASF, A);
     }
 
     @Test
     public void v1PortIsIgnoredRfc6265() {
         FOO.setDomain("apache.org");
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", $VERSION_1, FOO, $DOMAIN_ASF, $PORT, A);
+        test("$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", $VERSION_1, FOO_QUOTED, $DOMAIN_ASF, $PORT, A);
     }
 
     @Test
     public void v1PathAffectsPrecedingCookieRfc6265() {
-        FOO.setPath("/examples");
-        test("$Version=1;foo=\"bar\";$Path=/examples;a=b; ; ", $VERSION_1, FOO, $PATH, A);
+        FOO_QUOTED.setPath("/examples");
+        test("$Version=1;foo=\"bar\";$Path=/examples;a=b; ; ", $VERSION_1, FOO_QUOTED, $PATH, A);
     }
 
     @Test
@@ -219,7 +227,7 @@ public class TestCookies {
     @Test
     public void allow8bitInV1QuotedValue() {
         // Bug 55917
-        test("$Version=1; foo=\"b\u00e1r\"", $VERSION_1, FOO_CONTROL);
+        test("$Version=1; foo=\"b\u00e1r\"", $VERSION_1, FOO_CONTROL_QUOTED);
     }
 
     @Test
@@ -268,12 +276,13 @@ public class TestCookies {
 
     @Test
     public void testBug60788Rfc6265() {
-        Cookie c1 = new Cookie("userId", "foo");
-        Cookie c2 = new Cookie("$Path", "/");
-        Cookie c3 = new Cookie("$Domain", "www.example.org");
+        Cookie c1 = new Cookie("$Version", "\"1\"");
+        Cookie c2 = new Cookie("userId", "\"foo\"");
+        Cookie c3 = new Cookie("$Path", "\"/\"");
+        Cookie c4 = new Cookie("$Domain", "\"www.example.org\"");
 
         test("$Version=\"1\"; userId=\"foo\";$Path=\"/\";$Domain=\"www.example.org\"",
-                $VERSION_1, c1, c2, c3);
+                c1, c2, c3, c4);
     }
 
 

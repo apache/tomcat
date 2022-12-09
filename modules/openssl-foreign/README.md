@@ -5,26 +5,11 @@
 It uses the JEP 434 API. More details on this API are available
 at `https://openjdk.java.net/jeps/434`.
 
-## Building Java 20 with the JEP 434 API
-
-Clone `https://github.com/openjdk/panama-foreign/` in some location and
-checkout the main branch. This is a Java 20 development JVM
-with the JEP 434 API. It may fail to build. When this happens, step back
-one commit at a time until it does.
-
-```
-bash configure
-make images
-```
-
 ## Building
 
-The module can now be built.
-```
-export JAVA_HOME=<pathto>/panama-foreign/build/linux-x86_64-server-release/images/jdk
-mvn package
-```
-Note: The build path for the JDK will be different on other platforms.
+The module can be built using Java 20. This will be the only Java version that
+is supported as the JEP 434 API is incubating and will continue to evolve.
+It can be built and run with Apache Tomcat 9.0 or newer.
 
 ## Running
 
@@ -69,7 +54,7 @@ export JAVA_OPTS="--enable-preview --enable-native-access=ALL-UNNAMED"
 
 jextract is now available in its own standalone repository. Clone
 `https://github.com/openjdk/jextract` in some location and
-checkout the `panama` branch. Please refer to the
+checkout the branch that supports Java 20. Please refer to the
 instructions from the repository for building.
 
 This step is only useful to be able to use additional native APIs from OpenSSL

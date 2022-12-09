@@ -24,8 +24,8 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.MemorySession;
 import java.lang.foreign.SegmentAllocator;
+import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -171,11 +171,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private static final ConcurrentHashMap<Long, ContextState> states = new ConcurrentHashMap<>();
 
     static ContextState getState(MemorySegment ctx) {
-        return states.get(Long.valueOf(Long.valueOf(ctx.address())));
+        return states.get(Long.valueOf(ctx.address()));
     }
 
     private final ContextState state;
-    private final MemorySession contextMemorySession;
+    private final SegmentScope contextScope;
     private final Cleanable cleanable;
 
     private static String[] getCiphers(MemorySegment sslCtx) {
@@ -207,7 +207,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
-        contextMemorySession = MemorySession.implicit();
+        contextScope = SegmentScope.auto();
 
         MemorySegment sslCtx = MemorySegment.NULL;
         MemorySegment confCtx = MemorySegment.NULL;
@@ -224,8 +224,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     confCtx = SSL_CONF_CTX_new();
                     long errCode = ERR_get_error();
                     if (errCode != 0) {
-                        try (var memorySession = Arena.openConfined()) {
-                            var buf = memorySession.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
+                        try (var localArena = Arena.openConfined()) {
+                            var buf = localArena.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
                             ERR_error_string(errCode, buf);
                             log.error(sm.getString("openssl.errorLoadingCertificate", buf.getUtf8String(0)));
                         }
@@ -331,7 +331,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Set int pem_password_cb(char *buf, int size, int rwflag, void *u) callback
             openSSLCallbackPassword =
                     Linker.nativeLinker().upcallStub(openSSLCallbackPasswordHandle,
-                    openSSLCallbackPasswordFunctionDescriptor, contextMemorySession);
+                    openSSLCallbackPasswordFunctionDescriptor, contextScope);
             SSL_CTX_set_default_passwd_cb(sslCtx, openSSLCallbackPassword);
 
             alpn = (negotiableProtocols != null && negotiableProtocols.size() > 0);
@@ -402,16 +402,16 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("opensslconf.checkCommand", name, value));
             }
-            try (var memorySession = Arena.openConfined()) {
+            try (var localArena = Arena.openConfined()) {
                 // rc = SSLConf.check(confCtx, name, value);
                 if (name.equals("NO_OCSP_CHECK")) {
                     rc = 1;
                 } else {
-                    int code = SSL_CONF_cmd_value_type(state.confCtx, memorySession.allocateUtf8String(name));
+                    int code = SSL_CONF_cmd_value_type(state.confCtx, localArena.allocateUtf8String(name));
                     rc = 1;
                     long errCode = ERR_get_error();
                     if (errCode != 0) {
-                        var buf = memorySession.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
+                        var buf = localArena.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
                         ERR_error_string(errCode, buf);
                         log.error(sm.getString("opensslconf.checkFailed", buf.getUtf8String(0)));
                         rc = 0;
@@ -477,17 +477,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("opensslconf.applyCommand", name, value));
             }
-            try (var memorySession = Arena.openConfined()) {
+            try (var localArena = Arena.openConfined()) {
                 // rc = SSLConf.apply(confCtx, name, value);
                 if (name.equals("NO_OCSP_CHECK")) {
                     noOcspCheck = Boolean.valueOf(value);
                     rc = 1;
                 } else {
-                    rc = SSL_CONF_cmd(state.confCtx, memorySession.allocateUtf8String(name),
-                            memorySession.allocateUtf8String(value));
+                    rc = SSL_CONF_cmd(state.confCtx, localArena.allocateUtf8String(name),
+                            localArena.allocateUtf8String(value));
                     long errCode = ERR_get_error();
                     if (rc <= 0 || errCode != 0) {
-                        var buf = memorySession.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
+                        var buf = localArena.allocateArray(ValueLayout.JAVA_BYTE, new byte[128]);
                         ERR_error_string(errCode, buf);
                         log.error(sm.getString("opensslconf.commandError", name, value, buf.getUtf8String(0)));
                         rc = 0;
@@ -535,7 +535,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             log.warn(sm.getString("openssl.doubleInit"));
             return;
         }
-        try (var memorySession = Arena.openConfined()) {
+        try (var localArena = Arena.openConfined()) {
             if (sslHostConfig.getInsecureRenegotiation()) {
                 SSL_CTX_set_options(state.sslCtx, SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION());
             } else {
@@ -567,13 +567,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // List the ciphers that the client is permitted to negotiate
             if (minTlsVersion <= TLS1_2_VERSION()) {
                 if (SSL_CTX_set_cipher_list(state.sslCtx,
-                        memorySession.allocateUtf8String(sslHostConfig.getCiphers())) <= 0) {
+                        localArena.allocateUtf8String(sslHostConfig.getCiphers())) <= 0) {
                     log.warn(sm.getString("engine.failedCipherList", sslHostConfig.getCiphers()));
                 }
             }
             if (maxTlsVersion >= TLS1_3_VERSION() && (sslHostConfig.getCiphers() != SSLHostConfig.DEFAULT_TLS_CIPHERS)) {
                 if (SSL_CTX_set_ciphersuites(state.sslCtx,
-                        memorySession.allocateUtf8String(sslHostConfig.getCiphers())) <= 0) {
+                        localArena.allocateUtf8String(sslHostConfig.getCiphers())) <= 0) {
                     log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
                 }
             }
@@ -582,7 +582,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 certificate.setCertificateKeyManager(OpenSSLUtil.chooseKeyManager(kms));
             }
 
-            addCertificate(certificate, memorySession);
+            addCertificate(certificate, localArena);
 
             // Client certificate verification
             int value = 0;
@@ -610,7 +610,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             var openSSLCallbackVerify =
                     Linker.nativeLinker().upcallStub(openSSLCallbackVerifyHandle,
-                    openSSLCallbackVerifyFunctionDescriptor, contextMemorySession);
+                    openSSLCallbackVerifyFunctionDescriptor, contextScope);
             // Leave this just in case but in Tomcat this is always set again by the engine
             SSL_CTX_set_verify(state.sslCtx, value, openSSLCallbackVerify);
 
@@ -620,7 +620,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 state.x509TrustManager = chooseTrustManager(tms);
                 var openSSLCallbackCertVerify =
                         Linker.nativeLinker().upcallStub(openSSLCallbackCertVerifyHandle,
-                                openSSLCallbackCertVerifyFunctionDescriptor, contextMemorySession);
+                                openSSLCallbackCertVerifyFunctionDescriptor, contextScope);
                 SSL_CTX_set_cert_verify_callback(state.sslCtx, openSSLCallbackCertVerify, state.sslCtx);
 
                 // Pass along the DER encoded certificates of the accepted client
@@ -629,13 +629,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // an acceptable certificate
                 for (X509Certificate caCert : state.x509TrustManager.getAcceptedIssuers()) {
                     //SSLContext.addClientCACertificateRaw(state.ctx, caCert.getEncoded());
-                    var rawCACertificate = memorySession.allocateArray(ValueLayout.JAVA_BYTE, caCert.getEncoded());
-                    var rawCACertificatePointer = memorySession.allocate(ValueLayout.ADDRESS, rawCACertificate);
+                    var rawCACertificate = localArena.allocateArray(ValueLayout.JAVA_BYTE, caCert.getEncoded());
+                    var rawCACertificatePointer = localArena.allocate(ValueLayout.ADDRESS, rawCACertificate);
                     var x509CACert = d2i_X509(MemorySegment.NULL, rawCACertificatePointer, rawCACertificate.byteSize());
                     if (MemorySegment.NULL.equals(x509CACert)) {
-                        logLastError(memorySession, "openssl.errorLoadingCertificate");
+                        logLastError(localArena, "openssl.errorLoadingCertificate");
                     } else if (SSL_CTX_add_client_CA(state.sslCtx, x509CACert) <= 0) {
-                        logLastError(memorySession, "openssl.errorAddingCertificate");
+                        logLastError(localArena, "openssl.errorAddingCertificate");
                     } else if (log.isDebugEnabled()) {
                         log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
                     }
@@ -646,14 +646,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
                 //        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
                 MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null
-                        ? memorySession.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : null;
+                        ? localArena.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : null;
                 MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
-                        ? memorySession.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : null;
+                        ? localArena.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : null;
                 if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) 
                         && SSL_CTX_load_verify_locations(state.sslCtx,
                                 caCertificateFileNative == null ? MemorySegment.NULL : caCertificateFileNative,
                                         caCertificatePathNative == null ? MemorySegment.NULL : caCertificatePathNative) <= 0) {
-                    logLastError(memorySession, "openssl.errorConfiguringLocations");
+                    logLastError(localArena, "openssl.errorConfiguringLocations");
                 } else {
                     var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
                     if (MemorySegment.NULL.equals(caCerts)) {
@@ -678,7 +678,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 //        MemoryAddress in, int inlen, MemoryAddress arg
                 var openSSLCallbackAlpnSelectProto =
                         Linker.nativeLinker().upcallStub(openSSLCallbackAlpnSelectProtoHandle,
-                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, contextMemorySession);
+                        openSSLCallbackAlpnSelectProtoFunctionDescriptor, contextScope);
                 SSL_CTX_set_alpn_select_cb(state.sslCtx, openSSLCallbackAlpnSelectProto, state.sslCtx);
             }
 
@@ -794,8 +794,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             log.warn(sm.getString("context.noSSL", Long.valueOf(arg.address())));
             return SSL_TLSEXT_ERR_NOACK();
         }
-        try (var memorySession = Arena.openConfined()) {
-            MemorySegment inSeg = MemorySegment.ofAddress(in.address(), inlen, memorySession.session());
+        try (var localArena = Arena.openConfined()) {
+            MemorySegment inSeg = MemorySegment.ofAddress(in.address(), inlen, localArena.scope());
             byte[] advertisedBytes = inSeg.toArray(ValueLayout.JAVA_BYTE);
             for (byte[] negotiableProtocolBytes : state.negotiableProtocols) {
                 for (int i = 0; i <= advertisedBytes.length - negotiableProtocolBytes.length; i++) {
@@ -804,9 +804,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                             if (advertisedBytes[i + j] == negotiableProtocolBytes[j]) {
                                 if (j == negotiableProtocolBytes.length - 1) {
                                     // Match
-                                    MemorySegment outSeg = MemorySegment.ofAddress(out.address(), ValueLayout.ADDRESS.byteSize(), memorySession.session());
+                                    MemorySegment outSeg = MemorySegment.ofAddress(out.address(), ValueLayout.ADDRESS.byteSize(), localArena.scope());
                                     outSeg.set(ValueLayout.ADDRESS, 0, inSeg.asSlice(i));
-                                    MemorySegment outlenSeg = MemorySegment.ofAddress(outlen.address(), ValueLayout.JAVA_BYTE.byteSize(), memorySession.session());
+                                    MemorySegment outlenSeg = MemorySegment.ofAddress(outlen.address(), ValueLayout.JAVA_BYTE.byteSize(), localArena.scope());
                                     outlenSeg.set(ValueLayout.JAVA_BYTE, 0, (byte) negotiableProtocolBytes.length);
                                     return SSL_TLSEXT_ERR_OK();
                                 }
@@ -842,17 +842,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         MemorySegment /*STACK_OF(X509)*/ sk = X509_STORE_CTX_get0_untrusted(x509_ctx);
         int len = OPENSSL_sk_num(sk);
         byte[][] certificateChain = new byte[len][];
-        try (var memorySession = Arena.openConfined()) {
+        try (var localArena = Arena.openConfined()) {
             for (int i = 0; i < len; i++) {
                 MemorySegment/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
-                MemorySegment bufPointer = memorySession.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
+                MemorySegment bufPointer = localArena.allocate(ValueLayout.ADDRESS, MemorySegment.NULL);
                 int length = i2d_X509(x509, bufPointer);
                 if (length < 0) {
                     certificateChain[i] = new byte[0];
                     continue;
                 }
                 MemorySegment buf = bufPointer.get(ValueLayout.ADDRESS, 0);
-                certificateChain[i] = MemorySegment.ofAddress(buf.address(), length, memorySession.session()).toArray(ValueLayout.JAVA_BYTE);
+                certificateChain[i] = MemorySegment.ofAddress(buf.address(), length, localArena.scope()).toArray(ValueLayout.JAVA_BYTE);
                 CRYPTO_free(buf, MemorySegment.NULL, 0); // OPENSSL_free macro
             }
             MemorySegment cipher = SSL_get_current_cipher(ssl);
@@ -960,13 +960,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
         String callbackPassword = callbackPasswordTheadLocal.get();
         if (callbackPassword != null && callbackPassword.length() > 0) {
-            try (var memorySession = Arena.openConfined()) {
-                MemorySegment callbackPasswordNative = memorySession.allocateUtf8String(callbackPassword);
+            try (var localArena = Arena.openConfined()) {
+                MemorySegment callbackPasswordNative = localArena.allocateUtf8String(callbackPassword);
                 if (callbackPasswordNative.byteSize() > bufsiz) {
                     // The password is too long
                     log.error(sm.getString("openssl.passwordTooLong"));
                 } else {
-                    MemorySegment bufSegment = MemorySegment.ofAddress(buf.address(), bufsiz, memorySession.session());
+                    MemorySegment bufSegment = MemorySegment.ofAddress(buf.address(), bufsiz, localArena.scope());
                     bufSegment.copyFrom(callbackPasswordNative);
                     return (int) callbackPasswordNative.byteSize();
                 }
@@ -976,7 +976,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
-    private void addCertificate(SSLHostConfigCertificate certificate, Arena memorySession) throws Exception {
+    private void addCertificate(SSLHostConfigCertificate certificate, Arena localArena) throws Exception {
         int index = getCertificateIndex(certificate);
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {
@@ -985,9 +985,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             //        SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
             //        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
             //        certificate.getCertificateKeyPassword(), getCertificateIndex(certificate));
-            var certificateFileNative = memorySession.allocateUtf8String(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()));
+            var certificateFileNative = localArena.allocateUtf8String(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()));
             var certificateKeyFileNative = (certificate.getCertificateKeyFile() == null) ? certificateFileNative
-                    : memorySession.allocateUtf8String(SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()));
+                    : localArena.allocateUtf8String(SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()));
             MemorySegment bio;
             MemorySegment cert = MemorySegment.NULL;
             MemorySegment key = MemorySegment.NULL;
@@ -1011,7 +1011,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 int passwordLength = 0;
                 String callbackPassword = certificate.getCertificateKeyPassword();
                 if (callbackPassword != null && callbackPassword.length() > 0) {
-                    passwordAddress = memorySession.allocateUtf8String(callbackPassword);
+                    passwordAddress = localArena.allocateUtf8String(callbackPassword);
                     passwordLength = (int) (passwordAddress.byteSize() - 1);
                 }
                 if (PKCS12_verify_mac(p12, passwordAddress, passwordLength) <= 0) {
@@ -1020,8 +1020,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     PKCS12_free(p12);
                     return;
                 }
-                MemorySegment certPointer = memorySession.allocate(ValueLayout.ADDRESS);
-                MemorySegment keyPointer = memorySession.allocate(ValueLayout.ADDRESS);
+                MemorySegment certPointer = localArena.allocate(ValueLayout.ADDRESS);
+                MemorySegment keyPointer = localArena.allocate(ValueLayout.ADDRESS);
                 if (PKCS12_parse(p12, passwordAddress, keyPointer, certPointer, MemorySegment.NULL) <= 0) {
                     log.error(sm.getString("openssl.errorLoadingCertificate", "[3]:" + certificate.getCertificateFile()));
                     PKCS12_free(p12);
@@ -1101,20 +1101,20 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
             if (SSL_CTX_use_certificate(state.sslCtx, cert) <= 0) {
-                logLastError(memorySession, "openssl.errorLoadingCertificate");
+                logLastError(localArena, "openssl.errorLoadingCertificate");
                 return;
             }
             if (SSL_CTX_use_PrivateKey(state.sslCtx, key) <= 0) {
-                logLastError(memorySession, "openssl.errorLoadingPrivateKey");
+                logLastError(localArena, "openssl.errorLoadingPrivateKey");
                 return;
             }
             if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
-                logLastError(memorySession, "openssl.errorPrivateKeyCheck");
+                logLastError(localArena, "openssl.errorPrivateKeyCheck");
                 return;
             }
             // Try to read DH parameters from the (first) SSLCertificateFile
             if (index == SSL_AIDX_RSA) {
-                bio = BIO_new_file(certificateFileNative, memorySession.allocateUtf8String("r"));
+                bio = BIO_new_file(certificateFileNative, localArena.allocateUtf8String("r"));
                 var dh = PEM_read_bio_DHparams(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
                 BIO_free(bio);
                 // #  define SSL_CTX_set_tmp_dh(sslCtx,dh) \
@@ -1125,7 +1125,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
             // Similarly, try to read the ECDH curve name from SSLCertificateFile...
-            bio = BIO_new_file(certificateFileNative, memorySession.allocateUtf8String("r"));
+            bio = BIO_new_file(certificateFileNative, localArena.allocateUtf8String("r"));
             var ecparams = PEM_read_bio_ECPKParameters(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
             BIO_free(bio);
             if (!MemorySegment.NULL.equals(ecparams)) {
@@ -1139,12 +1139,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             // Set callback for DH parameters
             var openSSLCallbackTmpDH = Linker.nativeLinker().upcallStub(openSSLCallbackTmpDHHandle,
-                    openSSLCallbackTmpDHFunctionDescriptor, contextMemorySession);
+                    openSSLCallbackTmpDHFunctionDescriptor, contextScope);
             SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
             // Set certificate chain file
             if (certificate.getCertificateChainFile() != null) {
                 var certificateChainFileNative =
-                        memorySession.allocateUtf8String(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()));
+                        localArena.allocateUtf8String(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()));
                 // SSLContext.setCertificateChainFile(state.ctx,
                 //        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
                 if (SSL_CTX_use_certificate_chain_file(state.sslCtx, certificateChainFileNative) <= 0) {
@@ -1161,7 +1161,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (sslHostConfig.getCertificateRevocationListFile() != null) {
                 MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_file());
                 var certificateRevocationListFileNative =
-                        memorySession.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()));
+                        localArena.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListFile()));
                 //X509_LOOKUP_ctrl(lookup,X509_L_FILE_LOAD,file,type,NULL)
                 if (X509_LOOKUP_ctrl(x509Lookup, X509_L_FILE_LOAD(), certificateRevocationListFileNative,
                         X509_FILETYPE_PEM(), MemorySegment.NULL) <= 0) {
@@ -1171,7 +1171,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (sslHostConfig.getCertificateRevocationListPath() != null) {
                 MemorySegment x509Lookup = X509_STORE_add_lookup(certificateStore, X509_LOOKUP_hash_dir());
                 var certificateRevocationListPathNative =
-                        memorySession.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()));
+                        localArena.allocateUtf8String(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateRevocationListPath()));
                 //X509_LOOKUP_ctrl(lookup,X509_L_ADD_DIR,path,type,NULL)
                 if (X509_LOOKUP_ctrl(x509Lookup, X509_L_ADD_DIR(), certificateRevocationListPathNative,
                         X509_FILETYPE_PEM(), MemorySegment.NULL) <= 0) {
@@ -1197,12 +1197,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             //SSLContext.setCertificateRaw(state.ctx, chain[0].getEncoded(),
             //        sb.toString().getBytes(StandardCharsets.US_ASCII),
             //        getCertificateIndex(certificate));
-            var rawCertificate = memorySession.allocateArray(ValueLayout.JAVA_BYTE, chain[0].getEncoded());
-            var rawCertificatePointer = memorySession.allocate(ValueLayout.ADDRESS, rawCertificate);
-            var rawKey = memorySession.allocateArray(ValueLayout.JAVA_BYTE, sb.toString().getBytes(StandardCharsets.US_ASCII));
+            var rawCertificate = localArena.allocateArray(ValueLayout.JAVA_BYTE, chain[0].getEncoded());
+            var rawCertificatePointer = localArena.allocate(ValueLayout.ADDRESS, rawCertificate);
+            var rawKey = localArena.allocateArray(ValueLayout.JAVA_BYTE, sb.toString().getBytes(StandardCharsets.US_ASCII));
             var x509cert = d2i_X509(MemorySegment.NULL, rawCertificatePointer, rawCertificate.byteSize());
             if (MemorySegment.NULL.equals(x509cert)) {
-                logLastError(memorySession, "openssl.errorLoadingCertificate");
+                logLastError(localArena, "openssl.errorLoadingCertificate");
                 return;
             }
             var bio = BIO_new(BIO_s_mem());
@@ -1210,37 +1210,37 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             MemorySegment privateKeyAddress = PEM_read_bio_PrivateKey(bio, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
             BIO_free(bio);
             if (MemorySegment.NULL.equals(privateKeyAddress)) {
-                logLastError(memorySession, "openssl.errorLoadingPrivateKey");
+                logLastError(localArena, "openssl.errorLoadingPrivateKey");
                 return;
             }
             if (SSL_CTX_use_certificate(state.sslCtx, x509cert) <= 0) {
-                logLastError(memorySession, "openssl.errorLoadingCertificate");
+                logLastError(localArena, "openssl.errorLoadingCertificate");
                 return;
             }
             if (SSL_CTX_use_PrivateKey(state.sslCtx, privateKeyAddress) <= 0) {
-                logLastError(memorySession, "openssl.errorLoadingPrivateKey");
+                logLastError(localArena, "openssl.errorLoadingPrivateKey");
                 return;
             }
             if (SSL_CTX_check_private_key(state.sslCtx) <= 0) {
-                logLastError(memorySession, "openssl.errorPrivateKeyCheck");
+                logLastError(localArena, "openssl.errorPrivateKeyCheck");
                 return;
             }
             // Set callback for DH parameters
             var openSSLCallbackTmpDH = Linker.nativeLinker().upcallStub(openSSLCallbackTmpDHHandle,
-                    openSSLCallbackTmpDHFunctionDescriptor, contextMemorySession);
+                    openSSLCallbackTmpDHFunctionDescriptor, contextScope);
             SSL_CTX_set_tmp_dh_callback(state.sslCtx, openSSLCallbackTmpDH);
             for (int i = 1; i < chain.length; i++) {
                 //SSLContext.addChainCertificateRaw(state.ctx, chain[i].getEncoded());
-                var rawCertificateChain = memorySession.allocateArray(ValueLayout.JAVA_BYTE, chain[i].getEncoded());
-                var rawCertificateChainPointer = memorySession.allocate(ValueLayout.ADDRESS, rawCertificateChain);
+                var rawCertificateChain = localArena.allocateArray(ValueLayout.JAVA_BYTE, chain[i].getEncoded());
+                var rawCertificateChainPointer = localArena.allocate(ValueLayout.ADDRESS, rawCertificateChain);
                 var x509certChain = d2i_X509(MemorySegment.NULL, rawCertificateChainPointer, rawCertificateChain.byteSize());
                 if (MemorySegment.NULL.equals(x509certChain)) {
-                    logLastError(memorySession, "openssl.errorLoadingCertificate");
+                    logLastError(localArena, "openssl.errorLoadingCertificate");
                     return;
                 }
                 // # define SSL_CTX_add0_chain_cert(sslCtx,x509) SSL_CTX_ctrl(sslCtx,SSL_CTRL_CHAIN_CERT,0,(char *)(x509))
                 if (SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_CHAIN_CERT(), 0, x509certChain) <= 0) {
-                    logLastError(memorySession, "openssl.errorAddingCertificate");
+                    logLastError(localArena, "openssl.errorAddingCertificate");
                     return;
                 }
             }
@@ -1372,7 +1372,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static class ContextState implements Runnable {
 
-        private final Arena stateSession = Arena.openShared();
+        private final Arena stateArena = Arena.openShared();
         private final MemorySegment sslCtx;
         private final MemorySegment confCtx;
         private final List<byte[]> negotiableProtocols;
@@ -1384,9 +1384,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             this.negotiableProtocols = negotiableProtocols;
             // Allocate another session to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
-            this.sslCtx = MemorySegment.ofAddress(sslCtx.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
+            this.sslCtx = MemorySegment.ofAddress(sslCtx.address(), ValueLayout.ADDRESS.byteSize(), stateArena.scope());
             if (!MemorySegment.NULL.equals(confCtx)) {
-                this.confCtx = MemorySegment.ofAddress(confCtx.address(), ValueLayout.ADDRESS.byteSize(), stateSession.session());
+                this.confCtx = MemorySegment.ofAddress(confCtx.address(), ValueLayout.ADDRESS.byteSize(), stateArena.scope());
             } else {
                 this.confCtx = null;
             }
@@ -1401,7 +1401,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     SSL_CONF_CTX_free(confCtx);
                 }
             } finally {
-                stateSession.close();
+                stateArena.close();
             }
         }
     }

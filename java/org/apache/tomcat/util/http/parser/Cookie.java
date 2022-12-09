@@ -185,13 +185,6 @@ public class Cookie {
      */
     private static ByteBuffer readCookieValueRfc6265(ByteBuffer bb) {
         boolean quoted = false;
-        if (bb.hasRemaining()) {
-            if (bb.get() == QUOTE_BYTE) {
-                quoted = true;
-            } else {
-                bb.rewind();
-            }
-        }
         int start = bb.position();
         int end = bb.limit();
         while (bb.hasRemaining()) {
@@ -202,8 +195,10 @@ public class Cookie {
                 end = bb.position() - 1;
                 bb.position(end);
                 break;
+            } else if (b == QUOTE_BYTE && start == bb.position() -1) {
+                quoted = true;
             } else if (quoted && b == QUOTE_BYTE) {
-                end = bb.position() - 1;
+                end = bb.position();
                 break;
             } else {
                 // Invalid cookie

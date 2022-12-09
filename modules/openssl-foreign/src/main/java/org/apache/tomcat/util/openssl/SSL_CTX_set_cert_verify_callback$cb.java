@@ -27,10 +27,10 @@ import static java.lang.foreign.ValueLayout.*;
 public interface SSL_CTX_set_cert_verify_callback$cb {
 
     int apply(java.lang.foreign.MemorySegment _x0, java.lang.foreign.MemorySegment _x1);
-    static MemorySegment allocate(SSL_CTX_set_cert_verify_callback$cb fi, MemorySession session) {
+    static MemorySegment allocate(SSL_CTX_set_cert_verify_callback$cb fi, SegmentScope session) {
         return RuntimeHelper.upcallStub(SSL_CTX_set_cert_verify_callback$cb.class, fi, constants$15.SSL_CTX_set_cert_verify_callback$cb$FUNC, session);
     }
-    static SSL_CTX_set_cert_verify_callback$cb ofAddress(MemorySegment addr, MemorySession session) {
+    static SSL_CTX_set_cert_verify_callback$cb ofAddress(MemorySegment addr, SegmentScope session) {
         MemorySegment symbol = MemorySegment.ofAddress(addr.address(), 0, session);
         return (java.lang.foreign.MemorySegment __x0, java.lang.foreign.MemorySegment __x1) -> {
             try {
