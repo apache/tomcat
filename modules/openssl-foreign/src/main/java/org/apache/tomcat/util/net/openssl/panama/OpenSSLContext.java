@@ -1382,7 +1382,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         private ContextState(MemorySegment sslCtx, MemorySegment confCtx, List<byte[]> negotiableProtocols) {
             states.put(Long.valueOf(sslCtx.address()), this);
             this.negotiableProtocols = negotiableProtocols;
-            // Allocate another session to avoid keeping a reference through segments
+            // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
             this.sslCtx = MemorySegment.ofAddress(sslCtx.address(), ValueLayout.ADDRESS.byteSize(), stateArena.scope());
             if (!MemorySegment.NULL.equals(confCtx)) {
