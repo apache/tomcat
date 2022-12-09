@@ -22,17 +22,18 @@ import org.apache.tomcat.util.res.StringManager;
 
 enum FrameType {
 
-    DATA          (0,   false,  true, null,              false),
-    HEADERS       (1,   false,  true, null,               true),
-    PRIORITY      (2,   false,  true, (x) -> x == 5,     false),
-    RST           (3,   false,  true, (x) -> x == 4,     false),
-    SETTINGS      (4,    true, false, (x) -> x % 6 == 0,  true),
-    PUSH_PROMISE  (5,   false,  true, (x) -> x >= 4,      true),
-    PING          (6,    true, false, (x) -> x == 8,     false),
-    GOAWAY        (7,    true, false, (x) -> x >= 8,     false),
-    WINDOW_UPDATE (8,    true,  true, (x) -> x == 4,      true),
-    CONTINUATION  (9,   false,  true, null,               true),
-    UNKNOWN       (256,  true,  true, null,              false);
+    DATA            (  0, false,  true, null,              false),
+    HEADERS         (  1, false,  true, null,               true),
+    PRIORITY        (  2, false,  true, (x) -> x == 5,     false),
+    RST             (  3, false,  true, (x) -> x == 4,     false),
+    SETTINGS        (  4,  true, false, (x) -> x % 6 == 0,  true),
+    PUSH_PROMISE    (  5, false,  true, (x) -> x >= 4,      true),
+    PING            (  6,  true, false, (x) -> x == 8,     false),
+    GOAWAY          (  7,  true, false, (x) -> x >= 8,     false),
+    WINDOW_UPDATE   (  8,  true,  true, (x) -> x == 4,      true),
+    CONTINUATION    (  9, false,  true, null,               true),
+    PRIORITY_UPDATE ( 16,  true, false, (x) -> x >= 4,      true),
+    UNKNOWN         (256,  true,  true, null,              false);
 
     private static final StringManager sm = StringManager.getManager(FrameType.class);
 
@@ -107,6 +108,8 @@ enum FrameType {
             return WINDOW_UPDATE;
         case 9:
             return CONTINUATION;
+        case 16:
+            return PRIORITY_UPDATE;
         default:
             return UNKNOWN;
         }

@@ -16,7 +16,11 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
@@ -27,6 +31,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
+import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.res.StringManager;
 
 class Http2Parser {
@@ -120,6 +125,9 @@ class Http2Parser {
             break;
         case CONTINUATION:
             readContinuationFrame(streamId, flags, payloadSize, null);
+            break;
+        case PRIORITY_UPDATE:
+            readPriorityUpdateFrame(payloadSize, null);
             break;
         case UNKNOWN:
             readUnknownFrame(streamId, frameTypeId, flags, payloadSize, null);
@@ -438,6 +446,36 @@ class Http2Parser {
             headersCurrentStream = -1;
             onHeadersComplete(streamId);
         }
+    }
+
+
+    protected void readPriorityUpdateFrame(int payloadSize, ByteBuffer buffer) throws Http2Exception, IOException {
+        // Identify prioritized stream ID
+        byte[] payload = new byte[payloadSize];
+        if (buffer == null) {
+            input.fill(true, payload);
+        } else {
+            buffer.get(payload);
+        }
+
+        int prioritizedStreamID = ByteUtil.get31Bits(payload, 0);
+
+        if (prioritizedStreamID == 0) {
+            throw new ConnectionException(
+                    sm.getString("http2Parser.processFramePriorityUpdate.streamZero"), Http2Error.PROTOCOL_ERROR);
+        }
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(payload, 4, payloadSize - 4);
+        Reader r = new BufferedReader(new InputStreamReader(bais, StandardCharsets.US_ASCII));
+        Priority p = Priority.parsePriority(r);
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFramePriorityUpdate.debug", connectionId,
+                    Integer.toString(prioritizedStreamID), Integer.toString(p.getUrgency()),
+                    Boolean.valueOf(p.getIncremental())));
+        }
+
+        output.priorityUpdate(prioritizedStreamID, p);
     }
 
 
@@ -782,6 +820,9 @@ class Http2Parser {
 
         // Window size
         void incrementWindowSize(int streamId, int increment) throws Http2Exception;
+
+        // Priority update
+        void priorityUpdate(int prioritizedStreamID, Priority p) throws Http2Exception;
 
         /**
          * Notification triggered when the parser swallows the payload of an

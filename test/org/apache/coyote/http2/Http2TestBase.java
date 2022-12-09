@@ -62,6 +62,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.net.TesterSupport;
 
 /**
@@ -1230,6 +1231,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         public void incrementWindowSize(int streamId, int increment) {
             trace.append(streamId + "-WindowSize-[" + increment + "]\n");
+        }
+
+
+        @Override
+        public void priorityUpdate(int prioritizedStreamID, Priority p) throws Http2Exception {
+            trace.append(prioritizedStreamID + "-PriorityUpdate-[" + p.getUrgency()+ "]-[" + p.getIncremental()+ "]\n");
         }
 
 

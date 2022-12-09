@@ -276,6 +276,9 @@ class Http2AsyncParser extends Http2Parser {
                             case CONTINUATION:
                                 readContinuationFrame(streamId, flags, payloadSize, payload);
                                 break;
+                            case PRIORITY_UPDATE:
+                                readPriorityUpdateFrame(payloadSize, payload);
+                                break;
                             case UNKNOWN:
                                 readUnknownFrame(streamId, frameTypeId, flags, payloadSize, payload);
                             }

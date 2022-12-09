@@ -48,6 +48,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -1790,6 +1791,17 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
             stream.checkState(FrameType.WINDOW_UPDATE);
             stream.incrementWindowSize(increment);
+        }
+    }
+
+
+    @Override
+    public void priorityUpdate(int prioritizedStreamID, Priority p) throws Http2Exception {
+        AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(prioritizedStreamID, true);
+        if (abstractNonZeroStream instanceof Stream) {
+            Stream stream = (Stream) abstractNonZeroStream;
+            stream.setUrgency(p.getUrgency());
+            stream.setIncremental(p.getIncremental());
         }
     }
 
