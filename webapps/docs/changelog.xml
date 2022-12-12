@@ -105,6 +105,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M2 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Update the <code>ServletInputStream</code> and
+        <code>ServletOuputStream</code> classes in the Servlet API to align with
+        the recent updates in the Jakarta Servlet specification to support
+        reading and writing with <code>ByteBuffer</code>s. The changes also
+        clarified various aspects of the Servlet non-blocking API. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>

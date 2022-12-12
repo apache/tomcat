@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Objects;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
@@ -134,18 +135,9 @@ public class CoyoteInputStream extends ServletInputStream {
     }
 
 
-    /**
-     * Transfers bytes from the buffer to the specified ByteBuffer. After the
-     * operation the position of the ByteBuffer will be returned to the one
-     * before the operation, the limit will be the position incremented by
-     * the number of the transferred bytes.
-     *
-     * @param b the ByteBuffer into which bytes are to be written.
-     * @return an integer specifying the actual number of bytes read, or -1 if
-     *         the end of the stream is reached
-     * @throws IOException if an input or output exception has occurred
-     */
+    @Override
     public int read(final ByteBuffer b) throws IOException {
+        Objects.requireNonNull(b);
         checkNonBlockingRead();
 
         if (SecurityUtil.isPackageProtectionEnabled()) {

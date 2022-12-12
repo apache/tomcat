@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
@@ -100,8 +101,13 @@ public class CoyoteOutputStream extends ServletOutputStream {
     }
 
 
+    @Override
     public void write(ByteBuffer from) throws IOException {
+        Objects.requireNonNull(from);
         boolean nonBlocking = checkNonBlockingWrite();
+        if (from.remaining() == 0) {
+            return;
+        }
         ob.write(from);
         if (nonBlocking) {
             checkRegisterForWrite();

@@ -19,7 +19,9 @@ package jakarta.servlet;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.text.MessageFormat;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -43,6 +45,69 @@ public abstract class ServletOutputStream extends OutputStream {
      */
     protected ServletOutputStream() {
         // NOOP
+    }
+
+    /**
+     * Writes from the given buffer to the output stream.
+     * <p>
+     * If the output steam is in non-blocking mode, before each invocation of
+     * this method {@link #isReady()} must be called and must return
+     * {@code true} or the {@link WriteListener#onWritePossible()} call back
+     * must indicate that data may be written else an
+     * {@link IllegalStateException} must be thrown.
+     * <p>
+     * Otherwise, if this method is called when {@code buffer} has no data
+     * remaining, the method returns immediately and {@code buffer} is
+     * unchanged.
+     * <p>
+     * If the output stream is in non-blocking mode, neither the position, limit
+     * nor content of the buffer passed to this method may be modified until a
+     * subsequent call to {@link #isReady()} returns true or the
+     * {@link WriteListener#onWritePossible()} call back indicates data may be
+     * written again. At this point the buffer's limit will be unchanged from
+     * the value when passed to this method and the position will be the same as
+     * the limit.
+     * <p>
+     * If the output stream is in blocking mode and {@code buffer} has space
+     * remaining, this method blocks until all the remaining data in the buffer
+     * has been written. When the method returns, and if data has been written,
+     * the buffer's limit will be unchanged from the value when passed to this
+     * method and the position will be the same as the limit.
+     * <p>
+     * Subclasses are strongly encouraged to override this method and provide a
+     * more efficient implementation.
+     *
+     * @param buffer The buffer from which the data is written.
+     *
+     * @exception IllegalStateException If the output stream is in non-blocking
+     * mode and this method is called without first calling {@link #isReady()}
+     * and that method has returned {@code true} or
+     * {@link WriteListener#onWritePossible()} has not signalled that data may
+     * be written.
+     *
+     * @exception IOException If the output stream has been closed or if some
+     * other I/O error occurs.
+     *
+     * @exception NullPointerException If buffer is null.
+     *
+     * @since Servlet 6.1
+     */
+    public void write(ByteBuffer buffer) throws IOException {
+        Objects.requireNonNull(buffer);
+
+        if (!isReady()) {
+            throw new IllegalStateException();
+        }
+
+        if (buffer.remaining() == 0) {
+            return;
+        }
+
+        byte[] b = new byte[buffer.remaining()];
+
+        buffer.get(b);
+
+        write(b);
     }
 
     /**
@@ -278,13 +343,24 @@ public abstract class ServletOutputStream extends OutputStream {
     }
 
     /**
-     * Checks if a non-blocking write will succeed. If this returns
-     * <code>false</code>, it will cause a callback to
-     * {@link WriteListener#onWritePossible()} when the buffer has emptied. If
-     * this method returns <code>false</code> no further data must be written
-     * until the container calls {@link WriteListener#onWritePossible()}.
+     * Returns {@code true} if it is allowable to call any method that may write
+     * data (e.g. {@code write()}, {@code print()} or {@code flush}). In
+     * blocking mode, this method will always return {@code true}, but a
+     * subsequent call to a method that writes data may block. In non-blocking
+     * mode this method may return {@code false}, in which case it is illegal to
+     * call a method that writes data and an {@link IllegalStateException} MUST
+     * be thrown. When {@link WriteListener#onWritePossible()} is called, a call
+     * to this method that returned {@code true} is implicit.
+     * <p>
+     * If this method returns {@code false} and a {@link WriteListener} has been
+     * set via {@link #setWriteListener(WriteListener)}, then container will
+     * subsequently invoke {@link WriteListener#onWritePossible()} once a write
+     * operation becomes possible without blocking. Other than the initial call,
+     * {@link WriteListener#onWritePossible()} will only be called if and only
+     * if this method is called and returns false.
      *
-     * @return <code>true</code> if data can be written, else <code>false</code>
+     * @return {@code true} if data can be written without blocking, otherwise
+     *         returns {@code false}.
      *
      * @since Servlet 3.1
      */
@@ -306,4 +382,17 @@ public abstract class ServletOutputStream extends OutputStream {
      * @since Servlet 3.1
      */
     public abstract void setWriteListener(jakarta.servlet.WriteListener listener);
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If this method is called when the output stream is in non-blocking mode, it will immediately return with the stream
+     * effectively closed, even if the stream contains buffered data that is yet to be written to client. The container will
+     * write this data out in the background. If this process fails the {@link WriteListener#onError(Throwable)} method will
+     * be invoked as normal.
+     */
+    @Override
+    public void close() throws IOException {
+        super.close();
+    }
 }
