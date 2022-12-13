@@ -359,6 +359,10 @@ public class InputBuffer extends Reader
     public int read(ByteBuffer to) throws IOException {
         throwIfClosed();
 
+        if (to.remaining() == 0) {
+            return 0;
+        }
+
         if (checkByteBufferEof()) {
             return -1;
         }

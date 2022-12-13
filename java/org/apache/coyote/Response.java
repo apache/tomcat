@@ -746,10 +746,7 @@ public final class Response {
 
     public boolean isReady() {
         if (listener == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("response.notNonBlocking"));
-            }
-            return false;
+            return true;
         }
         // Assume write is not possible
         boolean ready = false;
