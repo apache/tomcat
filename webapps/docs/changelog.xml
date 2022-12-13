@@ -163,6 +163,10 @@
         Update the packaged version of the Apache Tomcat Migration Tool for
         Jakarta EE to 1.0.6. (markt)
       </update>
+      <update>
+        Update the internal fork of Apache Commons FileUpload to 34eb241
+        (2023-01-03, 2.0-SNAPSHOT). (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
