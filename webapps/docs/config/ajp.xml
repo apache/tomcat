@@ -136,12 +136,15 @@
     </attribute>
 
     <attribute name="maxParameterCount" required="false">
-      <p>The maximum number of parameter and value pairs (GET plus POST) which
-      will be automatically parsed by the container. Parameter and value pairs
-      beyond this limit will be ignored. A value of less than 0 means no limit.
-      If not specified, a default of 10000 is used. Note that
-      <code>FailedRequestFilter</code> <a href="filter.html">filter</a> can be
-      used to reject requests that hit the limit.</p>
+      <p>The maximum total number of request parameters (including uploaded
+      files) obtained from the query string and, for POST requests, the request
+      body if the content type is
+      <code>application/x-www-form-urlencoded</code> or
+      <code>multipart/form-data</code>. Request parameters beyond this limit
+      will be ignored. A value of less than 0 means no limit. If not specified,
+      a default of 10000 is used. Note that <code>FailedRequestFilter</code>
+      <a href="filter.html">filter</a> can be used to reject requests that
+      exceed the limit.</p>
     </attribute>
 
     <attribute name="maxPostSize" required="false">

@@ -138,6 +138,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the internal fork of Apache Commons FileUpload to 34eb241
+        (2023-01-03, 2.0-SNAPSHOT). (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.70 (remm)" rtext="2022-12-05">
   <subsection name="Catalina">
