@@ -144,9 +144,16 @@
         servlets. (markt)
       </fix>
       <fix>
-        Implement clarification from Jakarta Servlet project that Servlets
-        mapped to the context root should be mapped for requests to the
+        Implement the clarification from the Jakarta Servlet project that
+        Servlets mapped to the context root should be mapped for requests to the
         context root with or without the trailing <code>/</code>. (markt)
+      </fix>
+      <fix>
+        Implement the clarification from the Jakarta Servlet project that
+        calling <code>ServletOutputStream.close()</code> on a stream in
+        non-blocking mode returns immediately with the stream effectively closed
+        and any data remaining to be written is written in the background by the
+        container. (markt)
       </fix>
     </changelog>
   </subsection>

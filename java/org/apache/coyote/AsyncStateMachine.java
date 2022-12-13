@@ -16,6 +16,7 @@
  */
 package org.apache.coyote;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.juli.logging.Log;
@@ -264,7 +265,7 @@ class AsyncStateMachine {
      * current state. For example, as per SRV.2.3.3.3 can now process calls to
      * complete() or dispatch().
      */
-    synchronized SocketState asyncPostProcess() {
+    synchronized SocketState asyncPostProcess() throws IOException {
         if (state == AsyncState.COMPLETE_PENDING) {
             clearNonBlockingListeners();
             updateState(AsyncState.COMPLETING);
@@ -277,6 +278,9 @@ class AsyncStateMachine {
             updateState(AsyncState.STARTED);
             return SocketState.LONG;
         } else if (state == AsyncState.MUST_COMPLETE || state == AsyncState.COMPLETING) {
+            if (processor.getErrorState().isIoAllowed() && processor.flushBufferedWrite()) {
+                return SocketState.LONG;
+            }
             asyncCtxt.fireOnComplete();
             updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();
@@ -285,6 +289,9 @@ class AsyncStateMachine {
             updateState(AsyncState.DISPATCHING);
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.DISPATCHING) {
+            if (processor.getErrorState().isIoAllowed() && processor.flushBufferedWrite()) {
+                return SocketState.LONG;
+            }
             updateState(AsyncState.DISPATCHED);
             asyncCtxt.decrementInProgressAsyncCount();
             return SocketState.ASYNC_END;

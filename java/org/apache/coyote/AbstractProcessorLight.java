@@ -192,7 +192,7 @@ public abstract class AbstractProcessorLight implements Processor {
      */
     protected abstract SocketState dispatch(SocketEvent status) throws IOException;
 
-    protected abstract SocketState asyncPostProcess();
+    protected abstract SocketState asyncPostProcess() throws IOException;
 
     protected abstract Log getLog();
 }

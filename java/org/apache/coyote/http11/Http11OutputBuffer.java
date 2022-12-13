@@ -565,14 +565,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
 
         @Override
         public void end() throws IOException {
-            /*
-             * TODO
-             * As of Servlet 6.1, this flush is (currently) meant to be
-             * non-blocking if the output stream is in non-blocking mode. That
-             * requirement creates various complications I want to discuss with
-             * the EG before I try implementing it.
-             */
-            socketWrapper.flush(true);
+            socketWrapper.flush(response.getWriteListener() == null);
         }
 
         @Override
