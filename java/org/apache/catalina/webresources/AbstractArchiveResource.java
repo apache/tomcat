@@ -22,10 +22,13 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
+
+import org.apache.catalina.util.URLEncoder;
 
 public abstract class AbstractArchiveResource extends AbstractResource {
 
@@ -139,7 +142,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     @Override
     public URL getURL() {
-        String url = baseUrl + resource.getName();
+        String url = baseUrl + URLEncoder.DEFAULT.encode(resource.getName(), StandardCharsets.UTF_8);
         try {
             return new URI(url).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
