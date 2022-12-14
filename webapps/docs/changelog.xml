@@ -117,6 +117,12 @@
         correct <code>protocolHeader</code> default value of "X-Forwarded-Proto".
         (lihan)
       </fix>
+      <fix>
+        <bug>66388</bug>: Correct a regression in the refactoring that replaced
+        the use of the <code>URL</code> constructors. The regression broke
+        lookups for resources that contained one or more characters in their
+        name that required escaping when used in a URI path. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
