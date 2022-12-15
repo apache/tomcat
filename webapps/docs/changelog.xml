@@ -114,6 +114,12 @@
         reading and writing with <code>ByteBuffer</code>s. The changes also
         clarified various aspects of the Servlet non-blocking API. (markt)
       </add>
+      <fix>
+        <bug>66388</bug>: Correct a regression in the refactoring that replaced
+        the use of the <code>URL</code> constructors. The regression broke
+        lookups for resources that contained one or more characters in their
+        name that required escaping when used in a URI path. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
