@@ -43,8 +43,28 @@ class Util {
     private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
-    private static final boolean GET_CLASSLOADER_USE_PRIVILEGED =
-            Boolean.getBoolean("org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED");
+    private static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
+
+    private static final boolean GET_CLASSLOADER_USE_PRIVILEGED;
+
+    static {
+        if (IS_SECURITY_ENABLED) {
+            // Defaults to using a privileged block
+            // When running on Tomcat this will be set to false in
+            // $CATALINA_BASE/conf/catalina.properties
+            String value = AccessController.doPrivileged(new PrivilegedAction<String>() {
+                @Override
+                public String run() {
+                    return System.getProperty("org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED", "true");
+                }
+            });
+            GET_CLASSLOADER_USE_PRIVILEGED = Boolean.parseBoolean(value);
+        } else {
+            // No security manager - no need to use a privileged block.
+            GET_CLASSLOADER_USE_PRIVILEGED = false;
+        }
+    }
+
 
     /**
      * Checks whether the supplied Throwable is one that needs to be
@@ -652,7 +672,7 @@ class Util {
 
     static ClassLoader getContextClassLoader() {
         ClassLoader tccl;
-        if (System.getSecurityManager() != null && GET_CLASSLOADER_USE_PRIVILEGED) {
+        if (IS_SECURITY_ENABLED && GET_CLASSLOADER_USE_PRIVILEGED) {
             PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
             tccl = AccessController.doPrivileged(pa);
         } else {
