@@ -94,7 +94,7 @@ class StreamProcessor extends AbstractProcessor {
                             // send any more data on this stream (reset).
                             StreamException se = new StreamException(
                                     sm.getString("streamProcessor.cancel", stream.getConnectionId(),
-                                            stream.getIdAsString()), Http2Error.CANCEL, stream.getIdAsInt());
+                                            stream.getIdAsString()), Http2Error.NO_ERROR, stream.getIdAsInt());
                             stream.close(se);
                         } else if (!getErrorState().isConnectionIoAllowed()) {
                             ConnectionException ce = new ConnectionException(sm.getString(
