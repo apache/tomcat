@@ -109,7 +109,7 @@ public class TestFlowControl extends Http2TestBase {
                     "3-HeadersEnd\n" +
                     "3-Body-" + contentLength + "\n" +
                     "3-EndOfStream\n" +
-                    "3-RST-[8]\n", output.getTrace());
+                    "3-RST-[0]\n", output.getTrace());
             output.clearTrace();
 
             // Write 3*16k=48k of request body
