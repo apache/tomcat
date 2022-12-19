@@ -136,6 +136,12 @@
         Add a parser for the <code>priority</code> HTTP header field defined in
         RFC 9218. (markt)
       </add>
+      <fix>
+        When resetting an HTTP/2 stream because the final response has been
+        generated before the request has been fully read, use the HTTP/2 error
+        code <code>NO_ERROR</code> so that client does not discard the response.
+        Based on a suggestion by Lorenzo Dalla Vecchia. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
