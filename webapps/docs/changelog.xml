@@ -142,6 +142,11 @@
         code <code>NO_ERROR</code> so that client does not discard the response.
         Based on a suggestion by Lorenzo Dalla Vecchia. (markt)
       </fix>
+      <fix>
+        <bug>66385</bug>: Correct a bug in HTTP/2 where a non-blocking read for
+        a new frame with the NIO2 connector was incorrectly made using the read
+        timeout leading to unexpected stream closure. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
