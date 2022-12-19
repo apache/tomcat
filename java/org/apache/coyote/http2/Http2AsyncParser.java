@@ -134,8 +134,10 @@ class Http2AsyncParser extends Http2Parser {
         ByteBuffer header = ByteBuffer.allocate(9);
         ByteBuffer framePayload = ByteBuffer.allocate(input.getMaxFrameSize());
         FrameCompletionHandler handler = new FrameCompletionHandler(expected, header, framePayload);
-        CompletionState state =
-                socketWrapper.read(block ? BlockingMode.BLOCK : BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null, handler, handler, header, framePayload);
+        CompletionState state = socketWrapper.read(
+                block ? BlockingMode.BLOCK : BlockingMode.NON_BLOCK,
+                block ? socketWrapper.getReadTimeout() : 0,
+                TimeUnit.MILLISECONDS, null, handler, handler, header, framePayload);
         if (state == CompletionState.ERROR || state == CompletionState.INLINE) {
             handleAsyncException();
             return true;
