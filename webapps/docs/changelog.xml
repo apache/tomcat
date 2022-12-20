@@ -120,6 +120,10 @@
         lookups for resources that contained one or more characters in their
         name that required escaping when used in a URI path. (markt)
       </fix>
+      <fix>
+        <bug>66392</bug>: Change the default value of <code>AccessLogValue</code>'s
+        file encoding to UTF-8 and update documentation. (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
