@@ -19,9 +19,8 @@ package org.apache.catalina.valves;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
-import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +35,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -409,12 +409,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             if (null==value || value.length()==0) {
                 return null;
             }
-            try {
-                return URLEncoder.encode(value, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                // Should never happen - all JVMs are required to support UTF-8
-                return null;
-            }
+            return URLEncoder.QUERY.encode(value, StandardCharsets.UTF_8);
         }
 
         @Override
