@@ -117,6 +117,10 @@
         <bug>66392</bug>: Change the default value of <code>AccessLogValue</code>'s
         file encoding to UTF-8 and update documentation. (lihan)
       </fix>
+      <fix>
+        <bug>66393</bug>: Align <code>ExtendedAccessLogValve</code>'s x-P(XXX) with the
+        documentation. (lihan)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
