@@ -165,8 +165,7 @@
 
       <attribute name="encoding" required="false">
         <p>Character set used to write the log file. An empty string means
-        to use the system default character set. Default value: use the
-        system default character set.
+        to use the default character set. Default value: UTF-8.
         </p>
       </attribute>
 

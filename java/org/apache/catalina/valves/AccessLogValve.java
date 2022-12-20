@@ -150,9 +150,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
     protected String fileDateFormat = ".yyyy-MM-dd";
 
     /**
-     * Character set used by the log file. If it is <code>null</code>, the
-     * system default character set will be used. An empty string will be
-     * treated as <code>null</code> when this property is assigned.
+     * Character set used by the log file. If it is <code>null</code>, UTF-8
+     * will be used. An empty string will be treated as <code>null</code>
+     * when this property is assigned.
      */
     protected volatile String encoding = null;
 
@@ -342,7 +342,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
     /**
      * Return the character set name that is used to write the log file.
      *
-     * @return Character set name, or <code>null</code> if the system default
+     * @return Character set name, or <code>null</code> if the default
      *  character set is used.
      */
     public String getEncoding() {
@@ -644,7 +644,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
             }
         }
         if (charset == null) {
-            charset = StandardCharsets.ISO_8859_1;
+            charset = StandardCharsets.UTF_8;
         }
 
         try {
