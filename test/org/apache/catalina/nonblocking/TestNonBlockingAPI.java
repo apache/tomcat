@@ -1676,7 +1676,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         sos.print("TEST");
                         stage.incrementAndGet();
                     } else if (stage.get() == 2) {
+                        // This should trigger an error as the client closed the
+                        // socket
                         sos.flush();
+                        // Additional writes are required to trigger the error
+                        // on solaris
+                        sos.print("MORE");
+                        log.info("Additional server write after client close to trigger exception");
                     }
                 } while (sos.isReady());
             } catch (IOException ioe) {
