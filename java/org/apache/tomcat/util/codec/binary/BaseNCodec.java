@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.codec.binary;
 
+import java.util.Arrays;
+
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -206,8 +208,7 @@ public abstract class BaseNCodec {
             newCapacity = createPositiveCapacity(minCapacity);
         }
 
-        final byte[] b = new byte[newCapacity];
-        System.arraycopy(context.buffer, 0, b, 0, context.buffer.length);
+        final byte[] b = Arrays.copyOf(context.buffer, newCapacity);
         context.buffer = b;
         return b;
     }
