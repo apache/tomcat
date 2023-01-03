@@ -145,6 +145,10 @@
         6.7.1-SNAPSHOT). (markt)
       </update>
       <update>
+        Update the internal fork of Apache Commons Codec to 3eafd6c (2023-01-03,
+        1.16-SNAPSHOT). (markt)
+      </update>
+      <update>
         Update the internal fork of Apache Commons FileUpload to 34eb241
         (2023-01-03, 2.0-SNAPSHOT). (markt)
       </update>
