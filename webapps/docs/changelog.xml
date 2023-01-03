@@ -147,8 +147,12 @@
         Jakarta EE to 1.0.6. (markt)
       </update>
       <update>
-        Update the internal fork of Apache Commons BCEL to 2ee2bff (2023-01-02,
+        Update the internal fork of Apache Commons BCEL to 2ee2bff (2023-01-03,
         6.7.1-SNAPSHOT). (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons Codec to 3eafd6c (2023-01-03,
+        1.16-SNAPSHOT). (markt)
       </update>
       <update>
         Update the internal fork of Apache Commons FileUpload to 34eb241
