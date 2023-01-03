@@ -18,8 +18,8 @@
 /**
  * <p>
  * This package contains one public class which is a
- * <code>ConnectionPoolDataSource</code> (CPDS) implementation that can be used to
- * adapt older <code>Driver</code> based JDBC implementations. Below is an
+ * {@code ConnectionPoolDataSource} (CPDS) implementation that can be used to
+ * adapt older {@code Driver} based JDBC implementations. Below is an
  * example of setting up the CPDS to be available via JNDI in the
  * catalina servlet container.
  * </p>

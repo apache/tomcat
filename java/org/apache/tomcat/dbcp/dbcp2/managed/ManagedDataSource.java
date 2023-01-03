@@ -85,7 +85,7 @@ public class ManagedDataSource<C extends Connection> extends PoolingDataSource<C
         if (this.transactionRegistry != null) {
             throw new IllegalStateException("TransactionRegistry already set");
         }
-        Objects.requireNonNull(transactionRegistry, "transactionRegistry is null");
+        Objects.requireNonNull(transactionRegistry, "transactionRegistry");
 
         this.transactionRegistry = transactionRegistry;
     }

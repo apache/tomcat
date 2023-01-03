@@ -72,4 +72,4 @@ Sub-tree
 src/main/java/org/apache/commons/dbcp2
 src/main/resources/org/apache/commons/dbcp2
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-rel/commons-dbcp-2.9.0 (2021-08-03)
+f13128604536e78bb1b45b44f74128e93cfbb7cc (2023-01-03)

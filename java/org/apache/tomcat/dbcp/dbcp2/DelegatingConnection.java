@@ -25,7 +25,6 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -108,7 +107,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
                 String label = "";
                 try {
                     label = connection.toString();
-                } catch (final Exception ex) {
+                } catch (final Exception ignored) {
                     // ignore, leave label empty
                 }
                 throw new SQLException("Connection " + label + " is closed.");
@@ -118,7 +117,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     }
 
     /**
-     * Can be used to clear cached state when it is known that the underlying connection may have been accessed
+     * Clears the cached state. Call when you known that the underlying connection may have been accessed
      * directly.
      */
     public void clearCachedState() {
@@ -145,9 +144,9 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
      * Closes the underlying connection, and close any Statements that were not explicitly closed. Sub-classes that
      * override this method must:
      * <ol>
-     * <li>Call passivate()</li>
+     * <li>Call {@link #passivate()}</li>
      * <li>Call close (or the equivalent appropriate action) on the wrapped connection</li>
-     * <li>Set _closed to <code>false</code></li>
+     * <li>Set {@code closed} to {@code false}</li>
      * </ol>
      */
     @Override
@@ -359,7 +358,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
 
     /**
      * Gets the default query timeout that will be used for {@link Statement}s created from this connection.
-     * <code>null</code> means that the driver default will be used.
+     * {@code null} means that the driver default will be used.
      *
      * @return query timeout limit in seconds; zero means there is no limit.
      * @deprecated Use {@link #getDefaultQueryTimeoutDuration()}.
@@ -371,7 +370,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
 
     /**
      * Gets the default query timeout that will be used for {@link Statement}s created from this connection.
-     * <code>null</code> means that the driver default will be used.
+     * {@code null} means that the driver default will be used.
      *
      * @return query timeout limit; zero means there is no limit.
      * @since 2.10.0
@@ -556,7 +555,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
      *
      * @param c
      *            connection to compare innermost delegate with
-     * @return true if innermost delegate equals <code>c</code>
+     * @return true if innermost delegate equals {@code c}
      */
     public boolean innermostDelegateEquals(final Connection c) {
         final Connection innerCon = getInnermostDelegateInternal();
@@ -646,26 +645,10 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         // The JDBC specification requires that a Connection close any open
         // Statement's when it is closed.
         // DBCP-288. Not all the traced objects will be statements
-        final List<AbandonedTrace> traces = getTrace();
-        if (traces != null && !traces.isEmpty()) {
+        final List<AbandonedTrace> traceList = getTrace();
+        if (!Utils.isEmpty(traceList)) {
             final List<Exception> thrownList = new ArrayList<>();
-            for (final Object trace : traces) {
-                if (trace instanceof Statement) {
-                    try {
-                        ((Statement) trace).close();
-                    } catch (final Exception e) {
-                        thrownList.add(e);
-                    }
-                } else if (trace instanceof ResultSet) {
-                    // DBCP-265: Need to close the result sets that are
-                    // generated via DatabaseMetaData
-                    try {
-                        ((ResultSet) trace).close();
-                    } catch (final Exception e) {
-                        thrownList.add(e);
-                    }
-                }
-            }
+            traceList.forEach(trace -> trace.close(thrownList::add));
             clearTrace();
             if (!thrownList.isEmpty()) {
                 throw new SQLExceptionList(thrownList);
@@ -879,7 +862,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
 
     /**
      * Sets the default query timeout that will be used for {@link Statement}s created from this connection.
-     * <code>null</code> means that the driver default will be used.
+     * {@code null} means that the driver default will be used.
      *
      * @param defaultQueryTimeoutDuration
      *            the new query timeout limit Duration; zero means there is no limit.
@@ -891,7 +874,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
 
     /**
      * Sets the default query timeout that will be used for {@link Statement}s created from this connection.
-     * <code>null</code> means that the driver default will be used.
+     * {@code null} means that the driver default will be used.
      *
      * @param defaultQueryTimeoutSeconds
      *            the new query timeout limit in seconds; zero means there is no limit.
@@ -1026,7 +1009,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
                         str = sb.toString();
                     }
                 }
-            } catch (final SQLException ex) {
+            } catch (final SQLException ignored) {
                 // Ignore
             }
         }

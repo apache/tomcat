@@ -92,12 +92,7 @@ public class TransactionRegistry {
 
         // register the context (or create a new one)
         synchronized (this) {
-            TransactionContext cache = caches.get(transaction);
-            if (cache == null) {
-                cache = new TransactionContext(this, transaction, transactionSynchronizationRegistry);
-                caches.put(transaction, cache);
-            }
-            return cache;
+            return caches.computeIfAbsent(transaction, k -> new TransactionContext(this, k, transactionSynchronizationRegistry));
         }
     }
 
@@ -121,7 +116,7 @@ public class TransactionRegistry {
      *             Thrown when the connection does not have a registered XAResource.
      */
     public synchronized XAResource getXAResource(final Connection connection) throws SQLException {
-        Objects.requireNonNull(connection, "connection is null");
+        Objects.requireNonNull(connection, "connection");
         final Connection key = getConnectionKey(connection);
         final XAResource xaResource = xaResources.get(key);
         if (xaResource == null) {
@@ -140,8 +135,8 @@ public class TransactionRegistry {
      *            The XAResource which managed the connection within a transaction.
      */
     public synchronized void registerConnection(final Connection connection, final XAResource xaResource) {
-        Objects.requireNonNull(connection, "connection is null");
-        Objects.requireNonNull(xaResource, "xaResource is null");
+        Objects.requireNonNull(connection, "connection");
+        Objects.requireNonNull(xaResource, "xaResource");
         xaResources.put(connection, xaResource);
     }
 

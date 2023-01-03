@@ -14,31 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.dbcp.dbcp2;
+package org.apache.tomcat.dbcp.dbcp2.managed;
 
-import java.sql.SQLException;
+import javax.transaction.Synchronization;
 
 /**
- * Exception thrown when a connection's maximum lifetime has been exceeded.
- *
- * @since 2.1
+ * Implements {@link Synchronization} for subclasses.
  */
-final class LifetimeExceededException extends SQLException {
+class SynchronizationAdapter implements Synchronization {
 
-    private static final long serialVersionUID = -3783783104516492659L;
-
-    /**
-     * Constructs a new instance.
-     */
-    public LifetimeExceededException() {
+    @Override
+    public void afterCompletion(final int status) {
+        // Noop
     }
 
-    /**
-     * Constructs a new instance with the given message.
-     *
-     * @param reason a description of the exception
-     */
-    public LifetimeExceededException(final String reason) {
-        super(reason);
+    @Override
+    public void beforeCompletion() {
+        // Noop
     }
+
 }

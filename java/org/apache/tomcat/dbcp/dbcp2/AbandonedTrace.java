@@ -17,11 +17,13 @@
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.lang.ref.WeakReference;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.tomcat.dbcp.pool2.TrackedUse;
 
@@ -33,7 +35,7 @@ import org.apache.tomcat.dbcp.pool2.TrackedUse;
  *
  * @since 2.0
  */
-public class AbandonedTrace implements TrackedUse {
+public class AbandonedTrace implements TrackedUse, AutoCloseable {
 
     /** A list of objects created by children of this object. */
     private final List<WeakReference<AbandonedTrace>> traceList = new ArrayList<>();
@@ -78,6 +80,27 @@ public class AbandonedTrace implements TrackedUse {
         synchronized (this.traceList) {
             this.traceList.clear();
         }
+    }
+
+    /**
+     * Subclasses can implement this nop.
+     *
+     * @throws SQLException Ignored here, for subclasses.
+     * @since 2.10.0
+     */
+    @Override
+    public void close() throws SQLException {
+        // nop
+    }
+
+    /**
+     * Closes this resource and if an exception is caught, then calls {@code exceptionHandler}.
+     *
+     * @param exceptionHandler Consumes exception thrown closing this resource.
+     * @since 2.10.0
+     */
+    protected void close(final Consumer<Exception> exceptionHandler) {
+        Utils.close(this, exceptionHandler);
     }
 
     /**
