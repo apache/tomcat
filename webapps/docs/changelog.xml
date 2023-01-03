@@ -170,10 +170,6 @@
         all versions so move away from them now. (markt)
       </scode>
       <update>
-        Update the internal fork of Apache Commons BCEL to b015e90 (2022-11-28,
-        6.7.0-RC1). (markt)
-      </update>
-      <update>
         Update the internal fork of Apache Commons Codec to ae32a3f (2022-11-29,
         1.16-SNAPSHOT). (markt)
       </update>
@@ -187,6 +183,10 @@
       <update>
         Update the internal fork of Apache Commons FileUpload to 34eb241
         (2023-01-03, 2.0-SNAPSHOT). (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons BCEL to 2ee2bff (2023-01-03,
+        6.7.1-SNAPSHOT). (markt)
       </update>
     </changelog>
   </subsection>
