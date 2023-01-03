@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,7 +37,7 @@ import org.apache.tomcat.dbcp.dbcp2.ListException;
 import org.apache.tomcat.dbcp.dbcp2.Utils;
 
 /**
- * A JNDI ObjectFactory which creates <code>SharedPoolDataSource</code>s or <code>PerUserPoolDataSource</code>s
+ * A JNDI ObjectFactory which creates {@code SharedPoolDataSource}s or {@code PerUserPoolDataSource}s
  *
  * @since 2.0
  */
@@ -49,29 +48,22 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
     /**
      * Closes all pools associated with this class.
      *
-     * @throws Exception
+     * @throws ListException
      *             a {@link ListException} containing all exceptions thrown by {@link InstanceKeyDataSource#close()}
      * @see InstanceKeyDataSource#close()
-     * @see ListException
      * @since 2.4.0 throws a {@link ListException} instead of, in 2.3.0 and before, the first exception thrown by
      *        {@link InstanceKeyDataSource#close()}.
      */
-    public static void closeAll() throws Exception {
+    public static void closeAll() throws ListException {
         // Get iterator to loop over all instances of this data source.
         final List<Throwable> exceptionList = new ArrayList<>(INSTANCE_MAP.size());
-        for (final Entry<String, InstanceKeyDataSource> next : INSTANCE_MAP.entrySet()) {
+        INSTANCE_MAP.entrySet().forEach(entry -> {
             // Bullet-proof to avoid anything else but problems from InstanceKeyDataSource#close().
-            if (next != null) {
-                final InstanceKeyDataSource value = next.getValue();
-                if (value != null) {
-                    try {
-                        value.close();
-                    } catch (final Exception e) {
-                        exceptionList.add(e);
-                    }
-                }
+            if (entry != null) {
+                final InstanceKeyDataSource value = entry.getValue();
+                Utils.close(value, exceptionList::add);
             }
-        }
+        });
         INSTANCE_MAP.clear();
         if (!exceptionList.isEmpty()) {
             throw new ListException("Could not close all InstanceKeyDataSource instances.", exceptionList);
@@ -107,7 +99,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
             if (s != null) {
                 try {
                     max = Math.max(max, Integer.parseInt(s));
-                } catch (final NumberFormatException e) {
+                } catch (final NumberFormatException ignored) {
                     // no sweat, ignore those keys
                 }
             }

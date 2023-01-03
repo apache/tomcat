@@ -21,10 +21,16 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.MessageFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Consumer;
+
+import org.apache.tomcat.dbcp.pool2.PooledObject;
 
 /**
  * Utility methods.
@@ -57,7 +63,9 @@ public final class Utils {
      * <li>JZ0C0 (Sybase disconnect error)</li>
      * <li>JZ0C1 (Sybase disconnect error)</li>
      * </ul>
+     * @deprecated Use {@link #getDisconnectionSqlCodes()}.
      */
+    @Deprecated
     public static final Set<String> DISCONNECTION_SQL_CODES;
 
     static final ResultSet[] EMPTY_RESULT_SET_ARRAY = {};
@@ -101,19 +109,32 @@ public final class Utils {
     }
 
     /**
+     * Closes the given {@link AutoCloseable} and if an exception is caught, then calls {@code exceptionHandler}.
+     *
+     * @param autoCloseable The resource to close.
+     * @param exceptionHandler Consumes exception thrown closing this resource.
+     * @since 2.10.0
+     */
+    public static void close(AutoCloseable autoCloseable, final Consumer<Exception> exceptionHandler) {
+        if (autoCloseable != null) {
+            try {
+                autoCloseable.close();
+            } catch (final Exception e) {
+                if (exceptionHandler != null) {
+                    exceptionHandler.accept(e);
+                }
+            }
+        }
+    }
+
+    /**
      * Closes the AutoCloseable (which may be null).
      *
      * @param autoCloseable an AutoCloseable, may be {@code null}
      * @since 2.6.0
      */
     public static void closeQuietly(final AutoCloseable autoCloseable) {
-        if (autoCloseable != null) {
-            try {
-                autoCloseable.close();
-            } catch (final Exception e) {
-                // ignored
-            }
-        }
+        close(autoCloseable, null);
     }
 
     /**
@@ -150,6 +171,23 @@ public final class Utils {
     }
 
     /**
+     * Gets a copy of SQL codes of fatal connection errors.
+     * <ul>
+     * <li>57P01 (Admin shutdown)</li>
+     * <li>57P02 (Crash shutdown)</li>
+     * <li>57P03 (Cannot connect now)</li>
+     * <li>01002 (SQL92 disconnect error)</li>
+     * <li>JZ0C0 (Sybase disconnect error)</li>
+     * <li>JZ0C1 (Sybase disconnect error)</li>
+     * </ul>
+     * @return SQL codes of fatal connection errors.
+     * @since 2.10.0
+     */
+    public static Set<String> getDisconnectionSqlCodes() {
+        return new HashSet<>(DISCONNECTION_SQL_CODES);
+    }
+
+    /**
      * Gets the correct i18n message for the given key.
      *
      * @param key The key to look up an i18n message.
@@ -175,6 +213,10 @@ public final class Utils {
         return mf.format(args, new StringBuffer(), null).toString();
     }
 
+    static boolean isEmpty(final Collection<?> collection) {
+        return collection == null || collection.isEmpty();
+    }
+
     static boolean isSecurityEnabled() {
         return System.getSecurityManager() != null;
     }
@@ -197,6 +239,15 @@ public final class Utils {
      */
     public static String toString(final char[] value) {
         return value == null ? null : String.valueOf(value);
+    }
+
+    public static void validateLifetime(final PooledObject<?> p, final Duration maxDuration) throws LifetimeExceededException {
+        if (maxDuration.compareTo(Duration.ZERO) > 0) {
+            final Duration lifetimeDuration = Duration.between(p.getCreateInstant(), Instant.now());
+            if (lifetimeDuration.compareTo(maxDuration) > 0) {
+                throw new LifetimeExceededException(Utils.getMessage("connectionFactory.lifetimeExceeded", lifetimeDuration, maxDuration));
+            }
+        }
     }
 
     private Utils() {
