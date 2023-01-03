@@ -170,10 +170,6 @@
         all versions so move away from them now. (markt)
       </scode>
       <update>
-        Update the internal fork of Apache Commons Codec to ae32a3f (2022-11-29,
-        1.16-SNAPSHOT). (markt)
-      </update>
-      <update>
         Update to Commons Daemon 1.3.3. (markt)
       </update>
       <add>
@@ -187,6 +183,10 @@
       <update>
         Update the internal fork of Apache Commons BCEL to 2ee2bff (2023-01-03,
         6.7.1-SNAPSHOT). (markt)
+      </update>
+      <update>
+        Update the internal fork of Apache Commons Codec to 3eafd6c (2023-01-03,
+        1.16-SNAPSHOT). (markt)
       </update>
     </changelog>
   </subsection>

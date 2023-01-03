@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.codec.binary;
 
+import java.util.Arrays;
+
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.codec.BinaryDecoder;
 import org.apache.tomcat.util.codec.BinaryEncoder;
@@ -253,8 +255,7 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
             newCapacity = createPositiveCapacity(minCapacity);
         }
 
-        final byte[] b = new byte[newCapacity];
-        System.arraycopy(context.buffer, 0, b, 0, context.buffer.length);
+        final byte[] b = Arrays.copyOf(context.buffer, newCapacity);
         context.buffer = b;
         return b;
     }
