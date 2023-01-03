@@ -141,6 +141,10 @@
   <subsection name="Other">
     <changelog>
       <update>
+        Update the internal fork of Apache Commons BCEL to 2ee2bff (2023-01-03,
+        6.7.1-SNAPSHOT). (markt)
+      </update>
+      <update>
         Update the internal fork of Apache Commons FileUpload to 34eb241
         (2023-01-03, 2.0-SNAPSHOT). (markt)
       </update>
