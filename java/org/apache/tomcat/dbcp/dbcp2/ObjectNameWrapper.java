@@ -31,7 +31,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @since 2.2.1
  */
-class ObjectNameWrapper {
+final class ObjectNameWrapper {
 
     private static final Log log = LogFactory.getLog(ObjectNameWrapper.class);
 

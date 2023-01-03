@@ -22,7 +22,7 @@ import java.util.Objects;
 /**
  * @since 2.0
  */
-class PoolKey implements Serializable {
+final class PoolKey implements Serializable {
     private static final long serialVersionUID = 2252771047542484533L;
 
     private final String dataSourceName;

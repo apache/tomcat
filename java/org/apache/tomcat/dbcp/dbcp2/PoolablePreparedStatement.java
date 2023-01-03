@@ -17,10 +17,7 @@
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
 
@@ -71,7 +68,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
 
         // Remove from trace now because this statement will be
         // added by the activate method.
-        removeThisTrace(getConnectionInternal());
+        removeThisTrace(conn);
     }
 
     @Override
@@ -125,32 +122,6 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         if (batchAdded) {
             clearBatch();
         }
-        setClosedInternal(true);
-        removeThisTrace(getConnectionInternal());
-
-        // The JDBC spec requires that a statement closes any open
-        // ResultSet's when it is closed.
-        // FIXME The PreparedStatement we're wrapping should handle this for us.
-        // See bug 17301 for what could happen when ResultSets are closed twice.
-        final List<AbandonedTrace> resultSetList = getTrace();
-        if (resultSetList != null) {
-            final List<Exception> thrownList = new ArrayList<>();
-            final ResultSet[] resultSets = resultSetList.toArray(Utils.EMPTY_RESULT_SET_ARRAY);
-            for (final ResultSet resultSet : resultSets) {
-                if (resultSet != null) {
-                    try {
-                        resultSet.close();
-                    } catch (final Exception e) {
-                        thrownList.add(e);
-                    }
-                }
-            }
-            clearTrace();
-            if (!thrownList.isEmpty()) {
-                throw new SQLExceptionList(thrownList);
-            }
-        }
-
-        super.passivate();
+        prepareToReturn();
     }
 }
