@@ -156,6 +156,10 @@
         Update the internal fork of Apache Commons DBCP to f131286 (2023-01-03,
         2.10.0-SNAPSHOT). (markt)
       </update>
+      <add>
+        Improvements to Japanese translations. Contributed by Shirayuking.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
