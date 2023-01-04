@@ -63,7 +63,7 @@ public class ConnectorStoreAppender extends StoreAppender {
             throws Exception {
 
         // Render a className attribute if requested
-        if (include && desc != null && !desc.isStandard()) {
+        if (include && !desc.isStandard()) {
             writer.print(" className=\"");
             writer.print(bean.getClass().getName());
             writer.print("\"");
@@ -105,11 +105,11 @@ public class ConnectorStoreAppender extends StoreAppender {
      *
      * @param bean The connector
      * @return List of Connector property names
-     * @throws IntrospectionException Error intropecting connector
+     * @throws IntrospectionException Error introspecting connector
      */
     protected List<String> getPropertyKeys(Connector bean)
             throws IntrospectionException {
-        ArrayList<String> propertyKeys = new ArrayList<>();
+        List<String> propertyKeys = new ArrayList<>();
         // Acquire the list of properties for this bean
         ProtocolHandler protocolHandler = bean.getProtocolHandler();
         // Acquire the list of properties for this bean
