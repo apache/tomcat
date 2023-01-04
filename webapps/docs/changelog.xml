@@ -179,6 +179,10 @@
         Update the internal fork of Apache Commons DBCP to f131286 (2023-01-03,
         2.10.0-SNAPSHOT). (markt)
       </update>
+      <add>
+        Improvements to Portuguese translations. Contributed by Guilherme
+        Custódio. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
