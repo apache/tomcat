@@ -180,6 +180,10 @@
         2.10.0-SNAPSHOT). (markt)
       </update>
       <add>
+        Improvements to Japanese translations. Contributed by Shirayuking.
+        (markt)
+      </add>
+      <add>
         Improvements to Portuguese translations. Contributed by Guilherme
         Custódio. (markt)
       </add>
