@@ -188,6 +188,10 @@
         Update the internal fork of Apache Commons Codec to 3eafd6c (2023-01-03,
         1.16-SNAPSHOT). (markt)
       </update>
+      <add>
+        Improvements to Japanese translations. Contributed by Shirayuking.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
