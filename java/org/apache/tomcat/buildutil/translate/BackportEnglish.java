@@ -42,6 +42,7 @@ public class BackportEnglish extends BackportBase {
         keysToExclude.add("java.org.apache.catalina.manager.zzz.htmlManagerServlet.deployPath");
         keysToExclude.add("java.org.apache.catalina.startup.zzz.catalina.stopServer.connectException");
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.usage");
+        keysToExclude.add("java.org.apache.tomcat.dbcp.dbcp2.zzz.connectionFactory.lifetimeExceeded");
 
         BackportEnglish backport = new BackportEnglish(args);
         backport.execute();
