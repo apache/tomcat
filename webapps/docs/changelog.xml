@@ -141,6 +141,10 @@
   <subsection name="Other">
     <changelog>
       <add>
+        Improvements to Japanese translations. Contributed by Shirayuking.
+        (markt)
+      </add>
+      <add>
         Improvements to Portuguese translations. Contributed by Guilherme
         Custódio. (markt)
       </add>
