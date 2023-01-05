@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -132,33 +131,33 @@ public class TestMessageBytesConversion {
 
 
     public static enum MessageBytesType {
-        BYTE((x) -> x.setBytes(PREVIOUS_BYTES, 0, PREVIOUS_BYTES.length),
-                (x) -> x.setBytes(EXPECTED_BYTES, 0, EXPECTED_BYTES.length),
-                (x) -> {x.toBytes(); Assert.assertTrue(x.getByteChunk().equals(EXPECTED_BYTES, 0, EXPECTED_BYTES.length) );},
-                (x) -> {x.toBytes(); Assert.assertTrue(x.getByteChunk().isNull());}),
+        BYTE(setBytes(PREVIOUS_BYTES),
+                setBytes(EXPECTED_BYTES),
+                assertBytes(EXPECTED_BYTES),
+                assertBytes(null)),
 
-        CHAR((x) -> x.setChars(PREVIOUS_CHARS, 0, PREVIOUS_CHARS.length),
-                (x) -> x.setChars(EXPECTED_CHARS, 0, EXPECTED_CHARS.length),
-                (x) -> {x.toChars(); Assert.assertArrayEquals(EXPECTED_CHARS, x.getCharChunk().getChars());},
-                (x) -> {x.toChars(); Assert.assertTrue(x.getCharChunk().isNull());}),
+        CHAR(setChars(PREVIOUS_CHARS),
+                setChars(EXPECTED_CHARS),
+                assertChars(EXPECTED_CHARS),
+                assertChars(null)),
 
-        STRING((x) -> x.setString(PREVIOUS_STRING),
-                (x) -> x.setString(EXPECTED_STRING),
-                (x) -> Assert.assertEquals(EXPECTED_STRING, x.toString()),
-                (x) -> Assert.assertNull(x.toString())),
+        STRING(setString(PREVIOUS_STRING),
+                setString(EXPECTED_STRING),
+                assertString(EXPECTED_STRING),
+                assertString(null)),
 
-        NULL((x) -> x.setString(null),
-                (x) -> x.setString(null),
-                (x) -> Assert.assertTrue(x.isNull()),
-                (x) -> Assert.assertTrue(x.isNull()));
+        NULL(setString(null),
+                setString(null),
+                assertNull(),
+                assertNull());
 
-        private final Consumer<MessageBytes> setPrevious;
-        private final Consumer<MessageBytes> setExpected;
-        private final Consumer<MessageBytes> checkExpected;
-        private final Consumer<MessageBytes> checkNull;
+        private final MessageBytesConsumer setPrevious;
+        private final MessageBytesConsumer setExpected;
+        private final MessageBytesConsumer checkExpected;
+        private final MessageBytesConsumer checkNull;
 
-        private MessageBytesType(Consumer<MessageBytes> setPrevious, Consumer<MessageBytes> setExpected,
-                Consumer<MessageBytes> checkExpected, Consumer<MessageBytes> checkNull) {
+        private MessageBytesType(MessageBytesConsumer setPrevious, MessageBytesConsumer setExpected,
+                MessageBytesConsumer checkExpected, MessageBytesConsumer checkNull) {
             this.setPrevious = setPrevious;
             this.setExpected = setExpected;
             this.checkExpected = checkExpected;
@@ -203,5 +202,94 @@ public class TestMessageBytesConversion {
         }
 
         return results;
+    }
+
+
+    private interface MessageBytesConsumer {
+        void accept(MessageBytes mb);
+    }
+
+
+    private static MessageBytesConsumer setBytes(final byte[] b) {
+        return new MessageBytesConsumer() {
+            @Override
+            public void accept(MessageBytes mb) {
+                mb.setBytes(b, 0, b.length);
+            }
+        };
+    }
+
+
+    private static MessageBytesConsumer assertBytes(final byte[] b) {
+        return new MessageBytesConsumer() {
+            @Override
+            public void accept(MessageBytes mb) {
+                mb.toBytes();
+                if (b == null) {
+                    Assert.assertTrue(mb.getByteChunk().isNull());
+                } else {
+                    Assert.assertTrue(mb.getByteChunk().equals(b, 0, b.length));
+                }
+            }
+        };
+    }
+
+
+    private static MessageBytesConsumer setChars(final char[] c) {
+        return new MessageBytesConsumer() {
+            @Override
+            public void accept(MessageBytes mb) {
+                mb.setChars(c, 0, c.length);
+            }
+        };
+    }
+
+
+    private static MessageBytesConsumer assertChars(final char[] c) {
+        return new MessageBytesConsumer() {
+            @Override
+            public void accept(MessageBytes mb) {
+                mb.toChars();
+                if (c == null) {
+                    Assert.assertTrue(mb.getCharChunk().isNull());
+                } else {
+                    Assert.assertArrayEquals(c, mb.getCharChunk().getChars());
+                }
+            }
+        };
+    }
+
+
+    private static MessageBytesConsumer setString(final String s) {
+        return new MessageBytesConsumer() {
+            @Override
+            public void accept(MessageBytes mb) {
+                mb.setString(s);
+            }
+        };
+    }
+
+
+    private static MessageBytesConsumer assertString(final String s) {
+        return new MessageBytesConsumer() {
+            @Override
+            public void accept(MessageBytes mb) {
+                if (s == null) {
+                    Assert.assertNull(mb.toString());
+                } else {
+                    Assert.assertEquals(s, mb.toString());
+                }
+            }
+        };
+    }
+
+
+    private static MessageBytesConsumer assertNull() {
+        return new MessageBytesConsumer() {
+            @Override
+            public void accept(MessageBytes mb) {
+                Assert.assertTrue(mb.isNull());
+            }
+        };
     }
 }
