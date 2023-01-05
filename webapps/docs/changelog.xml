@@ -139,17 +139,16 @@
     </changelog>
   </subsection>
   <subsection name="Jasper">
-      <changelog>
-          <fix>
-              <bug>66370</bug>: Change the default of the
-              <code>org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED</code> system
-              property to <code>true</code> unless the EL library is running on
-              Tomcat in which case the default remains <code>false</code> as the
-              EL library is already called from within a privileged block and
-              skipping the unnecessary privileged block improves performance.
-              (markt)
-          </fix>
-      </changelog>
+    <changelog>
+      <fix>
+        <bug>66370</bug>: Change the default of the
+        <code>org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED</code> system
+        property to <code>true</code> unless the EL library is running on Tomcat
+        in which case the default remains <code>false</code> as the EL library
+        is already called from within a privileged block and skipping the 
+        unnecessary privileged block improves performance. (markt)
+      </fix>
+    </changelog>
   </subsection>
   <subsection name="Other">
     <changelog>
