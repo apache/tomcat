@@ -199,6 +199,9 @@
         Improvements to Portuguese translations. Contributed by Guilherme
         Custódio. (markt)
       </add>
+      <update>
+        Update to the Eclipse JDT compiler 4.26. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
