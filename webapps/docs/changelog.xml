@@ -186,6 +186,15 @@
       <update>
         Update to the Eclipse JDT compiler 4.26. (markt)
       </update>
+      <update>
+        Update Checkstyle to 10.6.0. (markt)
+      </update>
+      <update>
+        Update Unboundid to 6.0.7. (markt)
+      </update>
+      <update>
+        Update SpotBugs to 4.7.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
