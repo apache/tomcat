@@ -925,6 +925,16 @@
     <Bug pattern="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
+    <!-- False positive. Affects 4.7.3. May affect other versions. -->
+    <Class name="org.apache.coyote.http2.HpackDecoder" />
+    <Method name="handleMaxMemorySizeChange" />
+    <Or>
+      <Field name="currentMemorySize" />
+      <Field name="filledTableSlots" />
+    </Or>
+    <Bug pattern="SA_FIELD_SELF_ASSIGNMENT" />
+  </Match>
+  <Match>
     <!-- Number being tested is unsigned. -->
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
     <Method name="createRemoteStream" />
@@ -944,6 +954,12 @@
       <Bug pattern="NN_NAKED_NOTIFY" />
       <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
     </Or>
+  </Match>
+  <Match>
+    <!-- Switch fall-through is intentional. -->
+    <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
+    <Method name="upgradeDispatch" />
+     <Bug pattern="SF_SWITCH_FALLTHROUGH" />
   </Match>
   <Match>
     <!-- Return value is intentionally ignored. -->
@@ -1210,12 +1226,20 @@
     <!-- SQL construction is necessary for pooled statements -->
     <Class name="org.apache.tomcat.dbcp.dbcp2.PStmtKey" />
     <Or>
+      <!-- Names reported via IDE -->
       <Method name="lambda$3" />
       <Method name="lambda$4" />
       <Method name="lambda$5" />
       <Method name="lambda$6" />
       <Method name="lambda$7" />
       <Method name="lambda$8" />
+      <!-- Names reported via Ant -->
+      <Method name="lambda$static$3" />
+      <Method name="lambda$static$4" />
+      <Method name="lambda$static$5" />
+      <Method name="lambda$static$6" />
+      <Method name="lambda$static$7" />
+      <Method name="lambda$static$8" />
     </Or>
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
   </Match>
@@ -1396,6 +1420,12 @@
     </Or>
     <Method name="toString"/>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Switch fall-through is intentional. -->
+    <Class name="org.apache.tomcat.util.buf.MessageBytes"/>
+    <Method name="toChars"/>
+    <Bug pattern="SF_SWITCH_FALLTHROUGH" />
   </Match>
   <Match>
     <!-- Returning null here is fine -->
