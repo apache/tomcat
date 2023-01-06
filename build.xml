@@ -219,8 +219,6 @@
   <path id="compile.classpath">
     <pathelement location="${bnd.jar}"/>
     <pathelement location="${jdt.jar}"/>
-    <pathelement location="${jaxrpc-lib.jar}"/>
-    <pathelement location="${wsdl4j-lib.jar}"/>
     <pathelement location="${migration-lib.jar}"/>
   </path>
 
@@ -614,7 +612,6 @@
     <exclude name="org/apache/naming/factory/ResourceLinkFactory*" />
     <exclude name="org/apache/naming/factory/SendMailFactory*" />
     <exclude name="org/apache/naming/factory/TransactionFactory*" />
-    <exclude name="org/apache/naming/factory/webservices/*" />
     <exclude name="org/apache/naming/LookupRef*" />
     <exclude name="org/apache/naming/NameParserImpl*" />
     <exclude name="org/apache/naming/NamingContextBindingsEnumeration*" />
@@ -3286,24 +3283,6 @@ asf.ldap.username=${release.asfusername}
       <param name="checksum.enabled" value="${jdt.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${jdt.checksum.algorithm}"/>
       <param name="checksum.value" value="${jdt.checksum.value}"/>
-    </antcall>
-
-    <!-- Download WS API -->
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${jaxrpc-lib.loc}"/>
-      <param name="destfile" value="${jaxrpc-lib.jar}"/>
-      <param name="destdir" value="${jaxrpc-lib.home}"/>
-      <param name="checksum.enabled" value="${jaxrpc-lib.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${jaxrpc-lib.checksum.algorithm}"/>
-      <param name="checksum.value" value="${jaxrpc-lib.checksum.value}"/>
-    </antcall>
-    <antcall target="downloadfile">
-      <param name="sourcefile" value="${wsdl4j-lib.loc}"/>
-      <param name="destfile" value="${wsdl4j-lib.jar}"/>
-      <param name="destdir" value="${wsdl4j-lib.home}"/>
-      <param name="checksum.enabled" value="${wsdl4j-lib.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${wsdl4j-lib.checksum.algorithm}"/>
-      <param name="checksum.value" value="${wsdl4j-lib.checksum.value}"/>
     </antcall>
 
     <!-- Tomcat Migration Tool for Jakarta EE -->

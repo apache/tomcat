@@ -128,6 +128,10 @@
         <bug>66393</bug>: Align <code>ExtendedAccessLogValve</code>'s x-P(XXX) with the
         documentation. (lihan)
       </fix>
+      <fix>
+        Remove JAX-RPC support which was removed from the Jakarta EE platform
+        for Jakarta EE 9. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
