@@ -261,19 +261,19 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- UnboundID, used by unit tests, version 5.1.4 or later -----
-unboundid.version=6.0.6
+unboundid.version=6.0.7
 unboundid.checksum.enabled=true
 unboundid.checksum.algorithm=SHA-512
-unboundid.checksum.value=080a6719ceeb55bcdcc8cac7146b4da1ef7c29107d336868e7f77666fc834ed4191bdaa54dac03eccf02bdfb0b6293809b7b8a41eee7cf420489c98018afeb9f
+unboundid.checksum.value=c0adafab9e493150b9729f51fb0dee6a787821ab93a760794962fadcdbbbf9f868e5c159f3a344c43f0b7b037b9b01b35f86e4bc97e903a40e25c884cdedaf5b
 unboundid.home=${base.path}/unboundid-${unboundid.version}
 unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
-checkstyle.version=10.3.4
+checkstyle.version=10.6.0
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=03bf9d20a83dbf44dd83e8081e293903c94b10f92b9b78051be04a6c759c43cff537acf4086da23a69c8875b3f3dbabdd11ab345d07d3d42940621c507fc1e84
+checkstyle.checksum.value=424ec002f7246c081df0d24168ba3da20af06d001a1d77afead5a730fe2565bc7db5025ccdefe4d27b4545c4358cb20ac845365162011e63e216aabd6f7adf38
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
@@ -288,10 +288,10 @@ jacoco.jar=${jacoco.home}/lib/jacocoant.jar
 jacoco.loc=${base-maven.loc}/org/jacoco/jacoco/${jacoco.version}/jacoco-${jacoco.version}.zip
 
 # ----- SpotBugs (originally FindBugs) -----
-spotbugs.version=4.7.2
+spotbugs.version=4.7.3
 spotbugs.checksum.enabled=true
 spotbugs.checksum.algorithm=SHA-256
-spotbugs.checksum.value=f02a023d03b0fde70038ccb4bc8d4a964a504262d13024a97b14d9070f7d4d96
+spotbugs.checksum.value=f02e2f1135b23f3edfddb75f64be0491353cfeb567b5a584115aa4fd373d4431
 spotbugs.home=${base.path}/spotbugs-${spotbugs.version}
 spotbugs.jar=${spotbugs.home}/lib/spotbugs-ant.jar
 spotbugs.loc=${base-maven.loc}/com/github/spotbugs/spotbugs/${spotbugs.version}/spotbugs-${spotbugs.version}.tgz
@@ -303,7 +303,7 @@ bnd.version=6.3.1
 # checksums for biz.aQute.bnd-6.3.1.jar
 bnd.checksum.enabled=true
 bnd.checksum.algorithm=MD5|SHA-1
-bnd.checksum.value=06bb0a51c208fc2f24c8cd54216b4b6f|c00993c55ccee432dd43f540e6f7c194fe946d20
+bnd.checksum.value=a812b31a81f05767ea11896a81cd8eab|8a359edbb02aad9138b7824a0d7bbe22f02cf990
 
 bnd.home=${base.path}/bnd-${bnd.version}
 bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
