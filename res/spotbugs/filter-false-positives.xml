@@ -955,6 +955,16 @@
     <Bug pattern="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
+    <!-- False positive. Affects 4.7.3. May affect other versions. -->
+    <Class name="org.apache.coyote.http2.HpackDecoder" />
+    <Method name="handleMaxMemorySizeChange" />
+    <Or>
+      <Field name="currentMemorySize" />
+      <Field name="filledTableSlots" />
+    </Or>
+    <Bug pattern="SA_FIELD_SELF_ASSIGNMENT" />
+  </Match>
+  <Match>
     <!-- Number being tested is unsigned. -->
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
     <Method name="createRemoteStream" />
@@ -971,6 +981,12 @@
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
     <Method name="incrementWindowSize" />
     <Bug pattern="NN_NAKED_NOTIFY" />
+  </Match>
+  <Match>
+    <!-- Switch fall-through is intentional. -->
+    <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
+    <Method name="upgradeDispatch" />
+     <Bug pattern="SF_SWITCH_FALLTHROUGH" />
   </Match>
   <Match>
     <!-- Return value is intentionally ignored. -->
@@ -1421,6 +1437,12 @@
     </Or>
     <Method name="toString"/>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Switch fall-through is intentional. -->
+    <Class name="org.apache.tomcat.util.buf.MessageBytes"/>
+    <Method name="toChars"/>
+    <Bug pattern="SF_SWITCH_FALLTHROUGH" />
   </Match>
   <Match>
     <!-- Returning null here is fine -->
