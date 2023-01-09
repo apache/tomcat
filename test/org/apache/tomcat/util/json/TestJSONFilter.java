@@ -77,6 +77,6 @@ public class TestJSONFilter {
 
     @Test
     public void testStringEscaping() {
-        Assert.assertEquals(output, JSONFilter.escape(input));;
+        Assert.assertEquals(output, JSONFilter.escape(input));
     }
 }
