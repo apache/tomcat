@@ -2036,20 +2036,7 @@
               <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
               <!-- Exclude tests that Gump can't compile -->
               <exclude name="org/apache/tomcat/buildutil/**" />
-              <!--
-                Avoid running tests which require the SecurityManager with other
-                tests. See below for more details.
-              -->
-              <exclude name="**/*SecurityManager.java" />
             </fileset>
-          </batchtest>
-          <!--
-             Run tests which require the SecurityManager in their own forked
-             batch to ensure that global/system security settings don't pollute
-             other tests. See SecurityManagerBaseTest.java for more details.
-          -->
-          <batchtest todir="${test.reports}" unless="test.entry" fork="true">
-            <fileset dir="test" includes="**/SecurityManager.java" excludes="${test.exclude}" />
           </batchtest>
         </junit>
       </jacoco:coverage>
