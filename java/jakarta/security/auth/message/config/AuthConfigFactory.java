@@ -16,11 +16,6 @@
  */
 package jakarta.security.auth.message.config;
 
-import java.security.AccessController;
-import java.security.Permission;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.security.Security;
 import java.security.SecurityPermission;
 import java.util.Map;
@@ -64,7 +59,6 @@ public abstract class AuthConfigFactory {
     }
 
     public static AuthConfigFactory getFactory() {
-        checkPermission(getFactorySecurityPermission);
         if (factory != null) {
             return factory;
         }
@@ -73,27 +67,18 @@ public abstract class AuthConfigFactory {
             if (factory == null) {
                 final String className = getFactoryClassName();
                 try {
-                    factory = AccessController.doPrivileged(
-                            (PrivilegedExceptionAction<AuthConfigFactory>) () -> {
-                                // Load this class with the same class loader as used for
-                                // this class. Note that the Thread context class loader
-                                // should not be used since that would trigger a memory leak
-                                // in container environments.
-                                if (className.equals("org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl")) {
-                                    return new org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl();
-                                } else {
-                                    Class<?> clazz = Class.forName(className);
-                                    return (AuthConfigFactory) clazz.getConstructor().newInstance();
-                                }
-                            });
-                } catch (PrivilegedActionException e) {
-                    Exception inner = e.getException();
-                    if (inner instanceof InstantiationException) {
-                        throw new SecurityException("AuthConfigFactory error:" +
-                                inner.getCause().getMessage(), inner.getCause());
+                    // Load this class with the same class loader as used for
+                    // this class. Note that the Thread context class loader
+                    // should not be used since that would trigger a memory leak
+                    // in container environments.
+                    if (className.equals("org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl")) {
+                        factory =  new org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl();
                     } else {
-                        throw new SecurityException("AuthConfigFactory error: " + inner, inner);
+                        Class<?> clazz = Class.forName(className);
+                        factory = (AuthConfigFactory) clazz.getConstructor().newInstance();
                     }
+                } catch (ReflectiveOperationException e) {
+                    throw new RuntimeException("AuthConfigFactory error:" + e.getCause().getMessage(), e.getCause());
                 }
             }
         }
@@ -102,7 +87,6 @@ public abstract class AuthConfigFactory {
     }
 
     public static synchronized void setFactory(AuthConfigFactory factory) {
-        checkPermission(setFactorySecurityPermission);
         AuthConfigFactory.factory = factory;
     }
 
@@ -153,20 +137,8 @@ public abstract class AuthConfigFactory {
      */
     public abstract void removeServerAuthModule(Object context);
 
-    /**
-     * @deprecated Following JEP 411
-     */
-    @Deprecated(forRemoval = true)
-    private static void checkPermission(Permission permission) {
-        SecurityManager securityManager = System.getSecurityManager();
-        if (securityManager != null) {
-            securityManager.checkPermission(permission);
-        }
-    }
-
     private static String getFactoryClassName() {
-        String className = AccessController.doPrivileged(
-                (PrivilegedAction<String>) () -> Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY));
+        String className = Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
 
         if (className != null) {
             return className;
