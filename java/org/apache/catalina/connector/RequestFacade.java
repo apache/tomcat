@@ -53,21 +53,8 @@ import org.apache.tomcat.util.res.StringManager;
 public class RequestFacade implements HttpServletRequest {
 
 
-    // ----------------------------------------------------------- Constructors
+    private static final StringManager sm = StringManager.getManager(RequestFacade.class);
 
-    /**
-     * Construct a wrapper for the specified request.
-     *
-     * @param request The request to be wrapped
-     */
-    public RequestFacade(Request request) {
-
-        this.request = request;
-
-    }
-
-
-    // ----------------------------------------------------- Instance Variables
 
     /**
      * The wrapped request.
@@ -76,12 +63,13 @@ public class RequestFacade implements HttpServletRequest {
 
 
     /**
-     * The string manager for this package.
+     * Construct a wrapper for the specified request.
+     *
+     * @param request The request to be wrapped
      */
-    protected static final StringManager sm = StringManager.getManager(RequestFacade.class);
-
-
-    // --------------------------------------------------------- Public Methods
+    public RequestFacade(Request request) {
+        this.request = request;
+    }
 
 
     /**
@@ -104,659 +92,383 @@ public class RequestFacade implements HttpServletRequest {
 
     // ------------------------------------------------- ServletRequest Methods
 
-
     @Override
     public Object getAttribute(String name) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getAttribute(name);
     }
 
 
     @Override
     public Enumeration<String> getAttributeNames() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getAttributeNames();
     }
 
 
     @Override
     public String getCharacterEncoding() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getCharacterEncoding();
     }
 
 
     @Override
-    public void setCharacterEncoding(String env)
-            throws java.io.UnsupportedEncodingException {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+    public void setCharacterEncoding(String env) throws java.io.UnsupportedEncodingException {
+        checkFacade();
         request.setCharacterEncoding(env);
     }
 
 
     @Override
     public int getContentLength() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getContentLength();
     }
 
 
     @Override
     public String getContentType() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getContentType();
     }
 
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getInputStream();
     }
 
 
     @Override
     public String getParameter(String name) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getParameter(name);
     }
 
 
     @Override
     public Enumeration<String> getParameterNames() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getParameterNames();
     }
 
 
     @Override
     public String[] getParameterValues(String name) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getParameterValues(name);
     }
 
 
     @Override
     public Map<String,String[]> getParameterMap() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getParameterMap();
     }
 
 
     @Override
     public String getProtocol() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getProtocol();
     }
 
 
     @Override
     public String getScheme() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getScheme();
     }
 
 
     @Override
     public String getServerName() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getServerName();
     }
 
 
     @Override
     public int getServerPort() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getServerPort();
     }
 
 
     @Override
     public BufferedReader getReader() throws IOException {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getReader();
     }
 
 
     @Override
     public String getRemoteAddr() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getRemoteAddr();
     }
 
 
     @Override
     public String getRemoteHost() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getRemoteHost();
     }
 
 
     @Override
     public void setAttribute(String name, Object o) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         request.setAttribute(name, o);
     }
 
 
     @Override
     public void removeAttribute(String name) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         request.removeAttribute(name);
     }
 
 
     @Override
     public Locale getLocale() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getLocale();
     }
 
 
     @Override
     public Enumeration<Locale> getLocales() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getLocales();
     }
 
 
     @Override
     public boolean isSecure() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.isSecure();
     }
 
 
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getRequestDispatcher(path);
     }
 
     @Override
     public String getAuthType() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getAuthType();
     }
 
 
     @Override
     public Cookie[] getCookies() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getCookies();
     }
 
 
     @Override
     public long getDateHeader(String name) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getDateHeader(name);
     }
 
 
     @Override
     public String getHeader(String name) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getHeader(name);
     }
 
 
     @Override
     public Enumeration<String> getHeaders(String name) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getHeaders(name);
     }
 
 
     @Override
     public Enumeration<String> getHeaderNames() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getHeaderNames();
     }
 
 
     @Override
     public int getIntHeader(String name) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getIntHeader(name);
     }
 
 
     @Override
     public HttpServletMapping getHttpServletMapping() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getHttpServletMapping();
     }
 
 
     @Override
     public String getMethod() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getMethod();
     }
 
 
     @Override
     public String getPathInfo() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getPathInfo();
     }
 
 
     @Override
     public String getPathTranslated() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getPathTranslated();
     }
 
 
     @Override
     public String getContextPath() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getContextPath();
     }
 
 
     @Override
     public String getQueryString() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getQueryString();
     }
 
 
     @Override
     public String getRemoteUser() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getRemoteUser();
     }
 
 
     @Override
     public boolean isUserInRole(String role) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.isUserInRole(role);
     }
 
 
     @Override
     public java.security.Principal getUserPrincipal() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getUserPrincipal();
     }
 
 
     @Override
     public String getRequestedSessionId() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getRequestedSessionId();
     }
 
 
     @Override
     public String getRequestURI() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getRequestURI();
     }
 
 
     @Override
     public StringBuffer getRequestURL() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getRequestURL();
     }
 
 
     @Override
     public String getServletPath() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getServletPath();
     }
 
 
     @Override
     public HttpSession getSession(boolean create) {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getSession(create);
     }
 
     @Override
     public HttpSession getSession() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return getSession(true);
     }
 
     @Override
     public String changeSessionId() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.changeSessionId();
     }
 
     @Override
     public boolean isRequestedSessionIdValid() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.isRequestedSessionIdValid();
     }
 
 
     @Override
     public boolean isRequestedSessionIdFromCookie() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.isRequestedSessionIdFromCookie();
     }
 
 
     @Override
     public boolean isRequestedSessionIdFromURL() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.isRequestedSessionIdFromURL();
     }
 
 
     @Override
     public String getLocalAddr() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getLocalAddr();
     }
 
 
     @Override
     public String getLocalName() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getLocalName();
     }
 
 
     @Override
     public int getLocalPort() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getLocalPort();
     }
 
 
     @Override
     public int getRemotePort() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getRemotePort();
     }
 
 
     @Override
     public ServletContext getServletContext() {
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
+        checkFacade();
         return request.getServletContext();
     }
 
@@ -885,5 +597,12 @@ public class RequestFacade implements HttpServletRequest {
     @Override
     public ServletConnection getServletConnection() {
         return request.getServletConnection();
+    }
+
+
+    private void checkFacade() {
+        if (request == null) {
+            throw new IllegalStateException(sm.getString("requestFacade.nullRequest"));
+        }
     }
 }
