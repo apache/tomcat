@@ -739,79 +739,87 @@ public class RequestFacade implements HttpServletRequest {
 
     @Override
     public AsyncContext startAsync() throws IllegalStateException {
+        checkFacade();
         return request.startAsync();
     }
 
 
     @Override
-    public AsyncContext startAsync(ServletRequest request, ServletResponse response)
-    throws IllegalStateException {
+    public AsyncContext startAsync(ServletRequest request, ServletResponse response) throws IllegalStateException {
+        checkFacade();
         return this.request.startAsync(request, response);
     }
 
 
     @Override
     public boolean isAsyncStarted() {
+        checkFacade();
         return request.isAsyncStarted();
     }
 
 
     @Override
     public boolean isAsyncSupported() {
+        checkFacade();
         return request.isAsyncSupported();
     }
 
 
     @Override
     public AsyncContext getAsyncContext() {
+        checkFacade();
         return request.getAsyncContext();
     }
 
 
     @Override
     public DispatcherType getDispatcherType() {
+        checkFacade();
         return request.getDispatcherType();
     }
 
 
     @Override
-    public boolean authenticate(HttpServletResponse response)
-    throws IOException, ServletException {
+    public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+        checkFacade();
         return request.authenticate(response);
     }
 
     @Override
-    public void login(String username, String password)
-    throws ServletException {
+    public void login(String username, String password) throws ServletException {
+        checkFacade();
         request.login(username, password);
     }
 
     @Override
     public void logout() throws ServletException {
+        checkFacade();
         request.logout();
     }
 
     @Override
-    public Collection<Part> getParts() throws IllegalStateException,
-            IOException, ServletException {
+    public Collection<Part> getParts() throws IllegalStateException, IOException, ServletException {
+        checkFacade();
         return request.getParts();
     }
 
 
     @Override
-    public Part getPart(String name) throws IllegalStateException, IOException,
-            ServletException {
+    public Part getPart(String name) throws IllegalStateException, IOException, ServletException {
+        checkFacade();
         return request.getPart(name);
     }
 
 
     public boolean getAllowTrace() {
+        checkFacade();
         return request.getConnector().getAllowTrace();
     }
 
 
     @Override
     public long getContentLengthLong() {
+        checkFacade();
         return request.getContentLengthLong();
     }
 
@@ -819,47 +827,55 @@ public class RequestFacade implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {
+        checkFacade();
         return request.upgrade(httpUpgradeHandlerClass);
     }
 
 
     @Override
     public PushBuilder newPushBuilder() {
+        checkFacade();
         return request.newPushBuilder();
     }
 
 
     public PushBuilder newPushBuilder(HttpServletRequest request) {
+        checkFacade();
         return this.request.newPushBuilder(request);
     }
 
 
     @Override
     public boolean isTrailerFieldsReady() {
+        checkFacade();
         return request.isTrailerFieldsReady();
     }
 
 
     @Override
     public Map<String, String> getTrailerFields() {
+        checkFacade();
         return request.getTrailerFields();
     }
 
 
     @Override
     public String getRequestId() {
+        checkFacade();
         return request.getRequestId();
     }
 
 
     @Override
     public String getProtocolRequestId() {
+        checkFacade();
         return request.getProtocolRequestId();
     }
 
 
     @Override
     public ServletConnection getServletConnection() {
+        checkFacade();
         return request.getServletConnection();
     }
 
