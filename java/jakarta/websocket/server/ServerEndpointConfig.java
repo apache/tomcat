@@ -16,8 +16,6 @@
  */
 package jakarta.websocket.server;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -163,12 +161,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
             if (defaultImpl == null) {
                 synchronized (defaultImplLock) {
                     if (defaultImpl == null) {
-                        if (System.getSecurityManager() == null) {
-                            defaultImpl = loadDefault();
-                        } else {
-                            defaultImpl =
-                                    AccessController.doPrivileged(new PrivilegedLoadDefault());
-                        }
+                        defaultImpl = loadDefault();
                     }
                 }
             }
@@ -201,15 +194,6 @@ public interface ServerEndpointConfig extends EndpointConfig {
                 }
             }
             return result;
-        }
-
-
-        private static class PrivilegedLoadDefault implements PrivilegedAction<Configurator> {
-
-            @Override
-            public Configurator run() {
-                return Configurator.loadDefault();
-            }
         }
 
 
