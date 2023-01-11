@@ -18,10 +18,6 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -31,8 +27,6 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.Globals;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -42,65 +36,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  */
 public class ResponseFacade implements HttpServletResponse {
-
-    // ----------------------------------------------------------- DoPrivileged
-
-    private final class SetContentTypePrivilegedAction
-            implements PrivilegedAction<Void> {
-
-        private final String contentType;
-
-        public SetContentTypePrivilegedAction(String contentType){
-            this.contentType = contentType;
-        }
-
-        @Override
-        public Void run() {
-            response.setContentType(contentType);
-            return null;
-        }
-    }
-
-    private final class DateHeaderPrivilegedAction
-            implements PrivilegedAction<Void> {
-
-        private final String name;
-        private final long value;
-        private final boolean add;
-
-        DateHeaderPrivilegedAction(String name, long value, boolean add) {
-            this.name = name;
-            this.value = value;
-            this.add = add;
-        }
-
-        @Override
-        public Void run() {
-            if(add) {
-                response.addDateHeader(name, value);
-            } else {
-                response.setDateHeader(name, value);
-            }
-            return null;
-        }
-    }
-
-    private static class FlushBufferPrivilegedAction implements PrivilegedExceptionAction<Void> {
-
-        private final Response response;
-
-        public FlushBufferPrivilegedAction(Response response) {
-            this.response = response;
-        }
-
-        @Override
-        public Void run() throws IOException {
-            response.setAppCommitted(true);
-            response.flushBuffer();
-            return null;
-        }
-    }
-
 
     // ----------------------------------------------------------- Constructors
 
@@ -116,7 +51,6 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     // ----------------------------------------------- Class/Instance Variables
-
 
     /**
      * The string manager for this package.
@@ -256,12 +190,7 @@ public class ResponseFacade implements HttpServletResponse {
         if (isCommitted()) {
             return;
         }
-
-        if (SecurityUtil.isPackageProtectionEnabled()){
-            AccessController.doPrivileged(new SetContentTypePrivilegedAction(type));
-        } else {
-            response.setContentType(type);
-        }
+        response.setContentType(type);
     }
 
 
@@ -297,19 +226,8 @@ public class ResponseFacade implements HttpServletResponse {
             return;
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try{
-                AccessController.doPrivileged(new FlushBufferPrivilegedAction(response));
-            } catch(PrivilegedActionException e) {
-                Exception ex = e.getException();
-                if (ex instanceof IOException) {
-                    throw (IOException)ex;
-                }
-            }
-        } else {
-            response.setAppCommitted(true);
-            response.flushBuffer();
-        }
+        response.setAppCommitted(true);
+        response.flushBuffer();
     }
 
 
@@ -477,13 +395,7 @@ public class ResponseFacade implements HttpServletResponse {
             return;
         }
 
-        if(Globals.IS_SECURITY_ENABLED) {
-            AccessController.doPrivileged(new DateHeaderPrivilegedAction
-                                             (name, date, false));
-        } else {
-            response.setDateHeader(name, date);
-        }
-
+        response.setDateHeader(name, date);
     }
 
 
@@ -494,13 +406,7 @@ public class ResponseFacade implements HttpServletResponse {
             return;
         }
 
-        if(Globals.IS_SECURITY_ENABLED) {
-            AccessController.doPrivileged(new DateHeaderPrivilegedAction
-                                             (name, date, true));
-        } else {
-            response.addDateHeader(name, date);
-        }
-
+        response.addDateHeader(name, date);
     }
 
 

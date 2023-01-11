@@ -18,8 +18,6 @@ package org.apache.catalina.connector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -43,8 +41,6 @@ import jakarta.servlet.http.HttpUpgradeHandler;
 import jakarta.servlet.http.Part;
 import jakarta.servlet.http.PushBuilder;
 
-import org.apache.catalina.Globals;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -57,168 +53,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class RequestFacade implements HttpServletRequest {
 
 
-    // ----------------------------------------------------------- DoPrivileged
-
-    private final class GetAttributePrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
-
-        @Override
-        public Enumeration<String> run() {
-            return request.getAttributeNames();
-        }
-    }
-
-
-    private final class GetParameterMapPrivilegedAction
-            implements PrivilegedAction<Map<String,String[]>> {
-
-        @Override
-        public Map<String,String[]> run() {
-            return request.getParameterMap();
-        }
-    }
-
-
-    private final class GetRequestDispatcherPrivilegedAction
-            implements PrivilegedAction<RequestDispatcher> {
-
-        private final String path;
-
-        public GetRequestDispatcherPrivilegedAction(String path){
-            this.path = path;
-        }
-
-        @Override
-        public RequestDispatcher run() {
-            return request.getRequestDispatcher(path);
-        }
-    }
-
-
-    private final class GetParameterPrivilegedAction
-            implements PrivilegedAction<String> {
-
-        public String name;
-
-        public GetParameterPrivilegedAction(String name){
-            this.name = name;
-        }
-
-        @Override
-        public String run() {
-            return request.getParameter(name);
-        }
-    }
-
-
-    private final class GetParameterNamesPrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
-
-        @Override
-        public Enumeration<String> run() {
-            return request.getParameterNames();
-        }
-    }
-
-
-    private final class GetParameterValuePrivilegedAction
-            implements PrivilegedAction<String[]> {
-
-        public String name;
-
-        public GetParameterValuePrivilegedAction(String name){
-            this.name = name;
-        }
-
-        @Override
-        public String[] run() {
-            return request.getParameterValues(name);
-        }
-    }
-
-
-    private final class GetCookiesPrivilegedAction
-            implements PrivilegedAction<Cookie[]> {
-
-        @Override
-        public Cookie[] run() {
-            return request.getCookies();
-        }
-    }
-
-
-    private final class GetCharacterEncodingPrivilegedAction
-            implements PrivilegedAction<String> {
-
-        @Override
-        public String run() {
-            return request.getCharacterEncoding();
-        }
-    }
-
-
-    private final class GetHeadersPrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
-
-        private final String name;
-
-        public GetHeadersPrivilegedAction(String name){
-            this.name = name;
-        }
-
-        @Override
-        public Enumeration<String> run() {
-            return request.getHeaders(name);
-        }
-    }
-
-
-    private final class GetHeaderNamesPrivilegedAction
-            implements PrivilegedAction<Enumeration<String>> {
-
-        @Override
-        public Enumeration<String> run() {
-            return request.getHeaderNames();
-        }
-    }
-
-
-    private final class GetLocalePrivilegedAction
-            implements PrivilegedAction<Locale> {
-
-        @Override
-        public Locale run() {
-            return request.getLocale();
-        }
-    }
-
-
-    private final class GetLocalesPrivilegedAction
-            implements PrivilegedAction<Enumeration<Locale>> {
-
-        @Override
-        public Enumeration<Locale> run() {
-            return request.getLocales();
-        }
-    }
-
-    private final class GetSessionPrivilegedAction
-            implements PrivilegedAction<HttpSession> {
-
-        private final boolean create;
-
-        public GetSessionPrivilegedAction(boolean create){
-            this.create = create;
-        }
-
-        @Override
-        public HttpSession run() {
-            return request.getSession(create);
-        }
-    }
-
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Construct a wrapper for the specified request.
@@ -233,7 +68,6 @@ public class RequestFacade implements HttpServletRequest {
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The wrapped request.
@@ -291,12 +125,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetAttributePrivilegedAction());
-        } else {
-            return request.getAttributeNames();
-        }
+        return request.getAttributeNames();
     }
 
 
@@ -308,12 +137,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetCharacterEncodingPrivilegedAction());
-        } else {
-            return request.getCharacterEncoding();
-        }
+        return request.getCharacterEncoding();
     }
 
 
@@ -374,12 +198,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetParameterPrivilegedAction(name));
-        } else {
-            return request.getParameter(name);
-        }
+        return request.getParameter(name);
     }
 
 
@@ -391,12 +210,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetParameterNamesPrivilegedAction());
-        } else {
-            return request.getParameterNames();
-        }
+        return request.getParameterNames();
     }
 
 
@@ -408,23 +222,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        String[] ret = null;
-
-        /*
-         * Clone the returned array only if there is a security manager
-         * in place, so that performance won't suffer in the non-secure case
-         */
-        if (SecurityUtil.isPackageProtectionEnabled()){
-            ret = AccessController.doPrivileged(
-                new GetParameterValuePrivilegedAction(name));
-            if (ret != null) {
-                ret = ret.clone();
-            }
-        } else {
-            ret = request.getParameterValues(name);
-        }
-
-        return ret;
+        return request.getParameterValues(name);
     }
 
 
@@ -436,12 +234,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetParameterMapPrivilegedAction());
-        } else {
-            return request.getParameterMap();
-        }
+        return request.getParameterMap();
     }
 
 
@@ -561,12 +354,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetLocalePrivilegedAction());
-        } else {
-            return request.getLocale();
-        }
+        return request.getLocale();
     }
 
 
@@ -578,12 +366,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetLocalesPrivilegedAction());
-        } else {
-            return request.getLocales();
-        }
+        return request.getLocales();
     }
 
 
@@ -607,12 +390,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetRequestDispatcherPrivilegedAction(path));
-        } else {
-            return request.getRequestDispatcher(path);
-        }
+        return request.getRequestDispatcher(path);
     }
 
     @Override
@@ -635,23 +413,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        Cookie[] ret = null;
-
-        /*
-         * Clone the returned array only if there is a security manager
-         * in place, so that performance won't suffer in the non-secure case
-         */
-        if (SecurityUtil.isPackageProtectionEnabled()){
-            ret = AccessController.doPrivileged(
-                new GetCookiesPrivilegedAction());
-            if (ret != null) {
-                ret = ret.clone();
-            }
-        } else {
-            ret = request.getCookies();
-        }
-
-        return ret;
+        return request.getCookies();
     }
 
 
@@ -687,12 +449,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetHeadersPrivilegedAction(name));
-        } else {
-            return request.getHeaders(name);
-        }
+        return request.getHeaders(name);
     }
 
 
@@ -704,12 +461,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (Globals.IS_SECURITY_ENABLED){
-            return AccessController.doPrivileged(
-                new GetHeaderNamesPrivilegedAction());
-        } else {
-            return request.getHeaderNames();
-        }
+        return request.getHeaderNames();
     }
 
 
@@ -889,12 +641,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()){
-            return AccessController.
-                doPrivileged(new GetSessionPrivilegedAction(create));
-        } else {
-            return request.getSession(create);
-        }
+        return request.getSession(create);
     }
 
     @Override

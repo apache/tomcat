@@ -22,16 +22,12 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.servlet.WriteListener;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.Globals;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.CloseNowException;
 import org.apache.coyote.Response;
@@ -570,26 +566,8 @@ public class OutputBuffer extends Writer {
         conv = encoders.get(charset);
 
         if (conv == null) {
-            conv = createConverter(charset);
+            conv = new C2BConverter(charset);
             encoders.put(charset, conv);
-        }
-    }
-
-
-    private static C2BConverter createConverter(final Charset charset) throws IOException {
-        if (Globals.IS_SECURITY_ENABLED) {
-            try {
-                return AccessController.doPrivileged(new PrivilegedCreateConverter(charset));
-            } catch (PrivilegedActionException ex) {
-                Exception e = ex.getException();
-                if (e instanceof IOException) {
-                    throw (IOException) e;
-                } else {
-                    throw new IOException(ex);
-                }
-            }
-        } else {
-            return new C2BConverter(charset);
         }
     }
 
@@ -857,21 +835,5 @@ public class OutputBuffer extends Writer {
         buffer.mark()
               .position(buffer.limit())
               .limit(buffer.capacity());
-    }
-
-
-    private static class PrivilegedCreateConverter
-            implements PrivilegedExceptionAction<C2BConverter> {
-
-        private final Charset charset;
-
-        public PrivilegedCreateConverter(Charset charset) {
-            this.charset = charset;
-        }
-
-        @Override
-        public C2BConverter run() throws IOException {
-            return new C2BConverter(charset);
-        }
     }
 }

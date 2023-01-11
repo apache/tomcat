@@ -22,15 +22,11 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ReadListener;
 
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
@@ -556,27 +552,8 @@ public class InputBuffer extends Reader
         conv = stack.pop();
 
         if (conv == null) {
-            conv = createConverter(charset);
+            conv = new B2CConverter(charset);
         }
-    }
-
-
-    private static B2CConverter createConverter(Charset charset) throws IOException {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try {
-                return AccessController.doPrivileged(new PrivilegedCreateConverter(charset));
-            } catch (PrivilegedActionException ex) {
-                Exception e = ex.getException();
-                if (e instanceof IOException) {
-                    throw (IOException) e;
-                } else {
-                    throw new IOException(e);
-                }
-            }
-        } else {
-            return new B2CConverter(charset);
-        }
-
     }
 
 
@@ -649,21 +626,5 @@ public class InputBuffer extends Reader
         tmp.position(oldPosition);
         cb = tmp;
         tmp = null;
-    }
-
-
-    private static class PrivilegedCreateConverter
-            implements PrivilegedExceptionAction<B2CConverter> {
-
-        private final Charset charset;
-
-        public PrivilegedCreateConverter(Charset charset) {
-            this.charset = charset;
-        }
-
-        @Override
-        public B2CConverter run() throws IOException {
-            return new B2CConverter(charset);
-        }
     }
 }

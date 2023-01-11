@@ -24,10 +24,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,13 +39,11 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.SessionTrackingMode;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Session;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ContinueResponseTiming;
@@ -968,12 +962,7 @@ public class Response implements HttpServletResponse {
     public String generateCookieString(final Cookie cookie) {
         // Web application code can receive a IllegalArgumentException
         // from the generateHeader() invocation
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return AccessController.doPrivileged(
-                    new PrivilegedGenerateCookieString(getContext(), cookie, request.getRequest()));
-        } else {
-            return getContext().getCookieProcessor().generateHeader(cookie, request.getRequest());
-        }
+        return getContext().getCookieProcessor().generateHeader(cookie, request.getRequest());
     }
 
 
@@ -1469,13 +1458,7 @@ public class Response implements HttpServletResponse {
             return false;
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            Boolean result =  AccessController.doPrivileged(
-                    new PrivilegedDoIsEncodable(getContext(), hreq, session, location));
-            return result.booleanValue();
-        } else {
-            return doIsEncodeable(getContext(), hreq, session, location);
-        }
+        return doIsEncodeable(getContext(), hreq, session, location);
     }
 
 
@@ -1590,17 +1573,7 @@ public class Response implements HttpServletResponse {
                 if (!leadingSlash) {
                     String relativePath = request.getDecodedRequestURI();
                     int pos = relativePath.lastIndexOf('/');
-                    CharChunk encodedURI = null;
-                    if (SecurityUtil.isPackageProtectionEnabled() ){
-                        try{
-                            encodedURI = AccessController.doPrivileged(
-                                    new PrivilegedEncodeUrl(urlEncoder, relativePath, pos));
-                        } catch (PrivilegedActionException pae){
-                            throw new IllegalArgumentException(location, pae.getException());
-                        }
-                    } else {
-                        encodedURI = urlEncoder.encodeURL(relativePath, 0, pos);
-                    }
+                    CharChunk encodedURI = urlEncoder.encodeURL(relativePath, 0, pos);
                     redirectURLCC.append(encodedURI);
                     encodedURI.recycle();
                     redirectURLCC.append('/');
@@ -1771,65 +1744,5 @@ public class Response implements HttpServletResponse {
         sb.append(anchor);
         sb.append(query);
         return sb.toString();
-    }
-
-
-    private static class PrivilegedGenerateCookieString implements PrivilegedAction<String> {
-
-        private final Context context;
-        private final Cookie cookie;
-        private final HttpServletRequest request;
-
-        public PrivilegedGenerateCookieString(Context context, Cookie cookie, HttpServletRequest request) {
-            this.context = context;
-            this.cookie = cookie;
-            this.request = request;
-        }
-
-        @Override
-        public String run(){
-            return context.getCookieProcessor().generateHeader(cookie, request);
-        }
-    }
-
-
-    private static class PrivilegedDoIsEncodable implements PrivilegedAction<Boolean> {
-
-        private final Context context;
-        private final Request hreq;
-        private final Session session;
-        private final String location;
-
-        public PrivilegedDoIsEncodable(Context context, Request hreq, Session session,
-                String location) {
-            this.context = context;
-            this.hreq = hreq;
-            this.session = session;
-            this.location = location;
-        }
-
-        @Override
-        public Boolean run(){
-            return Boolean.valueOf(doIsEncodeable(context, hreq, session, location));
-        }
-    }
-
-
-    private static class PrivilegedEncodeUrl implements PrivilegedExceptionAction<CharChunk> {
-
-        private final UEncoder urlEncoder;
-        private final String relativePath;
-        private final int end;
-
-        public PrivilegedEncodeUrl(UEncoder urlEncoder, String relativePath, int end) {
-            this.urlEncoder = urlEncoder;
-            this.relativePath = relativePath;
-            this.end = end;
-        }
-
-        @Override
-        public CharChunk run() throws IOException{
-            return urlEncoder.encodeURL(relativePath, 0, end);
-        }
     }
 }
