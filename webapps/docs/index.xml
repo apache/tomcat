@@ -77,10 +77,6 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
     - Description of how to configure <em>Realms</em> (databases of users,
     passwords, and their associated roles) for use in web applications that
     utilize <em>Container Managed Security</em>.</li>
-<li><a href="security-manager-howto.html"><strong>Security Manager</strong></a>
-    - Configuring and using a Java Security Manager to
-    support fine-grained control over the behavior of your web applications.
-    </li>
 <li><a href="jndi-resources-howto.html"><strong>JNDI Resources</strong></a>
     - Configuring standard and custom resources in the JNDI naming context
     that is provided to each web application.</li>

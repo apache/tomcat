@@ -110,6 +110,9 @@
       <update>
         Update BND to 6.4.0. (markt)
       </update>
+      <update>
+        Remove support for starting Tomcat under a SecurityManager. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
