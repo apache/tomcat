@@ -22,8 +22,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,26 +40,6 @@ class Util {
 
     private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
-
-    private static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
-
-    private static final boolean GET_CLASSLOADER_USE_PRIVILEGED;
-
-    static {
-        if (IS_SECURITY_ENABLED) {
-            // Defaults to using a privileged block
-            // When running on Tomcat this will be set to false in
-            // $CATALINA_BASE/conf/catalina.properties
-            String value = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(
-                            "org.apache.el.GET_CLASSLOADER_USE_PRIVILEGED", "true"));
-            GET_CLASSLOADER_USE_PRIVILEGED = Boolean.parseBoolean(value);
-        } else {
-            // No security manager - no need to use a privileged block.
-            GET_CLASSLOADER_USE_PRIVILEGED = false;
-        }
-    }
-
 
     /**
      * Checks whether the supplied Throwable is one that needs to be
@@ -113,7 +91,7 @@ class Util {
      */
     static ExpressionFactory getExpressionFactory() {
 
-        ClassLoader tccl = getContextClassLoader();
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
         CacheValue cacheValue = null;
         ExpressionFactory factory = null;
@@ -673,19 +651,6 @@ class Util {
     }
 
 
-    static ClassLoader getContextClassLoader() {
-        ClassLoader tccl;
-        if (IS_SECURITY_ENABLED && GET_CLASSLOADER_USE_PRIVILEGED) {
-            PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
-            tccl = AccessController.doPrivileged(pa);
-        } else {
-            tccl = Thread.currentThread().getContextClassLoader();
-        }
-
-        return tccl;
-    }
-
-
     private abstract static class Wrapper<T> {
 
         public static List<Wrapper<Method>> wrap(Method[] methods, String name) {
@@ -866,14 +831,6 @@ class Util {
             result = prime * result + (varArgs ? 1231 : 1237);
             result = prime * result + varArgsCount;
             return result;
-        }
-    }
-
-
-    private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
-        @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
         }
     }
 }

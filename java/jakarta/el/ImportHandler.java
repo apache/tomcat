@@ -447,7 +447,7 @@ public class ImportHandler {
 
     private Class<?> findClass(String name, boolean throwException) {
         Class<?> clazz;
-        ClassLoader cl = Util.getContextClassLoader();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             clazz = cl.loadClass(name);
         } catch (ClassNotFoundException e) {

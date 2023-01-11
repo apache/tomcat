@@ -25,8 +25,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -42,26 +40,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public abstract class ExpressionFactory {
 
-    private static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
-
     private static final String PROPERTY_NAME = "jakarta.el.ExpressionFactory";
 
-    private static final String PROPERTY_FILE;
+    private static final String PROPERTY_FILE =
+            System.getProperty("java.home") + File.separator + "lib" + File.separator + "el.properties";
 
     private static final CacheValue nullTcclFactory = new CacheValue();
     private static final Map<CacheKey, CacheValue> factoryCache = new ConcurrentHashMap<>();
-
-    static {
-        if (IS_SECURITY_ENABLED) {
-            PROPERTY_FILE = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty("java.home") + File.separator +
-                            "lib" + File.separator + "el.properties"
-            );
-        } else {
-            PROPERTY_FILE = System.getProperty("java.home") + File.separator + "lib" +
-                    File.separator + "el.properties";
-        }
-    }
 
     /**
      * Create a new {@link ExpressionFactory}. The class to use is determined by
@@ -89,7 +74,7 @@ public abstract class ExpressionFactory {
     public static ExpressionFactory newInstance(Properties properties) {
         ExpressionFactory result = null;
 
-        ClassLoader tccl = Util.getContextClassLoader();
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
         CacheValue cacheValue;
         Class<?> clazz;
@@ -323,20 +308,12 @@ public abstract class ExpressionFactory {
         // First services API
         className = getClassNameServices(tccl);
         if (className == null) {
-            if (IS_SECURITY_ENABLED) {
-                className = AccessController.doPrivileged((PrivilegedAction<String>) ExpressionFactory::getClassNameJreDir);
-            } else {
-                // Second el.properties file
-                className = getClassNameJreDir();
-            }
+            // Second el.properties file
+            className = getClassNameJreDir();
         }
         if (className == null) {
-            if (IS_SECURITY_ENABLED) {
-                className = AccessController.doPrivileged((PrivilegedAction<String>) ExpressionFactory::getClassNameSysProp);
-            } else {
-                // Third system property
-                className = getClassNameSysProp();
-            }
+            // Third system property
+            className = getClassNameSysProp();
         }
         if (className == null) {
             // Fourth - default

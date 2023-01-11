@@ -22,8 +22,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -39,14 +37,7 @@ public class BeanELResolver extends ELResolver {
     private static final String CACHE_SIZE_PROP = "org.apache.el.BeanELResolver.CACHE_SIZE";
 
     static {
-        String cacheSizeStr;
-        if (System.getSecurityManager() == null) {
-            cacheSizeStr = System.getProperty(CACHE_SIZE_PROP, "1000");
-        } else {
-            cacheSizeStr = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(CACHE_SIZE_PROP, "1000"));
-        }
-        CACHE_SIZE = Integer.parseInt(cacheSizeStr);
+        CACHE_SIZE = Integer.parseInt(System.getProperty(CACHE_SIZE_PROP, "1000"));
     }
 
     private final boolean readOnly;
