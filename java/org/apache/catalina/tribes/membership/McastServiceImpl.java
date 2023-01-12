@@ -258,7 +258,7 @@ public class McastServiceImpl extends MembershipProviderBase {
             }
             try {
                 if ( sender == null ) {
-                    socket.joinGroup(address);
+                    socket.joinGroup(new InetSocketAddress(address, 0), null);
                 }
             }catch (IOException iox) {
                 log.error(sm.getString("mcastServiceImpl.unable.join"));
@@ -275,7 +275,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                 throw new IllegalStateException(sm.getString("mcastServiceImpl.send.running"));
             }
             if ( receiver == null ) {
-                socket.joinGroup(address);
+                socket.joinGroup(new InetSocketAddress(address, 0), null);
             }
             //make sure at least one packet gets out there
             send(false);
