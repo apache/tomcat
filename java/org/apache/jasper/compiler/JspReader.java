@@ -487,7 +487,7 @@ class JspReader {
      * Skip until the given end tag is matched in the stream.
      * When returned, the context is positioned past the end of the tag.
      *
-     * @param tag The name of the tag whose ETag (</tag>) to match.
+     * @param tag The name of the tag whose ETag (&lt;/tag>) to match.
      * @return A non-null <code>Mark</code> instance (positioned immediately
      *               before the ETag) if found, <strong>null</strong> otherwise.
      */

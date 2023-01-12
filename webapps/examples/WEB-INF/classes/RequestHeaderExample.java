@@ -33,7 +33,7 @@ import util.HTMLFilter;
 /**
  * Example servlet showing request headers
  *
- * @author James Duncan Davidson <duncan@eng.sun.com>
+ * @author James Duncan Davidson &lt;duncan@eng.sun.com>
  */
 
 public class RequestHeaderExample extends HttpServlet {

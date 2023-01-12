@@ -75,8 +75,8 @@ public final class UriUtil {
      *
      * @param c The character to test
      *
-     * @return {@code true} if a the character is allowed, otherwise {code
-     *         @false}
+     * @return {@code true} if a the character is allowed, otherwise {@code
+     *         false}
      */
     private static boolean isSchemeChar(char c) {
         return Character.isLetterOrDigit(c) || c == '+' || c == '-' || c == '.';
