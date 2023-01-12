@@ -172,18 +172,21 @@ public final class AstFunction extends SimpleNode {
                     if (m.isVarArgs() && i == methodParameterCount - 1) {
                         if (inputParameterCount < methodParameterCount) {
                             params[i] = new Object[] { null };
-                        } else if (inputParameterCount == methodParameterCount &&
-                                paramTypes[i].isArray()) {
-                            params[i] = parameters.jjtGetChild(i).getValue(ctx);
                         } else {
-                            Object[] varargs =
-                                    new Object[inputParameterCount - methodParameterCount + 1];
-                            Class<?> target = paramTypes[i].getComponentType();
-                            for (int j = i; j < inputParameterCount; j++) {
-                                varargs[j-i] = parameters.jjtGetChild(j).getValue(ctx);
-                                varargs[j-i] = ELSupport.coerceToType(ctx, varargs[j-i], target);
-                            }
-                            params[i] = varargs;
+                        	Object value = parameters.jjtGetChild(i).getValue(ctx);
+                        	if (inputParameterCount == methodParameterCount &&
+                        			value != null && value.getClass().isArray()) {
+	                            params[i] = parameters.jjtGetChild(i).getValue(ctx);
+	                        } else {
+	                            Object[] varargs =
+	                                    new Object[inputParameterCount - methodParameterCount + 1];
+	                            Class<?> target = paramTypes[i].getComponentType();
+	                            for (int j = i; j < inputParameterCount; j++) {
+	                                varargs[j-i] = parameters.jjtGetChild(j).getValue(ctx);
+	                                varargs[j-i] = ELSupport.coerceToType(ctx, varargs[j-i], target);
+	                            }
+	                            params[i] = varargs;
+	                        }
                         }
                     } else {
                         params[i] = parameters.jjtGetChild(i).getValue(ctx);

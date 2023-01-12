@@ -18,17 +18,17 @@ package org.apache.el.parser;
 
 import java.io.StringReader;
 
-import jakarta.el.ELContext;
-import jakarta.el.ELException;
-import jakarta.el.ExpressionFactory;
-import jakarta.el.ValueExpression;
-
+import org.apache.jasper.el.ELContextImpl;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import org.apache.jasper.el.ELContextImpl;
-import org.apache.tomcat.util.collections.SynchronizedStack;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.StandardELContext;
+import jakarta.el.ValueExpression;
 
 public class TestELParser {
 
@@ -218,6 +218,25 @@ public class TestELParser {
         beanC.setInt1(2);
         beanC.setMyBool1(true);
         Assert.assertEquals(Boolean.TRUE, ve.getValue(context));
+    }
+
+    @Test
+    public void testVarargMethod() throws NoSuchMethodException, SecurityException {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new StandardELContext(factory);
+        context.getFunctionMapper().mapFunction("fn", "format", String.class.getMethod("format",String.class, Object[].class));
+
+        Object result = factory.createValueExpression(context, "${fn:format('%s-%s','one','two')}",
+                String.class).getValue(context);
+        Assert.assertEquals("one-two",result);
+
+        result = factory.createValueExpression(context, "${fn:format('%s-%s','one,two'.split(','))}",
+                String.class).getValue(context);
+        Assert.assertEquals("one-two",result);
+
+        result = factory.createValueExpression(context, "${fn:format('%s','one')}",
+                String.class).getValue(context);
+        Assert.assertEquals("one",result);
     }
 
     private void testExpression(String expression, String expected) {
