@@ -782,7 +782,6 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     *
      * @return The Charset to use to convert raw URI bytes (after %nn decoding)
      *         to characters. This will never be null
      */

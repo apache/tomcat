@@ -352,7 +352,6 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
     }
 
     /**
-     *
      * @param mbr Member
      * @return Member
      */

@@ -367,7 +367,6 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     /**
-     *
      * @return true if connect() was called successfully and disconnect has not yet been called
      */
     @Override

@@ -52,8 +52,8 @@ public interface ChannelMessage extends Serializable, Cloneable {
     public long getTimestamp();
 
     /**
+     * Sets the timestamp of this message.
      *
-     * Sets the timestamp of this message
      * @param timestamp The timestamp
      */
     public void setTimestamp(long timestamp);

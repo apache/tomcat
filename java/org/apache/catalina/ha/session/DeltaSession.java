@@ -49,7 +49,6 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- *
  * Similar to the StandardSession except that this session will keep
  * track of deltas during a request.
  */

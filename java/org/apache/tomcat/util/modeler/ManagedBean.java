@@ -76,8 +76,8 @@ public class ManagedBean implements java.io.Serializable {
     private NotificationInfo notifications[] = new NotificationInfo[0];
     protected String type = null;
 
-    /** Constructor. Will add default attributes.
-     *
+    /**
+     * Constructor. Will add default attributes.
      */
     public ManagedBean() {
         AttributeInfo ai=new AttributeInfo();

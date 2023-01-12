@@ -51,14 +51,20 @@ public final class MessageBytes implements Cloneable, Serializable {
     private int type = T_NULL;
 
     public static final int T_NULL = 0;
-    /** getType() is T_STR if the the object used to create the MessageBytes
-        was a String */
+    /**
+     * getType() is T_STR if the the object used to create the MessageBytes
+     * was a String.
+     */
     public static final int T_STR  = 1;
-    /** getType() is T_BYTES if the the object used to create the MessageBytes
-        was a byte[] */
+    /**
+     * getType() is T_BYTES if the the object used to create the MessageBytes
+     * was a byte[].
+     */
     public static final int T_BYTES = 2;
-    /** getType() is T_CHARS if the the object used to create the MessageBytes
-        was a char[] */
+    /**
+     * getType() is T_CHARS if the the object used to create the MessageBytes
+     * was a char[].
+     */
     public static final int T_CHARS = 3;
 
     public static final char[] EMPTY_CHAR_ARRAY = new char[0];

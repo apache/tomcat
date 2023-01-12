@@ -87,7 +87,6 @@ public interface Servlet {
     public void init(ServletConfig config) throws ServletException;
 
     /**
-     *
      * Returns a {@link ServletConfig} object, which contains initialization and
      * startup parameters for this servlet. The <code>ServletConfig</code>
      * object returned is the one passed to the <code>init</code> method.

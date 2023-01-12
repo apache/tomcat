@@ -20,10 +20,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** SSL Context
- *
- * @author Mladen Turk
- */
 public final class SSLContext {
 
     public static final byte[] DEFAULT_SESSION_ID_CONTEXT =

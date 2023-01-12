@@ -80,6 +80,7 @@
     <!-- Javadoc Comments -->
     <module name="InvalidJavadocPosition"/>
     <module name="JavadocBlockTagLocation"/>
+    <module name="JavadocContentLocationCheck"/>
 
     <!-- Miscellaneous -->
     <!-- ~5500 errors

@@ -34,10 +34,6 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.res.StringManager;
 
-/**
- *
- * @author Costin Manolache
- */
 public final class Parameters {
 
     private static final Log log = LogFactory.getLog(Parameters.class);
@@ -172,7 +168,8 @@ public final class Parameters {
         }
     }
     // -------------------- Processing --------------------
-    /** Process the query string into parameters
+    /**
+     * Process the query string into parameters
      */
     public void handleQueryParameters() {
         if (didQueryParameters) {
