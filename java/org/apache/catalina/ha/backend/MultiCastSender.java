@@ -60,7 +60,7 @@ public class MultiCastSender
                 }
 
                 s.setTimeToLive(config.getTtl());
-                s.joinGroup(group);
+                s.joinGroup(new InetSocketAddress(group, 0), null);
             } catch (Exception ex) {
                 log.error(sm.getString("multiCastSender.multiCastFailed"), ex);
                 s = null;
