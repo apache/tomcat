@@ -452,7 +452,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             for (X509Certificate cert : certs) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Checking validity for '" +
-                            cert.getSubjectDN().getName() + "'");
+                            cert.getSubjectX500Principal().getName() + "'");
                 }
                 try {
                     cert.checkValidity();
