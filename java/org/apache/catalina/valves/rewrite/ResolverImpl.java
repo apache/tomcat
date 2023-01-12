@@ -233,10 +233,10 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("M_SERIAL")) {
             return certificates[0].getSerialNumber().toString();
         } else if (key.equals("S_DN")) {
-            return certificates[0].getSubjectX500Principal().getName();
+            return certificates[0].getSubjectX500Principal().toString();
         } else if (key.startsWith("S_DN_")) {
             key = key.substring("S_DN_".length());
-            return resolveComponent(certificates[0].getSubjectX500Principal().getName(), key);
+            return resolveComponent(certificates[0].getSubjectX500Principal().toString(), key);
         } else if (key.startsWith("SAN_Email_")) {
             // Type rfc822Name, which is 1
             key = key.substring("SAN_Email_".length());
