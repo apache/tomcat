@@ -30,7 +30,7 @@ public class TestResourceBundleELResolver {
     @Test
     public void bug53001() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         ResourceBundle rb = new TesterResourceBundle();
 

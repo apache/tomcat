@@ -37,7 +37,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testGetValueReference() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanB beanB = new TesterBeanB();
         beanB.setName("Tomcat");
@@ -63,7 +63,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testGetValueReferenceVariable() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanB beanB = new TesterBeanB();
         beanB.setName("Tomcat");
@@ -91,7 +91,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testBug49345() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanA beanA = new TesterBeanA();
         TesterBeanB beanB = new TesterBeanB();
@@ -120,7 +120,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testBug50105() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterEnum testEnum = TesterEnum.APPLE;
 
@@ -143,7 +143,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testBug51177ObjectMap() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         Object o1 = "String value";
         Object o2 = Integer.valueOf(32);
@@ -170,7 +170,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testBug51177ObjectList() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         Object o1 = "String value";
         Object o2 = Integer.valueOf(32);
@@ -201,7 +201,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testBug51544Bean() throws Exception {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanA beanA = new TesterBeanA();
         beanA.setValList(Collections.emptyList());
@@ -224,7 +224,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testBug51544Direct() throws Exception {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         List<?> list = Collections.emptyList();
 
@@ -243,7 +243,7 @@ public class TestValueExpressionImpl {
     @Test
     public void testBug56522SetNullValue() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanB beanB = new TesterBeanB();
         beanB.setName("Tomcat");

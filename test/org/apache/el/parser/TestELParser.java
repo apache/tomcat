@@ -64,7 +64,7 @@ public class TestELParser {
     @Test
     public void testJavaKeyWordSuffix() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
@@ -86,7 +86,7 @@ public class TestELParser {
     @Test
     public void testJavaKeyWordIdentifier() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanA beanA = new TesterBeanA();
         beanA.setInt("five");
@@ -177,7 +177,7 @@ public class TestELParser {
 
     private void doTestBug56179(int parenthesesCount, String innerExpr) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         ValueExpression var =
             factory.createValueExpression(Boolean.TRUE, Boolean.class);
@@ -203,7 +203,7 @@ public class TestELParser {
     @Test
     public void bug56185() {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         TesterBeanC beanC = new TesterBeanC();
         ValueExpression var =
@@ -222,7 +222,7 @@ public class TestELParser {
 
     private void testExpression(String expression, String expected) {
         ExpressionFactory factory = ExpressionFactory.newInstance();
-        ELContext context = new ELContextImpl(factory);
+        ELContext context = new ELContextImpl();
 
         ValueExpression ve = factory.createValueExpression(
                 context, expression, String.class);

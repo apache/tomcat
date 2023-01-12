@@ -28,7 +28,6 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.TldCache;
 import org.apache.jasper.runtime.JspFactoryImpl;
-import org.apache.jasper.security.SecurityClassLoad;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
@@ -49,7 +48,6 @@ public class JasperInitializer implements ServletContainerInitializer {
      */
     static {
         JspFactoryImpl factory = new JspFactoryImpl();
-        SecurityClassLoad.securityClassLoad(factory.getClass().getClassLoader());
         if (JspFactory.getDefaultFactory() == null) {
             JspFactory.setDefaultFactory(factory);
         }

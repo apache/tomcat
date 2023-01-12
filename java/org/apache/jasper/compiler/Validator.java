@@ -1376,8 +1376,7 @@ class Validator {
                             value, false, el, dynamic);
 
                     if (el != null) {
-                        ELContextImpl ctx =
-                                new ELContextImpl(expressionFactory);
+                        ELContextImpl ctx = new ELContextImpl();
                         ctx.setFunctionMapper(getFunctionMapper(el));
 
                         try {
@@ -1579,7 +1578,7 @@ class Validator {
             validateFunctions(el, n);
 
             // test it out
-            ELContextImpl ctx = new ELContextImpl(expressionFactory);
+            ELContextImpl ctx = new ELContextImpl();
             ctx.setFunctionMapper(this.getFunctionMapper(el));
             ExpressionFactory ef = this.pageInfo.getExpressionFactory();
             try {

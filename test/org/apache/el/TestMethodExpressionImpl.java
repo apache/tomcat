@@ -43,7 +43,7 @@ public class TestMethodExpressionImpl {
     @Before
     public void setUp() {
         factory = ExpressionFactory.newInstance();
-        context = new ELContextImpl(factory);
+        context = new ELContextImpl();
 
         TesterBeanA beanA = new TesterBeanA();
         beanA.setName("A");

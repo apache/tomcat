@@ -254,7 +254,7 @@ public class TestELEvaluation {
 
     private String evaluateExpression(String expression) {
         ExpressionFactoryImpl exprFactory = new ExpressionFactoryImpl();
-        ELContextImpl ctx = new ELContextImpl(exprFactory);
+        ELContextImpl ctx = new ELContextImpl();
         ctx.setFunctionMapper(new TesterFunctions.FMapper());
         ValueExpression ve = exprFactory.createValueExpression(ctx, expression,
                 String.class);

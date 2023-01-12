@@ -18,7 +18,6 @@ package org.apache.jasper.compiler;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.AccessController;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,8 +29,6 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
 import org.apache.jasper.compiler.tagplugin.TagPluginContext;
 import org.apache.tomcat.util.descriptor.tagplugin.TagPluginParser;
-import org.apache.tomcat.util.security.PrivilegedGetTccl;
-import org.apache.tomcat.util.security.PrivilegedSetTccl;
 import org.xml.sax.SAXException;
 
 /**
@@ -76,22 +73,9 @@ public class TagPluginManager {
         }
 
         TagPluginParser parser;
-        ClassLoader original;
-        if (Constants.IS_SECURITY_ENABLED) {
-            PrivilegedGetTccl pa = new PrivilegedGetTccl();
-            original = AccessController.doPrivileged(pa);
-        } else {
-            original = Thread.currentThread().getContextClassLoader();
-        }
+        ClassLoader original = Thread.currentThread().getContextClassLoader();
         try {
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa =
-                        new PrivilegedSetTccl(TagPluginManager.class.getClassLoader());
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(
-                        TagPluginManager.class.getClassLoader());
-            }
+            Thread.currentThread().setContextClassLoader(TagPluginManager.class.getClassLoader());
 
             parser = new TagPluginParser(ctxt, blockExternal);
 
@@ -109,12 +93,7 @@ public class TagPluginManager {
         } catch (IOException | SAXException e) {
             throw new JasperException(e);
         } finally {
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(original);
-            }
+            Thread.currentThread().setContextClassLoader(original);
         }
 
         Map<String, String> plugins = parser.getPlugins();
