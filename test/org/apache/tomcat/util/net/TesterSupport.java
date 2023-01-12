@@ -274,7 +274,7 @@ public final class TesterSupport {
         try {
             KeyStore ks = getKeyStore(CA_JKS);
             X509Certificate cert = (X509Certificate)ks.getCertificate(CA_ALIAS);
-            clientAuthExpectedIssuer = cert.getSubjectDN().getName();
+            clientAuthExpectedIssuer = cert.getSubjectX500Principal().toString();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -283,7 +283,7 @@ public final class TesterSupport {
         try {
             KeyStore ks = getKeyStore(CLIENT_JKS);
             X509Certificate cert = (X509Certificate)ks.getCertificate(CLIENT_ALIAS);
-            cn = cert.getSubjectDN().getName();
+            cn = cert.getSubjectX500Principal().toString();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

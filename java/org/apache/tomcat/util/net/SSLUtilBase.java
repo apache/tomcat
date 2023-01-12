@@ -465,7 +465,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                             ((X509Certificate) cert).checkValidity(now);
                         } catch (CertificateExpiredException | CertificateNotYetValidException e) {
                             String msg = sm.getString("sslUtilBase.trustedCertNotValid", alias,
-                                    ((X509Certificate) cert).getSubjectDN(), e.getMessage());
+                                    ((X509Certificate) cert).getSubjectX500Principal(), e.getMessage());
                             if (log.isDebugEnabled()) {
                                 log.debug(msg, e);
                             } else {
