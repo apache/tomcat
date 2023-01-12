@@ -24,7 +24,7 @@ import java.util.Enumeration;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.res.StringManager;
 
-/**
+/*
  * This class is used to contain standard internet message headers,
  * used for SMTP (RFC822) and HTTP (RFC2068) messages as well as for
  * MIME (RFC 2045) applications such as transferring typed data and
