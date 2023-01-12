@@ -50,7 +50,7 @@ public class TagData implements Cloneable {
      *
      * All values must be Strings except for those holding the
      * distinguished object REQUEST_TIME_VALUE.
-
+     *
      * @param atts the static attribute and values.  May be null.
      */
     public TagData(Object[] atts[]) {

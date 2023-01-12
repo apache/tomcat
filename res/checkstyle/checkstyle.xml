@@ -84,6 +84,7 @@
     <module name="JavadocMethod">
         <property name="accessModifiers" value="public,protected"/>
     </module>
+    <module name="JavadocMissingLeadingAsterisk"/>
 
     <!-- Miscellaneous -->
     <!-- ~5500 errors
