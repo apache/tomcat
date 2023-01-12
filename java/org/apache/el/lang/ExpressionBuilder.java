@@ -18,8 +18,6 @@ package org.apache.el.lang;
 
 import java.io.StringReader;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import jakarta.el.ELContext;
 import jakarta.el.ELException;
@@ -56,13 +54,7 @@ public final class ExpressionBuilder implements NodeVisitor {
         "org.apache.el.ExpressionBuilder.CACHE_SIZE";
 
     static {
-        String cacheSizeStr;
-        if (System.getSecurityManager() == null) {
-            cacheSizeStr = System.getProperty(CACHE_SIZE_PROP, "5000");
-        } else {
-            cacheSizeStr = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(CACHE_SIZE_PROP, "5000"));
-        }
+        String cacheSizeStr = System.getProperty(CACHE_SIZE_PROP, "5000");
         CACHE_SIZE = Integer.parseInt(cacheSizeStr);
     }
 

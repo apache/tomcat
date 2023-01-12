@@ -24,8 +24,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -47,21 +45,7 @@ public class ELSupport {
 
     private static final Long ZERO = Long.valueOf(0L);
 
-    protected static final boolean COERCE_TO_ZERO;
-
-    static {
-        String coerceToZeroStr;
-        if (System.getSecurityManager() != null) {
-            coerceToZeroStr = AccessController.doPrivileged(
-                    (PrivilegedAction<String>) () -> System.getProperty(
-                            "org.apache.el.parser.COERCE_TO_ZERO", "false")
-            );
-        } else {
-            coerceToZeroStr = System.getProperty(
-                    "org.apache.el.parser.COERCE_TO_ZERO", "false");
-        }
-        COERCE_TO_ZERO = Boolean.parseBoolean(coerceToZeroStr);
-    }
+    protected static final boolean COERCE_TO_ZERO = Boolean.getBoolean("org.apache.el.parser.COERCE_TO_ZERO");
 
 
     /**
@@ -639,11 +623,7 @@ public class ELSupport {
                 });
             return result;
         };
-        if (System.getSecurityManager() !=  null) {
-            return AccessController.doPrivileged((PrivilegedAction<T>) proxy::get);
-        } else {
-            return proxy.get();
-        }
+        return proxy.get();
     }
 
 
