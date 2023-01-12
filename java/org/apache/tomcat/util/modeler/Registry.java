@@ -59,8 +59,8 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * This class is itself an mbean.
  *
- * IMPORTANT: public methods not marked with @since x.x are experimental or
- * internal. Should not be used.
+ * IMPORTANT: public methods not marked with {@code @since x.x} are experimental
+ * or internal. Should not be used.
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache

@@ -189,7 +189,7 @@ public final class ExtensionValidator {
      * objects. This method requires an application name (which is the
      * context root of the application at runtime).
      *
-     * <code>false</false> is returned if the extension dependencies
+     * <code>false</code> is returned if the extension dependencies
      * represented by any given <code>ManifestResource</code> objects
      * is not met.
      *

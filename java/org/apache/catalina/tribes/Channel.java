@@ -66,7 +66,7 @@ import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
  *           MembershipService ChannelSender ChannelReceiver                        [IO layer]
  * </code></pre>
  *
- * For example usage @see org.apache.catalina.tribes.group.GroupChannel
+ * @see org.apache.catalina.tribes.group.GroupChannel example usage
  */
 public interface Channel {
 
