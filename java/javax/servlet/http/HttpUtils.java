@@ -49,7 +49,6 @@ public class HttpUtils {
 
 
     /**
-     *
      * Parses a query string passed from the client to the
      * server and builds a <code>HashTable</code> object
      * with key-value pairs.
@@ -114,7 +113,6 @@ public class HttpUtils {
 
 
     /**
-     *
      * Parses data from an HTML form that the client sends to
      * the server using the HTTP POST method and the
      * <i>application/x-www-form-urlencoded</i> MIME type.
@@ -237,7 +235,6 @@ public class HttpUtils {
 
 
     /**
-     *
      * Reconstructs the URL the client used to make the request,
      * using information in the <code>HttpServletRequest</code> object.
      * The returned URL contains a protocol, server name, port

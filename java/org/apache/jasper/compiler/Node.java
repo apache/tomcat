@@ -2199,7 +2199,6 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         *
          * @return return true if there's TagAttributeInfo meaning we need to
          *         assign a ValueExpression
          */
@@ -2208,7 +2207,6 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         *
          * @return return true if there's TagAttributeInfo meaning we need to
          *         assign a MethodExpression
          */

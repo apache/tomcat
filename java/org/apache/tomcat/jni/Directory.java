@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Directory
+/**
+ * Directory
  *
  * @author Mladen Turk
  *

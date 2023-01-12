@@ -147,11 +147,8 @@ public class ChannelException extends Exception {
     }
 
     /**
-     *
-     * <p>Title: FaultyMember class</p>
-     *
-     * <p>Description: Represent a failure to a specific member when a message was sent
-     * to more than one member</p>
+     * Represent a failure to a specific member when a message was sent to more
+     * than one member
      */
     public static class FaultyMember {
         protected final Exception cause;

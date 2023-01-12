@@ -815,7 +815,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
     // ------------------------------------------------ Sessions administration
 
     /**
-     *
      * Extract the expiration request parameter
      *
      * @param cn Name of the application from which to expire sessions

@@ -261,7 +261,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     /**
-     *
      * @param t             The throwable associated with any error that
      *                      occurred
      * @param useDispatch   Should {@link SendHandler#onResult(SendResult)} be

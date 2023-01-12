@@ -26,10 +26,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Peter Rossbach
- */
 @WebServlet(name = "param1", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),
         @WebInitParam(name = "bar", value = "World!") })

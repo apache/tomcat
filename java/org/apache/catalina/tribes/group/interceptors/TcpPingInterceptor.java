@@ -32,7 +32,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- *
  * Sends a ping to all members.
  * Configure this interceptor with the TcpFailureDetector below it,
  * and the TcpFailureDetector will act as the membership guide.

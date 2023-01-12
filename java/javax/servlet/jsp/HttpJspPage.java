@@ -36,7 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface HttpJspPage extends JspPage {
 
-    /** The _jspService()method corresponds to the body of the JSP page. This
+    /**
+     * The _jspService()method corresponds to the body of the JSP page. This
      * method is defined automatically by the JSP container and should never
      * be defined by the JSP page author.
      * <p>

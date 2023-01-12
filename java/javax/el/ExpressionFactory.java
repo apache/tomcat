@@ -37,7 +37,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- *
  * @since 2.1
  */
 public abstract class ExpressionFactory {

@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Stdlib
+/**
+ * Stdlib
  *
  * @author Mladen Turk
  *

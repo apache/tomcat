@@ -232,7 +232,6 @@ public class GroupChannel extends ChannelInterceptorBase
     }
 
     /**
-     *
      * @param destination Member[] - destination.length &gt; 0
      * @param msg Serializable - the message to send
      * @param options sender options, options can trigger guarantee levels and different
@@ -663,7 +662,6 @@ public class GroupChannel extends ChannelInterceptorBase
     }
 
     /**
-     *
      * Removes a channel listener from the channel.<br>
      * Channel listeners are uniquely identified using the equals(Object) method
      * @param channelListener ChannelListener

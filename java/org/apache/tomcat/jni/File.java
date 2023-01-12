@@ -18,7 +18,8 @@ package org.apache.tomcat.jni;
 /* Import needed classes */
 import java.nio.ByteBuffer;
 
-/** File
+/**
+ * File
  *
  * @author Mladen Turk
  *
@@ -48,21 +49,25 @@ public class File {
     public static final int APR_FOPEN_BUFFERED   = 0x00080;
     /** Delete the file after close */
     public static final int APR_FOPEN_DELONCLOSE = 0x00100;
-    /** Platform dependent tag to open the file for
+    /**
+     * Platform dependent tag to open the file for
      * use across multiple threads
      */
     public static final int APR_FOPEN_XTHREAD     = 0x00200;
-    /** Platform dependent support for higher level locked read/write
+    /**
+     * Platform dependent support for higher level locked read/write
      * access to support writes across process/machines
      */
     public static final int APR_FOPEN_SHARELOCK   = 0x00400;
     /** Do not register a cleanup when the file is opened */
     public static final int APR_FOPEN_NOCLEANUP   = 0x00800;
-    /** Advisory flag that this file should support
+    /**
+     * Advisory flag that this file should support
      * apr_socket_sendfile operation
      */
     public static final int APR_FOPEN_SENDFILE_ENABLED = 0x01000;
-    /** Platform dependent flag to enable large file support;
+    /**
+     * Platform dependent flag to enable large file support;
      * <br><b>Warning :</b> The APR_LARGEFILE flag only has effect on some platforms
      * where sizeof(apr_off_t) == 4.  Where implemented, it allows opening
      * and writing to a file which exceeds the size which can be
@@ -95,13 +100,15 @@ public class File {
 
     /* File lock types/flags */
 
-    /** Shared lock. More than one process or thread can hold a shared lock
+    /**
+     * Shared lock. More than one process or thread can hold a shared lock
      * at any given time. Essentially, this is a "read lock", preventing
      * writers from establishing an exclusive lock.
      */
     public static final int APR_FLOCK_SHARED    = 1;
 
-    /** Exclusive lock. Only one process may hold an exclusive lock at any
+    /**
+     * Exclusive lock. Only one process may hold an exclusive lock at any
      * given time. This is analogous to a "write lock".
      */
     public static final int APR_FLOCK_EXCLUSIVE = 2;

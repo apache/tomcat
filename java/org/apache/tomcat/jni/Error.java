@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Error
+/**
+ * Error
  *
  * @author Mladen Turk
  *

@@ -31,7 +31,6 @@ import org.apache.catalina.tribes.util.StringManager;
 
 
 /**
- *
  * The order interceptor guarantees that messages are received in the same order they were
  * sent.
  * This interceptor works best with the ack=true setting. <br>
@@ -126,7 +125,6 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         }
     }
     /**
-     *
      * @param order MessageOrder
      * @return boolean - true if a message expired and was processed
      */

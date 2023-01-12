@@ -35,18 +35,15 @@ import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 
-/** JSSESupport
-
-   Concrete implementation class for JSSE
-   Support classes.
-
-   This will only work with JDK 1.2 and up since it
-   depends on JDK 1.2's certificate support
-
-   @author EKR
-   @author Craig R. McClanahan
-   Parts cribbed from JSSECertCompat
-   Parts cribbed from CertificatesValve
+/**
+ * JSSESupport.
+ *
+ * Concrete implementation class for JSSE Support classes.
+ *
+ * @author EKR
+ * @author Craig R. McClanahan
+ * Parts cribbed from JSSECertCompat
+ * Parts cribbed from CertificatesValve
  */
 public class JSSESupport implements SSLSupport, SSLSessionManager {
 

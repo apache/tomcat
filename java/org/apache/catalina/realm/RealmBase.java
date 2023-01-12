@@ -1507,14 +1507,16 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected static class AllRolesMode {
 
         private final String name;
-        /** Use the strict servlet spec interpretation which requires that the user
+        /**
+         * Use the strict servlet spec interpretation which requires that the user
          * have one of the web-app/security-role/role-name
          */
         public static final AllRolesMode STRICT_MODE = new AllRolesMode("strict");
-        /** Allow any authenticated user
-         */
+        /** Allow any authenticated user */
         public static final AllRolesMode AUTH_ONLY_MODE = new AllRolesMode("authOnly");
-        /** Allow any authenticated user only if there are no web-app/security-roles
+        /**
+         * Allow any authenticated user only if there are no
+         * web-app/security-roles
          */
         public static final AllRolesMode STRICT_AUTH_ONLY_MODE = new AllRolesMode("strictAuthOnly");
 

@@ -135,7 +135,6 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase
     }
 
     /**
-     *
      * @param mbr Member
      * @return Member
      */

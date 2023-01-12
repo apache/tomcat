@@ -610,7 +610,7 @@ public interface ServletContext {
     public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet);
 
     /**
-     * Add servlet to context.
+     * Add servlet to the context.
      * @param   servletName  Name of servlet to add
      * @param   servletClass Class of servlet to add
      * @return  <code>null</code> if the servlet has already been fully defined,
@@ -631,6 +631,7 @@ public interface ServletContext {
             Class<? extends Servlet> servletClass);
 
     /**
+     * Add a JSP to the context.
      *
      * @param jspName   The servlet name under which this JSP file should be
      *                  registered

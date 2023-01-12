@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** ProcErrorCallback Interface
+/**
+ * ProcErrorCallback Interface
  *
  * @author Mladen Turk
  *

@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Time
+/**
+ * Time
  *
  * @author Mladen Turk
  *
