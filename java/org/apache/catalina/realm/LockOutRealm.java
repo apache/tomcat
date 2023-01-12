@@ -166,7 +166,7 @@ public class LockOutRealm extends CombinedRealm {
     public Principal authenticate(X509Certificate[] certs) {
         String username = null;
         if (certs != null && certs.length >0) {
-            username = certs[0].getSubjectDN().getName();
+            username = certs[0].getSubjectX500Principal().toString();
         }
 
         Principal authenticatedUser = super.authenticate(certs);
