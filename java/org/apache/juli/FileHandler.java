@@ -27,8 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.sql.Timestamp;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -543,34 +541,19 @@ public class FileHandler extends Handler {
 
     protected static final class ThreadFactory implements java.util.concurrent.ThreadFactory {
         private final String namePrefix;
-        private final boolean isSecurityEnabled;
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);
 
         public ThreadFactory(final String namePrefix) {
             this.namePrefix = namePrefix;
-            SecurityManager s = System.getSecurityManager();
-            if (s == null) {
-                this.isSecurityEnabled = false;
-                this.group = Thread.currentThread().getThreadGroup();
-            } else {
-                this.isSecurityEnabled = true;
-                this.group = s.getThreadGroup();
-            }
+            this.group = Thread.currentThread().getThreadGroup();
         }
 
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
             // Threads should not have as context classloader a webapp classloader
-            if (isSecurityEnabled) {
-                AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-                    t.setContextClassLoader(ThreadFactory.class.getClassLoader());
-                    return null;
-                });
-            } else {
-                t.setContextClassLoader(ThreadFactory.class.getClassLoader());
-            }
+            t.setContextClassLoader(ThreadFactory.class.getClassLoader());
             t.setDaemon(true);
             return t;
         }
