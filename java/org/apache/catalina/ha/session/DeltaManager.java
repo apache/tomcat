@@ -339,7 +339,6 @@ public class DeltaManager extends ClusterManagerBase{
     }
 
     /**
-     *
      * @return the sendAllSessions.
      */
     public boolean isSendAllSessions() {

@@ -23,7 +23,6 @@ public class LibraryNotFoundError extends UnsatisfiedLinkError {
     private final String libraryNames;
 
     /**
-     *
      * @param libraryNames A list of the file names of the native libraries that
      *                     failed to load
      * @param errors A list of the error messages received when trying to load

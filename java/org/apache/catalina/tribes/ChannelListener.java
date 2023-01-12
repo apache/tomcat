@@ -46,7 +46,6 @@ public interface ChannelListener {
     public boolean accept(Serializable msg, Member sender);
 
     /**
-     *
      * @param listener Object
      * @return boolean
      * @see Object#equals(Object)
@@ -55,7 +54,6 @@ public interface ChannelListener {
     public boolean equals(Object listener);
 
     /**
-     *
      * @return int
      * @see Object#hashCode()
      */

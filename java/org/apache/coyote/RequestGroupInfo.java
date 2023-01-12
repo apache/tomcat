@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 
-/** This can be moved to top level ( eventually with a better name ).
- *  It is currently used only as a JMX artifact, to aggregate the data
- *  collected from each RequestProcessor thread.
+/**
+ * Only as a JMX artifact, to aggregate the data collected from each
+ * RequestProcessor thread.
  */
 public class RequestGroupInfo extends BaseModelMBean {
     private final List<RequestInfo> processors = new ArrayList<>();

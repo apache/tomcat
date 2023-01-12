@@ -23,7 +23,6 @@ import java.nio.charset.Charset;
 import java.util.BitSet;
 
 /**
- *
  * This class is very similar to the java.net.URLEncoder class.
  *
  * Unfortunately, with java.net.URLEncoder there is no way to specify to the

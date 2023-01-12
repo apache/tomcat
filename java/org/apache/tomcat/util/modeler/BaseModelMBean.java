@@ -118,7 +118,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
      */
     protected BaseNotificationBroadcaster generalBroadcaster = null;
 
-    /** Metadata for the mbean instance.
+    /**
+     * Metadata for the mbean instance.
      */
     protected ManagedBean managedBean = null;
 

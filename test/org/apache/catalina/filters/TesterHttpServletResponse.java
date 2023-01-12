@@ -220,7 +220,6 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     @Override
     public String encodeURL(String url) { return null; }
     /**
-     *
      * @throws IOException Never happens
      */
     public void sendAcknowledgement() throws IOException {/* NOOP */}

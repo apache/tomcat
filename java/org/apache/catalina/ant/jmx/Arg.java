@@ -16,11 +16,6 @@
  */
 package org.apache.catalina.ant.jmx;
 
-/**
- *
- * @author Peter Rossbach
- * @since 5.5.10
- */
 public class Arg {
 
     private String type;

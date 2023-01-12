@@ -140,7 +140,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     /**
-     *
      * @return The port
      */
     @Override

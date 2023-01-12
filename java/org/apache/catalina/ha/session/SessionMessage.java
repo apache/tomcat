@@ -18,11 +18,9 @@ package org.apache.catalina.ha.session;
 import org.apache.catalina.ha.ClusterMessage;
 
 /**
- *
- * <B>Class Description:</B><BR>
- * The SessionMessage class is a class that is used when a session has been
- * created, modified, expired in a Tomcat cluster node.<BR>
- *
+ * The SessionMessage interface is used when a session has been created,
+ * modified, expired in a Tomcat cluster node.
+ * <p>
  * The following events are currently available:
  * <ul>
  *   <li><pre>public static final int EVT_SESSION_CREATED</pre><li>
@@ -35,9 +33,7 @@ import org.apache.catalina.ha.ClusterMessage;
  *   <li><pre>public static final int EVT_CHANGE_SESSION_ID</pre><li>
  *   <li><pre>public static final int EVT_ALL_SESSION_NOCONTEXTMANAGER</pre><li>
  * </ul>
- *
  */
-
 public interface SessionMessage extends ClusterMessage {
 
     /**

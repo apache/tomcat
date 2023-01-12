@@ -16,10 +16,6 @@
  */
 package org.apache.tomcat.jni;
 
-/** SSL
- *
- * @author Mladen Turk
- */
 public final class SSL {
 
     /*

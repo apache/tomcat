@@ -29,7 +29,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- *
  * A simple implementation of a blocking queue with fairness waiting.
  * invocations to method poll(...) will get handed out in the order they were received.
  * Locking is fine grained, a shared lock is only used during the first level of contention, waiting is done in a
