@@ -19,8 +19,6 @@ package org.apache.catalina.core;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +42,6 @@ import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -130,31 +127,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     private static final Log log = LogFactory.getLog(ContainerBase.class);
 
-    /**
-     * Perform addChild with the permissions of this class.
-     * addChild can be called with the XML parser on the stack,
-     * this allows the XML parser to have fewer privileges than
-     * Tomcat.
-     */
-    protected class PrivilegedAddChild implements PrivilegedAction<Void> {
-
-        private final Container child;
-
-        PrivilegedAddChild(Container child) {
-            this.child = child;
-        }
-
-        @Override
-        public Void run() {
-            addChildInternal(child);
-            return null;
-        }
-
-    }
-
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The child Containers belonging to this Container, keyed by name.
@@ -690,17 +664,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
      */
     @Override
     public void addChild(Container child) {
-        if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedAction<Void> dp =
-                new PrivilegedAddChild(child);
-            AccessController.doPrivileged(dp);
-        } else {
-            addChildInternal(child);
-        }
-    }
-
-    private void addChildInternal(Container child) {
-
         if (log.isDebugEnabled()) {
             log.debug("Add child " + child + " " + this);
         }

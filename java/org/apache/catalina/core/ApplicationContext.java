@@ -1172,23 +1172,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public ClassLoader getClassLoader() {
-        ClassLoader result = context.getLoader().getClassLoader();
-        if (Globals.IS_SECURITY_ENABLED) {
-            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-            ClassLoader parent = result;
-            while (parent != null) {
-                if (parent == tccl) {
-                    break;
-                }
-                parent = parent.getParent();
-            }
-            if (parent == null) {
-                System.getSecurityManager().checkPermission(
-                        new RuntimePermission("getClassLoader"));
-            }
-        }
-
-        return result;
+        return context.getLoader().getClassLoader();
     }
 
 

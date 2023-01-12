@@ -18,9 +18,6 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
@@ -62,58 +59,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  */
 final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher {
-
-    protected class PrivilegedForward
-            implements PrivilegedExceptionAction<Void> {
-        private final ServletRequest request;
-        private final ServletResponse response;
-
-        PrivilegedForward(ServletRequest request, ServletResponse response) {
-            this.request = request;
-            this.response = response;
-        }
-
-        @Override
-        public Void run() throws java.lang.Exception {
-            doForward(request,response);
-            return null;
-        }
-    }
-
-    protected class PrivilegedInclude implements
-            PrivilegedExceptionAction<Void> {
-        private final ServletRequest request;
-        private final ServletResponse response;
-
-        PrivilegedInclude(ServletRequest request, ServletResponse response) {
-            this.request = request;
-            this.response = response;
-        }
-
-        @Override
-        public Void run() throws ServletException, IOException {
-            doInclude(request, response);
-            return null;
-        }
-    }
-
-    protected class PrivilegedDispatch implements
-            PrivilegedExceptionAction<Void> {
-        private final ServletRequest request;
-        private final ServletResponse response;
-
-        PrivilegedDispatch(ServletRequest request, ServletResponse response) {
-            this.request = request;
-            this.response = response;
-        }
-
-        @Override
-        public Void run() throws ServletException, IOException {
-            doDispatch(request, response);
-            return null;
-        }
-    }
-
 
     /**
      * Used to pass state when the request dispatcher is used. Using instance
@@ -277,29 +222,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
      * @exception ServletException if a servlet exception occurs
      */
     @Override
-    public void forward(ServletRequest request, ServletResponse response)
-        throws ServletException, IOException
-    {
-        if (Globals.IS_SECURITY_ENABLED) {
-            try {
-                PrivilegedForward dp = new PrivilegedForward(request,response);
-                AccessController.doPrivileged(dp);
-            } catch (PrivilegedActionException pe) {
-                Exception e = pe.getException();
-                if (e instanceof ServletException) {
-                    throw (ServletException) e;
-                }
-                throw (IOException) e;
-            }
-        } else {
-            doForward(request,response);
-        }
-    }
-
-    private void doForward(ServletRequest request, ServletResponse response)
-        throws ServletException, IOException
-    {
-
+    public void forward(ServletRequest request, ServletResponse response) throws ServletException, IOException {
         // Reset any output that has been buffered, but keep headers/cookies
         if (response.isCommitted()) {
             throw new IllegalStateException
@@ -480,29 +403,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
      * @exception ServletException if a servlet exception occurs
      */
     @Override
-    public void include(ServletRequest request, ServletResponse response)
-        throws ServletException, IOException
-    {
-        if (Globals.IS_SECURITY_ENABLED) {
-            try {
-                PrivilegedInclude dp = new PrivilegedInclude(request,response);
-                AccessController.doPrivileged(dp);
-            } catch (PrivilegedActionException pe) {
-                Exception e = pe.getException();
-
-                if (e instanceof ServletException) {
-                    throw (ServletException) e;
-                }
-                throw (IOException) e;
-            }
-        } else {
-            doInclude(request, response);
-        }
-    }
-
-    private void doInclude(ServletRequest request, ServletResponse response)
-            throws ServletException, IOException {
-
+    public void include(ServletRequest request, ServletResponse response) throws ServletException, IOException {
         // Set up to handle the specified request and response
         State state = new State(request, response, true);
 
@@ -564,28 +465,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
 
     @Override
-    public void dispatch(ServletRequest request, ServletResponse response)
-            throws ServletException, IOException {
-        if (Globals.IS_SECURITY_ENABLED) {
-            try {
-                PrivilegedDispatch dp = new PrivilegedDispatch(request,response);
-                AccessController.doPrivileged(dp);
-            } catch (PrivilegedActionException pe) {
-                Exception e = pe.getException();
-
-                if (e instanceof ServletException) {
-                    throw (ServletException) e;
-                }
-                throw (IOException) e;
-            }
-        } else {
-            doDispatch(request, response);
-        }
-    }
-
-    private void doDispatch(ServletRequest request, ServletResponse response)
-            throws ServletException, IOException {
-
+    public void dispatch(ServletRequest request, ServletResponse response) throws ServletException, IOException {
         // Set up to handle the specified request and response
         State state = new State(request, response, false);
 

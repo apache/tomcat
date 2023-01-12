@@ -22,8 +22,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,8 +130,6 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.apache.tomcat.util.scan.StandardJarScanner;
-import org.apache.tomcat.util.security.PrivilegedGetTccl;
-import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 /**
  * Standard implementation of the <b>Context</b> interface.  Each
@@ -5772,12 +5768,7 @@ public class StandardContext extends ContainerBase
         }
 
         if (originalClassLoader == null) {
-            if (usePrivilegedAction) {
-                PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
-                originalClassLoader = AccessController.doPrivileged(pa);
-            } else {
-                originalClassLoader = Thread.currentThread().getContextClassLoader();
-            }
+            originalClassLoader = Thread.currentThread().getContextClassLoader();
         }
 
         if (webApplicationClassLoader == null ||
@@ -5789,12 +5780,7 @@ public class StandardContext extends ContainerBase
 
         ThreadBindingListener threadBindingListener = getThreadBindingListener();
 
-        if (usePrivilegedAction) {
-            PrivilegedAction<Void> pa = new PrivilegedSetTccl(webApplicationClassLoader);
-            AccessController.doPrivileged(pa);
-        } else {
-            Thread.currentThread().setContextClassLoader(webApplicationClassLoader);
-        }
+        Thread.currentThread().setContextClassLoader(webApplicationClassLoader);
         if (threadBindingListener != null) {
             try {
                 threadBindingListener.bind();
@@ -5825,12 +5811,7 @@ public class StandardContext extends ContainerBase
             }
         }
 
-        if (usePrivilegedAction) {
-            PrivilegedAction<Void> pa = new PrivilegedSetTccl(originalClassLoader);
-            AccessController.doPrivileged(pa);
-        } else {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
-        }
+        Thread.currentThread().setContextClassLoader(originalClassLoader);
     }
 
 

@@ -25,7 +25,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.security.AccessControlException;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -606,9 +605,6 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         // it does.
                         log.warn(sm.getString("standardServer.accept.timeout",
                                 Long.valueOf(System.currentTimeMillis() - acceptStartTime)), ste);
-                        continue;
-                    } catch (AccessControlException ace) {
-                        log.warn(sm.getString("standardServer.accept.security"), ace);
                         continue;
                     } catch (IOException e) {
                         if (stopAwait) {

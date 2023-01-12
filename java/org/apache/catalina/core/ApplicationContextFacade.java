@@ -22,9 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.AccessController;
 import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -811,7 +809,7 @@ public class ApplicationContextFacade implements ServletContext {
                 objectCache.put(methodName, method);
             }
 
-            return executeMethod(method,appContext,params);
+            return method.invoke(context, params);
         } catch (Exception ex){
             handleException(ex);
             return null;
@@ -833,7 +831,7 @@ public class ApplicationContextFacade implements ServletContext {
 
         try{
             Method method = context.getClass().getMethod(methodName, clazz);
-            return executeMethod(method,context,params);
+            return method.invoke(context, params);
         } catch (Exception ex){
             try {
                 handleException(ex);
@@ -844,29 +842,6 @@ public class ApplicationContextFacade implements ServletContext {
             return null;
         } finally {
             params = null;
-        }
-    }
-
-
-    /**
-     * Executes the method of the specified <code>ApplicationContext</code>
-     * @param method The method object to be invoked.
-     * @param context The ApplicationContext object on which the method
-     *                   will be invoked
-     * @param params The arguments passed to the called method.
-     */
-    private Object executeMethod(final Method method,
-                                 final ApplicationContext context,
-                                 final Object[] params)
-            throws PrivilegedActionException,
-                   IllegalAccessException,
-                   InvocationTargetException {
-
-        if (SecurityUtil.isPackageProtectionEnabled()){
-           return AccessController.doPrivileged(
-                   new PrivilegedExecuteMethod(method, context,  params));
-        } else {
-            return method.invoke(context, params);
         }
     }
 
@@ -895,24 +870,5 @@ public class ApplicationContextFacade implements ServletContext {
         }
 
         throw realException;
-    }
-
-
-    private static class PrivilegedExecuteMethod implements PrivilegedExceptionAction<Object> {
-
-        private final Method method;
-        private final ApplicationContext context;
-        private final Object[] params;
-
-        public PrivilegedExecuteMethod(Method method, ApplicationContext context, Object[] params) {
-            this.method = method;
-            this.context = context;
-            this.params = params;
-        }
-
-        @Override
-        public Object run() throws Exception {
-            return method.invoke(context, params);
-        }
     }
 }
