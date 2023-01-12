@@ -222,7 +222,7 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("M_SERIAL")) {
             return certificates[0].getSerialNumber().toString();
         } else if (key.equals("S_DN")) {
-            return certificates[0].getSubjectDN().getName();
+            return certificates[0].getSubjectX500Principal().toString();
         } else if (key.startsWith("S_DN_")) {
             key = key.substring("S_DN_".length());
             return resolveComponent(certificates[0].getSubjectX500Principal().getName(), key);
@@ -235,10 +235,10 @@ public class ResolverImpl extends Resolver {
             key = key.substring("SAN_DNS_".length());
             return resolveAlternateName(certificates[0], 2, Integer.parseInt(key));
         } else if (key.equals("I_DN")) {
-            return certificates[0].getIssuerDN().getName();
+            return certificates[0].getIssuerX500Principal().getName();
         } else if (key.startsWith("I_DN_")) {
             key = key.substring("I_DN_".length());
-            return resolveComponent(certificates[0].getIssuerX500Principal().getName(), key);
+            return resolveComponent(certificates[0].getIssuerX500Principal().toString(), key);
         } else if (key.equals("V_START")) {
             return String.valueOf(certificates[0].getNotBefore().getTime());
         } else if (key.equals("V_END")) {

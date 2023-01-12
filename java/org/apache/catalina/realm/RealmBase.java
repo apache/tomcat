@@ -454,7 +454,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements org.apache
             for (X509Certificate cert : certs) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Checking validity for '" +
-                            cert.getSubjectDN().getName() + "'");
+                            cert.getSubjectX500Principal().toString() + "'");
                 }
                 try {
                     cert.checkValidity();
