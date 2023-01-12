@@ -81,6 +81,9 @@
     <module name="InvalidJavadocPosition"/>
     <module name="JavadocBlockTagLocation"/>
     <module name="JavadocContentLocationCheck"/>
+    <module name="JavadocMethod">
+        <property name="accessModifiers" value="public,protected"/>
+    </module>
 
     <!-- Miscellaneous -->
     <!-- ~5500 errors
