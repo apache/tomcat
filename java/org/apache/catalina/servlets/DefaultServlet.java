@@ -98,7 +98,7 @@ import org.apache.tomcat.util.security.Escape;
  * from the web application resource root using the full path from the root
  * of the web application context.
  * <br>e.g. given a web application structure:
- *</p>
+ * </p>
  * <pre>
  * /context
  *   /images

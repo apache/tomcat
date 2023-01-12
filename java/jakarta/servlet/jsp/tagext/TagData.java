@@ -140,7 +140,7 @@ public class TagData implements Cloneable {
     /**
      * Enumerates the attributes.
      *
-     *@return An enumeration of the attributes in a TagData
+     * @return An enumeration of the attributes in a TagData
      */
     public java.util.Enumeration<String> getAttributes() {
         return attributes.keys();
