@@ -122,6 +122,9 @@ public class CompressionResponseStream extends ServletOutputStream {
 
     /**
      * Set the compressionThreshold number and create buffer for this size
+     *
+     * @param compressionThreshold Responses above this size in bytes will be
+     *                             compressed
      */
     protected void setCompressionThreshold(int compressionThreshold) {
         this.compressionThreshold = compressionThreshold;
@@ -133,6 +136,8 @@ public class CompressionResponseStream extends ServletOutputStream {
 
     /**
      * The compression buffer size to avoid chunking
+     *
+     * @param compressionBuffer The compression buffer size in bytes
      */
     protected void setCompressionBuffer(int compressionBuffer) {
         this.compressionBuffer = compressionBuffer;
