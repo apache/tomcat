@@ -268,7 +268,7 @@ class Parser implements TagConstants {
     }
 
     /**
-     * AttributeValueDouble ::= (QuotedChar - '"')* ('"' | <TRANSLATION_ERROR>)
+     * AttributeValueDouble ::= (QuotedChar - '"')* ('"' | &lt;TRANSLATION_ERROR>)
      * RTAttributeValueDouble ::= ((QuotedChar - '"')* - ((QuotedChar-'"')'%>"')
      * ('%>"' | TRANSLATION_ERROR)
      */
@@ -830,7 +830,7 @@ class Parser implements TagConstants {
     }
 
     /**
-     * Param ::= '<jsp:param' S Attributes S? EmptyBody S?
+     * Param ::= '&lt;jsp:param' S Attributes S? EmptyBody S?
      */
     private void parseParam(Node parent) throws JasperException {
         if (!reader.matches("<jsp:param")) {
@@ -1019,8 +1019,8 @@ class Parser implements TagConstants {
      * Attempts to parse 'JspAttributeAndBody' production. Returns true if it
      * matched, or false if not. Assumes EmptyBody is okay as well.
      *
-     * JspAttributeAndBody ::= ( '>' # S? ( '<jsp:attribute' NamedAttributes )? '<jsp:body' (
-     * JspBodyBody | <TRANSLATION_ERROR> ) S? ETag )
+     * JspAttributeAndBody ::= ( '>' # S? ( '&lt;jsp:attribute' NamedAttributes )? '&lt;jsp:body' (
+     * JspBodyBody | &lt;TRANSLATION_ERROR> ) S? ETag )
      */
     private boolean parseJspAttributeAndBody(Node parent, String tag,
             String bodyType) throws JasperException {
@@ -1734,7 +1734,7 @@ class Parser implements TagConstants {
     }
 
     /**
-     * Determine the body type of <jsp:attribute> from the enclosing node
+     * Determine the body type of &lt;jsp:attribute> from the enclosing node
      */
     private String getAttributeBodyType(Node n, String name) {
 

@@ -763,11 +763,11 @@ public class CorsFilter extends GenericFilter {
     }
 
     /**
-     * Takes a comma separated list and returns a Set<String>.
+     * Takes a comma separated list and returns a Set&lt;String>.
      *
      * @param data
      *            A comma separated list of strings.
-     * @return Set<String>
+     * @return Set$lt;String>
      */
     private Set<String> parseStringToSet(final String data) {
         String[] splits;
