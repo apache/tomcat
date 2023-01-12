@@ -304,7 +304,7 @@ public class DefaultInstanceManager implements InstanceManager {
                 }
 
                 // Initialize methods annotations
-                Method[] methods = Introspection.getDeclaredMethods(clazz);
+                Method[] methods = clazz.getDeclaredMethods();
                 Method postConstruct = null;
                 String postConstructFromXml = postConstructMethods.get(clazz.getName());
                 Method preDestroy = null;
@@ -395,7 +395,7 @@ public class DefaultInstanceManager implements InstanceManager {
                 if (context != null) {
                     // Initialize fields annotations for resource injection if
                     // JNDI is enabled
-                    Field[] fields = Introspection.getDeclaredFields(clazz);
+                    Field[] fields = clazz.getDeclaredFields();
                     for (Field field : fields) {
                         Resource resourceAnnotation;
                         Annotation ejbAnnotation;
