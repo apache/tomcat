@@ -23,7 +23,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
+import java.net.StandardSocketOptions;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -217,12 +219,14 @@ public class McastServiceImpl extends MembershipProviderBase {
         } else {
             socket = new MulticastSocket(port);
         }
-        socket.setLoopbackMode(localLoopbackDisabled); //hint if we want disable loop back(local machine) messages
+        // Hint if we want disable loop back(local machine) messages
+        socket.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, Boolean.valueOf(!localLoopbackDisabled));
         if (mcastBindAddress != null) {
             if(log.isInfoEnabled()) {
                 log.info(sm.getString("mcastServiceImpl.setInterface", mcastBindAddress));
             }
-            socket.setInterface(mcastBindAddress);
+            NetworkInterface networkInterface = NetworkInterface.getByInetAddress(mcastBindAddress);
+            socket.setNetworkInterface(networkInterface);
         } //end if
         //force a so timeout so that we don't block forever
         if (mcastSoTimeout <= 0) {
@@ -343,8 +347,16 @@ public class McastServiceImpl extends MembershipProviderBase {
             member.setCommand(Member.SHUTDOWN_PAYLOAD);
             send(false);
             //leave mcast group
-            try {socket.leaveGroup(address);}catch ( Exception ignore){}
-            try {socket.close();}catch ( Exception ignore){}
+            try {
+                socket.leaveGroup(new InetSocketAddress(address, 0), null);
+                } catch ( Exception ignore) {
+                    // NO-OP
+                }
+            try {
+                socket.close();
+            } catch (Exception ignore) {
+                // NO-OP
+            }
             member.setServiceStartTime(-1);
         }
         return (startLevel == 0);
