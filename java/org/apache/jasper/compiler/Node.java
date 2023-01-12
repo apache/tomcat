@@ -2415,6 +2415,8 @@ abstract class Node implements TagConstants {
         /**
          * This method provides a place to put actions that are common to all
          * nodes. Override this in the child visitor class if need to.
+         *
+         * @param n The node to visit
          */
         @SuppressWarnings("unused")
         protected void doVisit(Node n) throws JasperException {
@@ -2423,6 +2425,8 @@ abstract class Node implements TagConstants {
 
         /**
          * Visit the body of a node, using the current visitor
+         *
+         * @param n The node to visit
          */
         protected void visitBody(Node n) throws JasperException {
             if (n.getBody() != null) {
