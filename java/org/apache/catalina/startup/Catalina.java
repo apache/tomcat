@@ -38,7 +38,6 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.security.SecurityConfig;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -173,7 +172,6 @@ public class Catalina {
     // ----------------------------------------------------------- Constructors
 
     public Catalina() {
-        setSecurityProtection();
         ExceptionUtils.preload();
     }
 
@@ -933,16 +931,6 @@ public class Catalina {
                 log.debug("INITIAL_CONTEXT_FACTORY already set " + value );
             }
         }
-    }
-
-
-    /**
-     * Set the security package access/protection.
-     */
-    protected void setSecurityProtection(){
-        SecurityConfig securityConfig = SecurityConfig.newInstance();
-        securityConfig.setPackageDefinition();
-        securityConfig.setPackageAccess();
     }
 
 
