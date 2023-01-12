@@ -236,7 +236,7 @@ public class ResolverImpl extends Resolver {
             return certificates[0].getSubjectX500Principal().toString();
         } else if (key.startsWith("S_DN_")) {
             key = key.substring("S_DN_".length());
-            return resolveComponent(certificates[0].getSubjectX500Principal().toString(), key);
+            return resolveComponent(certificates[0].getSubjectX500Principal().getName(), key);
         } else if (key.startsWith("SAN_Email_")) {
             // Type rfc822Name, which is 1
             key = key.substring("SAN_Email_".length());
@@ -249,7 +249,7 @@ public class ResolverImpl extends Resolver {
             return certificates[0].getIssuerX500Principal().getName();
         } else if (key.startsWith("I_DN_")) {
             key = key.substring("I_DN_".length());
-            return resolveComponent(certificates[0].getIssuerX500Principal().getName(), key);
+            return resolveComponent(certificates[0].getIssuerX500Principal().toString(), key);
         } else if (key.equals("V_START")) {
             return String.valueOf(certificates[0].getNotBefore().getTime());
         } else if (key.equals("V_END")) {
