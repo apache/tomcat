@@ -18,8 +18,6 @@ package org.apache.tomcat.websocket;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
@@ -105,47 +103,15 @@ public class AsyncChannelGroupUtil {
 
     private static class AsyncIOThreadFactory implements ThreadFactory {
 
-        static {
-            // Load NewThreadPrivilegedAction since newThread() will not be able
-            // to if called from an InnocuousThread.
-            // See https://bz.apache.org/bugzilla/show_bug.cgi?id=57490
-            NewThreadPrivilegedAction.load();
-        }
-
+        private static AtomicInteger count = new AtomicInteger(0);
 
         @Override
         public Thread newThread(final Runnable r) {
-            // Create the new Thread within a doPrivileged block to ensure that
-            // the thread inherits the current ProtectionDomain which is
-            // essential to be able to use this with a Java Applet. See
-            // https://bz.apache.org/bugzilla/show_bug.cgi?id=57091
-            return AccessController.doPrivileged(new NewThreadPrivilegedAction(r));
-        }
-
-        // Non-anonymous class so that AsyncIOThreadFactory can load it
-        // explicitly
-        private static class NewThreadPrivilegedAction implements PrivilegedAction<Thread> {
-
-            private static AtomicInteger count = new AtomicInteger(0);
-
-            private final Runnable r;
-
-            public NewThreadPrivilegedAction(Runnable r) {
-                this.r = r;
-            }
-
-            @Override
-            public Thread run() {
-                Thread t = new Thread(r);
-                t.setName("WebSocketClient-AsyncIO-" + count.incrementAndGet());
-                t.setContextClassLoader(this.getClass().getClassLoader());
-                t.setDaemon(true);
-                return t;
-            }
-
-            private static void load() {
-                // NO-OP. Just provides a hook to enable the class to be loaded
-            }
+            Thread t = new Thread(r);
+            t.setName("WebSocketClient-AsyncIO-" + count.incrementAndGet());
+            t.setContextClassLoader(this.getClass().getClassLoader());
+            t.setDaemon(true);
+            return t;
         }
     }
 }

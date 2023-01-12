@@ -42,14 +42,6 @@ public final class Utils {
     private static final ResourceBundle messages = ResourceBundle
         .getBundle(Utils.class.getPackage().getName() + ".LocalStrings");
 
-    /**
-     * Whether the security manager is enabled.
-     *
-     * @deprecated No replacement.
-     */
-    @Deprecated
-    public static final boolean IS_SECURITY_ENABLED = isSecurityEnabled();
-
     /** Any SQL_STATE starting with this value is considered a fatal disconnect */
     public static final String DISCONNECTION_SQL_CODE_PREFIX = "08";
 
@@ -215,10 +207,6 @@ public final class Utils {
 
     static boolean isEmpty(final Collection<?> collection) {
         return collection == null || collection.isEmpty();
-    }
-
-    static boolean isSecurityEnabled() {
-        return System.getSecurityManager() != null;
     }
 
     /**

@@ -19,9 +19,6 @@ package org.apache.tomcat.dbcp.dbcp2;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -73,30 +70,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     static {
         // Attempt to prevent deadlocks - see DBCP - 272
         DriverManager.getDrivers();
-        try {
-            // Load classes now to prevent AccessControlExceptions later
-            // A number of classes are loaded when getConnection() is called
-            // but the following classes are not loaded and therefore require
-            // explicit loading.
-            if (Utils.isSecurityEnabled()) {
-                final ClassLoader loader = BasicDataSource.class.getClassLoader();
-                final String dbcpPackageName = BasicDataSource.class.getPackage().getName();
-                loader.loadClass(dbcpPackageName + ".DelegatingCallableStatement");
-                loader.loadClass(dbcpPackageName + ".DelegatingDatabaseMetaData");
-                loader.loadClass(dbcpPackageName + ".DelegatingPreparedStatement");
-                loader.loadClass(dbcpPackageName + ".DelegatingResultSet");
-                loader.loadClass(dbcpPackageName + ".PoolableCallableStatement");
-                loader.loadClass(dbcpPackageName + ".PoolablePreparedStatement");
-                loader.loadClass(dbcpPackageName + ".PoolingConnection$StatementType");
-                loader.loadClass(dbcpPackageName + ".PStmtKey");
-
-                final String poolPackageName = PooledObject.class.getPackage().getName();
-                loader.loadClass(poolPackageName + ".impl.LinkedBlockingDeque$Node");
-                loader.loadClass(poolPackageName + ".impl.GenericKeyedObjectPool$ObjectDeque");
-            }
-        } catch (final ClassNotFoundException cnfe) {
-            throw new IllegalStateException("Unable to pre-load classes", cnfe);
-        }
     }
 
     /**
@@ -695,18 +668,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     @Override
     public Connection getConnection() throws SQLException {
-        if (Utils.isSecurityEnabled()) {
-            final PrivilegedExceptionAction<Connection> action = () -> createDataSource().getConnection();
-            try {
-                return AccessController.doPrivileged(action);
-            } catch (final PrivilegedActionException e) {
-                final Throwable cause = e.getCause();
-                if (cause instanceof SQLException) {
-                    throw (SQLException) cause;
-                }
-                throw new SQLException(e);
-            }
-        }
         return createDataSource().getConnection();
     }
 

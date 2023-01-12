@@ -26,7 +26,6 @@ import org.apache.tomcat.dbcp.pool2.UsageTracking;
  * {@linkplain UsageTracking usage tracking} so that different JVMs and configurations can use more efficient strategies
  * for obtaining the current call stack depending on metadata needs.
  *
- * @see CallStackUtils
  * @since 2.4.3
  */
 public interface CallStack {
