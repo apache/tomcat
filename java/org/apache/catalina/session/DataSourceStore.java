@@ -37,7 +37,6 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
 
@@ -466,7 +465,7 @@ public class DataSourceStore extends StoreBase {
                 return null;
             }
 
-            ClassLoader oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
+            ClassLoader oldThreadContextCL = context.bind(false, null);
 
             try (PreparedStatement preparedLoadSql = _conn.prepareStatement(loadSql)){
                 preparedLoadSql.setString(1, id);
@@ -493,7 +492,7 @@ public class DataSourceStore extends StoreBase {
             } catch (SQLException e) {
                 contextLog.error(sm.getString(getStoreName() + ".SQLException", e));
             } finally {
-                context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
+                context.unbind(false, oldThreadContextCL);
                 release(_conn);
             }
             numberOfTries--;
@@ -698,7 +697,7 @@ public class DataSourceStore extends StoreBase {
             org.apache.catalina.Context context = getManager().getContext();
             ClassLoader oldThreadContextCL = null;
             if (localDataSource) {
-                oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
+                oldThreadContextCL = context.bind(false, null);
             }
 
             Context initCtx;
@@ -712,7 +711,7 @@ public class DataSourceStore extends StoreBase {
                                 this.dataSourceName), e);
             } finally {
                 if (localDataSource) {
-                    context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
+                    context.unbind(false, oldThreadContextCL);
                 }
             }
         }

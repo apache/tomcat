@@ -263,12 +263,6 @@ public final class Globals {
 
 
     /**
-     * Has security been turned on?
-     */
-    public static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
-
-
-    /**
      * Default domain for MBeans if none can be determined
      */
     public static final String DEFAULT_MBEAN_DOMAIN = "Catalina";

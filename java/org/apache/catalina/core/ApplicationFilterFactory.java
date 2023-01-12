@@ -62,15 +62,10 @@ public final class ApplicationFilterFactory {
         ApplicationFilterChain filterChain = null;
         if (request instanceof Request) {
             Request req = (Request) request;
-            if (Globals.IS_SECURITY_ENABLED) {
-                // Security: Do not recycle
+            filterChain = (ApplicationFilterChain) req.getFilterChain();
+            if (filterChain == null) {
                 filterChain = new ApplicationFilterChain();
-            } else {
-                filterChain = (ApplicationFilterChain) req.getFilterChain();
-                if (filterChain == null) {
-                    filterChain = new ApplicationFilterChain();
-                    req.setFilterChain(filterChain);
-                }
+                req.setFilterChain(filterChain);
             }
         } else {
             // Request dispatcher in use

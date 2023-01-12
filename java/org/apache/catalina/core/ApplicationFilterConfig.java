@@ -34,8 +34,6 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -294,15 +292,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
         if (this.filter != null) {
             try {
-                if (Globals.IS_SECURITY_ENABLED) {
-                    try {
-                        SecurityUtil.doAsPrivilege("destroy", filter);
-                    } finally {
-                        SecurityUtil.remove(filter);
-                    }
-                } else {
-                    filter.destroy();
-                }
+                filter.destroy();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 context.getLogger().error(sm.getString(

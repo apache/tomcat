@@ -37,7 +37,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AsyncDispatcher;
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
@@ -99,7 +98,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
 
-        ClassLoader oldCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
+        ClassLoader oldCL = context.bind(false, null);
         try {
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
@@ -113,7 +112,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         } finally {
             context.fireRequestDestroyEvent(request.getRequest());
             clearServletRequestResponse();
-            context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
+            context.unbind(false, oldCL);
         }
     }
 
@@ -544,7 +543,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
         @Override
         public void run() {
-            ClassLoader oldCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
+            ClassLoader oldCL = context.bind(false, null);
             try {
                 wrapped.run();
             } catch (Throwable t) {
@@ -555,7 +554,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 coyoteResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 coyoteResponse.setError();
             } finally {
-                context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
+                context.unbind(false, oldCL);
             }
 
             // Since this runnable is not executing as a result of a socket

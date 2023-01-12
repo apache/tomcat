@@ -25,7 +25,6 @@ import java.util.HashSet;
 
 import javax.management.ObjectName;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
@@ -404,12 +403,10 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * @return <code>true</code> if the object facades are discarded, either
-     *   when the discardFacades value is <code>true</code> or when the
-     *   security manager is enabled.
+     * @return <code>true</code> if the object facades are discarded.
      */
     public boolean getDiscardFacades() {
-        return discardFacades || Globals.IS_SECURITY_ENABLED;
+        return discardFacades;
     }
 
 

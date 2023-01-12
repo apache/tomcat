@@ -47,11 +47,9 @@ import jakarta.servlet.annotation.MultipartConfig;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
@@ -973,25 +971,7 @@ public class StandardWrapper extends ContainerBase
 
         // Call the initialization method of this servlet
         try {
-            if( Globals.IS_SECURITY_ENABLED) {
-                boolean success = false;
-                try {
-                    Object[] args = new Object[] { facade };
-                    SecurityUtil.doAsPrivilege("init",
-                                               servlet,
-                                               classType,
-                                               args);
-                    success = true;
-                } finally {
-                    if (!success) {
-                        // destroy() will not be called, thus clear the reference now
-                        SecurityUtil.remove(servlet);
-                    }
-                }
-            } else {
-                servlet.init(facade);
-            }
-
+            servlet.init(facade);
             instanceInitialized = true;
         } catch (UnavailableException f) {
             unavailable(f);
@@ -1142,16 +1122,7 @@ public class StandardWrapper extends ContainerBase
 
             // Call the servlet destroy() method
             try {
-                if( Globals.IS_SECURITY_ENABLED) {
-                    try {
-                        SecurityUtil.doAsPrivilege("destroy", instance);
-                    } finally {
-                        SecurityUtil.remove(instance);
-                    }
-                } else {
-                    instance.destroy();
-                }
-
+                instance.destroy();
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);

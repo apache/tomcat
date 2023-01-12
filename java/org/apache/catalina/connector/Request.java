@@ -1929,34 +1929,7 @@ public class Request implements HttpServletRequest {
      * @param principal The user Principal
      */
     public void setUserPrincipal(final Principal principal) {
-        if (Globals.IS_SECURITY_ENABLED && principal != null) {
-            if (subject == null) {
-                final HttpSession session = getSession(false);
-                if (session == null) {
-                    // Cache the subject in the request
-                    subject = newSubject(principal);
-                } else {
-                    // Cache the subject in the request and the session
-                    subject = (Subject) session.getAttribute(Globals.SUBJECT_ATTR);
-                    if (subject == null) {
-                        subject = newSubject(principal);
-                        session.setAttribute(Globals.SUBJECT_ATTR, subject);
-                    } else {
-                        subject.getPrincipals().add(principal);
-                    }
-                }
-            } else {
-                subject.getPrincipals().add(principal);
-            }
-        }
         userPrincipal = principal;
-    }
-
-
-    private Subject newSubject(final Principal principal) {
-        final Subject result = new Subject();
-        result.getPrincipals().add(principal);
-        return result;
     }
 
 

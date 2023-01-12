@@ -26,7 +26,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
@@ -231,14 +230,14 @@ public class PersistentValve extends ValveBase {
 
     private void bind(Context context) {
         if (clBindRequired) {
-            context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
+            context.bind(false, MY_CLASSLOADER);
         }
     }
 
 
     private void unbind(Context context) {
         if (clBindRequired) {
-            context.unbind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
+            context.unbind(false, MY_CLASSLOADER);
         }
     }
 

@@ -43,14 +43,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -83,10 +79,6 @@ import org.apache.tomcat.util.http.parser.EntityTag;
 import org.apache.tomcat.util.http.parser.Ranges;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.EntityResolver2;
 
 
 /**
@@ -140,10 +132,6 @@ public class DefaultServlet extends HttpServlet {
      */
     protected static final StringManager sm = StringManager.getManager(DefaultServlet.class);
 
-    private static final DocumentBuilderFactory factory;
-
-    private static final SecureEntityResolver secureEntityResolver;
-
     /**
      * Full range marker.
      */
@@ -160,21 +148,6 @@ public class DefaultServlet extends HttpServlet {
      * Size of file transfer buffer in bytes.
      */
     protected static final int BUFFER_SIZE = 4096;
-
-
-    // ----------------------------------------------------- Static Initializer
-
-    static {
-        if (Globals.IS_SECURITY_ENABLED) {
-            factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            factory.setValidating(false);
-            secureEntityResolver = new SecureEntityResolver();
-        } else {
-            factory = null;
-            secureEntityResolver = null;
-        }
-    }
 
 
     // ----------------------------------------------------- Instance Variables
@@ -2008,11 +1981,7 @@ public class DefaultServlet extends HttpServlet {
             if (resource.isFile()) {
                 InputStream is = resource.getInputStream();
                 if (is != null) {
-                    if (Globals.IS_SECURITY_ENABLED) {
-                        return secureXslt(is);
-                    } else {
-                        return new StreamSource(is);
-                    }
+                    return new StreamSource(is);
                 }
             }
             if (debug > 10) {
@@ -2024,11 +1993,7 @@ public class DefaultServlet extends HttpServlet {
             InputStream is =
                 getServletContext().getResourceAsStream(contextXsltFile);
             if (is != null) {
-                if (Globals.IS_SECURITY_ENABLED) {
-                    return secureXslt(is);
-                } else {
-                    return new StreamSource(is);
-                }
+                return new StreamSource(is);
             }
 
             if (debug > 10) {
@@ -2101,31 +2066,6 @@ public class DefaultServlet extends HttpServlet {
         }
 
         return candidate;
-    }
-
-
-    private Source secureXslt(InputStream is) {
-        // Need to filter out any external entities
-        Source result = null;
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setEntityResolver(secureEntityResolver);
-            Document document = builder.parse(is);
-            result = new DOMSource(document);
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            if (debug > 0) {
-                log(e.getMessage(), e);
-            }
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    // Ignore
-                }
-            }
-        }
-        return result;
     }
 
 
@@ -2652,36 +2592,6 @@ public class DefaultServlet extends HttpServlet {
         private PrecompressedResource(WebResource resource, CompressionFormat format) {
             this.resource = resource;
             this.format = format;
-        }
-    }
-
-
-    /**
-     * This is secure in the sense that any attempt to use an external entity
-     * will trigger an exception.
-     */
-    private static class SecureEntityResolver implements EntityResolver2  {
-
-        @Override
-        public InputSource resolveEntity(String publicId, String systemId)
-                throws SAXException, IOException {
-            throw new SAXException(sm.getString("defaultServlet.blockExternalEntity",
-                    publicId, systemId));
-        }
-
-        @Override
-        public InputSource getExternalSubset(String name, String baseURI)
-                throws SAXException, IOException {
-            throw new SAXException(sm.getString("defaultServlet.blockExternalSubset",
-                    name, baseURI));
-        }
-
-        @Override
-        public InputSource resolveEntity(String name, String publicId,
-                String baseURI, String systemId) throws SAXException,
-                IOException {
-            throw new SAXException(sm.getString("defaultServlet.blockExternalEntity2",
-                    name, publicId, baseURI, systemId));
         }
     }
 

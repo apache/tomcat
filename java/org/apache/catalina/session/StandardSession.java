@@ -48,7 +48,6 @@ import jakarta.servlet.http.HttpSessionIdListener;
 import jakarta.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
@@ -764,7 +763,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             if (notify) {
                 ClassLoader oldContextClassLoader = null;
                 try {
-                    oldContextClassLoader = context.bind(Globals.IS_SECURITY_ENABLED, null);
+                    oldContextClassLoader = context.bind(false, null);
                     Object listeners[] = context.getApplicationLifecycleListeners();
                     if (listeners != null && listeners.length > 0) {
                         HttpSessionEvent event =
@@ -796,7 +795,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                         }
                     }
                 } finally {
-                    context.unbind(Globals.IS_SECURITY_ENABLED, oldContextClassLoader);
+                    context.unbind(false, oldContextClassLoader);
                 }
             }
 
@@ -832,12 +831,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
             String keys[] = keys();
             ClassLoader oldContextClassLoader = null;
             try {
-                oldContextClassLoader = context.bind(Globals.IS_SECURITY_ENABLED, null);
+                oldContextClassLoader = context.bind(false, null);
                 for (String key : keys) {
                     removeAttributeInternal(key, notify);
                 }
             } finally {
-                context.unbind(Globals.IS_SECURITY_ENABLED, oldContextClassLoader);
+                context.unbind(false, oldContextClassLoader);
             }
         }
 
