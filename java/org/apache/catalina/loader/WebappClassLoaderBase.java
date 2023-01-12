@@ -18,8 +18,6 @@ package org.apache.catalina.loader;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.instrument.ClassFileTransformer;
@@ -28,16 +26,11 @@ import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.AccessControlException;
-import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.Permission;
 import java.security.PermissionCollection;
-import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
@@ -62,7 +55,6 @@ import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -78,7 +70,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.security.PermissionCheck;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
@@ -125,7 +116,7 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * @author Craig R. McClanahan
  */
 public abstract class WebappClassLoaderBase extends URLClassLoader
-        implements Lifecycle, InstrumentableClassLoader, WebappProperties, PermissionCheck {
+        implements Lifecycle, InstrumentableClassLoader, WebappProperties {
 
     private static final Log log = LogFactory.getLog(WebappClassLoaderBase.class);
 
@@ -224,11 +215,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         }
         this.javaseClassLoader = j;
-
-        securityManager = System.getSecurityManager();
-        if (securityManager != null) {
-            refreshPolicy();
-        }
     }
 
 
@@ -259,11 +245,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         }
         this.javaseClassLoader = j;
-
-        securityManager = System.getSecurityManager();
-        if (securityManager != null) {
-            refreshPolicy();
-        }
     }
 
 
@@ -313,12 +294,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * application context.
      */
     protected final HashMap<String, PermissionCollection> loaderPC = new HashMap<>();
-
-
-    /**
-     * Instance of the SecurityManager installed.
-     */
-    protected final SecurityManager securityManager;
 
 
     /**
@@ -474,64 +449,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     public void setDelegate(boolean delegate) {
         this.delegate = delegate;
-    }
-
-
-    /**
-     * If there is a Java SecurityManager create a read permission for the
-     * target of the given URL as appropriate.
-     *
-     * @param url URL for a file or directory on local system
-     */
-    void addPermission(URL url) {
-        if (url == null) {
-            return;
-        }
-        if (securityManager != null) {
-            String protocol = url.getProtocol();
-            if ("file".equalsIgnoreCase(protocol)) {
-                URI uri;
-                File f;
-                String path;
-                try {
-                    uri = url.toURI();
-                    f = new File(uri);
-                    path = f.getCanonicalPath();
-                } catch (IOException | URISyntaxException e) {
-                    log.warn(sm.getString(
-                            "webappClassLoader.addPermissionNoCanonicalFile",
-                            url.toExternalForm()));
-                    return;
-                }
-                if (f.isFile()) {
-                    // Allow the file to be read
-                    addPermission(new FilePermission(path, "read"));
-                } else if (f.isDirectory()) {
-                    addPermission(new FilePermission(path, "read"));
-                    addPermission(new FilePermission(
-                            path + File.separator + "-", "read"));
-                } else {
-                    // File does not exist - ignore (shouldn't happen)
-                }
-            } else {
-                // Unsupported URL protocol
-                log.warn(sm.getString(
-                        "webappClassLoader.addPermissionNoProtocol",
-                        protocol, url.toExternalForm()));
-            }
-        }
-    }
-
-
-    /**
-     * If there is a Java SecurityManager create a Permission.
-     *
-     * @param permission The permission
-     */
-    void addPermission(Permission permission) {
-        if ((securityManager != null) && (permission != null)) {
-            permissionList.add(permission);
-        }
     }
 
 
@@ -831,24 +748,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         checkStateForClassLoading(name);
 
-        // (1) Permission to define this class when using a SecurityManager
-        if (securityManager != null) {
-            int i = name.lastIndexOf('.');
-            if (i >= 0) {
-                try {
-                    if (log.isTraceEnabled()) {
-                        log.trace("      securityManager.checkPackageDefinition");
-                    }
-                    securityManager.checkPackageDefinition(name.substring(0,i));
-                } catch (Exception se) {
-                    if (log.isTraceEnabled()) {
-                        log.trace("      -->Exception-->ClassNotFoundException", se);
-                    }
-                    throw new ClassNotFoundException(name, se);
-                }
-            }
-        }
-
         // Ask our superclass to locate this class, if possible
         // (throws ClassNotFoundException if it is not found)
         Class<?> clazz = null;
@@ -857,17 +756,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 log.trace("      findClassInternal(" + name + ")");
             }
             try {
-                if (securityManager != null) {
-                    PrivilegedAction<Class<?>> dp =
-                        new PrivilegedFindClassByName(name);
-                    clazz = AccessController.doPrivileged(dp);
-                } else {
-                    clazz = findClassInternal(name);
-                }
-            } catch(AccessControlException ace) {
-                log.warn(sm.getString("webappClassLoader.securityException", name,
-                        ace.getMessage()), ace);
-                throw new ClassNotFoundException(name, ace);
+                clazz = findClassInternal(name);
             } catch (RuntimeException e) {
                 if (log.isTraceEnabled()) {
                     log.trace("      -->RuntimeException Rethrown", e);
@@ -877,10 +766,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if ((clazz == null) && hasExternalRepositories) {
                 try {
                     clazz = super.findClass(name);
-                } catch(AccessControlException ace) {
-                    log.warn(sm.getString("webappClassLoader.securityException", name,
-                            ace.getMessage()), ace);
-                    throw new ClassNotFoundException(name, ace);
                 } catch (RuntimeException e) {
                     if (log.isTraceEnabled()) {
                         log.trace("      -->RuntimeException Rethrown", e);
@@ -907,13 +792,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         if (log.isTraceEnabled()) {
-            ClassLoader cl;
-            if (Globals.IS_SECURITY_ENABLED){
-                cl = AccessController.doPrivileged(
-                    new PrivilegedGetClassLoader(clazz));
-            } else {
-                cl = clazz.getClassLoader();
-            }
+            ClassLoader cl = clazz.getClassLoader();
             log.debug("      Loaded by " + cl.toString());
         }
         return clazz;
@@ -1317,21 +1196,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             try {
                 // Use getResource as it won't trigger an expensive
                 // ClassNotFoundException if the resource is not available from
-                // the Java SE class loader. However (see
-                // https://bz.apache.org/bugzilla/show_bug.cgi?id=58125 for
-                // details) when running under a security manager in rare cases
-                // this call may trigger a ClassCircularityError.
+                // the Java SE class loader.
                 // See https://bz.apache.org/bugzilla/show_bug.cgi?id=61424 for
                 // details of how this may trigger a StackOverflowError
-                // Given these reported errors, catch Throwable to ensure any
-                // other edge cases are also caught
-                URL url;
-                if (securityManager != null) {
-                    PrivilegedAction<URL> dp = new PrivilegedJavaseGetResource(resourceName);
-                    url = AccessController.doPrivileged(dp);
-                } else {
-                    url = javaseLoader.getResource(resourceName);
-                }
+                // Given these reported errors, catch Throwable to ensure all
+                // edge cases are also caught
+                URL url = javaseLoader.getResource(resourceName);
                 tryLoadingFromJavaseLoader = (url != null);
             } catch (Throwable t) {
                 // Swallow all exceptions apart from those that must be re-thrown
@@ -1353,20 +1223,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     }
                 } catch (ClassNotFoundException e) {
                     // Ignore
-                }
-            }
-
-            // (0.5) Permission to access this class when using a SecurityManager
-            if (securityManager != null) {
-                int i = name.lastIndexOf('.');
-                if (i >= 0) {
-                    try {
-                        securityManager.checkPackageAccess(name.substring(0,i));
-                    } catch (SecurityException se) {
-                        String error = sm.getString("webappClassLoader.restrictedPackage", name);
-                        log.info(error, se);
-                        throw new ClassNotFoundException(error, se);
-                    }
                 }
             }
 
@@ -1482,24 +1338,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         }
         return pc;
-    }
-
-
-    @Override
-    public boolean check(Permission permission) {
-        if (!Globals.IS_SECURITY_ENABLED) {
-            return true;
-        }
-        Policy currentPolicy = Policy.getPolicy();
-        if (currentPolicy != null) {
-            URL contextRootUrl = resources.getResource("/").getCodeBase();
-            CodeSource cs = new CodeSource(contextRootUrl, (Certificate[]) null);
-            PermissionCollection pc = currentPolicy.getPermissions(cs);
-            if (pc.implies(permission)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -2468,23 +2306,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 }
             }
 
-            if (securityManager != null) {
-                // Checking sealing
-                if (pkg != null) {
-                    boolean sealCheck = true;
-                    if (pkg.isSealed()) {
-                        sealCheck = pkg.isSealed(codeBase);
-                    } else {
-                        sealCheck = (manifest == null) || !isPackageSealed(packageName, manifest);
-                    }
-                    if (!sealCheck) {
-                        throw new SecurityException
-                            ("Sealing violation loading " + name + " : Package "
-                             + packageName + " is sealed.");
-                    }
-                }
-            }
-
             try {
                 clazz = defineClass(name, binaryContent, 0,
                         binaryContent.length, new CodeSource(codeBase, certificates));
@@ -2568,25 +2389,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             return entry.loadedClass;
         }
         return null;
-    }
-
-
-    /**
-     * Refresh the system policy file, to pick up eventual changes.
-     */
-    protected void refreshPolicy() {
-
-        try {
-            // The policy file may have been modified to adjust
-            // permissions, so we're reloading it when loading or
-            // reloading a Context
-            Policy policy = Policy.getPolicy();
-            policy.refresh();
-        } catch (AccessControlException e) {
-            // Some policy files may restrict this, even for the core,
-            // so this exception is ignored
-        }
-
     }
 
 
@@ -2741,21 +2543,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     @Override
     public boolean hasLoggingConfig() {
-        if (Globals.IS_SECURITY_ENABLED) {
-            Boolean result = AccessController.doPrivileged(new PrivilegedHasLoggingConfig());
-            return result.booleanValue();
-        } else {
-            return findResource("logging.properties") != null;
-        }
-    }
-
-
-    private class PrivilegedHasLoggingConfig implements PrivilegedAction<Boolean> {
-
-        @Override
-        public Boolean run() {
-            return Boolean.valueOf(findResource("logging.properties") != null);
-        }
+        return findResource("logging.properties") != null;
     }
 
 

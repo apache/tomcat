@@ -16,18 +16,15 @@
  */
 package org.apache.tomcat.util.digester;
 
-import java.io.FilePermission;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Permission;
 
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
- * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource}
+ * A {@link org.apache.tomcat.util.IntrospectionUtils.PropertySource}
  * that uses Kubernetes service bindings to resolve expressions.
  *
  * <p><strong>Usage example:</strong></p>
@@ -73,25 +70,12 @@ import org.apache.tomcat.util.security.PermissionCheck;
  * @see <a href="https://tomcat.apache.org/tomcat-9.0-doc/config/systemprops.html#Property_replacements">Tomcat
  *      Configuration Reference System Properties</a>
  */
-public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePropertySource {
+public class ServiceBindingPropertySource implements IntrospectionUtils.PropertySource {
 
     private static final String SERVICE_BINDING_ROOT_ENV_VAR = "SERVICE_BINDING_ROOT";
 
     @Override
     public String getProperty(String key) {
-        return null;
-    }
-
-    @Override
-    public String getProperty(String key, ClassLoader classLoader) {
-        // can we determine the service binding root
-        if (classLoader instanceof PermissionCheck) {
-            Permission p = new RuntimePermission("getenv." + SERVICE_BINDING_ROOT_ENV_VAR, null);
-            if (!((PermissionCheck) classLoader).check(p)) {
-                return null;
-            }
-        }
-
         // get the root to search from
         String serviceBindingRoot = System.getenv(SERVICE_BINDING_ROOT_ENV_VAR);
         if (serviceBindingRoot == null) {
@@ -106,12 +90,6 @@ public class ServiceBindingPropertySource implements IntrospectionUtils.SecurePr
 
         Path path = Paths.get(serviceBindingRoot, parts[0], parts[1]);
         try {
-            if (classLoader instanceof PermissionCheck) {
-                Permission p = new FilePermission(path.toString(), "read");
-                if (!((PermissionCheck) classLoader).check(p)) {
-                    return null;
-                }
-            }
             return new String(Files.readAllBytes(path));
         } catch (IOException e) {
             return null;

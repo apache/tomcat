@@ -19,8 +19,6 @@ package org.apache.catalina.loader;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.io.FilePermission;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -373,8 +371,6 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
             // Configure our repositories
             setClassPath();
 
-            setPermissions();
-
             classLoader.start();
 
             String contextName = context.getName();
@@ -472,43 +468,6 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader{
         classLoader = (WebappClassLoaderBase) constr.newInstance(args);
 
         return classLoader;
-    }
-
-
-    /**
-     * Configure associated class loader permissions.
-     */
-    private void setPermissions() {
-
-        if (!Globals.IS_SECURITY_ENABLED) {
-            return;
-        }
-        if (context == null) {
-            return;
-        }
-
-        // Tell the class loader the root of the context
-        ServletContext servletContext = context.getServletContext();
-
-        // Assigning permissions for the work directory
-        File workDir =
-            (File) servletContext.getAttribute(ServletContext.TEMPDIR);
-        if (workDir != null) {
-            try {
-                String workDirPath = workDir.getCanonicalPath();
-                classLoader.addPermission
-                    (new FilePermission(workDirPath, "read,write"));
-                classLoader.addPermission
-                    (new FilePermission(workDirPath + File.separator + "-",
-                                        "read,write,delete"));
-            } catch (IOException e) {
-                // Ignore
-            }
-        }
-
-        for (URL url : context.getResources().getBaseUrls()) {
-           classLoader.addPermission(url);
-        }
     }
 
 

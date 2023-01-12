@@ -16,13 +16,10 @@
  */
 package org.apache.tomcat.util.digester;
 
-import java.security.Permission;
-
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
- * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource}
+ * A {@link org.apache.tomcat.util.IntrospectionUtils.PropertySource}
  * that uses environment variables to resolve expressions.
  *
  * <p><strong>Usage example:</strong></p>
@@ -58,21 +55,10 @@ import org.apache.tomcat.util.security.PermissionCheck;
  *
  * @see <a href="https://tomcat.apache.org/tomcat-9.0-doc/config/systemprops.html#Property_replacements">Tomcat Configuration Reference System Properties</a>
  */
-public class EnvironmentPropertySource implements IntrospectionUtils.SecurePropertySource {
+public class EnvironmentPropertySource implements IntrospectionUtils.PropertySource {
 
     @Override
     public String getProperty(String key) {
-        return null;
-    }
-
-    @Override
-    public String getProperty(String key, ClassLoader classLoader) {
-        if (classLoader instanceof PermissionCheck) {
-            Permission p = new RuntimePermission("getenv." + key, null);
-            if (!((PermissionCheck) classLoader).check(p)) {
-                return null;
-            }
-        }
         return System.getenv(key);
     }
 }
