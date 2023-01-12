@@ -687,7 +687,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
         isNew = false;
 
-        /**
+        /*
          * The servlet spec mandates to ignore request handling time
          * in lastAccessedTime.
          */
