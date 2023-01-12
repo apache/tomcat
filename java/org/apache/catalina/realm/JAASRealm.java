@@ -96,21 +96,23 @@ import org.apache.tomcat.util.ExceptionUtils;
  *     with this name in the JAAS configuration file. Here is a hypothetical
  *     JAAS configuration file entry for a database-oriented login module that uses
  *     a Tomcat-managed JNDI database resource:
- *     <blockquote><pre>Catalina {
-org.foobar.auth.DatabaseLoginModule REQUIRED
-    JNDI_RESOURCE=jdbc/AuthDB
-  USER_TABLE=users
-  USER_ID_COLUMN=id
-  USER_NAME_COLUMN=name
-  USER_CREDENTIAL_COLUMN=password
-  ROLE_TABLE=roles
-  ROLE_NAME_COLUMN=name
-  PRINCIPAL_FACTORY=org.foobar.auth.impl.SimplePrincipalFactory;
-};</pre></blockquote></li>
+ *     <blockquote><pre>
+ * Catalina {
+ * org.foobar.auth.DatabaseLoginModule REQUIRED
+ *   JNDI_RESOURCE=jdbc/AuthDB
+ *   USER_TABLE=users
+ *   USER_ID_COLUMN=id
+ *   USER_NAME_COLUMN=name
+ *   USER_CREDENTIAL_COLUMN=password
+ *   ROLE_TABLE=roles
+ *   ROLE_NAME_COLUMN=name
+ *   PRINCIPAL_FACTORY=org.foobar.auth.impl.SimplePrincipalFactory;
+ * };
+ * </pre></blockquote></li>
  * <li>To set the JAAS configuration file
  *     location, set the <code>CATALINA_OPTS</code> environment variable
  *     similar to the following:
-<blockquote><code>CATALINA_OPTS="-Djava.security.auth.login.config=$CATALINA_HOME/conf/jaas.config"</code></blockquote>
+ *     <blockquote><code>CATALINA_OPTS="-Djava.security.auth.login.config=$CATALINA_HOME/conf/jaas.config"</code></blockquote>
  * </li>
  * <li>As part of the login process, JAASRealm registers its own <code>CallbackHandler</code>,
  *     called (unsurprisingly) <code>JAASCallbackHandler</code>. This handler supplies the

@@ -669,11 +669,11 @@ public interface PoolConfiguration {
      * Returns true if the pool sweeper is enabled for the connection pool.
      * The pool sweeper is enabled if any settings that require async intervention in the pool are turned on
      * <code>
-        boolean result = getTimeBetweenEvictionRunsMillis()&gt;0;
-        result = result &amp;&amp; (isRemoveAbandoned() &amp;&amp; getRemoveAbandonedTimeout()&gt;0);
-        result = result || (isTestWhileIdle() &amp;&amp; getValidationQuery()!=null);
-        return result;
-       </code>
+     * boolean result = getTimeBetweenEvictionRunsMillis()&gt;0;
+     * result = result &amp;&amp; (isRemoveAbandoned() &amp;&amp; getRemoveAbandonedTimeout()&gt;0);
+     * result = result || (isTestWhileIdle() &amp;&amp; getValidationQuery()!=null);
+     * return result;
+     * </code>
      *
      * @return true if a background thread is or will be enabled for this pool
      */
