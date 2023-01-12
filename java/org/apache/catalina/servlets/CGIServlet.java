@@ -765,7 +765,7 @@ public final class CGIServlet extends HttpServlet {
          *
          * @return true if the request was parsed without error, false if there
          *           was a problem
-
+         *
          * @throws UnsupportedEncodingException Unknown encoding
          */
         protected boolean setupFromRequest(HttpServletRequest req)

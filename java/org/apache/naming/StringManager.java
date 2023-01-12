@@ -92,13 +92,13 @@ public class StringManager {
     }
 
     /**
-        Get a string from the underlying resource bundle or return
-        null if the String is not found.
-
-        @param key to desired resource String
-        @return resource String matching <i>key</i> from underlying
-                bundle or null if not found.
-        @throws IllegalArgumentException if <i>key</i> is null.
+     *  Get a string from the underlying resource bundle or return
+     *  null if the String is not found.
+     *
+     *  @param key to desired resource String
+     *  @return resource String matching <i>key</i> from underlying
+     *          bundle or null if not found.
+     *  @throws IllegalArgumentException if <i>key</i> is null.
      */
     public String getString(String key) {
         if(key == null){
