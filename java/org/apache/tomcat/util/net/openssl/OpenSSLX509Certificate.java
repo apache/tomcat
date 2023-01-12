@@ -62,11 +62,13 @@ final class OpenSSLX509Certificate extends X509Certificate {
     }
 
     @Override
+    @Deprecated
     public Principal getIssuerDN() {
         return unwrap().getIssuerDN();
     }
 
     @Override
+    @Deprecated
     public Principal getSubjectDN() {
         return unwrap().getSubjectDN();
     }
