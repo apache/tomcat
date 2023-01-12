@@ -24,9 +24,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.io.WriteAbortedException;
-import java.security.AccessController;
 import java.security.Principal;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -57,7 +55,6 @@ import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.authenticator.SavedRequest;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -609,11 +606,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     @Override
     public HttpSession getSession() {
         if (facade == null) {
-            if (SecurityUtil.isPackageProtectionEnabled()) {
-                facade = AccessController.doPrivileged(new PrivilegedNewSessionFacade(this));
-            } else {
-                facade = new StandardSessionFacade(this);
-            }
+            facade = new StandardSessionFacade(this);
         }
         return facade;
     }
@@ -1785,22 +1778,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 }
                 manager.getContext().getLogger().error(sm.getString("standardSession.attributeEvent"), t);
             }
-        }
-    }
-
-
-    private static class PrivilegedNewSessionFacade implements
-            PrivilegedAction<StandardSessionFacade> {
-
-        private final HttpSession session;
-
-        public PrivilegedNewSessionFacade(HttpSession session) {
-            this.session = session;
-        }
-
-        @Override
-        public StandardSessionFacade run(){
-            return new StandardSessionFacade(session);
         }
     }
 }

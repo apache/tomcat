@@ -35,7 +35,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -84,8 +83,6 @@ import org.apache.tomcat.util.http.parser.EntityTag;
 import org.apache.tomcat.util.http.parser.Ranges;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
-import org.apache.tomcat.util.security.PrivilegedGetTccl;
-import org.apache.tomcat.util.security.PrivilegedSetTccl;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -1713,22 +1710,9 @@ public class DefaultServlet extends HttpServlet {
 
         // Prevent possible memory leak. Ensure Transformer and
         // TransformerFactory are not loaded from the web application.
-        ClassLoader original;
-        if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedGetTccl pa = new PrivilegedGetTccl();
-            original = AccessController.doPrivileged(pa);
-        } else {
-            original = Thread.currentThread().getContextClassLoader();
-        }
+        ClassLoader original = Thread.currentThread().getContextClassLoader();
         try {
-            if (Globals.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa =
-                        new PrivilegedSetTccl(DefaultServlet.class.getClassLoader());
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(
-                        DefaultServlet.class.getClassLoader());
-            }
+            Thread.currentThread().setContextClassLoader(DefaultServlet.class.getClassLoader());
 
             TransformerFactory tFactory = TransformerFactory.newInstance();
             Source xmlSource = new StreamSource(new StringReader(sb.toString()));
@@ -1743,12 +1727,7 @@ public class DefaultServlet extends HttpServlet {
         } catch (TransformerException e) {
             throw new ServletException(sm.getString("defaultServlet.xslError"), e);
         } finally {
-            if (Globals.IS_SECURITY_ENABLED) {
-                PrivilegedSetTccl pa = new PrivilegedSetTccl(original);
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(original);
-            }
+            Thread.currentThread().setContextClassLoader(original);
         }
     }
 

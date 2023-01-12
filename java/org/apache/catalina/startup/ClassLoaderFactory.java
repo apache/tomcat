@@ -23,8 +23,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -128,14 +126,11 @@ public final class ClassLoaderFactory {
 
         // Construct the class loader itself
         final URL[] array = set.toArray(new URL[0]);
-        return AccessController.doPrivileged(
-                (PrivilegedAction<URLClassLoader>) () -> {
-                    if (parent == null) {
-                        return new URLClassLoader(array);
-                    } else {
-                        return new URLClassLoader(array, parent);
-                    }
-                });
+        if (parent == null) {
+            return new URLClassLoader(array);
+        } else {
+            return new URLClassLoader(array, parent);
+        }
     }
 
 
@@ -236,14 +231,11 @@ public final class ClassLoaderFactory {
             }
         }
 
-        return AccessController.doPrivileged(
-                (PrivilegedAction<URLClassLoader>) () -> {
-                    if (parent == null) {
-                        return new URLClassLoader(array);
-                    } else {
-                        return new URLClassLoader(array, parent);
-                    }
-                });
+        if (parent == null) {
+            return new URLClassLoader(array);
+        } else {
+            return new URLClassLoader(array, parent);
+        }
     }
 
     private static boolean validateFile(File file,
