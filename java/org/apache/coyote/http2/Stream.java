@@ -19,9 +19,6 @@ package org.apache.coyote.http2;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -795,7 +792,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             request.getMimeHeaders().addValue(":authority").duplicate(request.serverName());
         }
 
-        push(handler, request, this);
+        handler.push(request, this);
     }
 
 
@@ -833,47 +830,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
         return result;
-    }
-
-
-    private static void push(final Http2UpgradeHandler handler, final Request request,
-            final Stream stream) throws IOException {
-        if (org.apache.coyote.Constants.IS_SECURITY_ENABLED) {
-            try {
-                AccessController.doPrivileged(new PrivilegedPush(handler, request, stream));
-            } catch (PrivilegedActionException ex) {
-                Exception e = ex.getException();
-                if (e instanceof IOException) {
-                    throw (IOException) e;
-                } else {
-                    throw new IOException(ex);
-                }
-            }
-
-        } else {
-            handler.push(request, stream);
-        }
-    }
-
-
-    private static class PrivilegedPush implements PrivilegedExceptionAction<Void> {
-
-        private final Http2UpgradeHandler handler;
-        private final Request request;
-        private final Stream stream;
-
-        public PrivilegedPush(Http2UpgradeHandler handler, Request request,
-                Stream stream) {
-            this.handler = handler;
-            this.request = request;
-            this.stream = stream;
-        }
-
-        @Override
-        public Void run() throws IOException {
-            handler.push(request, stream);
-            return null;
-        }
     }
 
 

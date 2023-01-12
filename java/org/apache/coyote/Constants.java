@@ -47,12 +47,6 @@ public final class Constants {
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
 
     /**
-     * Has security been turned on?
-     */
-    public static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
-
-
-    /**
      * The request attribute that is set to the value of {@code Boolean.TRUE}
      * if connector processing this request supports use of sendfile.
      */
