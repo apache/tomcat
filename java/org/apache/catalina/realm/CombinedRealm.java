@@ -320,7 +320,7 @@ public class CombinedRealm extends RealmBase {
         Principal authenticatedUser = null;
         String username = null;
         if (certs != null && certs.length >0) {
-            username = certs[0].getSubjectDN().getName();
+            username = certs[0].getSubjectX500Principal().getName();
         }
 
         for (Realm realm : realms) {
