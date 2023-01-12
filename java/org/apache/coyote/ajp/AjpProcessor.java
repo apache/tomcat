@@ -652,7 +652,7 @@ public class AjpProcessor extends AbstractProcessor {
      * @param message   The message to populate
      * @param block If there is no data available to read when this method is
      *              called, should this call block until data becomes available?
-
+     *
      * @return true if the message has been read, false if no data was read
      *
      * @throws IOException any other failure, including incomplete reads
