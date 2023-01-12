@@ -85,6 +85,7 @@
         <property name="accessModifiers" value="public,protected"/>
     </module>
     <module name="JavadocMissingLeadingAsterisk"/>
+    <module name="JavadocMissingWhitespaceAfterAsterisk"/>
 
     <!-- Miscellaneous -->
     <!-- ~5500 errors
