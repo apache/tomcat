@@ -857,18 +857,18 @@ public final class CGIServlet extends HttpServlet {
          * CGI search algorithm: search the real path below
          *    &lt;my-webapp-root&gt; and find the first non-directory in
          *    the getPathTranslated("/"), reading/searching from left-to-right.
-         *</p>
-         *<p>
+         * </p>
+         * <p>
          *   The CGI search path will start at
          *   webAppRootDir + File.separator + cgiPathPrefix
          *   (or webAppRootDir alone if cgiPathPrefix is
          *   null).
-         *</p>
-         *<p>
+         * </p>
+         * <p>
          *   cgiPathPrefix is defined by setting
          *   this servlet's cgiPathPrefix init parameter
          *
-         *</p>
+         * </p>
          *
          * @param pathInfo       String from HttpServletRequest.getPathInfo()
          * @param webAppRootDir  String from context.getRealPath("/")

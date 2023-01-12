@@ -540,7 +540,7 @@ public class JspServletWrapper {
      * information, and a snippet of the JSP to help debugging.
      * Please see https://bz.apache.org/bugzilla/show_bug.cgi?id=37062 and
      * http://www.tfenne.com/jasper/ for more details.
-     *</p>
+     * </p>
      *
      * @param ex the exception that was the cause of the problem.
      * @return a JasperException with more detailed information
