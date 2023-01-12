@@ -44,7 +44,7 @@ public class Strftime {
     protected static final Properties translate;
     protected final SimpleDateFormat simpleDateFormat;
 
-    /**
+    /*
      * Initialize our pattern translation
      */
     static {

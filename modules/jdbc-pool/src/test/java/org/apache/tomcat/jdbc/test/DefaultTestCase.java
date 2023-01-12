@@ -140,7 +140,7 @@ public abstract class DefaultTestCase {
 //        c3p0.setDriverClass(datasource.getPoolProperties().getDriverClassName());
 //        this.c3p0Datasource = c3p0;
 
-      /**
+      /*
         acquireIncrement
         acquireRetryAttempts
         acquireRetryDelay

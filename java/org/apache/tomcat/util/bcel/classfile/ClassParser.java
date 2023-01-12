@@ -69,19 +69,19 @@ public final class ClassParser {
      * @throws ClassFormatException if a class is malformed or cannot be interpreted as a class file
      */
     public JavaClass parse() throws IOException, ClassFormatException {
-        /****************** Read headers ********************************/
+        //****************** Read headers ********************************
         // Check magic tag of class file
         readID();
         // Get compiler version
         readVersion();
-        /****************** Read constant pool and related **************/
+        //***************** Read constant pool and related **************
         // Read constant pool entries
         readConstantPool();
         // Get class information
         readClassInfo();
         // Get interface information, i.e., implemented interfaces
         readInterfaces();
-        /****************** Read class fields and methods ***************/
+        //***************** Read class fields and methods ***************
         // Read class fields, i.e., the variables of the class
         readFields();
         // Read class methods, i.e., the functions in the class
@@ -198,7 +198,6 @@ public final class ClassParser {
     }
 
 
-    /******************** Private utility methods **********************/
     /**
      * Checks whether the header of the file is ok. Of course, this has to be the first action on successive file reads.
      *

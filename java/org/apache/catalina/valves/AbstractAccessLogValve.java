@@ -698,7 +698,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return;
         }
 
-        /**
+        /*
          * XXX This is a bit silly, but we want to have start and stop time and
          * duration consistent. It would be better to keep start and stop
          * simply in the request and/or response object and remove time

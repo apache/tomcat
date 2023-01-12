@@ -209,7 +209,7 @@ public class NioReplicationTask extends AbstractRxTask {
         registerForRead(key,reader);//register to read new data, before we send it off to avoid dead locks
 
         for (ChannelMessage msg : msgs) {
-            /**
+            /*
              * Use send ack here if you want to ack the request to the remote
              * server before completing the request
              * This is considered an asynchronous request
@@ -226,7 +226,7 @@ public class NioReplicationTask extends AbstractRxTask {
                 }
                 //process the message
                 getCallback().messageDataReceived(msg);
-                /**
+                /*
                  * Use send ack here if you want the request to complete on this
                  * server before sending the ack to the remote server
                  * This is considered a synchronized request

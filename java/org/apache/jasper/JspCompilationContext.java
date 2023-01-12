@@ -140,7 +140,7 @@ public class JspCompilationContext {
 
     /* ==================== Methods to override ==================== */
 
-    /** ---------- Class path and loader ---------- */
+    // ---------- Class path and loader ----------
 
     /**
      * @return the classpath that is passed off to the Java compiler.
@@ -191,7 +191,7 @@ public class JspCompilationContext {
     }
 
 
-    /** ---------- Input/Output  ---------- */
+    // ---------- Input/Output  ----------
 
     /**
      * The output directory to generate code into.  The output directory
@@ -259,7 +259,7 @@ public class JspCompilationContext {
         return jspCompiler;
     }
 
-    /** ---------- Access resources in the webapp ---------- */
+    // ---------- Access resources in the webapp ----------
 
     /**
      * Get the full value of a URI relative to this compilations context

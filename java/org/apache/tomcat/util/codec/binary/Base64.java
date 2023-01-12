@@ -124,7 +124,7 @@ public class Base64 extends BaseNCodec {
                 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51                      // 70-7a p-z
         };
 
-    /**
+    /*
      * Base64 uses 6-bit fields.
      */
     /** Mask used to extract 6 bits, used when encoding */

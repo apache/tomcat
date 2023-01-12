@@ -398,9 +398,6 @@ abstract class Node implements TagConstants {
         }
     }
 
-    /***************************************************************************
-     * Child classes
-     */
 
     /**
      * Represents the root of a Jsp page or Jsp document
@@ -2093,10 +2090,6 @@ abstract class Node implements TagConstants {
             return extraSmap;
         }
     }
-
-    /***************************************************************************
-     * Auxiliary classes used in Node
-     */
 
     /**
      * Represents attributes that can be request time expressions.

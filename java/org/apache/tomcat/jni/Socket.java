@@ -37,17 +37,26 @@ public class Socket {
     /*
      * apr_sockopt Socket option definitions
      */
-    public static final int APR_SO_LINGER       = 1;    /** Linger */
-    public static final int APR_SO_KEEPALIVE    = 2;    /** Keepalive */
-    public static final int APR_SO_DEBUG        = 4;    /** Debug */
-    public static final int APR_SO_NONBLOCK     = 8;    /** Non-blocking IO */
-    public static final int APR_SO_REUSEADDR    = 16;   /** Reuse addresses */
-    public static final int APR_SO_SNDBUF       = 64;   /** Send buffer */
-    public static final int APR_SO_RCVBUF       = 128;  /** Receive buffer */
-    public static final int APR_SO_DISCONNECTED = 256;  /** Disconnected */
+    /** Linger */
+    public static final int APR_SO_LINGER       = 1;
+    /** Keepalive */
+    public static final int APR_SO_KEEPALIVE    = 2;
+    /** Debug */
+    public static final int APR_SO_DEBUG        = 4;
+    /** Non-blocking IO */
+    public static final int APR_SO_NONBLOCK     = 8;
+    /** Reuse addresses */
+    public static final int APR_SO_REUSEADDR    = 16;
+    /** Send buffer */
+    public static final int APR_SO_SNDBUF       = 64;
+    /** Receive buffer */
+    public static final int APR_SO_RCVBUF       = 128;
+    /** Disconnected */
+    public static final int APR_SO_DISCONNECTED = 256;
     /** For SCTP sockets, this is mapped to STCP_NODELAY internally. */
     public static final int APR_TCP_NODELAY     = 512;
-    public static final int APR_TCP_NOPUSH      = 1024; /** No push */
+    /** No push */
+    public static final int APR_TCP_NOPUSH      = 1024;
     /** This flag is ONLY set internally when we set APR_TCP_NOPUSH with
      * APR_TCP_NODELAY set to tell us that APR_TCP_NODELAY should be turned on
      * again when NOPUSH is turned off
@@ -71,12 +80,15 @@ public class Socket {
      */
     public static final int APR_TCP_DEFER_ACCEPT = 32768;
 
-    /** Define what type of socket shutdown should occur.
+    /* Define what type of socket shutdown should occur.
      * apr_shutdown_how_e enum
      */
-    public static final int APR_SHUTDOWN_READ      = 0; /** no longer allow read request */
-    public static final int APR_SHUTDOWN_WRITE     = 1; /** no longer allow write requests */
-    public static final int APR_SHUTDOWN_READWRITE = 2; /** no longer allow read or write requests */
+    /** no longer allow read request */
+    public static final int APR_SHUTDOWN_READ      = 0;
+    /** no longer allow write requests */
+    public static final int APR_SHUTDOWN_WRITE     = 1;
+    /** no longer allow read or write requests */
+    public static final int APR_SHUTDOWN_READWRITE = 2;
 
     public static final int APR_IPV4_ADDR_OK = 0x01;
     public static final int APR_IPV6_ADDR_OK = 0x02;
@@ -86,9 +98,12 @@ public class Socket {
     public static final int APR_INET6  = 2;
     public static final int APR_UNIX   = 3;
 
-    public static final int APR_PROTO_TCP  =   6; /** TCP  */
-    public static final int APR_PROTO_UDP  =  17; /** UDP  */
-    public static final int APR_PROTO_SCTP = 132; /** SCTP */
+    /** TCP  */
+    public static final int APR_PROTO_TCP  =   6;
+    /** UDP  */
+    public static final int APR_PROTO_UDP  =  17;
+    /** SCTP */
+    public static final int APR_PROTO_SCTP = 132;
 
     /**
      * Enum to tell us if we're interested in remote or local socket
