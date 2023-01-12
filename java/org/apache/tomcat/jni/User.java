@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** User
+/**
+ * User
  *
  * @author Mladen Turk
  *

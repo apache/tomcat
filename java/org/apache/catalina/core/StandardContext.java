@@ -2583,8 +2583,8 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /** Get the absolute path to the work dir.
-     *  To avoid duplication.
+    /**
+     * Get the absolute path to the work dir. To avoid duplication.
      *
      * @return The work path
      */

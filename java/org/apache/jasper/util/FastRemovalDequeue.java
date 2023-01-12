@@ -17,7 +17,6 @@
 package org.apache.jasper.util;
 
 /**
- *
  * The FastRemovalDequeue is a Dequeue that supports constant time removal of
  * entries. This is achieved by using a doubly linked list and wrapping any object
  * added to the collection with an Entry type, that is returned to the consumer.

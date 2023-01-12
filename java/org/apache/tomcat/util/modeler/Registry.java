@@ -96,7 +96,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      */
     private HashMap<String,ManagedBean> descriptors = new HashMap<>();
 
-    /** List of managed beans, keyed by class name
+    /**
+     * List of managed beans, keyed by class name
      */
     private HashMap<String,ManagedBean> descriptorsByClass = new HashMap<>();
 
@@ -143,8 +144,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     }
 
 
-    /** Lifecycle method - clean up the registry metadata.
-     *  Called from resetMetadata().
+    /**
+     * Lifecycle method - clean up the registry metadata. Called from
+     * resetMetadata().
      *
      * @since 1.1
      */

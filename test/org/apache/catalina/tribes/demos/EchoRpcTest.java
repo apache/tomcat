@@ -60,7 +60,6 @@ public class EchoRpcTest implements RpcCallback, Runnable {
     }
 
     /**
-     *
      * @param msg Serializable
      * @param sender Member
      * @return Serializable - null if no reply should be sent

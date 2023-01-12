@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Fileinfo
+/**
+ * Fileinfo
  *
  * @author Mladen Turk
  *
@@ -30,12 +31,15 @@ public class FileInfo {
 
     /** Allocates memory and closes lingering handles in the specified pool */
     public long pool;
-    /** The bitmask describing valid fields of this apr_finfo_t structure
-     *  including all available 'wanted' fields and potentially more */
+    /**
+     * The bitmask describing valid fields of this apr_finfo_t structure
+     *  including all available 'wanted' fields and potentially more.
+     */
     public int valid;
     /** The access permissions of the file.  Mimics Unix access rights. */
     public int protection;
-    /** The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE,
+    /**
+     * The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE,
      * APR_LNK or APR_SOCK.  If the type is undetermined, the value is APR_NOFILE.
      * If the type cannot be determined, the value is APR_UNKFILE.
      */

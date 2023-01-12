@@ -226,7 +226,6 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     @Deprecated
     public String encodeUrl(String url) { return null; }
     /**
-     *
      * @throws IOException Never happens
      */
     public void sendAcknowledgement() throws IOException {/* NOOP */}

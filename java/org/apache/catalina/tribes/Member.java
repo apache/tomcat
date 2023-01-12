@@ -92,7 +92,6 @@ public interface Member extends Serializable {
     public boolean isSuspect();
 
     /**
-     *
      * @return boolean - true if the member has been confirmed to malfunction
      */
     public boolean isFailing();

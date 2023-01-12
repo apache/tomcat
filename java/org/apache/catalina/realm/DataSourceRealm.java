@@ -31,7 +31,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.naming.ContextBindings;
 
 /**
- *
  * Implementation of <b>Realm</b> that works with any JDBC JNDI DataSource.
  * See the Realm How-To for more details on how to set up the database and
  * for configuration options.

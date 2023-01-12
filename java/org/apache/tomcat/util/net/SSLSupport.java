@@ -136,7 +136,6 @@ public interface SSLSupport {
     public String getProtocol() throws IOException;
 
     /**
-     *
      * @return the list of SSL/TLS protocol versions requested by the client
      *
      * @throws IOException If an error occurs trying to obtain the client
@@ -145,7 +144,6 @@ public interface SSLSupport {
     public String getRequestedProtocols() throws IOException;
 
     /**
-    *
     * @return the list of SSL/TLS ciphers requested by the client
     *
      * @throws IOException If an error occurs trying to obtain the client

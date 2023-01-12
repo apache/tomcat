@@ -935,8 +935,8 @@ public class ApplicationContextFacade implements ServletContext {
 
 
     /**
-     *
      * Throw the real exception.
+     *
      * @param ex The current exception
      */
     private void handleException(Exception ex)

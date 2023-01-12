@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Lock
+/**
+ * Lock
  *
  * @author Mladen Turk
  *

@@ -76,7 +76,6 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     private final boolean fastFailValidation;
 
     /**
-     *
      * @param conn
      *            my underlying connection
      * @param pool
@@ -108,7 +107,6 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     }
 
     /**
-     *
      * @param conn
      *            my underlying connection
      * @param pool

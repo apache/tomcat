@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** PoolCallback Interface
+/**
+ * PoolCallback Interface
  *
  * @author Mladen Turk
  *

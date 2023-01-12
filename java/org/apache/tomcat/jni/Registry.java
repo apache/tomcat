@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Windows Registry support
+/**
+ * Windows Registry support
  *
  * @author Mladen Turk
  *

@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Multicast
+/**
+ * Multicast
  *
  * @author Mladen Turk
  *

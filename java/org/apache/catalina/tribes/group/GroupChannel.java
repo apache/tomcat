@@ -221,7 +221,6 @@ public class GroupChannel extends ChannelInterceptorBase
     }
 
     /**
-     *
      * @param destination Member[] - destination.length &gt; 0
      * @param msg Serializable - the message to send
      * @param options sender options, options can trigger guarantee levels and different
@@ -614,7 +613,6 @@ public class GroupChannel extends ChannelInterceptorBase
     }
 
     /**
-     *
      * Removes a channel listener from the channel.<br>
      * Channel listeners are uniquely identified using the equals(Object) method
      * @param channelListener ChannelListener
@@ -787,13 +785,8 @@ public class GroupChannel extends ChannelInterceptorBase
     }
 
     /**
-     *
-     * <p>Title: Internal heartbeat thread</p>
-     *
-     * <p>Description: if <code>Channel.getHeartbeat()==true</code> then a thread of this class
-     * is created</p>
-     *
-     * @version 1.0
+     * If <code>Channel.getHeartbeat()==true</code> then a thread of this class
+     * is created.
      */
     public static class HeartbeatThread extends Thread {
         private static final Log log = LogFactory.getLog(HeartbeatThread.class);

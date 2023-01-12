@@ -61,7 +61,6 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     /**
-     *
      * @throws SQLException
      *             thrown by the delegating statement.
      * @since 2.4.0 made public, was protected in 2.3.0.
@@ -573,7 +572,6 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
     }
 
     /**
-     *
      * @throws SQLException
      *             thrown by the delegating statement.
      * @since 2.4.0 made public, was protected in 2.3.0.

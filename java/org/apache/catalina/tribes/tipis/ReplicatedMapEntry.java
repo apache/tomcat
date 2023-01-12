@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- *
  * For smarter replication, an object can implement this interface to replicate diffs<br>
  * The replication logic will call the methods in the following order:<br>
  * <code>

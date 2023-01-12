@@ -628,7 +628,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     /**
-     *
      * @param mbr Member
      * @return Member
      */

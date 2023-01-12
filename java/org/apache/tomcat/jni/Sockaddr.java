@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Sockaddr
+/**
+ * Sockaddr
  *
  * @author Mladen Turk
  *
@@ -38,8 +39,9 @@ public class Sockaddr {
     public int port;
     /** The family */
     public int family;
-    /** If multiple addresses were found by apr_sockaddr_info_get(), this
-     *  points to a representation of the next address. */
+    /**
+     * If multiple addresses were found by apr_sockaddr_info_get(), this
+     * points to a representation of the next address. */
     public long next;
 
 }

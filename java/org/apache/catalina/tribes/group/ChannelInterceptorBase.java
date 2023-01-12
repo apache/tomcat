@@ -146,7 +146,6 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     }
 
     /**
-     *
      * @param mbr Member
      * @return Member
      */

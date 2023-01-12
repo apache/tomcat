@@ -34,14 +34,16 @@ public class DOMWriter {
     /** Default Encoding */
     private static final String PRINTWRITER_ENCODING = "UTF8";
 
-    /** Print writer.
+    /**
+     * Print writer.
      *
      * @deprecated Will be made private in Tomcat 9.
      */
     @Deprecated
     protected final PrintWriter out;
 
-    /** Canonical output.
+    /**
+     * Canonical output.
      *
      * @deprecated Will be made private in Tomcat 9.
      */

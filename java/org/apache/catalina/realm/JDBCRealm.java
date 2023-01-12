@@ -31,7 +31,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
- *
  * Implementation of <b>Realm</b> that works with any JDBC supported database.
  * See the JDBCRealm.howto for more details on how to set up the database and
  * for configuration options.

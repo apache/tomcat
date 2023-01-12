@@ -140,7 +140,6 @@ class CPDSConnectionFactory
     }
 
     /**
-     *
      * @param pool
      *            the {@link ObjectPool} in which to pool those {@link Connection}s
      */

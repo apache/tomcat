@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Procattr
+/**
+ * Procattr
  *
  * @author Mladen Turk
  *

@@ -65,10 +65,6 @@ public class SenderState {
         this.state = state;
     }
 
-    /**
-     *
-     * @return boolean
-     */
     public boolean isSuspect() {
         return (state == SUSPECT) || (state == FAILING);
     }

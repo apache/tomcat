@@ -19,10 +19,6 @@ package org.apache.catalina.tribes.io;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- *
- * @version 1.0
- */
 class BufferPool15Impl implements BufferPool.BufferPoolAPI {
     protected int maxSize;
     protected final AtomicInteger size = new AtomicInteger(0);

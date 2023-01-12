@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Poll
+/**
+ * Poll
  *
  * @author Mladen Turk
  *

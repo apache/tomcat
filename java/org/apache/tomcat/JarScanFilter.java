@@ -19,7 +19,6 @@ package org.apache.tomcat;
 public interface JarScanFilter {
 
     /**
-     *
      * @param jarScanType   The type of JAR scan currently being performed
      * @param jarName       The name of the JAR file (without any path
      *                          information) to be checked to see if it should

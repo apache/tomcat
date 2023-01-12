@@ -26,10 +26,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author Peter Rossbach
- */
 @WebServlet(value = "/annotation/overwrite", name = "param", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),
         @WebInitParam(name = "bar", value = "World!") }, displayName = "param", description = "param", largeIcon = "paramLarge.png", smallIcon = "paramSmall.png", loadOnStartup = 0, asyncSupported = false)

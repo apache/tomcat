@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** Proc
+/**
+ * Proc
  *
  * @author Mladen Turk
  *
@@ -31,26 +32,34 @@ public class Proc {
     /*
      * apr_cmdtype_e enum
      */
-    public static final int APR_SHELLCM      = 0; /** use the shell to invoke the program */
-    public static final int APR_PROGRAM      = 1; /** invoke the program directly, no copied env */
-    public static final int APR_PROGRAM_ENV  = 2; /** invoke the program, replicating our environment */
-    public static final int APR_PROGRAM_PATH = 3; /** find program on PATH, use our environment */
-    public static final int APR_SHELLCMD_ENV = 4; /** use the shell to invoke the program,
-                                                   *   replicating our environment
-                                                   */
+    /** use the shell to invoke the program */
+    public static final int APR_SHELLCM      = 0;
+    /** invoke the program directly, no copied env */
+    public static final int APR_PROGRAM      = 1;
+    /** invoke the program, replicating our environment */
+    public static final int APR_PROGRAM_ENV  = 2;
+    /** find program on PATH, use our environment */
+    public static final int APR_PROGRAM_PATH = 3;
+    /** use the shell to invoke the program, replicating our environment */
+    public static final int APR_SHELLCMD_ENV = 4;
 
     /*
      * apr_wait_how_e enum
      */
-    public static final int APR_WAIT   = 0; /** wait for the specified process to finish */
-    public static final int APR_NOWAIT = 1; /** do not wait -- just see if it has finished */
+    /** wait for the specified process to finish */
+    public static final int APR_WAIT   = 0;
+    /** do not wait -- just see if it has finished */
+    public static final int APR_NOWAIT = 1;
 
     /*
      * apr_exit_why_e enum
      */
-    public static final int APR_PROC_EXIT        = 1; /** process exited normally */
-    public static final int APR_PROC_SIGNAL      = 2; /** process exited due to a signal */
-    public static final int APR_PROC_SIGNAL_CORE = 4; /** process exited and dumped a core file */
+    /** process exited normally */
+    public static final int APR_PROC_EXIT        = 1;
+    /** process exited due to a signal */
+    public static final int APR_PROC_SIGNAL      = 2;
+    /** process exited and dumped a core file */
+    public static final int APR_PROC_SIGNAL_CORE = 4;
 
     public static final int APR_NO_PIPE       = 0;
     public static final int APR_FULL_BLOCK    = 1;
@@ -68,17 +77,20 @@ public class Proc {
     public static final int APR_OC_REASON_DEATH      = 0;
     /** write_fd is unwritable */
     public static final int APR_OC_REASON_UNWRITABLE = 1;
-    /** a restart is occurring, perform any necessary cleanup (including
+    /**
+     * a restart is occurring, perform any necessary cleanup (including
      * sending a special signal to child)
      */
     public static final int APR_OC_REASON_RESTART    = 2;
-    /** unregister has been called, do whatever is necessary (including
+    /**
+     * unregister has been called, do whatever is necessary (including
      * kill the child)
      */
     public static final int APR_OC_REASON_UNREGISTER = 3;
     /** somehow the child exited without us knowing ... buggy os? */
     public static final int APR_OC_REASON_LOST       = 4;
-    /** a health check is occurring, for most maintenance functions
+    /**
+     * a health check is occurring, for most maintenance functions
      * this is a no-op.
      */
     public static final int APR_OC_REASON_RUNNING    = 5;

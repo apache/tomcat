@@ -21,11 +21,6 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-/**
- *
- *
- * @version 1.0
- */
 public class BufferPool {
     private static final Log log = LogFactory.getLog(BufferPool.class);
 

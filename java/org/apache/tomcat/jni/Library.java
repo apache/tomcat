@@ -18,10 +18,6 @@ package org.apache.tomcat.jni;
 
 import java.io.File;
 
-/** Library
- *
- * @author Mladen Turk
- */
 public final class Library {
 
     /* Default library names */

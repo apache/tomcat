@@ -157,7 +157,8 @@ public class RequestInfo  {
     private long lastRequestProcessingTime = 0;
 
 
-    /** Called by the processor before recycling the request. It'll collect
+    /**
+     * Called by the processor before recycling the request. It'll collect
      * statistic information.
      */
     void updateCounters() {

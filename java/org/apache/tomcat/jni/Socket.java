@@ -19,7 +19,8 @@ package org.apache.tomcat.jni;
 /* Import needed classes */
 import java.nio.ByteBuffer;
 
-/** Socket
+/**
+ * Socket
  *
  * @author Mladen Turk
  *
@@ -57,12 +58,14 @@ public class Socket {
     public static final int APR_TCP_NODELAY     = 512;
     /** No push */
     public static final int APR_TCP_NOPUSH      = 1024;
-    /** This flag is ONLY set internally when we set APR_TCP_NOPUSH with
+    /**
+     * This flag is ONLY set internally when we set APR_TCP_NOPUSH with
      * APR_TCP_NODELAY set to tell us that APR_TCP_NODELAY should be turned on
      * again when NOPUSH is turned off
      */
     public static final int APR_RESET_NODELAY   = 2048;
-    /** Set on non-blocking sockets (timeout != 0) on which the
+    /**
+     * Set on non-blocking sockets (timeout != 0) on which the
      * previous read() did not fill a buffer completely.  the next
      * apr_socket_recv()  will first call select()/poll() rather than
      * going straight into read().  (Can also be set by an application to
@@ -70,14 +73,11 @@ public class Socket {
      * the app expects that an immediate read would fail.)
      */
     public static final int APR_INCOMPLETE_READ = 4096;
-    /** like APR_INCOMPLETE_READ, but for write
-     */
+    /** like APR_INCOMPLETE_READ, but for write */
     public static final int APR_INCOMPLETE_WRITE = 8192;
-    /** Don't accept IPv4 connections on an IPv6 listening socket.
-     */
+    /** Don't accept IPv4 connections on an IPv6 listening socket. */
     public static final int APR_IPV6_V6ONLY      = 16384;
-    /** Delay accepting of new connections until data is available.
-     */
+    /** Delay accepting of new connections until data is available. */
     public static final int APR_TCP_DEFER_ACCEPT = 32768;
 
     /* Define what type of socket shutdown should occur.

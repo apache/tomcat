@@ -16,7 +16,8 @@
  */
 package org.apache.tomcat.jni;
 
-/** PasswordCallback Interface
+/**
+ * PasswordCallback Interface
  *
  * @author Mladen Turk
  *

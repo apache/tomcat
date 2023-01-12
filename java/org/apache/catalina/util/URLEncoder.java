@@ -26,7 +26,6 @@ import java.util.BitSet;
 import org.apache.tomcat.util.buf.B2CConverter;
 
 /**
- *
  * This class is very similar to the java.net.URLEncoder class.
  *
  * Unfortunately, with java.net.URLEncoder there is no way to specify to the

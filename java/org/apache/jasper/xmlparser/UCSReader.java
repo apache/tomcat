@@ -40,7 +40,8 @@ public class UCSReader extends Reader {
     // Constants
     //
 
-    /** Default byte buffer size (8192, larger than that of ASCIIReader
+    /**
+     * Default byte buffer size (8192, larger than that of ASCIIReader
      * since it's reasonable to surmise that the average UCS-4-encoded
      * file should be 4 times as large as the average ASCII-encoded file).
      */
