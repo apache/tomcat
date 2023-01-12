@@ -578,11 +578,10 @@ public class XMLEncodingDetector {
                         fCurrentEntity.position++;
                         offset++;
                     }
-                    /*** NEWLINE NORMALIZATION ***/
+                    // NEWLINE NORMALIZATION
                     else {
                         newlines++;
                     }
-                    /***/
                 }
                 else if (c == '\n') {
                     newlines++;
@@ -593,13 +592,13 @@ public class XMLEncodingDetector {
                             break;
                         }
                     }
-                    /*** NEWLINE NORMALIZATION ***
+                    /* NEWLINE NORMALIZATION
                          if (fCurrentEntity.ch[fCurrentEntity.position] == '\r'
                          && external) {
                          fCurrentEntity.position++;
                          offset++;
                          }
-                         /***/
+                         */
                 }
                 else {
                     fCurrentEntity.position--;
@@ -720,7 +719,7 @@ public class XMLEncodingDetector {
                             fCurrentEntity.position++;
                             offset++;
                         }
-                        /*** NEWLINE NORMALIZATION ***/
+                        // NEWLINE NORMALIZATION
                         else {
                             newlines++;
                         }
@@ -887,14 +886,14 @@ public class XMLEncodingDetector {
                             fCurrentEntity.position--;
                         }
                     }
-                    /*** NEWLINE NORMALIZATION ***
+                    /* NEWLINE NORMALIZATION
                          else {
                          if (fCurrentEntity.ch[fCurrentEntity.position + 1] == '\r'
                          && external) {
                          fCurrentEntity.position++;
                          }
                          }
-                         /***/
+                         */
                 }
                 // load more characters, if needed
                 if (!entityChanged) {

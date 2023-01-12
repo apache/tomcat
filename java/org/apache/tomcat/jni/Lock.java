@@ -28,18 +28,24 @@ package org.apache.tomcat.jni;
 @Deprecated
 public class Lock {
 
-    /**
+    /*
      * Enumerated potential types for APR process locking methods
      * <br><b>Warning :</b> Check APR_HAS_foo_SERIALIZE defines to see if the platform supports
      *          APR_LOCK_foo.  Only APR_LOCK_DEFAULT is portable.
      */
 
-    public static final int APR_LOCK_FCNTL        = 0; /** fcntl() */
-    public static final int APR_LOCK_FLOCK        = 1; /** flock() */
-    public static final int APR_LOCK_SYSVSEM      = 2; /** System V Semaphores */
-    public static final int APR_LOCK_PROC_PTHREAD = 3; /** POSIX pthread process-based locking */
-    public static final int APR_LOCK_POSIXSEM     = 4; /** POSIX semaphore process-based locking */
-    public static final int APR_LOCK_DEFAULT      = 5; /** Use the default process lock */
+    /** fcntl() */
+    public static final int APR_LOCK_FCNTL        = 0;
+    /** flock() */
+    public static final int APR_LOCK_FLOCK        = 1;
+    /** System V Semaphores */
+    public static final int APR_LOCK_SYSVSEM      = 2;
+    /** POSIX pthread process-based locking */
+    public static final int APR_LOCK_PROC_PTHREAD = 3;
+    /** POSIX semaphore process-based locking */
+    public static final int APR_LOCK_POSIXSEM     = 4;
+    /** Use the default process lock */
+    public static final int APR_LOCK_DEFAULT      = 5;
 
     /**
      * Create and initialize a mutex that can be used to synchronize processes.

@@ -64,7 +64,7 @@ public final class ExtensionValidator {
     // ----------------------------------------------------- Static Initializer
 
 
-    /**
+    /*
      *  This static initializer loads the container level extensions that are
      *  available to all web applications. This method scans all extension
      *  directories available via the "java.ext.dirs" System property.

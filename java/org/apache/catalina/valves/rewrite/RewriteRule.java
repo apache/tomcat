@@ -272,11 +272,11 @@ public class RewriteRule {
      */
     protected boolean nosubreq = false;
 
-    /**
+    /*
      *  Note: No proxy
      */
 
-    /**
+    /*
      * Note: No passthrough
      */
 

@@ -53,9 +53,7 @@ public class TestXxxEndpoint extends TomcatBaseTest {
     @Deprecated
     private long createAprSocket(int port, long pool)
                  throws Exception {
-        /**
-         * Server socket "pointer".
-         */
+        //Server socket "pointer"
         long serverSock = 0;
 
         String address = InetAddress.getByName("localhost").getHostAddress();

@@ -77,6 +77,9 @@
     <module name="RedundantImport"/>
     <module name="UnusedImports"/>
 
+    <!-- Javadoc Comments -->
+    <module name="InvalidJavadocPosition"/>
+
     <!-- Miscellaneous -->
     <!-- ~5500 errors
     <module name="Indentation">

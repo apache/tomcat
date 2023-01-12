@@ -106,7 +106,7 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
             allowedWithoutQuotes.clear(ch);
         }
 
-        /**
+        /*
          * Some browsers (e.g. IE6 and IE7) do not handle quoted Path values even
          * when Version is set to 1. To allow for this, we support a property
          * FWD_SLASH_IS_SEPARATOR which, when false, means a '/' character will not

@@ -16,13 +16,6 @@
  */
 package org.apache.catalina.ha.session;
 
-/**
- * This class is used to track the series of actions that happens when
- * a request is executed. These actions will then translate into invocations of methods
- * on the actual session.
- * This class is NOT thread safe. One DeltaRequest per session
- */
-
 import java.io.ByteArrayOutputStream;
 import java.io.Externalizable;
 import java.io.IOException;
@@ -37,7 +30,12 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-
+/**
+ * This class is used to track the series of actions that happens when
+ * a request is executed. These actions will then translate into invocations of methods
+ * on the actual session.
+ * This class is NOT thread safe. One DeltaRequest per session
+ */
 public class DeltaRequest implements Externalizable {
 
     public static final Log log = LogFactory.getLog(DeltaRequest.class);
