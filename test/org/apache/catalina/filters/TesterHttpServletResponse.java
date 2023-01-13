@@ -215,13 +215,17 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     public boolean containsHeader(String name) { return false; }
     @Override
     public String encodeRedirectURL(String url) { return null; }
-    /** @deprecated Do not use */
+    /**
+     * @deprecated Do not use
+     */
     @Override
     @Deprecated
     public String encodeRedirectUrl(String url) { return null; }
     @Override
     public String encodeURL(String url) { return null; }
-    /** @deprecated Do not use */
+    /**
+     * @deprecated Do not use
+     */
     @Override
     @Deprecated
     public String encodeUrl(String url) { return null; }
@@ -241,7 +245,9 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     public void setDateHeader(String name, long value) {/* NOOP */}
     @Override
     public void setIntHeader(String name, int value) {/* NOOP */}
-    /** @deprecated Do not use */
+    /**
+     * @deprecated Do not use
+     */
     @Override
     @Deprecated
     public void setStatus(int status, String message) {/* NOOP */}
