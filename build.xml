@@ -2153,8 +2153,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.release}"
       maxmemory="512m"
-      failonerror="true"
-      failonwarning="true">
+      failonerror="${javadoc.failonerror}"
+      failonwarning="${javadoc.failonwarning}">
       <classpath>
         <path refid="compile.classpath"/>
         <path location="${ant.core.lib}"/>
@@ -2175,8 +2175,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.release}"
       maxmemory="512m"
-      failonerror="true"
-      failonwarning="true">
+      failonerror="${javadoc.failonerror}"
+      failonwarning="${javadoc.failonwarning}">
       <classpath>
         <path refid="compile.classpath"/>
         <path location="${ant.core.lib}"/>
@@ -2196,8 +2196,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.release}"
       maxmemory="512m"
-      failonerror="true"
-      failonwarning="true">
+      failonerror="${javadoc.failonerror}"
+      failonwarning="${javadoc.failonwarning}">
       <classpath>
         <path refid="compile.classpath"/>
         <path location="${ant.core.lib}"/>
@@ -2217,8 +2217,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.release}"
       maxmemory="512m"
-      failonerror="true"
-      failonwarning="true">
+      failonerror="${javadoc.failonerror}"
+      failonwarning="${javadoc.failonwarning}">
       <classpath>
         <path refid="compile.classpath"/>
         <path location="${ant.core.lib}"/>
@@ -2238,8 +2238,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.release}"
       maxmemory="512m"
-      failonerror="true"
-      failonwarning="true">
+      failonerror="${javadoc.failonerror}"
+      failonwarning="${javadoc.failonwarning}">
       <classpath>
         <path refid="compile.classpath"/>
         <path location="${ant.core.lib}"/>
@@ -2258,8 +2258,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       charset="UTF-8"
       additionalparam="-breakiterator -notimestamp -html5"
       maxmemory="512m"
-      failonerror="true"
-      failonwarning="true">
+      failonerror="${javadoc.failonerror}"
+      failonwarning="${javadoc.failonwarning}">
       <classpath>
         <path refid="compile.classpath"/>
         <path location="${ant.core.lib}"/>
@@ -2278,8 +2278,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       additionalparam="-breakiterator -notimestamp -html5"
       source="${compile.release}"
       maxmemory="512m"
-      failonerror="true"
-      failonwarning="true">
+      failonerror="${javadoc.failonerror}"
+      failonwarning="${javadoc.failonwarning}">
       <classpath>
         <path refid="compile.classpath"/>
         <path location="${ant.core.lib}"/>

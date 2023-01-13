@@ -58,6 +58,11 @@ test.coverage=false
 # Note the SpotBugs is LGPL licensed
 execute.spotbugs=false
 
+# Javadoc - warnings are disabled as they are noisy with Java 18+ and CheckStyle
+# works better for Tomcat.
+javadoc.failonerror=true
+javadoc.failonwarning=false
+
 # ----- Test configuration -----
 execute.test.nio=true
 execute.test.nio2=true
