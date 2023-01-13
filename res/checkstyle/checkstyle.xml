@@ -86,6 +86,21 @@
     </module>
     <module name="JavadocMissingLeadingAsterisk"/>
     <module name="JavadocMissingWhitespaceAfterAsterisk"/>
+    <module name="JavadocStyle">
+        <!-- ~1600 errors -->
+        <property name="checkFirstSentence" value="false"/>
+        <!-- ~1500 errors -->
+        <property name="checkEmptyJavadoc" value="false"/>
+        <!--  Does not handle HTML tags in {@code ...} correctly -->
+        <property name="checkHtml" value="false"/>
+    </module>
+    <!-- ~9000 errors
+    <module name="MissingJavadocMethod"/>
+    -->
+    <!-- ~1400 errors
+    <module name="MissingJavadocType"/>
+    -->
+    <module name="NonEmptyAtclauseDescription"/>
 
     <!-- Miscellaneous -->
     <!-- ~5500 errors
