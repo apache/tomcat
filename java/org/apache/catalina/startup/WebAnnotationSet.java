@@ -251,6 +251,7 @@ public class WebAnnotationSet {
             }
         }
         */
+
         /* Process DeclareRoles annotation.
          * Ref JSR 250, equivalent to the security-role element in
          * the deployment descriptor

@@ -64,7 +64,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class WebappLoader extends LifecycleMBeanBase implements Loader{
+public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
     private static final Log log = LogFactory.getLog(WebappLoader.class);
 
