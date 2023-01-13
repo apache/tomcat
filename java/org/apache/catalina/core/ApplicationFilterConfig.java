@@ -85,11 +85,14 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      * @exception InstantiationException if an exception occurs while
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
-     * @throws NamingException
-     * @throws InvocationTargetException
-     * @throws SecurityException
-     * @throws NoSuchMethodException
-     * @throws IllegalArgumentException
+     * @throws NamingException If a JNDI lookup fails
+     * @throws InvocationTargetException If an error occurs initialising the
+     *         filter
+     * @throws SecurityException If a security manager prevents the creation
+     * @throws NoSuchMethodException If the constructor for the filter cannot
+     *         be found
+     * @throws IllegalArgumentException If the provided configuration is not
+     *         valid
      */
     ApplicationFilterConfig(Context context, FilterDef filterDef)
             throws ClassCastException, ClassNotFoundException, IllegalAccessException,
@@ -240,11 +243,14 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      * @exception InstantiationException if an exception occurs while
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
-     * @throws NamingException
-     * @throws InvocationTargetException
-     * @throws SecurityException
-     * @throws NoSuchMethodException
-     * @throws IllegalArgumentException
+     * @throws NamingException If a JNDI lookup fails
+     * @throws InvocationTargetException If an error occurs initialising the
+     *         filter
+     * @throws SecurityException If a security manager prevents the creation
+     * @throws NoSuchMethodException If the constructor for the filter cannot
+     *         be found
+     * @throws IllegalArgumentException If the provided configuration is not
+     *         valid
      */
     Filter getFilter() throws ClassCastException, ClassNotFoundException, IllegalAccessException,
             InstantiationException, ServletException, InvocationTargetException, NamingException,

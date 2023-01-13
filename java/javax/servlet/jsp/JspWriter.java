@@ -23,7 +23,7 @@ import java.io.IOException;
  * The actions and template data in a JSP page is written using the JspWriter
  * object that is referenced by the implicit variable out which is initialized
  * automatically using methods in the PageContext object.
- *<p>
+ * <p>
  * This abstract class emulates some of the functionality found in the
  * java.io.BufferedWriter and java.io.PrintWriter classes, however it differs in
  * that it throws java.io.IOException from the print methods while PrintWriter

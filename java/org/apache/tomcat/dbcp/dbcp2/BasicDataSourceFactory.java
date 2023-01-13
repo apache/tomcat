@@ -570,13 +570,11 @@ public class BasicDataSourceFactory implements ObjectFactory {
     }
 
     /**
-     * <p>
      * Parse properties from the string. Format of the string must be [propertyName=property;]*
-     * <p>
      *
-     * @param propText
-     * @return Properties
-     * @throws Exception
+     * @param propText The source text
+     * @return Properties A new Properties instance
+     * @throws Exception When a paring exception occurs
      */
     private static Properties getProperties(final String propText) throws Exception {
         final Properties p = new Properties();

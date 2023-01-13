@@ -76,7 +76,7 @@ public class AbandonedConfig {
      * <p>If set to true, abandoned objects are removed by the pool
      * maintenance thread when it runs.  This setting has no effect
      * unless maintenance is enabled by setting
-     *{@link GenericObjectPool#getTimeBetweenEvictionRunsMillis() timeBetweenEvictionRunsMillis}
+     * {@link GenericObjectPool#getTimeBetweenEvictionRunsMillis() timeBetweenEvictionRunsMillis}
      * to a positive number.</p>
      *
      * @return true if abandoned objects are to be removed by the evictor
