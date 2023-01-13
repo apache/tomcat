@@ -101,6 +101,10 @@
     <module name="MissingJavadocType"/>
     -->
     <module name="NonEmptyAtclauseDescription"/>
+    <!-- ~1600 errors
+    <module name="RequireEmptyLineBeforeBlockTagGroup"/>
+    -->
+    <module name="SingleLineJavadoc"/>
 
     <!-- Miscellaneous -->
     <!-- ~5500 errors
