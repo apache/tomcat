@@ -455,7 +455,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     }
 
     public String getHostname() {
-        if ( this.hostname != null ) {
+        if (this.hostname != null) {
             return hostname;
         } else {
             try {

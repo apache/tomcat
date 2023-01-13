@@ -1568,8 +1568,7 @@ public class ContextConfig implements LifecycleListener {
                 context.setSessionTimeout(
                         sessionConfig.getSessionTimeout().intValue());
             }
-            SessionCookieConfig scc =
-                context.getServletContext().getSessionCookieConfig();
+            SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
             scc.setName(sessionConfig.getCookieName());
             scc.setDomain(sessionConfig.getCookieDomain());
             scc.setPath(sessionConfig.getCookiePath());

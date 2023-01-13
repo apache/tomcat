@@ -138,8 +138,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(WebappLoader.class);
 
 
     /**
@@ -179,8 +178,7 @@ public class WebappLoader extends LifecycleMBeanBase
         }
 
         if (getState().isAvailable()) {
-            throw new IllegalStateException(
-                    sm.getString("webappLoader.setContext.ise"));
+            throw new IllegalStateException(sm.getString("webappLoader.setContext.ise"));
         }
 
         // Deregister from the old Context (if any)

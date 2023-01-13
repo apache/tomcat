@@ -1110,11 +1110,11 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     protected void setAccessCount(int count) {
-        if ( accessCount == null && ACTIVITY_CHECK ) {
+        if (accessCount == null && ACTIVITY_CHECK) {
             accessCount = new AtomicInteger();
         }
-        if ( accessCount != null ) {
-            super.accessCount.set(count);
+        if (accessCount != null) {
+            accessCount.set(count);
         }
     }
 }

@@ -180,7 +180,6 @@ public class PersistentValve extends ValveBase {
                                     session.recycle();
                                     stored = true;
                                 }
-
                             }
                         }
                         if (!stored) {

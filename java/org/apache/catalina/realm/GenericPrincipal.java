@@ -153,7 +153,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     /**
      * The set of roles associated with this user.
      */
-    protected final String roles[];
+    protected final String[] roles;
 
     public String[] getRoles() {
         return this.roles;

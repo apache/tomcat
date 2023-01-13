@@ -16,12 +16,10 @@
  */
 package org.apache.catalina.manager;
 
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
@@ -46,8 +44,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Remy Maucherat
  */
-public class StatusManagerServlet
-    extends HttpServlet implements NotificationListener {
+public class StatusManagerServlet extends HttpServlet implements NotificationListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -88,12 +85,10 @@ public class StatusManagerServlet
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Initialize this servlet.
@@ -311,9 +306,7 @@ public class StatusManagerServlet
             // use StatusTransformer to output status
             StatusTransformer.writeVMState(writer,mode, args);
 
-            Enumeration<ObjectName> enumeration = threadPools.elements();
-            while (enumeration.hasMoreElements()) {
-                ObjectName objectName = enumeration.nextElement();
+            for (ObjectName objectName : threadPools) {
                 String name = objectName.getKeyProperty("name");
                 args = new Object[19];
                 args[0] = smClient.getString("htmlManagerServlet.connectorStateMaxThreads");
@@ -336,18 +329,14 @@ public class StatusManagerServlet
                 args[17] = smClient.getString("htmlManagerServlet.connectorStateTableTitleRequest");
                 args[18] = smClient.getString("htmlManagerServlet.connectorStateHint");
                 // use StatusTransformer to output status
-                StatusTransformer.writeConnectorState
-                    (writer, objectName,
-                     name, mBeanServer, globalRequestProcessors,
-                     requestProcessors, mode, args);
+                StatusTransformer.writeConnectorState(writer, objectName, name, mBeanServer, globalRequestProcessors,
+                        requestProcessors, mode, args);
             }
 
-            if ((request.getPathInfo() != null)
-                && (request.getPathInfo().equals("/all"))) {
+            if ((request.getPathInfo() != null) && (request.getPathInfo().equals("/all"))) {
                 // Note: Retrieving the full status is much slower
                 // use StatusTransformer to output status
-                StatusTransformer.writeDetailedState
-                    (writer, mBeanServer, mode);
+                StatusTransformer.writeDetailedState(writer, mBeanServer, mode);
             }
 
         } catch (Exception e) {
@@ -356,11 +345,10 @@ public class StatusManagerServlet
 
         // use StatusTransformer to output status
         StatusTransformer.writeFooter(writer, mode);
-
     }
 
-    // ------------------------------------------- NotificationListener Methods
 
+    // ------------------------------------------- NotificationListener Methods
 
     @Override
     public void handleNotification(Notification notification,

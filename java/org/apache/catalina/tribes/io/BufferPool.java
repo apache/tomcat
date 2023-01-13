@@ -28,8 +28,6 @@ public class BufferPool {
 
     protected static final StringManager sm = StringManager.getManager(BufferPool.class);
 
-
-
     protected static volatile BufferPool instance = null;
     protected final BufferPoolAPI pool;
 
