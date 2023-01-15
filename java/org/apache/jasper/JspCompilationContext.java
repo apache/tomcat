@@ -178,10 +178,8 @@ public class JspCompilationContext {
 
     public ClassLoader getJspLoader() {
         if( jspLoader == null ) {
-            jspLoader = new JasperLoader
-                    (new URL[] {baseUrl},
-                            getClassLoader(),
-                            rctxt.getPermissionCollection());
+            jspLoader = new JasperLoader(new URL[] {baseUrl}, getClassLoader(),
+                    rctxt.getPermissionCollection());
         }
         return jspLoader;
     }

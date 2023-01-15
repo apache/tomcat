@@ -317,24 +317,16 @@ public class ClassLoaderLogManager extends LogManager {
     }
 
     @Override
-    public void readConfiguration()
-        throws IOException, SecurityException {
-
+    public void readConfiguration() throws IOException, SecurityException {
         checkAccess();
-
         readConfiguration(getClassLoader());
-
     }
 
     @Override
-    public void readConfiguration(InputStream is)
-        throws IOException, SecurityException {
-
+    public void readConfiguration(InputStream is) throws IOException, SecurityException {
         checkAccess();
         reset();
-
         readConfiguration(is, getClassLoader());
-
     }
 
     @Override

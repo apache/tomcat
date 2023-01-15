@@ -162,21 +162,21 @@ public class RequestInfo  {
      * statistic information.
      */
     void updateCounters() {
-        bytesReceived+=req.getBytesRead();
-        bytesSent+=req.getResponse().getContentWritten();
+        bytesReceived += req.getBytesRead();
+        bytesSent += req.getResponse().getContentWritten();
 
         requestCount++;
-        if( req.getResponse().getStatus() >=400 ) {
+        if (req.getResponse().getStatus() >= 400) {
             errorCount++;
         }
-        long t0=req.getStartTime();
-        long t1=System.currentTimeMillis();
-        long time=t1-t0;
+        long t0 = req.getStartTime();
+        long t1 = System.currentTimeMillis();
+        long time = t1 - t0;
         this.lastRequestProcessingTime = time;
-        processingTime+=time;
-        if( maxTime < time ) {
-            maxTime=time;
-            maxRequestUri=req.requestURI().toString();
+        processingTime += time;
+        if (maxTime < time) {
+            maxTime = time;
+            maxRequestUri = req.requestURI().toString();
         }
     }
 
