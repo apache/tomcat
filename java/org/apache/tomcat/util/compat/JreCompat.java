@@ -45,6 +45,7 @@ public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean jre19Available;
+    private static final boolean jre16Available;
     private static final boolean jre11Available;
     private static final boolean jre9Available;
     private static final boolean jre8Available;
@@ -57,21 +58,31 @@ public class JreCompat {
         if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
             jre19Available = true;
+            jre16Available = true;
+            jre9Available = true;
+            jre8Available = true;
+        } else if (Jre16Compat.isSupported()) {
+            instance = new Jre16Compat();
+            jre19Available = false;
+            jre16Available = true;
             jre9Available = true;
             jre8Available = true;
         } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
             jre19Available = false;
+            jre16Available = false;
             jre9Available = true;
             jre8Available = true;
         } else if (Jre8Compat.isSupported()) {
             instance = new Jre8Compat();
             jre19Available = false;
+            jre16Available = false;
             jre9Available = false;
             jre8Available = true;
         } else {
             instance = new JreCompat();
             jre19Available = false;
+            jre16Available = false;
             jre9Available = false;
             jre8Available = false;
         }
@@ -84,12 +95,27 @@ public class JreCompat {
     }
 
 
-    // Java 7 implementation of Java 8 methods
+    public static boolean isAlpnSupported() {
+        return isJre9Available() || (isJre8Available() && Jre8Compat.isAlpnSupported());
+    }
+
 
     public static boolean isJre8Available() {
         return jre8Available;
     }
 
+
+    public static boolean isJre9Available() {
+        return jre9Available;
+    }
+
+
+    public static boolean isJre16Available() {
+        return jre16Available;
+    }
+
+
+    // Java 7 implementation of Java 8 methods
 
     @SuppressWarnings("unused")
     public void setUseServerCipherSuitesOrder(SSLParameters engine, boolean useCipherSuitesOrder) {
@@ -104,16 +130,6 @@ public class JreCompat {
 
 
     // Java 7 implementation of Java 9 methods
-
-    public static boolean isAlpnSupported() {
-        return isJre9Available() || (isJre8Available() && Jre8Compat.isAlpnSupported());
-    }
-
-
-    public static boolean isJre9Available() {
-        return jre9Available;
-    }
-
 
     /**
      * Test if the provided exception is an instance of
@@ -133,9 +149,9 @@ public class JreCompat {
     /**
      * Set the application protocols the server will accept for ALPN
      *
-     * @param sslParameters    The SSL parameters for a connection
-     * @param protocols        The application protocols to be allowed for that
-     *                         connection
+     * @param sslParameters The SSL parameters for a connection
+     * @param protocols     The application protocols to be allowed for that
+     *                      connection
      */
     public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocols"));
