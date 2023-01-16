@@ -1444,7 +1444,7 @@ public final class CGIServlet extends HttpServlet {
          *  respectively.
          *
          * @param  command  string full path to command to be executed
-         * @param  env      Hashtable with the desired script environment
+         * @param  env      Map with the desired script environment
          * @param  wd       File with the script's desired working directory
          * @param  params   ArrayList with the script's query command line
          *                  parameters as strings
@@ -1508,11 +1508,11 @@ public final class CGIServlet extends HttpServlet {
 
 
         /**
-         * Converts a Hashtable to a String array by converting each
-         * key/value pair in the Hashtable to a String in the form
-         * "key=value" (hashkey + "=" + hash.get(hashkey).toString())
+         * Converts a Map to a String array by converting each
+         * key/value pair in the Map to a String in the form
+         * "key=value" (key + "=" + map.get(key).toString())
          *
-         * @param  map Hashtable to convert
+         * @param  map Map to convert
          *
          * @return     converted string array
          *
