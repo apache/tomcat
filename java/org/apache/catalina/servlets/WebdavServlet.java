@@ -1576,7 +1576,7 @@ public class WebdavServlet extends DefaultServlet {
     /**
      * Copy a collection.
      *
-     * @param errorList Hashtable containing the list of errors which occurred
+     * @param errorList Map containing the list of errors which occurred
      * during the copy operation
      * @param source Path of the resource to be copied
      * @param dest Destination path
