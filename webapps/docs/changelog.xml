@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.86 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Allow a Valve to access cookies from a request that cannot be mapped to
+        a Context. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.85 (schultz)" rtext="release in progress">
   <subsection name="Catalina">

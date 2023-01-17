@@ -16,20 +16,32 @@
  */
 package org.apache.catalina.valves.rewrite;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /*
@@ -714,6 +726,77 @@ public class TestRewriteValve extends TomcatBaseTest {
             String redirectURI = locations.get(0);
             Assert.assertEquals(expectedURI, redirectURI);
             Assert.assertEquals(expectedStatusCode, rc);
+        }
+    }
+
+
+    @Test
+    public void testCookie() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("redirect", null);
+
+        CookieTestValve cookieTestValve = new CookieTestValve();
+        tomcat.getHost().getPipeline().addValve(cookieTestValve);
+        RewriteValve rewriteValve = new RewriteValve();
+        tomcat.getHost().getPipeline().addValve(rewriteValve);
+
+        rewriteValve.setConfiguration("RewriteRule ^/source/(.*) /redirect/$1");
+
+        Tomcat.addServlet(ctx, "cookieTest", new CookieTestServlet());
+
+        ctx.addServletMappingDecoded("/", "cookieTest");
+
+        tomcat.start();
+
+        Map<String, List<String>> reqHead = new HashMap<>();
+        reqHead.put("cookie", Arrays.asList("test=data"));
+        ByteChunk res = new ByteChunk();
+        int rc = methodUrl("http://localhost:" + getPort() + "/source/cookieTest", res,
+                DEFAULT_CLIENT_TIMEOUT_MS, reqHead, null, "GET", false);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK , rc);
+
+        res.setCharset(StandardCharsets.UTF_8);
+        Assert.assertEquals("PASS", res.toString());
+    }
+
+
+    public static class CookieTestValve extends ValveBase {
+
+        @Override
+        public void invoke(Request request, Response response) throws IOException, ServletException {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("test".equals(cookie.getName())) {
+                        request.setAttribute("cookieTest", cookie.getValue());
+                        break;
+                    }
+                }
+            }
+            getNext().invoke(request, response);
+        }
+    }
+
+
+    public static class CookieTestServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            PrintWriter pw = resp.getWriter();
+            if (req.getAttribute("cookieTest") != null) {
+                pw.print("PASS");
+            } else {
+                pw.print("FAIL");
+            }
         }
     }
 }
