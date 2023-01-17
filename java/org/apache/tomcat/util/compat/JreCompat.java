@@ -118,7 +118,6 @@ public class JreCompat {
 
     // Java 11 implementations of Java 19 methods
 
-
     /**
      * Obtains the executor, if any, used to create the provided thread.
      *
