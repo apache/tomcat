@@ -18,6 +18,8 @@ package jakarta.servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
@@ -97,14 +99,34 @@ public interface ServletRequest {
      * request. This method must be called prior to reading request parameters
      * or reading input using getReader().
      *
-     * @param env
-     *            a <code>String</code> containing the name of the character
-     *            encoding.
-     * @throws java.io.UnsupportedEncodingException
+     * @param encoding a {@code String} containing the name of the character
+     *     encoding
+     *
+     * @throws UnsupportedEncodingException
      *             if this is not a valid encoding
      */
-    public void setCharacterEncoding(String env)
-            throws java.io.UnsupportedEncodingException;
+    public void setCharacterEncoding(String encoding) throws UnsupportedEncodingException;
+
+
+    /**
+     * Overrides the character encoding used in the body of this request. This
+     * method must be called prior to reading request parameters or reading
+     * input using getReader(). Otherwise, it has no effect.
+     *
+     * <p>Implementations are strongly encouraged to override this default
+     * method and provide a more efficient implementation.
+     *
+     * @param encoding {@code Charset} representing the character encoding.
+     *
+     * @since Servlet 6.1
+     */
+    public default void setCharacterEncoding(Charset encoding) {
+        try {
+            setCharacterEncoding(encoding.name());
+        } catch (UnsupportedEncodingException e) {
+            // Unreachable code
+        }
+    }
 
     /**
      * Returns the length, in bytes, of the request body and made available by

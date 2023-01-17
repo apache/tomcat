@@ -111,6 +111,10 @@
         Allow a Valve to access cookies from a request that cannot be mapped to
         a Context. (markt)
       </fix>
+      <add>
+        Implement the new Servlet API methods for setting character encodings
+        that accept {@code Charset} objects. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
