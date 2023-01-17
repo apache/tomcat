@@ -46,10 +46,10 @@ public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean graalAvailable;
-    private static final boolean jre19Available;
-    private static final boolean jre16Available;
-    private static final boolean jre11Available;
     private static final boolean jre9Available;
+    private static final boolean jre11Available;
+    private static final boolean jre16Available;
+    private static final boolean jre19Available;
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
     protected static final Method setApplicationProtocolsMethod;
@@ -71,24 +71,24 @@ public class JreCompat {
         // Look for the highest supported JVM first
         if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
-            jre9Available = true;
-            jre16Available = true;
             jre19Available = true;
+            jre16Available = true;
+            jre9Available = true;
         } else if (Jre16Compat.isSupported()) {
             instance = new Jre16Compat();
-            jre9Available = true;
-            jre16Available = true;
             jre19Available = false;
+            jre16Available = true;
+            jre9Available = true;
         } else if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
-            jre9Available = true;
-            jre16Available = false;
             jre19Available = false;
+            jre16Available = false;
+            jre9Available = true;
         } else {
             instance = new JreCompat();
-            jre9Available = false;
-            jre16Available = false;
             jre19Available = false;
+            jre16Available = false;
+            jre9Available = false;
         }
         jre11Available = instance.jarFileRuntimeMajorVersion() >= 11;
 
@@ -138,6 +138,7 @@ public class JreCompat {
     public static boolean isJre19Available() {
         return jre19Available;
     }
+
 
     // Java 8 implementation of Java 9 methods
 
