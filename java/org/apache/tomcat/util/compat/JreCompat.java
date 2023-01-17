@@ -39,21 +39,20 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JreCompat {
 
-    private static final StringManager sm = StringManager.getManager(JreCompat.class);
-
     private static final int RUNTIME_MAJOR_VERSION = 7;
 
     private static final JreCompat instance;
-    private static final boolean jre19Available;
-    private static final boolean jre16Available;
-    private static final boolean jre11Available;
-    private static final boolean jre9Available;
     private static final boolean jre8Available;
+    private static final boolean jre9Available;
+    private static final boolean jre11Available;
+    private static final boolean jre16Available;
+    private static final boolean jre19Available;
+    private static final StringManager sm = StringManager.getManager(JreCompat.class);
+
 
 
     static {
         // This is Tomcat 8 with a minimum Java version of Java 7.
-        // Compatibility code exists for Java 8, 9, 11 & 19
         // Look for the highest supported JVM first
         if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
@@ -110,8 +109,18 @@ public class JreCompat {
     }
 
 
+    public static boolean isJre11Available() {
+        return jre11Available;
+    }
+
+
     public static boolean isJre16Available() {
         return jre16Available;
+    }
+
+
+    public static boolean isJre19Available() {
+        return jre19Available;
     }
 
 
@@ -291,19 +300,7 @@ public class JreCompat {
     }
 
 
-    // Java 7 implementations of Java 11 methods
-
-    public static boolean isJre11Available() {
-        return jre11Available;
-    }
-
-
     // Java 7 implementations of Java 19 methods
-
-    public static boolean isJre19Available() {
-        return jre19Available;
-    }
-
 
     /**
      * Obtains the executor, if any, used to create the provided thread.
