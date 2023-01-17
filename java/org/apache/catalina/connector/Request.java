@@ -103,6 +103,7 @@ import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.Parameters.FailReason;
+import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.http.fileupload.FileItem;
@@ -3094,6 +3095,18 @@ public class Request implements HttpServletRequest {
         return buf.toString();
     }
 
+    private CookieProcessor getCookieProcessor() {
+        Context context = getContext();
+        if (context == null) {
+            // No context. Possible call from Valve before a Host level
+            // context rewrite when no ROOT content is configured. Use the
+            // default CookiePreocessor.
+            return new Rfc6265CookieProcessor();
+        } else {
+            return context.getCookieProcessor();
+        }
+    }
+
     /**
      * Parse cookies. This only parses the cookies into the memory efficient
      * ServerCookies structure. It does not populate the Cookie objects.
@@ -3107,8 +3120,7 @@ public class Request implements HttpServletRequest {
 
         ServerCookies serverCookies = coyoteRequest.getCookies();
         serverCookies.setLimit(connector.getMaxCookieCount());
-        CookieProcessor cookieProcessor = getContext().getCookieProcessor();
-        cookieProcessor.parseCookieHeader(coyoteRequest.getMimeHeaders(), serverCookies);
+        getCookieProcessor().parseCookieHeader(coyoteRequest.getMimeHeaders(), serverCookies);
     }
 
     /**
@@ -3122,14 +3134,9 @@ public class Request implements HttpServletRequest {
 
         cookiesConverted = true;
 
-        if (getContext() == null) {
-            return;
-        }
-
         parseCookies();
 
         ServerCookies serverCookies = coyoteRequest.getCookies();
-        CookieProcessor cookieProcessor = getContext().getCookieProcessor();
 
         int count = serverCookies.getCookieCount();
         if (count <= 0) {
@@ -3144,7 +3151,7 @@ public class Request implements HttpServletRequest {
             try {
                 // We must unescape the '\\' escape character
                 Cookie cookie = new Cookie(scookie.getName().toString(),null);
-                scookie.getValue().getByteChunk().setCharset(cookieProcessor.getCharset());
+                scookie.getValue().getByteChunk().setCharset(getCookieProcessor().getCharset());
                 cookie.setValue(unescape(scookie.getValue().toString()));
                 cookies[idx++] = cookie;
             } catch(IllegalArgumentException e) {
