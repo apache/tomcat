@@ -90,9 +90,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ApplicationContext implements ServletContext {
 
-
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Construct a new instance of this class, associated with the specified
@@ -735,12 +733,8 @@ public class ApplicationContext implements ServletContext {
                     "applicationContext.invalidFilterName", filterName));
         }
 
-        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.addFilter.ise",
-                            getContextPath()));
-        }
+        // TODO Spec breaking enhancement to ignore this restriction
+        checkState("applicationContext.addFilter.ise");
 
         FilterDef filterDef = context.findFilterDef(filterName);
 
@@ -856,12 +850,8 @@ public class ApplicationContext implements ServletContext {
                     "applicationContext.invalidServletName", servletName));
         }
 
-        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.addServlet.ise",
-                            getContextPath()));
-        }
+        // TODO Spec breaking enhancement to ignore this restriction
+        checkState("applicationContext.addServlet.ise");
 
         Wrapper wrapper = (Wrapper) context.findChild(servletName);
 
@@ -986,11 +976,7 @@ public class ApplicationContext implements ServletContext {
     @Override
     public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
 
-        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.setSessionTracking.ise",
-                            getContextPath()));
-        }
+        checkState("applicationContext.setSessionTracking.ise");
 
         // Check that only supported tracking modes have been requested
         for (SessionTrackingMode sessionTrackingMode : sessionTrackingModes) {
@@ -1020,12 +1006,7 @@ public class ApplicationContext implements ServletContext {
         if (name == null) {
             throw new NullPointerException(sm.getString("applicationContext.setAttribute.namenull"));
         }
-        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.setInitParam.ise",
-                            getContextPath()));
-        }
-
+        checkState("applicationContext.setInitParam.ise");
         return parameters.putIfAbsent(name, value) == null;
     }
 
@@ -1076,11 +1057,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public <T extends EventListener> void addListener(T t) {
-        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.addListener.ise",
-                            getContextPath()));
-        }
+        checkState("applicationContext.addListener.ise");
 
         boolean match = false;
         if (t instanceof ServletContextAttributeListener ||
@@ -1146,12 +1123,8 @@ public class ApplicationContext implements ServletContext {
     @Override
     public void declareRoles(String... roleNames) {
 
-        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.addRole.ise",
-                            getContextPath()));
-        }
+        // TODO Spec breaking enhancement to ignore this restriction
+        checkState("applicationContext.addRole.ise");
 
         if (roleNames == null) {
             throw new IllegalArgumentException(
@@ -1256,12 +1229,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public void setSessionTimeout(int sessionTimeout) {
-        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.setSessionTimeout.ise",
-                            getContextPath()));
-        }
-
+        checkState("applicationContext.setSessionTimeout.ise");
         context.setSessionTimeout(sessionTimeout);
     }
 
@@ -1274,12 +1242,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public void setRequestCharacterEncoding(String encoding) {
-        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.setRequestEncoding.ise",
-                            getContextPath()));
-        }
-
+        checkState("applicationContext.setRequestEncoding.ise");
         context.setRequestCharacterEncoding(encoding);
     }
 
@@ -1292,13 +1255,15 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public void setResponseCharacterEncoding(String encoding) {
-        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
-            throw new IllegalStateException(
-                    sm.getString("applicationContext.setResponseEncoding.ise",
-                            getContextPath()));
-        }
-
+        checkState("applicationContext.setResponseEncoding.ise");
         context.setResponseCharacterEncoding(encoding);
+    }
+
+
+    private void checkState(String messageKey) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
+            throw new IllegalStateException(sm.getString(messageKey,getContextPath()));
+        }
     }
 
 
