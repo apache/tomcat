@@ -1211,7 +1211,7 @@ public class Request implements HttpServletRequest {
         // here. Need to do this before setting usingReader.
         if (coyoteRequest.getCharacterEncoding() == null) {
             // Nothing currently set explicitly.
-            // Check the content
+            // Check the context
             Context context = getContext();
             if (context != null) {
                 String enc = context.getRequestCharacterEncoding();
