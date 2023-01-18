@@ -51,15 +51,6 @@ public class CharsetHolder {
     }
 
 
-    public static CharsetHolder getValidatedInstance(String name) throws UnsupportedEncodingException {
-        if (name == null) {
-            return EMPTY;
-        }
-
-        return new CharsetHolder(name, B2CConverter.getCharset(name));
-    }
-
-
     public static CharsetHolder getInstance(Charset encoding) {
         if (encoding == null) {
             return EMPTY;
@@ -105,9 +96,21 @@ public class CharsetHolder {
      *     name of a Charset that the JRE does not recognise
      */
     public Charset getValidatedCharset() throws UnsupportedEncodingException {
+        validate();
+        return charset;
+    }
+
+
+    /**
+     * Throws an exception if the instance holds a name that without a matching
+     * Charset.
+     *
+     * @throws UnsupportedEncodingException if the holder contains a name
+     *     without a matching Charset
+     */
+    public void validate() throws UnsupportedEncodingException {
         if (name != null && charset == null) {
             throw new UnsupportedEncodingException(name);
         }
-        return charset;
     }
 }

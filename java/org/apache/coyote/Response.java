@@ -502,7 +502,8 @@ public final class Response {
             return;
         }
 
-        charsetHolder = CharsetHolder.getValidatedInstance(characterEncoding);
+        charsetHolder = CharsetHolder.getInstance(characterEncoding);
+        charsetHolder.validate();
     }
 
 
@@ -562,8 +563,9 @@ public final class Response {
             this.contentType = m.toStringNoCharset();
             charsetValue = charsetValue.trim();
             if (charsetValue.length() > 0) {
+                charsetHolder = CharsetHolder.getInstance(charsetValue);
                 try {
-                    charsetHolder = CharsetHolder.getValidatedInstance(charsetValue);
+                    charsetHolder.validate();
                 } catch (UnsupportedEncodingException e) {
                     log.warn(sm.getString("response.encoding.invalid", charsetValue), e);
                 }
