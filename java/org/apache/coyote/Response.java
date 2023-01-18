@@ -32,7 +32,7 @@ import jakarta.servlet.WriteListener;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.CharsetHolder;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.MediaType;
@@ -113,11 +113,7 @@ public final class Response {
      */
     String contentType = null;
     String contentLanguage = null;
-    Charset charset = null;
-    // Retain the original name used to set the charset so exactly that name is
-    // used in the ContentType header. Some (arguably non-specification
-    // compliant) user agents are very particular
-    String characterEncoding = null;
+    private CharsetHolder charsetHolder = CharsetHolder.EMPTY;
     long contentLength = -1;
     private Locale locale = DEFAULT_LOCALE;
 
@@ -505,19 +501,13 @@ public final class Response {
         if (isCommitted()) {
             return;
         }
-        if (characterEncoding == null) {
-            this.charset = null;
-            this.characterEncoding = null;
-            return;
-        }
 
-        this.characterEncoding = characterEncoding;
-        this.charset = B2CConverter.getCharset(characterEncoding);
+        charsetHolder = CharsetHolder.getValidatedInstance(characterEncoding);
     }
 
 
     public Charset getCharset() {
-        return charset;
+        return charsetHolder.getCharset();
     }
 
 
@@ -525,7 +515,7 @@ public final class Response {
      * @return The name of the current encoding
      */
     public String getCharacterEncoding() {
-        return characterEncoding;
+        return charsetHolder.getName();
     }
 
 
@@ -573,7 +563,7 @@ public final class Response {
             charsetValue = charsetValue.trim();
             if (charsetValue.length() > 0) {
                 try {
-                    charset = B2CConverter.getCharset(charsetValue);
+                    charsetHolder = CharsetHolder.getValidatedInstance(charsetValue);
                 } catch (UnsupportedEncodingException e) {
                     log.warn(sm.getString("response.encoding.invalid", charsetValue), e);
                 }
@@ -588,9 +578,11 @@ public final class Response {
     public String getContentType() {
 
         String ret = contentType;
-
-        if (ret != null && charset != null) {
-            ret = ret + ";charset=" + characterEncoding;
+        if (ret != null) {
+            String charsetName = charsetHolder.getName();
+            if (charsetName != null) {
+                ret = ret + ";charset=" + charsetName;
+            }
         }
 
         return ret;
@@ -634,8 +626,7 @@ public final class Response {
         contentType = null;
         contentLanguage = null;
         locale = DEFAULT_LOCALE;
-        charset = null;
-        characterEncoding = null;
+        charsetHolder = CharsetHolder.EMPTY;
         contentLength = -1;
         status = 200;
         message = null;

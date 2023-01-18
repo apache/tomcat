@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletConnection;
 
-import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.CharsetHolder;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -148,10 +148,7 @@ public final class Request {
      */
     private long contentLength = -1;
     private MessageBytes contentTypeMB = null;
-    private Charset charset = null;
-    // Retain the original, user specified character encoding so it can be
-    // returned even if it is invalid
-    private String characterEncoding = null;
+    private CharsetHolder charsetHolder = CharsetHolder.EMPTY;
 
     /**
      * Is there an expectation ?
@@ -409,11 +406,11 @@ public final class Request {
      *         content type.
      */
     public String getCharacterEncoding() {
-        if (characterEncoding == null) {
-            characterEncoding = getCharsetFromContentType(getContentType());
+        if (charsetHolder.getName() == null) {
+            charsetHolder = CharsetHolder.getInstance(getCharsetFromContentType(getContentType()));
         }
 
-        return characterEncoding;
+        return charsetHolder.getName();
     }
 
 
@@ -428,20 +425,17 @@ public final class Request {
      *         invalid character encoding
      */
     public Charset getCharset() throws UnsupportedEncodingException {
-        if (charset == null) {
+        if (charsetHolder.getName() == null) {
+            // Populates charsetHolder
             getCharacterEncoding();
-            if (characterEncoding != null) {
-                charset = B2CConverter.getCharset(characterEncoding);
-            }
          }
 
-        return charset;
+        return charsetHolder.getValidatedCharset();
     }
 
 
     public void setCharset(Charset charset) {
-        this.charset = charset;
-        this.characterEncoding = charset.name();
+        charsetHolder = CharsetHolder.getInstance(charset);
     }
 
 
@@ -784,8 +778,7 @@ public final class Request {
 
         contentLength = -1;
         contentTypeMB = null;
-        charset = null;
-        characterEncoding = null;
+        charsetHolder = CharsetHolder.EMPTY;
         expectation = false;
         headers.recycle();
         trailerFields.clear();
