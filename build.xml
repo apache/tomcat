@@ -593,6 +593,7 @@
 
     <taskdef resource="${checkstyletask.properties}"
              classpath="${checkstyle.jar}" />
+    <!-- Main checks -->
     <checkstyle config="res/checkstyle/checkstyle.xml">
       <fileset dir="." >
         <patternset refid="text.files" />
@@ -603,6 +604,7 @@
         <exclude name="nbproject/**"/>
         <exclude name="output/**"/>
         <exclude name="modules/**"/>
+        <exclude name="test/**"/>
         <exclude name="**/*.mdl"/>
         <exclude name="**/*.pem"/>
         <exclude name="**/*.svg"/>
@@ -616,13 +618,6 @@
         <exclude name="java/org/apache/**/parser/ParseException.java" />
         <exclude name="java/org/apache/**/parser/SimpleCharStream.java" />
         <exclude name="java/org/apache/**/parser/Token*.java" />
-        <!-- Exclude simple test files -->
-        <exclude name="test/webapp/bug53257/**/*.txt"/>
-        <exclude name="test/webapp/bug49nnn/bug49464*"/>
-        <exclude name="test/webapp-fragments/WEB-INF/classes/*.txt"/>
-        <exclude name="test/webresources/**"/>
-        <!-- Exclude test files with unusual encodings -->
-        <exclude name="test/webapp/jsp/encoding/**"/>
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
         <exclude name="res/maven/mvn.properties" />
@@ -645,6 +640,21 @@
     <checkstyle config="res/checkstyle/org-checkstyle.xml">
       <fileset dir="java/org" >
         <include name="**/*.java"/>
+      </fileset>
+    </checkstyle>
+    <!-- Tests checks -->
+    <checkstyle config="res/checkstyle/test-checkstyle.xml">
+      <fileset dir="test" >
+        <patternset refid="text.files" />
+        <exclude name=".*/**"/>
+        <exclude name="**/*.pem"/>
+        <!-- Exclude simple test files -->
+        <exclude name="webapp/bug53257/**/*.txt"/>
+        <exclude name="webapp/bug49nnn/bug49464*"/>
+        <exclude name="webapp-fragments/WEB-INF/classes/*.txt"/>
+        <exclude name="webresources/**"/>
+        <!-- Exclude test files with unusual encodings -->
+        <exclude name="webapp/jsp/encoding/**"/>
       </fileset>
     </checkstyle>
   </target>
