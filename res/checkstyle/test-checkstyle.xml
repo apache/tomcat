@@ -25,13 +25,13 @@
 
   <!-- Cache what has passed checkstyle -->
   <property name="cacheFile"
-            value="${tomcat.output}/res/checkstyle/cachefile-checkstyle.xml"/>
+            value="${tomcat.output}/res/checkstyle/cachefile-test-checkstyle.xml"/>
 
   <!-- Headers -->
   <module name="RegexpHeader">
     <property name="headerFile" value="${basedir}/res/checkstyle/header-al2.txt"/>
     <property name="multiLines" value="1, 2, 3, 4"/>
-    <property name="fileExtensions" value="java,xml,jsp,txt,sh,bat,properties"/>
+    <property name="fileExtensions" value="java,xml,jsp,txt,sh,bat,properties,yaml"/>
   </module>
 
   <!-- Whitespace -->
@@ -69,7 +69,7 @@
         <property name="illegalPkgs" value="sun,junit.framework"/>
     </module>
     <module name="ImportOrder">
-        <property name="groups" value="java,javax,org.hamcrest,org.junit,org,async,jsp2,util"/>
+        <property name="groups" value="java,javax,jakarta,org.hamcrest,org.junit,org,async,jsp2,util"/>
         <property name="ordered" value="true"/>
         <property name="separated" value="true"/>
         <property name="option" value="above"/>
@@ -87,46 +87,20 @@
     <module name="JavadocMissingLeadingAsterisk"/>
     <module name="JavadocMissingWhitespaceAfterAsterisk"/>
     <module name="JavadocStyle">
-        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1600 errors -->
         <property name="checkFirstSentence" value="false"/>
-        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1500 errors -->
         <property name="checkEmptyJavadoc" value="false"/>
         <!-- Does not handle HTML tags in {@code ...} correctly -->
         <property name="checkHtml" value="false"/>
     </module>
-    <!-- ~9000 errors
-    <module name="MissingJavadocMethod"/>
-    -->
-    <!-- ~1400 errors
-    <module name="MissingJavadocType"/>
-    -->
     <module name="NonEmptyAtclauseDescription"/>
-    <!-- ~1600 errors
-    <module name="RequireEmptyLineBeforeBlockTagGroup"/>
-    -->
     <module name="SingleLineJavadoc"/>
-
-    <!-- Miscellaneous -->
-    <!-- ~5500 errors
-    <module name="Indentation">
-        <property name="lineWrappingIndentation" value="8"/>
-    </module>
-    -->
 
     <!-- Modifiers -->
     <module name="ModifierOrder"/>
-    <!-- ~1750 errors
-    <module name="RedundantModifier"/>
-    -->
 
     <!-- Whitespace -->
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
-    <!--  ~ 1100 errors
-    <module name="OperatorWrap">
-      <property name="option" value="eol"/>
-    </module>
-    -->
   </module>
 </module>
