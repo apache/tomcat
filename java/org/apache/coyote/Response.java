@@ -496,7 +496,10 @@ public final class Response {
      *
      * @throws UnsupportedEncodingException If the specified name is not
      *         recognised
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11.
      */
+    @Deprecated
     public void setCharacterEncoding(String characterEncoding) throws UnsupportedEncodingException {
         if (isCommitted()) {
             return;
@@ -507,16 +510,39 @@ public final class Response {
     }
 
 
+    /**
+     * Returns the current character set.
+     *
+     * @return The current character set
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11.
+     */
+    @Deprecated
     public Charset getCharset() {
         return charsetHolder.getCharset();
     }
 
 
     /**
+     * Returns the name of the current encoding.
+     *
      * @return The name of the current encoding
+     *
+     * @deprecated Unused. Will be removed in Tomcat 11.
      */
+    @Deprecated
     public String getCharacterEncoding() {
         return charsetHolder.getName();
+    }
+
+
+    public CharsetHolder getCharsetHolder() {
+        return charsetHolder;
+    }
+
+
+    public void setCharsetHolder(CharsetHolder charsetHolder) {
+        this.charsetHolder = charsetHolder;
     }
 
 

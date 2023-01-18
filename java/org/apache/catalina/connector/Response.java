@@ -50,6 +50,7 @@ import org.apache.coyote.ContinueResponseTiming;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.buf.CharsetHolder;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.apache.tomcat.util.buf.UriUtil;
@@ -486,22 +487,19 @@ public class Response implements HttpServletResponse {
      */
     @Override
     public String getCharacterEncoding() {
-        String charset = getCoyoteResponse().getCharacterEncoding();
-        if (charset != null) {
-            return charset;
+        String charset = getCoyoteResponse().getCharsetHolder().getName();
+        if (charset == null) {
+            Context context = getContext();
+            if (context != null) {
+                charset = context.getResponseCharacterEncoding();
+            }
         }
 
-        Context context = getContext();
-        String result = null;
-        if (context != null) {
-            result =  context.getResponseCharacterEncoding();
+        if (charset == null) {
+            charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET.name();
         }
 
-        if (result == null) {
-            result = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET.name();
-        }
-
-        return result;
+        return charset;
     }
 
 
@@ -720,11 +718,7 @@ public class Response implements HttpServletResponse {
 
         if (type == null) {
             getCoyoteResponse().setContentType(null);
-            try {
-                getCoyoteResponse().setCharacterEncoding(null);
-            } catch (UnsupportedEncodingException e) {
-                // Can never happen when calling with null
-            }
+            getCoyoteResponse().setCharsetHolder(CharsetHolder.EMPTY);
             isCharacterEncodingSet = false;
             return;
         }
@@ -750,8 +744,9 @@ public class Response implements HttpServletResponse {
 
             // Ignore charset if getWriter() has already been called
             if (!usingWriter) {
+                getCoyoteResponse().setCharsetHolder(CharsetHolder.getInstance(m[1]));
                 try {
-                    getCoyoteResponse().setCharacterEncoding(m[1]);
+                    getCoyoteResponse().getCharsetHolder().validate();
                 } catch (UnsupportedEncodingException e) {
                     log.warn(sm.getString("coyoteResponse.encoding.invalid", m[1]), e);
                 }
@@ -767,10 +762,10 @@ public class Response implements HttpServletResponse {
      * of the request. This method must be called prior to reading
      * request parameters or reading input using getReader().
      *
-     * @param charset String containing the name of the character encoding.
+     * @param encoding String containing the name of the character encoding.
      */
     @Override
-    public void setCharacterEncoding(String charset) {
+    public void setCharacterEncoding(String encoding) {
 
         if (isCommitted()) {
             return;
@@ -787,12 +782,40 @@ public class Response implements HttpServletResponse {
             return;
         }
 
+        getCoyoteResponse().setCharsetHolder(CharsetHolder.getInstance(encoding));
         try {
-            getCoyoteResponse().setCharacterEncoding(charset);
+            getCoyoteResponse().getCharsetHolder().validate();
         } catch (UnsupportedEncodingException e) {
-            log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+            log.warn(sm.getString("coyoteResponse.encoding.invalid", encoding), e);
             return;
         }
+        if (encoding == null) {
+            isCharacterEncodingSet = false;
+        } else {
+            isCharacterEncodingSet = true;
+        }
+    }
+
+
+    @Override
+    public void setCharacterEncoding(Charset charset) {
+
+        if (isCommitted()) {
+            return;
+        }
+
+        // Ignore any call from an included servlet
+        if (included) {
+            return;
+        }
+
+        // Ignore any call made after the getWriter has been invoked
+        // The default should be used
+        if (usingWriter) {
+            return;
+        }
+
+        getCoyoteResponse().setCharsetHolder(CharsetHolder.getInstance(charset));
         if (charset == null) {
             isCharacterEncodingSet = false;
         } else {
@@ -832,11 +855,7 @@ public class Response implements HttpServletResponse {
         }
 
         if (locale == null) {
-            try {
-                getCoyoteResponse().setCharacterEncoding(null);
-            } catch (UnsupportedEncodingException e) {
-                // Impossible when calling with null
-            }
+            getCoyoteResponse().setCharsetHolder(CharsetHolder.EMPTY);
         } else {
             // In some error handling scenarios, the context is unknown
             // (e.g. a 404 when a ROOT context is not present)
@@ -844,8 +863,9 @@ public class Response implements HttpServletResponse {
             if (context != null) {
                 String charset = context.getCharset(locale);
                 if (charset != null) {
+                    getCoyoteResponse().setCharsetHolder(CharsetHolder.getInstance(charset));
                     try {
-                        getCoyoteResponse().setCharacterEncoding(charset);
+                        getCoyoteResponse().getCharsetHolder().validate();
                     } catch (UnsupportedEncodingException e) {
                         log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
                     }

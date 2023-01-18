@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -357,9 +358,15 @@ public class ResponseFacade implements HttpServletResponse {
 
 
     @Override
-    public void setCharacterEncoding(String arg0) {
+    public void setCharacterEncoding(String encoding) {
         checkFacade();
-        response.setCharacterEncoding(arg0);
+        response.setCharacterEncoding(encoding);
+    }
+
+    @Override
+    public void setCharacterEncoding(Charset charset) {
+        checkFacade();
+        response.setCharacterEncoding(charset);
     }
 
     @Override
