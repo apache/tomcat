@@ -536,7 +536,7 @@ public class InputBuffer extends Reader
 
         Charset charset = null;
         if (coyoteRequest != null) {
-            charset = coyoteRequest.getCharset();
+            charset = coyoteRequest.getCharsetHolder().getValidatedCharset();
         }
 
         if (charset == null) {

@@ -95,6 +95,7 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.CharsetHolder;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -958,44 +959,34 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public String getCharacterEncoding() {
-        String characterEncoding = coyoteRequest.getCharacterEncoding();
-        if (characterEncoding != null) {
-            return characterEncoding;
+        String characterEncoding = coyoteRequest.getCharsetHolder().getName();
+
+        if (characterEncoding == null) {
+            Context context = getContext();
+            if (context != null) {
+                characterEncoding = context.getRequestCharacterEncoding();
+            }
         }
 
-        Context context = getContext();
-        if (context != null) {
-            return context.getRequestCharacterEncoding();
-        }
-
-        return null;
+        return characterEncoding;
     }
 
 
     private Charset getCharset() {
-        Charset charset = null;
-        try {
-            charset = coyoteRequest.getCharset();
-        } catch (UnsupportedEncodingException e) {
-            // Ignore
-        }
-        if (charset != null) {
-            return charset;
-        }
+        Charset charset = coyoteRequest.getCharsetHolder().getCharset();
 
-        Context context = getContext();
-        if (context != null) {
-            String encoding = context.getRequestCharacterEncoding();
-            if (encoding != null) {
-                try {
-                    return B2CConverter.getCharset(encoding);
-                } catch (UnsupportedEncodingException e) {
-                    // Ignore
-                }
+        if (charset == null) {
+            Context context = getContext();
+            if (context != null) {
+                charset = CharsetHolder.getInstance(context.getRequestCharacterEncoding()).getCharset() ;
             }
         }
 
-        return org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
+        if (charset == null) {
+            charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
+        }
+
+        return charset;
     }
 
 
@@ -1209,7 +1200,7 @@ public class Request implements HttpServletRequest {
         // to check for a default request character encoding at the Context.
         // Therefore, if a Context default should be used, it is set explicitly
         // here. Need to do this before setting usingReader.
-        if (coyoteRequest.getCharacterEncoding() == null) {
+        if (coyoteRequest.getCharsetHolder().getName() == null) {
             // Nothing currently set explicitly.
             // Check the context
             Context context = getContext();
@@ -1612,11 +1603,11 @@ public class Request implements HttpServletRequest {
             return;
         }
 
-        // Confirm that the encoding name is valid
-        Charset charset = B2CConverter.getCharset(enc);
+        CharsetHolder charsetHolder = CharsetHolder.getInstance(enc);
+        charsetHolder.validate();
 
         // Save the validated encoding
-        coyoteRequest.setCharset(charset);
+        coyoteRequest.setCharsetHolder(charsetHolder);
     }
 
 
@@ -1628,7 +1619,7 @@ public class Request implements HttpServletRequest {
         }
 
         // Save the validated encoding
-        coyoteRequest.setCharset(charset);
+        coyoteRequest.setCharsetHolder(CharsetHolder.getInstance(charset));
     }
 
 
