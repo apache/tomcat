@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -114,9 +115,16 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public void setCharacterEncoding(String env) throws java.io.UnsupportedEncodingException {
+    public void setCharacterEncoding(String encoding) throws java.io.UnsupportedEncodingException {
         checkFacade();
-        request.setCharacterEncoding(env);
+        request.setCharacterEncoding(encoding);
+    }
+
+
+    @Override
+    public void setCharacterEncoding(Charset encoding) {
+        checkFacade();
+        request.setCharacterEncoding(encoding);
     }
 
 

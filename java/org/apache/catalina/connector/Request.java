@@ -1621,6 +1621,18 @@ public class Request implements HttpServletRequest {
 
 
     @Override
+    public void setCharacterEncoding(Charset charset) {
+
+        if (usingReader) {
+            return;
+        }
+
+        // Save the validated encoding
+        coyoteRequest.setCharset(charset);
+    }
+
+
+    @Override
     public ServletContext getServletContext() {
         return getContext().getServletContext();
      }
