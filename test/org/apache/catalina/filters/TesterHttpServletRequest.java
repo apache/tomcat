@@ -73,8 +73,8 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public void setCharacterEncoding(String env)
-            throws UnsupportedEncodingException {
+    public void setCharacterEncoding(String env) throws UnsupportedEncodingException {
+        throw new RuntimeException("Not implemented");
     }
 
     @Override
