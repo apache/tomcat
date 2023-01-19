@@ -1323,18 +1323,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     @Override
     protected PermissionCollection getPermissions(CodeSource codeSource) {
-        String codeUrl = codeSource.getLocation().toString();
-        PermissionCollection pc;
-        if ((pc = loaderPC.get(codeUrl)) == null) {
-            pc = super.getPermissions(codeSource);
-            if (pc != null) {
-                for (Permission p : permissionList) {
-                    pc.add(p);
-                }
-                loaderPC.put(codeUrl,pc);
-            }
-        }
-        return pc;
+        return null;
     }
 
 
