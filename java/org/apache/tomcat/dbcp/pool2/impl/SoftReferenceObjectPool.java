@@ -364,7 +364,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         PooledSoftReference<T> ref;
         while (iterator.hasNext()) {
             ref = iterator.next();
-            if (ref.getReference() == null || ref.getReference().isEnqueued()) {
+            if (ref.getReference() == null || ref.getReference().refersTo(null)) {
                 iterator.remove();
             }
         }
