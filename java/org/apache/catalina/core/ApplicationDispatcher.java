@@ -517,7 +517,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         // Checking to see if the context classloader is the current context
         // classloader. If it's not, we're saving it, and setting the context
         // classloader to the Context classloader
-        ClassLoader oldCCL = context.bind(false, null);
+        ClassLoader oldCCL = context.bind(null);
 
         // Initialize local variables we may need
         HttpServletResponse hresponse = state.hresponse;
@@ -619,7 +619,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         }
 
         // Reset the old context class loader
-        context.unbind(false, oldCCL);
+        context.unbind(oldCCL);
 
         // Unwrap request/response if needed
         // See Bugzilla 30949

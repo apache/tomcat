@@ -98,7 +98,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
 
-        ClassLoader oldCL = context.bind(false, null);
+        ClassLoader oldCL = context.bind(null);
         try {
             for (AsyncListenerWrapper listener : listenersCopy) {
                 try {
@@ -112,7 +112,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         } finally {
             context.fireRequestDestroyEvent(request.getRequest());
             clearServletRequestResponse();
-            context.unbind(false, oldCL);
+            context.unbind(oldCL);
         }
     }
 
@@ -127,7 +127,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("asyncContextImpl.fireOnTimeout"));
             }
-            ClassLoader oldCL = context.bind(false, null);
+            ClassLoader oldCL = context.bind(null);
             try {
                 List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
                 for (AsyncListenerWrapper listener : listenersCopy) {
@@ -142,7 +142,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 request.getCoyoteRequest().action(
                         ActionCode.ASYNC_IS_TIMINGOUT, result);
             } finally {
-                context.unbind(false, oldCL);
+                context.unbind(oldCL);
             }
         }
         return !result.get();
@@ -543,7 +543,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
         @Override
         public void run() {
-            ClassLoader oldCL = context.bind(false, null);
+            ClassLoader oldCL = context.bind(null);
             try {
                 wrapped.run();
             } catch (Throwable t) {
@@ -554,7 +554,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 coyoteResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 coyoteResponse.setError();
             } finally {
-                context.unbind(false, oldCL);
+                context.unbind(oldCL);
             }
 
             // Since this runnable is not executing as a result of a socket

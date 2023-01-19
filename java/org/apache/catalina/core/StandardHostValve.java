@@ -100,7 +100,7 @@ final class StandardHostValve extends ValveBase {
         boolean asyncAtStart = request.isAsync();
 
         try {
-            context.bind(false, MY_CLASSLOADER);
+            context.bind(MY_CLASSLOADER);
 
             if (!asyncAtStart && !context.fireRequestInitEvent(request.getRequest())) {
                 // Don't fire listeners during async processing (the listener
@@ -167,7 +167,7 @@ final class StandardHostValve extends ValveBase {
                 request.getSession(false);
             }
 
-            context.unbind(false, MY_CLASSLOADER);
+            context.unbind(MY_CLASSLOADER);
         }
     }
 

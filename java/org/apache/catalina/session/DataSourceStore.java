@@ -465,7 +465,7 @@ public class DataSourceStore extends StoreBase {
                 return null;
             }
 
-            ClassLoader oldThreadContextCL = context.bind(false, null);
+            ClassLoader oldThreadContextCL = context.bind(null);
 
             try (PreparedStatement preparedLoadSql = _conn.prepareStatement(loadSql)){
                 preparedLoadSql.setString(1, id);
@@ -492,7 +492,7 @@ public class DataSourceStore extends StoreBase {
             } catch (SQLException e) {
                 contextLog.error(sm.getString(getStoreName() + ".SQLException", e));
             } finally {
-                context.unbind(false, oldThreadContextCL);
+                context.unbind(oldThreadContextCL);
                 release(_conn);
             }
             numberOfTries--;
@@ -697,7 +697,7 @@ public class DataSourceStore extends StoreBase {
             org.apache.catalina.Context context = getManager().getContext();
             ClassLoader oldThreadContextCL = null;
             if (localDataSource) {
-                oldThreadContextCL = context.bind(false, null);
+                oldThreadContextCL = context.bind(null);
             }
 
             Context initCtx;
@@ -711,7 +711,7 @@ public class DataSourceStore extends StoreBase {
                                 this.dataSourceName), e);
             } finally {
                 if (localDataSource) {
-                    context.unbind(false, oldThreadContextCL);
+                    context.unbind(oldThreadContextCL);
                 }
             }
         }

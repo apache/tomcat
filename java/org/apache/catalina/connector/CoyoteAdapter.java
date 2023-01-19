@@ -153,7 +153,7 @@ public class CoyoteAdapter implements Adapter {
                 Context context = request.getContext();
                 ClassLoader oldCL = null;
                 try {
-                    oldCL = context.bind(false, null);
+                    oldCL = context.bind(null);
                     if (req.getReadListener() != null) {
                         req.getReadListener().onError(t);
                     }
@@ -163,7 +163,7 @@ public class CoyoteAdapter implements Adapter {
                     res.action(ActionCode.CLOSE_NOW, t);
                     asyncConImpl.setErrorState(t, true);
                 } finally {
-                    context.unbind(false, oldCL);
+                    context.unbind(oldCL);
                 }
             }
 
@@ -175,7 +175,7 @@ public class CoyoteAdapter implements Adapter {
                     Context context = request.getContext();
                     ClassLoader oldCL = null;
                     try {
-                        oldCL = context.bind(false, null);
+                        oldCL = context.bind(null);
                         res.onWritePossible();
                         if (request.isFinished() && req.sendAllDataReadEvent() &&
                                 readListener != null) {
@@ -196,13 +196,13 @@ public class CoyoteAdapter implements Adapter {
                         res.action(ActionCode.CLOSE_NOW, t);
                         asyncConImpl.setErrorState(t, true);
                     } finally {
-                        context.unbind(false, oldCL);
+                        context.unbind(oldCL);
                     }
                 } else if (readListener != null && status == SocketEvent.OPEN_READ) {
                     Context context = request.getContext();
                     ClassLoader oldCL = null;
                     try {
-                        oldCL = context.bind(false, null);
+                        oldCL = context.bind(null);
                         // If data is being read on a non-container thread a
                         // dispatch with status OPEN_READ will be used to get
                         // execution back on a container thread for the
@@ -229,7 +229,7 @@ public class CoyoteAdapter implements Adapter {
                         res.action(ActionCode.CLOSE_NOW, t);
                         asyncConImpl.setErrorState(t, true);
                     } finally {
-                        context.unbind(false, oldCL);
+                        context.unbind(oldCL);
                     }
                 }
             }
@@ -365,12 +365,12 @@ public class CoyoteAdapter implements Adapter {
                     // method so this needs to be checked here
                     ClassLoader oldCL = null;
                     try {
-                        oldCL = request.getContext().bind(false, null);
+                        oldCL = request.getContext().bind(null);
                         if (req.sendAllDataReadEvent()) {
                             req.getReadListener().onAllDataRead();
                         }
                     } finally {
-                        request.getContext().unbind(false, oldCL);
+                        request.getContext().unbind(oldCL);
                     }
                 }
 

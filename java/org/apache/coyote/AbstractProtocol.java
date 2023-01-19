@@ -901,11 +901,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             if (upgradeToken.getInstanceManager() == null) {
                                 httpUpgradeHandler.init((WebConnection) processor);
                             } else {
-                                ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
+                                ClassLoader oldCL = upgradeToken.getContextBind().bind(null);
                                 try {
                                     httpUpgradeHandler.init((WebConnection) processor);
                                 } finally {
-                                    upgradeToken.getContextBind().unbind(false, oldCL);
+                                    upgradeToken.getContextBind().unbind(oldCL);
                                 }
                             }
                             if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
@@ -965,7 +965,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         if (instanceManager == null) {
                             httpUpgradeHandler.destroy();
                         } else {
-                            ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
+                            ClassLoader oldCL = upgradeToken.getContextBind().bind(null);
                             try {
                                 httpUpgradeHandler.destroy();
                             } finally {
@@ -975,7 +975,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                     ExceptionUtils.handleThrowable(e);
                                     getLog().error(sm.getString("abstractConnectionHandler.error"), e);
                                 }
-                                upgradeToken.getContextBind().unbind(false, oldCL);
+                                upgradeToken.getContextBind().unbind(oldCL);
                             }
                         }
                     }

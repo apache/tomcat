@@ -1211,7 +1211,17 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public ClassLoader bind(ClassLoader originalClassLoader) {
+        return null;
+    }
+
+    @Override
     public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+        // NO-OP
+    }
+
+    @Override
+    public void unbind(ClassLoader originalClassLoader) {
         // NO-OP
     }
 

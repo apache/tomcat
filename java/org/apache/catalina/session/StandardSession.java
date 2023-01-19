@@ -763,7 +763,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             if (notify) {
                 ClassLoader oldContextClassLoader = null;
                 try {
-                    oldContextClassLoader = context.bind(false, null);
+                    oldContextClassLoader = context.bind(null);
                     Object listeners[] = context.getApplicationLifecycleListeners();
                     if (listeners != null && listeners.length > 0) {
                         HttpSessionEvent event =
@@ -795,7 +795,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                         }
                     }
                 } finally {
-                    context.unbind(false, oldContextClassLoader);
+                    context.unbind(oldContextClassLoader);
                 }
             }
 
@@ -831,12 +831,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
             String keys[] = keys();
             ClassLoader oldContextClassLoader = null;
             try {
-                oldContextClassLoader = context.bind(false, null);
+                oldContextClassLoader = context.bind(null);
                 for (String key : keys) {
                     removeAttributeInternal(key, notify);
                 }
             } finally {
-                context.unbind(false, oldContextClassLoader);
+                context.unbind(oldContextClassLoader);
             }
         }
 

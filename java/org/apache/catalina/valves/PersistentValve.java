@@ -230,14 +230,14 @@ public class PersistentValve extends ValveBase {
 
     private void bind(Context context) {
         if (clBindRequired) {
-            context.bind(false, MY_CLASSLOADER);
+            context.bind(MY_CLASSLOADER);
         }
     }
 
 
     private void unbind(Context context) {
         if (clBindRequired) {
-            context.unbind(false, MY_CLASSLOADER);
+            context.unbind(MY_CLASSLOADER);
         }
     }
 

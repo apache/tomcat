@@ -225,7 +225,7 @@ public final class FileStore extends StoreBase {
             contextLog.debug(sm.getString(getStoreName()+".loading", id, file.getAbsolutePath()));
         }
 
-        ClassLoader oldThreadContextCL = context.bind(false, null);
+        ClassLoader oldThreadContextCL = context.bind(null);
 
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
                 ObjectInputStream ois = getObjectInputStream(fis)) {
@@ -240,7 +240,7 @@ public final class FileStore extends StoreBase {
             }
             return null;
         } finally {
-            context.unbind(false, oldThreadContextCL);
+            context.unbind(oldThreadContextCL);
         }
     }
 

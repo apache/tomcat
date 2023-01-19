@@ -5761,6 +5761,12 @@ public class StandardContext extends ContainerBase
 
     @Override
     public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+        return bind(originalClassLoader);
+    }
+
+
+    @Override
+    public ClassLoader bind(ClassLoader originalClassLoader) {
         Loader loader = getLoader();
         ClassLoader webApplicationClassLoader = null;
         if (loader != null) {
@@ -5797,6 +5803,12 @@ public class StandardContext extends ContainerBase
 
     @Override
     public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+        unbind(originalClassLoader);
+    }
+
+
+    @Override
+    public void unbind(ClassLoader originalClassLoader) {
         if (originalClassLoader == null) {
             return;
         }

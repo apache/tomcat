@@ -1320,7 +1320,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
                     // Ensure background processing for Contexts and Wrappers
                     // is performed under the web app's class loader
-                    originalClassLoader = ((Context) container).bind(false, null);
+                    originalClassLoader = ((Context) container).bind(null);
                 }
                 container.backgroundProcess();
                 Container[] children = container.findChildren();
@@ -1334,7 +1334,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
                 log.error(sm.getString("containerBase.backgroundProcess.error"), t);
             } finally {
                 if (container instanceof Context) {
-                    ((Context) container).unbind(false, originalClassLoader);
+                    ((Context) container).unbind(originalClassLoader);
                 }
             }
         }
