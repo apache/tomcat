@@ -107,6 +107,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
 
+            logCertificate(certificate);
             certificate.setSslContext(sslContext);
         }
     }

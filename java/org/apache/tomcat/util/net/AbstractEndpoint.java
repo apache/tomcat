@@ -368,6 +368,32 @@ public abstract class AbstractEndpoint<S,U> {
     protected abstract void createSSLContext(SSLHostConfig sslHostConfig) throws Exception;
 
 
+    protected void logCertificate(SSLHostConfigCertificate certificate) {
+        SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
+
+        String certificateSource = certificate.getCertificateKeystoreFile();
+        if (certificateSource == null) {
+            certificateSource = certificate.getCertificateKeyFile();
+        }
+
+        String keyAlias = certificate.getCertificateKeyAlias();
+        if (keyAlias == null) {
+            keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+        }
+
+        String trustStoreSource = sslHostConfig.getTruststoreFile();
+        if (trustStoreSource == null) {
+            trustStoreSource = sslHostConfig.getCaCertificateFile();
+        }
+        if (trustStoreSource == null) {
+            trustStoreSource = sslHostConfig.getCaCertificatePath();
+        }
+
+        getLog().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(), certificate.getType(),
+                certificateSource, keyAlias, trustStoreSource));
+    }
+
+
     protected void destroySsl() throws Exception {
         if (isSSLEnabled()) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {

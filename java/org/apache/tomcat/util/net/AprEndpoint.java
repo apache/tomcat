@@ -474,6 +474,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 sslContext.addCertificate(certificate);
             }
 
+            logCertificate(certificate);
             certificate.setSslContext(sslContext);
         }
 
