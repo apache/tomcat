@@ -220,6 +220,12 @@ class StreamProcessor extends AbstractProcessor {
         if (statusCode >= 200 && headers.getValue("date") == null) {
             headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
         }
+
+        // Remove payload headers for HEAD requests
+        if (coyoteRequest != null && "HEAD".equals(coyoteRequest.method().toString())) {
+            headers.removeHeader("content-length");
+            headers.removeHeader("content-range");
+        }
     }
 
 

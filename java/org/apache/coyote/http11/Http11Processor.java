@@ -916,7 +916,8 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         MessageBytes methodMB = request.method();
-        if (methodMB.equals("HEAD")) {
+        boolean head = methodMB.equals("HEAD");
+        if (head) {
             // No entity body
             outputBuffer.addActiveFilter
                 (outputFilters[Constants.VOID_FILTER]);
@@ -1054,6 +1055,13 @@ public class Http11Processor extends AbstractProcessor {
         } else {
             // server always overrides anything the app might set
             headers.setValue("Server").setString(server);
+        }
+
+        if (head) {
+            headers.removeHeader("content-length");
+            headers.removeHeader("content-range");
+            headers.removeHeader("trailer");
+            headers.removeHeader("transfer-encoding");
         }
 
         // Build the response header

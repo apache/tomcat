@@ -45,6 +45,10 @@ import org.apache.tomcat.util.net.TesterSupport.SimpleServlet;
 
 public class TestHttpServlet extends TomcatBaseTest {
 
+    /*
+     * Nature of test has changed from original bug report since content-length
+     * is no longer returned for HEAD requests as allowed by RFC 7231.
+     */
     @Test
     public void testBug53454() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -64,8 +68,7 @@ public class TestHttpServlet extends TomcatBaseTest {
                resHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals(LargeBodyServlet.RESPONSE_LENGTH,
-                resHeaders.get("Content-Length").get(0));
+        Assert.assertNull(resHeaders.get("Content-Length"));
     }
 
 
@@ -178,6 +181,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         int rc = getUrl(path, out, getHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        removePayloadHeaders(getHeaders);
         out.recycle();
 
         Map<String,List<String>> headHeaders = new HashMap<>();
@@ -201,6 +205,18 @@ public class TestHttpServlet extends TomcatBaseTest {
         }
 
         tomcat.stop();
+    }
+
+
+    /*
+     * Removes headers that are not expected to appear in the response to the
+     * equivalent HEAD request.
+     */
+    private void removePayloadHeaders(Map<String,List<String>> headers) {
+        headers.remove("content-length");
+        headers.remove("content-range");
+        headers.remove("trailer");
+        headers.remove("transfer-encoding");
     }
 
 
