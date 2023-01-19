@@ -57,8 +57,7 @@ this servlet is mapped to the URL pattern "/cgi-bin/*".</p>
 <section name="Installation">
 
 <p><strong>CAUTION</strong> - CGI scripts are used to execute programs
-external to the Tomcat JVM. If you are using the Java SecurityManager this
-will bypass your security policy configuration in <code>catalina.policy.</code></p>
+external to the Tomcat JVM.</p>
 
 <p>To enable CGI support:</p>
 

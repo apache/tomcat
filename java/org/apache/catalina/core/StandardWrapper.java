@@ -226,12 +226,6 @@ public class StandardWrapper extends ContainerBase
 
     private boolean overridable = false;
 
-    /**
-     * Static class array used when the SecurityManager is turned on and
-     * <code>Servlet.init</code> is invoked.
-     */
-    protected static Class<?>[] classType = new Class[]{ServletConfig.class};
-
     private final ReentrantReadWriteLock parametersLock =
             new ReentrantReadWriteLock();
 

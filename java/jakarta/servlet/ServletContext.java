@@ -874,9 +874,6 @@ public interface ServletContext {
      *
      * @return The associated web application class loader
      *
-     * @throws SecurityException if access to the class loader is prevented by a
-     *         SecurityManager
-     *
      * @since Servlet 3.0
      */
     public ClassLoader getClassLoader();
