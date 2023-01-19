@@ -470,6 +470,19 @@
       the <strong>JDBCStore</strong> is able to access the persisted session
       data. In particular, the <strong>JDBCStore</strong> should not be
       accessible via any credentials available to a web application.</p>
+
+      <p>Manager implementations that persist sessions to storage or replicate
+      sessions in a cluster typically use Java serialization. While the session
+      data is considered trusted (since the application is trusted), system
+      administrators may wish to consider placing restrictions on the Java
+      serialization. This can be done using the
+      <strong>sessionAttributeValueClassNameFilter</strong> attribute. A
+      safe starting value for this attribute is
+      <code>java\\.lang\\.(?:Boolean|Integer|Long|Number|String)|org\\.apache\\.catalina\\.realm\\.GenericPrincipal\\$SerializablePrincipal|\\[Ljava.lang.String;</code> which
+      can then be adjusted to meet the needs of the application. If setting a
+      value for <strong>sessionAttributeValueClassNameFilter</strong> it is
+      recommended that <strong>warnOnSessionAttributeFilterFailure</strong> is
+      set to <code>true</code>.</p>
     </subsection>
 
     <subsection name="Cluster">
