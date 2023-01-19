@@ -17,11 +17,6 @@
 package org.apache.tomcat.util.compat;
 
 import java.lang.reflect.Field;
-import java.net.SocketAddress;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This is the base implementation class for JRE compatibility and provides an
@@ -32,9 +27,7 @@ public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean graalAvailable;
-    private static final boolean jre16Available;
     private static final boolean jre19Available;
-    private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
     static {
         boolean result = false;
@@ -48,20 +41,14 @@ public class JreCompat {
         }
         graalAvailable = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
 
-        // This is Tomcat 11.0.x with a minimum Java version of Java 11.
+        // This is Tomcat 11.0.x with a minimum Java version of Java 17.
         // Look for the highest supported JVM first
         if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
             jre19Available = true;
-            jre16Available = true;
-        } else if (Jre16Compat.isSupported()) {
-            instance = new Jre16Compat();
-            jre19Available = false;
-            jre16Available = true;
         } else {
             instance = new JreCompat();
             jre19Available = false;
-            jre16Available = false;
         }
     }
 
@@ -76,47 +63,12 @@ public class JreCompat {
     }
 
 
-    public static boolean isJre16Available() {
-        return jre16Available;
-    }
-
-
     public static boolean isJre19Available() {
         return jre19Available;
     }
 
 
-    // Java 11 implementations of Java 16 methods
-
-    /**
-     * Return Unix domain socket address for given path.
-     * @param path The path
-     * @return the socket address
-     */
-    public SocketAddress getUnixDomainSocketAddress(String path) {
-        return null;
-    }
-
-
-    /**
-     * Create server socket channel using the Unix domain socket ProtocolFamily.
-     * @return the server socket channel
-     */
-    public ServerSocketChannel openUnixDomainServerSocketChannel() {
-        throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
-    }
-
-
-    /**
-     * Create socket channel using the Unix domain socket ProtocolFamily.
-     * @return the socket channel
-     */
-    public SocketChannel openUnixDomainSocketChannel() {
-        throw new UnsupportedOperationException(sm.getString("jreCompat.noUnixDomainSocket"));
-    }
-
-
-    // Java 11 implementations of Java 19 methods
+    // Java 17 implementations of Java 19 methods
 
     /**
      * Obtains the executor, if any, used to create the provided thread.
