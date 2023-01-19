@@ -905,7 +905,9 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        if (request.method().equals("HEAD")) {
+        MessageBytes methodMB = request.method();
+        boolean head = methodMB.equals("HEAD");
+        if (head) {
             // No entity body
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
@@ -1043,6 +1045,13 @@ public class Http11Processor extends AbstractProcessor {
         } else {
             // server always overrides anything the app might set
             headers.setValue("Server").setString(server);
+        }
+
+        if (head) {
+            headers.removeHeader("content-length");
+            headers.removeHeader("content-range");
+            headers.removeHeader("trailer");
+            headers.removeHeader("transfer-encoding");
         }
 
         writeHeaders(response.getStatus(), headers);

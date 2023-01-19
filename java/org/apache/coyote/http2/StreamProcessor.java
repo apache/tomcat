@@ -255,6 +255,12 @@ class StreamProcessor extends AbstractProcessor {
                 headers.setValue("Server").setString(server);
             }
         }
+
+        // Remove payload headers for HEAD requests
+        if (coyoteRequest != null && "HEAD".equals(coyoteRequest.method().toString())) {
+            headers.removeHeader("content-length");
+            headers.removeHeader("content-range");
+        }
     }
 
 

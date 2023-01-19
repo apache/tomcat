@@ -260,6 +260,10 @@
         documented by <code>javax.net.ssl.SSLContext.init</code>. This makes
         error handling more consistent. (remm)
       </fix>
+      <fix>
+        <bug>69379</bug>: The default HEAD response no longer includes the
+        payload HTTP header fields as per section 9.3.2 of RFC 9110. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
