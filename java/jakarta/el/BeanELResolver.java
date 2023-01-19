@@ -198,10 +198,7 @@ public class BeanELResolver extends ELResolver {
                     this.properties.put(pd.getName(), new BeanProperty(type, pd));
                 }
                 /*
-                 * Populating from any interfaces solves two distinct problems:
-                 * 1. When running under a security manager, classes may be
-                 *    unaccessible but have accessible interfaces.
-                 * 2. It causes default methods to be included.
+                 * Populating from any interfaces causes default methods to be included.
                  */
                 populateFromInterfaces(type);
             } catch (IntrospectionException ie) {

@@ -35,18 +35,23 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private final AbstractArchiveResourceSet archiveResourceSet;
     private final String baseUrl;
     private final JarEntry resource;
-    private final String codeBaseUrl;
     private final String name;
     private boolean readCerts = false;
     private Certificate[] certificates;
 
-    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet,
-            String webAppPath, String baseUrl, JarEntry jarEntry, String codeBaseUrl) {
+
+    @Deprecated
+    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
+            String baseUrl, JarEntry jarEntry, @SuppressWarnings("unused") String codeBaseUrl) {
+        this(archiveResourceSet, webAppPath, baseUrl, jarEntry);
+    }
+
+    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
+            String baseUrl, JarEntry jarEntry) {
         super(archiveResourceSet.getRoot(), webAppPath);
         this.archiveResourceSet = archiveResourceSet;
         this.baseUrl = baseUrl;
         this.resource = jarEntry;
-        this.codeBaseUrl = codeBaseUrl;
 
         String resourceName = resource.getName();
         if (resourceName.charAt(resourceName.length() - 1) == '/') {
@@ -148,18 +153,6 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         } catch (MalformedURLException | URISyntaxException e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("fileResource.getUrlFail", url), e);
-            }
-            return null;
-        }
-    }
-
-    @Override
-    public URL getCodeBase() {
-        try {
-            return new URI(codeBaseUrl).toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("fileResource.getUrlFail", codeBaseUrl), e);
             }
             return null;
         }

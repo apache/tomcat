@@ -103,8 +103,7 @@
       of the facade objects that isolate the container internal request
       processing objects. If set to <code>true</code> the facades will be
       set for garbage collection after every request, otherwise they will be
-      reused. This setting has no effect when the security manager is enabled.
-      If not specified, this attribute is set to <code>true</code>.</p>
+      reused. If not specified, this attribute is set to <code>true</code>.</p>
     </attribute>
 
     <attribute name="enableLookups" required="false">

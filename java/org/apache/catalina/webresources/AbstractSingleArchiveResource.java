@@ -23,9 +23,16 @@ import java.util.jar.JarFile;
 
 public abstract class AbstractSingleArchiveResource extends AbstractArchiveResource {
 
+
+    @Deprecated
     protected AbstractSingleArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
-            String baseUrl, JarEntry jarEntry, String codeBaseUrl) {
-        super(archiveResourceSet, webAppPath, baseUrl, jarEntry, codeBaseUrl);
+            String baseUrl, JarEntry jarEntry, @SuppressWarnings("unused") String codeBaseUrl) {
+        this(archiveResourceSet, webAppPath, baseUrl, jarEntry);
+    }
+
+    protected AbstractSingleArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
+            String baseUrl, JarEntry jarEntry) {
+        super(archiveResourceSet, webAppPath, baseUrl, jarEntry);
     }
 
 

@@ -272,15 +272,6 @@ public class FileResource extends AbstractResource {
     }
 
     @Override
-    public URL getCodeBase() {
-        if (getWebappPath().startsWith("/WEB-INF/classes/") && name.endsWith(".class")) {
-            return getWebResourceRoot().getResource("/WEB-INF/classes/").getURL();
-        } else {
-            return getURL();
-        }
-    }
-
-    @Override
     public Certificate[] getCertificates() {
         return null;
     }

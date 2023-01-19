@@ -103,9 +103,6 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * <strong>IMPLEMENTATION NOTE</strong> - Local repositories are searched in
  * the order they are added via the initial constructor.
  * <p>
- * <strong>IMPLEMENTATION NOTE</strong> - No check for sealing violations or
- * security is made unless a security manager is present.
- * <p>
  * <strong>IMPLEMENTATION NOTE</strong> - As of 8.0, this class
  * loader implements {@link InstrumentableClassLoader}, permitting web
  * application classes to instrument other classes in the same web
@@ -2254,7 +2251,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 return null;
             }
             Manifest manifest = resource.getManifest();
-            URL codeBase = resource.getCodeBase();
             Certificate[] certificates = resource.getCertificates();
 
             if (transformers.size() > 0) {
@@ -2297,7 +2293,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         if (manifest == null) {
                             definePackage(packageName, null, null, null, null, null, null, null);
                         } else {
-                            definePackage(packageName, manifest, codeBase);
+                            definePackage(packageName, manifest, null);
                         }
                     } catch (IllegalArgumentException e) {
                         // Ignore: normal error due to dual definition of package
@@ -2308,7 +2304,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
             try {
                 clazz = defineClass(name, binaryContent, 0,
-                        binaryContent.length, new CodeSource(codeBase, certificates));
+                        binaryContent.length, new CodeSource(null, certificates));
             } catch (UnsupportedClassVersionError ucve) {
                 throw new UnsupportedClassVersionError(
                         ucve.getLocalizedMessage() + " " +

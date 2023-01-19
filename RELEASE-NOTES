@@ -28,7 +28,6 @@ CONTENTS:
 * API Stability
 * Bundled APIs
 * Web application reloading and static fields in shared libraries
-* Security manager URLs
 * Symlinking static resources
 * Viewing the Tomcat Change Log
 * Cryptographic software notice
@@ -109,16 +108,6 @@ Something which might help is to avoid putting classes which would be
 referenced by a shared static field in the web application classloader,
 and putting them in the shared classloader instead (JARs should be put in the
 "lib" folder, and classes should be put in the "classes" folder).
-
-
-======================
-Security manager URLs:
-======================
-In order to grant security permissions to JARs located inside the
-web application repository, use URLs of the following format
-in your policy file:
-
-file:${catalina.base}/webapps/examples/WEB-INF/lib/driver.jar
 
 
 ============================

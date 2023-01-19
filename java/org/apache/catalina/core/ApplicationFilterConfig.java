@@ -84,7 +84,6 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
      * @throws NamingException If a JNDI lookup fails
-     * @throws SecurityException If a security manager prevents the creation
      * @throws IllegalArgumentException If the provided configuration is not
      *         valid
      */
@@ -233,7 +232,6 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      * @exception ServletException if thrown by the filter's init() method
      * @throws NamingException If a JNDI lookup fails
      * @throws ReflectiveOperationException If the creation of the filter fails
-     * @throws SecurityException If a security manager prevents the creation
      * @throws IllegalArgumentException If the provided configuration is not
      *         valid
      */
