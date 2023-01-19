@@ -88,10 +88,7 @@ import javax.servlet.jsp.tagext.BodyContent;
  * <code>forward()</code>,  <code>include()</code>,
  * and  <code>handlePageException()</code>.
  */
-
-public abstract class PageContext
-    extends JspContext
-{
+public abstract class PageContext extends JspContext {
 
     /**
      * Sole constructor. (For invocation by subclass constructors,
@@ -221,10 +218,9 @@ public abstract class PageContext
      *     is invalid
      */
 
-    public abstract void initialize(Servlet servlet, ServletRequest request,
-        ServletResponse response, String errorPageURL, boolean needsSession,
-        int bufferSize, boolean autoFlush)
-        throws IOException, IllegalStateException, IllegalArgumentException;
+    public abstract void initialize(Servlet servlet, ServletRequest request, ServletResponse response,
+            String errorPageURL, boolean needsSession, int bufferSize, boolean autoFlush)
+            throws IOException, IllegalStateException, IllegalArgumentException;
 
     /**
      * <p>

@@ -127,8 +127,7 @@ public abstract class TagLibraryValidator {
      * @return A null object, or zero length array if no errors, an array
      * of ValidationMessages otherwise.
      */
-    public ValidationMessage[] validate(String prefix, String uri,
-        PageData page) {
+    public ValidationMessage[] validate(String prefix, String uri, PageData page) {
         return null;
     }
 
