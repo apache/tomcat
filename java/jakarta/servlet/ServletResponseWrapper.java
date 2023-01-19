@@ -33,8 +33,7 @@ import java.util.ResourceBundle;
  */
 public class ServletResponseWrapper implements ServletResponse {
     private static final String LSTRING_FILE = "jakarta.servlet.LocalStrings";
-    private static final ResourceBundle lStrings =
-        ResourceBundle.getBundle(LSTRING_FILE);
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     private ServletResponse response;
 

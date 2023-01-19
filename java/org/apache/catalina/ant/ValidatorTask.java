@@ -81,11 +81,9 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
 
         // Commons-logging likes having the context classloader set
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader
-            (ValidatorTask.class.getClassLoader());
+        Thread.currentThread().setContextClassLoader(ValidatorTask.class.getClassLoader());
 
-        // Called through trusted manager interface. If running under a
-        // SecurityManager assume that untrusted applications may be deployed.
+        // Called through trusted manager interface.
         Digester digester = DigesterFactory.newDigester(true, true, null, false);
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file.getCanonicalFile()))) {
             InputSource is = new InputSource(file.toURI().toURL().toExternalForm());
