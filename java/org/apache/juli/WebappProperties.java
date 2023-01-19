@@ -60,6 +60,9 @@ public interface WebappProperties {
      * @return {@code true} if the web application includes a logging
      *         configuration at the standard location of
      *         /WEB-INF/classes/logging.properties.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
+    @Deprecated
     boolean hasLoggingConfig();
 }
