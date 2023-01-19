@@ -20,6 +20,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.Random;
 import java.util.logging.Level;
@@ -160,7 +163,12 @@ public class TestClassLoaderLogManager {
         }
     }
 
-    private static class TestClassLoader extends ClassLoader implements WebappProperties {
+    private static class TestClassLoader extends URLClassLoader implements WebappProperties {
+
+        public TestClassLoader() {
+            super(new URL[0]);
+        }
+
 
         @Override
         public String getWebappName() {
@@ -181,6 +189,20 @@ public class TestClassLoaderLogManager {
         public boolean hasLoggingConfig() {
             return true;
         }
+
+        @Override
+        public URL findResource(String name) {
+            if ("logging.properties".equals(name)) {
+                try {
+                    return new URL("file:///path/does/not/exist");
+                } catch (MalformedURLException e) {
+                    // Should never happen
+                    throw new IllegalArgumentException(e);
+                }
+            }
+            return null;
+        }
+
 
         @Override
         public InputStream getResourceAsStream(final String resource) {
