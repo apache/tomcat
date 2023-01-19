@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.0-M3 (markt)" rtext="in development">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Increase the minimum supported Java version to Java 17. Note that
+        Jakarta EE 11 permits a minimum Java version of 21. The minimum Java
+        version for Tomcat 11 may be increased to Java 21 before the first
+        stable release. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
