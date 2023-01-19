@@ -31,11 +31,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [ 11, 17, 19, 20-ea ]
+        java: [ 17, 19, 20-ea ]
         os: [ ubuntu-latest ]
         include:
         - os: windows-latest
-          java: 11
+          java: 17
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
