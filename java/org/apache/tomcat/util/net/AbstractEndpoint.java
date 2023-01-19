@@ -407,10 +407,36 @@ public abstract class AbstractEndpoint<S,U> {
                 throw new IllegalArgumentException(e.getMessage(), e);
             }
 
+            logCertificate(certificate);
             certificate.setSslContext(sslContext);
         }
     }
 
+
+    protected void logCertificate(SSLHostConfigCertificate certificate) {
+        SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
+
+        String certificateSource = certificate.getCertificateKeystoreFile();
+        if (certificateSource == null) {
+            certificateSource = certificate.getCertificateKeyFile();
+        }
+
+        String keyAlias = certificate.getCertificateKeyAlias();
+        if (keyAlias == null) {
+            keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
+        }
+
+        String trustStoreSource = sslHostConfig.getTruststoreFile();
+        if (trustStoreSource == null) {
+            trustStoreSource = sslHostConfig.getCaCertificateFile();
+        }
+        if (trustStoreSource == null) {
+            trustStoreSource = sslHostConfig.getCaCertificatePath();
+        }
+
+        getLog().info(sm.getString("endpoint.tls.info", getName(), sslHostConfig.getHostName(), certificate.getType(),
+                certificateSource, keyAlias, trustStoreSource));
+    }
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
             List<String> clientRequestedApplicationProtocols) {

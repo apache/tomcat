@@ -71,6 +71,8 @@ public abstract class SSLUtilBase implements SSLUtil {
     private static final Log log = LogFactory.getLog(SSLUtilBase.class);
     private static final StringManager sm = StringManager.getManager(SSLUtilBase.class);
 
+    protected static final String DEFAULT_KEY_ALIAS = "tomcat";
+
     protected final SSLHostConfig sslHostConfig;
     protected final SSLHostConfigCertificate certificate;
 
@@ -324,7 +326,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             }
 
             if (keyAlias == null) {
-                keyAlias = "tomcat";
+                keyAlias = DEFAULT_KEY_ALIAS;
             }
 
             // Switch to in-memory key store
