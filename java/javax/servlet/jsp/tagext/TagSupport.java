@@ -81,10 +81,8 @@ public class TagSupport implements IterationTag, Serializable {
             Class klass) {
         boolean isInterface = false;
 
-        if (from == null ||
-            klass == null ||
-            (!Tag.class.isAssignableFrom(klass) &&
-             !(isInterface = klass.isInterface()))) {
+        if (from == null || klass == null ||
+                (!Tag.class.isAssignableFrom(klass) && !(isInterface = klass.isInterface()))) {
             return null;
         }
 

@@ -316,9 +316,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
                     @Override
                     protected String[] getAttribute(String name) {
-                        Enumeration<String> e =
-                            ((HttpServletRequest) page.getRequest())
-                                    .getHeaders(name);
+                        Enumeration<String> e = ((HttpServletRequest) page.getRequest()).getHeaders(name);
                         if (e != null) {
                             List<String> list = new ArrayList<>();
                             while (e.hasMoreElements()) {

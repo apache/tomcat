@@ -35,8 +35,7 @@ import java.util.ResourceBundle;
  */
 public class ServletRequestWrapper implements ServletRequest {
     private static final String LSTRING_FILE = "javax.servlet.LocalStrings";
-    private static final ResourceBundle lStrings =
-        ResourceBundle.getBundle(LSTRING_FILE);
+    private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
     private ServletRequest request;
 
