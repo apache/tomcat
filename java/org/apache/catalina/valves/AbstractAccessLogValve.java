@@ -1140,58 +1140,53 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request,
-                Response response, long time) {
+        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             long timestamp = date.getTime();
             long frac;
             if (!usesBegin) {
                 timestamp += TimeUnit.NANOSECONDS.toMillis(time);
             }
-            /*  Implementation note: This is deliberately not implemented using
-             *  switch. If a switch is used the compiler (at least the Oracle
-             *  one) will use a synthetic class to implement the switch. The
-             *  problem is that this class needs to be pre-loaded when using a
-             *  SecurityManager and the name of that class will depend on any
-             *  anonymous inner classes and any other synthetic classes. As such
-             *  the name is not constant and keeping the pre-loading up to date
-             *  as the name changes is error prone.
-             */
-            if (type == FormatType.CLF) {
-                buf.append(localDateCache.get().getFormat(timestamp));
-            } else if (type == FormatType.SEC) {
-                buf.append(Long.toString(timestamp / 1000));
-            } else if (type == FormatType.MSEC) {
-                buf.append(Long.toString(timestamp));
-            } else if (type == FormatType.MSEC_FRAC) {
-                frac = timestamp % 1000;
-                if (frac < 100) {
-                    if (frac < 10) {
-                        buf.append('0');
-                        buf.append('0');
-                    } else {
-                        buf.append('0');
-                    }
-                }
-                buf.append(Long.toString(frac));
-            } else {
-                // FormatType.SDF
-                String temp = localDateCache.get().getFormat(format, locale, timestamp);
-                if (usesMsecs) {
+            switch (type) {
+                case CLF:
+                    buf.append(localDateCache.get().getFormat(timestamp));
+                    break;
+                case SEC:
+                    buf.append(Long.toString(timestamp / 1000));
+                    break;
+                case MSEC:
+                    buf.append(Long.toString(timestamp));
+                    break;
+                case MSEC_FRAC:
                     frac = timestamp % 1000;
-                    StringBuilder tripleMsec = new StringBuilder(4);
                     if (frac < 100) {
                         if (frac < 10) {
-                            tripleMsec.append('0');
-                            tripleMsec.append('0');
+                            buf.append('0');
+                            buf.append('0');
                         } else {
-                            tripleMsec.append('0');
+                            buf.append('0');
                         }
                     }
-                    tripleMsec.append(frac);
-                    temp = temp.replace(tripleMsecPattern, tripleMsec);
-                    temp = temp.replace(msecPattern, Long.toString(frac));
-                }
-                buf.append(temp);
+                    buf.append(Long.toString(frac));
+                    break;
+                case SDF:
+                    String temp = localDateCache.get().getFormat(format, locale, timestamp);
+                    if (usesMsecs) {
+                        frac = timestamp % 1000;
+                        StringBuilder tripleMsec = new StringBuilder(4);
+                        if (frac < 100) {
+                            if (frac < 10) {
+                                tripleMsec.append('0');
+                                tripleMsec.append('0');
+                            } else {
+                                tripleMsec.append('0');
+                            }
+                        }
+                        tripleMsec.append(frac);
+                        temp = temp.replace(tripleMsecPattern, tripleMsec);
+                        temp = temp.replace(msecPattern, Long.toString(frac));
+                    }
+                    buf.append(temp);
+                    break;
             }
         }
     }
