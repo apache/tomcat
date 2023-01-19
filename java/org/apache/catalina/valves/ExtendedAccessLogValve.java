@@ -128,16 +128,6 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
     private static final Log log = LogFactory.getLog(ExtendedAccessLogValve.class);
 
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The descriptive information about this implementation.
-     */
-    protected static final String extendedAccessLogInfo =
-        "org.apache.catalina.valves.ExtendedAccessLogValve/2.1";
-
-
     // -------------------------------------------------------- Private Methods
 
     /**
