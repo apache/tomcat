@@ -33,8 +33,7 @@ public class TestAstFunction {
     @Test
     public void testImport02() {
         ELProcessor processor = new ELProcessor();
-        processor.getELManager().getELContext().getImportHandler()
-                .importStatic("java.lang.Integer.valueOf");
+        processor.getELManager().getELContext().getImportHandler().importStatic("java.lang.Integer.valueOf");
         Object result = processor.getValue("valueOf(1000)", Integer.class);
         Assert.assertEquals(Integer.valueOf(1000), result);
     }
