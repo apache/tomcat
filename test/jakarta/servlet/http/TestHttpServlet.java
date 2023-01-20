@@ -47,7 +47,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
     /*
      * Nature of test has changed from original bug report since content-length
-     * is no longer returned for HEAD requests as allowed by RFC 7231.
+     * is no longer returned for HEAD requests as allowed by RFC 9110.
      */
     @Test
     public void testBug53454() throws Exception {
@@ -181,7 +181,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         int rc = getUrl(path, out, getHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        removePayloadHeaders(getHeaders);
+        removeGeneratingContentHeaders(getHeaders);
         out.recycle();
 
         Map<String,List<String>> headHeaders = new HashMap<>();
@@ -212,7 +212,7 @@ public class TestHttpServlet extends TomcatBaseTest {
      * Removes headers that are not expected to appear in the response to the
      * equivalent HEAD request.
      */
-    private void removePayloadHeaders(Map<String,List<String>> headers) {
+    private void removeGeneratingContentHeaders(Map<String,List<String>> headers) {
         headers.remove("content-length");
         headers.remove("content-range");
         headers.remove("trailer");

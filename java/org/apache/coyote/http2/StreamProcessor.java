@@ -221,7 +221,8 @@ class StreamProcessor extends AbstractProcessor {
             headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
         }
 
-        // Remove payload headers for HEAD requests
+        // Exclude some HTTP header fields where the value is determined only
+        // while generating the content as per section 9.3.2 of RFC 9110.
         if (coyoteRequest != null && "HEAD".equals(coyoteRequest.method().toString())) {
             headers.removeHeader("content-length");
             headers.removeHeader("content-range");

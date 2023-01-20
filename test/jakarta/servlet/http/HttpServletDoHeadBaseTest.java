@@ -97,8 +97,9 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
 
         // Headers should be the same part from:
         // - Date header may be different
-        // - HEAD requests don't include payload headers
-        //   (RFC 7231, section 4.3.2)
+        // Exclude some HTTP header fields where the value is determined only
+        // while generating the content as per section 9.3.2 of RFC 9110.
+        // (previously RFC 7231, section 4.3.2)
         getHeaders.remove("content-length");
         getHeaders.remove("content-range");
         getHeaders.remove("trailer");
@@ -168,7 +169,9 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             int i = 0;
             int j = 0;
             for (; i < getHeaders.length; i++) {
-                // Ignore payload headers
+                // Exclude some HTTP header fields where the value is determined
+                // only while generating the content as per section 9.3.2 of RFC
+                // 9110.
                 if (getHeaders[i].contains("content-length") || getHeaders[i].contains("content-range") ) {
                     // Skip
                 } else {

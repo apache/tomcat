@@ -126,8 +126,9 @@
         that accept <code>Charset</code> objects. (markt)
       </add>
       <update>
-        The default HEAD response no longer includes the payload HTTP header
-        fields as per section 9.3.2 of RFC 9110. (markt)
+        The default HEAD response no longer includes some HTTP header fields
+        where the value is determined only while generating the content as per
+        section 9.3.2 of RFC 9110. (markt)
       </update>
     </changelog>
   </subsection>
