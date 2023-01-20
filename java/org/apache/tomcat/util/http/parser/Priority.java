@@ -73,7 +73,7 @@ public class Priority {
         if (urgencyListMember instanceof SfInteger) {
             long urgency = ((SfInteger) urgencyListMember).getVaue().longValue();
             // If out of range, ignore it
-            if (urgency < 0 || urgency > 7) {
+            if (urgency > -1 && urgency < 8) {
                 result.setUrgency((int) urgency);
             }
         }
