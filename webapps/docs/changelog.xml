@@ -123,7 +123,7 @@
       </fix>
       <add>
         Implement the new Servlet API methods for setting character encodings
-        that accept {@code Charset} objects. (markt)
+        that accept <code>Charset</code> objects. (markt)
       </add>
       <update>
         The default HEAD response no longer includes the payload HTTP header
