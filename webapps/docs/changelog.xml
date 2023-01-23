@@ -130,6 +130,10 @@
         where the value is determined only while generating the content as per
         section 9.3.2 of RFC 9110. (markt)
       </update>
+      <fix>
+        <bug>66438</bug>: Correct names of Jakarta modules in JPMS metadata.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
