@@ -121,6 +121,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>66419</bug>: Fix calls from expression language to a method that
+        accepts varargs when only one argument was passed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.85 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
