@@ -162,7 +162,7 @@ public final class AstFunction extends SimpleNode {
                     if (m.isVarArgs() && i == methodParameterCount - 1) {
                         if (inputParameterCount < methodParameterCount) {
                             params[i] = new Object[] { null };
-                        } else if (inputParameterCount == methodParameterCount && paramTypes[i].isArray()) {
+                        } else if (inputParameterCount == methodParameterCount && isArray(parameters.jjtGetChild(i).getValue(ctx))) {
                             params[i] = parameters.jjtGetChild(i).getValue(ctx);
                         } else {
                             Object[] varargs = new Object[inputParameterCount - methodParameterCount + 1];
@@ -198,6 +198,15 @@ public final class AstFunction extends SimpleNode {
         }
         return result;
     }
+
+
+    private boolean isArray(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        return obj.getClass().isArray();
+    }
+
 
     public void setLocalName(String localName) {
         this.localName = localName;
