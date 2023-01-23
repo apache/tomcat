@@ -27,13 +27,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.startup.CatalinaBaseConfigurationSource;
-import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 
 public class TestConfigFileLoader {
 
     @BeforeClass
     public static void setup() {
-        TomcatURLStreamHandlerFactory.getInstance();
         System.setProperty("catalina.base", "");
         ConfigFileLoader.setSource(new CatalinaBaseConfigurationSource(new File(System.getProperty("catalina.base")), null));
     }

@@ -22,12 +22,11 @@ import java.net.URLStreamHandlerFactory;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.catalina.webresources.war.Handler;
-
+/**
+ * @deprecated Unused. Use the ServiceLoader mechanism to define additional
+ *             handlers. Will be removed in Tomcat 11 onwards.
+ */
 public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
-
-    private static final String WAR_PROTOCOL = "war";
-    private static final String CLASSPATH_PROTOCOL = "classpath";
 
     // Singleton instance
     private static volatile TomcatURLStreamHandlerFactory instance = null;
@@ -153,13 +152,6 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
     @Override
     public URLStreamHandler createURLStreamHandler(String protocol) {
 
-        // Tomcat's handler always takes priority so applications can't override
-        // it.
-        if (WAR_PROTOCOL.equals(protocol)) {
-            return new Handler();
-        } else if (CLASSPATH_PROTOCOL.equals(protocol)) {
-            return new ClasspathURLStreamHandler();
-        }
 
         // Application handlers
         for (URLStreamHandlerFactory factory : userFactories) {
