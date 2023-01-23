@@ -26,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @deprecated Unused. Use the ServiceLoader mechanism to define additional
  *             handlers. Will be removed in Tomcat 11 onwards.
  */
+@Deprecated
 public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
 
     // Singleton instance
