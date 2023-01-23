@@ -115,6 +115,10 @@
         <bug>66438</bug>: Correct names of Jakarta modules in JPMS metadata.
         (markt)
       </fix>
+      <update>
+        Switch to using the ServiceLoader mechanism to load the custom URL
+        protocol handlers that Tomcat uses. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

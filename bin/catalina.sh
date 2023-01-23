@@ -251,10 +251,6 @@ if [ -z "$JSSE_OPTS" ] ; then
 fi
 JAVA_OPTS="$JAVA_OPTS $JSSE_OPTS"
 
-# Register custom URL handlers
-# Do this here so custom URL handles (specifically 'war:...') can be used in the security policy
-JAVA_OPTS="$JAVA_OPTS -Djava.protocol.handler.pkgs=org.apache.catalina.webresources"
-
 # Set juli LogManager config file if it is present and an override has not been issued
 if [ -z "$CATALINA_LOGGING_CONFIG" ]; then
   if [ -r "$CATALINA_BASE"/conf/logging.properties ]; then

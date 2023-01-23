@@ -69,7 +69,6 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.apache.juli.WebappProperties;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1669,6 +1668,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     /**
      * Clear references.
      */
+    @SuppressWarnings("deprecation")
     protected void clearReferences() {
 
         // If the JVM is shutting down, skip the memory leak checks
@@ -1721,7 +1721,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         java.beans.Introspector.flushCaches();
 
         // Clear any custom URLStreamHandlers
-        TomcatURLStreamHandlerFactory.release(this);
+        org.apache.catalina.webresources.TomcatURLStreamHandlerFactory.release(this);
     }
 
 

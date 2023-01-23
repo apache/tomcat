@@ -21,18 +21,9 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
-
 public class TestHandler {
-
-    @Before
-    public void register() {
-        TomcatURLStreamHandlerFactory.register();
-    }
-
 
     @Test
     public void testUrlFileInJarInWar() throws Exception {
