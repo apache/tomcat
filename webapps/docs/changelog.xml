@@ -111,6 +111,10 @@
         Allow a Valve to access cookies from a request that cannot be mapped to
         a Context. (markt)
       </fix>
+      <fix>
+        <bug>66438</bug>: Correct names of Jakarta modules in JPMS metadata.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
