@@ -1682,7 +1682,7 @@
            filesId="files.tomcat-embed-core"
            notice="${tomcat.manifests}/servlet-api.jar.notice"
            license="${tomcat.manifests}/servlet-api.jar.license"
-           metainf="${tomcat.manifests}/tomcat-embed-core.jar"
+           meta-inf="${tomcat.manifests}/tomcat-embed-core.jar"
            addOSGi="true"
            addGraal="true"
            graalPrefix="org.apache.tomcat.embed/tomcat-embed-core"
