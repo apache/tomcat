@@ -1492,7 +1492,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     /**
      * Clear references.
      */
-    @SuppressWarnings("deprecation")
     protected void clearReferences() {
 
         // If the JVM is shutting down, skip the memory leak checks
@@ -1543,9 +1542,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         // Clear the classloader reference in the VM's bean introspector
         java.beans.Introspector.flushCaches();
-
-        // Clear any custom URLStreamHandlers
-        org.apache.catalina.webresources.TomcatURLStreamHandlerFactory.release(this);
     }
 
 
