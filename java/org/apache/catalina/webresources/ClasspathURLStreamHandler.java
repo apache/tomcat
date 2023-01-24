@@ -26,8 +26,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class ClasspathURLStreamHandler extends URLStreamHandler {
 
-    private static final StringManager sm =
-            StringManager.getManager(ClasspathURLStreamHandler.class);
+    private static final StringManager sm = StringManager.getManager(ClasspathURLStreamHandler.class);
 
 
     @Override
