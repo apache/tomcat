@@ -44,9 +44,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Standard implementation of the <b>Engine</b> interface.  Each
- * child container must be a Host implementation to process the specific
- * fully qualified host name of that virtual host.
+ * Standard implementation of the <b>Engine</b> interface. Each child container must be a Host implementation to process
+ * the specific fully qualified host name of that virtual host.
  *
  * @author Craig R. McClanahan
  */
@@ -70,8 +69,7 @@ public class StandardEngine extends ContainerBase implements Engine {
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * Host name to use when no server host, or an unknown host,
-     * is specified in the request.
+     * Host name to use when no server host, or an unknown host, is specified in the request.
      */
     private String defaultHost = null;
 
@@ -82,23 +80,19 @@ public class StandardEngine extends ContainerBase implements Engine {
     private Service service = null;
 
     /**
-     * The JVM Route ID for this Tomcat instance. All Route ID's must be unique
-     * across the cluster.
+     * The JVM Route ID for this Tomcat instance. All Route ID's must be unique across the cluster.
      */
     private String jvmRouteId;
 
     /**
-     * Default access log to use for request/response pairs where we can't ID
-     * the intended host and context.
+     * Default access log to use for request/response pairs where we can't ID the intended host and context.
      */
-    private final AtomicReference<AccessLog> defaultAccessLog =
-        new AtomicReference<>();
+    private final AtomicReference<AccessLog> defaultAccessLog = new AtomicReference<>();
 
     // ------------------------------------------------------------- Properties
 
     /**
-     * Obtain the configured Realm and provide a default Realm implementation
-     * when no explicit configuration is set.
+     * Obtain the configured Realm and provide a default Realm implementation when no explicit configuration is set.
      *
      * @return configured realm, or a {@link NullRealm} by default
      */
@@ -141,15 +135,13 @@ public class StandardEngine extends ContainerBase implements Engine {
         if (getState().isAvailable()) {
             service.getMapper().setDefaultHostName(host);
         }
-        support.firePropertyChange("defaultHost", oldDefaultHost,
-                                   this.defaultHost);
+        support.firePropertyChange("defaultHost", oldDefaultHost, this.defaultHost);
 
     }
 
 
     /**
-     * Set the cluster-wide unique identifier for this Engine.
-     * This value is only useful in a load-balancing scenario.
+     * Set the cluster-wide unique identifier for this Engine. This value is only useful in a load-balancing scenario.
      * <p>
      * This property should not be changed once it is set.
      */
@@ -160,8 +152,8 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * Retrieve the cluster-wide unique identifier for this Engine.
-     * This value is only useful in a load-balancing scenario.
+     * Retrieve the cluster-wide unique identifier for this Engine. This value is only useful in a load-balancing
+     * scenario.
      */
     @Override
     public String getJvmRoute() {
@@ -192,8 +184,7 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * Add a child Container, only if the proposed child is an implementation
-     * of Host.
+     * Add a child Container, only if the proposed child is an implementation of Host.
      *
      * @param child Child container to be added
      */
@@ -201,8 +192,7 @@ public class StandardEngine extends ContainerBase implements Engine {
     public void addChild(Container child) {
 
         if (!(child instanceof Host)) {
-            throw new IllegalArgumentException
-                (sm.getString("standardEngine.notHost"));
+            throw new IllegalArgumentException(sm.getString("standardEngine.notHost"));
         }
         super.addChild(child);
 
@@ -210,16 +200,15 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * Disallow any attempt to set a parent for this Container, since an
-     * Engine is supposed to be at the top of the Container hierarchy.
+     * Disallow any attempt to set a parent for this Container, since an Engine is supposed to be at the top of the
+     * Container hierarchy.
      *
      * @param container Proposed parent Container
      */
     @Override
     public void setParent(Container container) {
 
-        throw new IllegalArgumentException
-            (sm.getString("standardEngine.notParent"));
+        throw new IllegalArgumentException(sm.getString("standardEngine.notParent"));
 
     }
 
@@ -234,11 +223,11 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * Start this component and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
+     * Start this component and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
@@ -254,14 +243,12 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * Override the default implementation. If no access log is defined for the
-     * Engine, look for one in the Engine's default host and then the default
-     * host's ROOT context. If still none is found, return the default NoOp
-     * access log.
+     * Override the default implementation. If no access log is defined for the Engine, look for one in the Engine's
+     * default host and then the default host's ROOT context. If still none is found, return the default NoOp access
+     * log.
      */
     @Override
-    public void logAccess(Request request, Response response, long time,
-            boolean useDefault) {
+    public void logAccess(Request request, Response response, long time, boolean useDefault) {
 
         boolean logged = false;
 
@@ -281,23 +268,18 @@ public class StandardEngine extends ContainerBase implements Engine {
                     newDefaultAccessLog = host.getAccessLog();
 
                     if (newDefaultAccessLog != null) {
-                        if (defaultAccessLog.compareAndSet(null,
-                                newDefaultAccessLog)) {
-                            AccessLogListener l = new AccessLogListener(this,
-                                    host, null);
+                        if (defaultAccessLog.compareAndSet(null, newDefaultAccessLog)) {
+                            AccessLogListener l = new AccessLogListener(this, host, null);
                             l.install();
                         }
                     } else {
                         // Try the ROOT context of default host
                         context = (Context) host.findChild("");
-                        if (context != null &&
-                                context.getState().isAvailable()) {
+                        if (context != null && context.getState().isAvailable()) {
                             newDefaultAccessLog = context.getAccessLog();
                             if (newDefaultAccessLog != null) {
-                                if (defaultAccessLog.compareAndSet(null,
-                                        newDefaultAccessLog)) {
-                                    AccessLogListener l = new AccessLogListener(
-                                            this, null, context);
+                                if (defaultAccessLog.compareAndSet(null, newDefaultAccessLog)) {
+                                    AccessLogListener l = new AccessLogListener(this, null, context);
                                     l.install();
                                 }
                             }
@@ -307,10 +289,8 @@ public class StandardEngine extends ContainerBase implements Engine {
 
                 if (newDefaultAccessLog == null) {
                     newDefaultAccessLog = new NoopAccessLog();
-                    if (defaultAccessLog.compareAndSet(null,
-                            newDefaultAccessLog)) {
-                        AccessLogListener l = new AccessLogListener(this, host,
-                                context);
+                    if (defaultAccessLog.compareAndSet(null, newDefaultAccessLog)) {
+                        AccessLogListener l = new AccessLogListener(this, host, context);
                         l.install();
                     }
                 }
@@ -368,7 +348,7 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
 
-    // -------------------- JMX registration  --------------------
+    // -------------------- JMX registration --------------------
 
     @Override
     protected String getObjectNameKeyProperties() {
@@ -391,8 +371,7 @@ public class StandardEngine extends ContainerBase implements Engine {
         }
 
         @Override
-        public void setRequestAttributesEnabled(
-                boolean requestAttributesEnabled) {
+        public void setRequestAttributesEnabled(boolean requestAttributesEnabled) {
             // NOOP
 
         }
@@ -405,16 +384,14 @@ public class StandardEngine extends ContainerBase implements Engine {
     }
 
     protected static final class AccessLogListener
-            implements PropertyChangeListener, LifecycleListener,
-            ContainerListener {
+            implements PropertyChangeListener, LifecycleListener, ContainerListener {
 
         private final StandardEngine engine;
         private final Host host;
         private final Context context;
         private volatile boolean disabled = false;
 
-        public AccessLogListener(StandardEngine engine, Host host,
-                Context context) {
+        public AccessLogListener(StandardEngine engine, Host host, Context context) {
             this.engine = engine;
             this.host = host;
             this.context = context;
@@ -450,8 +427,7 @@ public class StandardEngine extends ContainerBase implements Engine {
             }
 
             String type = event.getType();
-            if (Lifecycle.AFTER_START_EVENT.equals(type) ||
-                    Lifecycle.BEFORE_STOP_EVENT.equals(type) ||
+            if (Lifecycle.AFTER_START_EVENT.equals(type) || Lifecycle.BEFORE_STOP_EVENT.equals(type) ||
                     Lifecycle.BEFORE_DESTROY_EVENT.equals(type)) {
                 // Container is being started/stopped/removed
                 // Force re-calculation and disable listener since it won't

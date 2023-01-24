@@ -26,14 +26,12 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * An implementation of LifeCycleListener that loads a native library into the JVM.
  * <p>
- * Native libraries are associated with the class loader of the class that loaded them,
- * and the same library may not be loaded by more than one class loader. Due to that
- * restriction, loading a native library from a Webapp's class loader makes it impossible
- * for other Webapps to load the native library.
+ * Native libraries are associated with the class loader of the class that loaded them, and the same library may not be
+ * loaded by more than one class loader. Due to that restriction, loading a native library from a Webapp's class loader
+ * makes it impossible for other Webapps to load the native library.
  * <p>
- * Loading the native library using this listener solves the issue as it is loaded
- * by a shared class loader (typically the Common class loader, but may vary in some
- * configurations).
+ * Loading the native library using this listener solves the issue as it is loaded by a shared class loader (typically
+ * the Common class loader, but may vary in some configurations).
  */
 public class JniLifecycleListener implements LifecycleListener {
 
