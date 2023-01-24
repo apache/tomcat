@@ -22,6 +22,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot.CacheStrategy;
@@ -48,8 +49,8 @@ public class Cache {
     private int objectMaxSize = (int) maxSize / OBJECT_MAX_SIZE_FACTOR;
     private CacheStrategy cacheStrategy;
 
-    private AtomicLong lookupCount = new AtomicLong(0);
-    private AtomicLong hitCount = new AtomicLong(0);
+    private LongAdder lookupCount = new LongAdder();
+    private LongAdder hitCount = new LongAdder();
 
     private final ConcurrentMap<String, CachedResource> resourceCache = new ConcurrentHashMap<>();
 
@@ -70,7 +71,7 @@ public class Cache {
             }
         }
 
-        lookupCount.incrementAndGet();
+        lookupCount.increment();
 
         CachedResource cacheEntry = resourceCache.get(path);
 
@@ -138,14 +139,14 @@ public class Cache {
                 cacheEntry.validateResource(useClassLoaderResources);
             }
         } else {
-            hitCount.incrementAndGet();
+            hitCount.increment();
         }
 
         return cacheEntry;
     }
 
     protected WebResource[] getResources(String path, boolean useClassLoaderResources) {
-        lookupCount.incrementAndGet();
+        lookupCount.increment();
 
         // Don't call noCache(path) since the class loader only caches
         // individual resources. Therefore, always cache collections here
@@ -196,7 +197,7 @@ public class Cache {
                 cacheEntry.validateResources(useClassLoaderResources);
             }
         } else {
-            hitCount.incrementAndGet();
+            hitCount.increment();
         }
 
         return cacheEntry.getWebResources();
@@ -291,11 +292,11 @@ public class Cache {
     }
 
     public long getLookupCount() {
-        return lookupCount.get();
+        return lookupCount.sum();
     }
 
     public long getHitCount() {
-        return hitCount.get();
+        return hitCount.sum();
     }
 
     public void setObjectMaxSize(int objectMaxSize) {
